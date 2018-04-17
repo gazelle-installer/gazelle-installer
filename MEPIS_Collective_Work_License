@@ -1,0 +1,104 @@
+MEPIS COLLECTIVE WORK LICENSE
+
+COPYRIGHT
+Unless stated otherwise, MEPIS software packages are unique collective 
+works under US copyright law.  Copyright (c) MEPIS LLC.  All rights 
+reserved.
+
+GRANT OF COLLECTIVE WORK LICENSE
+Except as specifically stated in a separate agreement, and subject to the 
+Terms and Conditions stated herein, MEPIS LLC hereby grants you the right 
+to install or redistribute this collective work for non-commercial purposes 
+for use with other legally obtained MEPIS software collections.
+
+TERMS AND CONDITIONS
+
+1. COMPONENT LICENSE RIGHTS
+Nothing in this collective work license limits your rights under, or grants
+you rights that supercede, the terms of any applicable component license.
+Each component is a separate collective or original work to the maximum 
+extent possible as defined by US copyright law. The inclusion in this 
+collection of a component subject to a particular license does not limit 
+your rights, or grant you rights in another component or in the collective 
+work that supercede, the terms of the license of that other work.
+
+2. LIMITED REDISTRIBUTION RIGHTS
+This collective work may contain some components of binary code that are 
+licensed under the GPLv2 license which limits your rights to redistribute 
+the GPLv2 licensed components of this collective work to third parties, 
+unless for a three year period you also distribute or formally offer to 
+distribute to ANY party the source code of the component binary code that 
+is licensed pursuant to the GPLv2 license. The Free Software Foundation of 
+Boston, MA, US, as author of the GPLv2 license, claims to strictly enforce 
+this requirement of the GPLv2 license for all parties with NO exceptions.
+
+3. RESPONSIBILITY TO COMPLY
+By using this package, you agree to comply with any applicable restrictions 
+and obligations imposed by the GPLv2 license or any other applicable license 
+and to hold MEPIS LLC and its assigns harmless in case of your knowing or
+unknowing violation thereof.
+
+4. AVAILABILITY OF SOURCE CODE
+You may obtain a copy of GPL licensed source code from the source code 
+package maintainer which is usually the next upstream copyright holder. 
+In the case of MEPIS products, most GPL licensed binary code is 
+redistributed without change.  In such cases, MEPIS is not a copyright
+holder in such code.  The maintained upstream sources of such code are 
+available in the public Ubuntu and Debian software repositories. 
+
+5. MEPIS OFFER OF SOURCE CODE
+MEPIS LLC hereby offers to provide, for three years from the original 
+timestamp on any included GPLv2 licensed binary package, to any third 
+party, a copy of the source code of the GPLv2 licensed binary code 
+that is distributed with this collection, except where MEPIS LLC is 
+prohibited from doing so by US law. For further details about this 
+offer or to obtain said source code, visit http://www.mepis.org/source
+
+6. NO WARRANTY
+Except as specifically stated in a separate agreement or a license for a
+particular component, to the maximum extent permitted under applicable law,
+the collective work and the components are provided and licensed AS-IS 
+without warranty of any kind, expressed or implied, including the implied 
+warranties of merchantability, non-infringement or fitness for a particular 
+purpose.
+
+7. ATTENTION US GOVERNMENT USERS
+The US Government's rights in this Software and accompanying documentation
+are only as set forth herein, in accordance with 48 CFR 227.7201 through
+227.7202-4 and 48 CFR 2.101 and 12.212.
+
+8. CRYPTOGRAPHIC SOFTWARE RESTRICTIONS
+Some MEPIS packages are collections of Software that contain unmodified 
+publicly available Open Source encryption source code which, together 
+with object code resulting from the compiling of publicly available
+source code, has been previously cleared for export from the United States
+under License Exception "TSU" pursuant to EAR Section 740.13(e).  Said
+source code and object code is publicly available at several web sites
+including ftp://mirror.mcs.anl.gov/pub/
+
+However, the knowing export or reexport of ANY cryptographic software and 
+technology, including MEPIS related packages, from the US to nationals of 
+Country Group E:1, currently Cuba, Iran, Libya, North Korea, Sudan, and 
+Syria, is prohibited by US Law.
+
+In addition, at this time there MAY be export or import restrictions for 
+products containing strong encryption (128 bit or greater) when sent to 
+or from Armenia, Azerbaijan, Belarus, Burma, Republic of Congo, Egypt, 
+France, Hong Kong, Israel, Kazakhstan, Liberia, Moldova, Nagorno-Karabakh, 
+Pakistan, Philippines, Poland, Russia, Rwanda, Saudi Arabia, Sierra Leone, 
+Somalia, Ukraine, Vietnam, or Yemen.
+
+These country lists are subject to change and other countries may impose 
+restrictions on the import, export, and/or use of encryption software.
+
+This legal notice applies to cryptographic software only. More detailed
+information is available at http://www.bxa.doc.gov/
+
+9. PREVAILING LAW
+Whereas MEPIS LLC is a US based entity subject to US laws, by using this 
+package, you agree that in cases of conflict of law US Copyright, Patent, 
+Trademark, Contract, and Export Law shall prevail.
+
+10. IMPLICIT ACCEPTANCE
+By using and/or installing a MEPIS collective work, you accept and agree 
+to comply with these Terms and Conditions.
