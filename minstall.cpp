@@ -1073,7 +1073,7 @@ bool MInstall::installLoader()
 
         if (boot == "") {
             //try fallback method
-            //modification for mmc/nmve devices that don't always update the parttype uuid
+            //modification for mmc/nvme devices that don't always update the parttype uuid
             cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
             qDebug() << "parted command" << cmd;
             boot = getCmdOut(cmd);
@@ -1081,7 +1081,7 @@ bool MInstall::installLoader()
                 qDebug() << "could not find ESP on: " << bootdrv;
                 return false;
             }
-            if (bootdrv.contains("nmve") || bootdrv.contains("mmcblk")) {
+            if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
                 boot = QString(bootdrv + "p" + boot);
             } else {
                 boot = QString(bootdrv + boot);
