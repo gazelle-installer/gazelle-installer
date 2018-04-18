@@ -1,4 +1,4 @@
-mx-installer (18.4.11) mx; urgency=medium
+gazelle-installer (18.4.11) mx; urgency=medium
 
   * switch to gazelle-installer source base
 
