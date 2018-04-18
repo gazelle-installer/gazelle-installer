@@ -9,25 +9,9 @@ Build-Depends: qt5-qmake,
 Standards-Version: 3.9.8
 Homepage: https://github.com/gazelle-installer
 
-Package: gazelle-installer
-Replaces: mx-installer, antix-installer
+Package: antix-installer
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, gazelle-installer-data, fskbsetting, os-prober, gdisk, partition-info , antix-libs, grub-efi-amd64-bin [amd64], grub-efi-ia32-bin, parted, ecryptfs-utils, cryptsetup
+Depends: ${misc:Depends}, ${shlibs:Depends}, installer-data-antix, fskbsetting, os-prober, gdisk, partition-info , antix-libs, grub-efi-amd64-bin [amd64], grub-efi-ia32-bin, parted, ecryptfs-utils, cryptsetup
 Recommends: gparted
 Description: Customizable GUI installer for MX Linux and antiX Linux
 
-Package: mx-installer
-Depends: gazelle-installer, ${misc:Depends}
-Architecture: all
-Priority: optional
-Section: oldlibs
-Description: transitional package
-  This is a transitional package. It can safely be removed.
-  
-Package: antix-installer
-Depends: gazelle-installer, ${misc:Depends}
-Architecture: all
-Priority: optional
-Section: oldlibs
-Description: transitional package
-  This is a transitional package. It can safely be removed.
