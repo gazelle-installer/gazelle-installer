@@ -27,14 +27,14 @@ MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
 {
     setupUi(this);
     this->args = args;
-    labelMX->setPixmap(QPixmap("/usr/share/installer-data/logo.png"));
+    labelMX->setPixmap(QPixmap("/usr/share/gazelle-installer-data/logo.png"));
     char line[260];
     char *tok;
     FILE *fp;
     int i;
 
     //setup system variables
-    QSettings settings("/usr/share/installer-data/installer.conf", QSettings::NativeFormat);
+    QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
     PROJECTNAME=settings.value("PROJECT_NAME").toString();
     PROJECTSHORTNAME=settings.value("PROJECT_SHORTNAME").toString();
     PROJECTVERSION=settings.value("VERSION").toString();
@@ -49,7 +49,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
     PREFERRED_MIN_INSTALL_SIZE=settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
 
     //do not offer home folder encyrption if so configured in installer.conf
-    QString OFFER_HOME_ENCRYPTION = getCmdOut("grep OFFER_HOME_ENCRYPTION /usr/share/installer-data/installer.conf |cut -d= -f2").simplified().toLower();
+    QString OFFER_HOME_ENCRYPTION = getCmdOut("grep OFFER_HOME_ENCRYPTION /usr/share/gazelle-installer-data/installer.conf |cut -d= -f2").simplified().toLower();
     qDebug() << "Offer Home Encryption is " << OFFER_HOME_ENCRYPTION;
     if ( OFFER_HOME_ENCRYPTION == "false" ) {
     encryptCheckBox->hide();
@@ -2060,7 +2060,7 @@ void MInstall::buildServiceList()
     csView->header()->setMinimumSectionSize(150);
     csView->header()->resizeSection(0,150);
 
-    QSettings services_desc("/usr/share/installer-data/services.list", QSettings::NativeFormat);
+    QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
 
     foreach (const QString &service, ENABLE_SERVICES) {
         QString lang_str = (lang == "EN")? "" : "_" + lang;
