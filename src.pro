@@ -31,5 +31,5 @@ SOURCES += app.cpp mmain.cpp minstall.cpp
 LIBS += -lcrypt
 CONFIG += release warn_on thread qt
 
-RESOURCES += \
-    images.qrc
+#RESOURCES += \
+#    images.qrc
