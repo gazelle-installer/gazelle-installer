@@ -160,7 +160,7 @@ padding: 8px</string>
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>../../../../usr/share/installer-data/backdrop-textbox.png</pixmap>
+        <pixmap>../../../../usr/share/gazelle-installer-data/backdrop-textbox.png</pixmap>
        </property>
       </widget>
       <zorder>helpbackdrop</zorder>
