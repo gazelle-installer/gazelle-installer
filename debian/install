@@ -1,7 +1,7 @@
 translations/*.qm               usr/share/gazelle-installer/locale
 locales.template                usr/share/antiX
 copyright		        usr/share/doc/gazelle-installer
-LICENSE				usr/share/doc/mx-installer 
+LICENSE				usr/share/doc/gazelle-installer 
 NOTICE                          usr/share/doc/gazelle-installer
 MEPIS_Collective_Work_License   usr/share/doc/gazelle-installer
 minstall                        usr/sbin 
