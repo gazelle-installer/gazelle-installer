@@ -1,7 +1,7 @@
 //
 //  Copyright (C) 2003-2010 by Warren Woodford
 //  Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
-//
+//  Heavily revised by dolphin oracle, adrian, and anticaptialista 2018.
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
 //   You may obtain a copy of the License at
@@ -1073,7 +1073,7 @@ bool MInstall::installLoader()
 
         if (boot == "") {
             //try fallback method
-            //modification for mmc/nmve devices that don't always update the parttype uuid
+            //modification for mmc/nvme devices that don't always update the parttype uuid
             cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
             qDebug() << "parted command" << cmd;
             boot = getCmdOut(cmd);
@@ -1081,7 +1081,7 @@ bool MInstall::installLoader()
                 qDebug() << "could not find ESP on: " << bootdrv;
                 return false;
             }
-            if (bootdrv.contains("nmve") || bootdrv.contains("mmcblk")) {
+            if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
                 boot = QString(bootdrv + "p" + boot);
             } else {
                 boot = QString(bootdrv + boot);
