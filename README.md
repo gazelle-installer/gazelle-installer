@@ -20,3 +20,5 @@ Services to show in the Services tab are also configurable through services.list
 For now the services tab supports sysVinit enable/disable actions. 
 
 See gazelle-installer-data services.list and installer.conf for instructions on configuration options.
+
+gazelle-installer is maintained by the MX Linux and antiX Linux Projects.
