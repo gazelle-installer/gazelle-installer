@@ -9,5 +9,6 @@
 # In order to enable or disable this script just change the execution
 # bits.
 #
-
+make-fstab &
+sed -i '12,13d' /etc/rc.local
 exit 0
