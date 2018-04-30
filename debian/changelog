@@ -1,3 +1,9 @@
+gazelle-installer (1.0.1) unstable; urgency=medium
+
+  * more btrfs options
+
+ -- anticapitalista <antix@operamail.com>  Tue, 24 Apr 2018 19:27:25 +0300
+
 gazelle-installer (1.0.0) unstable; urgency=medium
 
   * antiX build of generic gazelle installer
