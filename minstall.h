@@ -85,7 +85,7 @@ public:
     bool makeLinuxPartition(QString dev, const char *type, bool bad, QString label);
     bool makeSwapPartition(QString dev);
     bool makeEsp(QString drv, int size);
-    bool mountPartition(QString dev, const char *point);
+    bool mountPartition(QString dev, const char *point, const char *mopts);
     bool removeKernel();
     bool setComputerName();
     bool setPasswords();
