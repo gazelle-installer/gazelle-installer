@@ -2,7 +2,7 @@
 
 ME=${0##*/}
 
-PURGE_PACKAGES=""
+PURGE_PACKAGES="live-init-antix live-init-mx"
 W_MANAGERS="fluxbox icewm jwm"
 PRETEND=
 
@@ -59,10 +59,10 @@ main() {
     del_line_skel "antixsources.sh"          ".%s/menu"
     del_line_skel "antixsources.desktop"     $rox_pb
     rm_file_skel  "Desktop/Installer"
-    
-    
 
     rm_file       etc/udev/rules.d/90-fstab-automount.rules
+    rm_file       etc/*.bak 
+    rm_file       etc/*-
     rm_file       lib/udev/rules.d/92-console-font.rules
 
     cp_file       /usr/share/antiX/rc.local.install etc/rc.local
@@ -72,7 +72,6 @@ main() {
     cp_dir        /etc/init.d/debian etc/init.d
     rm_dir        etc/init.d/debian
 
-    rm_file        etc/skel/Desktop/Installer.desktop
     rm_file        usr/share/applications/antix/minstall.desktop
     rm_file        usr/share/applications/antix/antixsources.desktop
     rm_file        usr/share/applications/antix/persist-config.desktop

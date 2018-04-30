@@ -650,7 +650,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string notr="true">homeMX</string>
+             <string notr="true">homeantiX</string>
             </property>
             <property name="maxLength">
              <number>16</number>
@@ -741,6 +741,16 @@
             <item>
              <property name="text">
               <string>btrfs</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>btrfs-zlib</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>btrfs-lzo</string>
              </property>
             </item>
             <item>
@@ -1056,7 +1066,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Ready to install MX Linux filesystem</string>
+             <string>Ready to install antiX Linux filesystem</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
