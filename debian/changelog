@@ -1,4 +1,10 @@
-gazelle-installer (1.0.1) unstable; urgency=medium
+gazelle-installer (1.0.3) unstable; urgency=medium
+
+  * working on making POPULATE_MEDIA_MOUNTPOINTS configurable with btrfs changes 
+
+ -- dolphinoracle <dolphinoracle@gmail.com>  Mon, 30 Apr 2018 20:13:53 -0400
+
+gazelle-installer (1.0.2) unstable; urgency=medium
 
   * more btrfs options
 

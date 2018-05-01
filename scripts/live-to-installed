@@ -72,6 +72,7 @@ main() {
     cp_dir        /etc/init.d/debian etc/init.d
     rm_dir        etc/init.d/debian
 
+    rm_file        etc/skel/Desktop/Installer.desktop
     rm_file        usr/share/applications/antix/minstall.desktop
     rm_file        usr/share/applications/antix/antixsources.desktop
     rm_file        usr/share/applications/antix/persist-config.desktop
