@@ -1,6 +1,7 @@
 gazelle-installer (1.0.3) unstable; urgency=medium
 
   * working on making POPULATE_MEDIA_MOUNTPOINTS configurable with btrfs changes 
+  * moved rc.local.install and live-to-install scripts to data deb
 
  -- dolphinoracle <dolphinoracle@gmail.com>  Mon, 30 Apr 2018 20:13:53 -0400
 
