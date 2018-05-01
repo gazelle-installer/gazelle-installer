@@ -470,13 +470,13 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
     char line[260];
     isFormatExt4 = false;
     if (strncmp(type, "reiserfs", 4) == 0) {
-        cmd = QString("/sbin/mkfs.reiserfs -q %1 -l \"%2\"").arg(dev).arg(label);
+        cmd = QString("mkfs.reiserfs -q %1 -l \"%2\"").arg(dev).arg(label);
 	isFormatReiserfs = true;
         mntops = "defaults,noatime";
     } else {
         if (strncmp(type, "reiser4", 4) == 0) {
             // reiser4
-            cmd = QString("/sbin/mkfs.reiser4 -f -y %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.reiser4 -f -y %1 -L \"%2\"").arg(dev).arg(label);
             isFormatReiser4 = true;
             mntops = "defaults,noatime";
         } else {
@@ -484,10 +484,10 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
                 // ext3
                 if (bad) {
                     // do with badblocks
-                    cmd = QString("/sbin/mkfs.ext3 -c %1 -L \"%2\"").arg(dev).arg(label);
+                    cmd = QString("mkfs.ext3 -c %1 -L \"%2\"").arg(dev).arg(label);
                 } else {
                     // do no badblocks
-                    cmd = QString("/sbin/mkfs.ext3 -F %1 -L \"%2\"").arg(dev).arg(label);
+                    cmd = QString("mkfs.ext3 -F %1 -L \"%2\"").arg(dev).arg(label);
                 }
                 isFormatExt3 = true;
               	mntops = "defaults,noatime";
@@ -496,10 +496,10 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
                     // ext2
                     if (bad) {
                         // do with badblocks
-                        cmd = QString("/sbin/mkfs.ext2 -c %1 -L \"%2\"").arg(dev).arg(label);
+                        cmd = QString("mkfs.ext2 -c %1 -L \"%2\"").arg(dev).arg(label);
                     } else {
                         // do no badblocks
-                        cmd = QString("/sbin/mkfs.ext2 -F %1 -L \"%2\"").arg(dev).arg(label);
+                        cmd = QString("mkfs.ext2 -F %1 -L \"%2\"").arg(dev).arg(label);
                     }
                     isFormatExt2 = true;
                     mntops = "defaults,noatime";
@@ -519,9 +519,9 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
                         size = size / 1024; // in MiB
                         // if drive is smaller than 6GB, create in mixed mode
                         if (size < 6000) {
-                            cmd = QString("/sbin/mkfs.btrfs -f -M -O skinny-metadata %1 -L \"%2\"").arg(dev).arg(label);
+                            cmd = QString("mkfs.btrfs -f -M -O skinny-metadata %1 -L \"%2\"").arg(dev).arg(label);
 			} else {
-                            cmd = QString("/sbin/mkfs.btrfs -f %1 -L \"%2\"").arg(dev).arg(label);
+                            cmd = QString("mkfs.btrfs -f %1 -L \"%2\"").arg(dev).arg(label);
                         }
                         // if compression has been selected by user, set flag
                         if (strncmp(type, "btrfs-zlib", 8) == 0) {
@@ -541,10 +541,10 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
                         if (strncmp(type, "xfs", 4) == 0) {
                             if (bad) {
                                 // do with badblocks
-                                cmd = QString("/sbin/mkfs.xfs -f -c %1 -L \"%2\"").arg(dev).arg(label);
+                                cmd = QString("mkfs.xfs -f -c %1 -L \"%2\"").arg(dev).arg(label);
                             } else {
                                 // do no badblocks
-                                cmd = QString("/sbin/mkfs.xfs -f %1 -L \"%2\"").arg(dev).arg(label);
+                                cmd = QString("mkfs.xfs -f %1 -L \"%2\"").arg(dev).arg(label);
                             }
                             isFormatXfs = true;
                             mntops = "defaults,noatime";
@@ -553,10 +553,10 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
                             if (strncmp(type, "jfs", 4) == 0) {
                                 if (bad) {
                                     // do with badblocks
-                                    cmd = QString("/sbin/mkfs.jfs -q -c %1 -L \"%2\"").arg(dev).arg(label);
+                                    cmd = QString("mkfs.jfs -q -c %1 -L \"%2\"").arg(dev).arg(label);
                                 } else {
                                     // do no badblocks
-                                    cmd = QString("/sbin/mkfs.jfs -q %1 -L \"%2\"").arg(dev).arg(label);
+                                    cmd = QString("mkfs.jfs -q %1 -L \"%2\"").arg(dev).arg(label);
                                 }
                                 isFormatJfs = true;
                                 mntops = "defaults,noatime";
@@ -564,10 +564,10 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
                                 // must be ext4
                                 if (bad) {
                                     // do with badblocks
-                                    cmd = QString("/sbin/mkfs.ext4 -c %1 -L \"%2\"").arg(dev).arg(label);
+                                    cmd = QString("mkfs.ext4 -c %1 -L \"%2\"").arg(dev).arg(label);
                                 } else {
                                     // do no badblocks
-                                    cmd = QString("/sbin/mkfs.ext4 -F %1 -L \"%2\"").arg(dev).arg(label);
+                                    cmd = QString("mkfs.ext4 -F %1 -L \"%2\"").arg(dev).arg(label);
                                 }
                                 isFormatExt4 = true;
                                 mntops = "defaults,noatime";
@@ -812,7 +812,7 @@ bool MInstall::makeChosenPartitions()
 
     if (rootdev.compare("/dev/none") == 0 || rootdev.compare("/dev/") == 0) {
         QMessageBox::critical(0, QString::null,
-                              tr("You must choose a root partition.\nThe root partition must be at least 3.5 GB."));
+                              tr("You must choose a root partition.\nThe root partition must be at least %1 .").arg(MIN_INSTALL_SIZE));
         return false;
     }
 
@@ -1211,11 +1211,27 @@ bool MInstall::installLoader()
     system(cmd.toUtf8());
     // update grub config
     runCmd("chroot /mnt/antiX update-grub");
-    if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
-      runCmd("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media"); 
-     } else {
-      runCmd("/sbin/make-fstab -f /mnt/antiX/etc/fstab --mntpnt=/media");
-     }
+
+    //create fstab file
+    //if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
+    if (POPULATE_MEDIA_MOUNTPOINTS) {
+        //if compressed btrfs filesystem is not used, use default locate for fstab
+        if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
+            runCmd("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
+        } else {
+            // if compressed btrfs filessystem is used, specify the -f switch
+            runCmd("/sbin/make-fstab -f /mnt/antiX/etc/fstab --mntpnt=/media");
+        }
+    } else {
+        //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
+        //but do check for compressed btrfs filesystem
+        if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
+            runCmd("/sbin/make-fstab --install /mnt/antiX");
+        } else {
+            // if compressed btrfs filessystem is used, specify the -f switch
+            runCmd("/sbin/make-fstab --install /mnt/antiX -f /mnt/antiX/etc/fstab");
+        }
+    }
 	runCmd("chroot /mnt/antiX dev2uuid_fstab");  
     runCmd("chroot /mnt/antiX update-initramfs -u -t -k all");
     system("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
