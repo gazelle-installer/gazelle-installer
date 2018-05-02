@@ -15,17 +15,19 @@
 //   limitations under the License.
 //
 
-#include <sys/stat.h>
-#include <sys/swap.h>
-#include <unistd.h>
-#include <dirent.h>
 #include <QFile>
 #include <QMessageBox>
 #include <QProcess>
 #include <QTimer>
 #include <QProgressDialog>
-#include <QtConcurrent/QtConcurrent>
+
+#include <sys/stat.h>
+#include <sys/swap.h>
+#include <unistd.h>
+#include <dirent.h>
+
 #include "ui_meinstall.h"
+#include "cmd.h"
 
 class MInstall : public QWidget, public Ui::MeInstall {
     Q_OBJECT
@@ -33,7 +35,6 @@ protected:
     QProcess *proc;
     QTimer *timer;
     QProgressBar *bar;
-    QFutureWatcher<void> futureWatcher;
     QDialog *mmn;
 
 
@@ -59,14 +60,12 @@ public:
     static QStringList getCmdValues(QString cmd, QString key, QString keydel, QString valdel);
     static bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
     static int getPartitionNumber();
-    static int command(const QString &string);
 
     bool is32bit();
     bool is64bit();
     bool isInsideVB();
     bool isGpt(QString drv);
     bool isUefi();
-    int runCmd(QString cmd);
 
     void buildServiceList();
     void copyLinux();
@@ -85,7 +84,7 @@ public:
     bool makeLinuxPartition(QString dev, const char *type, bool bad, QString label);
     bool makeSwapPartition(QString dev);
     bool makeEsp(QString drv, int size);
-    bool mountPartition(QString dev, const char *point, const char *mopts);
+    bool mountPartition(const QString dev, const QString point, const QString mopts);
     bool removeKernel();
     bool setComputerName();
     bool setPasswords();
@@ -145,4 +144,7 @@ private slots:
     void on_encryptCheckBox_toggled(bool checked);
     void on_saveHomeCheck_toggled(bool checked);
     void on_buttonSetKeyboard_clicked();
+
+private:
+    Cmd *shellcmd;
 };

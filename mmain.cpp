@@ -15,10 +15,13 @@
 //   limitations under the License.
 //
 
+#include <QSettings>
+#include <QDebug>
+
 #include "mmain.h"
 #include "minstall.h"
 
-#include "QDebug"
+
 
 MInstall *minstall;
 bool firstShow;
