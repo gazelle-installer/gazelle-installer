@@ -1202,8 +1202,8 @@ bool MInstall::installLoader()
         if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
             shellcmd->run("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
         } else {
-            // if compressed btrfs filessystem is used, specify the -f switch
-            shellcmd->run("/sbin/make-fstab -f /mnt/antiX/etc/fstab --mntpnt=/media");
+            // if compressed btrfs filessystem is used, specify the -O switch
+            shellcmd->run("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
         }
     } else {
         //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
@@ -1211,8 +1211,8 @@ bool MInstall::installLoader()
         if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
             shellcmd->run("/sbin/make-fstab --install /mnt/antiX");
         } else {
-            // if compressed btrfs filessystem is used, specify the -f switch
-            shellcmd->run("/sbin/make-fstab --install /mnt/antiX -f /mnt/antiX/etc/fstab");
+            // if compressed btrfs filessystem is used, specify the -O switch
+            shellcmd->run("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
         }
     }
     shellcmd->run("chroot /mnt/antiX dev2uuid_fstab");
