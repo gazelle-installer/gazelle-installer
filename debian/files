@@ -1,0 +1,3 @@
+antix-installer-dbgsym_1.0.3_amd64.deb debug extra
+antix-installer_1.0.3_amd64.deb system optional
+gazelle-installer_1.0.3_amd64.buildinfo system optional
