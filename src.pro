@@ -24,7 +24,8 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_sk.ts \
                 translations/gazelle-installer_sv.ts \
                 translations/gazelle-installer_tr.ts \
-                translations/gazelle-installer_uk.ts
+                translations/gazelle-installer_uk.ts \
+                translations/gazelle-installer_zh_TW.ts
 FORMS += memain.ui meinstall.ui
 HEADERS += mmain.h minstall.h
 SOURCES += app.cpp mmain.cpp minstall.cpp
