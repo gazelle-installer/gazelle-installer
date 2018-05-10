@@ -2201,7 +2201,7 @@ void MInstall::on_viewServicesButton_clicked()
 void MInstall::on_qtpartedButton_clicked()
 {
     system("/sbin/swapoff -a 2>&1");
-    system("/usr/sbin/gparted");
+    shellcmd->run("/usr/sbin/gparted");
     system("make-fstab -s");
     system("/sbin/swapon -a 2>&1");
     this->updatePartitionWidgets();
