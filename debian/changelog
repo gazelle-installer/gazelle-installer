@@ -1,3 +1,9 @@
+gazelle-installer (1.0.4) unstable; urgency=medium
+
+  *  use libcmd to call gparted...fix to video corruption issue
+
+ -- dolphinoracle <dolphinoracle@gmail.com>  Wed, 09 May 2018 21:34:08 -0400
+
 gazelle-installer (1.0.3) unstable; urgency=medium
 
   * working on making POPULATE_MEDIA_MOUNTPOINTS configurable with btrfs changes 
