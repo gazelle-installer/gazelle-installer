@@ -1358,7 +1358,7 @@ bool MInstall::setUserName()
         }
     }
     // fix the ownership, demo=newuser
-    cmd = QString("chown -R demo.users %1").arg(dpath);
+    cmd = QString("chown -R demo:demo %1").arg(dpath);
     if (shellcmd->run(cmd.toUtf8()) != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(0, QString::null,
