@@ -19,10 +19,32 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QSettings>
+#include <QtConcurrent/QtConcurrent>
 
 #include "minstall.h"
 #include "mmain.h"
 #include "cmd.h"
+
+int MInstall::command(const QString &cmd)
+{
+    qDebug() << cmd;
+    return system(cmd.toUtf8());
+}
+
+// helping function that runs a bash command in an event loop
+int MInstall::runCmd(QString cmd)
+{
+    QEventLoop loop;
+    QFutureWatcher<int> futureWatcher;
+    QFuture<int> future;
+    future = QtConcurrent::run(command, cmd);
+    futureWatcher.setFuture(future);
+    connect(&futureWatcher, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+    qDebug() << "Exit code: " << future.result();
+    return future.result();
+}
+
 
 
 void MInstall::keyPressEvent(QKeyEvent *event)
@@ -1095,6 +1117,7 @@ bool MInstall::installLoader()
         part_num.remove(QRegularExpression("\\D+\\d*\\D+")); // remove the non-digit part to get the number of the root partition
         drive.remove(QRegularExpression("\\d*$|p\\d*$"));    // remove partition number to get the root drive
         if (!isGpt("/dev/" + drive)) {
+            qDebug() << "parted -s /dev/" + drive.toUtf8() + " set " + part_num.toUtf8() + " boot on";
             system("parted -s /dev/" + drive.toUtf8() + " set " + part_num.toUtf8() + " boot on");
         }
     } else if (grubRootButton->isChecked()) {
@@ -1158,8 +1181,10 @@ bool MInstall::installLoader()
     if (!grubEspButton->isChecked()) {
         cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot /dev/%1").arg(boot);
     } else {
+        qDebug("mkdir /mnt/antiX/boot/efi");
         system("mkdir /mnt/antiX/boot/efi");
         QString mount = QString("mount /dev/%1 /mnt/antiX/boot/efi").arg(boot);
+        qDebug() << mount;
         system(mount.toUtf8());
         // rename arch to match grub-install target
         QString arch = getCmdOut("cat /sys/firmware/efi/fw_platform_size");
@@ -1171,20 +1196,17 @@ bool MInstall::installLoader()
         QString release = getCmdOut("lsb_release -rs");
         cmd = QString("chroot /mnt/antiX grub-install --target=%1-efi --efi-directory=/boot/efi --bootloader-id=" + PROJECTSHORTNAME +"%2 --recheck").arg(arch).arg(release);
     }
-    QEventLoop loop;
-    QProcess proc;
-    connect(&proc, SIGNAL(finished(int)), &loop, SLOT(quit()));
-    proc.start("/bin/bash", QStringList() << "-c" << cmd);
-    loop.exec();
 
-    if (proc.exitCode() != 0 || proc.exitStatus() != 0) {
+    if (runCmd(cmd) != 0) {
         // error
         progress->close();
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function."));
+        qDebug("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
         system("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
         if (system("mountpoint -q /mnt/antiX/boot/efi") == 0) {
+            qDebug("umount /mnt/antiX/boot/efi");
             system("umount /mnt/antiX/boot/efi");
         }
         nextButton->setEnabled(true);
@@ -1199,34 +1221,42 @@ bool MInstall::installLoader()
 //        cmdline.prepend("zswap.zpool=zsmalloc ");
 //    }
     cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(cmdline);
+    qDebug() << cmd;
     system(cmd.toUtf8());
     // update grub config
-    system("chroot /mnt/antiX update-grub");
+    runCmd("chroot /mnt/antiX update-grub");
 
     //create fstab file
     //if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     if (POPULATE_MEDIA_MOUNTPOINTS) {
         //if compressed btrfs filesystem is not used, use default locate for fstab
         if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
+            qDebug("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
             system("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
         } else {
             // if compressed btrfs filessystem is used, specify the -O switch
+            qDebug("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
             system("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
         }
     } else {
         //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
         //but do check for compressed btrfs filesystem
         if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
+            qDebug("/sbin/make-fstab --install /mnt/antiX");
             system("/sbin/make-fstab --install /mnt/antiX");
         } else {
             // if compressed btrfs filessystem is used, specify the -O switch
+            qDebug("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
             system("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
         }
     }
+    qDebug("chroot /mnt/antiX dev2uuid_fstab");
     system("chroot /mnt/antiX dev2uuid_fstab");
-    shell.run("chroot /mnt/antiX update-initramfs -u -t -k all");
+    runCmd("chroot /mnt/antiX update-initramfs -u -t -k all");
+    qDebug("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
     system("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
     if (system("mountpoint -q /mnt/antiX/boot/efi") == 0) {
+        qDebug("umount /mnt/antiX/boot/efi");
         system("umount /mnt/antiX/boot/efi");
     }
 
