@@ -1142,7 +1142,6 @@ bool MInstall::installLoader()
     progress->setLabelText(tr("Please wait till GRUB is installed, it might take a couple of minutes."));
     progress->setAutoClose(false);
     progress->setBar(bar);
-    progress->setWindowTitle(this->windowTitle());
     bar->setTextVisible(false);
     timer->start(100);
     connect(timer, SIGNAL(timeout()), this, SLOT(procTime()));
@@ -1202,7 +1201,7 @@ bool MInstall::installLoader()
     cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(cmdline);
     system(cmd.toUtf8());
     // update grub config
-    shell.run("chroot /mnt/antiX update-grub");
+    system("chroot /mnt/antiX update-grub");
 
     //create fstab file
     //if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
