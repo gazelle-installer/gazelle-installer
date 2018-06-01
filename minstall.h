@@ -36,7 +36,7 @@ protected:
     QTimer *timer;
     QProgressBar *bar;
     QDialog *mmn;
-
+    void keyPressEvent(QKeyEvent* event);
 
 public:
     /** constructor */
@@ -132,9 +132,6 @@ public slots:
     void copyDone(int, QProcess::ExitStatus exitStatus);
     void copyTime();
     void procTime();
-
-
-
 
 private slots:
     void on_viewServicesButton_clicked();

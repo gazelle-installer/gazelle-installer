@@ -25,7 +25,14 @@
 #include "cmd.h"
 
 
-
+void MInstall::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape) {
+        if (widgetStack->currentWidget() != Step_Boot) { // don't close on GRUB installation by mistake
+            on_closeButton_clicked();
+        }
+    }
+}
 
 MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
 {
@@ -1063,7 +1070,6 @@ void MInstall::copyLinux()
 // build a grub configuration and install grub
 bool MInstall::installLoader()
 {
-    Cmd shell;
     QString cmd;
     QString val = getCmdOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1089,13 +1095,13 @@ bool MInstall::installLoader()
         part_num.remove(QRegularExpression("\\D+\\d*\\D+")); // remove the non-digit part to get the number of the root partition
         drive.remove(QRegularExpression("\\d*$|p\\d*$"));    // remove partition number to get the root drive
         if (!isGpt("/dev/" + drive)) {
-            shell.run("parted -s /dev/" + drive + " set " + part_num + " boot on");
+            system("parted -s /dev/" + drive.toUtf8() + " set " + part_num.toUtf8() + " boot on");
         }
     } else if (grubRootButton->isChecked()) {
         boot = rootpart;
     } else if (grubEspButton->isChecked()) {
 //        if (entireDiskButton->isChecked()) { // don't use PMBR if installing on ESP and doing automatic partitioning
-//            shell.run("parted -s /dev/" + bootdrv + " disk_set pmbr_boot off");
+//            system("parted -s /dev/" + bootdrv + " disk_set pmbr_boot off");
 //        }
         // find first ESP on the boot disk
 
@@ -1136,11 +1142,13 @@ bool MInstall::installLoader()
     progress->setLabelText(tr("Please wait till GRUB is installed, it might take a couple of minutes."));
     progress->setAutoClose(false);
     progress->setBar(bar);
+    progress->setWindowTitle(this->windowTitle());
     bar->setTextVisible(false);
     timer->start(100);
     connect(timer, SIGNAL(timeout()), this, SLOT(procTime()));
     progress->show();
     qApp->processEvents();
+    nextButton->setEnabled(false);
 
     // set mounts for chroot
     system("mount -o bind /dev /mnt/antiX/dev");
@@ -1153,7 +1161,7 @@ bool MInstall::installLoader()
     } else {
         system("mkdir /mnt/antiX/boot/efi");
         QString mount = QString("mount /dev/%1 /mnt/antiX/boot/efi").arg(boot);
-        shell.run(mount);
+        system(mount.toUtf8());
         // rename arch to match grub-install target
         QString arch = getCmdOut("cat /sys/firmware/efi/fw_platform_size");
         if (arch == "32") {
@@ -1164,22 +1172,24 @@ bool MInstall::installLoader()
         QString release = getCmdOut("lsb_release -rs");
         cmd = QString("chroot /mnt/antiX grub-install --target=%1-efi --efi-directory=/boot/efi --bootloader-id=" + PROJECTSHORTNAME +"%2 --recheck").arg(arch).arg(release);
     }
-    if (shell.run(cmd) != 0) {
-        // error, try again
-        // this works for reiser-grub bug
-        qDebug() << "error installing Grub, trying again";
-        if (shell.run(cmd) != 0) {
-            // error
-            progress->close();
-            setCursor(QCursor(Qt::ArrowCursor));
-            QMessageBox::critical(this, QString::null,
-                                  tr("Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function."));
-            system("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
-            if (system("mountpoint -q /mnt/antiX/boot/efi") == 0) {
-                system("umount /mnt/antiX/boot/efi");
-            }
-            return false;
+    QEventLoop loop;
+    QProcess proc;
+    connect(&proc, SIGNAL(finished(int)), &loop, SLOT(quit()));
+    proc.start("/bin/bash", QStringList() << "-c" << cmd);
+    loop.exec();
+
+    if (proc.exitCode() != 0 || proc.exitStatus() != 0) {
+        // error
+        progress->close();
+        setCursor(QCursor(Qt::ArrowCursor));
+        QMessageBox::critical(this, QString::null,
+                              tr("Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function."));
+        system("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
+        if (system("mountpoint -q /mnt/antiX/boot/efi") == 0) {
+            system("umount /mnt/antiX/boot/efi");
         }
+        nextButton->setEnabled(true);
+        return false;
     }
 
     // replace "quiet" in /etc/default/grub with the non-live boot codes
@@ -1199,22 +1209,22 @@ bool MInstall::installLoader()
     if (POPULATE_MEDIA_MOUNTPOINTS) {
         //if compressed btrfs filesystem is not used, use default locate for fstab
         if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
-            shell.run("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
+            system("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
         } else {
             // if compressed btrfs filessystem is used, specify the -O switch
-            shell.run("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
+            system("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
         }
     } else {
         //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
         //but do check for compressed btrfs filesystem
         if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
-            shell.run("/sbin/make-fstab --install /mnt/antiX");
+            system("/sbin/make-fstab --install /mnt/antiX");
         } else {
             // if compressed btrfs filessystem is used, specify the -O switch
-            shell.run("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
+            system("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
         }
     }
-    shell.run("chroot /mnt/antiX dev2uuid_fstab");
+    system("chroot /mnt/antiX dev2uuid_fstab");
     shell.run("chroot /mnt/antiX update-initramfs -u -t -k all");
     system("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
     if (system("mountpoint -q /mnt/antiX/boot/efi") == 0) {
@@ -1224,6 +1234,7 @@ bool MInstall::installLoader()
     setCursor(QCursor(Qt::ArrowCursor));
     timer->stop();
     progress->close();
+    nextButton->setEnabled(true);
     return true;
 }
 
@@ -1817,14 +1828,13 @@ int MInstall::showPage(int curr, int next)
             break;
         }
     }
-    if (next == 1 && curr == 0) {
-    } else if (next == 2 && curr == 1) {
+    if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
             return 3;
         }
-    } else if (next == 3 && curr == 4) {
+    } else if (next == 3 && curr == 4) { // at Step_Boot screen (back)
         return 1;
-    } else if (next == 5 && curr == 4) {
+    } else if (next == 5 && curr == 4) { // at Step_Boot screen (forward)
         if (pretend) {
             return next + 1; // skip Services screen
         }
@@ -1833,22 +1843,23 @@ int MInstall::showPage(int curr, int next)
         } else {
             return next + 1; // skip Services screen
         }
-
-    } else if (next == 9 && curr == 8) {
+    } else if (next == 9 && curr == 8) { // at Step_User_Accounts (forward)
         if (pretend) {
             return next;
         }
         if (!setUserInfo()) {
             return curr;
         }
-    } else if (next == 7 && curr == 6) {
+    } else if (next == 7 && curr == 6) { // at Step_Network (forward)
         if (pretend) {
             return next;
         }
         if (!setComputerName()) {
             return curr;
         }
-    } else if (next == 8 && curr == 7) {
+    } else if (next == 5 && curr == 6) { // at Step_Network (forward)
+       return 4; // go to Step_Boot
+    } else if (next == 8 && curr == 7) { // at Step_Localization (forward)
         if (pretend) {
             return next;
         }
@@ -1862,13 +1873,13 @@ int MInstall::showPage(int curr, int next)
             setCursor(QCursor(Qt::ArrowCursor));
             next +=1;
         }
-    } else if (next == 6 && curr == 5) {
+    } else if (next == 6 && curr == 5) { // at Step_Services (forward)
         if (pretend) {
-            return 7;
+            return 7; // Step_Localization
         }
         setServices();
         return 7; // goes back to the screen that called Services screen
-    } else if (next == 4 && curr == 5) {
+    } else if (next == 4 && curr == 5) { // at Step_Services (backward)
         return 7; // goes back to the screen that called Services screen
     }
     return next;
@@ -1909,6 +1920,7 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 3:
+        backButton->setEnabled(false);
         foreach (const QString &arg, args) {
             if(arg == "--pretend" || arg == "-p") {
                 buildServiceList(); // build anyway
@@ -1980,8 +1992,6 @@ void MInstall::pageDisplayed(int next)
                                        "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                                        "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                                        "with a local computer that is running MS-Windows or Mac OSX.</p>"));
-        nextButton->setEnabled(true);
-        backButton->setEnabled(false);
         break;
 
     case 7:
@@ -1990,8 +2000,6 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
                                        "<p><b>Timezone Settings</b><br/>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</p>"
                                        "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
-        nextButton->setEnabled(true);
-        backButton->setEnabled(false);
         break;
 
     case 8:
@@ -2010,8 +2018,6 @@ void MInstall::pageDisplayed(int next)
                                                                                                                                      "Many of the apps were developed specifically for the %1 project. "
                                                                                                                                      "These are shown in the main menus. "
                                                                                                                                      "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME));
-        nextButton->setEnabled(true);
-        backButton->setEnabled(false);
         break;
 
     default:
@@ -2040,6 +2046,8 @@ void MInstall::gotoPage(int next)
     int c = widgetStack->count();
     if (next >= c-1) {
         // entering the last page
+        backButton->setEnabled(false);
+        backButton->hide();
         nextButton->setText(tr("Finish"));
     } else {
         nextButton->setText(tr("Next"));
@@ -2558,7 +2566,15 @@ void MInstall::copyTime()
 
 void MInstall::on_closeButton_clicked()
 {
-   ((MMain *)mmn)->closeClicked();
+    // ask for confirmation when installing
+    if (widgetStack->currentWidget() == Step_Progress) {
+        if (QMessageBox::question(this, tr("Confirmation"), tr("Are you sure you want to quit the application?"),
+                                        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+            ((MMain *)mmn)->closeClicked();
+        }
+    } else {
+        ((MMain *)mmn)->closeClicked();
+    }
 }
 
 void MInstall::on_encryptCheckBox_toggled(bool checked)
