@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>MeInstall</string>
+   <string notr="true">MeInstall</string>
   </property>
   <layout class="QGridLayout">
    <property name="leftMargin">

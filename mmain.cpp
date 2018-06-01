@@ -35,7 +35,7 @@ MMain::MMain(QStringList args = QStringList())
     helpbackdrop->resize(mainHelp->size());
 
     //setup system variables
-    QSettings settings("/usr/share/installer-data/installer.conf", QSettings::NativeFormat);
+    QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
     PROJECTNAME = settings.value("PROJECT_NAME").toString();
     PROJECTSHORTNAME = settings.value("PROJECT_SHORTNAME").toString();
     PROJECTVERSION = settings.value("VERSION").toString();
