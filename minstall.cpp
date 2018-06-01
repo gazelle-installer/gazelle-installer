@@ -30,7 +30,6 @@
 MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
 {
     setupUi(this);
-    shellcmd = new Cmd(this);
     this->args = args;
     labelMX->setPixmap(QPixmap("/usr/share/gazelle-installer-data/logo.png"));
     char line[260];
@@ -433,18 +432,18 @@ bool MInstall::makeEsp(QString drv, int size)
     if (drv.contains("nvme") || drv.contains("mmcblk" )) {
         mmcnvmepartdesignator = "p";
     }
-    int err = shellcmd->run("parted -s " + drv + " mkpart ESP 0 " + QString::number(size) + "MiB");
+    int err = shell.run("parted -s " + drv + " mkpart ESP 0 " + QString::number(size) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create ESP";
         return false;
     }
 
-    err = shellcmd->run("mkfs.msdos -F 32 " + drv + mmcnvmepartdesignator + "1");
+    err = shell.run("mkfs.msdos -F 32 " + drv + mmcnvmepartdesignator + "1");
     if (err != 0) {
         qDebug() << "Could not format ESP";
         return false;
     }
-    shellcmd->run("parted -s " + drv + " set 1 esp on");   // sets boot flag and esp flag
+    shell.run("parted -s " + drv + " set 1 esp on");   // sets boot flag and esp flag
     return true;
 }
 
@@ -674,7 +673,7 @@ bool MInstall::makeDefaultPartitions()
 
     if(uefi) { // if booted from UEFI make ESP
         // new GPT partition table
-        int err = shellcmd->run("parted -s " + drv + " mklabel gpt");
+        int err = shell.run("parted -s " + drv + " mklabel gpt");
         if (err != 0 ) {
             qDebug() << "Could not create gpt partition table on " + drv;
             return false;
@@ -689,7 +688,7 @@ bool MInstall::makeDefaultPartitions()
         // new msdos partition table
         cmd = QString("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv);
         system(cmd.toUtf8());
-        int err = shellcmd->run("parted -s " + drv + " mklabel msdos");
+        int err = shell.run("parted -s " + drv + " mklabel msdos");
         if (err != 0 ) {
             qDebug() << "Could not create msdos partition table on " + drv;
             return false;
@@ -706,14 +705,14 @@ bool MInstall::makeDefaultPartitions()
         start = QString::number(esp_size) + "MiB ";
     }
     int end_root = esp_size + remaining;
-    int err = shellcmd->run("parted -s " + drv + " mkpart primary  " + start + QString::number(end_root) + "MiB");
+    int err = shell.run("parted -s " + drv + " mkpart primary  " + start + QString::number(end_root) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create root partition";
         return false;
     }
 
     // create swap partition
-    err = shellcmd->run("parted -s " + drv + " mkpart primary  " + QString::number(end_root) + "MiB " + QString::number(end_root + swap) + "MiB");
+    err = shell.run("parted -s " + drv + " mkpart primary  " + QString::number(end_root) + "MiB " + QString::number(end_root + swap) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create swap partition";
         return false;
@@ -737,9 +736,9 @@ bool MInstall::makeDefaultPartitions()
     //if uefi is not detected, set flags based on GPT. Else don't set a flag...done by makeESP.
     if(!uefi) { // set appropriate flags
         if (isGpt(drv)) {
-            shellcmd->run("parted -s " + drv + " disk_set pmbr_boot on");
+            shell.run("parted -s " + drv + " disk_set pmbr_boot on");
         } else {
-            shellcmd->run("parted -s " + drv + " set 1 boot on");
+            shell.run("parted -s " + drv + " set 1 boot on");
         }
     }
 
@@ -1064,6 +1063,7 @@ void MInstall::copyLinux()
 // build a grub configuration and install grub
 bool MInstall::installLoader()
 {
+    Cmd shell;
     QString cmd;
     QString val = getCmdOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1089,17 +1089,15 @@ bool MInstall::installLoader()
         part_num.remove(QRegularExpression("\\D+\\d*\\D+")); // remove the non-digit part to get the number of the root partition
         drive.remove(QRegularExpression("\\d*$|p\\d*$"));    // remove partition number to get the root drive
         if (!isGpt("/dev/" + drive)) {
-            shellcmd->run("parted -s /dev/" + drive + " set " + part_num + " boot on");
+            shell.run("parted -s /dev/" + drive + " set " + part_num + " boot on");
         }
     } else if (grubRootButton->isChecked()) {
         boot = rootpart;
     } else if (grubEspButton->isChecked()) {
 //        if (entireDiskButton->isChecked()) { // don't use PMBR if installing on ESP and doing automatic partitioning
-//            shellcmd->run("parted -s /dev/" + bootdrv + " disk_set pmbr_boot off");
+//            shell.run("parted -s /dev/" + bootdrv + " disk_set pmbr_boot off");
 //        }
         // find first ESP on the boot disk
-
-        QString cmd;
 
         cmd = QString("partition-info find-esp=%1").arg(bootdrv);
         boot = getCmdOut(cmd);
@@ -1155,7 +1153,7 @@ bool MInstall::installLoader()
     } else {
         system("mkdir /mnt/antiX/boot/efi");
         QString mount = QString("mount /dev/%1 /mnt/antiX/boot/efi").arg(boot);
-        shellcmd->run(mount);
+        shell.run(mount);
         // rename arch to match grub-install target
         QString arch = getCmdOut("cat /sys/firmware/efi/fw_platform_size");
         if (arch == "32") {
@@ -1166,10 +1164,11 @@ bool MInstall::installLoader()
         QString release = getCmdOut("lsb_release -rs");
         cmd = QString("chroot /mnt/antiX grub-install --target=%1-efi --efi-directory=/boot/efi --bootloader-id=" + PROJECTSHORTNAME +"%2 --recheck").arg(arch).arg(release);
     }
-    if (shellcmd->run(cmd) != 0) {
+    if (shell.run(cmd) != 0) {
         // error, try again
         // this works for reiser-grub bug
-        if (shellcmd->run(cmd) != 0) {
+        qDebug() << "error installing Grub, trying again";
+        if (shell.run(cmd) != 0) {
             // error
             progress->close();
             setCursor(QCursor(Qt::ArrowCursor));
@@ -1193,30 +1192,30 @@ bool MInstall::installLoader()
     cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(cmdline);
     system(cmd.toUtf8());
     // update grub config
-    system("chroot /mnt/antiX update-grub");
+    shell.run("chroot /mnt/antiX update-grub");
 
     //create fstab file
     //if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     if (POPULATE_MEDIA_MOUNTPOINTS) {
         //if compressed btrfs filesystem is not used, use default locate for fstab
         if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
-            shellcmd->run("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
+            shell.run("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
         } else {
             // if compressed btrfs filessystem is used, specify the -O switch
-            shellcmd->run("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
+            shell.run("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
         }
     } else {
         //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
         //but do check for compressed btrfs filesystem
         if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
-            shellcmd->run("/sbin/make-fstab --install /mnt/antiX");
+            shell.run("/sbin/make-fstab --install /mnt/antiX");
         } else {
             // if compressed btrfs filessystem is used, specify the -O switch
-            shellcmd->run("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
+            shell.run("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
         }
     }
-    shellcmd->run("chroot /mnt/antiX dev2uuid_fstab");
-    shellcmd->run("chroot /mnt/antiX update-initramfs -u -t -k all");
+    shell.run("chroot /mnt/antiX dev2uuid_fstab");
+    shell.run("chroot /mnt/antiX update-initramfs -u -t -k all");
     system("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
     if (system("mountpoint -q /mnt/antiX/boot/efi") == 0) {
         system("umount /mnt/antiX/boot/efi");
@@ -1316,14 +1315,14 @@ bool MInstall::setUserName()
     if ((dir = opendir(dpath.toUtf8())) == NULL) {
         // dir does not exist, must create it
         // copy skel to demo
-        if (shellcmd->run("cp -a /mnt/antiX/etc/skel /mnt/antiX/home") != 0) {
+        if (shell.run("cp -a /mnt/antiX/etc/skel /mnt/antiX/home") != 0) {
             setCursor(QCursor(Qt::ArrowCursor));
             QMessageBox::critical(0, QString::null,
                                   tr("Sorry, failed to create user directory."));
             return false;
         }
         cmd = QString("mv -f /mnt/antiX/home/skel %1").arg(dpath);
-        if (shellcmd->run(cmd.toUtf8()) != 0) {
+        if (shell.run(cmd.toUtf8()) != 0) {
             setCursor(QCursor(Qt::ArrowCursor));
             QMessageBox::critical(0, QString::null,
                                   tr("Sorry, failed to name user directory."));
@@ -1332,23 +1331,23 @@ bool MInstall::setUserName()
     } else {
         // dir does exist, clean it up
         cmd = QString("cp -n /mnt/antiX/etc/skel/.bash_profile %1").arg(dpath);
-        shellcmd->run(cmd.toUtf8());
+        shell.run(cmd.toUtf8());
         cmd = QString("cp -n /mnt/antiX/etc/skel/.bashrc %1").arg(dpath);
-        shellcmd->run(cmd.toUtf8());
+        shell.run(cmd.toUtf8());
         cmd = QString("cp -n /mnt/antiX/etc/skel/.gtkrc %1").arg(dpath);
-        shellcmd->run(cmd.toUtf8());
+        shell.run(cmd.toUtf8());
         cmd = QString("cp -n /mnt/antiX/etc/skel/.gtkrc-2.0 %1").arg(dpath);
-        shellcmd->run(cmd.toUtf8());
+        shell.run(cmd.toUtf8());
         cmd = QString("cp -Rn /mnt/antiX/etc/skel/.config %1").arg(dpath);
-        shellcmd->run(cmd.toUtf8());
+        shell.run(cmd.toUtf8());
         cmd = QString("cp -Rn /mnt/antiX/etc/skel/.local %1").arg(dpath);
-        shellcmd->run(cmd.toUtf8());
+        shell.run(cmd.toUtf8());
     }
     // saving Desktop changes
     if (saveDesktopCheckBox->isChecked()) {
-        shellcmd->run("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
+        shell.run("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
         cmd = cmd = QString("rsync -a /home/demo/ %1 --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority' --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
-        if (shellcmd->run(cmd.toUtf8()) != 0) {
+        if (shell.run(cmd.toUtf8()) != 0) {
             setCursor(QCursor(Qt::ArrowCursor));
             QMessageBox::critical(0, QString::null,
                                   tr("Sorry, failed to save desktop changes."));
@@ -1359,7 +1358,7 @@ bool MInstall::setUserName()
     }
     // fix the ownership, demo=newuser
     cmd = QString("chown -R demo:demo %1").arg(dpath);
-    if (shellcmd->run(cmd.toUtf8()) != 0) {
+    if (shell.run(cmd.toUtf8()) != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(0, QString::null,
                               tr("Sorry, failed to set ownership of user directory."));
@@ -1693,13 +1692,13 @@ void MInstall::setLocale()
     } else {
         system("echo '0.0 0 0.0\\n0\\nUTC' > /etc/adjtime");
     }
-    shellcmd->run("hwclock --hctosys");
+    shell.run("hwclock --hctosys");
     QString rootdev = "/dev/" + QString(rootCombo->currentText()).section(" ", 0, 0);
     QString homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
-    shellcmd->run("umount -R /mnt/antiX");
-    shellcmd->run(QString("mount %1 /mnt/antiX -o %2").arg(rootdev).arg(mntops));
+    shell.run("umount -R /mnt/antiX");
+    shell.run(QString("mount %1 /mnt/antiX -o %2").arg(rootdev).arg(mntops));
     if (homedev != "/dev/root" && homedev != rootdev) {
-        shellcmd->run(QString("mount %1 /mnt/antiX/home").arg(homedev));
+        shell.run(QString("mount %1 /mnt/antiX/home").arg(homedev));
     }
     system("cp -f /etc/adjtime /mnt/antiX/etc/");
 
@@ -1723,7 +1722,7 @@ void MInstall::setLocale()
     }
 
     // localize repos
-    shellcmd->run("chroot /mnt/antiX localize-repo default");
+    shell.run("chroot /mnt/antiX localize-repo default");
 }
 
 void MInstall::setServices()
@@ -1737,9 +1736,9 @@ void MInstall::setServices()
         QString service = (*it)->text(0);
         qDebug() << "Service: " << service;
         if ((*it)->checkState(0) == Qt::Checked) {
-            shellcmd->run("chroot /mnt/antiX update-rc.d " + service + " enable");
+            shell.run("chroot /mnt/antiX update-rc.d " + service + " enable");
         } else {
-            shellcmd->run("chroot /mnt/antiX update-rc.d " + service + " disable");
+            shell.run("chroot /mnt/antiX update-rc.d " + service + " disable");
         }
         ++it;
     }
@@ -2201,7 +2200,7 @@ void MInstall::on_viewServicesButton_clicked()
 void MInstall::on_qtpartedButton_clicked()
 {
     system("/sbin/swapoff -a 2>&1");
-    shellcmd->run("/usr/sbin/gparted");
+    shell.run("/usr/sbin/gparted");
     system("make-fstab -s");
     system("/sbin/swapon -a 2>&1");
     this->updatePartitionWidgets();
@@ -2474,7 +2473,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         // Copy live set up to install and clean up.
         //system("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");
         system("/usr/sbin/live-to-installed /mnt/antiX");
-        shellcmd->run("chroot /mnt/antiX desktop-menu --write-out-global");
+        shell.run("chroot /mnt/antiX desktop-menu --write-out-global");
         system("/bin/rm -rf /mnt/antiX/home/demo");
         system("/bin/rm -rf /mnt/antiX/media/sd*");
         system("/bin/rm -rf /mnt/antiX/media/hd*");
