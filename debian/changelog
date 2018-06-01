@@ -1,4 +1,10 @@
-gazelle-installer (1.0.4) unstable; urgency=medium
+gazelle-installer (1.0.5) mx; urgency=medium
+
+  * modified libcmd callouts (adrian)
+
+ -- dolphinoracle <dolphin@mx>  Fri, 01 Jun 2018 06:55:30 -0400
+ 
+ gazelle-installer (1.0.4) unstable; urgency=medium
 
   *  use libcmd to call gparted...fix to video corruption issue
 
