@@ -146,5 +146,5 @@ private slots:
     void on_buttonSetKeyboard_clicked();
 
 private:
-    Cmd *shellcmd;
+    Cmd shell;
 };
