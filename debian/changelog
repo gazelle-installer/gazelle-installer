@@ -1,3 +1,9 @@
+gazelle-installer (1.0.6) mx; urgency=medium
+
+  * Fix crash, enable back button on some steps
+
+ -- Adrian <adrian@mxlinux.org>  Fri, 01 Jun 2018 18:08:05 -0400
+ 
 gazelle-installer (1.0.5) mx; urgency=medium
 
   * modified libcmd callouts (adrian)
