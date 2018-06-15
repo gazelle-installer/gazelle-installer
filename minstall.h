@@ -58,7 +58,7 @@ public:
     static QStringList getCmdOuts(QString cmd);
     static QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
     static QStringList getCmdValues(QString cmd, QString key, QString keydel, QString valdel);
-    static bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
+    bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
     static int command(const QString &string);
     static int getPartitionNumber();
     int runCmd(QString cmd);
