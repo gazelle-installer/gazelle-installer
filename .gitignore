@@ -42,3 +42,6 @@ debian/.debhelper/
 
 # Exclude debian folder, each distro will use custom debian configuration
 debian
+
+# Exclude binary
+minstall

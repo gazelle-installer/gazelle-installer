@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string notr="true">MeInstall</string>
   </property>
-  <layout class="QGridLayout">
+  <layout class="QGridLayout" name="_2">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -132,10 +132,10 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>7</number>
      </property>
      <widget class="QWidget" name="Step_Terms">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="_4">
        <property name="leftMargin">
         <number>9</number>
        </property>
@@ -302,7 +302,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_Disk">
-      <layout class="QGridLayout" name="gridLayout">
+      <layout class="QGridLayout" name="_3">
        <item row="3" column="0" colspan="2">
         <widget class="QGroupBox" name="installationTypeBox">
          <property name="sizePolicy">
@@ -575,7 +575,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_Partitions">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="_5">
        <property name="leftMargin">
         <number>9</number>
        </property>
@@ -956,7 +956,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_Progress">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="_6">
        <property name="leftMargin">
         <number>9</number>
        </property>
@@ -1137,7 +1137,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_Boot">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="_7">
        <property name="leftMargin">
         <number>9</number>
        </property>
@@ -1164,7 +1164,7 @@
          <property name="title">
           <string>4. Select Boot Method</string>
          </property>
-         <layout class="QGridLayout">
+         <layout class="QGridLayout" name="_8">
           <property name="leftMargin">
            <number>9</number>
           </property>
@@ -1357,7 +1357,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_Services">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="_9">
        <property name="leftMargin">
         <number>9</number>
        </property>
@@ -1384,7 +1384,7 @@
          <property name="title">
           <string>Common Services to Enable</string>
          </property>
-         <layout class="QGridLayout">
+         <layout class="QGridLayout" name="_10">
           <property name="leftMargin">
            <number>9</number>
           </property>
@@ -1438,7 +1438,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_Network">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="_11">
        <property name="leftMargin">
         <number>9</number>
        </property>
@@ -1465,7 +1465,7 @@
          <property name="title">
           <string>5. Computer Network Names</string>
          </property>
-         <layout class="QGridLayout">
+         <layout class="QGridLayout" name="_12">
           <property name="leftMargin">
            <number>9</number>
           </property>
@@ -1622,7 +1622,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_Localization">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="_13">
        <property name="leftMargin">
         <number>9</number>
        </property>
@@ -1779,7 +1779,7 @@
          <property name="title">
           <string>6a. Localization Defaults</string>
          </property>
-         <layout class="QGridLayout">
+         <layout class="QGridLayout" name="_14">
           <property name="leftMargin">
            <number>9</number>
           </property>
@@ -1884,7 +1884,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_User_Accounts">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="_15">
        <property name="leftMargin">
         <number>9</number>
        </property>
