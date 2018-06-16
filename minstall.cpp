@@ -1825,6 +1825,11 @@ void MInstall::stopInstall()
                                               "To use the new installation, reboot without the installation media.\n\n"
                                               "Do you want to reboot now?"),
                                            tr("Yes"), tr("No"));
+        foreach (const QString &arg, args) {
+            if(arg == "--pretend" || arg == "-p") {
+                qApp->exit(0);
+            }
+        }
         if (ans == 0) {
             shell.run("/bin/rm -rf /mnt/antiX/mnt/antiX");
             shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
@@ -2058,11 +2063,11 @@ void MInstall::pageDisplayed(int next)
     case 9:
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
-                                                                                                                                     "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
-                                                                                                                                     "The best way to learn about them is to browse through the Menu and try them. "
-                                                                                                                                     "Many of the apps were developed specifically for the %1 project. "
-                                                                                                                                     "These are shown in the main menus. "
-                                                                                                                                     "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME));
+                                       "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
+                                       "The best way to learn about them is to browse through the Menu and try them. "
+                                       "Many of the apps were developed specifically for the %1 project. "
+                                       "These are shown in the main menus. "
+                                       "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME));
         break;
 
     default:
