@@ -73,8 +73,8 @@ De schijf waarop de door jou geselecteerde partitie staat vertoont faalsymptomen
         <location filename="../minstall.cpp" line="1316"/>
         <location filename="../minstall.cpp" line="1341"/>
         <location filename="../minstall.cpp" line="1827"/>
-        <location filename="../minstall.cpp" line="1841"/>
-        <location filename="../minstall.cpp" line="2374"/>
+        <location filename="../minstall.cpp" line="1846"/>
+        <location filename="../minstall.cpp" line="2379"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
@@ -92,8 +92,8 @@ De schijf waarop de door jou geselecteerde partitie staat vertoont faalsymptomen
         <location filename="../minstall.cpp" line="1316"/>
         <location filename="../minstall.cpp" line="1341"/>
         <location filename="../minstall.cpp" line="1827"/>
-        <location filename="../minstall.cpp" line="1841"/>
-        <location filename="../minstall.cpp" line="2374"/>
+        <location filename="../minstall.cpp" line="1846"/>
+        <location filename="../minstall.cpp" line="2379"/>
         <source>No</source>
         <translation>Nee</translation>
     </message>
@@ -439,175 +439,175 @@ Start opnieuw op zonder het installatiemedium om de nieuwe installatie te gebrui
 Wilt u nu opnieuw opstarten?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1840"/>
+        <location filename="../minstall.cpp" line="1845"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>De installatie en configuratie zijn niet voltooid.
 Wilt u werkelijk stoppen?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1941"/>
+        <location filename="../minstall.cpp" line="1946"/>
         <source>&lt;p&gt;&lt;b&gt;General Instructions&lt;/b&gt;&lt;br/&gt;BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.&lt;/p&gt;&lt;p&gt;On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.&lt;/p&gt;&lt;p&gt;Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions. &lt;/p&gt;&lt;p&gt;If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.&lt;/p&gt;&lt;p&gt;The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Algemene aanwijzingen&lt;/b&gt;&lt;br/&gt;VOORDAT U VERDER GAAT, SLUIT EERST ALLE ANDERE TOEPASSINGEN.&lt;/p&gt;&lt;p&gt;Lees de aanwijzingen op iedere pagina, maak uw keuze, en klik dan op Volgende als u weer verder wilt gaan. U wordt steeds om bevestiging gevraagd voordat een riskante handeling wordt uitgevoerd.&lt;/p&gt;&lt;p&gt;Installatie vereist ongeveer %1 aan ruimte, %2 of meer heeft de voorkeur. U kunt de gehele schijf gebruiken of u kunt installeren op bestaande partities. &lt;/p&gt;&lt;p&gt; Indien u Mac OS of Windows OS (Vista of nieuwer) gebruikt, dient U bij voorkeur de systeemsoftware van die OS&apos;n te gebruiken om de partities en boot manager in te stellen voor het installeren.&lt;/p&gt;&lt;p&gt;De ext2, ext3, ext4, jfs, xfs, btrfs en reiserfs Linux bestands-systemen worden ondersteund, en ext4 wordt aanbevolen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1952"/>
+        <location filename="../minstall.cpp" line="1957"/>
         <source>&lt;p&gt;&lt;b&gt;Limitations&lt;/b&gt;&lt;br/&gt;Remember, this software is provided AS-IS with no warranty what-so-ever. It&apos;s solely your responsibility to backup your data before proceeding.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Choose Partitions&lt;/b&gt;&lt;br/&gt;%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.&lt;/p&gt;&lt;p&gt;If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Upgrading&lt;/b&gt;&lt;br/&gt;To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.&lt;/p&gt;&lt;p&gt;If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Preferred Filesystem Type&lt;/b&gt;&lt;br/&gt;For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. &lt;/p&gt;&lt;p&gt;Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bad Blocks&lt;/b&gt;&lt;br/&gt;If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Beperkingen&lt;/b&gt;&lt;br/&gt;Weet dat in deze software wordt voorzien AS-IS, zonder enige garantie. Het is louter uw verantwoordelijkheid om uw gegevens op te slaan, voordat u verder gaat.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Partities kiezen&lt;/b&gt;&lt;br/&gt;%1 vereist een root-partitie. De swap-partitie is optioneel, maar wordt sterk aanbevolen. Indien u de Suspend-to-Disk mogelijkheid van %1 wilt gebruiken, hebt u een swap-partitie nodig die groter is dan de omvang van het fysieke geheugen.&lt;/p&gt;&lt;p&gt;Indien u kiest voor een afzonderlijke /home-partitie zal het gemakkelijker zijn om in de toekomst op te waarderen, maar dit zal niet mogelijk zijn als u een installatie wilt opwaarderen zonder aparte /home-partitie.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Opwaarderen&lt;/b&gt;&lt;br/&gt;Om een bestaande Linux-installatie op te waarderen, kies dezelfde home-partitie als voorheen en vink de voorkeur aan, om de gegevens op te slaan in /home.&lt;/p&gt;&lt;p&gt;Indien u een reeds bestaande /home-directory structuur bewaart die onderdeel uitmaakt van uw root-partitie, zal het installatieprogramma de root-partitie niet opnieuw formatteren. De installatie zal dientengevolge veel meer tijd in beslag nemen dan normaal.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Aanbevolen type bestandssysteem&lt;/b&gt;&lt;br/&gt;Voor %1 kunt u ervoor kiezen om de partities te formatteren als ext2, ext3, ext4, jfs, xfs, btrfs of reiser. &lt;/p&gt;&lt;p&gt;Verdere compressie opties zijn beschikbaar voor schijven die btrfs gebruiken. Lzo is snel, maar de compressie is lager. Zlib is langzamer, met hogere compressie.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bad Blocks&lt;/b&gt;&lt;br/&gt;Als u kiest voor ext2, ext3 of ext4 als het format-type, hebt u de mogelijk om &apos;Bad Blocks&apos; op uw schijf op te sporen en te corrigeren. De bad block controle kost erg veel tijd, dus u kunt ervoor kiezen om deze stap over te slaan, tenzij u vermoedt dat uw schijf deze Bad Blocks heeft.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1977"/>
+        <location filename="../minstall.cpp" line="1982"/>
         <source>Returning to Step 1 to select another disk.</source>
         <translation>Terugkeren naar stap 1 om een andere schijf te selecteren.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1981"/>
+        <location filename="../minstall.cpp" line="1986"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Speciale Dank&lt;/b&gt;&lt;br/&gt;Dank aan iedereen die ervoor gekozen heeft %1 te ondersteunen met hun tijd, geld, suggesties, werk, waardering, ideëen, promotie, en/of aanmoediging.&lt;/p&gt;&lt;p&gt;Zonder u zou er geen %1 zijn.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1984"/>
+        <location filename="../minstall.cpp" line="1989"/>
         <source>&lt;p&gt;&lt;b&gt;Installation in Progress&lt;/b&gt;&lt;br/&gt; %1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.&lt;/p&gt;&lt;p&gt;If you click the Abort button, the installation will be stopped as soon as possible.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Voortgang van installatie&lt;/b&gt;&lt;br/&gt;%1 wordt geinstalleerd. Voor een nieuwe installatie zal dat ongeveer 3-20 minuten in beslag nemen, afhankelijk van de snelheid van uw systeem en de grootte van de partities die u formatteert.&lt;/p&gt;&lt;p&gt;Wanneer u de knop &apos;Afgelasten&apos; aanklikt, wordt de installatie zo snel mogelijk stopgezet.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1996"/>
+        <location filename="../minstall.cpp" line="2001"/>
         <source>Failed to create required partitions.
 Returning to Step 1.</source>
         <translation>Het aanmaken van de vereiste partities is mislukt.
 Terugkeren naar stap 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2005"/>
+        <location filename="../minstall.cpp" line="2010"/>
         <source>Failed to prepare chosen partitions.
 Returning to Step 1.</source>
         <translation>Het voorbereiden van de gekozen partities is mislukt.
 Terugkeren naar stap 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2019"/>
+        <location filename="../minstall.cpp" line="2024"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 at root instead, then GRUB2 will be installed at the beginning of the root partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Selecteer Opstartmethode&lt;/b&gt;&lt;br/&gt;%1 gebruikt de GRUB bootlader om %1 en MS-Windows op te starten. &lt;p&gt;Standaard is GRUB2 geïnstalleerd in het Master Boot Record of ESP (EFI Systeempartitie voor 64-bit UEFI opstartsystemen) van uw opstartschijf en deze vervangt de bootlader die u eerder gebruikte. Dit is normaal.&lt;/p&gt;&lt;p&gt;Als u er echter voor kiest om GRUB2 op root te installeren dan zal GRUB2 aan het begin van de rootpartitie geïnstalleerd worden. Deze optie is enkel voor experts.&lt;/p&gt;&lt;p&gt;Als u het Installeer GRUB hokje uitvinkt zal GRUB nu niet geïnstalleerd worden. Deze optie is enkel voor experts.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2028"/>
+        <location filename="../minstall.cpp" line="2033"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Instellen van Algemene Functies&lt;/b&gt;&lt;br/&gt;Selecteer de algemene functies die u nodig hebt in uw systeem-configuratie, en de diensten die automatisch moeten worden gestart wanneer u %1 opstart.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2035"/>
+        <location filename="../minstall.cpp" line="2040"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Computeridentiteit&lt;/b&gt;&lt;br/&gt;De computernaam is een algemene unieke naam die uw computer zal identificeren als deze zich in een netwerk bevindt. Het computerdomein wordt waarschijnlijk niet gebruikt tenzij uw internetaanbieder of locale netwerk het vereist.&lt;/p&gt;&lt;p&gt;De computer- en domeinnamen kunnen enkel alfanumerieke karakters, punten en streepjes bevatten. Ze kunnen geen spaties bevatten of beginnen of eindigen met streepjes.&lt;/p&gt;&lt;p&gt;De SaMBa Server moet worden geactiveerd als u het wilt gebruiken om bestandsmappen of een printer met een locale computer te delen die op MS-Windows of Mac OSX draait.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2044"/>
+        <location filename="../minstall.cpp" line="2049"/>
         <source>&lt;p&gt;&lt;b&gt;Localization Defaults&lt;/b&gt;&lt;br/&gt;Set the default keyboard and locale. These will apply unless they are overridden later by the user.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configure Clock&lt;/b&gt;&lt;br/&gt;If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for &apos;System clock uses LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Timezone Settings&lt;/b&gt;&lt;br/&gt;The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Service Settings&lt;/b&gt;&lt;br/&gt;Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! </source>
         <translation>&lt;p&gt;&lt;b&gt;Lokalisatie Standaarden&lt;/b&gt;&lt;br/&gt;Stel het toetsenbord en de locatie in. Deze instelling wordt toegepast, tenzij ze later door de gebruiker wordt gewijzigd.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Klok Instellen&lt;/b&gt;&lt;br/&gt;Wanneer u een Apple of een pure Unix computer hebt, dan wordt de systeem-tijd standaard ingesteld naar de GMT of de Wereldtijd. Om dat te veranderen vink het vakje &apos;Systeemklok gebruikt LOCAL&apos; aan.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Tijdzone instellngen&lt;/b&gt;&lt;br/&gt;Het systeem start op met een tijdszone vooraf ingesteld op GMT/UTC. Wanneer u de tijdsinstelling wilt veranderen nadat u de nieuwe installatie hebt herstart, klik dan met de rechter muisknop op het paneel en selecteer vervolgens Eigenschappen.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Service Instellingen&lt;/b&gt;&lt;br/&gt;De meeste gebruikers hoeven de standaard instellingen niet te wijzigen. Gebruikers van minder krachtige computers kunnen het beste niet-benodigde services uitschakelen teneinde het RAM gebruik zo laag mogelijk te houden. Zorg ervoor dat u weet wat u doet! </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2052"/>
+        <location filename="../minstall.cpp" line="2057"/>
         <source>&lt;p&gt;&lt;b&gt;Default User Login&lt;/b&gt;&lt;br/&gt;The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwords&lt;/b&gt;&lt;br/&gt;Enter a new password for your default user account and for the root account. Each password must be entered twice.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Aanmelden van de standaard-gebruiker&lt;/b&gt;&lt;br/&gt;De root-gebruiker is vergelijkbaar met de Administrator in bepaalde andere besturingssystemen. Gebruik de root-gebruiker liever niet als uw dagelijkse gebruikers-account. Vul de naam in voor een nieuwe (standaard-)gebruikersaccount dat u dagelijks zult gebruiken. Indien noodzakelijk, kunt u met %1 User Manager later nog andere gebruikersaccounts toevoegen.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Wachtwoorden&lt;/b&gt;&lt;br/&gt;Vul een nieuw wachtwoord in voor uw standaard gebruikersaccount en voor de root-account. Ieder wachtwoord moet tweemaal worden ingevoerd.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2060"/>
+        <location filename="../minstall.cpp" line="2065"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Gefeliciteerd!&lt;/b&gt;&lt;br/&gt;U hebt de installatie van%1 linux voltooid.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Toepassingen opsporen&lt;/b&gt;&lt;br/&gt;Er bestaan honderden uitstekende toepassingen die met %1 worden mee-geinstalleerd. De beste manier om er meer over te weten te komen, is ze allereerst op te zoeken met het Menu en ze dan uit te proberen. Vele van deze toepassingen zijn speciaal ontwikkeld voor het %1 projecte. Ze zijn te vinden in de hoofdmenu. &lt;p&gt;In aansluiting daarop bevat %1 vele standaard Linux applicaties die alleen via de commandline worden gestart. Daarom zijn ze niet zichtbaar in het Menu.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2070"/>
+        <location filename="../minstall.cpp" line="2075"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
         <translation>Veel plezier met %1&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2084"/>
-        <location filename="../minstall.cpp" line="2098"/>
+        <location filename="../minstall.cpp" line="2089"/>
+        <location filename="../minstall.cpp" line="2103"/>
         <source>Next</source>
         <translation>Volgende</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2096"/>
+        <location filename="../minstall.cpp" line="2101"/>
         <source>Finish</source>
         <translation>Voltooien</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2373"/>
+        <location filename="../minstall.cpp" line="2378"/>
         <source>%1 is installing, are you 
 sure you want to Close now?</source>
         <translation>%1 wordt geinstalleerd, weet u
 zeker dat u nu wilt Afsluiten?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2400"/>
+        <location filename="../minstall.cpp" line="2405"/>
         <source>Deleting old system</source>
         <translation>Het oude systeem wissen</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2410"/>
+        <location filename="../minstall.cpp" line="2415"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
         <translation>Het wissen van het oude %1 op de bestemde plaats is mislukt.
 Terugkeren naar Stap 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2436"/>
+        <location filename="../minstall.cpp" line="2441"/>
         <source>Copying new system</source>
         <translation>Kopiëren van het nieuwe systeem</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2461"/>
+        <location filename="../minstall.cpp" line="2466"/>
         <source>Fixing configuration</source>
         <translation>Herstellen van de configuratie</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2554"/>
+        <location filename="../minstall.cpp" line="2559"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Het schrijven van %1 naar de bestemde plaats is mislukt.
 Terugkeren naar Stap 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2581"/>
+        <location filename="../minstall.cpp" line="2586"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Hulp verkrijgen&lt;/b&gt;&lt;br/&gt;Basis-informatie over %1 kunt u vinden op %2.&lt;/p&gt;&lt;p&gt;Er zijn vrijwilligers om u te helpen op het %3 forum, %4&lt;/p&gt;&lt;p&gt;Indien u om hulp vraagt, probeer dan uw probleem en uw computer zo gedetailleerd mogelijk te beschrijven. Een uitspraak als &apos;Het heeft niet gewerkt&apos; zijn niet behulpzaam.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2589"/>
+        <location filename="../minstall.cpp" line="2594"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Uw Installatie Repareren&lt;/b&gt;&lt;br/&gt;Wanneer %1 niet meer werkt vanaf de harde schijf is het soms mogelijk om het probleem op te lossen door op te starten met de LiveDVD of LiveUSB en een van de &apos;utilities&apos; te gebruiken uit %1 of door de reguliere Linux gereedschappen te gebruiken om het systeem te herstellen.&lt;/p&gt;&lt;p&gt;U kunt uw %1 LiveDVD of LiveUSB ook gebruiken om gegevens te redden van MS-Windows systemen!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2595"/>
+        <location filename="../minstall.cpp" line="2600"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ondersteuning van %1&lt;/b&gt;&lt;br/&gt;%1 wordt ondersteund door mensen als u. Sommigen zijn behulpzaam op het forum - %2 - of ze vertalen help-bestanden in de verschillende talen, doen suggesties, schrijven handleidingen of testen nieuwe software.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2602"/>
+        <location filename="../minstall.cpp" line="2607"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Geluidsmixer instellen&lt;/b&gt;&lt;br/&gt; %1 probeert de geluidsmixer in te stellen, maar soms is het voor u noodzakelijk om het volume te verhogen, of kanalen in de mixer te ontmuten om geluid te horen.&lt;/p&gt;&lt;p&gt;De snelkoppeling voor de mixer is geplaatst in het menu. Klik erop om de mixer te openen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2610"/>
+        <location filename="../minstall.cpp" line="2615"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Houdt uw kopie van %1 up-to-date&lt;/b&gt;&lt;br/&gt;Voor meer informatie en updates, kijk aub op .&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2623"/>
+        <location filename="../minstall.cpp" line="2628"/>
         <source>Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2623"/>
+        <location filename="../minstall.cpp" line="2628"/>
         <source>Are you sure you want to quit the application?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2638"/>
+        <location filename="../minstall.cpp" line="2643"/>
         <source>This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation>Deze optie versleutelt ook /swap, wat het onmogelijk maakt dat de swap partitie gedeeld kan worden met andere geïnstalleerde besturingssystemen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2639"/>
+        <location filename="../minstall.cpp" line="2644"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -1100,7 +1100,7 @@ Terugkeren naar Stap 1.</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../app.cpp" line="49"/>
+        <location filename="../app.cpp" line="62"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -1109,7 +1109,7 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Sluit deze indien mogelijk, of voer &apos;pkill minstall&apos; uit in terminal.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="57"/>
+        <location filename="../app.cpp" line="70"/>
         <source>You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot unless you select Legacy Boot or similar at restart.
 We recommend you quit now and restart in Legacy Boot
 
@@ -1120,17 +1120,17 @@ We raden u aan nu te stoppen en te herstarten in Legacy Boot
 Wilt u de installatie voortzetten?</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="61"/>
+        <location filename="../app.cpp" line="74"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="61"/>
+        <location filename="../app.cpp" line="74"/>
         <source>No</source>
         <translation>Nee</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="74"/>
+        <location filename="../app.cpp" line="87"/>
         <source>You must run this app as root.</source>
         <translation>U moet deze toepassing als root uitvoeren.</translation>
     </message>
