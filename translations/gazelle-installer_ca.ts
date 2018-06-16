@@ -72,8 +72,8 @@ El disc amb la partició que heu seleccionat per a la instal·lació està falla
         <location filename="../minstall.cpp" line="1316"/>
         <location filename="../minstall.cpp" line="1341"/>
         <location filename="../minstall.cpp" line="1827"/>
-        <location filename="../minstall.cpp" line="1841"/>
-        <location filename="../minstall.cpp" line="2374"/>
+        <location filename="../minstall.cpp" line="1846"/>
+        <location filename="../minstall.cpp" line="2379"/>
         <source>Yes</source>
         <translation>Sí </translation>
     </message>
@@ -91,8 +91,8 @@ El disc amb la partició que heu seleccionat per a la instal·lació està falla
         <location filename="../minstall.cpp" line="1316"/>
         <location filename="../minstall.cpp" line="1341"/>
         <location filename="../minstall.cpp" line="1827"/>
-        <location filename="../minstall.cpp" line="1841"/>
-        <location filename="../minstall.cpp" line="2374"/>
+        <location filename="../minstall.cpp" line="1846"/>
+        <location filename="../minstall.cpp" line="2379"/>
         <source>No</source>
         <translation>No </translation>
     </message>
@@ -441,175 +441,175 @@ Per usar la nova instal·lació, reinicieu sense el mitjà d&apos;instal·lació
 Voleu reiniciar ara?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1840"/>
+        <location filename="../minstall.cpp" line="1845"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>No s&apos;ha acabat la instal·lació i configuració.
 De debò voleu aturar-la ara?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1941"/>
+        <location filename="../minstall.cpp" line="1946"/>
         <source>&lt;p&gt;&lt;b&gt;General Instructions&lt;/b&gt;&lt;br/&gt;BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.&lt;/p&gt;&lt;p&gt;On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.&lt;/p&gt;&lt;p&gt;Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions. &lt;/p&gt;&lt;p&gt;If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.&lt;/p&gt;&lt;p&gt;The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Instruccions generals&lt;/b&gt;&lt;br/&gt;ABANS DE CONTINUAR, TANQUEU TOTES LES ALTRES APLICACIONS.&lt;/p&gt;&lt;p&gt;A cada pàgina, si us plau llegiu les instruccions, feu la vostra elecció, i llavors cliqueu a Següent quan esteu a punt per continuar.  Se us demanarà confirmació abans abans de fer qualsevol acció destructiva.&lt;/p&gt;&lt;p&gt;La instal·lació necessita al voltant de %1 d&apos;espai. Preferible tenir-ne %2 o més. Es pot usar el disc sencer o instal·lar en les particions existents. &lt;/p&gt;&lt;p&gt;Si esteu usant Mac OS o Windows (de Vista endavant), podeu haver d&apos;usar les eines d&apos;aquests sistemes per ajustar les particions i el gestor d&apos;arrencada abans d&apos;instal·lar.&lt;/p&gt;&lt;p&gt;Tenen suport els sistemes de fitxers Linux ext2, ext3, ext4, jfs, xfs, btrfs i reiserfs; es recomana ext4 &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1952"/>
+        <location filename="../minstall.cpp" line="1957"/>
         <source>&lt;p&gt;&lt;b&gt;Limitations&lt;/b&gt;&lt;br/&gt;Remember, this software is provided AS-IS with no warranty what-so-ever. It&apos;s solely your responsibility to backup your data before proceeding.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Choose Partitions&lt;/b&gt;&lt;br/&gt;%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.&lt;/p&gt;&lt;p&gt;If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Upgrading&lt;/b&gt;&lt;br/&gt;To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.&lt;/p&gt;&lt;p&gt;If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Preferred Filesystem Type&lt;/b&gt;&lt;br/&gt;For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. &lt;/p&gt;&lt;p&gt;Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bad Blocks&lt;/b&gt;&lt;br/&gt;If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Limitacions&lt;/b&gt;&lt;br/&gt;Recordeu que aquest programari se subministra TAL QUAL, sense garantia de cap mena. És la vostra responsabilitat fer copia de seguretat de les dades abans de procedir.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Selecció de Particions&lt;/b&gt;&lt;br/&gt;%1 necessita una partició arrel. La partició d&apos;intercanvi (swap) és opcional però molt recomanable. Si voleu usar la funció de suspensió al disc de %1, cal una partició més gran que la mida de la vostra memòria física.&lt;/p&gt;&lt;p&gt;Si trieu una partició /home separada, us resultarà més fàcil d&apos;actualitzar en el futur, però això no és possible si esteu actualitzant des d&apos;una instal·lació que no tingui una partició d&apos;usuari (home) separada.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Actualització&lt;/b&gt;&lt;br/&gt;Per actualitzar una instal·lació Linux existent, seleccioneu la mateixa partició d&apos;abans i trieu l&apos;opció de preservar les dades a /home.&lt;/p&gt;&lt;p&gt;Si preserveu l&apos;arbre de directoris /home a la partició arrel, l&apos;instal·lador no reformatarà la partició arrel. En conseqüència, la instal·lació trigarà molt més de l&apos;habitual. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Sistema de fitxers preferit&lt;/b&gt;&lt;br/&gt;Per %1, podeu triar de formatar les particions com a ext2, ext3, ext4, jfs, xfs, btrfs o reiser. &lt;/p&gt;&lt;p&gt;Opcions de compressió addicionals usant btrfs. Lzo és ràpid, però la compressió és menor. Zlib és més lent, amb millor compressió.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Blocs dolents&lt;/b&gt;&lt;br/&gt;Si trieu els tipus de format ext2, ext3 o ext4, teniu l&apos;opció de comprovar i corregir els blocs dolents del disc. La comprovació de blocs dolents necessita molt temps, o sigui que potser voleu saltar aquesta etapa,llevat que sospiteu que el vostre disc té blocs defectuosos.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1977"/>
+        <location filename="../minstall.cpp" line="1982"/>
         <source>Returning to Step 1 to select another disk.</source>
         <translation>Retornant al primer pas per triar un altre disc. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1981"/>
+        <location filename="../minstall.cpp" line="1986"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Agraïments&lt;/b&gt;&lt;br/&gt;Gràcies a tothom que ha triat donar suport a  %1 amb el seu temps, diners, suggeriments, treball, lloances, idees, promoció i/o with their time, money, suggestions, work, praise, ideas, promotion, and/or ànims.&lt;/p&gt;&lt;p&gt;Sense vosaltres no hi hauria %1.&lt;/p&gt;&lt;p&gt;L&apos;Equip de Desenvolupament de %2.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1984"/>
+        <location filename="../minstall.cpp" line="1989"/>
         <source>&lt;p&gt;&lt;b&gt;Installation in Progress&lt;/b&gt;&lt;br/&gt; %1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.&lt;/p&gt;&lt;p&gt;If you click the Abort button, the installation will be stopped as soon as possible.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Instal·lació en funcionament&lt;/b&gt;&lt;br/&gt;S&apos;està instal·lant  %1.  Cal un temps d&apos;entre 3 i 20 minuts per una instal·lació nova, depenent de la velocitat del vostre sistema i de la mida de les particions que cal formatar.&lt;/p&gt;&lt;p&gt;Si cliqueu sobre el botó Interromp, la instal·lació s&apos;aturarà tan aviat com sigui possible.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1996"/>
+        <location filename="../minstall.cpp" line="2001"/>
         <source>Failed to create required partitions.
 Returning to Step 1.</source>
         <translation>Ha fallat la creació de particions.
 Retornant al primer pas.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2005"/>
+        <location filename="../minstall.cpp" line="2010"/>
         <source>Failed to prepare chosen partitions.
 Returning to Step 1.</source>
         <translation>Ha fallat la preparació de particions.
 Retornant al primer pas.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2019"/>
+        <location filename="../minstall.cpp" line="2024"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 at root instead, then GRUB2 will be installed at the beginning of the root partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;trieu el mètode d&apos;arrencada&lt;/b&gt;&lt;br/&gt; %1 usa el carregador GRUB per arrencar %1 i MS-Windows. &lt;p&gt;Per omissió s&apos;instal·la GRUB2 al MBR (Master Boot Record) o ESP (EFI System Partition per sistemes de UEFI de 64-bit) de la vostra unitat d&apos;arrencada i reemplaça el carregador que usàveu abans. Això és normal.&lt;/p&gt;&lt;p&gt;Si trieu instal·lar GRUB2 a l&apos;arrel, llavors s&apos;instal·larà GRUB2 a l&apos;inici de la partició arrel. Aquesta opció és només per a experts.&lt;/p&gt;&lt;p&gt;Si deseleccioneu la casella d&apos;ºInstal·la GRUB, aquest no s&apos;instal·larà en aquest moment. Aquesta opció és només per a experts.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2028"/>
+        <location filename="../minstall.cpp" line="2033"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Serveis Comuns a activar&lt;/b&gt;&lt;br/&gt;seleccioneu els serveis comuns que podeu necessitar en la vostra configuració de sistema i aquests serveis s&apos;engegaran automàticament en arrencar %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2035"/>
+        <location filename="../minstall.cpp" line="2040"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Identitat de l&apos;ordinador&lt;/b&gt;&lt;br/&gt;El nom de l&apos;ordinador és un nom únic que identifica el vostre ordinador quan forma part d&apos;una xarxa. El domini de l&apos;ordinador és improbable que sigui obligatori llevat que el vostre proveïdor d&apos;Internet (ISP) o bé la xarxa local ho necessitin.&lt;/p&gt;&lt;p&gt;Els noms d&apos;equip i de domini poden contenir només caràcters alfanumèrics, punts, i guionets. No poden contenir espais en blanc, començar o acabar amb guionets.&lt;/p&gt;&lt;p&gt;Cal activar el servidor SaMBa si voleu compartir els vostres directoris o impressores amb un ordinador local que usi MS-Windows o Mac OSX.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2044"/>
+        <location filename="../minstall.cpp" line="2049"/>
         <source>&lt;p&gt;&lt;b&gt;Localization Defaults&lt;/b&gt;&lt;br/&gt;Set the default keyboard and locale. These will apply unless they are overridden later by the user.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configure Clock&lt;/b&gt;&lt;br/&gt;If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for &apos;System clock uses LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Timezone Settings&lt;/b&gt;&lt;br/&gt;The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Service Settings&lt;/b&gt;&lt;br/&gt;Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! </source>
         <translation>&lt;p&gt;&lt;b&gt;Localització per omissió&lt;/b&gt;&lt;br/&gt;Definiu el teclat per omissió i el &lt;i&gt;locale&lt;/i&gt;.  Aquests s&apos;aplicaran tot seguit, però es poden canviar més endavant per l&apos;usuari.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configuració del Rellotge&lt;/b&gt;&lt;br/&gt;Si teniu un ordinador Apple o un sistema Unix pur, per omissió el rellotge del sistema s&apos;estableix en hora GMT &lt;i&gt;Greenwich Mean Time&lt;/i&gt; o UT &lt;i&gt;Universal Time&lt;/i&gt;.  Per canviar-lo, marqueu la casella de &apos;Rellotge de Sistema en LOCAL&apos;.&lt;/p&gt;El sistema arrenca amb la zona horària GMT/UTC per omissió. Per canviar la zona horària, un cop heu arrencat amb la nova instal·lació, feu clic amb el botó dret del ratolí sobre el rellotge del plafó i trieu Propietats.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configuració de Serveis&lt;/b&gt;&lt;br/&gt;Normalment no cal canviar la configuració per omissió. Els usuaris amb ordinadors de poca capacitat a vegades poden desactivar alguns serveis innecessaris, per tal de minimitzar l&apos;ús de la RAM. Assegureu-vos, però, de saber el que esteu fent! </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2052"/>
+        <location filename="../minstall.cpp" line="2057"/>
         <source>&lt;p&gt;&lt;b&gt;Default User Login&lt;/b&gt;&lt;br/&gt;The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwords&lt;/b&gt;&lt;br/&gt;Enter a new password for your default user account and for the root account. Each password must be entered twice.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Entrada d&apos;usuari per omissió&lt;/b&gt;&lt;br/&gt;L&apos;usuari primari (root) és semblant a l&apos;usuari administrador en altres Sistemes Operatius. No hauríeu d&apos;usar l&apos;usuari primari com a usuari habitual. Si us plau, entreu el nom per a un compte d&apos;usuari nou que s&apos;utilitzarà diàriament. Si cal, podeu crear altres comptes d&apos;usuari més endavant amb %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Contrasenyes&lt;/b&gt;&lt;br/&gt;Entreu una nova contrasenya per al vostre ususri per omissió i per a l&apos;usuari primari (root). Cada contrasenya s&apos;ha d&apos;entrar dos cops.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2060"/>
+        <location filename="../minstall.cpp" line="2065"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Enhorabona!&lt;/b&gt;&lt;br/&gt;Heu acomplert la instal·lació de %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Trobar Aplicacions&lt;/b&gt;&lt;br/&gt;Ja hi ha centenars d&apos;aplicacions instal·lades a %1 . La millor manera de familiaritzar-s&apos;hi és fullejar el Menú i provar-les. Moltes de les aplicacions s&apos;han desenvolupat especialment per al projecte %1. Aquestes es mostren als menús principals.&lt;p&gt;Però a més,  %1 inclou moltes aplicacions estàndard de Linux que s&apos;executen des de la línia d&apos;ordres i, per tant, no surten al Menú.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2070"/>
+        <location filename="../minstall.cpp" line="2075"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
         <translation>Gaudiu usant %1&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2084"/>
-        <location filename="../minstall.cpp" line="2098"/>
+        <location filename="../minstall.cpp" line="2089"/>
+        <location filename="../minstall.cpp" line="2103"/>
         <source>Next</source>
         <translation>Segúent</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2096"/>
+        <location filename="../minstall.cpp" line="2101"/>
         <source>Finish</source>
         <translation>Acaba</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2373"/>
+        <location filename="../minstall.cpp" line="2378"/>
         <source>%1 is installing, are you 
 sure you want to Close now?</source>
         <translation>S&apos;està instal·lant %1, esteu segurs 
 de voler tancar-ho ara?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2400"/>
+        <location filename="../minstall.cpp" line="2405"/>
         <source>Deleting old system</source>
         <translation>Esborrant el sistema antic </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2410"/>
+        <location filename="../minstall.cpp" line="2415"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
         <translation>Ha fallat en esborrar l&apos;antic %1 a la destinació.
 Retornant al primer pas.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2436"/>
+        <location filename="../minstall.cpp" line="2441"/>
         <source>Copying new system</source>
         <translation>Copiant el nou sistema </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2461"/>
+        <location filename="../minstall.cpp" line="2466"/>
         <source>Fixing configuration</source>
         <translation>Arranjant la configuració</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2554"/>
+        <location filename="../minstall.cpp" line="2559"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Ha fallat en escriure %1 a la destinació.
 Retornant al primer pas.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2581"/>
+        <location filename="../minstall.cpp" line="2586"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Obtenir Ajuda&lt;/b&gt;&lt;br/&gt;La informació bàsica quant a %1 està a %2.&lt;/p&gt;&lt;p&gt;Trobareu voluntaris per ajudar-vos al fòrum de %3 , %4&lt;/p&gt;&lt;p&gt;Si demaneu ajuda, si us plau recordeu-vos de descriure en detall l&apos;ordinador i el vostre problema. Normalment frases com &apos;No funciona&apos; no ajuden gens. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2589"/>
+        <location filename="../minstall.cpp" line="2594"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Reparar la instal·lació&lt;/b&gt;&lt;br/&gt;Si %1 deixa de funcionar des del disc dur, a vegades es pot arreglar arrencant des del DVD Autònom o Live USB i executant alguna de les utilitats incorporades a %1 o usant una de les eines clàssiques de Linux per reparar el sistema.&lt;/p&gt;&lt;p&gt;Fins i tot podeu usar el vostre DVD Autònom o Live USB de %1 per recuperar dades dels sistemes MS-Windows!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2595"/>
+        <location filename="../minstall.cpp" line="2600"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Suport de %1&lt;/b&gt;&lt;br/&gt;%1 té el suport de persones com vosaltres. Uns n&apos;ajuden altres al fòrum d&apos;ajuda (%2), tradueixen fitxers d&apos;ajuda a diversos idiomes, fan suggeriments, escriuen documentació o proven el programari nou.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2602"/>
+        <location filename="../minstall.cpp" line="2607"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ajustatges del mesclador de so&lt;/b&gt;&lt;br/&gt; %1 prova de configurar el mesclador de so per vosaltres, però a vegades us serà necessari pujar el volum o desenmudir canals al mesclador per escoltar so.&lt;/p&gt; &lt;p&gt;Trobareu la drecera del mesclador al menú. Cliqueu-hi per obrir el mesclador. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2610"/>
+        <location filename="../minstall.cpp" line="2615"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Mantenir la vostra còpia de %1 al dia&lt;/b&gt;&lt;br/&gt;Per més informació i actualitzacions podeu visitar &lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2623"/>
+        <location filename="../minstall.cpp" line="2628"/>
         <source>Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2623"/>
+        <location filename="../minstall.cpp" line="2628"/>
         <source>Are you sure you want to quit the application?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2638"/>
+        <location filename="../minstall.cpp" line="2643"/>
         <source>This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation>Aquesta opció també encripta /swap, el que fa que la partició d&apos;intercanvi no es pugui compartir amb altres Sistemes Operatius instal·lats.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2639"/>
+        <location filename="../minstall.cpp" line="2644"/>
         <source>OK</source>
         <translation>D&apos;acord</translation>
     </message>
@@ -1102,7 +1102,7 @@ Retornant al primer pas.</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../app.cpp" line="49"/>
+        <location filename="../app.cpp" line="62"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -1112,7 +1112,7 @@ Si us plau, tanqueu-lo si podeu, o executeu &apos;pkill minstall&apos; en un ter
 </translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="57"/>
+        <location filename="../app.cpp" line="70"/>
         <source>You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot unless you select Legacy Boot or similar at restart.
 We recommend you quit now and restart in Legacy Boot
 
@@ -1123,17 +1123,17 @@ Us recomanem que sortiu ara i torneu a arrencar en mode Legacy Boot.
 Voleu continuar la instal·lació?</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="61"/>
+        <location filename="../app.cpp" line="74"/>
         <source>Yes</source>
         <translation>Sí </translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="61"/>
+        <location filename="../app.cpp" line="74"/>
         <source>No</source>
         <translation>No </translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="74"/>
+        <location filename="../app.cpp" line="87"/>
         <source>You must run this app as root.</source>
         <translation>Cal ser usuari primari per executar aquest programa.</translation>
     </message>

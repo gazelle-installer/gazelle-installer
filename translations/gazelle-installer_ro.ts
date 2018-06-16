@@ -74,8 +74,8 @@ Discul cu partiția selectă pentru instalare este in curs de defectare.
         <location filename="../minstall.cpp" line="1316"/>
         <location filename="../minstall.cpp" line="1341"/>
         <location filename="../minstall.cpp" line="1827"/>
-        <location filename="../minstall.cpp" line="1841"/>
-        <location filename="../minstall.cpp" line="2374"/>
+        <location filename="../minstall.cpp" line="1846"/>
+        <location filename="../minstall.cpp" line="2379"/>
         <source>Yes</source>
         <translation>Da</translation>
     </message>
@@ -93,8 +93,8 @@ Discul cu partiția selectă pentru instalare este in curs de defectare.
         <location filename="../minstall.cpp" line="1316"/>
         <location filename="../minstall.cpp" line="1341"/>
         <location filename="../minstall.cpp" line="1827"/>
-        <location filename="../minstall.cpp" line="1841"/>
-        <location filename="../minstall.cpp" line="2374"/>
+        <location filename="../minstall.cpp" line="1846"/>
+        <location filename="../minstall.cpp" line="2379"/>
         <source>No</source>
         <translation>Nu</translation>
     </message>
@@ -444,175 +444,175 @@ Ca să folosiți noul sistem, reporniți fără mediul de instalare.
 Doriți să reporniți acum?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1840"/>
+        <location filename="../minstall.cpp" line="1845"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>Instalarea și configurarea e incompletă.
 Sigur doriți sa opriți acum?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1941"/>
+        <location filename="../minstall.cpp" line="1946"/>
         <source>&lt;p&gt;&lt;b&gt;General Instructions&lt;/b&gt;&lt;br/&gt;BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.&lt;/p&gt;&lt;p&gt;On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.&lt;/p&gt;&lt;p&gt;Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions. &lt;/p&gt;&lt;p&gt;If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.&lt;/p&gt;&lt;p&gt;The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Instructii generale&lt;/b&gt;&lt;br/&gt;ÎNAINTE DE A CONTINUA, ÎNCHIDEȚI TOATE CELELALTE APLICAȚII.&lt;/p&gt;&lt;p&gt;Vă rugăm să citiți instrucțiunile pe fiecare pagină, faceți selecțiile, și apoi faceți clic pe Următorul atunci când sunteți gata pentru a continua. Vi se va cere o confirmare înainte de a fi efectuate orice acțiuni distructive. Instalarea necesită aproximativ %1 de spațiu. %2 sau mai mult este de preferat. Puteți folosi întregul disc sau puteți pune instalația pe niște partiții existente.&lt;/p&gt;&lt;p&gt;Dacă utilizați Mac OS sau Windows OS (de la Vista încoace) s-ar putea sa trebuiască să utilizați program de partiționare din sistemul de operare respectiv înainte de instalare.&lt;/p&gt;&lt;p&gt;Sunt sprijinite sistemele de fișiere ext2, ext3, ext4, jfs, xfs, btrfs.  Ext4 este recomandat de dezvoltatori.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1952"/>
+        <location filename="../minstall.cpp" line="1957"/>
         <source>&lt;p&gt;&lt;b&gt;Limitations&lt;/b&gt;&lt;br/&gt;Remember, this software is provided AS-IS with no warranty what-so-ever. It&apos;s solely your responsibility to backup your data before proceeding.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Choose Partitions&lt;/b&gt;&lt;br/&gt;%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.&lt;/p&gt;&lt;p&gt;If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Upgrading&lt;/b&gt;&lt;br/&gt;To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.&lt;/p&gt;&lt;p&gt;If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Preferred Filesystem Type&lt;/b&gt;&lt;br/&gt;For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. &lt;/p&gt;&lt;p&gt;Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bad Blocks&lt;/b&gt;&lt;br/&gt;If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1977"/>
+        <location filename="../minstall.cpp" line="1982"/>
         <source>Returning to Step 1 to select another disk.</source>
         <translation>Întoarcere la Pasul 1 pentru a alege alt disc.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1981"/>
+        <location filename="../minstall.cpp" line="1986"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;Mulțumiri speciale&lt;b&gt;&lt;br/&gt;Mulțumim tuturor celor care au ales să sprijine %1, cu timpul lor, bani, sugestii, muncă, laudă, idei, promovare, și/sau cu încurajare.&lt;/p&gt;&lt;p&gt;Fără dumneavoastră nu ar exista %1. &lt;/p&gt;&lt;p&gt;Echipa de dezvoltatori %2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1984"/>
+        <location filename="../minstall.cpp" line="1989"/>
         <source>&lt;p&gt;&lt;b&gt;Installation in Progress&lt;/b&gt;&lt;br/&gt; %1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.&lt;/p&gt;&lt;p&gt;If you click the Abort button, the installation will be stopped as soon as possible.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Instalare în curs de desfășurare&lt;/b&gt;&lt;br/&gt;%1 se instalează. Procesul probabil va dura 3-20 minute pentru o instalație nouă, în funcție de viteza sistemului și de dimensiunea partițiilor care sunt reformatate.&lt;/p&gt;&lt;p&gt;Dacă faceți clic pe butonul Anulare, instalarea va fi oprită în cel mai scurt timp posibil.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1996"/>
+        <location filename="../minstall.cpp" line="2001"/>
         <source>Failed to create required partitions.
 Returning to Step 1.</source>
         <translation>Nu s-au putut prepara partițiile alese.
 Întoarcere la Pasul 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2005"/>
+        <location filename="../minstall.cpp" line="2010"/>
         <source>Failed to prepare chosen partitions.
 Returning to Step 1.</source>
         <translation>Nu s-a putut prepara partiția aleasă
 Întoarcere la Pasul 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2019"/>
+        <location filename="../minstall.cpp" line="2024"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 at root instead, then GRUB2 will be installed at the beginning of the root partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Selectați metoda de bootare&lt;/b&gt;&lt;br/&gt;%1 utilizează aplicația bootloader GRUB care pornește %1 și MS Windows.&lt;p&gt;În mod implicit GRUB2 este instalat in Master Boot Record sau pe ESP (Partiția de sistem EFI) și înlocuiește bootloader pe care-l utilizați înainte. Acest lucru este normal. &lt;/p&gt;&lt;p&gt;Dacă doriți să instalați GRUB2 pe partiția root în loc de MBR sau EFI, atunci GRUB2 va fi instalat la începutul partiției root. Această opțiune este recomandată numai pentru experți.&lt;/p&gt;&lt;p&gt;Dacă nu selectați căsuța Instalare GRUB, GRUB nu va fi instalat în acest moment. Această opțiune este recomandată numai pentru experți.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2028"/>
+        <location filename="../minstall.cpp" line="2033"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt; Servicii de activat &lt;/b&gt;&lt;br/&gt; Selectați oricare dintre aceste servicii de care ați putea avea nevoie și serviciile vor fi pornite automat atunci când porniți %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2035"/>
+        <location filename="../minstall.cpp" line="2040"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Nume computer&lt;/b&gt;&lt;br/&gt;Numele computerului este un nume unic care va indentifica computerul dumneavoastra pe rețea. Numele domeniului nu e probabil să fie folosit decât dacă e necesar furnizorului de servicii Internet sau pentru rețeaua locala.&lt;/p&gt;&lt;p&gt;Numele computerului și a domeniului pot conține numai caractere alfanumerice, puncte și cratime. Nu pot conține spații goale și nu pot să inceapă sau să se termine cu cratime sau puncte.&lt;/p&gt;&lt;p&gt;Serverul SaMBa trebuie să fie activat dacă doriți să-l folosiți să împărțiți directoarele sau printerul cu un computer care rulează MS-Windows sau Mac OSX.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2044"/>
+        <location filename="../minstall.cpp" line="2049"/>
         <source>&lt;p&gt;&lt;b&gt;Localization Defaults&lt;/b&gt;&lt;br/&gt;Set the default keyboard and locale. These will apply unless they are overridden later by the user.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configure Clock&lt;/b&gt;&lt;br/&gt;If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for &apos;System clock uses LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Timezone Settings&lt;/b&gt;&lt;br/&gt;The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Service Settings&lt;/b&gt;&lt;br/&gt;Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! </source>
         <translation>&lt;p&gt;&lt;b&gt;Setări pentru localizare &lt;/b&gt;&lt;br/&gt;Setați tastatura și localizarea implicite. Acestea se vor aplica dacă nu sunt suprascrise ulterior de către utilizator. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Configurare ceas&lt;/b&gt;&lt;br/&gt;Dacă aveți un Apple sau un calculator pur Unix, ceasul de sistem este setat la GMT sau timp universal. Pentru a schimba, bifați caseta pentru &quot;ceasul sistemului folosește LOCAL.&quot; &lt;/p&gt;&lt;p&gt;&lt;b&gt;Setări fus orar&lt;/b&gt;&lt;br/&gt;Sistemul pornește cu presetarea zonă de fus orar la GMT / UTC. Pentru a schimba zona de fus orar, după ce reporniți în noua instalare, faceți clic dreapta pe ceasul din Panel și selectați Properties. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Setare Servicii&lt;/b&gt;&lt;br/&gt;Majoritatea utilizatorilor nu au nevoie sa schimbe setările implicite. Utilizatorii de computere cu resurse limitate pot sa deactiveze serviciile de care nu au nevoie, ca să reducă ulitizarea memoriei. Nu schimbați configurarea implicită dacă nu sunteți siguri de ceea ce faceți! </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2052"/>
+        <location filename="../minstall.cpp" line="2057"/>
         <source>&lt;p&gt;&lt;b&gt;Default User Login&lt;/b&gt;&lt;br/&gt;The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwords&lt;/b&gt;&lt;br/&gt;Enter a new password for your default user account and for the root account. Each password must be entered twice.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Cont implicit&lt;/b&gt;&lt;br/&gt;Contul root este similar cu contul Administrator în alte sisteme de operare. Ne este recomandat să folosiți contul root zi de zi. Introduceți numele unui nou (implicit) cont pe care o să-l folosiți in fiecare zi. Dacă aveți nevoie, puteți adăuga alte conturi mai târziu cu %1 Manager Utilizator. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Parole&lt;/b&gt;&lt;br/&gt;Introduceți o nouă parolă pentru contul de utilizator implicit și pentru contul de root. Fiecare parolă trebuie să fie introdusă de două ori.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2060"/>
+        <location filename="../minstall.cpp" line="2065"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Felicitări!&lt;/b&gt;&lt;br/&gt;Ați finalizat instalarea sitemului de operare %1. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Cum să găsiți aplicații&lt;/b&gt;&lt;br/&gt;Există sute de programe excelente instalate cu %1. Cel mai bun mod de a învăța despre ele este de a naviga prin meniu și a le încerca. Multe dintre aplicații au fost dezvoltate special pentru proiectul %1. Acestea sunt prezentate în meniurile principale.&lt;p&gt;În plus, %1 include numeroase aplicații Linux standard, care sunt rulate numai de la linie de comandă și, prin urmare, nu apar în meniu. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2070"/>
+        <location filename="../minstall.cpp" line="2075"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
         <translation>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2084"/>
-        <location filename="../minstall.cpp" line="2098"/>
+        <location filename="../minstall.cpp" line="2089"/>
+        <location filename="../minstall.cpp" line="2103"/>
         <source>Next</source>
         <translation>Următorul</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2096"/>
+        <location filename="../minstall.cpp" line="2101"/>
         <source>Finish</source>
         <translation>Sfârșit</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2373"/>
+        <location filename="../minstall.cpp" line="2378"/>
         <source>%1 is installing, are you 
 sure you want to Close now?</source>
         <translation>%1se instaleaza, sigur
 doriți sa Inchideți acum?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2400"/>
+        <location filename="../minstall.cpp" line="2405"/>
         <source>Deleting old system</source>
         <translation>Se șterge sistemul vechi</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2410"/>
+        <location filename="../minstall.cpp" line="2415"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
         <translation>Nu s-a putut șterge vechiul %1 pe destinație.
 Întoarcere la Pasul 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2436"/>
+        <location filename="../minstall.cpp" line="2441"/>
         <source>Copying new system</source>
         <translation>Copiere sistem nou</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2461"/>
+        <location filename="../minstall.cpp" line="2466"/>
         <source>Fixing configuration</source>
         <translation>Se prepară configurarea</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2554"/>
+        <location filename="../minstall.cpp" line="2559"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Nu s-a putut scrie %1 la destinație.
 Întoarcere la Pasul 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2581"/>
+        <location filename="../minstall.cpp" line="2586"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Cum să obțineți ajutor &lt;/b&gt;&lt;br/&gt;Puteți găsi informații de bază despre %1 la %2  Există voluntari care vă pot ajuta la forumul %3, %4 &lt;/p&gt;&lt;p&gt;Dacă cereți ajutor, vă rugăm să nu uitați să descrieți problema dvs. și computerul dvs. în detaliu. De obicei, afirmații de genul &quot;nu merge&quot;, nu sunt de ajutor. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2589"/>
+        <location filename="../minstall.cpp" line="2594"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Repararea instalării&lt;/b&gt;&lt;br/&gt;Dacă %1 nu mai funcționează de pe hard disk, uneori, este posibil să rezolvați problema pornind de pe DVD sau USB și rulând unul dintre utilitarele din System Configuration sau folosind unul dintre obișnuitele utilitare Linux pentru a repara sistemul. &lt;/p&gt;&lt;p&gt;Puteți folosi, de asemenea, DVD-ul %1 pentru a recupera datele de pe sistemele MS-Windows!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2595"/>
+        <location filename="../minstall.cpp" line="2600"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Suport %1&lt;/b&gt;&lt;br/&gt;%1 este susținut de către oameni ca tine care se ajută unii pe alții pe forumul comunității - %2, traduc fișiere de ajutor în diverse limbi, fac sugestii, scriu documentație, sau ajută la testarea programelor noi.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2602"/>
+        <location filename="../minstall.cpp" line="2607"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt; &lt;b&gt;Reglarea mixer de sunet &lt;/b&gt;&lt;br/&gt; %1 încercă să configureze mixerul de sunet automat, dar, uneori, pentru a auzi ceva, va fi necesar să modificați volumul și canale de activare sunet în mixer.&lt;/p&gt;&lt;p&gt;Comanda pentru mixer se află în meniu. Faceți clic pe el pentru a deschide mixerul. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2610"/>
+        <location filename="../minstall.cpp" line="2615"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Țineți %1 la curent&lt;/b&gt;&lt;br/&gt;Pentru informații și actualizări, vă rugăm să vizitați &lt;/p&gt;&lt;p&gt;%2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2623"/>
+        <location filename="../minstall.cpp" line="2628"/>
         <source>Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2623"/>
+        <location filename="../minstall.cpp" line="2628"/>
         <source>Are you sure you want to quit the application?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2638"/>
+        <location filename="../minstall.cpp" line="2643"/>
         <source>This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation>Această opțiune de asemenea cifrează /swap, ceea ce va face ca partiția swap să nu poată fi împărţită cu alte sisteme de operare instalate.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2639"/>
+        <location filename="../minstall.cpp" line="2644"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -1105,7 +1105,7 @@ Returning to Step 1.</source>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../app.cpp" line="49"/>
+        <location filename="../app.cpp" line="62"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -1114,7 +1114,7 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Închideți-l dacă este posibil sau rulați &quot;pkill minstall&quot; în terminal.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="57"/>
+        <location filename="../app.cpp" line="70"/>
         <source>You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot unless you select Legacy Boot or similar at restart.
 We recommend you quit now and restart in Legacy Boot
 
@@ -1125,17 +1125,17 @@ Vă recomandăm să părăsiți acum și să reporniți în Legacy Boot
 Doriți să continuați instalarea?</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="61"/>
+        <location filename="../app.cpp" line="74"/>
         <source>Yes</source>
         <translation>Da</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="61"/>
+        <location filename="../app.cpp" line="74"/>
         <source>No</source>
         <translation>Nu</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="74"/>
+        <location filename="../app.cpp" line="87"/>
         <source>You must run this app as root.</source>
         <translation>Trebuie să rulați programul ca administrator.</translation>
     </message>

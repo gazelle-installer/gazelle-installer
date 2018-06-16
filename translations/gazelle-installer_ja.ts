@@ -72,8 +72,8 @@ The disk with the partition you selected for installation is failing.
         <location filename="../minstall.cpp" line="1316"/>
         <location filename="../minstall.cpp" line="1341"/>
         <location filename="../minstall.cpp" line="1827"/>
-        <location filename="../minstall.cpp" line="1841"/>
-        <location filename="../minstall.cpp" line="2374"/>
+        <location filename="../minstall.cpp" line="1846"/>
+        <location filename="../minstall.cpp" line="2379"/>
         <source>Yes</source>
         <translation>はい</translation>
     </message>
@@ -91,8 +91,8 @@ The disk with the partition you selected for installation is failing.
         <location filename="../minstall.cpp" line="1316"/>
         <location filename="../minstall.cpp" line="1341"/>
         <location filename="../minstall.cpp" line="1827"/>
-        <location filename="../minstall.cpp" line="1841"/>
-        <location filename="../minstall.cpp" line="2374"/>
+        <location filename="../minstall.cpp" line="1846"/>
+        <location filename="../minstall.cpp" line="2379"/>
         <source>No</source>
         <translation>いいえ</translation>
     </message>
@@ -438,175 +438,175 @@ Do you want to reboot now?</source>
 今すぐ再起動を行ってもよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1840"/>
+        <location filename="../minstall.cpp" line="1845"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>インストールと設定がまだ完了していません。
 処理を止めてよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1941"/>
+        <location filename="../minstall.cpp" line="1946"/>
         <source>&lt;p&gt;&lt;b&gt;General Instructions&lt;/b&gt;&lt;br/&gt;BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.&lt;/p&gt;&lt;p&gt;On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.&lt;/p&gt;&lt;p&gt;Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions. &lt;/p&gt;&lt;p&gt;If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.&lt;/p&gt;&lt;p&gt;The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;はじめに&lt;/b&gt;&lt;br/&gt;実行の前に他のアプリケーションを閉じて下さい。&lt;/p&gt;&lt;p&gt;各ページに表示される表示を読み、選択を行って下さい。進めてもよろしければ「次へ」を押して進めて下さい。&lt;/p&gt;&lt;p&gt;では %1 GB の空き容量が必要です。%2 以上が推奨されます。任意のディスクによるパーティション内で MX Linux を使用する事ができます。&lt;/p&gt;&lt;p&gt;もしパソコンをご利用で、パーティション作業が必要であれば GParted を実行しパーティションを修正した後、カスタムインストールを使用して下さい。もし Apple 製のハードウェアを使用している場合は parted や GParted を起動ドライブで使用しないで下さい。MX Linux をインストールする前に OS X または Windows OS (Vista 以降) からパーティションとブートマネージャの設定を行って下さい。&lt;/p&gt;&lt;p&gt;ファイルシステムは ext2、ext3、ext4、jfs、xfs、btrfs、reiserfs の Linux ファイルシステムに対応しています。ext4 が推奨されます。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1952"/>
+        <location filename="../minstall.cpp" line="1957"/>
         <source>&lt;p&gt;&lt;b&gt;Limitations&lt;/b&gt;&lt;br/&gt;Remember, this software is provided AS-IS with no warranty what-so-ever. It&apos;s solely your responsibility to backup your data before proceeding.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Choose Partitions&lt;/b&gt;&lt;br/&gt;%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.&lt;/p&gt;&lt;p&gt;If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Upgrading&lt;/b&gt;&lt;br/&gt;To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.&lt;/p&gt;&lt;p&gt;If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Preferred Filesystem Type&lt;/b&gt;&lt;br/&gt;For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. &lt;/p&gt;&lt;p&gt;Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bad Blocks&lt;/b&gt;&lt;br/&gt;If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1977"/>
+        <location filename="../minstall.cpp" line="1982"/>
         <source>Returning to Step 1 to select another disk.</source>
         <translation>Step 1 へ処理を戻します。他のディスクを選んで下さい。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1981"/>
+        <location filename="../minstall.cpp" line="1986"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;スペシャルサンクス&lt;/b&gt;&lt;br/&gt;%1 をサポートするために、自分の時間、お金、提案、仕事、賞賛、アイデア、プロモーション、激励を提供してくれたすべての方々に感謝いたします。&lt;/p&gt;&lt;p&gt;あなたなしでは %1 はなかったでしょう。&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1984"/>
+        <location filename="../minstall.cpp" line="1989"/>
         <source>&lt;p&gt;&lt;b&gt;Installation in Progress&lt;/b&gt;&lt;br/&gt; %1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.&lt;/p&gt;&lt;p&gt;If you click the Abort button, the installation will be stopped as soon as possible.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;インストール作業&lt;/b&gt;&lt;br/&gt;%1 をインストールしています。フレッシュインストールの場合はおおよそ 3〜20 分要します。この速度はシステムやパーティション構成で変わります。&lt;/p&gt;&lt;p&gt;もし中断ボタンを押した場合、はやいうちにインストールを止める事ができます。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1996"/>
+        <location filename="../minstall.cpp" line="2001"/>
         <source>Failed to create required partitions.
 Returning to Step 1.</source>
         <translation>必須パーティションの生成に失敗しました。
 Step 1 へ処理を戻します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2005"/>
+        <location filename="../minstall.cpp" line="2010"/>
         <source>Failed to prepare chosen partitions.
 Returning to Step 1.</source>
         <translation>パーティションの設定に失敗しました。
 Step 1 に処理を戻します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2019"/>
+        <location filename="../minstall.cpp" line="2024"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 at root instead, then GRUB2 will be installed at the beginning of the root partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;起動メソッドの選択&lt;/b&gt;&lt;br/&gt;%1 と MS Windows の起動に GRUB ブートローダーを起動できます。&lt;p&gt;標準の GRUB2 は起動ドライブの MBR または ESP (64 ビット UEFI 起動システムの EFI システムパーティション) へインストールし、ブートローダーを置き換えます。これは標準です。&lt;/p&gt;&lt;p&gt;もし、GRUB をルートパーティションにインストールするよう選択した場合、GRUB2 はルートパーティションへインストールされます。これは経験者向けのオプションです。&lt;/p&gt;&lt;p&gt;もし、GRUB のチェックを外した場合、GRUB はインストールされません。これは経験者向けのオプションです。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2028"/>
+        <location filename="../minstall.cpp" line="2033"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;コモンサービスの有効&lt;/b&gt;&lt;br/&gt;ご使用のシステム構成に必要なサービスがあればそれを選択して下さい。これは %1 起動時に自動的に開始されます。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2035"/>
+        <location filename="../minstall.cpp" line="2040"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;コンピュータ ID&lt;/b&gt;&lt;br/&gt;コンピュータ名は、ネットワーク上でコンピュータを特定するための名称です。インターネットサービスプロバイダ（ISP）またはローカル・ネットワークが必要としない限り、コンピュータドメインは使われません。&lt;/p&gt;&lt;p&gt;コンピュータ名・ドメイン名は英数・ドット（.）・ハイフン（-）の文字で構成されます。空白を含めず、ハイフンは前後に付けられません。&lt;/p&gt;&lt;p&gt;フォルダやプリンターを Windows・Mac OS X を実行するコンピュータを共有するためには SAMBA サーバを有効にする必要があります。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2044"/>
+        <location filename="../minstall.cpp" line="2049"/>
         <source>&lt;p&gt;&lt;b&gt;Localization Defaults&lt;/b&gt;&lt;br/&gt;Set the default keyboard and locale. These will apply unless they are overridden later by the user.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configure Clock&lt;/b&gt;&lt;br/&gt;If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for &apos;System clock uses LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Timezone Settings&lt;/b&gt;&lt;br/&gt;The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Service Settings&lt;/b&gt;&lt;br/&gt;Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! </source>
         <translation>&lt;p&gt;&lt;b&gt;言語のデフォルト&lt;/b&gt;&lt;br/&gt;デフォルトキーボードと言語(ロケール)を設定します。これらは後にユーザーによって上書きされない限り適用されます。&lt;/p&gt;&lt;p&gt;&lt;b&gt;クロックの設定&lt;/b&gt;&lt;br/&gt;もし Apple や純粋な Unix コンピュータを使用している場合、そのシステムは通常 GMT または Universal Time (UTC) へ設定します。それを変更する場合は「シシテムクロックにローカルタイムを使用する」をクリックしチェックを入れます&lt;/p&gt;&lt;p&gt;&lt;b&gt;タイムゾーンの設定&lt;/b&gt;&lt;br/&gt;システム起動時、タイムゾーンは GMT/UTC へ設定されています。タイムゾーンを再起動して新たにインストールしたシステムで変更したい場合、パネルにある時計を右クリックし、プロパティを選択して下さい。&lt;/p&gt;&lt;p&gt;&lt;b&gt;サービス設定&lt;/b&gt;&lt;br/&gt;通常ユーザーはこれを変更しないで下さい。低リソースのコンピュータを使用するユーザーはいくつかのサービスを無効にする事でメモリ使用を低く抑える事ができます。行っている事を承知の上で実施して下さい！ </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2052"/>
+        <location filename="../minstall.cpp" line="2057"/>
         <source>&lt;p&gt;&lt;b&gt;Default User Login&lt;/b&gt;&lt;br/&gt;The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwords&lt;/b&gt;&lt;br/&gt;Enter a new password for your default user account and for the root account. Each password must be entered twice.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;デフォルトユーザーログイン&lt;/b&gt;&lt;br/&gt;root ユーザーは他の OS でいう Administrator ユーザーに類似します。root ユーザーをユーザーアカウントとして通常使用すべきではありません。通常使用するユーザーアカウントを入力して下さい。必要な場合は %1 ユーザーマネージャーで他のユーザーアカウントを後に追加する事ができます。&lt;/p&gt;&lt;p&gt;&lt;b&gt;パスワード&lt;/b&gt;&lt;br/&gt;ユーザーアカウントと root アカウントのパスワードを入力して下さい。このパスワードは2回入力する必要があります。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2060"/>
+        <location filename="../minstall.cpp" line="2065"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;インストールが完了しました&lt;/b&gt;&lt;br/&gt;%1 のインストールが完了しました&lt;/p&gt;&lt;p&gt;&lt;b&gt;アプリケーションの検索&lt;/b&gt;&lt;br/&gt;%1 には沢山の素晴らしいアプリケーションが入っています。まずはメニュー中を探索して下さい。多くのアプリは特に %1 環境のために作成されています。これはメインメニューから見る事ができます。&lt;p&gt;更に %1 はコマンドラインから動作するメニューに表示されない標準の Linux アプリケーションを含めています。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2070"/>
+        <location filename="../minstall.cpp" line="2075"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
         <translation>%1 を楽しんで使用して下さい&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2084"/>
-        <location filename="../minstall.cpp" line="2098"/>
+        <location filename="../minstall.cpp" line="2089"/>
+        <location filename="../minstall.cpp" line="2103"/>
         <source>Next</source>
         <translation>次へ</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2096"/>
+        <location filename="../minstall.cpp" line="2101"/>
         <source>Finish</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2373"/>
+        <location filename="../minstall.cpp" line="2378"/>
         <source>%1 is installing, are you 
 sure you want to Close now?</source>
         <translation>%1 をインストール中です。
 閉じてもよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2400"/>
+        <location filename="../minstall.cpp" line="2405"/>
         <source>Deleting old system</source>
         <translation>旧システムの削除中</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2410"/>
+        <location filename="../minstall.cpp" line="2415"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
         <translation>古い %1 の削除に失敗しました。
 Step 1 に処理を戻します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2436"/>
+        <location filename="../minstall.cpp" line="2441"/>
         <source>Copying new system</source>
         <translation>新システムのコピー中</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2461"/>
+        <location filename="../minstall.cpp" line="2466"/>
         <source>Fixing configuration</source>
         <translation>設定の構築中</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2554"/>
+        <location filename="../minstall.cpp" line="2559"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>%1 の書き込みに失敗しました。
 Step 1 へ処理を戻します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2581"/>
+        <location filename="../minstall.cpp" line="2586"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;困った時は (英語情報)&lt;/b&gt;&lt;br/&gt;%1 の基本的な情報は %2 で参照できます。%3 Forum %4 で助けてくれる人がいるでしょう。&lt;/p&gt;&lt;p&gt;もし助けを求める場合、必須情報として問題の詳細とコンピュータ情報を忘れずに記述して下さい。通常「動きません」とだけ書かれた内容は役に立ちません。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2589"/>
+        <location filename="../minstall.cpp" line="2594"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;インストールの修復&lt;/b&gt;&lt;br/&gt;%1 はハードドライブから作業を停止した場合、LiveDVD や LiveUSB からブートし MX ツールのユーティリティいずれかを実行するか、システムを修復するため Linux ツールを使用して問題を解決することが可能です。&lt;/p&gt;&lt;p&gt;また、MS-Windows システムからデータを回復するために %1 LiveDVD やLiveUSB を使用することができます！&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2595"/>
+        <location filename="../minstall.cpp" line="2600"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;%1 のサポート&lt;/b&gt;&lt;br/&gt;%1 はあなたのような皆様に支援されています。サポートフォーラム %2  で他の人を助ける、使用している言語の翻訳作業を行う、ドキュメント作成を行う、新しいバージョンのテストを行う、といった支援が可能です。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2602"/>
+        <location filename="../minstall.cpp" line="2607"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;音量調整&lt;/b&gt;&lt;br/&gt;%1 は音楽ミキサーを備えます。たまに音を聞くため、ミキサーでチャンネル毎の音量調整が必要になるかもしれません。&lt;/p&gt; &lt;p&gt;ミキサーの素早い起動はメニューからミキサーをクリックして開いて下さい。 &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2610"/>
+        <location filename="../minstall.cpp" line="2615"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;%1 を最新にする&lt;/b&gt;&lt;br/&gt; 情報やアップデートについてをご参照ください&lt;/p&gt;&lt;p&gt; %2 &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2623"/>
+        <location filename="../minstall.cpp" line="2628"/>
         <source>Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2623"/>
+        <location filename="../minstall.cpp" line="2628"/>
         <source>Are you sure you want to quit the application?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2638"/>
+        <location filename="../minstall.cpp" line="2643"/>
         <source>This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2639"/>
+        <location filename="../minstall.cpp" line="2644"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -1099,7 +1099,7 @@ Step 1 へ処理を戻します。</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../app.cpp" line="49"/>
+        <location filename="../app.cpp" line="62"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -1108,7 +1108,7 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 可能であれば閉じてください。または端末で &apos;pkill minstall&apos; を実行して下さい。</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="57"/>
+        <location filename="../app.cpp" line="70"/>
         <source>You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot unless you select Legacy Boot or similar at restart.
 We recommend you quit now and restart in Legacy Boot
 
@@ -1116,17 +1116,17 @@ Do you want to continue the installation?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="61"/>
+        <location filename="../app.cpp" line="74"/>
         <source>Yes</source>
         <translation>はい</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="61"/>
+        <location filename="../app.cpp" line="74"/>
         <source>No</source>
         <translation>いいえ</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="74"/>
+        <location filename="../app.cpp" line="87"/>
         <source>You must run this app as root.</source>
         <translation>このアプリは root で実行して下さい。</translation>
     </message>
