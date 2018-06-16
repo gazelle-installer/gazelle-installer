@@ -379,7 +379,7 @@ bool MInstall::checkDisk()
                 tr("You are strongly advised to abort.\n") +
                 tr("If unsure, please exit the Installer and run GSmartControl for more information.\n\n") +
                 tr("Do you want to abort the installation?");
-        ans = QMessageBox::critical(0, QString::null, msg,
+        ans = QMessageBox::critical(this, QString::null, msg,
                                     tr("Yes"), tr("No"));
         if (ans == 0) {
             return false;
@@ -393,7 +393,7 @@ bool MInstall::checkDisk()
                     tr("but the tests indicate it will have a higher than average failure rate in the upcoming year.\n") +
                     tr("If unsure, please exit the Installer and run GSmartControl for more information.\n\n") +
                     tr("Do you want to continue?");
-            ans = QMessageBox::warning(0, QString::null, msg,
+            ans = QMessageBox::warning(this, QString::null, msg,
                                        tr("Yes"), tr("No"));
             if (ans != 0) {
                 return false;
@@ -630,7 +630,7 @@ bool MInstall::makeDefaultPartitions()
 
     QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
     QString msg = QString(tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME));
-    ans = QMessageBox::information(0, QString::null, msg,
+    ans = QMessageBox::information(this, QString::null, msg,
                                    tr("Yes"), tr("No"));
     if (ans != 0) { // don't format--stop install
         return false;
@@ -830,7 +830,7 @@ bool MInstall::makeChosenPartitions()
     QStringList homesplit = getCmdOut("partition-info split-device=" + homedev).split(" ", QString::SkipEmptyParts);
 
     if (rootdev.compare("/dev/none") == 0 || rootdev.compare("/dev/") == 0) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("You must choose a root partition.\nThe root partition must be at least %1 .").arg(MIN_INSTALL_SIZE));
         return false;
     }
@@ -838,7 +838,7 @@ bool MInstall::makeChosenPartitions()
     cmd = QString("partition-info is-linux=%1").arg(rootdev);
     if (shell.run(cmd) != 0) {
         msg = QString(tr("The partition you selected for root, appears to be a MS-Windows partition.  Are you sure you want to reformat this partition?")).arg(rootdev);
-        ans = QMessageBox::warning(0, QString::null, msg,
+        ans = QMessageBox::warning(this, QString::null, msg,
                                    tr("Yes"), tr("No"));
         if (ans != 0) {
             // don't format--stop install
@@ -850,7 +850,7 @@ bool MInstall::makeChosenPartitions()
     } else {
         msg = QString(tr("All data on %1 will be deleted, except for /home\nOK to continue?")).arg(rootdev);
     }
-    ans = QMessageBox::warning(0, QString::null, msg,
+    ans = QMessageBox::warning(this, QString::null, msg,
                                tr("Yes"), tr("No"));
     if (ans != 0) {
         // don't format--stop install
@@ -866,7 +866,7 @@ bool MInstall::makeChosenPartitions()
         if (shell.run(cmd) != 0) {
             if (swapdev.compare("/dev/none") != 0) {
                 msg = QString(tr("OK to format and destroy all data on \n%1 for the swap partition?")).arg(swapdev);
-                ans = QMessageBox::warning(0, QString::null, msg,
+                ans = QMessageBox::warning(this, QString::null, msg,
                                            tr("Yes"), tr("No"));
                 if (ans != 0) {
                     // don't format--stop install
@@ -879,7 +879,7 @@ bool MInstall::makeChosenPartitions()
         cmd = QString("partition-info is-linux=%1").arg(homedev);
         if (shell.run(cmd) != 0) {
             msg = QString(tr("The partition you selected for /home, appears to be a MS-Windows partition.  Are you sure you want to reformat this partition?")).arg(rootdev);
-            ans = QMessageBox::warning(0, QString::null, msg,
+            ans = QMessageBox::warning(this, QString::null, msg,
                                        tr("Yes"), tr("No"));
             if (ans != 0) {
                 // don't format--stop install
@@ -892,7 +892,7 @@ bool MInstall::makeChosenPartitions()
             msg = QString(tr("OK to format and destroy all data on %1 for the /home partition?")).arg(homedev);
         }
 
-        ans = QMessageBox::warning(0, QString::null, msg,
+        ans = QMessageBox::warning(this, QString::null, msg,
                                    tr("Yes"), tr("No"));
         if (ans != 0) {
             // don't format--stop install
@@ -1307,12 +1307,12 @@ bool MInstall::setUserName()
         closedir(dir);
         msg = QString( tr("The home directory for %1 already exists.Would you like to reuse the old home directory?")).arg(userNameEdit->text());
         setCursor(QCursor(Qt::ArrowCursor));
-        ans = QMessageBox::information(0, QString::null, msg,
+        ans = QMessageBox::information(this, QString::null, msg,
                                        tr("Yes"), tr("No"));
         if (ans != 0) {
             // don't reuse -- maybe save the old home
             msg = QString( tr("Would you like to save the old home directory\nand create a new home directory?"));
-            ans = QMessageBox::information(0, QString::null, msg,
+            ans = QMessageBox::information(this, QString::null, msg,
                                            tr("Yes"), tr("No"));
             if (ans == 0) {
                 // save the old directory
@@ -1326,7 +1326,7 @@ bool MInstall::setUserName()
                             if (shell.run(cmd) != 0) {
                                 cmd = QString("mv -f %1 %2.005").arg(dpath).arg(dpath);
                                 if (shell.run(cmd) != 0) {
-                                    QMessageBox::critical(0, QString::null,
+                                    QMessageBox::critical(this, QString::null,
                                                           tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
                                     return false;
                                 }
@@ -1337,7 +1337,7 @@ bool MInstall::setUserName()
             } else {
                 // don't save and don't reuse -- delete?
                 msg = QString( tr("Would you like to delete the old home directory for %1?")).arg(userNameEdit->text());
-                ans = QMessageBox::information(0, QString::null, msg,
+                ans = QMessageBox::information(this, QString::null, msg,
                                                tr("Yes"), tr("No"));
                 if (ans == 0) {
                     // delete the directory
@@ -1345,14 +1345,14 @@ bool MInstall::setUserName()
                     cmd = QString("rm -f %1").arg(dpath);
                     if (shell.run(cmd) != 0) {
                         setCursor(QCursor(Qt::ArrowCursor));
-                        QMessageBox::critical(0, QString::null,
+                        QMessageBox::critical(this, QString::null,
                                               tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
                         return false;
                     }
                 } else {
                     // don't save, reuse or delete -- can't proceed
                     setCursor(QCursor(Qt::ArrowCursor));
-                    QMessageBox::critical(0, QString::null,
+                    QMessageBox::critical(this, QString::null,
                                           tr("You've chosen to not use, save or delete the old home directory.\nBefore proceeding, you'll have to select a different username."));
                     return false;
                 }
@@ -1365,14 +1365,14 @@ bool MInstall::setUserName()
         // copy skel to demo
         if (shell.run("cp -a /mnt/antiX/etc/skel /mnt/antiX/home") != 0) {
             setCursor(QCursor(Qt::ArrowCursor));
-            QMessageBox::critical(0, QString::null,
+            QMessageBox::critical(this, QString::null,
                                   tr("Sorry, failed to create user directory."));
             return false;
         }
         cmd = QString("mv -f /mnt/antiX/home/skel %1").arg(dpath);
         if (shell.run(cmd) != 0) {
             setCursor(QCursor(Qt::ArrowCursor));
-            QMessageBox::critical(0, QString::null,
+            QMessageBox::critical(this, QString::null,
                                   tr("Sorry, failed to name user directory."));
             return false;
         }
@@ -1397,7 +1397,7 @@ bool MInstall::setUserName()
         cmd = cmd = QString("rsync -a /home/demo/ %1 --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority' --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
         if (shell.run(cmd) != 0) {
             setCursor(QCursor(Qt::ArrowCursor));
-            QMessageBox::critical(0, QString::null,
+            QMessageBox::critical(this, QString::null,
                                   tr("Sorry, failed to save desktop changes."));
         } else {
             replaceStringInFile("\\/home\\/demo", "\\/home\\/" + userNameEdit->text(), dpath + "/.conky/conky-startup.sh");
@@ -1408,7 +1408,7 @@ bool MInstall::setUserName()
     cmd = QString("chown -R demo:demo %1").arg(dpath);
     if (shell.run(cmd) != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("Sorry, failed to set ownership of user directory."));
         return false;
     }
@@ -1461,7 +1461,7 @@ bool MInstall::setUserName()
         if (!fpok) {
             shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
             setCursor(QCursor(Qt::ArrowCursor));
-            QMessageBox::critical(0, QString::null,
+            QMessageBox::critical(this, QString::null,
                                   tr("Sorry, could not encrypt /home/") + userNameEdit->text());
             return false;
         }
@@ -1508,7 +1508,7 @@ bool MInstall::setPasswords()
 
     if (!fpok) {
         setCursor(QCursor(Qt::ArrowCursor));
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set root password."));
         return false;
     }
@@ -1535,7 +1535,7 @@ bool MInstall::setPasswords()
 
     if (!fpok) {
         setCursor(QCursor(Qt::ArrowCursor));
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set user password."));
         return false;
     }
@@ -1548,27 +1548,27 @@ bool MInstall::setUserInfo()
     //validate data before proceeding
     // see if username is reasonable length
     if (strlen(userNameEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("The user name needs to be at least\n"
                                  "2 characters long. Please select\n"
                                  "a longer name before proceeding."));
         return false;
     } else if (!userNameEdit->text().contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("The user name cannot contain special\n"
                                  " characters or spaces.\n"
                                  "Please choose another name before proceeding."));
         return false;
     }
     if (strlen(userPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("The user password needs to be at least\n"
                                  "2 characters long. Please select\n"
                                  "a longer password before proceeding."));
         return false;
     }
     if (strlen(rootPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("The root password needs to be at least\n"
                                  "2 characters long. Please select\n"
                                  "a longer password before proceeding."));
@@ -1577,33 +1577,33 @@ bool MInstall::setUserInfo()
     // check that user name is not already used
     QString cmd = QString("grep '^%1' /etc/passwd >/dev/null").arg(userNameEdit->text());
     if (shell.run(cmd) == 0) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("Sorry that name is in use.\n"
                                  "Please select a different name.\n"));
         return false;
     }
 
     if (strcmp(userPasswordEdit->text().toUtf8(), userPasswordEdit2->text().toUtf8()) != 0) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("The user password entries do\n"
                                  "not match.  Please try again."));
         return false;
     }
     if (strcmp(rootPasswordEdit->text().toUtf8(), rootPasswordEdit2->text().toUtf8()) != 0) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("The root password entries do\n"
                                  " not match.  Please try again."));
         return false;
     }
     if (strlen(userPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("The user password needs to be at least\n"
                                  "2 characters long. Please select\n"
                                  "a longer password before proceeding."));
         return false;
     }
     if (strlen(rootPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("The root password needs to be at least\n"
                                  "2 characters long. Please select\n"
                                  "a longer password before proceeding."));
@@ -1625,21 +1625,21 @@ bool MInstall::setComputerName()
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
     // see if name is reasonable
     if (computerNameEdit->text().length() < 2) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("Sorry your computer name needs to be\nat least 2 characters long. You'll have to\nselect a different name before proceeding."));
         return false;
     } else if (computerNameEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("Sorry your computer name contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return false;
     }
     // see if name is reasonable
     if (computerDomainEdit->text().length() < 2) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("Sorry your computer domain needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
         return false;
     } else if (computerDomainEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(this, QString::null,
                               tr("Sorry your computer domain contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return false;
     }
@@ -1648,7 +1648,7 @@ bool MInstall::setComputerName()
     if (val.compare("installed") == 0) {
         // see if name is reasonable
         if (computerGroupEdit->text().length() < 2) {
-            QMessageBox::critical(0, QString::null,
+            QMessageBox::critical(this, QString::null,
                                   tr("Sorry your workgroup needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
             return false;
         }
@@ -1820,7 +1820,7 @@ void MInstall::stopInstall()
         QApplication::beep();
         return;
     } else if (curr >= c-3) {
-        int ans = QMessageBox::information(0, QString::null,
+        int ans = QMessageBox::information(this, QString::null,
                                              tr("Installation and configuration is complete.\n"
                                               "To use the new installation, reboot without the installation media.\n\n"
                                               "Do you want to reboot now?"),
@@ -1841,7 +1841,7 @@ void MInstall::stopInstall()
         }
 
     } else if (curr > 3) {
-        int ans = QMessageBox::critical(0, QString::null,
+        int ans = QMessageBox::critical(this, QString::null,
                                         tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
                                         tr("Yes"), tr("No"));
         if (ans != 0) {
@@ -1863,7 +1863,7 @@ void MInstall::unmountGoBack(QString msg)
 
 void MInstall::goBack(QString msg)
 {
-    QMessageBox::critical(0, QString::null, msg);
+    QMessageBox::critical(this, QString::null, msg);
     gotoPage(1);
 }
 
@@ -2374,7 +2374,7 @@ void MInstall::procAbort()
 bool MInstall::close()
 {
     if (proc->state() != QProcess::NotRunning) {
-        int ans = QMessageBox::warning(0, QString::null,
+        int ans = QMessageBox::warning(this, QString::null,
                                        tr("%1 is installing, are you \nsure you want to Close now?").arg(PROJECTNAME),
                                        tr("Yes"), tr("No"));
         if (ans != 0) {
@@ -2639,7 +2639,7 @@ void MInstall::on_encryptCheckBox_toggled(bool checked)
     if (checked) {
         autologinCheckBox->setChecked(false);
         autologinCheckBox->setDisabled(true);
-        QMessageBox::warning(0, QString::null,
+        QMessageBox::warning(this, QString::null,
                              tr("This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems."),
                              tr("OK"));
     } else {
