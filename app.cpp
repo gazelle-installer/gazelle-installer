@@ -109,6 +109,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     case QtWarningMsg:  out << "WRN "; break;
     case QtCriticalMsg: out << "CRT "; break;
     case QtFatalMsg:    out << "FTL "; break;
+    default:            out << "OTH"; break;
     }
     // Write to the output category of the message and the message itself
     out << context.category << ": "
