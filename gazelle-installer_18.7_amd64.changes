@@ -1,0 +1,51 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Format: 1.8
+Date: Thu, 12 Jul 2018 01:28:07 -0400
+Source: gazelle-installer
+Binary: mx-installer
+Architecture: source amd64
+Version: 18.7
+Distribution: mx
+Urgency: medium
+Maintainer: dolphinoracle <dolphinoracle@gmail.com>
+Changed-By: Adrian <adrian@mxlinux.org>
+Description:
+ mx-installer - Customizable GUI installer for MX Linux and antiX Linux
+Changes:
+ gazelle-installer (18.7) mx; urgency=medium
+ .
+   * change UI for partition selection
+   * allows installing /home on different file type than root
+   * fix default /home label
+Checksums-Sha1:
+ 7916531181785f3f875a6dfabeee4922c8f7516a 1212 gazelle-installer_18.7.dsc
+ 83d6f010b5dbebbd57fa6f290ebec503a59ba4ad 299008 gazelle-installer_18.7.tar.xz
+ cd91eaf1b37f5ecd663ac9f55296c69b21c3c61e 10458 gazelle-installer_18.7_amd64.buildinfo
+ 43dd796a2620b72a621ffda5127c8187fdbbbf43 1000608 mx-installer-dbgsym_18.7_amd64.deb
+ 12c3d40060b99bed49bc3ddc7a82f5c6769ebccf 222710 mx-installer_18.7_amd64.deb
+Checksums-Sha256:
+ aed8439cc169a7188b4a332ff5d1735fe31d55ef20ca21ef5642d88de3f39b73 1212 gazelle-installer_18.7.dsc
+ cd9217dd241d276e6f6496b1d5c23b97488934ce7d56ce5fc112a561711880c7 299008 gazelle-installer_18.7.tar.xz
+ 3a1bc4046b338769bb18a38990e3c5b9cfcb513e64032a5646126a6f8ad679e6 10458 gazelle-installer_18.7_amd64.buildinfo
+ 428df63aa98f92c92860fa15f5b8a183ec573acc5e88032d5ed05cb13d8e3329 1000608 mx-installer-dbgsym_18.7_amd64.deb
+ 462ba11dffe56fb81195c1f867b5bba2a491e5d152cdaa9da59095a79b03f577 222710 mx-installer_18.7_amd64.deb
+Files:
+ 58cac4b17193c0202a48f456ba3e4754 1212 system optional gazelle-installer_18.7.dsc
+ 1ced8a7214cd404c1dbe3d2d848d7082 299008 system optional gazelle-installer_18.7.tar.xz
+ cc1cf0a96b83bd3dca141227337f6c1e 10458 system optional gazelle-installer_18.7_amd64.buildinfo
+ 10d1a2783aedaadc5a598ae5e6e0da8a 1000608 debug optional mx-installer-dbgsym_18.7_amd64.deb
+ a5a2ce115bb013c659322c02ae582c5c 222710 system optional mx-installer_18.7_amd64.deb
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFHBAEBCAAxFiEE8ndToY6S45N+YzXncJOMeAZ57pgFAltHaWMTHGFkcmlhbkBt
+eGxpbnV4Lm9yZwAKCRBwk4x4BnnumBKxB/9R3ySSxn50MfnnzlqfuB+ZlEslsfQz
+a62GC9oosVyXGf9iq1saGiE698WqNyy28rGjD21FlXw7jQil8ImHuKPtBIGLKRre
+GRlE2WxbJ00L/367q31ZBqJvZ1QEBcEFY88srV/poyFxgzh9b9z/8gMEo+GuEj6Z
+wYouOV0guoO7WcxiaD5Kv7EUeE9l0vr0JjqGVKVuxux5mWLeqSmyv1H2FEAELA8v
+hlap9EQBuWJPO1znQPfVWyd+C+1pi93JVScBUNueKhAQYo+FD+aX7tTHBvWBfGb6
+ZH/HU9jAUGpK980bUaCVfxZD+sTGG+w5388y+cPED5IhcPb5HfjUF44U
+=VYLW
+-----END PGP SIGNATURE-----
