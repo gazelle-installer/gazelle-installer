@@ -854,7 +854,10 @@
              </size>
             </property>
             <property name="text">
-             <string>homeMX</string>
+             <string notr="true">homeMX</string>
+            </property>
+            <property name="maxLength">
+             <number>16</number>
             </property>
            </widget>
           </item>
@@ -993,7 +996,10 @@
              </size>
             </property>
             <property name="text">
-             <string>swap</string>
+             <string notr="true">swap</string>
+            </property>
+            <property name="maxLength">
+             <number>16</number>
             </property>
            </widget>
           </item>
@@ -1012,7 +1018,10 @@
              </size>
             </property>
             <property name="text">
-             <string>rootMX17.1</string>
+             <string notr="true">rootMX17.1</string>
+            </property>
+            <property name="maxLength">
+             <number>16</number>
             </property>
            </widget>
           </item>
