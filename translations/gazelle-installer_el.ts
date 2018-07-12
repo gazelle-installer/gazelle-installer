@@ -768,55 +768,55 @@ Returning to Step 1.</source>
     </message>
     <message>
         <location filename="../meinstall.ui" line="703"/>
-        <location filename="../meinstall.ui" line="899"/>
+        <location filename="../meinstall.ui" line="902"/>
         <source>ext4</source>
         <translation>ext4</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
-        <location filename="../meinstall.ui" line="904"/>
+        <location filename="../meinstall.ui" line="907"/>
         <source>ext3</source>
         <translation>ext3</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="713"/>
-        <location filename="../meinstall.ui" line="909"/>
+        <location filename="../meinstall.ui" line="912"/>
         <source>ext2</source>
         <translation>ext2</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="718"/>
-        <location filename="../meinstall.ui" line="914"/>
+        <location filename="../meinstall.ui" line="917"/>
         <source>jfs</source>
         <translation>jfs</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="723"/>
-        <location filename="../meinstall.ui" line="919"/>
+        <location filename="../meinstall.ui" line="922"/>
         <source>xfs</source>
         <translation>xfs</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="728"/>
-        <location filename="../meinstall.ui" line="924"/>
+        <location filename="../meinstall.ui" line="927"/>
         <source>btrfs</source>
         <translation>btrfs</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="733"/>
-        <location filename="../meinstall.ui" line="929"/>
+        <location filename="../meinstall.ui" line="932"/>
         <source>btrfs-zlib</source>
         <translation>btrfs-zlib</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="738"/>
-        <location filename="../meinstall.ui" line="934"/>
+        <location filename="../meinstall.ui" line="937"/>
         <source>btrfs-lzo</source>
         <translation>btrfs-lzo</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="743"/>
-        <location filename="../meinstall.ui" line="939"/>
+        <location filename="../meinstall.ui" line="942"/>
         <source>reiserfs</source>
         <translation>reiserfs</translation>
     </message>
@@ -848,7 +848,7 @@ Returning to Step 1.</source>
     </message>
     <message>
         <location filename="../meinstall.ui" line="748"/>
-        <location filename="../meinstall.ui" line="944"/>
+        <location filename="../meinstall.ui" line="947"/>
         <source>reiser4</source>
         <translation type="unfinished"></translation>
     </message>
@@ -873,274 +873,259 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="857"/>
-        <source>homeMX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="884"/>
-        <location filename="../meinstall.ui" line="1365"/>
+        <location filename="../meinstall.ui" line="887"/>
+        <location filename="../meinstall.ui" line="1374"/>
         <source>root</source>
         <translation>root</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="958"/>
+        <location filename="../meinstall.ui" line="961"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="974"/>
+        <location filename="../meinstall.ui" line="977"/>
         <source>home:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="996"/>
-        <source>swap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1015"/>
-        <source>rootMX17.1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1050"/>
+        <location filename="../meinstall.ui" line="1059"/>
         <source>3. Installation in progress</source>
         <translation>3. Γίνεται εγκατάσταση</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1093"/>
+        <location filename="../meinstall.ui" line="1102"/>
         <source>Abort</source>
         <translation>Ματαίωση</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1096"/>
-        <location filename="../meinstall.ui" line="1314"/>
+        <location filename="../meinstall.ui" line="1105"/>
+        <location filename="../meinstall.ui" line="1323"/>
         <source>Alt+A</source>
         <translation>Alt+A</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1135"/>
+        <location filename="../meinstall.ui" line="1144"/>
         <source>Ready to install antiX Linux filesystem</source>
         <translation>Έτοιμοι για την εγκατάσταση του Συστήματος Αρχείων του antiX Linux</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1157"/>
+        <location filename="../meinstall.ui" line="1166"/>
         <source>Tips</source>
         <translation>Συμβουλές</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1231"/>
+        <location filename="../meinstall.ui" line="1240"/>
         <source>4. Select Boot Method</source>
         <translation>4. Επιλεξτε Μέθοδο Εγκατάστασης</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1264"/>
+        <location filename="../meinstall.ui" line="1273"/>
         <source>MBR</source>
         <translation>MBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1267"/>
+        <location filename="../meinstall.ui" line="1276"/>
         <source>Alt+B</source>
         <translation>Alt+B</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1295"/>
+        <location filename="../meinstall.ui" line="1304"/>
         <source>Install on:</source>
         <translation>Να γίνει εγκατάσταση στο:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1311"/>
+        <location filename="../meinstall.ui" line="1320"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Εγκατάσταση του GRUB για το Linux και τα Windows</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1333"/>
+        <location filename="../meinstall.ui" line="1342"/>
         <source>System boot disk:</source>
         <translation>Δίσκος εκκίνησης συστήματος:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1378"/>
+        <location filename="../meinstall.ui" line="1387"/>
         <source>EFI System Partition</source>
         <translation>Διαμέρισμα συστήματος EFI</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1381"/>
+        <location filename="../meinstall.ui" line="1390"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1451"/>
+        <location filename="../meinstall.ui" line="1460"/>
         <source>Common Services to Enable</source>
         <translation>Κοινές Υπηρεσίες προς ενεργοποίηση</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1491"/>
+        <location filename="../meinstall.ui" line="1500"/>
         <source>Service</source>
         <translation>Υπηρεσία</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1496"/>
+        <location filename="../meinstall.ui" line="1505"/>
         <source>Description</source>
         <translation>Περιγραφή</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1532"/>
+        <location filename="../meinstall.ui" line="1541"/>
         <source>5. Computer Network Names</source>
         <translation>5. Ονόματα Υπολογιστών Δικτύου</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1559"/>
+        <location filename="../meinstall.ui" line="1568"/>
         <source>Workgroup</source>
         <translation>Ομάδα Εργασίας:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1572"/>
+        <location filename="../meinstall.ui" line="1581"/>
         <source>Workgroup:</source>
         <translation>Ομάδα Εργασίας:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1588"/>
+        <location filename="../meinstall.ui" line="1597"/>
         <source>SaMBa Server for MS Networking</source>
         <translation>Διακομιστής SaMBa για δικτύωση MS</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1604"/>
+        <location filename="../meinstall.ui" line="1613"/>
         <source>example.dom</source>
         <translation>example.dom</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1617"/>
+        <location filename="../meinstall.ui" line="1626"/>
         <source>Computer domain:</source>
         <translation>Όνομα Υπολογιστή:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1649"/>
+        <location filename="../meinstall.ui" line="1658"/>
         <source>Computer name:</source>
         <translation>Όνομα Υπολογιστή:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1722"/>
+        <location filename="../meinstall.ui" line="1731"/>
         <source>6d. Service Settings (advanced)</source>
         <translation>6d. Ρυθμίσεις υπηρεσίας (για προχωρημένους)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1740"/>
+        <location filename="../meinstall.ui" line="1749"/>
         <source>Adjust which services should run at startup</source>
         <translation>Ρυθμίστε ποιες υπηρεσίες θα πρέπει να εκτελείται κατά την εκκίνηση </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1743"/>
+        <location filename="../meinstall.ui" line="1752"/>
         <source>View</source>
         <translation>Άποψη</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1772"/>
+        <location filename="../meinstall.ui" line="1781"/>
         <source>6b. Configure Clock</source>
         <translation>6b. Ρύθμιση Ωρολογίου</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1800"/>
+        <location filename="../meinstall.ui" line="1809"/>
         <source>Format:</source>
         <translation>Μορφή</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1817"/>
+        <location filename="../meinstall.ui" line="1826"/>
         <source>System clock uses LOCAL</source>
         <translation>Το ρολόι του συστήματος χρησιμοποιεί ώρα LOCAL</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1846"/>
+        <location filename="../meinstall.ui" line="1855"/>
         <source>6a. Localization Defaults</source>
         <translation>6a. Προεπιλογές Τοπικοποίησης (Localization)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1876"/>
+        <location filename="../meinstall.ui" line="1885"/>
         <source>Locale:</source>
         <translation>Locale:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1905"/>
+        <location filename="../meinstall.ui" line="1914"/>
         <source>6c. Timezone Settings</source>
         <translation>6c. Ρυθμόσεις Ζώνης ώρας</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1917"/>
+        <location filename="../meinstall.ui" line="1926"/>
         <source>Timezone:</source>
         <translation>Ζώνη ώρας:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1994"/>
+        <location filename="../meinstall.ui" line="2003"/>
         <source>7b. Root (administrator) Account</source>
         <translation>7b. Λογαριασμός Root (Διαχειριστή)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2065"/>
+        <location filename="../meinstall.ui" line="2074"/>
         <source>Confirm root password:</source>
         <translation>Επιβεβαιώστε τον Κωδικό Συστήματος:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2081"/>
+        <location filename="../meinstall.ui" line="2090"/>
         <source>Root password:</source>
         <translation>Κωδικός του χρήστη root:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2100"/>
+        <location filename="../meinstall.ui" line="2109"/>
         <source>7a. Default User Account</source>
         <translation>7a. Λογαριασμός Προεπιλεγμένου Χρήστη</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2180"/>
+        <location filename="../meinstall.ui" line="2189"/>
         <source>username</source>
         <translation>όνομα χρήστη</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2193"/>
+        <location filename="../meinstall.ui" line="2202"/>
         <source>Confirm user password:</source>
         <translation>Επιβεβαίωση Κωδικού Χρήστη:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2209"/>
+        <location filename="../meinstall.ui" line="2218"/>
         <source>Default user password:</source>
         <translation>Κωδικός Προεπιλεγμένου Χρήστη:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2225"/>
+        <location filename="../meinstall.ui" line="2234"/>
         <source>Default user login name:</source>
         <translation>Όνομα σύνδεσης προεπιλεγμένου χρήστη:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2244"/>
+        <location filename="../meinstall.ui" line="2253"/>
         <source>Autologin</source>
         <translation>Autologin</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2257"/>
+        <location filename="../meinstall.ui" line="2266"/>
         <source>Show passwords</source>
         <translation>Εμφάνιση κωδικών</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2270"/>
+        <location filename="../meinstall.ui" line="2279"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
         <translation>Οι τροποποιήσεις της επιφάνειας εργασίας σε live περιβάλλον, θα μεταφέρονται στο εγκατεστημένο λειτουργικό σύστημα</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2273"/>
+        <location filename="../meinstall.ui" line="2282"/>
         <source>Save live desktop changes</source>
         <translation>Αποθηκεύστε ζωντανά αλλαγές στην επιφάνεια εργασίας </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2286"/>
+        <location filename="../meinstall.ui" line="2295"/>
         <source>Encrypt /home</source>
         <translation>Κρυπτογράφηση του /home </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2318"/>
+        <location filename="../meinstall.ui" line="2327"/>
         <source>Reminders</source>
         <translation>Υπενθυμίσεις</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2386"/>
+        <location filename="../meinstall.ui" line="2395"/>
         <source>Close</source>
         <translation>Κλείσιμο</translation>
     </message>
