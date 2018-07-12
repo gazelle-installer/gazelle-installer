@@ -522,7 +522,7 @@ Returning to Step 1.</source>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2242"/>
-        <location filename="../minstall.cpp" line="2620"/>
+        <location filename="../minstall.cpp" line="2621"/>
         <source>none - or existing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -554,53 +554,53 @@ Returning to Step 1.</source>
         <translation>Установка конфигурации</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2463"/>
+        <location filename="../minstall.cpp" line="2464"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2490"/>
+        <location filename="../minstall.cpp" line="2491"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2498"/>
+        <location filename="../minstall.cpp" line="2499"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2504"/>
+        <location filename="../minstall.cpp" line="2505"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2511"/>
+        <location filename="../minstall.cpp" line="2512"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2519"/>
+        <location filename="../minstall.cpp" line="2520"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2532"/>
+        <location filename="../minstall.cpp" line="2533"/>
         <source>Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2532"/>
+        <location filename="../minstall.cpp" line="2533"/>
         <source>Are you sure you want to quit the application?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2547"/>
+        <location filename="../minstall.cpp" line="2548"/>
         <source>This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2548"/>
+        <location filename="../minstall.cpp" line="2549"/>
         <source>OK</source>
         <translation>Да</translation>
     </message>
