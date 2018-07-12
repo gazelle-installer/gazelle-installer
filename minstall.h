@@ -86,7 +86,7 @@ public:
     bool makeLinuxPartition(QString dev, const char *type, bool bad, QString label);
     bool makeSwapPartition(QString dev);
     bool makeEsp(QString drv, int size);
-    bool mountPartition(const QString dev, const QString point, const QString mopts);
+    bool mountPartition(const QString dev, const QString point, const QString mntops);
     bool removeKernel();
     bool setComputerName();
     bool setPasswords();
@@ -95,6 +95,8 @@ public:
 
     bool INSTALL_FROM_ROOT_DEVICE;
     bool POPULATE_MEDIA_MOUNTPOINTS;
+
+    QString getPartType(const QString dev);
     QString PROJECTNAME;
     QString PROJECTVERSION;
     QString PROJECTSHORTNAME;
@@ -137,12 +139,14 @@ public slots:
 
 private slots:
     void on_viewServicesButton_clicked();
-    void on_homeCombo_activated(const QString &arg1);
     void on_grubBootCombo_activated(QString item = "");
     void on_closeButton_clicked();
     void on_encryptCheckBox_toggled(bool checked);
     void on_saveHomeCheck_toggled(bool checked);
     void on_buttonSetKeyboard_clicked();
+    void on_homeCombo_currentIndexChanged(const QString &arg1);
+
+    void on_swapCombo_currentIndexChanged(const QString &arg1);
 
 private:
     Cmd shell;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt">
+<TS version="2.1" language="fi">
 <context>
     <name>MInstall</name>
     <message>
@@ -10,20 +10,20 @@
 %1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.
 
 Enjoy using %1</source>
-        <translation>O %1 é uma distribuição Linux independente baseada no Debian Stable
+        <translation>%1 on itsenäinen Linux jakelu, joka pohjautuu Debianin vakaaseen (Stable) haaraan.
 
-O %1 usa alguns componentes do MEPIS Linux publicados sob Licença Apache (Apache free license). Alguns componentes do MEPIS foram modificados para o %1.
+%1 käyttää joitakin MEPIS Linuxin komponentteja jotka on julkaistu Apachen vapaalla lisenssillä. Jotkin MEPIS-komponentit on muokattu %1 varten.
 
-Usufrua do %1.</translation>
+Pidä hauskaa käyttäessäsi %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="108"/>
         <source>Support %1
 
 %1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.</source>
-        <translation>Apoiar o %1
+        <translation>Tue %1:ia
 
-O %1 é apoiado por pessoas como você. Algumas ajudam outras no fórum de apoio -%2, traduzem ficheiros de ajuda para diferentes idiomas, fazem sugestões, redigem documentação ou ajudam a testar novo software.</translation>
+%1 on sinunlaistesi ihmisten tukema. Jotkut auttavat toisia tukifoorumilla - %2, tai kääntävät ohjeita eri kielille, tekevät ehdotuksia uusista ominaisuuksista, kirjoittavat dokumentaatiota, tai auttavat kokeilemalla uusia sovelluksia.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="380"/>
@@ -32,17 +32,14 @@ O %1 é apoiado por pessoas como você. Algumas ajudam outras no fórum de apoio
 The disk with the partition you selected for installation is failing.
 
 </source>
-        <translation>
-
-O disco com a partição selecionada para a instalação está a falhar. 
-
-</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="381"/>
         <source>You are strongly advised to abort.
 </source>
-        <translation>É altamente aconselhável abortar a instalação. </translation>
+        <translation>Sinua neuvotaan vakavasti keskeyttämään.
+</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="382"/>
@@ -50,14 +47,14 @@ O disco com a partição selecionada para a instalação está a falhar.
         <source>If unsure, please exit the Installer and run GSmartControl for more information.
 
 </source>
-        <translation>Havendo dúvidas, sair do Instalador e executar a ferramenta GSmartControl para obter mais informação sobre o estado do disco.
+        <translation>Jos olet epävarma, poistu asennustyökalusta ja suorita GSmartControl saadaksesi lisätietoja.
 
 </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="383"/>
         <source>Do you want to abort the installation?</source>
-        <translation>Abortar a instalação? </translation>
+        <translation>Haluatko keskeyttää asennuksen?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="385"/>
@@ -76,7 +73,7 @@ O disco com a partição selecionada para a instalação está a falhar.
         <location filename="../minstall.cpp" line="1808"/>
         <location filename="../minstall.cpp" line="2329"/>
         <source>Yes</source>
-        <translation>Sim</translation>
+        <translation>Kyllä</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="385"/>
@@ -95,14 +92,14 @@ O disco com a partição selecionada para a instalação está a falhar.
         <location filename="../minstall.cpp" line="1808"/>
         <location filename="../minstall.cpp" line="2329"/>
         <source>No</source>
-        <translation>Não</translation>
+        <translation>Ei</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="393"/>
         <source>Smartmon tool output:
 
 </source>
-        <translation>Resultados da ferramenta Smartmon:
+        <translation>Smartmon työkalun syöte:
 
 </translation>
     </message>
@@ -110,236 +107,225 @@ O disco com a partição selecionada para a instalação está a falhar.
         <location filename="../minstall.cpp" line="394"/>
         <source>The disk with the partition you selected for installation passes the S.M.A.R.T. monitor test (smartctl)
 </source>
-        <translation>O disco com a partição selecionada para a instalação passa nos testes do monitor S.M.A.R.T. (smartctl) 
-</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="395"/>
         <source>but the tests indicate it will have a higher than average failure rate in the upcoming year.
 </source>
-        <translation>mas os testes indicam que no próximo ano terá uma probabilidade de falha superior à média.
-</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="397"/>
         <source>Do you want to continue?</source>
-        <translation>Continuar? </translation>
+        <translation>Haluatko jatkaa?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="425"/>
         <source>Ready to install %1 filesystem</source>
-        <translation>Pronto para instalar o systema de ficheiros do %1</translation>
+        <translation>Valmis asentamaan tiedostojärjestelmän %1 </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="594"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
-        <translation>Formatar e usar todo o disco (%1) para o %2?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="606"/>
         <source>Creating required partitions</source>
-        <translation>A criar as partições necessárias</translation>
+        <translation>Luodaan vaadittavia osioita</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="681"/>
         <source>Formating EFI System Partition (ESP)</source>
-        <translation>A formatar Partição de Sistema EFI (ESP)</translation>
+        <translation>Alustetaan EFI System Partition (ESP)</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="719"/>
         <location filename="../minstall.cpp" line="899"/>
         <source>Formatting swap partition</source>
-        <translation>A formatar a partição de trocas (swap)</translation>
+        <translation>Alustetaan sivutusosio</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="728"/>
         <source>Formatting root partition</source>
-        <translation>A formatar a partição raíz (root) « / »</translation>
+        <translation>Alustetaan juuriosio</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="799"/>
         <source>You must choose a root partition.
 The root partition must be at least %1 .</source>
-        <translation type="unfinished"></translation>
+        <translation>Sinun täytyy valita juuriosio.
+Juuriosion on oltava vähintään %1 .</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="805"/>
         <source>The partition you selected for root, appears to be a MS-Windows partition.  Are you sure you want to reformat this partition?</source>
-        <translation>A partição escolhida para raíz (root ou / ) parece ser do MS Windows. Reformatar esta partição?</translation>
+        <translation>Osio, jonka valitsit pääosioksi, näyttää olevan MS-Windows osio.  Haluatko varmasti osioida tämän osion uudelleen?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="814"/>
         <source>OK to format and destroy all data on 
 %1 for the / (root) partition?</source>
-        <translation>Formatar e apagar todos os dados em
-%1 para a partição / (root)?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="816"/>
         <source>All data on %1 will be deleted, except for /home
 OK to continue?</source>
-        <translation>Todos os dados em %1 serão eliminados, excepto em /home
-Continuar?</translation>
+        <translation>Kaikki sisältö %1 poistetaan, paitsi /home
+Haluatko jatkaa?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="833"/>
         <source>OK to format and destroy all data on 
 %1 for the swap partition?</source>
-        <translation>Formatar e apagar todos os dados em
-%1 para a partição swap?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="846"/>
         <source>The partition you selected for /home, appears to be a MS-Windows partition.  Are you sure you want to reformat this partition?</source>
-        <translation>A partição que selecionou para /home parece ser do MS Windows. Reformatar realmente esta partição? </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="855"/>
         <source>OK to reuse (no reformat) %1 as the /home partition?</source>
-        <translation>Reusar (sem reformatar) %1 como partição /home?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="857"/>
         <source>OK to format and destroy all data on %1 for the /home partition?</source>
-        <translation>Formatar e apagar todos os dados em %1 para a partição /home?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="868"/>
         <source>Preparing required partitions</source>
-        <translation>A preparar as partições necessárias</translation>
+        <translation>Valmistellaan vaadittavia osioita</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="919"/>
         <source>Formatting the / (root) partition</source>
-        <translation>A formatar a partição / (root ou raíz)</translation>
+        <translation>Alustetaan / (root) osiota</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="943"/>
         <source>Mounting the /home partition</source>
-        <translation>A montar a partição /home</translation>
+        <translation>Liitetään /home osiota</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="958"/>
         <source>Formatting the /home partition</source>
-        <translation>A formatar a partição /home</translation>
+        <translation>Alustetaan /home osiota</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1001"/>
         <source>Mounting the / (root) partition</source>
-        <translation>A montar a partição / (root ou raíz)</translation>
+        <translation>Liitetään / (root) osiota</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1029"/>
         <source>Creating system directories</source>
-        <translation>A criar os diretórios (pastas) do sistema</translation>
+        <translation>Luodaan järjestelmähakemistoja</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1119"/>
         <source>OK to install GRUB bootloader at %1 ?</source>
-        <translation>Instalar o gestor de arranque GRUB em %1?</translation>
+        <translation>GRUB käynnistyslataaja voidaan asentaa %1 ?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1131"/>
         <source>Please wait till GRUB is installed, it might take a couple of minutes.</source>
-        <translation>Aguardar até que o GRUB esteja instalado; pode demorar alguns minutos.</translation>
+        <translation>Odota kunnes GRUB on asennettu, asennus voi kestää muutaman minuutin.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1170"/>
         <source>Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function.</source>
-        <translation>Falha ao Instalar o GRUB. Isto pode dever-se a uma alteração na formatação do disco. Pode desmarcar o GRUB e terminar a instalação, e depois iniciar o computador novamente com o meio externo executável para reparar a instalação com a função de reinstalação do GRUB.</translation>
+        <translation>GRUB:in asennus epäonnistui. Tämä saattaa johtua muutoksesta levyn alustamisessa. Voit ohittaa GRUB:in asennnuksen ja viimeistellä muun asennusprosessin ja sitten käynnistää järjestelmän käyttäen LiveDVD:tä tai LiveUSB:ia ja korjata asennuksen käyttäen GRUB:in uudelleenasennustoimintoa.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1263"/>
         <source>The home directory for %1 already exists.Would you like to reuse the old home directory?</source>
-        <translation>O diretório home para %1 já existe. Usar o diretório home existente?</translation>
+        <translation>Kotihakemisto %1:lle on jo olemassa. Haluatko käyttää vanhaa kotihakemistoa?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1269"/>
         <source>Would you like to save the old home directory
 and create a new home directory?</source>
-        <translation>Guardar a informação do diretório home existente
-e criar um novo diretório home?</translation>
+        <translation>Haluaisitko tallentaa vanhan kotihakemiston
+ja luoda täysin uuden kotihakemiston?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1285"/>
         <source>Sorry, failed to save old home directory. Before proceeding,
 you&apos;ll have to select a different username or
 delete a previously saved copy of your home directory.</source>
-        <translation>O processo de guardar a informação do diretório home existente falhou.
-Antes de prosseguir, deve ser selecionado um nome de utilizador diferente
-ou apagada uma cópia anterior do diretório home.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1294"/>
         <source>Would you like to delete the old home directory for %1?</source>
-        <translation>Apagar o diretório home existente em %1?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1304"/>
         <source>Sorry, failed to delete old home directory. Before proceeding, 
 you&apos;ll have to select a different username.</source>
-        <translation>O processo de apagar o diretório home existente falhou. Antes de prosseguir,
-deve ser selecionado um nome de utilizador diferente.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1311"/>
         <source>You&apos;ve chosen to not use, save or delete the old home directory.
 Before proceeding, you&apos;ll have to select a different username.</source>
-        <translation>Optou por não usar, guardar ou apagar o diretório home existente.
-Antes de prosseguir, deve ser selecionado um nome de utilizador diferente.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1324"/>
         <source>Sorry, failed to create user directory.</source>
-        <translation>A criação da pasta (diretório) de utilizador falhou.</translation>
+        <translation>Käyttäjähakemistoa ei voitu luoda.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1331"/>
         <source>Sorry, failed to name user directory.</source>
-        <translation>A atribuição de nome à pasta do utilizador falhou.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1356"/>
         <source>Sorry, failed to save desktop changes.</source>
-        <translation>Não foi possível guardar as alterações do ambiente de trabalho.</translation>
+        <translation>Työpöydän muutoksia ei voitu tallentaa.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1367"/>
         <source>Sorry, failed to set ownership of user directory.</source>
-        <translation>A atribuição de propriedade à pasta do utilizador falhou.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1420"/>
         <source>Sorry, could not encrypt /home/</source>
-        <translation>Não foi possível encriptar /home/</translation>
+        <translation>Ei voitu salata /home/ -hakemistoa</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1474"/>
         <source>Sorry, unable to set root password.</source>
-        <translation>Não foi possível estabelecer a senha para root.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1501"/>
         <source>Sorry, unable to set user password.</source>
-        <translation>Não foi possível estabelecer a senha de utilizador.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1514"/>
         <source>The user name needs to be at least
 2 characters long. Please select
 a longer name before proceeding.</source>
-        <translation>O nome do utilizador tem que ter
-pelo menos 2 caracteres. Escolher
-um nome de utilizador mais longo.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1520"/>
         <source>The user name cannot contain special
  characters or spaces.
 Please choose another name before proceeding.</source>
-        <translation>O nome de utilizador não pode conter
-caracteres especiais nem espaços.
-Escolher outro nome de utilizador.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1527"/>
@@ -347,9 +333,7 @@ Escolher outro nome de utilizador.</translation>
         <source>The user password needs to be at least
 2 characters long. Please select
 a longer password before proceeding.</source>
-        <translation>A senha do utilizador tem que ter
-pelo menos 2 caracteres. Escolher
-uma senha mais longa.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1534"/>
@@ -357,77 +341,62 @@ uma senha mais longa.</translation>
         <source>The root password needs to be at least
 2 characters long. Please select
 a longer password before proceeding.</source>
-        <translation>A senha para root tem que ter
-pelo menos 2 caracteres. Escolher
-uma senha mais longa.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1543"/>
         <source>Sorry that name is in use.
 Please select a different name.
 </source>
-        <translation>Este nome já está em uso.
-Escolher um nome diferente.
-</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1550"/>
         <source>The user password entries do
 not match.  Please try again.</source>
-        <translation>As senhas que escreveu
-não coincidem. Tentar novamente.</translation>
+        <translation>Käyttäjän salasanat eivät täsmää
+Ole hyvä ja yritä uudelleen.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1556"/>
         <source>The root password entries do
  not match.  Please try again.</source>
-        <translation>As senhas de root que escreveu
-não coincidem. Tentar novamente.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1591"/>
         <source>Sorry your computer name needs to be
 at least 2 characters long. You&apos;ll have to
 select a different name before proceeding.</source>
-        <translation>O nome a dar ao computador
-deve ter pelo menos 2 caracteres.
-Escolher um nome mais longo.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1595"/>
         <source>Sorry your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>O nome a dar ao computador
-contém caracteres inválidos.
-Escolher um nome diferente.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1601"/>
         <source>Sorry your computer domain needs to be at least
 2 characters long. You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>O nome do domínio do computador
-deve conter pelo menos 2 caracteres.
-Escolher um nome .mais longo</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1605"/>
         <source>Sorry your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>O nome do domínio do computador
-contém caracteres inválidos.
-Escolher um nome diferente.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1614"/>
         <source>Sorry your workgroup needs to be at least
 2 characters long. You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>O grupo de trabalho deve conter
-pelo menos 2 caracteres.
-Escolher um nome mais longo.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1786"/>
@@ -435,22 +404,19 @@ Escolher um nome mais longo.</translation>
 To use the new installation, reboot without the installation media.
 
 Do you want to reboot now?</source>
-        <translation>A instalação e configuração está terminada. 
-Para usar a nova instalação, reiniciar o computador sem o meio de instalação.
-
-Reiniciar agora? </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1807"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
-        <translation>A instalação e configuração NÃO está completa.
-Interromper realmente o processo agora?</translation>
+        <translation>Asennus ja konfigurointi on kesken..
+Haluatko varmasti lopettaa nyt?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1908"/>
         <source>&lt;p&gt;&lt;b&gt;General Instructions&lt;/b&gt;&lt;br/&gt;BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.&lt;/p&gt;&lt;p&gt;On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.&lt;/p&gt;&lt;p&gt;Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions. &lt;/p&gt;&lt;p&gt;If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.&lt;/p&gt;&lt;p&gt;The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Instruções Gerais&lt;/b&gt;&lt;br/&gt;ANTES DE PROSSEGUIR, FECHAR TODAS AS OUTRAS APLICAÇÕES.&lt;/p&gt;&lt;p&gt;Em cada página, ler as instruções, fazer as escolhas requeridas e clicar em «Próximo». Será pedida confirmação de continuação antes de quaisquer acções destrutivas serem executadas.&lt;/p&gt;&lt;p&gt;A instalação necessita de cerca de %1 de espaço em disco; no entanto, é recomendado usar %2 ou mais. Pode ser usado todo o disco ou podem ser usadas partições. &lt;/p&gt;&lt;p&gt;Em computadores com sistema operativo Mac OS ou Windows (Vista ou posterior), poderá ser necessário usar o software do sistema existente para fazer partições e instalar o gestor do arranque (boot manager) antes de proceder à instalação.&lt;/p&gt;&lt;p&gt;Os sistemas de ficheiros Linux ext2, ext3, ext4, jfs, xfs, btrfs e reiserfs são compatíveis; o sistema de ficheiros ext4 é o recomendado.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1919"/>
@@ -460,77 +426,76 @@ Interromper realmente o processo agora?</translation>
     <message>
         <location filename="../minstall.cpp" line="1944"/>
         <source>Returning to Step 1 to select another disk.</source>
-        <translation>A voltar ao Passo 1 para seleccionar outro disco.</translation>
+        <translation>Palataan kohtaan 1 toisen levyaseman valitsemiseksi.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1948"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Agradecimentos&lt;/b&gt;&lt;br/&gt;Agradecemos a todos os que decidiram apoiar o %1 com o seu tempo, os seus donativos, as suas sugestões, o seu trabalho, os seus elogios, as suas ideias, promovendo-o e/ou encorajando-nos.&lt;/p&gt;&lt;p&gt;Sem eles o %1 não existiria.&lt;/p&gt;&lt;p&gt;A equipa de desenvolvimento do %2&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Erityiskiitokset&lt;/b&gt;&lt;br/&gt;Kiitokset kaikille jotka ovat valinneet tukevansa %1 omalla ajalla, rahalla, ehdotuksilla, työllä, kehuilla, ideoilla, mainonnalla, ja/tai sitoutumisella.&lt;/p&gt;&lt;p&gt;Ilman teitä %1 ei olisi olemassa.&lt;/p&gt;&lt;p&gt;%2 Kehitystiimi&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1951"/>
         <source>&lt;p&gt;&lt;b&gt;Installation in Progress&lt;/b&gt;&lt;br/&gt; %1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.&lt;/p&gt;&lt;p&gt;If you click the Abort button, the installation will be stopped as soon as possible.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Instalação em curso&lt;/b&gt;&lt;br/&gt;O %1 está a ser instalado. Uma instalação de novo geralmente demora de 3 a 20 min, dependendo da velocidade do equipamento e do tamanho das partições a serem formatadas.&lt;/p&gt;&lt;p&gt;Clicando no botão &apos;Abortar&apos;, a instalação será interrompida assim que possível.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1963"/>
         <source>Failed to create required partitions.
 Returning to Step 1.</source>
-        <translation>A criação das partições necessárias falhou.
-A voltar ao Passo 1.</translation>
+        <translation>Vaadittujen osioiden luonti epäonnistui.
+Palataan vaiheeseen 1.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1972"/>
         <source>Failed to prepare chosen partitions.
 Returning to Step 1.</source>
-        <translation>A preparação das partições seleccionadas falhou.
-A voltar ao Passo 1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1986"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 at root instead, then GRUB2 will be installed at the beginning of the root partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Opções para o Arranque&lt;/b&gt;&lt;br/&gt;O %1 usa o gestor do arranque GRUB2 para o arranque do sistema a usar (%1, MS-Windows ou outro instalado). &lt;p&gt;Por pré-definição o GRUB2 será instalado no MBR [Master Boot Record] ou na ESP [EFI System Partition] (no caso de sistemas de 64-bit com UEFI) do disco (do disco de arranque se o computador tiver mais do que um disco) e substituirá o gestor do arranque aí instalado. Isto é normal.&lt;/p&gt;&lt;p&gt;Optando por instalar o GRUB2 na raíz do sistema, ele será instalado no início da partição / . Esta opção só deve usar por utilizadores experientes.&lt;/p&gt;&lt;p&gt;Desmarcando a caixa &apos;Instalar GRUB&apos;, o GRUB não será instalado. Esta opção só deve usar por utilizadores experientes.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1995"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Activar Serviços de Uso Frequente&lt;/b&gt;&lt;br/&gt;Selecionar quaisquer destes serviços e eles serão iniciados automaticamente ao iniciar o %1.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2002"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Identificação do Computador&lt;/b&gt;&lt;br/&gt;O nome do computador é um nome específico que permitirá identificar o computador numa rede a que esteja ligado. Não é provável que o domínio do computador seja usado, a menos que o fornecedor de Internet ou a rede local o requeiram.&lt;/p&gt;&lt;p&gt;Os nomes de computador e de domínio apenas podem conter caracteres alfanuméricos, pontos e hífens. Não podem conter espaços em branco, nem começar ou terminar com hífens.&lt;/p&gt;&lt;p&gt;Para partilhar pastas/diretórios ou uma impressora com um computador local que opere com MS-Windows ou Mac OSX deve ser activado o servidor de ficheiros (aplicação) Samba.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2011"/>
         <source>&lt;p&gt;&lt;b&gt;Localization Defaults&lt;/b&gt;&lt;br/&gt;Set the default keyboard and locale. These will apply unless they are overridden later by the user.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configure Clock&lt;/b&gt;&lt;br/&gt;If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for &apos;System clock uses LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Timezone Settings&lt;/b&gt;&lt;br/&gt;The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Service Settings&lt;/b&gt;&lt;br/&gt;Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! </source>
-        <translation>&lt;p&gt;&lt;b&gt;Pré-definições de Localização&lt;/b&gt;&lt;br/&gt;Escolher o teclado e o idioma (localizado) a serem usados. Estas definições manter-se-ão, a menos que sejam modificadas posteriormente pelo utilizador.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configurar o Relógio do Sistema&lt;/b&gt;&lt;br/&gt;Se o computador é Apple ou Unix puro, por pré-definição o relógio do sistema é configurado para GMT ou UTC. Para alterar, marcar a caixa &apos;Relógio do sistema usa LOCAL&apos;.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Definições de Fuso Horário&lt;/b&gt;&lt;br/&gt;O sistema inicia com o fuso horário pré-definido para GMT/UTC. Depois de reiniciar o computador com o novo MX, para alterar o fuso horário clicar com o botão direito no Painel e seleccionar Propriedades.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Definições de Serviço&lt;/b&gt;&lt;br/&gt;Recomenda-se que o utilizador comum não altere as opções pré-definidas. Por vezes, utilizadores de computadores de baixo desempenho pretendem desligar serviços não necessários para manter o uso da RAM tão baixo quanto possível. Nessa opção, o utilizador deve saber bem o que está a fazer! </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2019"/>
         <source>&lt;p&gt;&lt;b&gt;Default User Login&lt;/b&gt;&lt;br/&gt;The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwords&lt;/b&gt;&lt;br/&gt;Enter a new password for your default user account and for the root account. Each password must be entered twice.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;O equivalente em sistemas linux ao &apos;administrador&apos; de outros sistemas operativos é a utilização do sistema em modo root (conta root ou superutilizador/su/sudo). Mas, por regra, o computador não deve ser usado no modo root - este deve ser usado apenas para tarefas de gestão do sistema. Deve ser introduzido um nome de utilizador, o que criará uma conta padrão. Esse será o utilizador pré-definido. Posteriormente, se necessário, poderão ser acrescentados mais utilizadores (mais contas padrão) com o Gestor de Utilizadores do %1. &lt;/b&gt;&lt;p&gt;&lt;b&gt;Senhas&lt;/b&gt;&lt;br/&gt;Estabelecer senhas para as contas de utilizador pré-definido e root. Cada senha deve ser inserida duas vezes.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2027"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Parabéns!&lt;/b&gt;&lt;br/&gt;Terminou a instalação do %1. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Encontrar Aplicações&lt;/b&gt;&lt;br/&gt;Com o %1 são instaladas centenas de excelentes aplicações. A melhor maneira de se familiarizar com elas é navegar pelo Menu e experimentá-las. Muitas delas foram desenvolvidas especificamente para o projecto %1. Essas são acedidas pelos menus principais. &lt;p&gt;O %1 inclui também muitas aplicações linux que só são executáveis a partir da linha de comando, pelo que não aparecem no Menu.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2037"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation>Usufrua do %1&lt;/b&gt;&lt;/p&gt;</translation>
+        <translation>Pidä hauskaa käyttäessäsi %1&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2051"/>
         <location filename="../minstall.cpp" line="2065"/>
         <source>Next</source>
-        <translation>Próximo</translation>
+        <translation>Seuraava</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2063"/>
         <source>Finish</source>
-        <translation>Terminar</translation>
+        <translation>Lopeta</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2242"/>
@@ -542,62 +507,59 @@ A voltar ao Passo 1.</translation>
         <location filename="../minstall.cpp" line="2328"/>
         <source>%1 is installing, are you 
 sure you want to Close now?</source>
-        <translation>O %1 está a ser instalado. 
-Fechar, realmente?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2355"/>
         <source>Deleting old system</source>
-        <translation>A remover o sistema antigo</translation>
+        <translation>Poistetaan vanhaa järjestelmää</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2365"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
-        <translation>Não foi possível remover o %1 antigo no destino.
-A voltar ao Passo 1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2391"/>
         <source>Copying new system</source>
-        <translation>A gravar o novo sistema</translation>
+        <translation>Kopioidaan uutta järjestelmää</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2405"/>
         <source>Fixing configuration</source>
-        <translation>A reparar a configuração</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2463"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
-        <translation>Não foi possível gravar o %1 no destino.
-A voltar ao Passo 1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2490"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Obter Ajuda&lt;/b&gt;&lt;br/&gt;Informação básica sobre o %1 em %2.&lt;/p&gt;&lt;p&gt;Há voluntários que prestam ajuda no fórum do %3, %4 (maioritariamente em inglês)&lt;/p&gt;&lt;p&gt;Ao solicitar ajuda, ter presente a necessidade de pormenorizar suficientemente a descrição do problema, bem como a informação sobre o computador. Por regra, afirmações como &apos;(algo) não funcionou&apos; não ajudam a proporcionar boa ajuda.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2498"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Reparar o Sistema/Instalação&lt;/b&gt;&lt;br/&gt;Se o %1 deixar de funcionar, às vezes é possível reparar o problema através do meio externo executável - CD ou penUSB - usando algum dos utilitários do %1 ou uma das ferramentas padrão do Linux.&lt;/p&gt;&lt;p&gt;O %1 em CD ou penUSB executáveis pode também usado para recuperar dados de sistemas MS-Windows!&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Asennuksen korjaaminen&lt;/b&gt;&lt;br/&gt;Jos %1 lakkaa toimimasta kiintolevyllä, joskus ongelma on mahdollista korjata käynnistämällä järjestelmä LiveDVD:n tai LiveUSB:in kautta ja suorittamalla jokin vaihtoehto mukana olevasta %1 tai käyttämällä jotakin yleistä Linux-työkalua järjestelmän korjaamiseen.&lt;/p&gt;&lt;p&gt;Voit myös käyttää %1 LiveDVD:tä tai LiveUSB:ia palauttaaksesi tiedostoja MS-Windows käyttöjärjestelmistä!&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2504"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Apoiar o %1&lt;/b&gt;&lt;br/&gt;O %1 é apoiado por pessoas como você. Algumas prestam ajuda a quem a solicita nos fóruns de apoio - %2 - outras traduzem ficheiros da ajuda para diferentes idiomas, fazem sugestões, elaboram documentação ou ajudam a testar novo software.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2511"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Ajustar o Misturador de Som&lt;/b&gt;&lt;br/&gt;O %1 procura configurar o misturador de som, mas por vezes é necessário aumentar o volume ou desativar a função &apos;mute&apos; nos canais do misturador para que se possa ouvir o som.&lt;/p&gt; &lt;p&gt;O atalho para o misturador está localizado no menu. Clique para abrir o misturador.&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2519"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Manter o %1 actualizado&lt;/b&gt;&lt;br/&gt;Para informações e actualizações do %1, visitar&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Pidä %1-kopiosi ajan tasalla&lt;/b&gt;&lt;br/&gt;Saadaksesi lisätietoja sekä viimeisimmät päivitykset, vieraile osoitteessa&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2532"/>
@@ -612,12 +574,12 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../minstall.cpp" line="2547"/>
         <source>This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems.</source>
-        <translation>Esta opção encripta também a partição /swap, o que a impede de ser partilhada com outros sistemas operativos instalados.</translation>
+        <translation>Tämä valinta myös salaa /swap-osion, joka muuntaa swap-osion käyttökelvottomaksi jaettavaksi muiden asennettujen käyttöjärjestelmien kanssa.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2548"/>
         <source>OK</source>
-        <translation>Aceitar</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -625,7 +587,7 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../mmain.cpp" line="42"/>
         <source>Installer</source>
-        <translation>Instalador</translation>
+        <translation>Asennusohjelma</translation>
     </message>
 </context>
 <context>
@@ -637,7 +599,7 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="92"/>
         <source>Back</source>
-        <translation>Anterior</translation>
+        <translation>Takaisin</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="99"/>
@@ -647,7 +609,7 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="106"/>
         <source>Next</source>
-        <translation>Próximo</translation>
+        <translation>Seuraava</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="113"/>
@@ -657,7 +619,7 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="163"/>
         <source>Terms of Use</source>
-        <translation>Termos de Utilização</translation>
+        <translation>Käyttöehdot</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="229"/>
@@ -667,12 +629,12 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="249"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Asettelu:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="256"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Muunnos:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="263"/>
@@ -687,85 +649,85 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="277"/>
         <source>Change Keyboard Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuta näppäimistön asetuksia</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="284"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Malli:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="291"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Näppäimistön asetukset&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="315"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Selecionar o tipo de instalação</translation>
+        <translation>1c. Valitse asennuksen tyyppi</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="345"/>
         <source>MB </source>
-        <translation>MB </translation>
+        <translation>Mt</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="364"/>
         <source>Leave free space up to:</source>
-        <translation>Deixar espaço livre até:</translation>
+        <translation>Jätä vapaata tilaa:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="412"/>
         <source>Auto-install using entire disk </source>
-        <translation>Instalação automática usando o disco todo</translation>
+        <translation>Asenna automaattisesti käyttäen koko levyä</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="428"/>
         <source>Custom install on existing partitions</source>
-        <translation>Instalação passo a passo em partições existentes</translation>
+        <translation>Mukautettu asennus olemassaoleville osioille</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="447"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. Modificar as partições do disco (opcional)</translation>
+        <translation>1b. Järjestä levyn osiot uudelleen (valinnainen)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="474"/>
         <source>Modify partitions:</source>
-        <translation>Modificar partições:</translation>
+        <translation>Muokkaa osioita:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="490"/>
         <source>Run partition tool...</source>
-        <translation>Executar a ferramenta de partição...</translation>
+        <translation>Suorita osiotyökalu...</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="506"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Escolher o disco para a instalação</translation>
+        <translation>1a. Valitse levy asennusta varten</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="536"/>
         <source>Use disk:</source>
-        <translation>Usar o disco:</translation>
+        <translation>Käytä levyä:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="610"/>
         <source>2b. Preferences</source>
-        <translation>2b. Preferências</translation>
+        <translation>2b. Asetukset</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="637"/>
         <source>Preserve data in /home (if upgrading)</source>
-        <translation>Preservar dados em /home (se a substituir uma instalação Linux existente)</translation>
+        <translation>Säilytä tiedostot /home-osiossa (jos päivitetään)</translation>
     </message>
     <message>
         <source>Filesystem type:</source>
-        <translation type="vanished">Tipo de sistema de ficheiros:</translation>
+        <translation type="vanished">Tiedostojärjestelmä:</translation>
     </message>
     <message>
         <source>Change default / (root) partition label:</source>
-        <translation type="vanished">Mudar o rótulo predefinido da partição / (root):</translation>
+        <translation type="vanished">Vaihda oletus / (root) osiotunnus:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="703"/>
@@ -807,13 +769,13 @@ A voltar ao Passo 1.</translation>
         <location filename="../meinstall.ui" line="733"/>
         <location filename="../meinstall.ui" line="929"/>
         <source>btrfs-zlib</source>
-        <translation type="unfinished"></translation>
+        <translation>btrfs-zlib</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="738"/>
         <location filename="../meinstall.ui" line="934"/>
         <source>btrfs-lzo</source>
-        <translation type="unfinished"></translation>
+        <translation>btrfs-lzo</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="743"/>
@@ -823,29 +785,29 @@ A voltar ao Passo 1.</translation>
     </message>
     <message>
         <source>Change default /home partition label:</source>
-        <translation type="vanished">Mudar o rótulo predefinido da partição /home:</translation>
+        <translation type="vanished">Vaihda /home -osion oletusosiointitunnusta:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="656"/>
         <source>Check for badblocks (takes longer)</source>
-        <translation>Analisar blocos (demora mais)</translation>
+        <translation>Tarkista mahdollisesti huonot lohkot (kestää kauemmin)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="675"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. Escolha as partições</translation>
+        <translation>2a. Valitse osioinnit</translation>
     </message>
     <message>
         <source>/ (root) partition:</source>
-        <translation type="vanished">partição / (root):</translation>
+        <translation type="vanished">/ (root) osio:</translation>
     </message>
     <message>
         <source>swap partition:</source>
-        <translation type="vanished">Partição swap:</translation>
+        <translation type="vanished">sivutusosio:</translation>
     </message>
     <message>
         <source>/home partition:</source>
-        <translation type="vanished">Partição /home:</translation>
+        <translation type="vanished">/home osio:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="748"/>
@@ -882,7 +844,7 @@ A voltar ao Passo 1.</translation>
         <location filename="../meinstall.ui" line="884"/>
         <location filename="../meinstall.ui" line="1365"/>
         <source>root</source>
-        <translation>root</translation>
+        <translation>juuri</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="958"/>
@@ -907,12 +869,12 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="1050"/>
         <source>3. Installation in progress</source>
-        <translation>3. Instalação em curso</translation>
+        <translation>3. Asennus käynnissä</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1093"/>
         <source>Abort</source>
-        <translation>Abortar</translation>
+        <translation>Keskeytä</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1096"/>
@@ -923,17 +885,17 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="1135"/>
         <source>Ready to install antiX Linux filesystem</source>
-        <translation>Pronto para instalar o sistema de ficheiros do antiX</translation>
+        <translation>Valmis asentamaan antiX Linux -tiedostojärjestelmän</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1157"/>
         <source>Tips</source>
-        <translation>Dicas</translation>
+        <translation>Vinkkejä</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1231"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Selecionar Método de Arranque</translation>
+        <translation>4. Valitse käynnistystapa</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1264"/>
@@ -948,22 +910,22 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="1295"/>
         <source>Install on:</source>
-        <translation>Instalar em:</translation>
+        <translation>Asenna:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1311"/>
         <source>Install GRUB for Linux and Windows</source>
-        <translation>Instalar o GRUB para Linux e Windows</translation>
+        <translation>Asenna GRUB Linuxille ja Windowsille</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1333"/>
         <source>System boot disk:</source>
-        <translation>Disco de arranque do sistema:</translation>
+        <translation>Järjestelmän käynnistyslevy:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1378"/>
         <source>EFI System Partition</source>
-        <translation>Partição de Sistema EFI</translation>
+        <translation>EFI Järjestelmäosio</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1381"/>
@@ -973,177 +935,177 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="1451"/>
         <source>Common Services to Enable</source>
-        <translation>Activar Serviços Comuns</translation>
+        <translation>Yleiset käyttöön otettavat palvelut</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1491"/>
         <source>Service</source>
-        <translation>Serviço</translation>
+        <translation>Palvelu</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1496"/>
         <source>Description</source>
-        <translation>Descrição</translation>
+        <translation>Kuvaus</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1532"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Nome do Computador na Rede</translation>
+        <translation>5. Tietokoneen verkkonimet</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1559"/>
         <source>Workgroup</source>
-        <translation>Grupo de trabalho</translation>
+        <translation>Työryhmä</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1572"/>
         <source>Workgroup:</source>
-        <translation>Grupo de trabalho:</translation>
+        <translation>Työryhmä:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1588"/>
         <source>SaMBa Server for MS Networking</source>
-        <translation>Servidor de ficheiros Samba para interacção com sistemas MS Windows</translation>
+        <translation>SaMBa-palvelin Microsoftin verkkojakoa varten</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1604"/>
         <source>example.dom</source>
-        <translation>exemplo.dom</translation>
+        <translation>esimerkki.fi</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1617"/>
         <source>Computer domain:</source>
-        <translation>Domínio do computador:</translation>
+        <translation>Tietokoneen verkkonimi:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1649"/>
         <source>Computer name:</source>
-        <translation>Nome do computador:</translation>
+        <translation>Tietokoneen nimi:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1722"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Configuração de serviços (avançada) </translation>
+        <translation>6d. Palveluiden asetukset (edistynyt)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1740"/>
         <source>Adjust which services should run at startup</source>
-        <translation>Definir os serviços a serem activados ao iniciar</translation>
+        <translation>Määritä, mitkä palvelut tulisi käynnistää järjestelmän käynnistyessä</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1743"/>
         <source>View</source>
-        <translation>Ver pacotes/programas</translation>
+        <translation>Näytä</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1772"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Configurar o Relógio</translation>
+        <translation>6b. Konfiguroi kellonkaika</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1800"/>
         <source>Format:</source>
-        <translation>Formato:</translation>
+        <translation>Muoto:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1817"/>
         <source>System clock uses LOCAL</source>
-        <translation>O relógio do sistema usa LOCAL</translation>
+        <translation>Käytä paikallista aikaa järjestelmän kellonaikana</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1846"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Pré-definições de Localização</translation>
+        <translation>6a. Oletuslokalisaatiot</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1876"/>
         <source>Locale:</source>
-        <translation>Localização:</translation>
+        <translation>Sijainti:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1905"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Definições de fuso horário</translation>
+        <translation>6c. Aikavyöhykkeen asetukset</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1917"/>
         <source>Timezone:</source>
-        <translation>Fuso horário:</translation>
+        <translation>Aikavyöhyke:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1994"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Conta root (administrador)</translation>
+        <translation>7b. Pääkäyttäjän (ylläpitäjä) käyttäjätili</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2065"/>
         <source>Confirm root password:</source>
-        <translation>Confirmar a senha de root:</translation>
+        <translation>Vahvista pääkäyttäjän salasana:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2081"/>
         <source>Root password:</source>
-        <translation>Senha de root:</translation>
+        <translation>Pääkäyttäjän salasana:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2100"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Conta do Utilizador Pré-definido</translation>
+        <translation>7a. Oletuskäyttäjätili</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2180"/>
         <source>username</source>
-        <translation>nome de utilizador</translation>
+        <translation>käyttäjänimi</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2193"/>
         <source>Confirm user password:</source>
-        <translation>Confirmar a senha de utilizador:</translation>
+        <translation>Vahvista käyttäjän salasana:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2209"/>
         <source>Default user password:</source>
-        <translation>Senha do utilizador pré-definido:</translation>
+        <translation>Käyttäjän oletussalasana:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2225"/>
         <source>Default user login name:</source>
-        <translation>Utilizador pré-definido:</translation>
+        <translation>Käyttäjän oletuskäyttäjätunnus:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2244"/>
         <source>Autologin</source>
-        <translation>Início de sessão sem autenticação</translation>
+        <translation>Kirjaudu automaattisesti</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2257"/>
         <source>Show passwords</source>
-        <translation>Mostrar senhas</translation>
+        <translation>Näytä salasanat</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2270"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
-        <translation>As alterações ao ambiente de trabalho feitas na sessão da instalação externa serão transpostas para o sistema instalado no disco rígido</translation>
+        <translation>Liveympäristössä tehdyt työpöydän muutokset siirtyvät asennettuun käyttöjärjestelmään</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
         <source>Save live desktop changes</source>
-        <translation>Guardar as alterações feitas na sessão da instalação externa</translation>
+        <translation>Tallenna livetilan muutokset</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2286"/>
         <source>Encrypt /home</source>
-        <translation>Encriptar /home</translation>
+        <translation>Salaa /home</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2318"/>
         <source>Reminders</source>
-        <translation>Lembretes</translation>
+        <translation>Muistutukset</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2386"/>
         <source>Close</source>
-        <translation>Fechar</translation>
+        <translation>Sulje</translation>
     </message>
 </context>
 <context>
@@ -1151,12 +1113,12 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../memain.ui" line="26"/>
         <source>antiX Linux Install</source>
-        <translation>Instalador do antiX</translation>
+        <translation>antiX Linuxin asennus</translation>
     </message>
     <message>
         <location filename="../memain.ui" line="76"/>
         <source>Help</source>
-        <translation>Ajudas várias (em inglês)</translation>
+        <translation>Ohje</translation>
     </message>
 </context>
 <context>
@@ -1166,9 +1128,9 @@ A voltar ao Passo 1.</translation>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
-        <translation>O instalador não inicia porque parece já estar em execução em segundo plano.
+        <translation>Asennusohjelma ei käynnistynyt koska se näyttäisi olevan jo käynnissä.
 
-Deve ser encerrado, se possível; se não, no terminal/consola executar &apos;pkill minstall&apos;.</translation>
+Jos mahdollista, sulje se tai suorita &apos;pkill minstall&apos; päätteessä.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="70"/>
@@ -1176,25 +1138,22 @@ Deve ser encerrado, se possível; se não, no terminal/consola executar &apos;pk
 We recommend you quit now and restart in Legacy Boot
 
 Do you want to continue the installation?</source>
-        <translation>O Sistema Operativo de 32bit em execução foi iniciado em modo UEFI 64 bit. Depois de instalado no disco, o sistema não arrancará a menos que no reinício seja seleccionado o modo Legacy Boot - isto é, o modo BIOS - ou similar.
-Recomenda-se que o sistema seja encerrado agora e reiniciado em modo Legacy Boot.
-
-Continuar a instalação, ainda assim?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="74"/>
         <source>Yes</source>
-        <translation>Sim</translation>
+        <translation>Kyllä</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="74"/>
         <source>No</source>
-        <translation>Não</translation>
+        <translation>Ei</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="87"/>
         <source>You must run this app as root.</source>
-        <translation>Esta aplicação tem que ser executada como root.</translation>
+        <translation>Sinun täytyy suorittaa tämä sovellus pääkäyttäjänä.</translation>
     </message>
 </context>
 </TS>
