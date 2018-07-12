@@ -730,55 +730,55 @@ Returning to Step 1.</source>
     </message>
     <message>
         <location filename="../meinstall.ui" line="703"/>
-        <location filename="../meinstall.ui" line="899"/>
+        <location filename="../meinstall.ui" line="902"/>
         <source>ext4</source>
         <translation>ext4</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
-        <location filename="../meinstall.ui" line="904"/>
+        <location filename="../meinstall.ui" line="907"/>
         <source>ext3</source>
         <translation>ext3</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="713"/>
-        <location filename="../meinstall.ui" line="909"/>
+        <location filename="../meinstall.ui" line="912"/>
         <source>ext2</source>
         <translation>ext2</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="718"/>
-        <location filename="../meinstall.ui" line="914"/>
+        <location filename="../meinstall.ui" line="917"/>
         <source>jfs</source>
         <translation>jfs</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="723"/>
-        <location filename="../meinstall.ui" line="919"/>
+        <location filename="../meinstall.ui" line="922"/>
         <source>xfs</source>
         <translation>xfs</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="728"/>
-        <location filename="../meinstall.ui" line="924"/>
+        <location filename="../meinstall.ui" line="927"/>
         <source>btrfs</source>
         <translation>btrfs</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="733"/>
-        <location filename="../meinstall.ui" line="929"/>
+        <location filename="../meinstall.ui" line="932"/>
         <source>btrfs-zlib</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="738"/>
-        <location filename="../meinstall.ui" line="934"/>
+        <location filename="../meinstall.ui" line="937"/>
         <source>btrfs-lzo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="743"/>
-        <location filename="../meinstall.ui" line="939"/>
+        <location filename="../meinstall.ui" line="942"/>
         <source>reiserfs</source>
         <translation>reiserfs</translation>
     </message>
@@ -810,7 +810,7 @@ Returning to Step 1.</source>
     </message>
     <message>
         <location filename="../meinstall.ui" line="748"/>
-        <location filename="../meinstall.ui" line="944"/>
+        <location filename="../meinstall.ui" line="947"/>
         <source>reiser4</source>
         <translation type="unfinished"></translation>
     </message>
@@ -835,274 +835,259 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="857"/>
-        <source>homeMX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="884"/>
-        <location filename="../meinstall.ui" line="1365"/>
+        <location filename="../meinstall.ui" line="887"/>
+        <location filename="../meinstall.ui" line="1374"/>
         <source>root</source>
         <translation>šaknis</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="958"/>
+        <location filename="../meinstall.ui" line="961"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="974"/>
+        <location filename="../meinstall.ui" line="977"/>
         <source>home:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="996"/>
-        <source>swap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1015"/>
-        <source>rootMX17.1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1050"/>
+        <location filename="../meinstall.ui" line="1059"/>
         <source>3. Installation in progress</source>
         <translation>3. Įdiegimas eigoje</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1093"/>
+        <location filename="../meinstall.ui" line="1102"/>
         <source>Abort</source>
         <translation>Nutraukti</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1096"/>
-        <location filename="../meinstall.ui" line="1314"/>
+        <location filename="../meinstall.ui" line="1105"/>
+        <location filename="../meinstall.ui" line="1323"/>
         <source>Alt+A</source>
         <translation>Alt+A</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1135"/>
+        <location filename="../meinstall.ui" line="1144"/>
         <source>Ready to install antiX Linux filesystem</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1157"/>
+        <location filename="../meinstall.ui" line="1166"/>
         <source>Tips</source>
         <translation>Patarimai</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1231"/>
+        <location filename="../meinstall.ui" line="1240"/>
         <source>4. Select Boot Method</source>
         <translation>4. Pasirinkite OS paleidimo metodą</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1264"/>
+        <location filename="../meinstall.ui" line="1273"/>
         <source>MBR</source>
         <translation>MBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1267"/>
+        <location filename="../meinstall.ui" line="1276"/>
         <source>Alt+B</source>
         <translation>Alt+B</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1295"/>
+        <location filename="../meinstall.ui" line="1304"/>
         <source>Install on:</source>
         <translation>Įdiegti ties:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1311"/>
+        <location filename="../meinstall.ui" line="1320"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1333"/>
+        <location filename="../meinstall.ui" line="1342"/>
         <source>System boot disk:</source>
         <translation>Sistemos paleidimo diskas:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1378"/>
+        <location filename="../meinstall.ui" line="1387"/>
         <source>EFI System Partition</source>
         <translation>EFI sistemos skaidinys</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1381"/>
+        <location filename="../meinstall.ui" line="1390"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1451"/>
+        <location filename="../meinstall.ui" line="1460"/>
         <source>Common Services to Enable</source>
         <translation>Bendrosios tarnybos, kurias įjungti</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1491"/>
+        <location filename="../meinstall.ui" line="1500"/>
         <source>Service</source>
         <translation>Tarnyba</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1496"/>
+        <location filename="../meinstall.ui" line="1505"/>
         <source>Description</source>
         <translation>Aprašas</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1532"/>
+        <location filename="../meinstall.ui" line="1541"/>
         <source>5. Computer Network Names</source>
         <translation>5. Kompiuterio tinklo pavadinimai</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1559"/>
+        <location filename="../meinstall.ui" line="1568"/>
         <source>Workgroup</source>
         <translation>Darbo_grupė</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1572"/>
+        <location filename="../meinstall.ui" line="1581"/>
         <source>Workgroup:</source>
         <translation>Darbo grupė:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1588"/>
+        <location filename="../meinstall.ui" line="1597"/>
         <source>SaMBa Server for MS Networking</source>
         <translation>SaMBa serveris, skirtas MS darbui tinkle</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1604"/>
+        <location filename="../meinstall.ui" line="1613"/>
         <source>example.dom</source>
         <translation>pavyzdys.sri</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1617"/>
+        <location filename="../meinstall.ui" line="1626"/>
         <source>Computer domain:</source>
         <translation>Kompiuterio sritis:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1649"/>
+        <location filename="../meinstall.ui" line="1658"/>
         <source>Computer name:</source>
         <translation>Kompiuterio pavadinimas:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1722"/>
+        <location filename="../meinstall.ui" line="1731"/>
         <source>6d. Service Settings (advanced)</source>
         <translation>6d. Tarnybų nustatymai (išplėstiniai)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1740"/>
+        <location filename="../meinstall.ui" line="1749"/>
         <source>Adjust which services should run at startup</source>
         <translation>Reguliuoti, kurios tarnybos turėtų būti paleidžiamos kompiuterio paleidimo metu</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1743"/>
+        <location filename="../meinstall.ui" line="1752"/>
         <source>View</source>
         <translation>Rodyti</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1772"/>
+        <location filename="../meinstall.ui" line="1781"/>
         <source>6b. Configure Clock</source>
         <translation>6b. Konfigūruoti laikrodį</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1800"/>
+        <location filename="../meinstall.ui" line="1809"/>
         <source>Format:</source>
         <translation>Formatas:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1817"/>
+        <location filename="../meinstall.ui" line="1826"/>
         <source>System clock uses LOCAL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1846"/>
+        <location filename="../meinstall.ui" line="1855"/>
         <source>6a. Localization Defaults</source>
         <translation>6a. Lokalizavimo numatytosios reikšmės</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1876"/>
+        <location filename="../meinstall.ui" line="1885"/>
         <source>Locale:</source>
         <translation>Lokalė:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1905"/>
+        <location filename="../meinstall.ui" line="1914"/>
         <source>6c. Timezone Settings</source>
         <translation>6c. Laiko juostos nustatymai</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1917"/>
+        <location filename="../meinstall.ui" line="1926"/>
         <source>Timezone:</source>
         <translation>Laiko juosta:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1994"/>
+        <location filename="../meinstall.ui" line="2003"/>
         <source>7b. Root (administrator) Account</source>
         <translation>7b. Root (administratoriaus) paskyra</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2065"/>
+        <location filename="../meinstall.ui" line="2074"/>
         <source>Confirm root password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2081"/>
+        <location filename="../meinstall.ui" line="2090"/>
         <source>Root password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2100"/>
+        <location filename="../meinstall.ui" line="2109"/>
         <source>7a. Default User Account</source>
         <translation>7a. Numatytojo naudotojo paskyra</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2180"/>
+        <location filename="../meinstall.ui" line="2189"/>
         <source>username</source>
         <translation>naudotojo_vardas</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2193"/>
+        <location filename="../meinstall.ui" line="2202"/>
         <source>Confirm user password:</source>
         <translation>Patvirtinkite naudotojo slaptažodį:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2209"/>
+        <location filename="../meinstall.ui" line="2218"/>
         <source>Default user password:</source>
         <translation>Numatytojo naudotojo slaptažodis:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2225"/>
+        <location filename="../meinstall.ui" line="2234"/>
         <source>Default user login name:</source>
         <translation>Numatytojo naudotojo prisijungimo vardas:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2244"/>
+        <location filename="../meinstall.ui" line="2253"/>
         <source>Autologin</source>
         <translation>Automatiškai prisijungti</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2257"/>
+        <location filename="../meinstall.ui" line="2266"/>
         <source>Show passwords</source>
         <translation>Rodyti slaptažodžius</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2270"/>
+        <location filename="../meinstall.ui" line="2279"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
         <translation>Pristatymo aplinkoje atliktos darbalaukio modifikacijos bus perkeltos į įdiegtą OS</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2273"/>
+        <location filename="../meinstall.ui" line="2282"/>
         <source>Save live desktop changes</source>
         <translation>Įrašyti pristatomojo darbalaukio pakeitimus</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2286"/>
+        <location filename="../meinstall.ui" line="2295"/>
         <source>Encrypt /home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2318"/>
+        <location filename="../meinstall.ui" line="2327"/>
         <source>Reminders</source>
         <translation>Priminimai</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2386"/>
+        <location filename="../meinstall.ui" line="2395"/>
         <source>Close</source>
         <translation>Užverti</translation>
     </message>
