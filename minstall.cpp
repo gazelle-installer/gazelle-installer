@@ -2419,8 +2419,8 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         QFile file("/mnt/antiX/etc/fstab");
         if (file.open(QIODevice::WriteOnly)) {
             QTextStream out(&file);
-            out << "# Pluggable devices are handled by uDev, they are not in fstab";
-            out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass;
+            out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
+            out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
 
             if (homedev != "/dev/root" && homedev != rootdev) {
                 if (isHomeFormatted) {
@@ -2431,9 +2431,9 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                         home_mntops += ",notail";
                         dump_pass = "0 0";
                     }
-                    out << homedev + " / " + fstype + " " + home_mntops + " " + dump_pass;
+                    out << homedev + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
                 } else {
-                    out << homedev + " /home auto defaults,noatime 1 2";
+                    out << homedev + " /home auto defaults,noatime 1 2\n";
                 }
             }
             file.close();
