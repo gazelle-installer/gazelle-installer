@@ -216,6 +216,8 @@ MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
     timer = new QTimer(this);
 
     rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
+    homeLabelEdit->setText("home" + PROJECTSHORTNAME);
+    swapLabelEdit->setText("swap" + PROJECTSHORTNAME);
 
     // if it looks like an apple...
     if (shell.run("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus") == 0) {
@@ -352,11 +354,11 @@ void MInstall::updateStatus(QString msg, int val)
     qApp->processEvents();
 }
 
-bool MInstall::mountPartition(const QString dev, const QString point, const QString mntopts)
+bool MInstall::mountPartition(const QString dev, const QString point, const QString mntops)
 {
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
     mkdir(point.toUtf8(), 0755);
-    QString cmd = QString("/bin/mount %1 %2 -o %3").arg(dev).arg(point).arg(mntopts);
+    QString cmd = QString("/bin/mount %1 %2 -o %3").arg(dev).arg(point).arg(mntops);
 
     if (shell.run(cmd) != 0) {
         return false;
@@ -405,21 +407,10 @@ bool MInstall::checkDisk()
 
 /////////////////////////////////////////////////////////////////////////
 // install functions
-QString mntops = "defaults";
+QString home_mntops = "defaults";
+QString root_mntops = "defaults";
 bool isRootFormatted = false;
 bool isHomeFormatted = false;
-bool isFormatExt3 = false;
-bool isFormatReiserfs = false;
-//added by anticapitalista
-bool isFormatExt2 = false;
-bool isFormatExt4 = false;
-bool isFormatJfs = false;
-bool isFormatXfs = false;
-bool isFormatBtrfs = false;
-bool isFormatReiser4 = false;
-//added by rob
-bool isFormatBtrfsZlib = false;
-bool isFormatBtrfsLzo = false;
 
 int MInstall::getPartitionNumber()
 {
@@ -444,13 +435,12 @@ void MInstall::prepareToInstall()
 
     isRootFormatted = false;
     isHomeFormatted = false;
-    isFormatExt4 = true;
 }
 
 bool MInstall::makeSwapPartition(QString dev)
 {
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
-    QString cmd = QString("/sbin/mkswap %1 -L " + PROJECTSHORTNAME + "swap").arg(dev);
+    QString cmd = QString("/sbin/mkswap " + dev + " -L " + swapLabelEdit->text());
     if (shell.run(cmd) != 0) {
         // error
         return false;
@@ -484,131 +474,103 @@ bool MInstall::makeEsp(QString drv, int size)
 bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QString label)
 {
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+
+    QString homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
+    if (homedev == dev) {  // if formating /home partition
+        home_mntops = "defaults,noatime";
+    } else {
+        root_mntops = "defaults,noatime";
+    }
+
     QString cmd;
     char line[260];
-    isFormatExt4 = false;
     if (strncmp(type, "reiserfs", 4) == 0) {
         cmd = QString("mkfs.reiserfs -q %1 -l \"%2\"").arg(dev).arg(label);
-    isFormatReiserfs = true;
-        mntops = "defaults,noatime";
-    } else {
-        if (strncmp(type, "reiser4", 4) == 0) {
-            // reiser4
-            cmd = QString("mkfs.reiser4 -f -y %1 -L \"%2\"").arg(dev).arg(label);
-            isFormatReiser4 = true;
-            mntops = "defaults,noatime";
+    } else if (strncmp(type, "reiser4", 4) == 0) {
+        // reiser4
+        cmd = QString("mkfs.reiser4 -f -y %1 -L \"%2\"").arg(dev).arg(label);
+    } else if (strncmp(type, "ext3", 4) == 0) {
+        // ext3
+        if (bad) {
+            // do with badblocks
+            cmd = QString("mkfs.ext3 -c %1 -L \"%2\"").arg(dev).arg(label);
         } else {
-            if (strncmp(type, "ext3", 4) == 0) {
-                // ext3
-                if (bad) {
-                    // do with badblocks
-                    cmd = QString("mkfs.ext3 -c %1 -L \"%2\"").arg(dev).arg(label);
-                } else {
-                    // do no badblocks
-                    cmd = QString("mkfs.ext3 -F %1 -L \"%2\"").arg(dev).arg(label);
-                }
-                isFormatExt3 = true;
-                mntops = "defaults,noatime";
+            // do no badblocks
+            cmd = QString("mkfs.ext3 -F %1 -L \"%2\"").arg(dev).arg(label);
+        }
+    } else if (strncmp(type, "ext2", 4) == 0) {
+        // ext2
+        if (bad) {
+            // do with badblocks
+            cmd = QString("mkfs.ext2 -c %1 -L \"%2\"").arg(dev).arg(label);
+        } else {
+            // do no badblocks
+            cmd = QString("mkfs.ext2 -F %1 -L \"%2\"").arg(dev).arg(label);
+        }
+    } else if (strncmp(type, "btrfs", 4) == 0) {
+        // btrfs and set up fsck
+        shell.run("/bin/cp -fp /bin/true /sbin/fsck.auto");
+        // set creation options for small drives using btrfs
+        const char *partstr;
+        sleep(1);
+        cmd = QString("/sbin/sfdisk -s %1").arg(dev);
+        FILE *fp = popen(cmd.toUtf8(), "r");
+        fgets(line, sizeof line, fp);
+        partstr = strtok(line," ");
+        pclose(fp);
+        int size = atoi(partstr);
+        size = size / 1024; // in MiB
+        // if drive is smaller than 6GB, create in mixed mode
+        if (size < 6000) {
+            cmd = QString("mkfs.btrfs -f -M -O skinny-metadata %1 -L \"%2\"").arg(dev).arg(label);
+        } else {
+            cmd = QString("mkfs.btrfs -f %1 -L \"%2\"").arg(dev).arg(label);
+        }
+        // if compression has been selected by user, set flag
+        if (strncmp(type, "btrfs-zlib", 8) == 0) {
+            if (homedev == dev) {  // if formating /home partition
+                home_mntops = "defaults,noatime,compress-force=zlib";
             } else {
-                if (strncmp(type, "ext2", 4) == 0) {
-                    // ext2
-                    if (bad) {
-                        // do with badblocks
-                        cmd = QString("mkfs.ext2 -c %1 -L \"%2\"").arg(dev).arg(label);
-                    } else {
-                        // do no badblocks
-                        cmd = QString("mkfs.ext2 -F %1 -L \"%2\"").arg(dev).arg(label);
-                    }
-                    isFormatExt2 = true;
-                    mntops = "defaults,noatime";
-                } else {
-                    if (strncmp(type, "btrfs", 4) == 0) {
-                        // btrfs and set up fsck
-                        shell.run("/bin/cp -fp /bin/true /sbin/fsck.auto");
-                        // set creation options for small drives using btrfs
-                        const char *partstr;
-                        sleep(1);
-                        cmd = QString("/sbin/sfdisk -s %1").arg(dev);
-                        FILE *fp = popen(cmd.toUtf8(), "r");
-                        fgets(line, sizeof line, fp);
-                        partstr = strtok(line," ");
-                        pclose(fp);
-                        int size = atoi(partstr);
-                        size = size / 1024; // in MiB
-                        // if drive is smaller than 6GB, create in mixed mode
-                        if (size < 6000) {
-                            cmd = QString("mkfs.btrfs -f -M -O skinny-metadata %1 -L \"%2\"").arg(dev).arg(label);
+                root_mntops = "defaults,noatime,compress-force=zlib";
+            }
+        } else if (strncmp(type, "btrfs-lzo", 8) == 0) {
+            if (homedev == dev) {  // if formating /home partition
+                home_mntops = "defaults,noatime,compress-force=lzo";
             } else {
-                            cmd = QString("mkfs.btrfs -f %1 -L \"%2\"").arg(dev).arg(label);
-                        }
-                        // if compression has been selected by user, set flag
-                        if (strncmp(type, "btrfs-zlib", 8) == 0) {
-                            isFormatBtrfsZlib = true;
-                            mntops = "defaults,noatime,compress-force=zlib";
-            } else {
-                            if (strncmp(type, "btrfs-lzo", 8) == 0) {
-                                isFormatBtrfsLzo = true;
-                                mntops = "defaults,noatime,compress-force=lzo";
-                                } else {
-                     isFormatBtrfs = true;
-                                 mntops = "defaults,noatime";
-                                }
-                        }
-                    } else {
-                        //xfs
-                        if (strncmp(type, "xfs", 4) == 0) {
-                            if (bad) {
-                                // do with badblocks
-                                cmd = QString("mkfs.xfs -f -c %1 -L \"%2\"").arg(dev).arg(label);
-                            } else {
-                                // do no badblocks
-                                cmd = QString("mkfs.xfs -f %1 -L \"%2\"").arg(dev).arg(label);
-                            }
-                            isFormatXfs = true;
-                            mntops = "defaults,noatime";
-                        } else {
-                            //jfs
-                            if (strncmp(type, "jfs", 4) == 0) {
-                                if (bad) {
-                                    // do with badblocks
-                                    cmd = QString("mkfs.jfs -q -c %1 -L \"%2\"").arg(dev).arg(label);
-                                } else {
-                                    // do no badblocks
-                                    cmd = QString("mkfs.jfs -q %1 -L \"%2\"").arg(dev).arg(label);
-                                }
-                                isFormatJfs = true;
-                                mntops = "defaults,noatime";
-                            } else {
-                                // must be ext4
-                                if (bad) {
-                                    // do with badblocks
-                                    cmd = QString("mkfs.ext4 -c %1 -L \"%2\"").arg(dev).arg(label);
-                                } else {
-                                    // do no badblocks
-                                    cmd = QString("mkfs.ext4 -F %1 -L \"%2\"").arg(dev).arg(label);
-                                }
-                                isFormatExt4 = true;
-                                mntops = "defaults,noatime";
-                            }
-                        }
-                    }
-                }
-            }
-            if (shell.run(cmd) != 0) {
-                // error
-                return false;
-            }
-            system("sleep 1");
-
-            if (strncmp(type, "ext*", 4) == 0) {
-                // ext4 tuning
-                cmd = QString("/sbin/tune2fs -c0 -C0 -i1m %1").arg(dev);
-            }
-            if (shell.run(cmd) != 0) {
-                // error
+                root_mntops = "defaults,noatime,compress-force=lzo";
             }
         }
-        return true;
+    } else if (strncmp(type, "xfs", 4) == 0) {
+        cmd = QString("mkfs.xfs -f %1 -L \"%2\"").arg(dev).arg(label);
+    } else if (strncmp(type, "jfs", 4) == 0) {
+        if (bad) {
+            // do with badblocks
+            cmd = QString("mkfs.jfs -q -c %1 -L \"%2\"").arg(dev).arg(label);
+        } else {
+            // do no badblocks
+            cmd = QString("mkfs.jfs -q %1 -L \"%2\"").arg(dev).arg(label);
+        }
+    } else { // must be ext4
+        if (bad) {
+            // do with badblocks
+            cmd = QString("mkfs.ext4 -c %1 -L \"%2\"").arg(dev).arg(label);
+        } else {
+            // do no badblocks
+            cmd = QString("mkfs.ext4 -F %1 -L \"%2\"").arg(dev).arg(label);
+        }
+    }
+    if (shell.run(cmd) != 0) {
+        // error
+        return false;
+    }
+    system("sleep 1");
+
+    if (strncmp(type, "ext*", 4) == 0) {
+        // ext4 tuning
+        cmd = QString("/sbin/tune2fs -c0 -C0 -i1m %1").arg(dev);
+    }
+    if (shell.run(cmd) != 0) {
+        // error
     }
     return true;
 }
@@ -766,9 +728,10 @@ bool MInstall::makeDefaultPartitions()
     updateStatus(tr("Formatting root partition"), ++prog);
     if (!makeLinuxPartition(rootdev, "ext4", false, rootLabelEdit->text())) {
         return false;
+    } else {
+        root_mntops = "defaults,noatime";
+        isRootFormatted = true;
     }
-    else { mntops = "defaults,noatime";
-    isRootFormatted = true; } //  this line inserted to fix automatic/default whole drive installation
     //if uefi is not detected, set flags based on GPT. Else don't set a flag...done by makeESP.
     if(!uefi) { // set appropriate flags
         if (isGpt(drv)) {
@@ -780,7 +743,7 @@ bool MInstall::makeDefaultPartitions()
 
     system("sleep 1");
     // mount partitions
-    if (!mountPartition(rootdev, "/mnt/antiX", mntops)) {
+    if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
         return false;
     }
 
@@ -804,7 +767,8 @@ bool MInstall::makeChosenPartitions()
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
     int ans;
     char line[130];
-    char type[20];
+    char root_type[20];
+    char home_type[20];
     QString msg;
     QString cmd;
 
@@ -812,7 +776,8 @@ bool MInstall::makeChosenPartitions()
     bool gpt = isGpt(drv);
 
     // get config
-    strncpy(type, rootTypeCombo->currentText().toUtf8(), 10);
+    strncpy(root_type, rootTypeCombo->currentText().toUtf8(), 10);
+    strncpy(home_type, homeTypeCombo->currentText().toUtf8(), 10);
 
     strcpy(line, rootCombo->currentText().toUtf8());
     char *tok = strtok(line, " -");
@@ -960,24 +925,14 @@ bool MInstall::makeChosenPartitions()
         }
         shell.run(cmd);
         system("sleep 1");
-        if (!makeLinuxPartition(rootdev, type, badblocksCheck->isChecked(), rootLabelEdit->text())) {
+        if (!makeLinuxPartition(rootdev, root_type, badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
         system("sleep 1");
-        if (!mountPartition(rootdev, "/mnt/antiX", mntops)) {
+        if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
             return false;
         }
         isRootFormatted = true;
-        if (strncmp(type, "ext4", 4) == 0) {
-            isFormatExt3 = false;
-            isFormatReiserfs = false;
-        } else if (strncmp(type, "reis", 4) == 0) {
-            isFormatExt3 = false;
-            isFormatReiserfs = true;
-        } else if (strncmp(type, "ext3", 4) == 0) {
-            isFormatExt3 = true;
-            isFormatReiserfs = false;
-        }
     }
     // maybe format home
     if (saveHomeCheck->isChecked()) {
@@ -986,7 +941,7 @@ bool MInstall::makeChosenPartitions()
             // not on root
             // shell.run("rm -r -d /mnt/antiX/home >/dev/null 2>&1"); ///not sure why this was here
             updateStatus(tr("Mounting the /home partition"), 8);
-            if (!mountPartition(homedev, "/mnt/antiX/home", mntops)) {
+            if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) {
                 return false;
             }
         } else {
@@ -1009,11 +964,11 @@ bool MInstall::makeChosenPartitions()
             }
             shell.run(cmd);
             system("sleep 1");
-            if (!makeLinuxPartition(homedev, type, badblocksCheck->isChecked(), homeLabelEdit->text())) {
+            if (!makeLinuxPartition(homedev, home_type, badblocksCheck->isChecked(), homeLabelEdit->text())) {
                 return false;
             }
             system("sleep 1");
-            if (!mountPartition(homedev, "/mnt/antiX/home", mntops)) {
+            if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) {
                 return false;
             }
             isHomeFormatted = true;
@@ -1044,7 +999,7 @@ void MInstall::installLinux()
     } else {
         // no--it's being reused
         updateStatus(tr("Mounting the / (root) partition"), 3);
-        mountPartition(rootdev, "/mnt/antiX", mntops);
+        mountPartition(rootdev, "/mnt/antiX", root_mntops);
         // set all connections in advance
         disconnect(timer, SIGNAL(timeout()), 0, 0);
         connect(timer, SIGNAL(timeout()), this, SLOT(delTime()));
@@ -1239,7 +1194,7 @@ bool MInstall::installLoader()
     //if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     if (POPULATE_MEDIA_MOUNTPOINTS) {
         //if compressed btrfs filesystem is not used, use default locate for fstab
-        if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
+        if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
             runCmd("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
         } else {
             // if compressed btrfs filessystem is used, specify the -O switch
@@ -1248,7 +1203,7 @@ bool MInstall::installLoader()
     } else {
         //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
         //but do check for compressed btrfs filesystem
-        if (!isFormatBtrfsZlib && !isFormatBtrfsLzo) {
+        if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
             runCmd("/sbin/make-fstab --install /mnt/antiX");
         } else {
             // if compressed btrfs filessystem is used, specify the -O switch
@@ -1479,6 +1434,13 @@ bool MInstall::setUserName()
     shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
     setCursor(QCursor(Qt::ArrowCursor));
     return true;
+}
+
+// get the type of the partition
+QString MInstall::getPartType(const QString dev)
+{
+    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    return shell.getOutput("blkid " + dev + " -o value -s TYPE");
 }
 
 bool MInstall::setPasswords()
@@ -1748,7 +1710,7 @@ void MInstall::setLocale()
     QString rootdev = "/dev/" + QString(rootCombo->currentText()).section(" ", 0, 0);
     QString homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
     shell.run("umount -R /mnt/antiX");
-    shell.run(QString("mount %1 /mnt/antiX -o %2").arg(rootdev).arg(mntops));
+    shell.run(QString("mount %1 /mnt/antiX -o %2").arg(rootdev).arg(root_mntops));
     if (homedev != "/dev/root" && homedev != rootdev) {
         shell.run(QString("mount %1 /mnt/antiX/home").arg(homedev));
     }
@@ -2151,8 +2113,8 @@ void MInstall::refresh()
     QStringList drives = getCmdOuts("partition-info" + exclude + " --min-size=" + MIN_ROOT_DEVICE_SIZE + " -n drives");
     diskCombo->clear();
     grubBootCombo->clear();
-    homeLabelEdit->setHidden(true);
-    homeLabelCheck->setHidden(true);
+    homeLabelEdit->setEnabled(false);
+    homeTypeCombo->setEnabled(false);
     diskCombo->addItems(drives);
     diskCombo->setCurrentIndex(0);
     grubBootCombo->addItems(drives);
@@ -2277,7 +2239,7 @@ void MInstall::on_diskCombo_activated(QString)
     rootCombo->clear();
     swapCombo->clear();
     homeCombo->clear();
-    swapCombo->addItem("none - or existing");
+    swapCombo->addItem(tr("none - or existing"));
     homeCombo->addItem("root");
     removedItem = "";
 
@@ -2327,22 +2289,10 @@ void MInstall::on_rootCombo_activated(QString)
 
 void MInstall::on_rootTypeCombo_activated(QString)
 {
-    if (rootTypeCombo->currentText().startsWith("ext")) {
+    if (rootTypeCombo->currentText().startsWith("ext") || rootTypeCombo->currentText() == "jfs") {
         badblocksCheck->setEnabled(true);
     } else {
         badblocksCheck->setEnabled(false);
-    }
-    badblocksCheck->setChecked(false);
-}
-
-void MInstall::on_homeCombo_activated(const QString &arg1)
-{
-    if (arg1 == "root") {
-        homeLabelEdit->setHidden(true);
-        homeLabelCheck->setHidden(true);
-    } else {
-        homeLabelEdit->setHidden(false);
-        homeLabelCheck->setHidden(false);
     }
 }
 
@@ -2444,21 +2394,10 @@ void MInstall::copyStart()
 void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 {
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
-    char line[130];
-    char rootdev[20];
-    char swapdev[20];
-    char homedev[20];
 
     // get config
-    strcpy(line, rootCombo->currentText().toUtf8());
-    char *tok = strtok(line, " -");
-    sprintf(rootdev, "/dev/%s", tok);
-    strcpy(line, swapCombo->currentText().toUtf8());
-    tok = strtok(line, " -");
-    sprintf(swapdev, "/dev/%s", tok);
-    strcpy(line, homeCombo->currentText().toUtf8());
-    tok = strtok(line, " -");
-    sprintf(homedev, "/dev/%s", tok);
+    QString rootdev = "/dev/" + QString(rootCombo->currentText()).section(" ", 0, 0);
+    QString homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
 
     timer->stop();
 
@@ -2467,72 +2406,37 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         chmod("/mnt/antiX/var/tmp",01777);
         shell.run("cd /mnt/antiX && ln -s var/tmp tmp");
 
-        FILE *fp = fopen("/mnt/antiX/etc/fstab", "w");
-        if (fp != NULL) {
-            fputs("# Pluggable devices are handled by uDev, they are not in fstab\n", fp);
-//            if (isRootFormatted) {
-                if (isFormatExt4) {
-                    sprintf(line, "%s / ext4 defaults,noatime 1 1\n", rootdev);
-                } else if (isFormatExt3) {
-                    sprintf(line, "%s / ext3 defaults,noatime 1 1\n", rootdev);
-                } else if (isFormatXfs) {
-                    sprintf(line, "%s / xfs defaults,noatime 1 1\n", rootdev);
-                } else if (isFormatJfs) {
-                    sprintf(line, "%s / jfs defaults,noatime 1 1\n", rootdev);
-                } else if (isFormatBtrfs) {
-                    sprintf(line, "%s / btrfs defaults,noatime 1 0\n", rootdev);
-                // btrfs compression options
-                } else if (isFormatBtrfsZlib) {
-                    sprintf(line, "%s / btrfs defaults,noatime,compress-force=zlib 1 0\n", rootdev);
-                } else if (isFormatBtrfsLzo) {
-                    sprintf(line, "%s / btrfs defaults,noatime,compress-force=lzo 1 0\n", rootdev);
-                } else if (isFormatReiserfs) {
-                    sprintf(line, "%s / reiserfs defaults,noatime,notail 0 0\n", rootdev);
-                } else if (isFormatReiser4) {
-                    sprintf(line, "%s / reiser4 defaults,noatime,notail 0 0\n", rootdev);
-                } else {
-                    sprintf(line, "%s / auto defaults,noatime 1 1\n", rootdev);
-                }
- //           } else {
-//                sprintf(line, "%s / auto defaults,noatime 1 1\n", rootdev);
-//            }
-            fputs(line, fp);
-            //if (strcmp(swapdev, "/dev/none") != 0) {
-            //  sprintf(line, "%s swap swap sw,pri=1 0 0\n", swapdev);
-            //  fputs(line, fp);
-            //}
-            //fputs("proc /proc proc defaults 0 0\n", fp);
-            //fputs("devpts /dev/pts devpts mode=0622 0 0\n", fp);
-            if (strcmp(homedev, "/dev/root") != 0 && strcmp(homedev, rootdev) != 0) {
+        QString fstype = getPartType(rootdev);
+        QString dump_pass = "1 1";
+
+        if (fstype.startsWith("btrfs")) {
+            dump_pass = "1 0";
+        } else if (fstype.startsWith("reiser") ) {
+            root_mntops += ",notail";
+            dump_pass = "0 0";
+        }
+
+        QFile file("/mnt/antiX/etc/fstab");
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream out(&file);
+            out << "# Pluggable devices are handled by uDev, they are not in fstab";
+            out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass;
+
+            if (homedev != "/dev/root" && homedev != rootdev) {
                 if (isHomeFormatted) {
-                    if (isFormatExt4) {
-                        sprintf(line, "%s /home auto defaults,noatime 1 2\n", homedev);
-                    } else if (isFormatExt3) {
-                        sprintf(line, "%s /home auto defaults,noatime 1 2\n", homedev);
-                    } else if (isFormatXfs) {
-                        sprintf(line, "%s /home auto defaults,noatime 1 2\n", homedev);
-                    } else if (isFormatJfs) {
-                        sprintf(line, "%s /home auto defaults,noatime 1 2\n", homedev);
-                    } else if (isFormatBtrfs) {
-                        sprintf(line, "%s /home btrfs defaults,noatime 1 2\n", homedev);
-                    // btrfs compression options
-                    } else if (isFormatBtrfsZlib) {
-                        sprintf(line, "%s /home btrfs defaults,noatime,compress-force=zlib 1 0\n", homedev);
-                    } else if (isFormatBtrfsLzo) {
-                        sprintf(line, "%s /home btrfs defaults,noatime,compress-force=lzo 1 0\n", homedev);
-                    } else if (isFormatReiserfs) {
-                        sprintf(line, "%s /home reiserfs defaults,noatime,notail 0 0\n", homedev);
-                    } else if (isFormatReiser4) {
-                        sprintf(line, "%s /home reiser4 defaults,noatime,notail 0 0\n", homedev);
-                    } else {
-                        sprintf(line, "%s /home auto defaults,noatime 1 2\n", homedev);
+                    dump_pass = "1 2";
+                    if (fstype.startsWith("btrfs")) {
+                        dump_pass = "1 2";
+                    } else if (fstype.startsWith("reiser") ) {
+                        home_mntops += ",notail";
+                        dump_pass = "0 0";
                     }
+                    out << homedev + " / " + fstype + " " + home_mntops + " " + dump_pass;
                 } else {
-                    sprintf(line, "%s /home auto defaults,noatime 1 2\n", homedev);
+                    out << homedev + " /home auto defaults,noatime 1 2";
                 }
-                fputs(line, fp);
             }
-            fclose(fp);
+            file.close();
         }
         // Copy live set up to install and clean up.
         //shell.run("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");
@@ -2703,4 +2607,15 @@ void MInstall::on_buttonSetKeyboard_clicked()
     setupkeyboardbutton();
 
 
+}
+
+void MInstall::on_homeCombo_currentIndexChanged(const QString &arg1)
+{
+    homeLabelEdit->setEnabled(arg1 != "root");
+    homeTypeCombo->setEnabled(arg1 != "root");
+}
+
+void MInstall::on_swapCombo_currentIndexChanged(const QString &arg1)
+{
+    swapLabelEdit->setEnabled(arg1 != tr("none - or existing"));
 }
