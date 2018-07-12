@@ -538,7 +538,7 @@ Returning to Step 1.</source>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2242"/>
-        <location filename="../minstall.cpp" line="2620"/>
+        <location filename="../minstall.cpp" line="2621"/>
         <source>none - or existing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -572,54 +572,54 @@ Returning to Step 1.</source>
         <translation>Ordnar konfigurationen</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2463"/>
+        <location filename="../minstall.cpp" line="2464"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Misslyckades med att skriva %1 till destinationen.
 Återgår till Steg 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2490"/>
+        <location filename="../minstall.cpp" line="2491"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Få Hjälp&lt;/b&gt;&lt;br/&gt;Grundläggande information om %1 finns på %2.&lt;/p&gt;&lt;p&gt; Det finns frivilliga som hjälper dig på %3 forum, %4&lt;/p&gt;&lt;p&gt;Om du frågar efter hjälp, var vänlig kom ihåg att beskriva dina problem och din dator någorlunda detaljerat. Vanligen hjälper inte uttalanden som &quot;det fungerar inte&quot;.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2498"/>
+        <location filename="../minstall.cpp" line="2499"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Reparera din installation&lt;/b&gt;&lt;br/&gt;Om %1 slutar fungera på hårddisken, är det ibland möjligt att lösa problemet genom att starta från LiveDVDn eller LiveUSBn och köra ett av verktygen i %1 eller genom att använda ett av dom vanliga Linux-verktygen för att reparera systemet.&lt;/p&gt;&lt;p&gt;Du kan också använda din %1 LiveDVD eller LiveUSB för att rädda data från MS-Windows system!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2504"/>
+        <location filename="../minstall.cpp" line="2505"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Stöd %1&lt;/b&gt;&lt;br/&gt;%1 stöds av folk som du. En del hjälper andra på support-forumet - %2- eller översätter hjälpfiler till olika språk, kommer med förslag, skriver dokumentation, eller hjälper till med att testa ny mjukvara.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2511"/>
+        <location filename="../minstall.cpp" line="2512"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Justera din Ljudmixer&lt;/b&gt;&lt;br/&gt; %1 försöker att ställa in ljudmixern för dig men ibland kommer det att bli nödvändigt för dig att skruva upp volymen och sätta på kanaler i mixern för att höra ljudet.&lt;/p&gt;&lt;p&gt;Mixergenvägen finns i menyn. Klicka på den för att öppna mixern.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2519"/>
+        <location filename="../minstall.cpp" line="2520"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Håll ditt exemplar av %1 uppdaterat&lt;/b&gt;&lt;br/&gt;För mer information och uppdateringar var vänlig besök&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt; </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2532"/>
+        <location filename="../minstall.cpp" line="2533"/>
         <source>Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2532"/>
+        <location filename="../minstall.cpp" line="2533"/>
         <source>Are you sure you want to quit the application?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2547"/>
+        <location filename="../minstall.cpp" line="2548"/>
         <source>This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation>Detta alternativ krypterar också /swap, vilket gör att swap-partitionen inte kan delas med andra installerade operationssystem.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2548"/>
+        <location filename="../minstall.cpp" line="2549"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>

@@ -538,7 +538,7 @@ Wählen Sie hier die Systemdienste, die Sie in ihrer Systemkonfiguration haben w
     </message>
     <message>
         <location filename="../minstall.cpp" line="2242"/>
-        <location filename="../minstall.cpp" line="2620"/>
+        <location filename="../minstall.cpp" line="2621"/>
         <source>none - or existing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -572,54 +572,54 @@ Zurück zu Schritt 1.</translation>
         <translation>Schließe die Konfiguration ab</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2463"/>
+        <location filename="../minstall.cpp" line="2464"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Konnte %1 nicht auf das Ziellaufwerk schreiben.
 Zurück zu Schritt 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2490"/>
+        <location filename="../minstall.cpp" line="2491"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Wo gibt es Hilfe?&lt;/b&gt;&lt;br/&gt;Grundlegende Informationen zu %1 gibt es auf %2. &lt;/p&gt;&lt;p&gt;Viele Freiwillige helfen im %3 Forum, %4.&lt;/p&gt;&lt;p&gt;Wenn Sie um Hilfe bitten, denken Sie bitte daran, eine genaue Problembeschreibung anzugeben und Details zu Ihrer Hardware-Ausstattung mitzuteilen. Angaben wie: &apos;Es funktioniert nicht&apos; sind dabei nicht besonders hilfreich.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2498"/>
+        <location filename="../minstall.cpp" line="2499"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Reparatur der Installation&lt;/b&gt;&lt;br/&gt;Falls %1 von der Festplatte nicht mehr startet oder nicht mehr richtig funktioniert, ist es oftmals möglich das Problem dadurch zu lösen, dass man von LiveDVD oder LiveUSB startet und eines der Programme zur Systemkonfiguration von %1 oder eines der regulären Linux-Programme benutzt, um das System zu reparieren.&lt;/p&gt;&lt;p&gt;Sie können Ihre %1 LiveDVD oder LiveUSB auch benutzen, um Daten von MS-Windows-Systemen zu retten!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2504"/>
+        <location filename="../minstall.cpp" line="2505"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Unterstützung für %1&lt;/b&gt;&lt;br/&gt;%1 wird von Leuten wie Ihnen unterstützt. Einige helfen anderen Nutzern im Forum - %2 - oder übersetzen Dateien in andere Sprachen oder machen Verbesserungsvorschläge, schreiben Dokumentationen oder helfen beim Testen neuer Programme.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2511"/>
+        <location filename="../minstall.cpp" line="2512"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Einstellung des Sound Mixers&lt;/b&gt;&lt;br/&gt; %1 versucht, den Sound Mixer für Sie einzustellen, aber manchmal ist es notwendig Lautstärke-Einstellungen anzupassen oder abgeschaltete Kanäle im Mixer einzuschalten, um etwas hören zu können.&lt;/p&gt;&lt;p&gt;Ein Mixer-Schnellstart-Symbol befindet sich in der Kontrollleiste. Um den Mixer zu öffnen, einfach darauf klicken. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2519"/>
+        <location filename="../minstall.cpp" line="2520"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Halten Sie ihr %1 stets aktuell&lt;/b&gt;&lt;br/&gt;Für mehr Informationen und Aktualisierungen besuchen Sie bitte &lt;/p&gt;&lt;p&gt;%2.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2532"/>
+        <location filename="../minstall.cpp" line="2533"/>
         <source>Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2532"/>
+        <location filename="../minstall.cpp" line="2533"/>
         <source>Are you sure you want to quit the application?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2547"/>
+        <location filename="../minstall.cpp" line="2548"/>
         <source>This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation>Diese Option verschlüsselt zusätzlich die /swap-Partition und verhindert so, dass die swap-Partition von anderen installierten Betriebssystemen mitbenutzt werden kann.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2548"/>
+        <location filename="../minstall.cpp" line="2549"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>

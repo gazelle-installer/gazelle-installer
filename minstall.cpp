@@ -2423,6 +2423,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
             out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
 
             if (homedev != "/dev/root" && homedev != rootdev) {
+                fstype = getPartType(homedev);
                 if (isHomeFormatted) {
                     dump_pass = "1 2";
                     if (fstype.startsWith("btrfs")) {
@@ -2433,7 +2434,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                     }
                     out << homedev + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
                 } else {
-                    out << homedev + " /home auto defaults,noatime 1 2\n";
+                    out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
                 }
             }
             file.close();

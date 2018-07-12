@@ -536,7 +536,7 @@ Torna allo Step 1.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2242"/>
-        <location filename="../minstall.cpp" line="2620"/>
+        <location filename="../minstall.cpp" line="2621"/>
         <source>none - or existing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -570,54 +570,54 @@ Torna allo Step 1.</translation>
         <translation>Riparazione della configurazione</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2463"/>
+        <location filename="../minstall.cpp" line="2464"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Fallita scrittura di %1 nella sua destinazione.
 Torna allo Step 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2490"/>
+        <location filename="../minstall.cpp" line="2491"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ricevere Assistenza&lt;/b&gt;&lt;br/&gt;Informazioni di base su %1 puoi trovarle in %2.&lt;/p&gt;&lt;p&gt;Ci sono volontari che ti possono aiutare nel Forum di %3 , %4&lt;/p&gt;&lt;p&gt;Se chiedi aiuto, per favore ricordati di fornire sufficienti dettagli per descrivere il tuo problema e il tuo computer. Di solito con richieste del tipo &apos;non funziona&apos; non si riceve aiuto.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2498"/>
+        <location filename="../minstall.cpp" line="2499"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Riparare la tua Installazione&lt;/b&gt;&lt;br/&gt;Se %1, installato sul disco, per qualche motivo non dovesse funzionare, talvolta è possibile riparare il danno avviando il DVD-Live o l&apos;USB-Live e facendo uso delle utility presenti negli specifici strumenti d&apos;aiuto contenuti in %1 o usando i normali strumenti Linux per riparare il sistema.&lt;/p&gt;&lt;p&gt;Puoi usare il DVD-Live o l&apos;USB-Live di  %1 anche per recuperare dati da un sistema MS-Windows!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2504"/>
+        <location filename="../minstall.cpp" line="2505"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Sostieni %1&lt;/b&gt;&lt;br/&gt;%1 è sostenuta da persone come te. Alcuni aiutano altri nel forum di supporto - %2 - o traducono guide in lingue diverse, danno consigli, scrivono documentazione, o aiutano a testare nuovo software.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2511"/>
+        <location filename="../minstall.cpp" line="2512"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Regolare il Mixer del Suono&lt;/b&gt;&lt;br/&gt; %1 cerca di configurare il mixer del suono per te, ma talvolta dopo l&apos;installazione sarà necessario alzare i volumi e attivare i canali per riuscire ad udire il suono.&lt;/p&gt; &lt;p&gt;L&apos;icona del mixer si trova nel pannello. Cliccaci col destro per aprire il mixer. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2519"/>
+        <location filename="../minstall.cpp" line="2520"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Mantenere %1 aggiornato&lt;/b&gt;&lt;br/&gt;Per informazioni e aggiornamenti, prego visita&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2532"/>
+        <location filename="../minstall.cpp" line="2533"/>
         <source>Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2532"/>
+        <location filename="../minstall.cpp" line="2533"/>
         <source>Are you sure you want to quit the application?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2547"/>
+        <location filename="../minstall.cpp" line="2548"/>
         <source>This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation>Questa opzione cripterà anche /swap, rendendo la partizione di swap incapace di essere condivisa con gli altri sistemi operativi installati. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2548"/>
+        <location filename="../minstall.cpp" line="2549"/>
         <source>OK</source>
         <translation>Ok</translation>
     </message>
