@@ -1195,19 +1195,19 @@ bool MInstall::installLoader()
     if (POPULATE_MEDIA_MOUNTPOINTS) {
         //if compressed btrfs filesystem is not used, use default locate for fstab
         if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
-            runCmd("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
-        } else {
             // if compressed btrfs filessystem is used, specify the -O switch
             runCmd("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
+        } else {
+            runCmd("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
         }
     } else {
         //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
         //but do check for compressed btrfs filesystem
         if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
-            runCmd("/sbin/make-fstab --install /mnt/antiX");
-        } else {
             // if compressed btrfs filessystem is used, specify the -O switch
             runCmd("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
+        } else {
+            runCmd("/sbin/make-fstab --install /mnt/antiX");
         }
     }
     qDebug() << "change fstab entries to use UUIDs";
