@@ -145,8 +145,11 @@ private slots:
     void on_saveHomeCheck_toggled(bool checked);
     void on_buttonSetKeyboard_clicked();
     void on_homeCombo_currentIndexChanged(const QString &arg1);
-
     void on_swapCombo_currentIndexChanged(const QString &arg1);
+    void on_userPasswordEdit2_textChanged(const QString &arg1);
+    void on_rootPasswordEdit2_textChanged(const QString &arg1);
+    void on_userPasswordEdit_textChanged();
+    void on_rootPasswordEdit_textChanged();
 
 private:
     Cmd shell;

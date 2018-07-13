@@ -2620,3 +2620,42 @@ void MInstall::on_swapCombo_currentIndexChanged(const QString &arg1)
 {
     swapLabelEdit->setEnabled(arg1 != tr("none - or existing"));
 }
+
+void MInstall::on_userPasswordEdit2_textChanged(const QString &arg1)
+{
+    QPalette pal = userPasswordEdit->palette();
+    if (arg1 != userPasswordEdit->text()) {
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 20));
+    } else {
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 10));
+    }
+    userPasswordEdit->setPalette(pal);
+    userPasswordEdit2->setPalette(pal);
+}
+
+void MInstall::on_rootPasswordEdit2_textChanged(const QString &arg1)
+{
+    QPalette pal = rootPasswordEdit->palette();
+    if (arg1 != rootPasswordEdit->text()) {
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 20));
+    } else {
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 10));
+    }
+    rootPasswordEdit->setPalette(pal);
+    rootPasswordEdit2->setPalette(pal);
+}
+
+void MInstall::on_userPasswordEdit_textChanged()
+{
+    userPasswordEdit2->clear();
+    userPasswordEdit->setPalette(QApplication::palette());
+    userPasswordEdit2->setPalette(QApplication::palette());
+}
+
+
+void MInstall::on_rootPasswordEdit_textChanged()
+{
+    rootPasswordEdit2->clear();
+    rootPasswordEdit->setPalette(QApplication::palette());
+    rootPasswordEdit2->setPalette(QApplication::palette());
+}
