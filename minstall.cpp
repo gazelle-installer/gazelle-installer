@@ -787,6 +787,19 @@ bool MInstall::makeChosenPartitions()
     strcpy(line, swapCombo->currentText().toUtf8());
     tok = strtok(line, " -");
     QString swapdev = QString("/dev/%1").arg(tok);
+    // feh
+    // partition file name pattern
+    // /dev/hda1        # IDE partiton
+    // /dev/sda1        # SCSI/SATA partiton
+    // /dev/vda1        # paravirtual partiton
+    // /dev/xvda1   	# hardware virtual partiton
+    // /dev/nvme0n1p1   # NVMe SSD partiton
+    // /dev/mmcblk0p1   # SD/MMC card partiton
+    QRegExp rx( "/dev/((hd|sd|x?vd)[a-z]+|(nvme[0-9]+n|mmcblk)[0-9]+[p])[0-9]+" );
+    // check selected partition file name
+    if (! rx.exactMatch(swapdev)) {
+          swapdev = "/dev/none";
+      }
     QStringList swapsplit = getCmdOut("partition-info split-device=" + swapdev).split(" ", QString::SkipEmptyParts);
 
     strcpy(line, homeCombo->currentText().toUtf8());
@@ -826,7 +839,8 @@ bool MInstall::makeChosenPartitions()
 
         //if partition chosen is already swap, don't do anything
 
-        cmd = QString("partition-info %1 |grep swap").arg(swapdev);
+        //feh - check swap fstype
+        cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
 
         if (shell.run(cmd) != 0) {
             if (swapdev.compare("/dev/none") != 0) {
@@ -885,12 +899,16 @@ bool MInstall::makeChosenPartitions()
         if (swapoff(rootdev.toUtf8()) != 0) {
         }
     }
-    //if swap exists, do nothing
 
-    cmd = QString("partition-info %1 |grep swap").arg(swapdev);
+    //feh
+    //if no swap is chosen do nothing
 
-    if (shell.run(cmd) != 0) {
-        if (swapdev.compare("/dev/none") != 0) {
+    if (swapdev.compare("/dev/none") != 0) {
+        //if swap exists, do nothing
+        //feh - check swap fstype
+        cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
+
+        if (shell.run(cmd) != 0) {
             if (swapoff(swapdev.toUtf8()) != 0) {
                 cmd = QString("pumount %1").arg(swapdev);
                 if (shell.run(cmd) != 0) {
