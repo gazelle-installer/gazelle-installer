@@ -780,26 +780,20 @@ bool MInstall::makeChosenPartitions()
     strncpy(home_type, homeTypeCombo->currentText().toUtf8(), 10);
 
     strcpy(line, rootCombo->currentText().toUtf8());
+
     char *tok = strtok(line, " -");
     QString rootdev = QString("/dev/%1").arg(tok);
     QStringList rootsplit = getCmdOut("partition-info split-device=" + rootdev).split(" ", QString::SkipEmptyParts);
 
     strcpy(line, swapCombo->currentText().toUtf8());
+    QString qline = QString(line);
     tok = strtok(line, " -");
-    QString swapdev = QString("/dev/%1").arg(tok);
-    // feh
-    // partition file name pattern
-    // /dev/hda1        # IDE partiton
-    // /dev/sda1        # SCSI/SATA partiton
-    // /dev/vda1        # paravirtual partiton
-    // /dev/xvda1   	# hardware virtual partiton
-    // /dev/nvme0n1p1   # NVMe SSD partiton
-    // /dev/mmcblk0p1   # SD/MMC card partiton
-    QRegExp rx( "/dev/((hd|sd|x?vd)[a-z]+|(nvme[0-9]+n|mmcblk)[0-9]+[p])[0-9]+" );
-    // check selected partition file name
-    if (! rx.exactMatch(swapdev)) {
-          swapdev = "/dev/none";
-      }
+    QString swapdev;
+    if (qline == tr("none - or existing")) {
+        swapdev = "/dev/none";
+    } else {
+        swapdev = QString("/dev/%1").arg(tok);
+    }
     QStringList swapsplit = getCmdOut("partition-info split-device=" + swapdev).split(" ", QString::SkipEmptyParts);
 
     strcpy(line, homeCombo->currentText().toUtf8());
@@ -837,22 +831,22 @@ bool MInstall::makeChosenPartitions()
 
     // format swap
 
+    //if no swap is chosen do nothing
+    if (swapdev != "/dev/none") {
         //if partition chosen is already swap, don't do anything
-
-        //feh - check swap fstype
+        //check swap fstype
         cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
 
         if (shell.run(cmd) != 0) {
-            if (swapdev.compare("/dev/none") != 0) {
-                msg = QString(tr("OK to format and destroy all data on \n%1 for the swap partition?")).arg(swapdev);
-                ans = QMessageBox::warning(this, QString::null, msg,
-                                           tr("Yes"), tr("No"));
-                if (ans != 0) {
-                    // don't format--stop install
-                    return false;
+          msg = QString(tr("OK to format and destroy all data on \n%1 for the swap partition?")).arg(swapdev);
+          ans = QMessageBox::warning(this, QString::null, msg,
+                                                           tr("Yes"), tr("No"));
+            if (ans != 0) {
+                        // don't format--stop install
+                        return false;
                 }
             }
-        }
+	}
     // format /home?
     if (homedev.compare("/dev/root") != 0) {
         cmd = QString("partition-info is-linux=%1").arg(homedev);
@@ -900,12 +894,11 @@ bool MInstall::makeChosenPartitions()
         }
     }
 
-    //feh
     //if no swap is chosen do nothing
 
-    if (swapdev.compare("/dev/none") != 0) {
+    if (swapdev != "/dev/none") {
         //if swap exists, do nothing
-        //feh - check swap fstype
+        //check swap fstype
         cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
 
         if (shell.run(cmd) != 0) {
