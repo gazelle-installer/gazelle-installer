@@ -38,7 +38,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    a.setWindowIcon(QIcon("/usr/share/icons/msystem.png"));
+    a.setWindowIcon(QIcon::fromTheme("system-installer", QIcon("/usr/share/pixmaps/msystem.png")));
 
     // Set the logging files
     logFile.reset(new QFile("/var/log/minstall.log"));

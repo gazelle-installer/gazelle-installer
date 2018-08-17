@@ -25,10 +25,6 @@
   <property name="windowTitle">
    <string>antiX Linux Install</string>
   </property>
-  <property name="windowIcon">
-   <iconset>
-    <normaloff>../../../../../../../../usr/share/icons/msystem.png</normaloff>../../../../../../../../usr/share/icons/msystem.png</iconset>
-  </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
