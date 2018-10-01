@@ -1187,17 +1187,42 @@ bool MInstall::installLoader()
         return false;
     }
 
-    // replace "quiet" in /etc/default/grub with the non-live boot codes
+    //added non-live boot codes to those in /etc/default/grub, remove duplicates
+    //get non-live boot codes
     QString cmdline = getCmdOut("/live/bin/non-live-cmdline");
-    cmdline.replace('\\', "\\\\");
-    cmdline.replace('|', "\\|");
-//    if (!is32bit()) {
-//        cmdline.prepend("zswap.zpool=zsmalloc ");
-//    }
+
+    //get /etc/default/grub codes
+    QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
+    QString grubDefault=grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
+    qDebug() << "grubDefault is " << grubDefault;
+
+    //covert qstrings to qstringlists and join the default and non-live lists together
+    QStringList finalcmdline=cmdline.split(" ");
+    finalcmdline.append(grubDefault.split(" "));
+    qDebug() << "intermediate" << finalcmdline;
+
+    //remove any duplicate codes in list (typical splash)
+    finalcmdline.removeDuplicates();
+
+    //remove in null or empty strings that might have crept in
+    finalcmdline.removeAll({});
+    qDebug() << "Add cmdline options to Grub" << finalcmdline;
+
+    //convert qstringlist back into normal qstring
+    QString finalcmdlinestring = finalcmdline.join(" ");
+    qDebug() << "cmdlinestring" << finalcmdlinestring;
+
+    //get qstring boot codes read for sed command
+    finalcmdlinestring.replace('\\', "\\\\");
+    finalcmdlinestring.replace('|', "\\|");
+
+    //do the replacement in /etc/default/grub
     qDebug() << "Add cmdline options to Grub";
-    cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(cmdline);
+    cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(finalcmdlinestring);
     runCmd(cmd);
-    // update grub config
+
+    //update grub with new config
+
     qDebug() << "Update Grub";
     runCmd("chroot /mnt/antiX update-grub");
     qDebug() << "Create fstab";
