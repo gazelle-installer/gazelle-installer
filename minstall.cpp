@@ -84,9 +84,6 @@ MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
     //do not offer home folder encyrption if so configured in installer.conf
     QString OFFER_HOME_ENCRYPTION = getCmdOut("grep OFFER_HOME_ENCRYPTION /usr/share/gazelle-installer-data/installer.conf |cut -d= -f2").simplified().toLower();
     qDebug() << "Offer Home Encryption is " << OFFER_HOME_ENCRYPTION;
-    if ( OFFER_HOME_ENCRYPTION == "false" ) {
-    encryptCheckBox->hide();
-    }
 
     //check for samba
     QFileInfo info("/etc/init.d/smbd");
@@ -846,7 +843,7 @@ bool MInstall::makeChosenPartitions()
                         return false;
                 }
             }
-	}
+    }
     // format /home?
     if (homedev.compare("/dev/root") != 0) {
         cmd = QString("partition-info is-linux=%1").arg(homedev);
@@ -1423,50 +1420,50 @@ bool MInstall::setUserName()
     cmd = QString("touch /mnt/antiX/var/mail/%1").arg(userNameEdit->text());
     shell.run(cmd);
 
-    // Encrypt /home and swap partition
-    if (encryptCheckBox->isChecked() && shell.run("modprobe ecryptfs") == 0 ) {
+//    // Encrypt /home and swap partition
+//    if (encryptCheckBox->isChecked() && shell.run("modprobe ecryptfs") == 0 ) {
 
-        // set mounts for chroot
-        shell.run("mount -o bind /dev /mnt/antiX/dev");
-        shell.run("mount -o bind /dev/shm /mnt/antiX/dev/shm");
-        shell.run("mount -o bind /sys /mnt/antiX/sys");
-        shell.run("mount -o bind /proc /mnt/antiX/proc");
+//        // set mounts for chroot
+//        shell.run("mount -o bind /dev /mnt/antiX/dev");
+//        shell.run("mount -o bind /dev/shm /mnt/antiX/dev/shm");
+//        shell.run("mount -o bind /sys /mnt/antiX/sys");
+//        shell.run("mount -o bind /proc /mnt/antiX/proc");
 
-        // encrypt /home
-        cmd = "chroot /mnt/antiX ecryptfs-migrate-home -u " + userNameEdit->text();
-        FILE *fp = popen(cmd.toUtf8(), "w");
-        bool fpok = true;
-        cmd = QString("%1\n").arg(rootPasswordEdit->text());
-        if (fp != NULL) {
-            sleep(4);
-            if (fputs(cmd.toUtf8(), fp) >= 0) {
-                fflush(fp);
-             } else {
-                fpok = false;
-            }
-            pclose(fp);
-        } else {
-            fpok = false;
-        }
+//        // encrypt /home
+//        cmd = "chroot /mnt/antiX ecryptfs-migrate-home -u " + userNameEdit->text();
+//        FILE *fp = popen(cmd.toUtf8(), "w");
+//        bool fpok = true;
+//        cmd = QString("%1\n").arg(rootPasswordEdit->text());
+//        if (fp != NULL) {
+//            sleep(4);
+//            if (fputs(cmd.toUtf8(), fp) >= 0) {
+//                fflush(fp);
+//             } else {
+//                fpok = false;
+//            }
+//            pclose(fp);
+//        } else {
+//            fpok = false;
+//        }
 
-        if (!fpok) {
-            shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
-            setCursor(QCursor(Qt::ArrowCursor));
-            QMessageBox::critical(this, QString::null,
-                                  tr("Sorry, could not encrypt /home/") + userNameEdit->text());
-            return false;
-        }
+//        if (!fpok) {
+//            shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
+//            setCursor(QCursor(Qt::ArrowCursor));
+//            QMessageBox::critical(this, QString::null,
+//                                  tr("Sorry, could not encrypt /home/") + userNameEdit->text());
+//            return false;
+//        }
 
-        // encrypt swap
-        qDebug() << "Encrypt swap";
-        if (runCmd("chroot /mnt/antiX ecryptfs-setup-swap --force") != 0) {
-            qDebug() << "could not encrypt swap partition";
-        }
-        // clean up, remove folder only if one usename.* directory is present
-        if (getCmdOuts("find /mnt/antiX/home -maxdepth 1  -type d -name " + userNameEdit->text() + ".*").length() == 1) {
-            shell.run("rm -r "+ dpath + ".*");
-        }
-    }
+//        // encrypt swap
+//        qDebug() << "Encrypt swap";
+//        if (runCmd("chroot /mnt/antiX ecryptfs-setup-swap --force") != 0) {
+//            qDebug() << "could not encrypt swap partition";
+//        }
+//        // clean up, remove folder only if one usename.* directory is present
+//        if (getCmdOuts("find /mnt/antiX/home -maxdepth 1  -type d -name " + userNameEdit->text() + ".*").length() == 1) {
+//            shell.run("rm -r "+ dpath + ".*");
+//        }
+//    }
     shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
     setCursor(QCursor(Qt::ArrowCursor));
     return true;
@@ -2590,7 +2587,7 @@ void MInstall::on_encryptCheckBox_toggled(bool checked)
 
 void MInstall::on_saveHomeCheck_toggled(bool checked)
 {
-    encryptCheckBox->setEnabled(!checked);
+    // do we need to disable encryption on /home we preserve /home?
 }
 
 void MInstall::setupkeyboardbutton()
