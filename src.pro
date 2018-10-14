@@ -6,6 +6,7 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_bg.ts \
                 translations/gazelle-installer_ca.ts \
                 translations/gazelle-installer_cs.ts \
+                translations/gazelle-installer_da.ts \
                 translations/gazelle-installer_de.ts \
                 translations/gazelle-installer_el.ts \
                 translations/gazelle-installer_es.ts \

@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="cs" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="da" version="2.1">
 <context>
     <name>MInstall</name>
     <message>
@@ -24,16 +24,13 @@ Enjoy using %1</source>
 The disk with the partition you selected for installation is failing.
 
 </source>
-        <translation>
-
-Disk s oddílem jenž jste vybráli pro instalaci selhává.
-</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="381"/>
         <source>You are strongly advised to abort.
 </source>
-        <translation>Důrazně doporučeno zrušit.
+        <translation>Du rådgives kraftigt til at afbryde.
 </translation>
     </message>
     <message>
@@ -42,12 +39,12 @@ Disk s oddílem jenž jste vybráli pro instalaci selhává.
         <source>If unsure, please exit the Installer and run GSmartControl for more information.
 
 </source>
-        <translation>Pokud si nejste jisti, prosím, ukončete instalační program a spusťte GSmartControl pro více informací. </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="383"/>
         <source>Do you want to abort the installation?</source>
-        <translation>Chcete přerušit instalaci? </translation>
+        <translation>Vil du afbryde installationen?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="385"/>
@@ -66,7 +63,7 @@ Disk s oddílem jenž jste vybráli pro instalaci selhává.
         <location filename="minstall.cpp" line="1819"/>
         <location filename="minstall.cpp" line="2340"/>
         <source>Yes</source>
-        <translation>Ano</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="385"/>
@@ -85,39 +82,38 @@ Disk s oddílem jenž jste vybráli pro instalaci selhává.
         <location filename="minstall.cpp" line="1819"/>
         <location filename="minstall.cpp" line="2340"/>
         <source>No</source>
-        <translation>Ne</translation>
+        <translation>Nej</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="393"/>
         <source>Smartmon tool output:
 
 </source>
-        <translation>Smartmon nástroj výstup: </translation>
+        <translation>Output fra smartmon-værktøj:
+
+</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="394"/>
         <source>The disk with the partition you selected for installation passes the S.M.A.R.T. monitor test (smartctl)
 </source>
-        <translation>Disk s oddílem jenž jste vybráli pro instalaci prošel testem S.M.A.R.T. (smartctl)
-
-</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="395"/>
         <source>but the tests indicate it will have a higher than average failure rate in the upcoming year.
 </source>
-        <translation>ale testy naznačují, že bude mít vyšší, než li průměrnou poruchovost.
-</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="397"/>
         <source>Do you want to continue?</source>
-        <translation>Přejete si přesto pokračovat? </translation>
+        <translation>Vil du fortsætte?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="425"/>
         <source>Ready to install %1 filesystem</source>
-        <translation type="unfinished"/>
+        <translation>Klar til at installere %1-filsystem</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="594"/>
@@ -127,30 +123,30 @@ Disk s oddílem jenž jste vybráli pro instalaci selhává.
     <message>
         <location filename="minstall.cpp" line="606"/>
         <source>Creating required partitions</source>
-        <translation>Vytváření požadovaných oddílů</translation>
+        <translation>Opretter krævede partitioner</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="681"/>
         <source>Formating EFI System Partition (ESP)</source>
-        <translation>Formátuji EFI oddíl (ESP)</translation>
+        <translation>Formaterer EFI-systempartition (ESP)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="719"/>
         <location filename="minstall.cpp" line="910"/>
         <source>Formatting swap partition</source>
-        <translation>Formátování SWAP oddílu</translation>
+        <translation>Formaterer swap-partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="728"/>
         <source>Formatting root partition</source>
-        <translation>Formátování kořenového oddílu</translation>
+        <translation>Formaterer rodpartition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="792"/>
         <location filename="minstall.cpp" line="2253"/>
         <location filename="minstall.cpp" line="2632"/>
         <source>none - or existing</source>
-        <translation type="unfinished"/>
+        <translation>ingen - eller eksisterende</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="806"/>
@@ -161,83 +157,80 @@ The root partition must be at least %1 .</source>
     <message>
         <location filename="minstall.cpp" line="812"/>
         <source>The partition you selected for root, appears to be a MS-Windows partition.  Are you sure you want to reformat this partition?</source>
-        <translation>Oddíl, který jste vybrali pro root, se zdá být oddíl MS WIndows. Jste si jisti, že chcete tento oddíl přeformátovat?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="821"/>
         <source>OK to format and destroy all data on 
 %1 for the / (root) partition?</source>
-        <translation>Je v pořádku formátovat a zničit všechna data na 
-%1 pro oddíl / (root)?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="823"/>
         <source>All data on %1 will be deleted, except for /home
 OK to continue?</source>
-        <translation>Všechna data na% 1 budou odstraněna, s výjimkou pro /home
-Pokračovat?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="841"/>
         <source>OK to format and destroy all data on 
 %1 for the swap partition?</source>
-        <translation>Je v pořádku formátovat a zničit všechna data na 
-%1 pro SWAP oddíl?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="854"/>
         <source>The partition you selected for /home, appears to be a MS-Windows partition.  Are you sure you want to reformat this partition?</source>
-        <translation>Oddíl, který jste vybrali pro/home se zdá být oddíl MS WIndows. Jste si jisti, že chcete tento oddíl přeformátovat?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="863"/>
         <source>OK to reuse (no reformat) %1 as the /home partition?</source>
-        <translation>Je v pořádku znovu použít (neformátovat) %1 jako oddíl /home?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="865"/>
         <source>OK to format and destroy all data on %1 for the /home partition?</source>
-        <translation>Je v pořádku zformátovat a zničit všechna data na %1 pro oddíl /home?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="876"/>
         <source>Preparing required partitions</source>
-        <translation>Příprava požadovaných oddílů</translation>
+        <translation>Forbereder krævede partitioner</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="930"/>
         <source>Formatting the / (root) partition</source>
-        <translation>Formátuji oddíl / (root)</translation>
+        <translation>Formaterer /-partitionen (rod)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="954"/>
         <source>Mounting the /home partition</source>
-        <translation>Připojování oddílu /home</translation>
+        <translation>Monterer /home-partitionen</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="969"/>
         <source>Formatting the /home partition</source>
-        <translation>Formátování oddílu /home</translation>
+        <translation>Formaterer /home-partitionen</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1012"/>
         <source>Mounting the / (root) partition</source>
-        <translation>Připojování oddílu / (root)</translation>
+        <translation>Monterer /-partitionen (rod)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1040"/>
         <source>Creating system directories</source>
-        <translation>Vytváření systémových adresářů</translation>
+        <translation>Opretter systemmapper</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1130"/>
         <source>OK to install GRUB bootloader at %1 ?</source>
-        <translation>Je v pořádku instalovat GRUB bootloader na %1 ?</translation>
+        <translation>Skal GRUB-bootloader installeres på %1?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1142"/>
         <source>Please wait till GRUB is installed, it might take a couple of minutes.</source>
-        <translation>Prosím vyčkejte na dokončení instalace GRUB, může to trvat pár minut.</translation>
+        <translation>Vent venligst mens GRUB installeres, det kan tage nogle minutter.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1181"/>
@@ -247,94 +240,86 @@ Pokračovat?</translation>
     <message>
         <location filename="minstall.cpp" line="1274"/>
         <source>The home directory for %1 already exists.Would you like to reuse the old home directory?</source>
-        <translation>Domovská složka pro %1 již existuje. Chtěli byste znovu použít starou domovskou složku?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1280"/>
         <source>Would you like to save the old home directory
 and create a new home directory?</source>
-        <translation>Chcete uložit starý domovský adresář
-a vytvořit nový domovský adresář?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1296"/>
         <source>Sorry, failed to save old home directory. Before proceeding,
 you'll have to select a different username or
 delete a previously saved copy of your home directory.</source>
-        <translation>Je nám líto, nelze uložit do staré domovské složky. Před pokračováním,
-musíte vybrat jiné uživatelské jméno nebo
-smazat předešlou uloženou kopii Vaši domovské složky.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1305"/>
         <source>Would you like to delete the old home directory for %1?</source>
-        <translation>Chtěli byste smazat starou domovskou složku pro %1?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1315"/>
         <source>Sorry, failed to delete old home directory. Before proceeding, 
 you&apos;ll have to select a different username.</source>
-        <translation>Je nám líto, ale nelze smazat starou domovskou složku. Před pokračováním,
-si budete muset zvolit jiné uživatelské jméno.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1322"/>
         <source>You've chosen to not use, save or delete the old home directory.
 Before proceeding, you&apos;ll have to select a different username.</source>
-        <translation>Zvolili jste, že nechcete použít, uložit ani smazat starou domovskou složku. 
-Před pokračováním musíte zvolit jiné uživatelské jméno.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1335"/>
         <source>Sorry, failed to create user directory.</source>
-        <translation>Je nám líto, vytvoření uživatelského adresáře selhalo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1342"/>
         <source>Sorry, failed to name user directory.</source>
-        <translation>Je nám líto, pojmenování uživatelského adresáře selhalo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1367"/>
         <source>Sorry, failed to save desktop changes.</source>
-        <translation>Je nám líto, nepodařilo uložit změny plochy.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1378"/>
         <source>Sorry, failed to set ownership of user directory.</source>
-        <translation>Je nám líto, nelze nastavit vlastnictví uživatelské složky.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1431"/>
         <source>Sorry, could not encrypt /home/</source>
-        <translation>Je nám líto, /home/ nelze zašifrovat</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1485"/>
         <source>Sorry, unable to set root password.</source>
-        <translation>Je nám líto, nelze nastavit heslo pro root.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1512"/>
         <source>Sorry, unable to set user password.</source>
-        <translation>Je nám líto, nelze nastavit uživatelské heslo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1525"/>
         <source>The user name needs to be at least
 2 characters long. Please select
 a longer name before proceeding.</source>
-        <translation>Uživatelské jméno musí být dlouhé
-alespoň 2 znaky. Před pokračováním
-zvolte prosím delší jméno.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1531"/>
         <source>The user name cannot contain special
  characters or spaces.
 Please choose another name before proceeding.</source>
-        <translation>Uživatelské jméno musí být malá písmena a nesmí obsahovat speciální znaky ani mezery.
-Před pokračováním si prosím zvolte jiné jméno.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1538"/>
@@ -342,9 +327,7 @@ Před pokračováním si prosím zvolte jiné jméno.</translation>
         <source>The user password needs to be at least
 2 characters long. Please select
 a longer password before proceeding.</source>
-        <translation>Heslo uživatele musí být dlouhé alespoň
-2 znaky. Před pokračováním
-musíte vybrat delší heslo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1545"/>
@@ -352,75 +335,61 @@ musíte vybrat delší heslo.</translation>
         <source>The root password needs to be at least
 2 characters long. Please select
 a longer password before proceeding.</source>
-        <translation>Heslo root musí být alespoň
-2 znaky dlouhé. Před pokračováním
-zvolte prosím delší heslo.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1554"/>
         <source>Sorry that name is in use.
 Please select a different name.
 </source>
-        <translation>Je nám líto, toto jméno je již používáno.
-Prosím zvolte si jiné.
-</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1561"/>
         <source>The user password entries do
 not match.  Please try again.</source>
-        <translation>Záznamy hesla se neshodují. Zkuste to znovu prosím.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1567"/>
         <source>The root password entries do
  not match.  Please try again.</source>
-        <translation>Záznamy hesla root se
- neshodují. Zkuste to znovu prosím.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1602"/>
         <source>Sorry your computer name needs to be
 at least 2 characters long. You'll have to
 select a different name before proceeding.</source>
-        <translation>Je nám líto. Název Vašeho počítače musí mít
-délku alespoň 2 znaky. Před pokračováním
-budete muset zvolit jiný název.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1606"/>
         <source>Sorry your computer name contains invalid characters.
 You'll have to select a different
 name before proceeding.</source>
-        <translation>Je nám líto. Název počítače obsahuje neplatné znaky. 
-Před pokračováním budete muset
-zvolit jiný název.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1612"/>
         <source>Sorry your computer domain needs to be at least
 2 characters long. You'll have to select a different
 name before proceeding.</source>
-        <translation>Je nám líto, název Vaší domény musí být dlouhý
-alespoň 2 znaky. Před pokračováním
-budete muset zvolit jiný název.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1616"/>
         <source>Sorry your computer domain contains invalid characters.
 You'll have to select a different
 name before proceeding.</source>
-        <translation>Je nám líto, název Vaší doményobsahuje neplatné znaky.  
-Před pokračováním budete muset zvolit jiný název.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1625"/>
         <source>Sorry your workgroup needs to be at least
 2 characters long. You'll have to select a different
 name before proceeding.</source>
-        <translation>Je nám líto, Vaše pracovní skupina musí být alespoň
-2 znaky dlouhá. Před pokračováním musíte zvolit
-jiný název.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1797"/>
@@ -434,8 +403,7 @@ Do you want to reboot now?</source>
         <location filename="minstall.cpp" line="1818"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
-        <translation>Instalace a nastavení není kompletní.
-Chcete nyní skutečně ukončit akci?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1919"/>
@@ -450,7 +418,7 @@ Chcete nyní skutečně ukončit akci?</translation>
     <message>
         <location filename="minstall.cpp" line="1955"/>
         <source>Returning to Step 1 to select another disk.</source>
-        <translation>Návrat ke Kroku 1.</translation>
+        <translation>Vender tilbage til ting 1 for at vælge en anden disk.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1959"/>
@@ -466,15 +434,13 @@ Chcete nyní skutečně ukončit akci?</translation>
         <location filename="minstall.cpp" line="1974"/>
         <source>Failed to create required partitions.
 Returning to Step 1.</source>
-        <translation>Vytváření požadovaných oddílů selhalo.
-Návrat ke kroku 1.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1983"/>
         <source>Failed to prepare chosen partitions.
 Returning to Step 1.</source>
-        <translation>Nelze připravit zvolené oddíly.
-Návrat ke Kroku 1.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1997"/>
@@ -489,12 +455,12 @@ Návrat ke Kroku 1.</translation>
     <message>
         <location filename="minstall.cpp" line="2013"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Identita počítače&lt;/b&gt;&lt;br/&gt;Název počítače je společný jedinečný název, který určuje Váš počítač, pokud je v síti. Je nepravděpodobné, že počítačová doména bude použita, pokud ji Váš poskytovatel sítě, nebo Vaše místní síť nevyžaduje.&lt;/p&gt;&lt;p&gt;Počítačové a doménová jména mohou obsahovat pouze alfanumerické znaky, tečky, pomlčky. Nemohou obsahovat mezery, začínat nebo končit pomlčkou.&lt;/p&gt;&lt;p&gt;Server SaMBa potřebuje být aktivován, pokud ho chcete použít ke sdílení některých z Vašich složek nebo tiskárnu s místním počítačem na kterém běží MS-WIndows nebo Mac OSX.&lt;/p&gt;</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="2022"/>
         <source>&lt;p&gt;&lt;b&gt;Localization Defaults&lt;/b&gt;&lt;br/&gt;Set the default keyboard and locale. These will apply unless they are overridden later by the user.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configure Clock&lt;/b&gt;&lt;br/&gt;If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for &apos;System clock uses LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Timezone Settings&lt;/b&gt;&lt;br/&gt;The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Service Settings&lt;/b&gt;&lt;br/&gt;Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! </source>
-        <translation>&lt;p&gt;&lt;b&gt;Základní nastavení lokalizace&lt;/b&gt;&lt;br/&gt;Nastavte výchozí rozložení klávesnice a lokalitu. Tyto hodnoty budou použity do té doby kým nebodou uživatelem změněny .&lt;/p&gt;&lt;p&gt;&lt;b&gt;Nastavte hodiny&lt;/b&gt;&lt;br/&gt;Ak máte Apple nebo Unix počítač, z výroby jsou systémové hodiny nastaveny na GMT nebo Univerzální čas. Změníte ho, zašktrnutím políčka &apos;Systémový čas používá LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Nastavení časového pásma&lt;/b&gt;&lt;br/&gt;Systém se zpouští s časovým pásmem nastaveým na GMT/UTC. Pro změnu časového pásma klikněte po restartu v čerstvé instalaci pravým tlačítkem myši v liště na hodiny a zvolte Nastavení.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Nastavení služeb&lt;/b&gt;&lt;br/&gt;Většina uživatelů by neměla měnit předvolené nastavení. Vlastníci počítačů s omezenými zdroji někdy chtějí vypnout nepotřebné služby za účelem držet spotřebu RAM na co nejnižší úrovni. Ujistěte se prosím, že víte co děláte!</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="2030"/>
@@ -515,23 +481,24 @@ Návrat ke Kroku 1.</translation>
         <location filename="minstall.cpp" line="2062"/>
         <location filename="minstall.cpp" line="2076"/>
         <source>Next</source>
-        <translation>Další</translation>
+        <translation>Næste</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2074"/>
         <source>Finish</source>
-        <translation>Dokončit</translation>
+        <translation>Færdig</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2339"/>
         <source>%1 is installing, are you 
 sure you want to Close now?</source>
-        <translation type="unfinished"/>
+        <translation>%1 er ved at blive installeret, er du 
+sikker på, at du vil lukke nu?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2366"/>
         <source>Deleting old system</source>
-        <translation>Odstraňování starého systému</translation>
+        <translation>Sletter gammelt system</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2376"/>
@@ -542,12 +509,12 @@ Returning to Step 1.</source>
     <message>
         <location filename="minstall.cpp" line="2402"/>
         <source>Copying new system</source>
-        <translation>Kopírování nového systému</translation>
+        <translation>Kopierer nyt system</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2416"/>
         <source>Fixing configuration</source>
-        <translation>Fixování nastavení</translation>
+        <translation>Retter konfiguration</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2475"/>
@@ -583,12 +550,12 @@ Returning to Step 1.</source>
     <message>
         <location filename="minstall.cpp" line="2544"/>
         <source>Confirmation</source>
-        <translation>Potvrzení</translation>
+        <translation>Bekræftelse</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2544"/>
         <source>Are you sure you want to quit the application?</source>
-        <translation>Jste si jistí, že chcete ukončit aplikaci? </translation>
+        <translation>Er du sikker på, at du vil afslutte programmet?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2559"/>
@@ -606,7 +573,7 @@ Returning to Step 1.</source>
     <message>
         <location filename="mmain.cpp" line="42"/>
         <source>Installer</source>
-        <translation type="unfinished"/>
+        <translation>Installationsprogram</translation>
     </message>
 </context>
 <context>
@@ -614,17 +581,17 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="92"/>
         <source>Back</source>
-        <translation>Předchozí</translation>
+        <translation>Tilbage</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="99"/>
         <source>Alt+K</source>
-        <translation>Alt+K</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="106"/>
         <source>Next</source>
-        <translation>Další</translation>
+        <translation>Næste</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="113"/>
@@ -634,117 +601,117 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="163"/>
         <source>Terms of Use</source>
-        <translation>Podmínky použití</translation>
+        <translation>Vilkår for anvendelse</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="229"/>
         <source>ModelText</source>
-        <translation type="unfinished"/>
+        <translation>Modeltekst</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="249"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="256"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="263"/>
         <source>LayoutText</source>
-        <translation type="unfinished"/>
+        <translation>Layouttekst</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="270"/>
         <source>VariantText</source>
-        <translation type="unfinished"/>
+        <translation>Varianttekst</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="277"/>
         <source>Change Keyboard Settings</source>
-        <translation type="unfinished"/>
+        <translation>Skift tastaturindstillinger</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="284"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="291"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tastaturindstillinger&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="315"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Vyberte typ instalace</translation>
+        <translation>1c. Vælg typen af installation</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="345"/>
         <source>MB </source>
-        <translation>MB</translation>
+        <translation>MB </translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="364"/>
         <source>Leave free space up to:</source>
-        <translation>Ponechaná volná kapacita:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="412"/>
         <source>Auto-install using entire disk </source>
-        <translation>Automatická instalace za použití celého disku </translation>
+        <translation>Automatisk installation ved brug af hele disken </translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="428"/>
         <source>Custom install on existing partitions</source>
-        <translation>Vlastní instalace na existujících oddílech</translation>
+        <translation>Tilpasset installation på eksisterende partitioner</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="447"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. Přeskupit oddíly disku (nepovinné)</translation>
+        <translation>1b. Omarranger diskpartitioner (valgfrit)</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="474"/>
         <source>Modify partitions:</source>
-        <translation>Upravit oddíly:</translation>
+        <translation>Rediger partitioner:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="490"/>
         <source>Run partition tool...</source>
-        <translation>Spustit správce oddílů...</translation>
+        <translation>Kør partitionsværktøj...</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="506"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Vyberte disk pro instalaci</translation>
+        <translation>1a. Vælg disk til installation</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="536"/>
         <source>Use disk:</source>
-        <translation>Použít disk:</translation>
+        <translation>Brug disk:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="610"/>
         <source>2b. Preferences</source>
-        <translation>2b. Nastavení</translation>
+        <translation>2b. Præferencer</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="637"/>
         <source>Preserve data in /home (if upgrading)</source>
-        <translation>Zachovat data v /home (při aktualizaci)</translation>
+        <translation>Reservér data i /home (hvis der kan opgraderes)</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="656"/>
         <source>Check for badblocks (takes longer)</source>
-        <translation>Zkontrolovat špatné bloky (trvá déle)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="675"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. Vyberte oddíly</translation>
+        <translation>2a. Vælg partitioner</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="703"/>
@@ -786,13 +753,13 @@ Returning to Step 1.</source>
         <location filename="meinstall.ui" line="733"/>
         <location filename="meinstall.ui" line="932"/>
         <source>btrfs-zlib</source>
-        <translation type="unfinished"/>
+        <translation>btrfs-zlib</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="738"/>
         <location filename="meinstall.ui" line="937"/>
         <source>btrfs-lzo</source>
-        <translation type="unfinished"/>
+        <translation>btrfs-lzo</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="743"/>
@@ -804,74 +771,74 @@ Returning to Step 1.</source>
         <location filename="meinstall.ui" line="748"/>
         <location filename="meinstall.ui" line="947"/>
         <source>reiser4</source>
-        <translation type="unfinished"/>
+        <translation>reiser4</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="784"/>
         <source>Label</source>
-        <translation>Jmenovka</translation>
+        <translation>Etiket</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="803"/>
         <source>root:</source>
-        <translation type="unfinished"/>
+        <translation>rod:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="819"/>
         <source>swap:</source>
-        <translation type="unfinished"/>
+        <translation>swap:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="835"/>
         <source>Location</source>
-        <translation type="unfinished"/>
+        <translation>Placering</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="887"/>
         <location filename="meinstall.ui" line="1374"/>
         <source>root</source>
-        <translation>root</translation>
+        <translation>rod</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="961"/>
         <source>Type</source>
-        <translation>Typ</translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="977"/>
         <source>home:</source>
-        <translation type="unfinished"/>
+        <translation>hjem:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1059"/>
         <source>3. Installation in progress</source>
-        <translation>3. Instalace probíhá</translation>
+        <translation>3. Installationen er i gang</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1102"/>
         <source>Abort</source>
-        <translation>Zrušení</translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1105"/>
         <location filename="meinstall.ui" line="1323"/>
         <source>Alt+A</source>
-        <translation>Alt+A</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1144"/>
         <source>Ready to install antiX Linux filesystem</source>
-        <translation>Připraveno pro instalaci systému souborů antiX Linux</translation>
+        <translation>Klar til at installere antiX Linux-filsystem</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1166"/>
         <source>Tips</source>
-        <translation>Tipy</translation>
+        <translation>Tips</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1240"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Vyberte způsob zavedení</translation>
+        <translation>4. Vælg bootmetode</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1273"/>
@@ -886,22 +853,22 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="1304"/>
         <source>Install on:</source>
-        <translation>Instalovat na:</translation>
+        <translation>Installer på:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1320"/>
         <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished"/>
+        <translation>Installer GRUB til Linux og Windows</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1342"/>
         <source>System boot disk:</source>
-        <translation>Zaváděcí disk systému:</translation>
+        <translation>Systemets bootdisk:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1387"/>
         <source>EFI System Partition</source>
-        <translation>Oddíl systému EFI</translation>
+        <translation>EFI-systempartition</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1390"/>
@@ -911,177 +878,177 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="1460"/>
         <source>Common Services to Enable</source>
-        <translation>Společné služby k povolení</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1500"/>
         <source>Service</source>
-        <translation>Služba</translation>
+        <translation>Tjeneste</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1505"/>
         <source>Description</source>
-        <translation>Popis</translation>
+        <translation>Beskrivelse</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1541"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Názvy připojení počítače</translation>
+        <translation>5. Computernetværksnavne</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1568"/>
         <source>Workgroup</source>
-        <translation>Pracovní skupina</translation>
+        <translation>Arbejdsgruppe</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1581"/>
         <source>Workgroup:</source>
-        <translation>Pracovní skupina:</translation>
+        <translation>Arbejdsgruppe:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1597"/>
         <source>SaMBa Server for MS Networking</source>
-        <translation>SaMBa Server pro MS připojování</translation>
+        <translation>SaMBa-server til MS-netværk</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1613"/>
         <source>example.dom</source>
-        <translation>příklad.dom</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1626"/>
         <source>Computer domain:</source>
-        <translation>Doména počítače:</translation>
+        <translation>Computerdomæne:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1658"/>
         <source>Computer name:</source>
-        <translation>Název počítače:</translation>
+        <translation>Computernavn:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1731"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Servisní nastavení (pokročilé) </translation>
+        <translation>6d. Tjenesteindstillinger (avanceret)</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1749"/>
         <source>Adjust which services should run at startup</source>
-        <translation>Nastavit, které služby by měly spouštěny při startu </translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1752"/>
         <source>View</source>
-        <translation>Zobrazit</translation>
+        <translation>Vis</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1781"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Nastavte hodiny</translation>
+        <translation>6b. Konfigurer ur</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1809"/>
         <source>Format:</source>
-        <translation>Formátovat:</translation>
+        <translation>Format:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1826"/>
         <source>System clock uses LOCAL</source>
-        <translation>Systémové hodiny využívají LOCAL</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1855"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Výchozí lokalizace</translation>
+        <translation>6a. Lokaliseringsstandarder</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1885"/>
         <source>Locale:</source>
-        <translation>Místní:</translation>
+        <translation>Lokalitet:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1914"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Nastavit časové pásmo</translation>
+        <translation>6c. Tidszoneindstillinger</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1926"/>
         <source>Timezone:</source>
-        <translation>Časové pásmo:</translation>
+        <translation>Tidszone:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2003"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Účet (správce) Root</translation>
+        <translation>7b. Root-konto (administrator)</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2074"/>
         <source>Confirm root password:</source>
-        <translation>Potvrzení hesla správce:</translation>
+        <translation>Bekræft root-adgangskode:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2090"/>
         <source>Root password:</source>
-        <translation>Heslo správce:</translation>
+        <translation>Root-adgangskode:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2109"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Výchozí uživatelský účet</translation>
+        <translation>7a. Standardbrugerkonto</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2189"/>
         <source>username</source>
-        <translation>uživatelské jméno</translation>
+        <translation>brugernavn</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2202"/>
         <source>Confirm user password:</source>
-        <translation>Potvrďte uživatelské heslo:</translation>
+        <translation>Bekræft brugerens adgangskode:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2218"/>
         <source>Default user password:</source>
-        <translation>Výchozí uživatelské jméno:</translation>
+        <translation>Brugerens standardadgangskode:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2234"/>
         <source>Default user login name:</source>
-        <translation>Výchozí uživatelské přihlašovací jméno:</translation>
+        <translation>Brugerens standardloginnavn:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2253"/>
         <source>Autologin</source>
-        <translation>Automatické přihlašování</translation>
+        <translation>Automatisk indlogning</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2266"/>
         <source>Show passwords</source>
-        <translation>Zobrazit hesla</translation>
+        <translation>Vis adgangskoder</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2279"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
-        <translation>Změny nastavení pracovní plochy v live sezení budou převedené do plné instalace operačního systému.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="2282"/>
         <source>Save live desktop changes</source>
-        <translation>Uložte změny plochy live sezení</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="2295"/>
         <source>Encrypt /home</source>
-        <translation>Zašifrovat /home</translation>
+        <translation>Kryptér /home</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2327"/>
         <source>Reminders</source>
-        <translation>Připomenutí</translation>
+        <translation>Påmindere</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2395"/>
         <source>Close</source>
-        <translation>Zavřít</translation>
+        <translation>Luk</translation>
     </message>
 </context>
 <context>
@@ -1089,12 +1056,12 @@ Returning to Step 1.</source>
     <message>
         <location filename="memain.ui" line="26"/>
         <source>antiX Linux Install</source>
-        <translation>antiX Linux Instalace </translation>
+        <translation>Installation af antiX Linux</translation>
     </message>
     <message>
         <location filename="memain.ui" line="72"/>
         <source>Help</source>
-        <translation>Nápověda</translation>
+        <translation>Hjælp</translation>
     </message>
 </context>
 <context>
@@ -1104,9 +1071,7 @@ Returning to Step 1.</source>
         <source>The installer won't launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
-        <translation>Instalační program se nespustí protože již bězí na pozadí.
-
-Prosím ukončete ho ak je to možné, nebo zadejte &apos;pkill minstall&apos; v terminálu.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="app.cpp" line="70"/>
@@ -1119,17 +1084,17 @@ Do you want to continue the installation?</source>
     <message>
         <location filename="app.cpp" line="74"/>
         <source>Yes</source>
-        <translation>Ano</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <location filename="app.cpp" line="74"/>
         <source>No</source>
-        <translation>Ne</translation>
+        <translation>Nej</translation>
     </message>
     <message>
         <location filename="app.cpp" line="87"/>
         <source>You must run this app as root.</source>
-        <translation>Tuto aplikaci musíte spustit jako root.</translation>
+        <translation>Du skal køre programmet som root.</translation>
     </message>
 </context>
 </TS>
