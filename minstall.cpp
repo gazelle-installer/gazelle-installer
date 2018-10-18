@@ -1713,9 +1713,9 @@ void MInstall::setLocale()
     shell.run("cp -f /etc/default/rcS /mnt/antiX/etc/default");
     // Set clock to use LOCAL
     if (gmtCheckBox->isChecked()) {
-        shell.run("echo '0.0 0 0.0\\n0\\nLOCAL' > /etc/adjtime");
+        shell.run("echo '0.0 0 0.0\n0\nLOCAL' > /etc/adjtime");
     } else {
-        shell.run("echo '0.0 0 0.0\\n0\\nUTC' > /etc/adjtime");
+        shell.run("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime");
     }
     shell.run("hwclock --hctosys");
     QString rootdev = "/dev/" + QString(rootCombo->currentText()).section(" ", 0, 0);
