@@ -721,6 +721,7 @@ bool MInstall::makeDefaultPartitions()
         start = QString::number(esp_size) + "MiB ";
     }
 
+    //create boot partition if necessary
     if (checkboxencryptauto->isChecked()){
         int end_boot = esp_size + boot_size;
         int err = shell.run("parted -s " + drv + " mkpart primary  " + start + QString::number(end_boot) + "MiB");
@@ -731,7 +732,9 @@ bool MInstall::makeDefaultPartitions()
         start = end_boot;
     }
 
-    int end_root = esp_size + remaining;
+    // if encrypting, boot_size=512, or 0 if not  .  start is set to end_boot if encrypting
+
+    int end_root = esp_size + boot_size + remaining;
     int err = shell.run("parted -s " + drv + " mkpart primary  " + start + QString::number(end_root) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create root partition";
@@ -744,6 +747,41 @@ bool MInstall::makeDefaultPartitions()
         qDebug() << "Could not create swap partition";
         return false;
     }
+
+    // if encrypting, set up luks containers for root and swap
+
+    if ( checkboxencryptauto->isChecked()) {
+        err = shell.run("x-terminal-emulator -e cryptsetup luksFormat " + rootdev + " --batch-mode");
+        if (err != 0) {
+            qDebug() << "Could not create create root luks partition";
+            return false;
+        }
+
+        err = shell.run("x-terminal-emulator -e cryptsetup luksFormat " + swapdev + " --batch-mode");
+        if (err != 0) {
+            qDebug() << "Could not create create swap luks partition";
+            return false;
+        }
+
+        //now open containers, assigning rootfs and swapfs as container names
+
+        err = shell.run("x-terminal-emulater cryptsetup luksOpen " + rootdev + " rootfs");
+        if (err != 0) {
+            qDebug() << "Could not open luks root container";
+            return false;
+        } else {
+            rootdev="/dev/mapper/rootfs";
+        }
+
+        err = shell.run("x-terminal-emulater cryptsetup luksOpen " + swapdev + " swapfs");
+        if (err != 0) {
+            qDebug() << "Could not open luks swap container";
+            return false;
+        } else {
+            swapdev="/dev/mapper/swapfs";
+        }
+
+
 
     updateStatus(tr("Formatting swap partition"), ++prog);
     system("sleep 1");
