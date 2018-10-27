@@ -1063,12 +1063,18 @@ void MInstall::installLinux()
 {
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
     char line[130];
+    QString rootdev;
 
-    QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
+    //use /dev/mapper designations if ecryption is checked
+    if (checkboxencryptauto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        rootdev = "/dev/mapper/rootfs";
+    } else {
+        QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
 
-    strcpy(line, rootCombo->currentText().toUtf8());
-    char *tok = strtok(line, " -");
-    QString rootdev = QString("/dev/%1").arg(tok);
+        strcpy(line, rootCombo->currentText().toUtf8());
+        char *tok = strtok(line, " -");
+        rootdev = QString("/dev/%1").arg(tok);
+    }
 
     // maybe root was formatted
     if (isRootFormatted) {
@@ -1096,11 +1102,16 @@ void MInstall::copyLinux()
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
     char line[130];
 
-    QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
+    //use /dev/mapper designations if ecryption is checked
+    if (checkboxencryptauto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        rootdev = "/dev/mapper/rootfs";
+    } else {
+        QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
 
-    strcpy(line, rootCombo->currentText().toUtf8());
-    char *tok = strtok(line, " -");
-    QString rootdev = QString("/dev/%1").arg(tok);
+        strcpy(line, rootCombo->currentText().toUtf8());
+        char *tok = strtok(line, " -");
+        rootdev = QString("/dev/%1").arg(tok);
+    }
 
     // make empty dirs for opt, dev, proc, sys, run,
     // home already done
@@ -1110,6 +1121,12 @@ void MInstall::copyLinux()
     mkdir("/mnt/antiX/proc", 0755);
     mkdir("/mnt/antiX/sys", 0755);
     mkdir("/mnt/antiX/run", 0755);
+
+    //if seperate /boot in use, mount that to /mnt/antiX/boot
+    //*****add that code here***    ///
+
+
+
 
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
