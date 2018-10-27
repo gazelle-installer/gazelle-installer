@@ -644,7 +644,7 @@ bool MInstall::makeDefaultPartitions()
 
     // allocate space for /boot if encrypting
     int boot_size = 0;
-    if (checkBoxEncryptRoot->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncrpytSwap->ischecked()) {
+    if (checkboxencryptauto->isChecked()){
             boot_size = 512;
             remaining -= boot_size;
     }
@@ -681,7 +681,7 @@ bool MInstall::makeDefaultPartitions()
             return false;
         }
         // switch for encrypted parts and /boot
-        if (checkBoxEncryptRoot->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncrpytSwap->ischecked()) {
+        if (checkboxencryptauto->isChecked()) {
             bootdev = drv + mmcnvmepartdesignator + "2";
             rootdev = drv + mmcnvmepartdesignator + "3";
             swapdev = drv + mmcnvmepartdesignator + "4";
@@ -703,7 +703,7 @@ bool MInstall::makeDefaultPartitions()
             return false;
         }
         // switch for encrypted parts and /boot
-        if (checkBoxEncryptRoot->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncrpytSwap->ischecked()) {
+        if (checkboxencryptauto->isChecked()) {
             bootdev = drv + mmcnvmepartdesignator + "1";
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
@@ -720,6 +720,17 @@ bool MInstall::makeDefaultPartitions()
     } else {
         start = QString::number(esp_size) + "MiB ";
     }
+
+    if (checkboxencryptauto->isChecked()){
+        int end_boot = esp_size + boot_size;
+        int err = shell.run("parted -s " + drv + " mkpart primary  " + start + QString::number(end_boot) + "MiB");
+        if (err != 0) {
+            qDebug() << "Could not create boot partition";
+            return false;
+        }
+        start = end_boot;
+    }
+
     int end_root = esp_size + remaining;
     int err = shell.run("parted -s " + drv + " mkpart primary  " + start + QString::number(end_root) + "MiB");
     if (err != 0) {
