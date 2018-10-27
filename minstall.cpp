@@ -585,7 +585,7 @@ bool MInstall::makeDefaultPartitions()
     QString mmcnvmepartdesignator;
     mmcnvmepartdesignator.clear();
 
-    QString rootdev, swapdev;
+    QString rootdev, swapdev, bootdev;
 
     QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
     QString msg = QString(tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME));
@@ -642,6 +642,13 @@ bool MInstall::makeDefaultPartitions()
         remaining -= esp_size;
     }
 
+    // allocate space for /boot if encrypting
+    int boot_size = 0;
+    if (checkBoxEncryptRoot->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncrpytSwap->ischecked()) {
+            boot_size = 512;
+            remaining -= boot_size;
+    }
+
     // 2048 swap should be ample
     int swap = 2048;
     if (remaining < 2048) {
@@ -673,9 +680,16 @@ bool MInstall::makeDefaultPartitions()
             qDebug() << "Could not create gpt partition table on " + drv;
             return false;
         }
-        rootdev = drv + mmcnvmepartdesignator + "2";
-        swapdev = drv + mmcnvmepartdesignator + "3";
-        updateStatus(tr("Formating EFI System Partition (ESP)"), ++prog);
+        // switch for encrypted parts and /boot
+        if (checkBoxEncryptRoot->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncrpytSwap->ischecked()) {
+            bootdev = drv + mmcnvmepartdesignator + "2";
+            rootdev = drv + mmcnvmepartdesignator + "3";
+            swapdev = drv + mmcnvmepartdesignator + "4";
+        } else {
+            rootdev = drv + mmcnvmepartdesignator + "2";
+            swapdev = drv + mmcnvmepartdesignator + "3";
+            updateStatus(tr("Formating EFI System Partition (ESP)"), ++prog);
+        }
         if(!makeEsp(drv, esp_size)) {
             return false;
         }
@@ -688,8 +702,15 @@ bool MInstall::makeDefaultPartitions()
             qDebug() << "Could not create msdos partition table on " + drv;
             return false;
         }
-        rootdev = drv + mmcnvmepartdesignator + "1";
-        swapdev = drv + mmcnvmepartdesignator + "2";
+        // switch for encrypted parts and /boot
+        if (checkBoxEncryptRoot->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncrpytSwap->ischecked()) {
+            bootdev = drv + mmcnvmepartdesignator + "1";
+            rootdev = drv + mmcnvmepartdesignator + "2";
+            swapdev = drv + mmcnvmepartdesignator + "3";
+        } else {
+            rootdev = drv + mmcnvmepartdesignator + "1";
+            swapdev = drv + mmcnvmepartdesignator + "2";
+        }
     }
 
     // create root partition
