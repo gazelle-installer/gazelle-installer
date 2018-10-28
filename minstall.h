@@ -110,6 +110,7 @@ public:
 
     // global for now until boot combo box is sorted out
     QString bootdev;
+    QString swapdevicepreserve;
 
     void setupkeyboardbutton();
     void gotoPage(int next);
