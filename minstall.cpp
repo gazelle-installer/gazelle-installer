@@ -684,6 +684,7 @@ bool MInstall::makeDefaultPartitions()
             bootdev = drv + mmcnvmepartdesignator + "2";
             rootdev = drv + mmcnvmepartdesignator + "3";
             swapdev = drv + mmcnvmepartdesignator + "4";
+            swapdevicepreserve = swapdev;
         } else {
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
@@ -706,6 +707,7 @@ bool MInstall::makeDefaultPartitions()
             bootdev = drv + mmcnvmepartdesignator + "1";
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
+            swapdevicepreserve = swapdev;
         } else {
             rootdev = drv + mmcnvmepartdesignator + "1";
             swapdev = drv + mmcnvmepartdesignator + "2";
@@ -1118,17 +1120,6 @@ void MInstall::copyLinux()
 {
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
     char line[130];
-
-    //use /dev/mapper designations if ecryption is checked
-    if (checkboxencryptauto->isChecked() || checkBoxEncryptRoot->isChecked()) {
-        rootdev = "/dev/mapper/rootfs";
-    } else {
-        QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
-
-        strcpy(line, rootCombo->currentText().toUtf8());
-        char *tok = strtok(line, " -");
-        rootdev = QString("/dev/%1").arg(tok);
-    }
 
     // make empty dirs for opt, dev, proc, sys, run,
     // home already done
@@ -2624,10 +2615,33 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
             // add key file to luks containers
             // get uuid of devices
             // write out crypttab
+            // if encrypt-auto, add home and swap
+            // if encrypt just home, just add swap
+            // blkid -s UUID -o value devicename for UUID
+            // containerName     /dev/disk/by-uuid/UUID_OF_PARTITION  /root/keyfile  luks >>/etc/crypttab
+            // for auto install, only need to add swap
+            // for root and home, need to add home and swap
+            // for root only, add swap
+            // for home only, add swap
 
+            if (checkboxencryptauto->isChecked()){
+                //get UUID
+                QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapdevicepreserve);
 
+                //create keyfile
+                shell.run("dd if=/dev/urandom of=mnt/antiX/root/keyfile bs=1024 count=4");
 
+                //add keyfile to container
+                shell.run("cryptsetup luksAddKey " + swapdevicepreserve + " /mnt/antiX/root/keyfile");
 
+                //write crypttab keyfile entry
+                QFile file2("/mnt/antiX/etc/crypttab");
+                if (file2.open(QIODevice::WriteOnly)) {
+                    QTextStream out(&file2);
+                    out << "swapfs  /dev/disk/by-uuid/"+ swapUUID +"  /root/keyfile luks \n";
+                }
+                file2.close();
+            }
 
         }
         // Copy live set up to install and clean up.
