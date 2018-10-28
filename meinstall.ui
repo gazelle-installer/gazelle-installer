@@ -132,7 +132,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="Step_Terms">
       <layout class="QGridLayout" name="_4">
@@ -400,7 +400,20 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0" colspan="4">
+          <item row="2" column="4">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="0" colspan="5">
            <widget class="QRadioButton" name="entireDiskButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -416,7 +429,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="4">
+          <item row="3" column="0" colspan="5">
            <widget class="QRadioButton" name="existing_partitionsButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -432,8 +445,11 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="1" column="1">
            <widget class="QCheckBox" name="checkboxencryptauto">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Encrypt full disk</string>
             </property>
@@ -2615,6 +2631,22 @@
     <hint type="destinationlabel">
      <x>414</x>
      <y>231</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>entireDiskButton</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>checkboxencryptauto</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>365</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>94</x>
+     <y>215</y>
     </hint>
    </hints>
   </connection>

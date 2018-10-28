@@ -1188,7 +1188,7 @@ bool MInstall::installLoader()
 
     //add switch to change root partition info
     QString rootpart;
-    if (checkboxencryptauto->isChecked || checkBoxEncryptRoot->isChecked()) {
+    if (checkboxencryptauto->isChecked() || checkBoxEncryptRoot->isChecked()) {
         rootpart = "/dev/mapper/rootfs";
     } else {
         QString rootpart = QString(rootCombo->currentText()).section(" ", 0, 0);
