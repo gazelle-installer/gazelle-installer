@@ -1121,17 +1121,6 @@ void MInstall::copyLinux()
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
     char line[130];
 
-    //use /dev/mapper designations if ecryption is checked
-    if (checkboxencryptauto->isChecked() || checkBoxEncryptRoot->isChecked()) {
-        rootdev = "/dev/mapper/rootfs";
-    } else {
-        QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
-
-        strcpy(line, rootCombo->currentText().toUtf8());
-        char *tok = strtok(line, " -");
-        rootdev = QString("/dev/%1").arg(tok);
-    }
-
     // make empty dirs for opt, dev, proc, sys, run,
     // home already done
     updateStatus(tr("Creating system directories"), 9);
