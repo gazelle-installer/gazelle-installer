@@ -765,7 +765,7 @@ bool MInstall::makeDefaultPartitions()
 
         //now open containers, assigning rootfs and swapfs as container names
 
-        err = shell.run("x-terminal-emulater cryptsetup luksOpen " + rootdev + " rootfs");
+        err = shell.run("x-terminal-emulater -e cryptsetup luksOpen " + rootdev + " rootfs");
         if (err != 0) {
             qDebug() << "Could not open luks root container";
             return false;
@@ -773,14 +773,14 @@ bool MInstall::makeDefaultPartitions()
             rootdev="/dev/mapper/rootfs";
         }
 
-        err = shell.run("x-terminal-emulater cryptsetup luksOpen " + swapdev + " swapfs");
+        err = shell.run("x-terminal-emulater -e cryptsetup luksOpen " + swapdev + " swapfs");
         if (err != 0) {
             qDebug() << "Could not open luks swap container";
             return false;
         } else {
             swapdev="/dev/mapper/swapfs";
         }
-
+    }
 
 
     updateStatus(tr("Formatting swap partition"), ++prog);
@@ -792,6 +792,14 @@ bool MInstall::makeDefaultPartitions()
     shell.run("make-fstab -s");
     shell.run("/sbin/swapon -a 2>&1");
 
+
+    //formate /boot filesystem if encrypting
+    if (checkboxencryptauto->isChecked()) {
+        if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
+            return false;
+        }
+    }
+
     updateStatus(tr("Formatting root partition"), ++prog);
     if (!makeLinuxPartition(rootdev, "ext4", false, rootLabelEdit->text())) {
         return false;
@@ -799,6 +807,7 @@ bool MInstall::makeDefaultPartitions()
         root_mntops = "defaults,noatime";
         isRootFormatted = true;
     }
+
     //if uefi is not detected, set flags based on GPT. Else don't set a flag...done by makeESP.
     if(!uefi) { // set appropriate flags
         if (isGpt(drv)) {
@@ -813,6 +822,15 @@ bool MInstall::makeDefaultPartitions()
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
         return false;
     }
+
+    //mount /boot if ecrypting
+    if (checkboxencryptauto->isChecked()) {
+        mkdir("/mnt/antiX/boot",0755);
+        if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
+            return false;
+        }
+    }
+
 
     // on root, make sure it exists
     system("sleep 1");
@@ -1168,7 +1186,15 @@ bool MInstall::installLoader()
     }
 
     QString bootdrv = QString(grubBootCombo->currentText()).section(" ", 0, 0);
-    QString rootpart = QString(rootCombo->currentText()).section(" ", 0, 0);
+
+    //add switch to change root partition info
+    QString rootpart;
+    if (checkboxencryptauto->isChecked || checkBoxEncryptRoot->isChecked()) {
+        rootpart = "/dev/mapper/rootfs";
+    } else {
+        QString rootpart = QString(rootCombo->currentText()).section(" ", 0, 0);
+    }
+
     QString boot;
 
     if (grubMbrButton->isChecked()) {
@@ -1285,7 +1311,7 @@ bool MInstall::installLoader()
     finalcmdline.append(grubDefault.split(" "));
     qDebug() << "intermediate" << finalcmdline;
 
-    //remove any duplicate codes in list (typical splash)
+    //remove any duplicate codes in list (typically splash)
     finalcmdline.removeDuplicates();
 
     //remove in null or empty strings that might have crept in
