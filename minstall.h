@@ -108,6 +108,9 @@ public:
     QString PREFERRED_MIN_INSTALL_SIZE;
     QStringList ENABLE_SERVICES;
 
+    // global for now until boot combo box is sorted out
+    QString bootdev;
+
     void setupkeyboardbutton();
     void gotoPage(int next);
     void pageDisplayed(int next);

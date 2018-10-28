@@ -585,8 +585,7 @@ bool MInstall::makeDefaultPartitions()
     QString mmcnvmepartdesignator;
     mmcnvmepartdesignator.clear();
 
-    QString rootdev, swapdev, bootdev;
-
+    QString rootdev, swapdev;
     QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
     QString msg = QString(tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME));
     ans = QMessageBox::information(this, QString::null, msg,
@@ -1337,25 +1336,36 @@ bool MInstall::installLoader()
     runCmd("chroot /mnt/antiX update-grub");
     qDebug() << "Create fstab";
     //create fstab file
+
+
     //if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
+//    if (POPULATE_MEDIA_MOUNTPOINTS) {
+//        //if compressed btrfs filesystem is not used, use default locate for fstab
+//        if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
+//            // if compressed btrfs filessystem is used, specify the -O switch
+//            runCmd("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
+//        } else {
+//            runCmd("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
+//        }
+//    } else {
+//        //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
+//        //but do check for compressed btrfs filesystem
+//        if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
+//            // if compressed btrfs filessystem is used, specify the -O switch
+//            runCmd("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
+//        } else {
+//            runCmd("/sbin/make-fstab --install /mnt/antiX");
+//        }
+//    }
+
+
+    //if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
+    //only add media mountpoints.  fstab is written elsewhere already
+
     if (POPULATE_MEDIA_MOUNTPOINTS) {
-        //if compressed btrfs filesystem is not used, use default locate for fstab
-        if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
-            // if compressed btrfs filessystem is used, specify the -O switch
-            runCmd("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
-        } else {
-            runCmd("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
+        runCmd("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
         }
-    } else {
-        //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
-        //but do check for compressed btrfs filesystem
-        if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
-            // if compressed btrfs filessystem is used, specify the -O switch
-            runCmd("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
-        } else {
-            runCmd("/sbin/make-fstab --install /mnt/antiX");
-        }
-    }
+
     qDebug() << "change fstab entries to use UUIDs";
     runCmd("chroot /mnt/antiX dev2uuid_fstab");
     qDebug() << "Update initramfs";
@@ -1577,6 +1587,8 @@ bool MInstall::setUserName()
 //            shell.run("rm -r "+ dpath + ".*");
 //        }
 //    }
+
+
     shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
     setCursor(QCursor(Qt::ArrowCursor));
     return true;
@@ -2542,8 +2554,23 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
 
     // get config
+
     QString rootdev = "/dev/" + QString(rootCombo->currentText()).section(" ", 0, 0);
     QString homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
+
+    // if encrypting, modify devices to /dev/mapper categories
+    if (checkboxencryptauto->isChecked() || checkBoxEncryptRoot->isChecked()){
+        rootdev = "/dev/mapper/rootfs";
+    }
+
+    if (checkboxencryptauto->isChecked()){
+        homedev = "/dev/mapper/rootfs";
+    }
+
+    if (checkBoxEncryptHome->isChecked()){
+        homedev = "/dev/mapper/homefs";
+    }
+
 
     timer->stop();
 
@@ -2582,8 +2609,26 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                 } else {
                     out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
                 }
+                //add bootdev if present
+                //only ext4 (for now) for max compatibility with other linuxes
+                if (!bootdev.isEmpty()){
+                    out << bootdev + " /boot ext4 " + root_mntops + " 1 1 \n";
+                }
             }
             file.close();
+
+
+            //write out crypttab if encrypting for auto-opening
+            //basic steps
+            // create keyfile
+            // add key file to luks containers
+            // get uuid of devices
+            // write out crypttab
+
+
+
+
+
         }
         // Copy live set up to install and clean up.
         //shell.run("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");
