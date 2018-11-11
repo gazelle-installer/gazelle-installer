@@ -84,6 +84,7 @@ public:
     bool makeFloppy();
     bool makeGrub(int rootdev, QString rootpart, const char *rootmnt, bool initrd);
     bool makeLinuxPartition(QString dev, const char *type, bool bad, QString label);
+    bool makeLuksPartitions(const QString &rootdev, const QString &swapdev, const QByteArray &password);
     bool makeSwapPartition(QString dev);
     bool makeEsp(QString drv, int size);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
@@ -154,6 +155,10 @@ private slots:
     void on_rootPasswordEdit2_textChanged(const QString &arg1);
     void on_userPasswordEdit_textChanged();
     void on_rootPasswordEdit_textChanged();
+    void on_checkBoxEncryptAuto_toggled(bool checked);
+    void on_existing_partitionsButton_clicked(bool checked);
+    void on_FDEpassword_textChanged();
+    void on_FDEpassword2_textChanged(const QString &arg1);
 
 private:
     Cmd shell;
