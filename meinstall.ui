@@ -330,7 +330,7 @@
           <property name="spacing">
            <number>6</number>
           </property>
-          <item row="2" column="3">
+          <item row="4" column="3">
            <widget class="QLabel" name="freeLabel">
             <property name="enabled">
              <bool>false</bool>
@@ -349,7 +349,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="4" column="1">
            <widget class="QLabel" name="leaveLabel">
             <property name="enabled">
              <bool>false</bool>
@@ -368,7 +368,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="4" column="0">
            <spacer>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -384,7 +384,7 @@
             </property>
            </spacer>
           </item>
-          <item row="2" column="2">
+          <item row="4" column="2">
            <widget class="QLineEdit" name="freeSpaceEdit">
             <property name="enabled">
              <bool>false</bool>
@@ -400,7 +400,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="4">
+          <item row="4" column="4">
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -429,7 +429,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="5">
+          <item row="5" column="0" colspan="5">
            <widget class="QRadioButton" name="existing_partitionsButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -446,12 +446,46 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QCheckBox" name="checkboxencryptauto">
+           <widget class="QCheckBox" name="checkBoxEncryptAuto">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="text">
              <string>Encrypt full disk</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="labelFDEpass">
+            <property name="text">
+             <string>Encryption password:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="labelFDEpass2">
+            <property name="text">
+             <string>Confirm encryption password:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2" colspan="3">
+           <widget class="QLineEdit" name="FDEpassword">
+            <property name="maxLength">
+             <number>512</number>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2" colspan="3">
+           <widget class="QLineEdit" name="FDEpassword2">
+            <property name="maxLength">
+             <number>512</number>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
             </property>
            </widget>
           </item>
@@ -2459,34 +2493,59 @@
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <tabstops>
-  <tabstop>copyrightBrowser</tabstop>
+  <tabstop>buttonSetKeyboard</tabstop>
   <tabstop>backButton</tabstop>
   <tabstop>nextButton</tabstop>
+  <tabstop>diskCombo</tabstop>
+  <tabstop>qtpartedButton</tabstop>
   <tabstop>entireDiskButton</tabstop>
-  <tabstop>freeSpaceEdit</tabstop>
+  <tabstop>checkBoxEncryptAuto</tabstop>
   <tabstop>existing_partitionsButton</tabstop>
+  <tabstop>FDEpassword</tabstop>
+  <tabstop>FDEpassword2</tabstop>
+  <tabstop>freeSpaceEdit</tabstop>
   <tabstop>rootCombo</tabstop>
+  <tabstop>rootTypeCombo</tabstop>
+  <tabstop>checkBoxEncryptRoot</tabstop>
+  <tabstop>rootLabelEdit</tabstop>
+  <tabstop>homeCombo</tabstop>
+  <tabstop>homeTypeCombo</tabstop>
+  <tabstop>checkBoxEncryptHome</tabstop>
+  <tabstop>homeLabelEdit</tabstop>
   <tabstop>swapCombo</tabstop>
+  <tabstop>checkBoxEncrpytSwap</tabstop>
+  <tabstop>swapLabelEdit</tabstop>
+  <tabstop>bootCombo</tabstop>
   <tabstop>saveHomeCheck</tabstop>
   <tabstop>badblocksCheck</tabstop>
-  <tabstop>abortInstallButton</tabstop>
-  <tabstop>tipsEdit</tabstop>
   <tabstop>grubCheckBox</tabstop>
   <tabstop>grubMbrButton</tabstop>
+  <tabstop>grubRootButton</tabstop>
+  <tabstop>grubEspButton</tabstop>
   <tabstop>grubBootCombo</tabstop>
-  <tabstop>csView</tabstop>
   <tabstop>computerNameEdit</tabstop>
   <tabstop>computerDomainEdit</tabstop>
   <tabstop>sambaCheckBox</tabstop>
   <tabstop>computerGroupEdit</tabstop>
   <tabstop>localeCombo</tabstop>
+  <tabstop>gmtCheckBox</tabstop>
+  <tabstop>radio24h</tabstop>
+  <tabstop>radio12h</tabstop>
+  <tabstop>timezoneCombo</tabstop>
+  <tabstop>viewServicesButton</tabstop>
   <tabstop>userNameEdit</tabstop>
   <tabstop>userPasswordEdit</tabstop>
   <tabstop>userPasswordEdit2</tabstop>
   <tabstop>rootPasswordEdit</tabstop>
   <tabstop>rootPasswordEdit2</tabstop>
+  <tabstop>passwordCheckBox</tabstop>
   <tabstop>autologinCheckBox</tabstop>
+  <tabstop>saveDesktopCheckBox</tabstop>
   <tabstop>remindersBrowser</tabstop>
+  <tabstop>copyrightBrowser</tabstop>
+  <tabstop>csView</tabstop>
+  <tabstop>tipsEdit</tabstop>
+  <tabstop>closeButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -2637,7 +2696,7 @@
   <connection>
    <sender>entireDiskButton</sender>
    <signal>toggled(bool)</signal>
-   <receiver>checkboxencryptauto</receiver>
+   <receiver>checkBoxEncryptAuto</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

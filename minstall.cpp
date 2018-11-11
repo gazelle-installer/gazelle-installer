@@ -572,6 +572,67 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
     return true;
 }
 
+// Create and open Luks partitions; return false if it cannot create one
+bool MInstall::makeLuksPartitions(const QString &rootdev, const QString &swapdev, const QByteArray &password)
+{
+    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    setCursor(QCursor(Qt::WaitCursor));
+    qApp->processEvents();
+
+    QProcess proc;
+
+    // create rootdev
+    proc.start("cryptsetup luksFormat --batch-mode " + rootdev);
+    proc.waitForStarted();
+    proc.write(password + "\n");
+    proc.waitForFinished();
+    if (proc.exitCode() != 0) {
+        setCursor(QCursor(Qt::ArrowCursor));
+        QMessageBox::critical(this, QString::null,
+                              tr("Sorry, count not create root LUKS partition"));
+        return false;
+    }
+
+    // create swapdev
+    proc.start("cryptsetup luksFormat --batch-mode " + swapdev);
+    proc.waitForStarted();
+    proc.write(password + "\n");
+    proc.waitForFinished();
+    if (proc.exitCode() != 0) {
+        setCursor(QCursor(Qt::ArrowCursor));
+        QMessageBox::critical(this, QString::null,
+                              tr("Sorry, count not create swap LUKS partition"));
+        return false;
+    }
+
+    //now open containers, assigning rootfs and swapfs as container names
+
+    // open rootdev
+    proc.start("cryptsetup luksOpen " + rootdev + " rootfs");
+    proc.waitForStarted();
+    proc.write(password + "\n");
+    proc.waitForFinished();
+    if (proc.exitCode() != 0) {
+        setCursor(QCursor(Qt::ArrowCursor));
+        QMessageBox::critical(this, QString::null,
+                              tr("Sorry, count not open root LUKS container"));
+        return false;
+    }
+
+    // open swapdev
+    proc.start("cryptsetup luksOpen " + swapdev + " swapfs");
+    proc.waitForStarted();
+    proc.write(password + "\n");
+    proc.waitForFinished();
+    if (proc.exitCode() != 0) {
+        setCursor(QCursor(Qt::ArrowCursor));
+        QMessageBox::critical(this, QString::null,
+                              tr("Sorry, count not open swap LUKS container"));
+        return false;
+    }
+    return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // in this case use all of the drive
 
@@ -643,7 +704,7 @@ bool MInstall::makeDefaultPartitions()
 
     // allocate space for /boot if encrypting
     int boot_size = 0;
-    if (checkboxencryptauto->isChecked()){
+    if (checkBoxEncryptAuto->isChecked()){
             boot_size = 512;
             remaining -= boot_size;
     }
@@ -680,7 +741,7 @@ bool MInstall::makeDefaultPartitions()
             return false;
         }
         // switch for encrypted parts and /boot
-        if (checkboxencryptauto->isChecked()) {
+        if (checkBoxEncryptAuto->isChecked()) {
             bootdev = drv + mmcnvmepartdesignator + "2";
             rootdev = drv + mmcnvmepartdesignator + "3";
             swapdev = drv + mmcnvmepartdesignator + "4";
@@ -703,7 +764,7 @@ bool MInstall::makeDefaultPartitions()
             return false;
         }
         // switch for encrypted parts and /boot
-        if (checkboxencryptauto->isChecked()) {
+        if (checkBoxEncryptAuto->isChecked()) {
             bootdev = drv + mmcnvmepartdesignator + "1";
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
@@ -723,66 +784,42 @@ bool MInstall::makeDefaultPartitions()
     }
 
     //create boot partition if necessary
-    if (checkboxencryptauto->isChecked()){
+    if (checkBoxEncryptAuto->isChecked()){
         int end_boot = esp_size + boot_size;
-        int err = shell.run("parted -s " + drv + " mkpart primary  " + start + QString::number(end_boot) + "MiB");
+        int err = shell.run("parted -s " + drv + " mkpart primary " + start + QString::number(end_boot) + "MiB");
         if (err != 0) {
             qDebug() << "Could not create boot partition";
             return false;
         }
-        start = end_boot;
+        start = QString::number(end_boot) + "MiB ";
     }
 
     // if encrypting, boot_size=512, or 0 if not  .  start is set to end_boot if encrypting
-
     int end_root = esp_size + boot_size + remaining;
-    int err = shell.run("parted -s " + drv + " mkpart primary  " + start + QString::number(end_root) + "MiB");
+    int err = shell.run("parted -s " + drv + " mkpart primary " + start + QString::number(end_root) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create root partition";
         return false;
     }
 
     // create swap partition
-    err = shell.run("parted -s " + drv + " mkpart primary  " + QString::number(end_root) + "MiB " + QString::number(end_root + swap) + "MiB");
+    err = shell.run("parted -s " + drv + " mkpart primary " + QString::number(end_root) + "MiB " + QString::number(end_root + swap) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create swap partition";
         return false;
     }
 
-    // if encrypting, set up luks containers for root and swap
-
-    if ( checkboxencryptauto->isChecked()) {
-        err = shell.run("x-terminal-emulator -e cryptsetup luksFormat " + rootdev + " --batch-mode");
-        if (err != 0) {
-            qDebug() << "Could not create create root luks partition";
-            return false;
-        }
-
-        err = shell.run("x-terminal-emulator -e cryptsetup luksFormat " + swapdev + " --batch-mode");
-        if (err != 0) {
-            qDebug() << "Could not create create swap luks partition";
-            return false;
-        }
-
-        //now open containers, assigning rootfs and swapfs as container names
-
-        err = shell.run("x-terminal-emulater -e cryptsetup luksOpen " + rootdev + " rootfs");
-        if (err != 0) {
-            qDebug() << "Could not open luks root container";
+    // if encrypting, set up LUKS containers for root and swap
+    if (checkBoxEncryptAuto->isChecked()) {
+        updateStatus(tr("Set up LUKS encrypted containers"), ++prog);
+        if(!makeLuksPartitions(rootdev, swapdev, FDEpassword->text().toUtf8())) {
+            qDebug() << "could not make LUKS partitions";
             return false;
         } else {
             rootdev="/dev/mapper/rootfs";
-        }
-
-        err = shell.run("x-terminal-emulater -e cryptsetup luksOpen " + swapdev + " swapfs");
-        if (err != 0) {
-            qDebug() << "Could not open luks swap container";
-            return false;
-        } else {
             swapdev="/dev/mapper/swapfs";
         }
     }
-
 
     updateStatus(tr("Formatting swap partition"), ++prog);
     system("sleep 1");
@@ -793,9 +830,9 @@ bool MInstall::makeDefaultPartitions()
     shell.run("make-fstab -s");
     shell.run("/sbin/swapon -a 2>&1");
 
-
-    //formate /boot filesystem if encrypting
-    if (checkboxencryptauto->isChecked()) {
+    // format /boot filesystem if encrypting
+    if (checkBoxEncryptAuto->isChecked()) {
+        updateStatus(tr("Formatting boot partition"), ++prog);
         if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
             return false;
         }
@@ -809,7 +846,7 @@ bool MInstall::makeDefaultPartitions()
         isRootFormatted = true;
     }
 
-    //if uefi is not detected, set flags based on GPT. Else don't set a flag...done by makeESP.
+    // if UEFI is not detected, set flags based on GPT. Else don't set a flag...done by makeESP.
     if(!uefi) { // set appropriate flags
         if (isGpt(drv)) {
             shell.run("parted -s " + drv + " disk_set pmbr_boot on");
@@ -824,8 +861,8 @@ bool MInstall::makeDefaultPartitions()
         return false;
     }
 
-    //mount /boot if ecrypting
-    if (checkboxencryptauto->isChecked()) {
+    // mount /boot if encrypting
+    if (checkBoxEncryptAuto->isChecked()) {
         mkdir("/mnt/antiX/boot",0755);
         if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
             return false;
@@ -1085,7 +1122,7 @@ void MInstall::installLinux()
     QString rootdev;
 
     //use /dev/mapper designations if ecryption is checked
-    if (checkboxencryptauto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
         rootdev = "/dev/mapper/rootfs";
     } else {
         QString drv = QString("/dev/%1").arg(diskCombo->currentText().section(" ", 0, 0));
@@ -1179,8 +1216,8 @@ bool MInstall::installLoader()
 
     //add switch to change root partition info
     QString rootpart;
-    if (checkboxencryptauto->isChecked() || checkBoxEncryptRoot->isChecked()) {
-        rootpart = "/dev/mapper/rootfs";
+    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        rootpart = "mapper/rootfs";
     } else {
         QString rootpart = QString(rootCombo->currentText()).section(" ", 0, 0);
     }
@@ -2051,7 +2088,7 @@ void MInstall::pageDisplayed(int next)
     QString val;
 
     switch (next) {
-    case 1:
+    case 1: // choose disk
 
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>General Instructions</b><br/>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</p>"
@@ -2063,7 +2100,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</p>").arg(MIN_INSTALL_SIZE).arg(PREFERRED_MIN_INSTALL_SIZE));
         break;
 
-    case 2:
+    case 2:  // choose partition
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
                                        "It's solely your responsibility to backup your data before proceeding.</p>"
@@ -2129,7 +2166,7 @@ void MInstall::pageDisplayed(int next)
         buildServiceList();
         break;
 
-    case 4:
+    case 4: // set bootloader
         on_grubBootCombo_activated();
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
@@ -2139,14 +2176,14 @@ void MInstall::pageDisplayed(int next)
         backButton->setEnabled(false);
         break;
 
-    case 5:
+    case 5: // set services
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         nextButton->setEnabled(true);
         backButton->setEnabled(true);
         break;
 
-    case 6:
+    case 6: // set computer name
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
                                        "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
@@ -2155,7 +2192,7 @@ void MInstall::pageDisplayed(int next)
                                        "with a local computer that is running MS-Windows or Mac OSX.</p>"));
         break;
 
-    case 7:
+    case 7: // set localization, clock, services button
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
                                        "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
@@ -2163,15 +2200,16 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
         break;
 
-    case 8:
+    case 8: // set username and passwords
         setCursor(QCursor(Qt::ArrowCursor));
+        userNameEdit->setFocus();
         ((MMain *)mmn)->setHelpText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
                                        "You should not use the root user as your daily user account. "
                                        "Please enter the name for a new (default) user account that you will use on a daily basis. "
                                        "If needed, you can add other user accounts later with %1 User Manager. </p>"
                                        "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
                                        "Each password must be entered twice.</p>").arg(PROJECTNAME));
-    case 9:
+    case 9: // done
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                                        "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -2267,6 +2305,11 @@ void MInstall::refresh()
     diskCombo->addItems(drives);
     diskCombo->setCurrentIndex(0);
     grubBootCombo->addItems(drives);
+
+    FDEpassword->hide();
+    FDEpassword2->hide();
+    labelFDEpass->hide();
+    labelFDEpass2->hide();
 
     on_diskCombo_activated();
 
@@ -2550,11 +2593,11 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
     QString homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
 
     // if encrypting, modify devices to /dev/mapper categories
-    if (checkboxencryptauto->isChecked() || checkBoxEncryptRoot->isChecked()){
+    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()){
         rootdev = "/dev/mapper/rootfs";
     }
 
-    if (checkboxencryptauto->isChecked()){
+    if (checkBoxEncryptAuto->isChecked()){
         homedev = "/dev/mapper/rootfs";
     }
 
@@ -2624,15 +2667,19 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
             // for root only, add swap
             // for home only, add swap
 
-            if (checkboxencryptauto->isChecked()){
+            if (checkBoxEncryptAuto->isChecked()){
                 //get UUID
                 QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapdevicepreserve);
 
                 //create keyfile
-                shell.run("dd if=/dev/urandom of=mnt/antiX/root/keyfile bs=1024 count=4");
+                shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
 
                 //add keyfile to container
-                shell.run("cryptsetup luksAddKey " + swapdevicepreserve + " /mnt/antiX/root/keyfile");
+                QProcess proc;
+                proc.start("cryptsetup luksAddKey " + swapdevicepreserve + " /mnt/antiX/root/keyfile");
+                proc.waitForStarted();
+                proc.write(FDEpassword->text().toUtf8() + "\n");
+                proc.waitForFinished();
 
                 //write crypttab keyfile entry
                 QFile file2("/mnt/antiX/etc/crypttab");
@@ -2863,4 +2910,46 @@ void MInstall::on_rootPasswordEdit_textChanged()
     rootPasswordEdit2->clear();
     rootPasswordEdit->setPalette(QApplication::palette());
     rootPasswordEdit2->setPalette(QApplication::palette());
+}
+
+void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
+{
+    FDEpassword->clear();
+    FDEpassword2->clear();
+    nextButton->setDisabled(checked);
+    FDEpassword->setVisible(checked);
+    FDEpassword2->setVisible(checked);
+    labelFDEpass->setVisible(checked);
+    labelFDEpass2->setVisible(checked);
+
+    if (checked) {
+        FDEpassword->setFocus();
+    }
+}
+
+void MInstall::on_existing_partitionsButton_clicked(bool checked)
+{
+    checkBoxEncryptAuto->setChecked(!checked);
+}
+
+void MInstall::on_FDEpassword_textChanged()
+{
+    FDEpassword2->clear();
+    FDEpassword->setPalette(QApplication::palette());
+    FDEpassword2->setPalette(QApplication::palette());
+    nextButton->setDisabled(true);
+}
+
+void MInstall::on_FDEpassword2_textChanged(const QString &arg1)
+{
+    QPalette pal = FDEpassword->palette();
+    if (arg1 != FDEpassword->text()) {
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 20));
+        nextButton->setDisabled(true);
+    } else {
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 10));
+        nextButton->setEnabled(true);
+    }
+    FDEpassword->setPalette(pal);
+    FDEpassword2->setPalette(pal);
 }
