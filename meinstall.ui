@@ -132,7 +132,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="Step_Terms">
       <layout class="QGridLayout" name="_4">
@@ -642,14 +642,14 @@
        <property name="spacing">
         <number>6</number>
        </property>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <spacer>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>20</width>
+           <width>10</width>
            <height>40</height>
           </size>
          </property>
@@ -749,6 +749,9 @@
           </property>
           <item row="3" column="5" alignment="Qt::AlignHCenter">
            <widget class="QCheckBox" name="checkBoxEncrpytSwap">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -1124,6 +1127,49 @@
               <string>root</string>
              </property>
             </item>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="gbEncrPass">
+         <property name="title">
+          <string>2c. Encryption password</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout2c">
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelFDEpassCust">
+            <property name="text">
+             <string>Encryption password:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="labelFDEpassCust2">
+            <property name="text">
+             <string>Confirm encryption password:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="FDEpassCust">
+            <property name="maxLength">
+             <number>256</number>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="FDEpassCust2">
+            <property name="maxLength">
+             <number>256</number>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
+            </property>
            </widget>
           </item>
          </layout>
