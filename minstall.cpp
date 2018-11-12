@@ -353,7 +353,7 @@ void MInstall::updateStatus(QString msg, int val)
 
 bool MInstall::mountPartition(const QString dev, const QString point, const QString mntops)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     mkdir(point.toUtf8(), 0755);
     QString cmd = QString("/bin/mount %1 %2 -o %3").arg(dev).arg(point).arg(mntops);
 
@@ -366,7 +366,7 @@ bool MInstall::mountPartition(const QString dev, const QString point, const QStr
 // checks SMART status of the selected disk, returs false if it detects errors and user chooses to abort
 bool MInstall::checkDisk()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString msg;
     int ans;
     QString output;
@@ -404,14 +404,14 @@ bool MInstall::checkDisk()
 
 int MInstall::getPartitionNumber()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     return getCmdOut("cat /proc/partitions | grep '[h,s,v].[a-z][1-9]$' | wc -l").toInt();
 }
 
 // unmount antiX in case we are retrying
 void MInstall::prepareToInstall()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     updateStatus(tr("Ready to install %1 filesystem").arg(PROJECTNAME), 0);
 
     // unmount /boot/efi if mounted by previous run
@@ -429,7 +429,7 @@ void MInstall::prepareToInstall()
 
 bool MInstall::makeSwapPartition(QString dev)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString cmd = QString("/sbin/mkswap " + dev + " -L " + swapLabelEdit->text());
     if (shell.run(cmd) != 0) {
         // error
@@ -441,7 +441,7 @@ bool MInstall::makeSwapPartition(QString dev)
 // create ESP at the begining of the drive
 bool MInstall::makeEsp(QString drv, int size)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString mmcnvmepartdesignator;
     if (drv.contains("nvme") || drv.contains("mmcblk" )) {
         mmcnvmepartdesignator = "p";
@@ -463,7 +463,7 @@ bool MInstall::makeEsp(QString drv, int size)
 
 bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QString label)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
     QString homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
     if (homedev == dev) {  // if formating /home partition
@@ -568,7 +568,7 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
 // Create and open Luks partitions; return false if it cannot create one
 bool MInstall::makeLuksPartitions(const QString &rootdev, const QString &swapdev, const QByteArray &password)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     setCursor(QCursor(Qt::WaitCursor));
     qApp->processEvents();
 
@@ -631,7 +631,7 @@ bool MInstall::makeLuksPartitions(const QString &rootdev, const QString &swapdev
 
 bool MInstall::makeDefaultPartitions()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     char line[130];
     int ans;
     int prog = 0;
@@ -881,7 +881,7 @@ bool MInstall::makeDefaultPartitions()
 
 bool MInstall::makeChosenPartitions()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     int ans;
     char line[130];
     char root_type[20];
@@ -1111,7 +1111,7 @@ bool MInstall::makeChosenPartitions()
 
 void MInstall::installLinux()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     char line[130];
     QString rootdev;
 
@@ -1149,7 +1149,7 @@ void MInstall::installLinux()
 
 void MInstall::copyLinux()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     char line[130];
 
     // make empty dirs for opt, dev, proc, sys, run,
@@ -1191,7 +1191,7 @@ void MInstall::copyLinux()
 // build a grub configuration and install grub
 bool MInstall::installLoader()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString cmd;
     QString val = getCmdOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1428,7 +1428,7 @@ bool MInstall::isUefi()
 
 bool MInstall::setUserName()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     int ans;
     DIR *dir;
     QString msg, cmd;
@@ -1619,13 +1619,13 @@ bool MInstall::setUserName()
 // get the type of the partition
 QString MInstall::getPartType(const QString dev)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     return shell.getOutput("blkid " + dev + " -o value -s TYPE");
 }
 
 bool MInstall::setPasswords()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     setCursor(QCursor(Qt::WaitCursor));
     qApp->processEvents();
 
@@ -1738,7 +1738,7 @@ bool MInstall::setUserInfo()
 
 bool MInstall::setComputerName()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // see if name is reasonable
     if (computerNameEdit->text().length() < 2) {
         QMessageBox::critical(this, QString::null,
@@ -1817,7 +1817,7 @@ bool MInstall::setComputerName()
 
 void MInstall::setLocale()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString cmd2;
     QString cmd;
     //QString kb = keyboardCombo->currentText();
@@ -1905,7 +1905,7 @@ void MInstall::setLocale()
 
 void MInstall::setServices()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     setCursor(QCursor(Qt::WaitCursor));
 
     qDebug() << "Setting Services";
@@ -1936,7 +1936,7 @@ void MInstall::setServices()
 
 void MInstall::stopInstall()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     int curr = widgetStack->currentIndex();
     int c = widgetStack->count();
 
@@ -1996,7 +1996,7 @@ void MInstall::stopInstall()
 
 void MInstall::unmountGoBack(QString msg)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
     shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
     if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
@@ -2267,7 +2267,7 @@ void MInstall::gotoPage(int next)
 
 void MInstall::firstRefresh(QDialog *main)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     mmn = main;
     // disable automounting in Thunar
     shell.run("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'");
@@ -2276,7 +2276,7 @@ void MInstall::firstRefresh(QDialog *main)
 
 void MInstall::updatePartitionWidgets()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     int numberPartitions = this->getPartitionNumber();
 
     if (numberPartitions > 0) {
@@ -2291,7 +2291,7 @@ void MInstall::updatePartitionWidgets()
 // widget being shown
 void MInstall::refresh()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     this->updatePartitionWidgets();
     //  shell.run("umount -a 2>/dev/null");
     QString exclude = " --exclude=boot";
@@ -2320,7 +2320,7 @@ void MInstall::refresh()
 
 void MInstall::buildServiceList()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QLocale locale;
     QString lang = locale.bcp47Name().toUpper();
 
@@ -2551,7 +2551,7 @@ void MInstall::delStart()
 
 void MInstall::delDone(int, QProcess::ExitStatus exitStatus)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (exitStatus == QProcess::NormalExit) {
         copyLinux();
     } else {
@@ -2587,7 +2587,7 @@ void MInstall::copyStart()
 
 void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
     // get config
 
@@ -2814,7 +2814,7 @@ void MInstall::on_saveHomeCheck_toggled(bool checked)
 
 void MInstall::setupkeyboardbutton()
 {
-    qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString kb;
     kb = getCmdOut("grep XKBMODEL /etc/default/keyboard");
     kb = kb.section('=', 1);
