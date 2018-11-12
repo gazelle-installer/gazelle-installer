@@ -1070,7 +1070,7 @@ bool MInstall::makeChosenPartitions()
         // don't save home
         shell.run("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1");
         mkdir("/mnt/antiX/home",0755);
-        if (homedev.compare("/dev/" + tr("root")) != 0) { // not on root
+        if (homedev.compare("/dev/root") != 0) { // not on root
             updateStatus(tr("Formatting the /home partition"), 8);
             // always set type
             if (gpt) {
@@ -2855,10 +2855,10 @@ void MInstall::on_buttonSetKeyboard_clicked()
 
 void MInstall::on_homeCombo_currentIndexChanged(const QString &arg1)
 {
-    homeLabelEdit->setEnabled(arg1 != tr("root"));
-    homeTypeCombo->setEnabled(arg1 != tr("root"));
-    checkBoxEncryptHome->setEnabled(arg1 != tr("root"));
-    if (checkBoxEncryptRoot && arg1 == tr("root")) {
+    homeLabelEdit->setEnabled(arg1 !="root");
+    homeTypeCombo->setEnabled(arg1 != "root");
+    checkBoxEncryptHome->setEnabled(arg1 != "root");
+    if (checkBoxEncryptRoot && arg1 == "root") {
         checkBoxEncryptHome->setChecked(true);
     }
 }
@@ -2968,7 +2968,7 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 
 void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 {
-    if (homeCombo->currentText() == tr("root")) { // if home on root set disable home encryption checkbox and set same encryption option
+    if (homeCombo->currentText() == "root") { // if home on root set disable home encryption checkbox and set same encryption option
         checkBoxEncryptHome->setEnabled(false);
         checkBoxEncryptHome->setChecked(checked);
     }

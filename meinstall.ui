@@ -831,6 +831,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
            </widget>
           </item>
           <item row="4" column="0">
@@ -949,6 +952,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="currentText">
+             <string notr="true"/>
+            </property>
            </widget>
           </item>
           <item row="2" column="2" colspan="2">
@@ -958,6 +964,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="currentText">
+             <string notr="true">root</string>
             </property>
             <property name="insertPolicy">
              <enum>QComboBox::InsertAtBottom</enum>
@@ -1128,6 +1137,9 @@
           </item>
           <item row="4" column="2" colspan="2">
            <widget class="QComboBox" name="bootCombo">
+            <property name="currentText">
+             <string notr="true">root</string>
+            </property>
             <item>
              <property name="text">
               <string>root</string>
