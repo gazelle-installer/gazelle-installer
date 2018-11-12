@@ -2912,6 +2912,7 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
     FDEpassword2->setVisible(checked);
     labelFDEpass->setVisible(checked);
     labelFDEpass2->setVisible(checked);
+    grubRootButton->setDisabled(checked);
 
     if (checked) {
         FDEpassword->setFocus();
@@ -2969,6 +2970,7 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 
 void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 {
+    grubRootButton->setDisabled(checked);
     if (homeCombo->currentText() == "root") { // if home on root set disable home encryption checkbox and set same encryption option
         checkBoxEncryptHome->setEnabled(false);
         checkBoxEncryptHome->setChecked(checked);
