@@ -1629,12 +1629,10 @@ bool MInstall::setPasswords()
     setCursor(QCursor(Qt::WaitCursor));
     qApp->processEvents();
 
-    QElapsedTimer timer;
-    timer.start();
-
     QProcess proc;
     proc.start("chroot /mnt/antiX passwd root");
     proc.waitForStarted();
+    proc.write(rootPasswordEdit->text().toUtf8() + "\n");
     proc.write(rootPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -1644,10 +1642,10 @@ bool MInstall::setPasswords()
                               tr("Sorry, unable to set root password."));
         return false;
     }
-    qDebug() << "TIMER 1:" << timer.elapsed();
 
     proc.start("chroot /mnt/antiX passwd demo");
     proc.waitForStarted();
+    proc.write(userPasswordEdit->text().toUtf8() + "\n");
     proc.write(userPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -1657,7 +1655,6 @@ bool MInstall::setPasswords()
                               tr("Sorry, unable to set user password."));
         return false;
     }
-    qDebug() << "TIMER 2:" << timer.elapsed();
     setCursor(QCursor(Qt::ArrowCursor));
     return true;
 }
