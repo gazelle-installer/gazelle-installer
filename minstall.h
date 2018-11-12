@@ -166,5 +166,10 @@ private slots:
     void on_checkBoxEncryptHome_toggled(bool checked);
 
 private:
+    bool isRootFormatted = false;
+    bool isHomeFormatted = false;
     Cmd shell;
+    QString home_mntops = "defaults";
+    QString root_mntops = "defaults";
+
 };
