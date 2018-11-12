@@ -112,6 +112,7 @@ public:
     // global for now until boot combo box is sorted out
     QString bootdev;
     QString swapdevicepreserve;
+    QString rootdevicepreserve;
 
     void setupkeyboardbutton();
     void gotoPage(int next);
