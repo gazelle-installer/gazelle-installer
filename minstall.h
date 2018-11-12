@@ -36,7 +36,7 @@ protected:
     QTimer *timer;
     QProgressBar *bar;
     QDialog *mmn;
-    void keyPressEvent(QKeyEvent* event);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 public:
     /** constructor */

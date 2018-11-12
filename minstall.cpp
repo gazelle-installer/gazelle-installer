@@ -48,6 +48,8 @@ int MInstall::runCmd(QString cmd)
 MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
 {
     setupUi(this);
+
+    this->installEventFilter(this);
     this->args = args;
     labelMX->setPixmap(QPixmap("/usr/share/gazelle-installer-data/logo.png"));
     char line[260];
@@ -1263,6 +1265,7 @@ bool MInstall::installLoader()
     timer->start(100);
     connect(timer, SIGNAL(timeout()), this, SLOT(procTime()));
     progress->show();
+    progress->installEventFilter(this);
     qApp->processEvents();
     nextButton->setEnabled(false);
 
@@ -2503,14 +2506,22 @@ void MInstall::procAbort()
     QTimer::singleShot(5000, proc, SLOT(kill()));
 }
 
-void MInstall::keyPressEvent(QKeyEvent *event)
+bool MInstall::eventFilter(QObject* obj, QEvent* event)
 {
-    if (event->key() == Qt::Key_Escape) {
-        if (widgetStack->currentWidget() != Step_Boot) { // don't close on GRUB installation by mistake
-            on_closeButton_clicked();
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if(keyEvent->key() == Qt::Key_Escape) {
+            if (widgetStack->currentWidget() != Step_Boot) { // don't close on GRUB installation by mistake
+                on_closeButton_clicked();
+            }
+            return true;
         }
+        return QObject::eventFilter(obj, event);
+    } else {
+        return QObject::eventFilter(obj, event);
     }
 }
+
 
 void MInstall::close()
 {
@@ -2777,12 +2788,8 @@ void MInstall::copyTime()
 
 void MInstall::on_closeButton_clicked()
 {
-    // don't close when installing GRUB
-    if(widgetStack->currentWidget() == Step_Boot && timer->isActive()) {
-        return;
-    }
-    // ask for confirmation when installing
-    if (widgetStack->currentWidget() == Step_Progress || proc->state() != QProcess::NotRunning || timer->isActive()) {
+    // ask for confirmation when installing (except for some steps that don't need confirmation)
+    if (widgetStack->currentIndex() != 0 && widgetStack->currentIndex() != 1 && widgetStack->currentIndex() != 2 && widgetStack->currentIndex() != 9) {
         if (QMessageBox::question(this, tr("Confirmation"), tr("Are you sure you want to quit the application?"),
                                         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             procAbort();
