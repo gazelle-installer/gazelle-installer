@@ -2681,6 +2681,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
                 //create keyfile
                 shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
+                shell.run("chmod 0400 /mnt/antiX/root/keyfile");
 
                 //add keyfile to container
                 QProcess proc;
