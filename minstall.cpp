@@ -768,6 +768,7 @@ bool MInstall::makeDefaultPartitions()
             bootdev = drv + mmcnvmepartdesignator + "1";
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
+            rootdevicepreserve = rootdev;
             swapdevicepreserve = swapdev;
         } else {
             rootdev = drv + mmcnvmepartdesignator + "1";
@@ -2671,6 +2672,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
             if (checkBoxEncryptAuto->isChecked()){
                 //get UUID
                 QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapdevicepreserve);
+                QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootdevicepreserve);
 
                 //create keyfile
                 shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
@@ -2686,6 +2688,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                 QFile file2("/mnt/antiX/etc/crypttab");
                 if (file2.open(QIODevice::WriteOnly)) {
                     QTextStream out(&file2);
+                    out << "rootfs /dev/disk/by-uuid/" +rootUUID +" none    luks \n";
                     out << "swapfs  /dev/disk/by-uuid/"+ swapUUID +"  /root/keyfile luks \n";
                 }
                 file2.close();
