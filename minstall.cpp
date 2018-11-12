@@ -2794,12 +2794,6 @@ void MInstall::on_closeButton_clicked()
     }
 }
 
-void MInstall::on_saveHomeCheck_toggled(bool checked)
-{
-    // do we need to disable encryption on /home we preserve /home?
-    //TODO
-}
-
 void MInstall::setupkeyboardbutton()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -2993,15 +2987,22 @@ void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
 {
     if (checked) {
-
         gbEncrPass->setVisible(true);
         nextButton->setDisabled(true);
         checkBoxEncrpytSwap->setChecked(true);
         FDEpassCust->setFocus();
+        if (saveHomeCheck->isChecked()) {
+            QMessageBox::warning(this, QString::null,
+                                 tr("If you choose to encrypt home partition you cannot use the option to preserve data in that partition"),
+                                 tr("OK"));
+            saveHomeCheck->setChecked(false);
+        }
+        saveHomeCheck->setEnabled(false);
     } else {
         gbEncrPass->setVisible(checkBoxEncryptRoot->isChecked());
         nextButton->setDisabled(checkBoxEncryptRoot->isChecked());
         checkBoxEncrpytSwap->setChecked(checkBoxEncryptRoot->isChecked());
+        saveHomeCheck->setEnabled(true);
     }
 
     if (!checkBoxEncrpytSwap->isChecked()) {
