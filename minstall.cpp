@@ -1070,8 +1070,7 @@ bool MInstall::makeChosenPartitions()
         // don't save home
         shell.run("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1");
         mkdir("/mnt/antiX/home",0755);
-        if (homedev.compare("/dev/root") != 0) {
-            // not on root
+        if (homedev.compare("/dev/" + tr("root")) != 0) { // not on root
             updateStatus(tr("Formatting the /home partition"), 8);
             // always set type
             if (gpt) {
@@ -2421,7 +2420,9 @@ void MInstall::on_diskCombo_activated(QString)
     swapCombo->clear();
     homeCombo->clear();
     swapCombo->addItem(tr("none - or existing"));
+    homeCombo->blockSignals(true);
     homeCombo->addItem("root");
+    homeCombo->blockSignals(false);
     removedItem = "";
 
     // build rootCombo
@@ -2521,7 +2522,6 @@ void MInstall::close()
         shell.run("cryptsetup luksClose homefs");
         shell.run("cryptsetup luksClose swapfs");
     }
-    qDebug() << "CLOSING";
     qApp->quit();
 }
 
@@ -2855,13 +2855,12 @@ void MInstall::on_buttonSetKeyboard_clicked()
 
 void MInstall::on_homeCombo_currentIndexChanged(const QString &arg1)
 {
-    homeLabelEdit->setEnabled(arg1 != "root");
-    homeTypeCombo->setEnabled(arg1 != "root");
-}
-
-void MInstall::on_swapCombo_currentIndexChanged(const QString &arg1)
-{
-    swapLabelEdit->setEnabled(arg1 != tr("none - or existing"));
+    homeLabelEdit->setEnabled(arg1 != tr("root"));
+    homeTypeCombo->setEnabled(arg1 != tr("root"));
+    checkBoxEncryptHome->setEnabled(arg1 != tr("root"));
+    if (checkBoxEncryptRoot && arg1 == tr("root")) {
+        checkBoxEncryptHome->setChecked(true);
+    }
 }
 
 void MInstall::on_userPasswordEdit2_textChanged(const QString &arg1)
@@ -2969,10 +2968,12 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 
 void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 {
+    if (homeCombo->currentText() == tr("root")) { // if home on root set disable home encryption checkbox and set same encryption option
+        checkBoxEncryptHome->setEnabled(false);
+        checkBoxEncryptHome->setChecked(checked);
+    }
+
     if (checked) {
-        QMessageBox::warning(this, QString::null,
-                             tr("This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems."),
-                             tr("OK"));
         gbEncrPass->setVisible(true);
         nextButton->setDisabled(true);
         checkBoxEncrpytSwap->setChecked(true);
@@ -2992,9 +2993,7 @@ void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
 {
     if (checked) {
-        QMessageBox::warning(this, QString::null,
-                             tr("This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems."),
-                             tr("OK"));
+
         gbEncrPass->setVisible(true);
         nextButton->setDisabled(true);
         checkBoxEncrpytSwap->setChecked(true);
@@ -3008,5 +3007,14 @@ void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
     if (!checkBoxEncrpytSwap->isChecked()) {
         FDEpassCust->clear();
         FDEpassCust2->clear();
+    }
+}
+
+void MInstall::on_checkBoxEncrpytSwap_toggled(bool checked)
+{
+    if (checked) {
+        QMessageBox::warning(this, QString::null,
+                             tr("This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems."),
+                             tr("OK"));
     }
 }
