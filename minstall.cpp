@@ -402,13 +402,6 @@ bool MInstall::checkDisk()
     return true;
 }
 
-/////////////////////////////////////////////////////////////////////////
-// install functions
-QString home_mntops = "defaults";
-QString root_mntops = "defaults";
-bool isRootFormatted = false;
-bool isHomeFormatted = false;
-
 int MInstall::getPartitionNumber()
 {
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
@@ -812,7 +805,7 @@ bool MInstall::makeDefaultPartitions()
 
     // if encrypting, set up LUKS containers for root and swap
     if (checkBoxEncryptAuto->isChecked()) {
-        updateStatus(tr("Set up LUKS encrypted containers"), ++prog);
+        updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
         if(!makeLuksPartitions(rootdev, swapdev, FDEpassword->text().toUtf8())) {
             qDebug() << "could not make LUKS partitions";
             return false;
@@ -1894,12 +1887,21 @@ void MInstall::setLocale()
         shell.run("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime");
     }
     shell.run("hwclock --hctosys");
-    QString rootdev = "/dev/" + QString(rootCombo->currentText()).section(" ", 0, 0);
-    QString homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
+    QString rootdev, homedev;
+    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        rootdev = "/dev/mapper/rootfs";
+    } else {
+        rootdev = "/dev/" + QString(rootCombo->currentText()).section(" ", 0, 0);
+    }
+    if (checkBoxEncryptHome->isChecked()) {
+        homedev = "/dev/mapper/homefs";
+    } else {
+        homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
+    }
     shell.run("umount -R /mnt/antiX");
-    shell.run(QString("mount %1 /mnt/antiX -o %2").arg(rootdev).arg(root_mntops));
+    mountPartition(rootdev, "/mnt/antiX", root_mntops);
     if (homedev != "/dev/root" && homedev != rootdev) {
-        shell.run(QString("mount %1 /mnt/antiX/home").arg(homedev));
+        mountPartition(homedev, "/mnt/antiX/home", home_mntops);
     }
     shell.run("cp -f /etc/adjtime /mnt/antiX/etc/");
 
