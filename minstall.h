@@ -131,8 +131,9 @@ public slots:
     virtual void on_diskCombo_activated(QString item = "");
     virtual void on_rootCombo_activated(QString item = "");
     virtual void on_rootTypeCombo_activated(QString item = "");
+    virtual void on_closeButton_clicked();
     void procAbort();
-    virtual bool close();
+    void close();
     //    void moreClicked(QListViewItem *item);
     void delStart();
     void delDone(int, QProcess::ExitStatus exitStatus);
@@ -146,8 +147,6 @@ public slots:
 private slots:
     void on_viewServicesButton_clicked();
     void on_grubBootCombo_activated(QString item = "");
-    void on_closeButton_clicked();
-    void on_encryptCheckBox_toggled(bool checked);
     void on_saveHomeCheck_toggled(bool checked);
     void on_buttonSetKeyboard_clicked();
     void on_homeCombo_currentIndexChanged(const QString &arg1);

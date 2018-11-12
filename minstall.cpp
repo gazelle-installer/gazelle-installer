@@ -45,17 +45,6 @@ int MInstall::runCmd(QString cmd)
     return future.result();
 }
 
-
-
-void MInstall::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Escape) {
-        if (widgetStack->currentWidget() != Step_Boot) { // don't close on GRUB installation by mistake
-            on_closeButton_clicked();
-        }
-    }
-}
-
 MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
 {
     setupUi(this);
@@ -1150,8 +1139,6 @@ void MInstall::installLinux()
 void MInstall::copyLinux()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    char line[130];
-
     // make empty dirs for opt, dev, proc, sys, run,
     // home already done
     updateStatus(tr("Creating system directories"), 9);
@@ -1163,7 +1150,7 @@ void MInstall::copyLinux()
 
     //if seperate /boot in use, mount that to /mnt/antiX/boot
     //*****add that code here***    ///
-
+    //TODO
 
 
 
@@ -2515,20 +2502,27 @@ void MInstall::procAbort()
     QTimer::singleShot(5000, proc, SLOT(kill()));
 }
 
-bool MInstall::close()
+void MInstall::keyPressEvent(QKeyEvent *event)
 {
-    if (proc->state() != QProcess::NotRunning) {
-        int ans = QMessageBox::warning(this, QString::null,
-                                       tr("%1 is installing, are you \nsure you want to Close now?").arg(PROJECTNAME),
-                                       tr("Yes"), tr("No"));
-        if (ans != 0) {
-            return false;
-        } else {
-            procAbort();
+    if (event->key() == Qt::Key_Escape) {
+        if (widgetStack->currentWidget() != Step_Boot) { // don't close on GRUB installation by mistake
+            on_closeButton_clicked();
         }
     }
-    //  shell.run("umount -a 2>/dev/null");
-    return QWidget::close();
+}
+
+void MInstall::close()
+{
+    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        shell.run("cryptsetup luksClose rootfs");
+        shell.run("cryptsetup luksClose swapfs");
+    }
+    if (checkBoxEncryptHome->isChecked()) {
+        shell.run("cryptsetup luksClose homefs");
+        shell.run("cryptsetup luksClose swapfs");
+    }
+    qDebug() << "CLOSING";
+    qApp->quit();
 }
 
 /*
@@ -2783,33 +2777,27 @@ void MInstall::copyTime()
 
 void MInstall::on_closeButton_clicked()
 {
+    // don't close when installing GRUB
+    if(widgetStack->currentWidget() == Step_Boot && timer->isActive()) {
+        return;
+    }
     // ask for confirmation when installing
-    if (widgetStack->currentWidget() == Step_Progress) {
+    if (widgetStack->currentWidget() == Step_Progress || proc->state() != QProcess::NotRunning || timer->isActive()) {
         if (QMessageBox::question(this, tr("Confirmation"), tr("Are you sure you want to quit the application?"),
                                         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+            procAbort();
             ((MMain *)mmn)->closeClicked();
         }
     } else {
+        procAbort();
         ((MMain *)mmn)->closeClicked();
-    }
-}
-
-void MInstall::on_encryptCheckBox_toggled(bool checked)
-{
-    if (checked) {
-        autologinCheckBox->setChecked(false);
-        autologinCheckBox->setDisabled(true);
-        QMessageBox::warning(this, QString::null,
-                             tr("This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems."),
-                             tr("OK"));
-    } else {
-        autologinCheckBox->setDisabled(false);
     }
 }
 
 void MInstall::on_saveHomeCheck_toggled(bool checked)
 {
     // do we need to disable encryption on /home we preserve /home?
+    //TODO
 }
 
 void MInstall::setupkeyboardbutton()
@@ -2982,6 +2970,9 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 {
     if (checked) {
+        QMessageBox::warning(this, QString::null,
+                             tr("This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems."),
+                             tr("OK"));
         gbEncrPass->setVisible(true);
         nextButton->setDisabled(true);
         checkBoxEncrpytSwap->setChecked(true);
@@ -3001,6 +2992,9 @@ void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
 {
     if (checked) {
+        QMessageBox::warning(this, QString::null,
+                             tr("This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems."),
+                             tr("OK"));
         gbEncrPass->setVisible(true);
         nextButton->setDisabled(true);
         checkBoxEncrpytSwap->setChecked(true);
