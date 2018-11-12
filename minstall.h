@@ -159,6 +159,10 @@ private slots:
     void on_existing_partitionsButton_clicked(bool checked);
     void on_FDEpassword_textChanged();
     void on_FDEpassword2_textChanged(const QString &arg1);
+    void on_FDEpassCust_textChanged();
+    void on_FDEpassCust2_textChanged(const QString &arg1);
+    void on_checkBoxEncryptRoot_toggled(bool checked);
+    void on_checkBoxEncryptHome_toggled(bool checked);
 
 private:
     Cmd shell;

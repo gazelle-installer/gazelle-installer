@@ -2310,6 +2310,7 @@ void MInstall::refresh()
     FDEpassword2->hide();
     labelFDEpass->hide();
     labelFDEpass2->hide();
+    gbEncrPass->hide();
 
     on_diskCombo_activated();
 
@@ -2952,4 +2953,64 @@ void MInstall::on_FDEpassword2_textChanged(const QString &arg1)
     }
     FDEpassword->setPalette(pal);
     FDEpassword2->setPalette(pal);
+}
+
+void MInstall::on_FDEpassCust_textChanged()
+{
+    FDEpassCust2->clear();
+    FDEpassCust->setPalette(QApplication::palette());
+    FDEpassCust2->setPalette(QApplication::palette());
+    nextButton->setDisabled(true);
+}
+
+void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
+{
+    QPalette pal = FDEpassCust->palette();
+    if (arg1 != FDEpassCust->text()) {
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 20));
+        nextButton->setDisabled(true);
+    } else {
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 10));
+        nextButton->setEnabled(true);
+    }
+    FDEpassCust->setPalette(pal);
+    FDEpassCust2->setPalette(pal);
+}
+
+void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
+{
+    if (checked) {
+        gbEncrPass->setVisible(true);
+        nextButton->setDisabled(true);
+        checkBoxEncrpytSwap->setChecked(true);
+        FDEpassCust->setFocus();
+    } else {
+        gbEncrPass->setVisible(checkBoxEncryptHome->isChecked());
+        nextButton->setDisabled(checkBoxEncryptHome->isChecked());
+        checkBoxEncrpytSwap->setChecked(checkBoxEncryptHome->isChecked());
+    }
+
+    if (!checkBoxEncrpytSwap->isChecked()) {
+        FDEpassCust->clear();
+        FDEpassCust2->clear();
+    }
+}
+
+void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
+{
+    if (checked) {
+        gbEncrPass->setVisible(true);
+        nextButton->setDisabled(true);
+        checkBoxEncrpytSwap->setChecked(true);
+        FDEpassCust->setFocus();
+    } else {
+        gbEncrPass->setVisible(checkBoxEncryptRoot->isChecked());
+        nextButton->setDisabled(checkBoxEncryptRoot->isChecked());
+        checkBoxEncrpytSwap->setChecked(checkBoxEncryptRoot->isChecked());
+    }
+
+    if (!checkBoxEncrpytSwap->isChecked()) {
+        FDEpassCust->clear();
+        FDEpassCust2->clear();
+    }
 }
