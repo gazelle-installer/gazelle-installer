@@ -1959,6 +1959,14 @@ void MInstall::stopInstall()
             shell.run("/bin/rm -rf /mnt/antiX/mnt/antiX");
             shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
             shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+            if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+                shell.run("cryptsetup luksClose rootfs");
+                shell.run("cryptsetup luksClose swapfs");
+            }
+            if (checkBoxEncryptHome->isChecked()) {
+                shell.run("cryptsetup luksClose homefs");
+                shell.run("cryptsetup luksClose swapfs");
+            }
             shell.run("/usr/local/bin/persist-config --shutdown --command reboot");
             return;
         } else {
@@ -1976,6 +1984,14 @@ void MInstall::stopInstall()
     shell.run("/bin/rm -rf /mnt/antiX/mnt/antiX");
     shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
     shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        shell.run("cryptsetup luksClose rootfs");
+        shell.run("cryptsetup luksClose swapfs");
+    }
+    if (checkBoxEncryptHome->isChecked()) {
+        shell.run("cryptsetup luksClose homefs");
+        shell.run("cryptsetup luksClose swapfs");
+    }
 }
 
 void MInstall::unmountGoBack(QString msg)
@@ -1983,6 +1999,14 @@ void MInstall::unmountGoBack(QString msg)
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
     shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
     shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        shell.run("cryptsetup luksClose rootfs");
+        shell.run("cryptsetup luksClose swapfs");
+    }
+    if (checkBoxEncryptHome->isChecked()) {
+        shell.run("cryptsetup luksClose homefs");
+        shell.run("cryptsetup luksClose swapfs");
+    }
     goBack(msg);
 }
 
@@ -2699,11 +2723,10 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
 void MInstall::copyTime()
 {
-    char line[130];
-    char rootdev[20];
-    strcpy(line, rootCombo->currentText().toUtf8());
-    char *tok = strtok(line, " -");
-    sprintf(rootdev, "/dev/%s", tok);
+    QString rootdev = "/dev/" + rootCombo->currentText().section(" ", 0, 0);
+    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        rootdev = "/dev/mapper/rootfs";
+    }
 
     QString val = getCmdValue("df /mnt/antiX", rootdev, " ", "/");
     QRegExp sep("\\s+");
