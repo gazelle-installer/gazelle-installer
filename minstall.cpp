@@ -1628,59 +1628,36 @@ bool MInstall::setPasswords()
     qDebug() << "+++ Enter Function:" << __PRETTY_FUNCTION__ << "+++";
     setCursor(QCursor(Qt::WaitCursor));
     qApp->processEvents();
-    FILE *fp = popen("chroot /mnt/antiX passwd root", "w");
-    bool fpok = true;
-    QString cmd = QString("%1\n").arg(rootPasswordEdit->text());
-    if (fp != NULL) {
-        sleep(6);
-        if (fputs(cmd.toUtf8(), fp) >= 0) {
-            fflush(fp);
-            sleep(2);
-            if (fputs(cmd.toUtf8(), fp) < 0) {
-                fpok = false;
-            }
-            fflush(fp);
-        } else {
-            fpok = false;
-        }
-        pclose(fp);
-    } else {
-        fpok = false;
-    }
 
-    if (!fpok) {
+    QElapsedTimer timer;
+    timer.start();
+
+    QProcess proc;
+    proc.start("chroot /mnt/antiX passwd root");
+    proc.waitForStarted();
+    proc.write(rootPasswordEdit->text().toUtf8() + "\n");
+    proc.waitForFinished();
+
+    if (proc.exitCode() != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set root password."));
         return false;
     }
+    qDebug() << "TIMER 1:" << timer.elapsed();
 
-    fp = popen("chroot /mnt/antiX passwd demo", "w");
-    fpok = true;
-    cmd = QString("%1\n").arg(userPasswordEdit->text());
-    if (fp != NULL) {
-        sleep(1);
-        if (fputs(cmd.toUtf8(), fp) >= 0) {
-            fflush(fp);
-            sleep(1);
-            if (fputs(cmd.toUtf8(), fp) < 0) {
-                fpok = false;
-            }
-            fflush(fp);
-        } else {
-            fpok = false;
-        }
-        pclose(fp);
-    } else {
-        fpok = false;
-    }
+    proc.start("chroot /mnt/antiX passwd demo");
+    proc.waitForStarted();
+    proc.write(userPasswordEdit->text().toUtf8() + "\n");
+    proc.waitForFinished();
 
-    if (!fpok) {
+    if (proc.exitCode() != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set user password."));
         return false;
     }
+    qDebug() << "TIMER 2:" << timer.elapsed();
     setCursor(QCursor(Qt::ArrowCursor));
     return true;
 }
