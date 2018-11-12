@@ -132,7 +132,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>9</number>
      </property>
      <widget class="QWidget" name="Step_Terms">
       <layout class="QGridLayout" name="_4">
@@ -394,6 +394,9 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="inputMask">
+             <string>00000000</string>
             </property>
             <property name="cursorPosition">
              <number>0</number>
