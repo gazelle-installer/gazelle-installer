@@ -132,7 +132,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>9</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="Step_Terms">
       <layout class="QGridLayout" name="_4">
@@ -395,8 +395,14 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="cursorPosition">
+             <number>0</number>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight</set>
+            </property>
+            <property name="clearButtonEnabled">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
