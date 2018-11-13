@@ -573,7 +573,7 @@ bool MInstall::makeLuksPartitions(const QString &rootdev, const QString &swapdev
     if (proc.exitCode() != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry, count not create root LUKS partition"));
+                              tr("Sorry, could not create root LUKS partition"));
         return false;
     }
 
@@ -585,7 +585,7 @@ bool MInstall::makeLuksPartitions(const QString &rootdev, const QString &swapdev
     if (proc.exitCode() != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry, count not create swap LUKS partition"));
+                              tr("Sorry, could not create swap LUKS partition"));
         return false;
     }
 
@@ -599,7 +599,7 @@ bool MInstall::makeLuksPartitions(const QString &rootdev, const QString &swapdev
     if (proc.exitCode() != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry, count not open root LUKS container"));
+                              tr("Sorry, could not open root LUKS container"));
         return false;
     }
 
@@ -611,7 +611,7 @@ bool MInstall::makeLuksPartitions(const QString &rootdev, const QString &swapdev
     if (proc.exitCode() != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry, count not open swap LUKS container"));
+                              tr("Sorry, could not open swap LUKS container"));
         return false;
     }
     return true;
