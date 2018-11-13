@@ -84,7 +84,7 @@ public:
     bool makeFloppy();
     bool makeGrub(int rootdev, QString rootpart, const char *rootmnt, bool initrd);
     bool makeLinuxPartition(QString dev, const char *type, bool bad, QString label);
-    bool makeLuksPartitions(const QString &rootdev, const QString &swapdev, const QByteArray &password);
+    bool makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password);
     bool makeSwapPartition(QString dev);
     bool makeEsp(QString drv, int size);
     bool mountPartition(const QString dev, const QString point, const QString mntops);

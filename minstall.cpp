@@ -553,7 +553,7 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
 }
 
 // Create and open Luks partitions; return false if it cannot create one
-bool MInstall::makeLuksPartitions(const QString &rootdev, const QString &swapdev, const QByteArray &password)
+bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     setCursor(QCursor(Qt::WaitCursor));
@@ -561,53 +561,27 @@ bool MInstall::makeLuksPartitions(const QString &rootdev, const QString &swapdev
 
     QProcess proc;
 
-    // create rootdev
-    proc.start("cryptsetup luksFormat --batch-mode " + rootdev);
+    // format partition
+    proc.start("cryptsetup luksFormat --batch-mode " + dev);
     proc.waitForStarted();
     proc.write(password + "\n");
     proc.waitForFinished();
     if (proc.exitCode() != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry, could not create root LUKS partition"));
+                              tr("Sorry, could not create %1 LUKS partition").arg(fs_name));
         return false;
     }
 
-    // create swapdev
-    proc.start("cryptsetup luksFormat --batch-mode " + swapdev);
+    // open containers, assigning container names
+    proc.start("cryptsetup luksOpen " + dev + " " + fs_name);
     proc.waitForStarted();
     proc.write(password + "\n");
     proc.waitForFinished();
     if (proc.exitCode() != 0) {
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry, could not create swap LUKS partition"));
-        return false;
-    }
-
-    //now open containers, assigning rootfs and swapfs as container names
-
-    // open rootdev
-    proc.start("cryptsetup luksOpen " + rootdev + " rootfs");
-    proc.waitForStarted();
-    proc.write(password + "\n");
-    proc.waitForFinished();
-    if (proc.exitCode() != 0) {
-        setCursor(QCursor(Qt::ArrowCursor));
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, could not open root LUKS container"));
-        return false;
-    }
-
-    // open swapdev
-    proc.start("cryptsetup luksOpen " + swapdev + " swapfs");
-    proc.waitForStarted();
-    proc.write(password + "\n");
-    proc.waitForFinished();
-    if (proc.exitCode() != 0) {
-        setCursor(QCursor(Qt::ArrowCursor));
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, could not open swap LUKS container"));
+                              tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
     }
     return true;
@@ -793,7 +767,7 @@ bool MInstall::makeDefaultPartitions()
     // if encrypting, set up LUKS containers for root and swap
     if (checkBoxEncryptAuto->isChecked()) {
         updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-        if(!makeLuksPartitions(rootdev, swapdev, FDEpassword->text().toUtf8())) {
+        if(!makeLuksPartition(rootdev, "rootfs", FDEpassword->text().toUtf8()) || !makeLuksPartition(swapdev, "swapfs", FDEpassword->text().toUtf8())) {
             qDebug() << "could not make LUKS partitions";
             return false;
         } else {
