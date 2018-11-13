@@ -72,10 +72,6 @@ MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
     MIN_INSTALL_SIZE=settings.value("MIN_INSTALL_SIZE").toString();
     PREFERRED_MIN_INSTALL_SIZE=settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
 
-    //do not offer home folder encyrption if so configured in installer.conf
-    QString OFFER_HOME_ENCRYPTION = getCmdOut("grep OFFER_HOME_ENCRYPTION /usr/share/gazelle-installer-data/installer.conf |cut -d= -f2").simplified().toLower();
-    qDebug() << "Offer Home Encryption is " << OFFER_HOME_ENCRYPTION;
-
     //check for samba
     QFileInfo info("/etc/init.d/smbd");
     if ( !info.exists()) {
