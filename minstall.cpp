@@ -1095,6 +1095,12 @@ bool MInstall::makeChosenPartitions()
     // format and mount /boot if different than root
     if (bootCombo->currentText() != "root") {
         updateStatus(tr("Formatting boot partition"), ++prog);
+        // always set type
+        if (gpt) {
+            cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:ef02").arg(bootsplit[0]).arg(bootsplit[1]);
+        } else {
+            cmd = QString("/sbin/sfdisk /dev/%1 --change-id %2 83").arg(bootsplit[0]).arg(bootsplit[1]);
+        }
         if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
             return false;
         }
