@@ -882,8 +882,8 @@ bool MInstall::makeChosenPartitions()
     // Boot
     QString bootdev;
     if (bootCombo->currentText() == "root") {
-        if (checkBoxEncrpytSwap->isChecked()) {
-            QMessageBox::critical(this, QString::null, tr("You must choose a separate boot partition when encrypting."));
+        if (checkBoxEncryptRoot->isChecked()) {
+            QMessageBox::critical(this, QString::null, tr("You must choose a separate boot partition when encrypting root."));
             return false;
         }
         bootdev = rootdev;
