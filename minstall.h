@@ -113,6 +113,7 @@ public:
     QString bootdev;
     QString swapdevicepreserve;
     QString rootdevicepreserve;
+    QString homedevicepreserve;
 
     void setupkeyboardbutton();
     void gotoPage(int next);

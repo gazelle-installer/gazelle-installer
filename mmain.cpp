@@ -56,10 +56,6 @@ void MMain::setHelpText(const QString &text)
 void MMain::closeEvent(QCloseEvent *e)
 {
     minstall->close();
-    system("umount -l /mnt/antiX/home >/dev/null 2>&1");
-    system("umount -l /mnt/antiX >/dev/null 2>&1");
-    system("rm -r /mnt/antiX >/dev/null 2>&1");
-    system("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true'");
     QWidget::closeEvent(e);
 }
 
