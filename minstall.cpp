@@ -1060,8 +1060,8 @@ bool MInstall::makeChosenPartitions()
             swapon(swapdev.toUtf8(),0);
         }
     }
-    // maybe format root (if not saving /home on root)
-    if (!(saveHomeCheck->isChecked() && homedev == "/dev/root")) {
+    // maybe format root (if not saving /home on root) // or if using --sync option
+    if (!(saveHomeCheck->isChecked() && homedev == "/dev/root") && !(args.contains("--sync") || args.contains("-s"))) {
         updateStatus(tr("Formatting the / (root) partition"), ++prog);
         // always set type
         if (gpt) {
@@ -1085,11 +1085,10 @@ bool MInstall::makeChosenPartitions()
             return false;
         }
         system("sleep 1");
-
-        if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
-            return false;
-        }
         isRootFormatted = true;
+    }
+    if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
+        return false;
     }
 
     // format and mount /boot if different than root
@@ -1189,8 +1188,8 @@ void MInstall::installLinux()
         rootdev = QString("/dev/%1").arg(tok);
     }
 
-    // maybe root was formatted
-    if (isRootFormatted) {
+    // maybe root was formatted or using --sync option
+    if (isRootFormatted || args.contains("--sync") || args.contains("-s")) {
         // yes it was
         copyLinux();
     } else {
@@ -1239,7 +1238,12 @@ void MInstall::copyLinux()
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
     connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(copyDone(int, QProcess::ExitStatus)));
     // setup and start the process
-    QString cmd = QString("/bin/cp -a /live/aufs/bin /live/aufs/boot /live/aufs/dev");
+    QString cmd;
+    cmd = "/bin/cp -a";
+    if (args.contains("--sync") || args.contains("-s")) {
+        cmd = "rsync -a --delete ";
+    }
+    cmd.append(" /live/aufs/bin /live/aufs/boot /live/aufs/dev");
     cmd.append(" /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt");
     cmd.append(" /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr");
     cmd.append(" /live/aufs/var /live/aufs/home /mnt/antiX");
