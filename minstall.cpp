@@ -2021,7 +2021,7 @@ void MInstall::stopInstall()
             shell.run("/usr/local/bin/persist-config --shutdown --command reboot");
             return;
         } else {
-            qApp->exit(0);
+            close();
         }
 
     } else if (curr > 3) {
@@ -2516,8 +2516,7 @@ void MInstall::on_diskCombo_activated(QString)
     partitions = getCmdOuts("partition-info all -n --exclude=" + exclude);
     swapCombo->addItems(partitions);
 
-    // build bootCombo for all disks
-    partitions = getCmdOuts("partition-info all -n --exclude=" + exclude);
+    // build bootCombo for all disks //TODO exclude ESP
     bootCombo->addItems(partitions);
 
     on_rootCombo_activated();
@@ -2597,13 +2596,13 @@ bool MInstall::eventFilter(QObject* obj, QEvent* event)
 // run before closing the app, do some cleanup
 void MInstall::close()
 {
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     shell.run("umount -l /mnt/antiX/home >/dev/null 2>&1");
     shell.run("umount -l /mnt/antiX >/dev/null 2>&1");
-    shell.run("rm -r /mnt/antiX >/dev/null 2>&1");
-    shell.run("swapoff -a");
     system("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true'");
     if (checkBoxEncryptAuto->isChecked() || checkBoxEncrpytSwap->isChecked()) {
         shell.run("cryptsetup luksClose rootfs");
+        shell.run("swapoff /dev/mapper/swapfs");
         shell.run("cryptsetup luksClose swapfs");
         shell.run("cryptsetup luksClose homefs");
     }
@@ -2624,6 +2623,7 @@ void MInstall::moreClicked(QListViewItem *item)
 
 void MInstall::delStart()
 {
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     timer->start(20000);
     updateStatus(tr("Deleting old system"), 4);
 }
