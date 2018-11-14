@@ -784,6 +784,9 @@ bool MInstall::makeDefaultPartitions()
     }
     system("sleep 1");
     shell.run("make-fstab -s");
+    if (checkBoxEncryptAuto->isChecked()) { // swapon -a doens't mount LUKS swap
+        shell.run("swapon " + swapdev);
+    }
     shell.run("/sbin/swapon -a 2>&1");
 
     // format /boot filesystem if encrypting
@@ -825,7 +828,6 @@ bool MInstall::makeDefaultPartitions()
             return false;
         }
     }
-
 
     // on root, make sure it exists
     system("sleep 1");
@@ -1156,6 +1158,9 @@ bool MInstall::makeChosenPartitions()
     }
     // mount all swaps
     system("sleep 1");
+    if (checkBoxEncrpytSwap->isChecked()) { // swapon -a doens't mount LUKS swap
+        shell.run("swapon " + swapdev);
+    }
     shell.run("/sbin/swapon -a 2>&1");
 
     return true;
@@ -2194,26 +2199,19 @@ void MInstall::pageDisplayed(int next)
         if (entireDiskButton->isChecked()) {
             if (!makeDefaultPartitions()) {
                 // failed
-                system("sleep 1");
-                shell.run("make-fstab -s");
-                shell.run("/sbin/swapon -a 2>&1");
                 nextButton->setEnabled(true);
                 goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
                 break;
             }
         } else {
             if (!makeChosenPartitions()) {
-                system("sleep 1");
-                //shell.run("/usr/sbin/buildfstab -r");
-                shell.run("/sbin/swapon -a 2>&1");
+                // failed
                 nextButton->setEnabled(true);
                 goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
                 break;
             }
         }
         system("sleep 1");
-        shell.run("make-fstab -s");
-        shell.run("/sbin/swapon -a 2>&1");
         installLinux();
         buildServiceList();
         break;
