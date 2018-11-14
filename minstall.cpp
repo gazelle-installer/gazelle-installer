@@ -1237,7 +1237,11 @@ void MInstall::copyLinux()
     cmd.append(" /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt");
     cmd.append(" /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr");
     cmd.append(" /live/aufs/var /live/aufs/home /mnt/antiX");
-    proc->start(cmd);
+    if (args.contains("--test") || args.contains("-t")) {
+        proc->start("");
+    } else {
+        proc->start(cmd);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1485,6 +1489,9 @@ bool MInstall::isUefi()
 bool MInstall::setUserName()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (args.contains("--test") || args.contains("-t")) {
+        return true;
+    }
     int ans;
     DIR *dir;
     QString msg, cmd;
@@ -1682,6 +1689,10 @@ QString MInstall::getPartType(const QString dev)
 bool MInstall::setPasswords()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (args.contains("-test") || args.contains("-t")) {
+        return true;
+    }
+
     setCursor(QCursor(Qt::WaitCursor));
     qApp->processEvents();
 
@@ -2006,24 +2017,24 @@ void MInstall::stopInstall()
                                               "To use the new installation, reboot without the installation media.\n\n"
                                               "Do you want to reboot now?"),
                                            tr("Yes"), tr("No"));
-        foreach (const QString &arg, args) {
-            if(arg == "--pretend" || arg == "-p") {
+        if (args.contains("--pretend") || args.contains("-p")) {
                 qApp->exit(0);
-            }
+                return;
         }
         if (ans == 0) {
-            shell.run("/bin/rm -rf /mnt/antiX/mnt/antiX");
-            shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
-            shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+            system("/bin/rm -rf /mnt/antiX/mnt/antiX");
+            system("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
+            system("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
             if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
-                shell.run("cryptsetup luksClose rootfs");
-                shell.run("cryptsetup luksClose swapfs");
+                system("cryptsetup luksClose rootfs");
+                system("cryptsetup luksClose swapfs");
             }
             if (checkBoxEncryptHome->isChecked()) {
-                shell.run("cryptsetup luksClose homefs");
-                shell.run("cryptsetup luksClose swapfs");
+                system("cryptsetup luksClose homefs");
+                system("cryptsetup luksClose swapfs");
             }
-            shell.run("/usr/local/bin/persist-config --shutdown --command reboot");
+            system("sleep 2");
+            system("/usr/local/bin/persist-config --shutdown --command reboot");
             return;
         } else {
             close();
@@ -2036,17 +2047,6 @@ void MInstall::stopInstall()
         if (ans != 0) {
             return;
         }
-    }
-    shell.run("/bin/rm -rf /mnt/antiX/mnt/antiX");
-    shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
-    shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
-    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
-        shell.run("cryptsetup luksClose rootfs");
-        shell.run("cryptsetup luksClose swapfs");
-    }
-    if (checkBoxEncryptHome->isChecked()) {
-        shell.run("cryptsetup luksClose homefs");
-        shell.run("cryptsetup luksClose swapfs");
     }
 }
 
@@ -2076,13 +2076,8 @@ void MInstall::goBack(QString msg)
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
 {
-    bool pretend = false;
-    foreach (const QString &arg, args) {
-        if(arg == "--pretend" || arg == "-p") {
-            pretend = true;
-            break;
-        }
-    }
+    bool pretend = args.contains("--pretend") || args.contains("-p");
+
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
             return 3;
@@ -2174,14 +2169,12 @@ void MInstall::pageDisplayed(int next)
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         break;
 
-    case 3:
+    case 3: // installation step
         backButton->setEnabled(false);
-        foreach (const QString &arg, args) {
-            if(arg == "--pretend" || arg == "-p") {
-                buildServiceList(); // build anyway
-                gotoPage(4);
-                return;
-            }
+        if (args.contains("--pretend") || args.contains("-p")) {
+            buildServiceList(); // build anyway
+            gotoPage(4);
+            return;
         }
         if (!checkDisk()) {
             goBack(tr("Returning to Step 1 to select another disk."));
@@ -2595,16 +2588,16 @@ bool MInstall::eventFilter(QObject* obj, QEvent* event)
 void MInstall::close()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    shell.run("umount -l /mnt/antiX/home >/dev/null 2>&1");
-    shell.run("umount -l /mnt/antiX >/dev/null 2>&1");
+    system("umount -l /mnt/antiX/home >/dev/null 2>&1");
+    system("umount -l /mnt/antiX >/dev/null 2>&1");
     system("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true'");
     if (checkBoxEncryptAuto->isChecked() || checkBoxEncrpytSwap->isChecked()) {
-        shell.run("cryptsetup luksClose rootfs");
-        shell.run("swapoff /dev/mapper/swapfs");
-        shell.run("cryptsetup luksClose swapfs");
-        shell.run("cryptsetup luksClose homefs");
+        system("cryptsetup luksClose rootfs");
+        system("swapoff /dev/mapper/swapfs");
+        system("cryptsetup luksClose swapfs");
+        system("cryptsetup luksClose homefs");
     }
-    qApp->quit();
+    //qApp->quit();
 }
 
 /*
