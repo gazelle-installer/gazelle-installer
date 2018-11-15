@@ -44,6 +44,11 @@ int main(int argc, char *argv[])
         printHelp();
         return 0;
     }
+    if (a.arguments().contains("--version") || a.arguments().contains("-v") ) {
+       system("echo 'Installer version'; dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:); echo"); // query 'minstall' since we don't know the name of the package
+       return 0;
+    }
+
 
     a.setWindowIcon(QIcon::fromTheme("system-installer", QIcon("/usr/share/pixmaps/msystem.png")));
 
@@ -134,5 +139,6 @@ void printHelp()
     qDebug() << "  -s --sync      Installing with rsync instead of cp on custom partitioning\n"
                 "                 -- doesn't format /root, it doesn't preserve Home, it doesn't work with encryption";
     qDebug() << "  -t --test      Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files";
+    qDebug() << "  -v --version   Show version information";
 }
 
