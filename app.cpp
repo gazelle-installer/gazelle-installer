@@ -34,10 +34,17 @@
 QScopedPointer<QFile> logFile;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+void printHelp();
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    if (a.arguments().contains("--help") || a.arguments().contains("-h") ) {
+        printHelp();
+        return 0;
+    }
+
     a.setWindowIcon(QIcon::fromTheme("system-installer", QIcon("/usr/share/pixmaps/msystem.png")));
 
     // Set the logging files
@@ -117,4 +124,15 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     out.flush();    // Clear the buffered data
 }
 
+// print CLI help info
+void printHelp()
+{
+    qDebug() << "Here are some CLI options you can use, please read the description carefully and be aware that these are experimental options\n";
+    qDebug() << "Usage: minstall [<options>]\n";
+    qDebug() << "Options:";
+    qDebug() << "  -p --pretend   Test mode for GUI, you can advance to different screens without actially installing";
+    qDebug() << "  -s --sync      Installing with rsync instead of cp on custom partitioning\n"
+                "                 -- doesn't format /root, it doesn't preserve Home, it doesn't work with encryption";
+    qDebug() << "  -t --test      Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files";
+}
 
