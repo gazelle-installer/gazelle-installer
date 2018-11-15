@@ -414,6 +414,96 @@ void MInstall::prepareToInstall()
     isHomeFormatted = false;
 }
 
+void MInstall::addItemCombo(QComboBox *cb, const QString *part)
+{
+    // determine which hash to update and exit if called on same combo
+    QHash<QString, int> *removedHash;
+    if (cb == homeCombo) {
+        if (part == prevItemHome) { // return if called to add item on the same combo
+            return;
+        }
+        removedHash = &removedHome;
+    } else if (cb == swapCombo) {
+        if (part == prevItemSwap) { // return if called to add item on the same combo
+            return;
+        }
+        removedHash = &removedSwap;
+    } else if (cb == bootCombo) {
+        if (part == prevItemBoot) { // return if called to add item on the same combo
+            return;
+        }
+        removedHash = &removedBoot;
+    } else { // root
+        if (part == prevItemRoot) { // return if called to add item on the same combo
+            return;
+        }
+        removedHash = &removedRoot;
+    }
+    // remove item from combo and update hash
+    if (removedHash->contains(*part)) {
+        cb->insertItem(removedHash->value(*part), *part);  //index, item
+        removedHash->remove(*part); // clear removed hash
+    }
+}
+
+void MInstall::removeItemCombo(QComboBox *cb, const QString *part)
+{
+    // determine which hash to update and exit if called on same combo
+    QHash<QString, int> *removedHash;
+    if (cb == homeCombo) {
+        if (part == prevItemHome) { // return if called to add item on the same combo
+            return;
+        }
+        removedHash = &removedHome;
+    } else if (cb == swapCombo) {
+        if (part == prevItemSwap) { // return if called to add item on the same combo
+            return;
+        }
+        removedHash = &removedSwap;
+    } else if (cb == bootCombo) {
+        if (part == prevItemBoot) { // return if called to add item on the same combo
+            return;
+        }
+        removedHash = &removedBoot;
+    } else { // root
+        if (part == prevItemRoot) { // return if called to add item on the same combo
+            return;
+        }
+        removedHash = &removedRoot;
+    }
+
+    // find and remove item
+    int index = cb->findText(*part, Qt::MatchStartsWith);
+    if (index != -1) {
+        cb->removeItem(index);
+        removedHash->insert(*part, index);
+    } else {
+        return;
+    }
+}
+
+// update partition combos
+void MInstall::updatePartCombo(QString *prevItem, const QString &part)
+{
+    // check if prev item selected is different or the same
+    if (*prevItem == part) { // same: do nothing
+        return;
+    } else if (part.isEmpty() || part == "root" || part == tr("none - or existing") || part == "none") { // different: check if empty or "root" selection (applicable for /home,/boot, swap).
+        // re-add removed item "prevItemRoot" to combo boxes if listed there.
+        addItemCombo(rootCombo, prevItem);
+        addItemCombo(homeCombo, prevItem);
+        addItemCombo(swapCombo, prevItem);
+        addItemCombo(bootCombo, prevItem);
+        prevItem->clear();
+    } else { // remove items from combos
+        *prevItem = part; // update selection
+        removeItemCombo(rootCombo, prevItem);
+        removeItemCombo(homeCombo, prevItem);
+        removeItemCombo(swapCombo, prevItem);
+        removeItemCombo(bootCombo, prevItem);
+    }
+}
+
 bool MInstall::makeSwapPartition(QString dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -699,8 +789,8 @@ bool MInstall::makeDefaultPartitions()
             bootdev = drv + mmcnvmepartdesignator + "2";
             rootdev = drv + mmcnvmepartdesignator + "3";
             swapdev = drv + mmcnvmepartdesignator + "4";
-            rootdevicepreserve = rootdev;
-            swapdevicepreserve = swapdev;
+            rootDevicePreserve = rootdev;
+            swapDevicePreserve = swapdev;
         } else {
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
@@ -723,8 +813,8 @@ bool MInstall::makeDefaultPartitions()
             bootdev = drv + mmcnvmepartdesignator + "1";
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
-            rootdevicepreserve = rootdev;
-            swapdevicepreserve = swapdev;
+            rootDevicePreserve = rootdev;
+            swapDevicePreserve = swapdev;
         } else {
             rootdev = drv + mmcnvmepartdesignator + "1";
             swapdev = drv + mmcnvmepartdesignator + "2";
@@ -864,7 +954,7 @@ bool MInstall::makeChosenPartitions()
 
     // Root
     QString rootdev = "/dev/" + rootCombo->currentText().section(" -", 0, 0).trimmed();
-    rootdevicepreserve = rootdev;
+    rootDevicePreserve = rootdev;
     QStringList rootsplit = getCmdOut("partition-info split-device=" + rootdev).split(" ", QString::SkipEmptyParts);
 
     // Swap
@@ -878,7 +968,7 @@ bool MInstall::makeChosenPartitions()
     } else {
         swapdev = "/dev/" + swapCombo->currentText().section(" -", 0, 0).trimmed();
     }
-    swapdevicepreserve = swapdev;
+    swapDevicePreserve = swapdev;
     QStringList swapsplit = getCmdOut("partition-info split-device=" + swapdev).split(" ", QString::SkipEmptyParts);
 
     // Boot
@@ -896,7 +986,7 @@ bool MInstall::makeChosenPartitions()
 
     // Home
     QString homedev = "/dev/" + homeCombo->currentText().section(" -", 0, 0).trimmed();
-    homedevicepreserve = (homedev == "/dev/root") ? rootdev : homedev;
+    HomeDevicePreserve = (homedev == "/dev/root") ? rootdev : homedev;
     QStringList homesplit = getCmdOut("partition-info split-device=" + homedev).split(" ", QString::SkipEmptyParts);
 
     if (rootdev == "/dev/none" || rootdev == "/dev/") {
@@ -2494,7 +2584,6 @@ void MInstall::on_diskCombo_activated(QString)
     bootCombo->blockSignals(true);
     bootCombo->addItem("root");
     bootCombo->blockSignals(false);
-    removedItem = "";
 
     // build rootCombo
     QString exclude;
@@ -2523,25 +2612,10 @@ void MInstall::on_diskCombo_activated(QString)
     on_rootCombo_activated();
 }
 
-// root partition changed, rebuild home
-void MInstall::on_rootCombo_activated(QString)
+// root partition changed, rebuild home, swap, boot combo boxes
+void MInstall::on_rootCombo_activated(const QString &arg1)
 {
-    // add back removed item
-    if (removedItem != "") {
-        homeCombo->insertItem(removedItemIndex, removedItem);
-        removedItem = "";
-    }
-    // remove item that matches root selection
-    if (rootCombo->currentText() != "") {
-        int index = homeCombo->findText(rootCombo->currentText().section(' ', 0, 0).toUtf8(), Qt::MatchStartsWith);
-        if ( index != -1 ) {
-            removedItem = homeCombo->itemText(index);
-            removedItemIndex = index;
-            homeCombo->removeItem(index);
-        } else {
-            removedItem = "";
-        }
-    }
+    updatePartCombo(&prevItemRoot, arg1);
 }
 
 void MInstall::on_rootTypeCombo_activated(QString)
@@ -2754,8 +2828,8 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                 QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
 
                 //get UUID
-                QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapdevicepreserve);
-                QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootdevicepreserve);
+                QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+                QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
 
                 //create keyfile
                 shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
@@ -2763,13 +2837,13 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
                 //add keyfile to container
                 QProcess proc;
-                proc.start("cryptsetup luksAddKey " + swapdevicepreserve + " /mnt/antiX/root/keyfile");
+                proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile");
                 proc.waitForStarted();
                 proc.write(password.toUtf8() + "\n");
                 proc.waitForFinished();
 
-                if (checkBoxEncryptHome->isChecked() && homedevicepreserve != rootdevicepreserve) { // if encrypting separate /home
-                    proc.start("cryptsetup luksAddKey " + homedevicepreserve + " /mnt/antiX/root/keyfile");
+                if (checkBoxEncryptHome->isChecked() && HomeDevicePreserve != rootDevicePreserve) { // if encrypting separate /home
+                    proc.start("cryptsetup luksAddKey " + HomeDevicePreserve + " /mnt/antiX/root/keyfile");
                     proc.waitForStarted();
                     proc.write(password.toUtf8() + "\n");
                     proc.waitForFinished();
@@ -2780,8 +2854,8 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                 if (file2.open(QIODevice::WriteOnly)) {
                     QTextStream out(&file2);
                     out << "rootfs /dev/disk/by-uuid/" + rootUUID +" none luks \n";
-                    if (checkBoxEncryptHome->isChecked() && homedevicepreserve != rootdevicepreserve) { // if encrypting separate /home
-                        QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homedevicepreserve);
+                    if (checkBoxEncryptHome->isChecked() && HomeDevicePreserve != rootDevicePreserve) { // if encrypting separate /home
+                        QString homeUUID =  getCmdOut("blkid -s UUID -o value " + HomeDevicePreserve);
                         out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
                     }
                     out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks \n";
@@ -2789,8 +2863,8 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                 file2.close();
             } else if (checkBoxEncryptHome->isChecked()) { // if encrypting /home without encrypting root
                 //get UUID
-                QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapdevicepreserve);
-                QString homeUUID = getCmdOut("blkid -s UUID -o value " + homedevicepreserve);
+                QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+                QString homeUUID = getCmdOut("blkid -s UUID -o value " + HomeDevicePreserve);
 
                 //create keyfile
                 shell.run("dd if=/dev/urandom of=/mnt/antiX/home/.keyfileDONOTdelete bs=1024 count=4");
@@ -2798,7 +2872,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
                 //add keyfile to container
                 QProcess proc;
-                proc.start("cryptsetup luksAddKey " + swapdevicepreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
+                proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
                 proc.waitForStarted();
                 proc.write(FDEpassCust->text().toUtf8() + "\n");
                 proc.waitForFinished();
@@ -3140,4 +3214,19 @@ void MInstall::on_checkBoxEncrpytSwap_toggled(bool checked)
                              tr("This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems."),
                              tr("OK"));
     }
+}
+
+void MInstall::on_homeCombo_activated(const QString &arg1)
+{
+    updatePartCombo(&prevItemHome, arg1);
+}
+
+void MInstall::on_swapCombo_activated(const QString &arg1)
+{
+    updatePartCombo(&prevItemSwap, arg1);
+}
+
+void MInstall::on_bootCombo_activated(const QString &arg1)
+{
+    updatePartCombo(&prevItemBoot, arg1);
 }
