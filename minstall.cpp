@@ -488,7 +488,8 @@ void MInstall::updatePartCombo(QString *prevItem, const QString &part)
     // check if prev item selected is different or the same
     if (*prevItem == part) { // same: do nothing
         return;
-    } else if (part.isEmpty() || part == "root" || part == tr("none - or existing") || part == "none") { // different: check if empty or "root" selection (applicable for /home,/boot, swap).
+    } else if (part.isEmpty() || part == "root" || part == tr("none - or existing") || part == "none") {
+        // different: check if empty or "root" selection (applicable for /home,/boot, swap).
         // re-add removed item "prevItemRoot" to combo boxes if listed there.
         addItemCombo(rootCombo, prevItem);
         addItemCombo(homeCombo, prevItem);
