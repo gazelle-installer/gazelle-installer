@@ -473,7 +473,7 @@ void MInstall::removeItemCombo(QComboBox *cb, const QString *part)
     }
 
     // find and remove item
-    int index = cb->findText(*part, Qt::MatchStartsWith);
+    int index = cb->findText(part->section(" ", 0, 0), Qt::MatchStartsWith);
     if (index != -1) {
         cb->removeItem(index);
         removedHash->insert(*part, index);
@@ -488,20 +488,20 @@ void MInstall::updatePartCombo(QString *prevItem, const QString &part)
     // check if prev item selected is different or the same
     if (*prevItem == part) { // same: do nothing
         return;
-    } else if (part.isEmpty() || part == "root" || part == tr("none - or existing") || part == "none") {
-        // different: check if empty or "root" selection (applicable for /home,/boot, swap).
-        // re-add removed item "prevItemRoot" to combo boxes if listed there.
+    } else {
         addItemCombo(rootCombo, prevItem);
         addItemCombo(homeCombo, prevItem);
         addItemCombo(swapCombo, prevItem);
         addItemCombo(bootCombo, prevItem);
-        prevItem->clear();
-    } else { // remove items from combos
-        *prevItem = part; // update selection
-        removeItemCombo(rootCombo, prevItem);
-        removeItemCombo(homeCombo, prevItem);
-        removeItemCombo(swapCombo, prevItem);
-        removeItemCombo(bootCombo, prevItem);
+        if (part.isEmpty() || part == "root" || part == tr("none - or existing") || part == "none") {
+            prevItem->clear();
+        } else { // remove items from combos
+            *prevItem = part; // update selection
+            removeItemCombo(rootCombo, prevItem);
+            removeItemCombo(homeCombo, prevItem);
+            removeItemCombo(swapCombo, prevItem);
+            removeItemCombo(bootCombo, prevItem);
+        }
     }
 }
 
