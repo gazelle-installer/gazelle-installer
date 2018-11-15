@@ -135,10 +135,10 @@ void printHelp()
     qDebug() << "Here are some CLI options you can use, please read the description carefully and be aware that these are experimental options\n";
     qDebug() << "Usage: minstall [<options>]\n";
     qDebug() << "Options:";
+    qDebug() << "  -n --nocopy    Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files";
     qDebug() << "  -p --pretend   Test mode for GUI, you can advance to different screens without actially installing";
     qDebug() << "  -s --sync      Installing with rsync instead of cp on custom partitioning\n"
                 "                 -- doesn't format /root, it doesn't preserve Home, it doesn't work with encryption";
-    qDebug() << "  -n --nocopy    Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files";
     qDebug() << "  -v --version   Show version information";
 }
 
