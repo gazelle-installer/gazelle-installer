@@ -1338,7 +1338,7 @@ void MInstall::copyLinux()
     cmd.append(" /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt");
     cmd.append(" /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr");
     cmd.append(" /live/aufs/var /live/aufs/home /mnt/antiX");
-    if (args.contains("--test") || args.contains("-t")) {
+    if (args.contains("--nocopy") || args.contains("-n")) {
         proc->start("");
     } else {
         proc->start(cmd);
@@ -1590,7 +1590,7 @@ bool MInstall::isUefi()
 bool MInstall::setUserName()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (args.contains("--test") || args.contains("-t")) {
+    if (args.contains("--nocopy") || args.contains("-n")) {
         return true;
     }
     int ans;
@@ -1790,7 +1790,7 @@ QString MInstall::getPartType(const QString dev)
 bool MInstall::setPasswords()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (args.contains("-test") || args.contains("-t")) {
+    if (args.contains("--nocopy") || args.contains("-n")) {
         return true;
     }
 
