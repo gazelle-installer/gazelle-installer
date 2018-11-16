@@ -924,14 +924,6 @@ bool MInstall::makeDefaultPartitions()
         return false;
     }
 
-    // mount /boot if encrypting
-    if (checkBoxEncryptAuto->isChecked()) {
-        mkdir("/mnt/antiX/boot",0755);
-        if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
-            return false;
-        }
-    }
-
     // on root, make sure it exists
     system("sleep 1");
     mkdir("/mnt/antiX/home",0755);
@@ -1197,10 +1189,6 @@ bool MInstall::makeChosenPartitions()
         if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
             return false;
         }
-        mkdir("/mnt/antiX/boot",0755);
-        if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
-            return false;
-        }
     }
 
     // maybe format home
@@ -1315,11 +1303,13 @@ void MInstall::copyLinux()
     mkdir("/mnt/antiX/sys", 0755);
     mkdir("/mnt/antiX/run", 0755);
 
-    //if seperate /boot in use, mount that to /mnt/antiX/boot
-    //*****add that code here***    ///
-    //TODO
-
-
+    //if separate /boot in use, mount that to /mnt/antiX/boot
+    if (bootdev != rootDevicePreserve) {
+        mkdir("/mnt/antiX/boot",0755);
+        if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
+            return false;
+        }
+    }
 
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
