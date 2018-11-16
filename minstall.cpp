@@ -494,7 +494,7 @@ void MInstall::updatePartCombo(QString *prevItem, const QString &part)
         addItemCombo(homeCombo, prevItem);
         addItemCombo(swapCombo, prevItem);
         addItemCombo(bootCombo, prevItem);
-        if (part.isEmpty() || part == "root" || part == tr("none - or existing") || part == "none") {
+        if (part.isEmpty() || part == "root" || part == "none") {
             prevItem->clear();
         } else { // remove items from combos
             *prevItem = part; // update selection
@@ -961,11 +961,7 @@ bool MInstall::makeChosenPartitions()
 
     // Swap
     QString swapdev;
-    if (swapCombo->currentText() == tr("none - or existing")) {
-        if (checkBoxEncrpytSwap->isChecked()) {
-            QMessageBox::critical(this, QString::null, tr("You must choose a swap partition when encrypting."));
-            return false;
-        }
+    if (swapCombo->currentText() == "none") {
         swapdev = "/dev/none";
     } else {
         swapdev = "/dev/" + swapCombo->currentText().section(" -", 0, 0).trimmed();
@@ -1112,7 +1108,6 @@ bool MInstall::makeChosenPartitions()
     }
 
     //if no swap is chosen do nothing
-
     if (swapdev != "/dev/none") {
         //if swap exists and not encrypted, do nothing
         //check swap fstype
@@ -1255,7 +1250,7 @@ bool MInstall::makeChosenPartitions()
     }
     // mount all swaps
     system("sleep 1");
-    if (checkBoxEncrpytSwap->isChecked()) { // swapon -a doens't mount LUKS swap
+    if (checkBoxEncrpytSwap->isChecked() && swapdev != "/dev/none") { // swapon -a doens't mount LUKS swap
         shell.run("swapon " + swapdev);
     }
     shell.run("/sbin/swapon -a 2>&1");
@@ -2582,7 +2577,7 @@ void MInstall::on_diskCombo_activated(QString)
     swapCombo->clear();
     homeCombo->clear();
     bootCombo->clear();
-    swapCombo->addItem(tr("none - or existing"));
+    swapCombo->addItem("none");
     homeCombo->blockSignals(true);
     homeCombo->addItem("root");
     homeCombo->blockSignals(false);
@@ -2686,7 +2681,6 @@ void MInstall::close()
         system("cryptsetup luksClose swapfs");
         system("cryptsetup luksClose homefs");
     }
-    //qApp->quit();
 }
 
 /*
@@ -2832,20 +2826,21 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
                 QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
 
-                //get UUID
-                QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
-                QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
-
                 //create keyfile
                 shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
                 shell.run("chmod 0400 /mnt/antiX/root/keyfile");
 
                 //add keyfile to container
-                QProcess proc;
-                proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile");
-                proc.waitForStarted();
-                proc.write(password.toUtf8() + "\n");
-                proc.waitForFinished();
+                QString swapUUID;
+                if (swapDevicePreserve != "/dev/none") {
+                    swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+
+                    QProcess proc;
+                    proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile");
+                    proc.waitForStarted();
+                    proc.write(password.toUtf8() + "\n");
+                    proc.waitForFinished();
+                }
 
                 if (checkBoxEncryptHome->isChecked() && HomeDevicePreserve != rootDevicePreserve) { // if encrypting separate /home
                     proc.start("cryptsetup luksAddKey " + HomeDevicePreserve + " /mnt/antiX/root/keyfile");
@@ -2853,7 +2848,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                     proc.write(password.toUtf8() + "\n");
                     proc.waitForFinished();
                 }
-
+                QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
                 //write crypttab keyfile entry
                 QFile file2("/mnt/antiX/etc/crypttab");
                 if (file2.open(QIODevice::WriteOnly)) {
@@ -2863,31 +2858,36 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                         QString homeUUID =  getCmdOut("blkid -s UUID -o value " + HomeDevicePreserve);
                         out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
                     }
-                    out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks \n";
+                    if (swapDevicePreserve != "/dev/none") {
+                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks \n";
+                    }
                 }
                 file2.close();
             } else if (checkBoxEncryptHome->isChecked()) { // if encrypting /home without encrypting root
-                //get UUID
-                QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
-                QString homeUUID = getCmdOut("blkid -s UUID -o value " + HomeDevicePreserve);
-
                 //create keyfile
                 shell.run("dd if=/dev/urandom of=/mnt/antiX/home/.keyfileDONOTdelete bs=1024 count=4");
                 shell.run("chmod 0400 /mnt/antiX/home/.keyfileDONOTdelete");
 
                 //add keyfile to container
-                QProcess proc;
-                proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
-                proc.waitForStarted();
-                proc.write(FDEpassCust->text().toUtf8() + "\n");
-                proc.waitForFinished();
+                QString swapUUID;
+                if (swapDevicePreserve != "/dev/none") {
+                    swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
 
+                    QProcess proc;
+                    proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
+                    proc.waitForStarted();
+                    proc.write(FDEpassCust->text().toUtf8() + "\n");
+                    proc.waitForFinished();
+                }
+                QString homeUUID = getCmdOut("blkid -s UUID -o value " + HomeDevicePreserve);
                 //write crypttab keyfile entry
                 QFile file2("/mnt/antiX/etc/crypttab");
                 if (file2.open(QIODevice::WriteOnly)) {
                     QTextStream out(&file2);
                     out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
-                    out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks \n";
+                    if (swapDevicePreserve != "/dev/none") {
+                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks \n";
+                    }
                 }
                 file2.close();
             }
@@ -3216,7 +3216,7 @@ void MInstall::on_checkBoxEncrpytSwap_toggled(bool checked)
 {
     if (checked) {
         QMessageBox::warning(this, QString::null,
-                             tr("This option also encrypts /swap, which will render the swap partition unable to be shared with other installed operating systems."),
+                             tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
                              tr("OK"));
     }
 }
