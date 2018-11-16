@@ -890,9 +890,6 @@ bool MInstall::makeDefaultPartitions()
     }
     system("sleep 1");
     shell.run("make-fstab -s");
-    if (checkBoxEncryptAuto->isChecked()) { // swapon -a doens't mount LUKS swap
-        shell.run("swapon " + swapdev);
-    }
     shell.run("/sbin/swapon -a 2>&1");
 
     // format /boot filesystem if encrypting
@@ -1556,7 +1553,7 @@ bool MInstall::installLoader()
 
     if (POPULATE_MEDIA_MOUNTPOINTS) {
         runCmd("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
-        }
+    }
 
     qDebug() << "change fstab entries to use UUIDs";
     runCmd("chroot /mnt/antiX dev2uuid_fstab");
@@ -2877,7 +2874,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                         out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
                     }
                     if (swapDevicePreserve != "/dev/none") {
-                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks \n";
+                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks,nofail \n";
                     }
                 }
                 file2.close();
@@ -2904,10 +2901,11 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                     QTextStream out(&file2);
                     out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
                     if (swapDevicePreserve != "/dev/none") {
-                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks \n";
+                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
                     }
                 }
                 file2.close();
+                system("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks");
             }
         }
         // Copy live set up to install and clean up.
