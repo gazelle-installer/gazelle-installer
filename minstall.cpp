@@ -390,6 +390,20 @@ bool MInstall::checkDisk()
     return true;
 }
 
+
+// check password length (maybe complexity)
+bool MInstall::checkPassword(const QString &pass)
+{
+    if (pass.length() < 8) {
+        QMessageBox::critical(this, QString::null,
+                              tr("The password needs to be at least\n"
+                                 "%1 characters long. Please select\n"
+                                 "a longer password before proceeding.").arg("8"));
+        return false;
+    }
+    return true;
+}
+
 int MInstall::getPartitionNumber()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -2176,7 +2190,14 @@ int MInstall::showPage(int curr, int next)
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
+            if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
+                return curr;
+            }
             return 3;
+        }
+    } else if  (next == 3 && curr == 2) {// at  Step_Parttion (fwd)
+        if (checkBoxEncrpytSwap->isChecked() && !checkPassword(FDEpassCust->text())) {
+            return curr;
         }
     } else if (next == 3 && curr == 4) { // at Step_Boot screen (back)
         return 1;
