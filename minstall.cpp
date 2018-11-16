@@ -1304,7 +1304,7 @@ void MInstall::copyLinux()
     mkdir("/mnt/antiX/run", 0755);
 
     //if separate /boot in use, mount that to /mnt/antiX/boot
-    if (bootdev != rootDevicePreserve) {
+    if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
         mkdir("/mnt/antiX/boot",0755);
         if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
             qDebug() << "Could not mount /boot on " + bootdev;
