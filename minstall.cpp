@@ -1307,7 +1307,8 @@ void MInstall::copyLinux()
     if (bootdev != rootDevicePreserve) {
         mkdir("/mnt/antiX/boot",0755);
         if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
-            return false;
+            qDebug() << "Could not mount /boot on " + bootdev;
+            return;
         }
     }
 
@@ -2610,7 +2611,8 @@ void MInstall::on_diskCombo_activated(QString)
     partitions = getCmdOuts("partition-info all -n --exclude=" + exclude);
     swapCombo->addItems(partitions);
 
-    // build bootCombo for all disks //TODO exclude ESP
+    // build bootCombo for all disks, exclude ESP (EFI)
+    partitions = getCmdOuts("partition-info all -n --exclude=" + exclude + "efi");
     bootCombo->addItems(partitions);
 
     on_rootCombo_activated();
