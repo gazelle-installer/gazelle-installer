@@ -2163,13 +2163,11 @@ void MInstall::unmountGoBack(QString msg)
     shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
     if (isRootEncrypted) {
         system("cryptsetup luksClose rootfs");
-        system("swapoff /dev/mapper/swapfs");
-        system("cryptsetup luksClose swapfs");
-        if (homeDevicePreserve != rootDevicePreserve) {
-            system("cryptsetup luksClose rootfs");
-        }
-    } else if (checkBoxEncryptHome->isChecked()) {
+    }
+    if (isHomeEncrypted) {
         system("cryptsetup luksClose homefs");
+    }
+    if (isSwapEncrypted) {
         system("swapoff /dev/mapper/swapfs");
         system("cryptsetup luksClose swapfs");
     }
