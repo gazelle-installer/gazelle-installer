@@ -969,7 +969,6 @@ bool MInstall::makeChosenPartitions()
     QStringList swapsplit = getCmdOut("partition-info split-device=" + swapdev).split(" ", QString::SkipEmptyParts);
 
     // Boot
-    QString bootdev;
     if (bootCombo->currentText() == "root") {
         if (checkBoxEncryptRoot->isChecked()) {
             QMessageBox::critical(this, QString::null, tr("You must choose a separate boot partition when encrypting root."));
@@ -2678,8 +2677,9 @@ bool MInstall::eventFilter(QObject* obj, QEvent* event)
 void MInstall::close()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    system("umount -l /mnt/antiX/home >/dev/null 2>&1");
-    system("umount -l /mnt/antiX >/dev/null 2>&1");
+    //system("umount -l /mnt/antiX/home >/dev/null 2>&1");
+    //system("umount -l /mnt/antiX/boot >/dev/null 2>&1");
+    system("umount -lR /mnt/antiX >/dev/null 2>&1");
     system("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true'");
     if (checkBoxEncryptAuto->isChecked() || checkBoxEncrpytSwap->isChecked()) {
         system("cryptsetup luksClose rootfs");
