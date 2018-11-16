@@ -961,11 +961,7 @@ bool MInstall::makeChosenPartitions()
 
     // Swap
     QString swapdev;
-    if (swapCombo->currentText() == "none") {
-        swapdev = "/dev/none";
-    } else {
-        swapdev = "/dev/" + swapCombo->currentText().section(" -", 0, 0).trimmed();
-    }
+    swapdev = "/dev/" + swapCombo->currentText().section(" -", 0, 0).trimmed();
     swapDevicePreserve = swapdev;
     QStringList swapsplit = getCmdOut("partition-info split-device=" + swapdev).split(" ", QString::SkipEmptyParts);
 
@@ -2843,6 +2839,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                 }
 
                 if (checkBoxEncryptHome->isChecked() && HomeDevicePreserve != rootDevicePreserve) { // if encrypting separate /home
+                    QProcess proc;
                     proc.start("cryptsetup luksAddKey " + HomeDevicePreserve + " /mnt/antiX/root/keyfile");
                     proc.waitForStarted();
                     proc.write(password.toUtf8() + "\n");
