@@ -982,7 +982,7 @@ bool MInstall::makeChosenPartitions()
 
     // Home
     QString homedev = "/dev/" + homeCombo->currentText().section(" -", 0, 0).trimmed();
-    HomeDevicePreserve = (homedev == "/dev/root") ? rootdev : homedev;
+    homeDevicePreserve = (homedev == "/dev/root") ? rootdev : homedev;
     QStringList homesplit = getCmdOut("partition-info split-device=" + homedev).split(" ", QString::SkipEmptyParts);
 
     if (rootdev == "/dev/none" || rootdev == "/dev/") {
@@ -2031,10 +2031,10 @@ void MInstall::setLocale()
     } else {
         rootdev = "/dev/" + QString(rootCombo->currentText()).section(" ", 0, 0);
     }
-    if (checkBoxEncryptHome->isChecked()) {
+
+    homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
+    if (checkBoxEncryptHome->isChecked() && homedev != rootdev) {
         homedev = "/dev/mapper/homefs";
-    } else {
-        homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
     }
     shell.run("umount -R /mnt/antiX");
     mountPartition(rootdev, "/mnt/antiX", root_mntops);
@@ -2120,17 +2120,20 @@ void MInstall::stopInstall()
         }
         if (ans == 0) {
             system("/bin/rm -rf /mnt/antiX/mnt/antiX");
-            system("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
-            system("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+            system("/bin/umount -lR /mnt/antiX >/dev/null 2>&1");
             if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
                 system("cryptsetup luksClose rootfs");
+                system("swapoff /dev/mapper/swapfs");
                 system("cryptsetup luksClose swapfs");
-            }
-            if (checkBoxEncryptHome->isChecked()) {
+                if (homeDevicePreserve != rootDevicePreserve) {
+                    system("cryptsetup luksClose rootfs");
+                }
+            } else if (checkBoxEncryptHome->isChecked()) {
                 system("cryptsetup luksClose homefs");
+                system("swapoff /dev/mapper/swapfs");
                 system("cryptsetup luksClose swapfs");
             }
-            system("sleep 2");
+            system("sleep 1");
             system("/usr/local/bin/persist-config --shutdown --command reboot");
             return;
         } else {
@@ -2153,12 +2156,16 @@ void MInstall::unmountGoBack(QString msg)
     shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
     shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
     if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
-        shell.run("cryptsetup luksClose rootfs");
-        shell.run("cryptsetup luksClose swapfs");
-    }
-    if (checkBoxEncryptHome->isChecked()) {
-        shell.run("cryptsetup luksClose homefs");
-        shell.run("cryptsetup luksClose swapfs");
+        system("cryptsetup luksClose rootfs");
+        system("swapoff /dev/mapper/swapfs");
+        system("cryptsetup luksClose swapfs");
+        if (homeDevicePreserve != rootDevicePreserve) {
+            system("cryptsetup luksClose rootfs");
+        }
+    } else if (checkBoxEncryptHome->isChecked()) {
+        system("cryptsetup luksClose homefs");
+        system("swapoff /dev/mapper/swapfs");
+        system("cryptsetup luksClose swapfs");
     }
     goBack(msg);
 }
@@ -2681,11 +2688,17 @@ void MInstall::close()
     //system("umount -l /mnt/antiX/boot >/dev/null 2>&1");
     system("umount -lR /mnt/antiX >/dev/null 2>&1");
     system("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true'");
-    if (checkBoxEncryptAuto->isChecked() || checkBoxEncrpytSwap->isChecked()) {
+    if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()) {
         system("cryptsetup luksClose rootfs");
         system("swapoff /dev/mapper/swapfs");
         system("cryptsetup luksClose swapfs");
+        if (homeDevicePreserve != rootDevicePreserve) {
+            system("cryptsetup luksClose rootfs");
+        }
+    } else if (checkBoxEncryptHome->isChecked()) {
         system("cryptsetup luksClose homefs");
+        system("swapoff /dev/mapper/swapfs");
+        system("cryptsetup luksClose swapfs");
     }
 }
 
@@ -2750,8 +2763,8 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
     // get config
 
-    QString rootdev = "/dev/" + QString(rootCombo->currentText()).section(" ", 0, 0);
-    QString homedev = "/dev/" + QString(homeCombo->currentText()).section(" ", 0, 0);
+    QString rootdev = "/dev/" + rootCombo->currentText().section(" ", 0, 0);
+    QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
 
     // if encrypting, modify devices to /dev/mapper categories
     if (checkBoxEncryptAuto->isChecked() || checkBoxEncryptRoot->isChecked()){
@@ -2762,10 +2775,9 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         homedev = "/dev/mapper/rootfs";
     }
 
-    if (checkBoxEncryptHome->isChecked()){
+    if (checkBoxEncryptHome->isChecked() && homedev != rootdev) { // needs to check if it's on root or not
         homedev = "/dev/mapper/homefs";
     }
-
 
     timer->stop();
 
@@ -2792,7 +2804,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
             if (homedev != "/dev/root" && homedev != rootdev) {
                 fstype = getPartType(homedev);
-                if (isHomeFormatted) {
+                if (isHomeFormatted && !checkBoxEncryptHome->isChecked()) { // if formatted and not encrypted
                     dump_pass = "1 2";
                     if (fstype.startsWith("btrfs")) {
                         dump_pass = "1 2";
@@ -2801,8 +2813,10 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                         dump_pass = "0 0";
                     }
                     out << homedev + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
-                } else {
-                    out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
+                } else { // if not formatted
+                    if(!checkBoxEncryptHome->isChecked()) { // only if not encrypted
+                        out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
+                    }
                 }
                 //add bootdev if present
                 //only ext4 (for now) for max compatibility with other linuxes
@@ -2851,9 +2865,9 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                     proc.waitForFinished();
                 }
 
-                if (checkBoxEncryptHome->isChecked() && HomeDevicePreserve != rootDevicePreserve) { // if encrypting separate /home
+                if (checkBoxEncryptHome->isChecked() && homeDevicePreserve != rootDevicePreserve) { // if encrypting separate /home
                     QProcess proc;
-                    proc.start("cryptsetup luksAddKey " + HomeDevicePreserve + " /mnt/antiX/root/keyfile");
+                    proc.start("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile");
                     proc.waitForStarted();
                     proc.write(password.toUtf8() + "\n");
                     proc.waitForFinished();
@@ -2864,8 +2878,8 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                 if (file2.open(QIODevice::WriteOnly)) {
                     QTextStream out(&file2);
                     out << "rootfs /dev/disk/by-uuid/" + rootUUID +" none luks \n";
-                    if (checkBoxEncryptHome->isChecked() && HomeDevicePreserve != rootDevicePreserve) { // if encrypting separate /home
-                        QString homeUUID =  getCmdOut("blkid -s UUID -o value " + HomeDevicePreserve);
+                    if (checkBoxEncryptHome->isChecked() && homeDevicePreserve != rootDevicePreserve) { // if encrypting separate /home
+                        QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
                         out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
                     }
                     if (swapDevicePreserve != "/dev/none") {
@@ -2889,7 +2903,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                     proc.write(FDEpassCust->text().toUtf8() + "\n");
                     proc.waitForFinished();
                 }
-                QString homeUUID = getCmdOut("blkid -s UUID -o value " + HomeDevicePreserve);
+                QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
                 //write crypttab keyfile entry
                 QFile file2("/mnt/antiX/etc/crypttab");
                 if (file2.open(QIODevice::WriteOnly)) {
