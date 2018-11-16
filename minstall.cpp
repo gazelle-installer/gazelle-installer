@@ -2904,7 +2904,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                     QTextStream out(&file2);
                     out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
                     if (swapDevicePreserve != "/dev/none") {
-                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks \n";
+                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /mnt/antiX/home/.keyfileDONOTdelete luks \n";
                     }
                 }
                 file2.close();
