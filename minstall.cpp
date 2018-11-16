@@ -45,7 +45,8 @@ int MInstall::runCmd(QString cmd)
     return future.result();
 }
 
-MInstall::MInstall(QWidget *parent, QStringList args) : QWidget(parent)
+MInstall::MInstall(QWidget *parent, QStringList args) :
+    QWidget(parent)
 {
     setupUi(this);
 
@@ -1332,7 +1333,10 @@ void MInstall::copyLinux()
     QString cmd;
     cmd = "/bin/cp -a";
     if (args.contains("--sync") || args.contains("-s")) {
-        cmd = "rsync -a --delete ";
+        cmd = "rsync -a --delete";
+        if (saveHomeCheck->isChecked()) {
+            cmd.append(" --filter 'protect home/*'");
+        }
     }
     cmd.append(" /live/aufs/bin /live/aufs/boot /live/aufs/dev");
     cmd.append(" /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt");
