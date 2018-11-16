@@ -2818,6 +2818,9 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                     out << bootdev + " /boot ext4 " + root_mntops + " 1 1 \n";
                 }
             }
+            if (checkBoxEncryptAuto->isChecked() || checkBoxEncrpytSwap->isChecked()) {
+                out << "/dev/mapper/swapfs swap swap defauts 0 0 \n";
+            }
             file.close();
 
 
