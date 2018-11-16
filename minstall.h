@@ -175,8 +175,12 @@ private slots:
     void on_bootCombo_activated(const QString &arg1);
 
 private:
+    bool isHomeEncrypted = false;
+    bool isRootEncrypted = false;
+    bool isSwapEncrypted = false;
     bool isRootFormatted = false;
     bool isHomeFormatted = false;
+
     Cmd shell;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
