@@ -339,6 +339,94 @@ void MInstall::updateStatus(QString msg, int val)
     qApp->processEvents();
 }
 
+// write out crypttab if encrypting for auto-opening
+void MInstall::writeKeyFile()
+{
+    // create keyfile
+    // add key file to luks containers
+    // get uuid of devices
+    // write out crypttab
+    // if encrypt-auto, add home and swap
+    // if encrypt just home, just add swap
+    // blkid -s UUID -o value devicename for UUID
+    // containerName     /dev/disk/by-uuid/UUID_OF_PARTITION  /root/keyfile  luks >>/etc/crypttab
+    // for auto install, only need to add swap
+    // for root and home, need to add home and swap
+    // for root only, add swap
+    // for home only, add swap
+
+    if (isRootEncrypted) { // if encrypting root
+        QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
+
+        //create keyfile
+        shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
+        shell.run("chmod 0400 /mnt/antiX/root/keyfile");
+
+        //add keyfile to container
+        QString swapUUID;
+        if (swapDevicePreserve != "/dev/none") {
+            swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+
+            QProcess proc;
+            proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile");
+            proc.waitForStarted();
+            proc.write(password.toUtf8() + "\n");
+            proc.waitForFinished();
+        }
+
+        if (isHomeEncrypted) { // if encrypting separate /home
+            QProcess proc;
+            proc.start("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile");
+            proc.waitForStarted();
+            proc.write(password.toUtf8() + "\n");
+            proc.waitForFinished();
+        }
+        QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
+        //write crypttab keyfile entry
+        QFile file("/mnt/antiX/etc/crypttab");
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream out(&file);
+            out << "rootfs /dev/disk/by-uuid/" + rootUUID +" none luks \n";
+            if (isHomeEncrypted) {
+                QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
+                out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
+            }
+            if (swapDevicePreserve != "/dev/none") {
+                out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks,nofail \n";
+            }
+        }
+        file.close();
+    } else if (isHomeEncrypted) { // if encrypting /home without encrypting root
+        //create keyfile
+        shell.run("dd if=/dev/urandom of=/mnt/antiX/home/.keyfileDONOTdelete bs=1024 count=4");
+        shell.run("chmod 0400 /mnt/antiX/home/.keyfileDONOTdelete");
+
+        //add keyfile to container
+        QString swapUUID;
+        if (swapDevicePreserve != "/dev/none") {
+            swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+
+            QProcess proc;
+            proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
+            proc.waitForStarted();
+            proc.write(FDEpassCust->text().toUtf8() + "\n");
+            proc.waitForFinished();
+        }
+        QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
+        //write crypttab keyfile entry
+        QFile file("/mnt/antiX/etc/crypttab");
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream out(&file);
+            out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
+            if (swapDevicePreserve != "/dev/none") {
+                out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
+            }
+        }
+        file.close();
+        system("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks");
+    }
+}
+
 bool MInstall::mountPartition(const QString dev, const QString point, const QString mntops)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -1087,7 +1175,7 @@ bool MInstall::makeChosenPartitions()
         // has homedev
         if (shell.run("pumount " + homedev) != 0) {
             // error
-            if (swapoff(homedev.toUtf8()) != 0) {
+            if (shell.run("swapoff " + homedev) != 0) {
             }
         }
     }
@@ -1095,7 +1183,7 @@ bool MInstall::makeChosenPartitions()
     // unmount root part
     if (shell.run("pumount " + rootdev) != 0) {
         // error
-        if (swapoff(rootdev.toUtf8()) != 0) {
+        if (shell.run("swapoff " + rootdev) != 0) {
         }
     }
 
@@ -1105,7 +1193,7 @@ bool MInstall::makeChosenPartitions()
         //check swap fstype
         cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
         if (shell.run(cmd) != 0 || checkBoxEncrpytSwap->isChecked()) {
-            if (swapoff(swapdev.toUtf8()) != 0) {
+            if (shell.run("swapoff " + swapdev) != 0) {
                 if (shell.run("pumount " + swapdev) != 0) {
                 }
             }
@@ -1136,7 +1224,7 @@ bool MInstall::makeChosenPartitions()
             system("sleep 1");
 
             shell.run("make-fstab -s");
-            swapon(swapdev.toUtf8(),0);
+            shell.run("/sbin/swapon " + swapdev);
         }
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
@@ -1281,8 +1369,30 @@ void MInstall::installLinux()
 }
 
 // create /etc/fstab file
-void MInstall::makeFstab(const QString &rootdev, const QString &homedev, const QString &swapdev)
+void MInstall::makeFstab()
 {
+    // get config
+    QString rootdev = rootDevicePreserve;
+    QString homedev = homeDevicePreserve;
+    QString swapdev = swapDevicePreserve;
+
+    // if encrypting, modify devices to /dev/mapper categories
+    if (isRootEncrypted){
+        rootdev = "/dev/mapper/rootfs";
+    }
+    if (isHomeEncrypted) {
+        homedev = "/dev/mapper/homefs";
+    }
+    if (isSwapEncrypted) {
+        swapdev = "/dev/mapper/swapfs";
+    }
+    qDebug() << "Create fstab entries for:";
+    qDebug() << "rootdev" << rootdev;
+    qDebug() << "homedev" << homedev;
+    qDebug() << "swapdev" << swapdev;
+    qDebug() << "bootdev" << bootdev;
+
+
     QString fstype = getPartType(rootdev);
     QString dump_pass = "1 1";
 
@@ -1300,10 +1410,10 @@ void MInstall::makeFstab(const QString &rootdev, const QString &homedev, const Q
         out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
         //add bootdev if present
         //only ext4 (for now) for max compatibility with other linuxes
-        if (!bootdev.isEmpty()){
+        if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
             out << bootdev + " /boot ext4 " + root_mntops + " 1 1 \n";
         }
-        if (homedev != "/dev/root") {
+        if (!homedev.isEmpty() && rootdev != rootDevicePreserve) {
             fstype = getPartType(homedev);
             if (isHomeFormatted) {
                 dump_pass = "1 2";
@@ -1318,11 +1428,28 @@ void MInstall::makeFstab(const QString &rootdev, const QString &homedev, const Q
                 out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
             }
         }
-        if (swapdev != "/dev/none") {
+        if (!swapdev.isEmpty()) {
             out << swapdev +" swap swap defauts 0 0 \n";
         }
         file.close();
     }
+    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
+    if (POPULATE_MEDIA_MOUNTPOINTS) {
+        runCmd("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
+    }
+
+    qDebug() << "change fstab entries to use UUIDs";
+    // set mounts for chroot
+    runCmd("mount -o bind /dev /mnt/antiX/dev");
+    runCmd("mount -o bind /sys /mnt/antiX/sys");
+    runCmd("mount -o bind /proc /mnt/antiX/proc");
+
+    runCmd("chroot /mnt/antiX dev2uuid_fstab");
+
+    qDebug() << "clear chroot env";
+    runCmd("umount /mnt/antiX/proc");
+    runCmd("umount /mnt/antiX/sys");
+    runCmd("umount /mnt/antiX/dev");
 }
 
 void MInstall::copyLinux()
@@ -1548,40 +1675,7 @@ bool MInstall::installLoader()
 
     qDebug() << "Update Grub";
     runCmd("chroot /mnt/antiX update-grub");
-    qDebug() << "Create fstab";
-    //create fstab file
 
-
-    //if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
-//    if (POPULATE_MEDIA_MOUNTPOINTS) {
-//        //if compressed btrfs filesystem is not used, use default locate for fstab
-//        if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
-//            // if compressed btrfs filessystem is used, specify the -O switch
-//            runCmd("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
-//        } else {
-//            runCmd("/sbin/make-fstab --install /mnt/antiX --mntpnt=/media");
-//        }
-//    } else {
-//        //if POPULATE_MEDIA_MOUNTPOINTS is false, do not use --mntpnt switch
-//        //but do check for compressed btrfs filesystem
-//        if (rootTypeCombo->currentText().startsWith("btrfs-") || homeTypeCombo->currentText().startsWith("btrfs-")) {
-//            // if compressed btrfs filessystem is used, specify the -O switch
-//            runCmd("/sbin/make-fstab --install /mnt/antiX -O /mnt/antiX");
-//        } else {
-//            runCmd("/sbin/make-fstab --install /mnt/antiX");
-//        }
-//    }
-
-
-    //if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
-    //only add media mountpoints.  fstab is written elsewhere already
-
-    if (POPULATE_MEDIA_MOUNTPOINTS) {
-        runCmd("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
-    }
-
-    qDebug() << "change fstab entries to use UUIDs";
-    runCmd("chroot /mnt/antiX dev2uuid_fstab");
     qDebug() << "Update initramfs";
     runCmd("chroot /mnt/antiX update-initramfs -u -t -k all");
     qDebug() << "clear chroot env";
@@ -2797,23 +2891,6 @@ void MInstall::copyStart()
 void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-
-    // get config
-    QString rootdev = "/dev/" + rootCombo->currentText().section(" ", 0, 0);
-    QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
-    QString swapdev = "/dev/" + swapCombo->currentText().section(" ", 0, 0);
-
-    // if encrypting, modify devices to /dev/mapper categories
-    if (isRootEncrypted){
-        rootdev = "/dev/mapper/rootfs";
-    }
-    if (isHomeEncrypted) {
-        homedev = "/dev/mapper/homefs";
-    }
-    if (isSwapEncrypted) {
-        swapdev = "/dev/mapper/swapfs";
-    }
-
     timer->stop();
 
     if (exitStatus == QProcess::NormalExit) {
@@ -2821,93 +2898,9 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         chmod("/mnt/antiX/var/tmp", 01777);
         shell.run("cd /mnt/antiX && ln -s var/tmp tmp");
 
-        makeFstab(rootdev, homedev, swapdev);
+        makeFstab();
 
-        //write out crypttab if encrypting for auto-opening
-        //basic steps
-        // create keyfile
-        // add key file to luks containers
-        // get uuid of devices
-        // write out crypttab
-        // if encrypt-auto, add home and swap
-        // if encrypt just home, just add swap
-        // blkid -s UUID -o value devicename for UUID
-        // containerName     /dev/disk/by-uuid/UUID_OF_PARTITION  /root/keyfile  luks >>/etc/crypttab
-        // for auto install, only need to add swap
-        // for root and home, need to add home and swap
-        // for root only, add swap
-        // for home only, add swap
-
-        if (isRootEncrypted) { // if encrypting root
-            QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
-
-            //create keyfile
-            shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
-            shell.run("chmod 0400 /mnt/antiX/root/keyfile");
-
-            //add keyfile to container
-            QString swapUUID;
-            if (swapDevicePreserve != "/dev/none") {
-                swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
-
-                QProcess proc;
-                proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile");
-                proc.waitForStarted();
-                proc.write(password.toUtf8() + "\n");
-                proc.waitForFinished();
-            }
-
-            if (isHomeEncrypted) { // if encrypting separate /home
-                QProcess proc;
-                proc.start("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile");
-                proc.waitForStarted();
-                proc.write(password.toUtf8() + "\n");
-                proc.waitForFinished();
-            }
-            QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
-            //write crypttab keyfile entry
-            QFile file("/mnt/antiX/etc/crypttab");
-            if (file.open(QIODevice::WriteOnly)) {
-                QTextStream out(&file);
-                out << "rootfs /dev/disk/by-uuid/" + rootUUID +" none luks \n";
-                if (isHomeEncrypted) {
-                    QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
-                    out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
-                }
-                if (swapDevicePreserve != "/dev/none") {
-                    out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks,nofail \n";
-                }
-            }
-            file.close();
-        } else if (isHomeEncrypted) { // if encrypting /home without encrypting root
-            //create keyfile
-            shell.run("dd if=/dev/urandom of=/mnt/antiX/home/.keyfileDONOTdelete bs=1024 count=4");
-            shell.run("chmod 0400 /mnt/antiX/home/.keyfileDONOTdelete");
-
-            //add keyfile to container
-            QString swapUUID;
-            if (swapDevicePreserve != "/dev/none") {
-                swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
-
-                QProcess proc;
-                proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
-                proc.waitForStarted();
-                proc.write(FDEpassCust->text().toUtf8() + "\n");
-                proc.waitForFinished();
-            }
-            QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
-            //write crypttab keyfile entry
-            QFile file("/mnt/antiX/etc/crypttab");
-            if (file.open(QIODevice::WriteOnly)) {
-                QTextStream out(&file);
-                out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
-                if (swapDevicePreserve != "/dev/none") {
-                    out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
-                }
-            }
-            file.close();
-            system("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks");
-        }
+        writeKeyFile();
 
         // Copy live set up to install and clean up.
         //shell.run("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");

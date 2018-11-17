@@ -22,7 +22,6 @@
 #include <QProgressDialog>
 
 #include <sys/stat.h>
-#include <sys/swap.h>
 #include <unistd.h>
 #include <dirent.h>
 
@@ -69,7 +68,7 @@ public:
     void buildServiceList();
     void copyLinux();
     void installLinux();
-    void makeFstab(const QString &rootdev, const QString &homedev, const QString &swapdev);
+    void makeFstab();
     void prepareToInstall();
     void addItemCombo(QComboBox *cb, const QString *part);
     void removeItemCombo(QComboBox *cb, const QString *part);
@@ -78,6 +77,7 @@ public:
     void setServices();
     void updatePartitionWidgets();
     void updateStatus(QString msg, int val);
+    void writeKeyFile();
     bool checkDisk();
     bool checkPassword(const QString &pass);
     bool installLoader();
