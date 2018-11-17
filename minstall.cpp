@@ -3235,6 +3235,7 @@ void MInstall::on_homeCombo_activated(const QString &arg1)
 void MInstall::on_swapCombo_activated(const QString &arg1)
 {
     updatePartCombo(&prevItemSwap, arg1);
+    swapLabelEdit->setEnabled(swapCombo->currentText() != "none");
 }
 
 void MInstall::on_bootCombo_activated(const QString &arg1)
