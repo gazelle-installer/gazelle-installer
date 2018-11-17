@@ -53,10 +53,6 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     this->installEventFilter(this);
     this->args = args;
     labelMX->setPixmap(QPixmap("/usr/share/gazelle-installer-data/logo.png"));
-    char line[260];
-    char *tok;
-    FILE *fp;
-    int i;
 
     //setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
@@ -95,17 +91,8 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     // timezone
 
     timezoneCombo->clear();
-    fp = popen("awk -F '\\t' '!/^#/ { print $3 }' /usr/share/zoneinfo/zone.tab | sort", "r");
-    if (fp != NULL) {
-        while (fgets(line, sizeof line, fp) != NULL) {
-            i = strlen(line);
-            line[--i] = '\0';
-            if (line != NULL && strlen(line) > 1) {
-                timezoneCombo->addItem(line);
-            }
-        }
-        pclose(fp);
-    }
+    QString tzone = shell.getOutput("awk -F '\\t' '!/^#/ { print $3 }' /usr/share/zoneinfo/zone.tab | sort");
+    timezoneCombo->addItems(tzone.split("\n"));
     timezoneCombo->setCurrentIndex(timezoneCombo->findText(getCmdOut("cat /etc/timezone")));
 
 
@@ -171,18 +158,9 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
 
     // locale
     localeCombo->clear();
-    fp = popen("cat /usr/share/antiX/locales.template", "r");
-    if (fp != NULL) {
-        while (fgets(line, sizeof line, fp) != NULL) {
-            i = strlen(line);
-            line[--i] = '\0';
-            tok = strtok(line, " ");
-            if (tok != NULL && strlen(tok) > 1 && strncmp(tok, "#", 1) != 0) {
-                localeCombo->addItem(tok);
-            }
-        }
-        pclose(fp);
-    }
+    QString loc_temp = shell.getOutput("cat /usr/share/antiX/locales.template");
+    localeCombo->addItems(loc_temp.split("\n")); // add all
+    localeCombo->removeItem(localeCombo->findText("#", Qt::MatchStartsWith)); // remove commented out lines
     QString locale;
     locale = getCmdOut("grep ^LANG /etc/default/locale").section('=',1);
     if (localeCombo->findText(locale) != -1) {
