@@ -1415,7 +1415,7 @@ void MInstall::makeFstab()
         if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
             out << bootdev + " /boot ext4 " + root_mntops + " 1 1 \n";
         }
-        if (!homedev.isEmpty() && rootdev != rootDevicePreserve) {
+        if (!homedev.isEmpty() && homedev != rootDevicePreserve) {
             fstype = getPartType(homedev);
             if (isHomeFormatted) {
                 dump_pass = "1 2";
@@ -1430,7 +1430,7 @@ void MInstall::makeFstab()
                 out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
             }
         }
-        if (!swapdev.isEmpty()) {
+        if (!swapdev.isEmpty() && swapdev != "/dev/none") {
             out << swapdev +" swap swap defauts 0 0 \n";
         }
         file.close();
