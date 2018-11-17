@@ -978,10 +978,6 @@ bool MInstall::makeChosenPartitions()
 
     // Boot
     if (bootCombo->currentText() == "root") {
-        if (checkBoxEncryptRoot->isChecked()) {
-            QMessageBox::critical(this, QString::null, tr("You must choose a separate boot partition when encrypting root."));
-            return false;
-        }
         bootdev = rootdev;
     } else {
         bootdev = "/dev/" + bootCombo->currentText().section(" -", 0, 0).trimmed();
@@ -2193,8 +2189,16 @@ int MInstall::showPage(int curr, int next)
             return 3;
         }
     } else if  (next == 3 && curr == 2) {// at  Step_Parttion (fwd)
-        if ((checkBoxEncrpytSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) && !checkPassword(FDEpassCust->text())) {
-            return curr;
+        if (checkBoxEncrpytSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
+            if (!checkPassword(FDEpassCust->text())) {
+                return curr;
+            }
+            if (bootCombo->currentText() == "root") {
+                if (checkBoxEncryptRoot->isChecked()) {
+                    QMessageBox::critical(this, QString::null, tr("You must choose a separate boot partition when encrypting root."));
+                    return curr;
+                }
+            }
         }
     } else if (next == 3 && curr == 4) { // at Step_Boot screen (back)
         return 1;
