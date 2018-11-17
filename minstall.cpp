@@ -2822,94 +2822,94 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
                 out << "/dev/mapper/swapfs swap swap defauts 0 0 \n";
             }
             file.close();
-
-
-            //write out crypttab if encrypting for auto-opening
-            //basic steps
-            // create keyfile
-            // add key file to luks containers
-            // get uuid of devices
-            // write out crypttab
-            // if encrypt-auto, add home and swap
-            // if encrypt just home, just add swap
-            // blkid -s UUID -o value devicename for UUID
-            // containerName     /dev/disk/by-uuid/UUID_OF_PARTITION  /root/keyfile  luks >>/etc/crypttab
-            // for auto install, only need to add swap
-            // for root and home, need to add home and swap
-            // for root only, add swap
-            // for home only, add swap
-
-            if (isRootEncrypted) { // if encrypting root
-                QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
-
-                //create keyfile
-                shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
-                shell.run("chmod 0400 /mnt/antiX/root/keyfile");
-
-                //add keyfile to container
-                QString swapUUID;
-                if (swapDevicePreserve != "/dev/none") {
-                    swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
-
-                    QProcess proc;
-                    proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile");
-                    proc.waitForStarted();
-                    proc.write(password.toUtf8() + "\n");
-                    proc.waitForFinished();
-                }
-
-                if (isHomeEncrypted) { // if encrypting separate /home
-                    QProcess proc;
-                    proc.start("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile");
-                    proc.waitForStarted();
-                    proc.write(password.toUtf8() + "\n");
-                    proc.waitForFinished();
-                }
-                QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
-                //write crypttab keyfile entry
-                QFile file2("/mnt/antiX/etc/crypttab");
-                if (file2.open(QIODevice::WriteOnly)) {
-                    QTextStream out(&file2);
-                    out << "rootfs /dev/disk/by-uuid/" + rootUUID +" none luks \n";
-                    if (isHomeEncrypted) {
-                        QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
-                        out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
-                    }
-                    if (swapDevicePreserve != "/dev/none") {
-                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks,nofail \n";
-                    }
-                }
-                file2.close();
-            } else if (isHomeEncrypted) { // if encrypting /home without encrypting root
-                //create keyfile
-                shell.run("dd if=/dev/urandom of=/mnt/antiX/home/.keyfileDONOTdelete bs=1024 count=4");
-                shell.run("chmod 0400 /mnt/antiX/home/.keyfileDONOTdelete");
-
-                //add keyfile to container
-                QString swapUUID;
-                if (swapDevicePreserve != "/dev/none") {
-                    swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
-
-                    QProcess proc;
-                    proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
-                    proc.waitForStarted();
-                    proc.write(FDEpassCust->text().toUtf8() + "\n");
-                    proc.waitForFinished();
-                }
-                QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
-                //write crypttab keyfile entry
-                QFile file2("/mnt/antiX/etc/crypttab");
-                if (file2.open(QIODevice::WriteOnly)) {
-                    QTextStream out(&file2);
-                    out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
-                    if (swapDevicePreserve != "/dev/none") {
-                        out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
-                    }
-                }
-                file2.close();
-                system("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks");
-            }
         }
+
+        //write out crypttab if encrypting for auto-opening
+        //basic steps
+        // create keyfile
+        // add key file to luks containers
+        // get uuid of devices
+        // write out crypttab
+        // if encrypt-auto, add home and swap
+        // if encrypt just home, just add swap
+        // blkid -s UUID -o value devicename for UUID
+        // containerName     /dev/disk/by-uuid/UUID_OF_PARTITION  /root/keyfile  luks >>/etc/crypttab
+        // for auto install, only need to add swap
+        // for root and home, need to add home and swap
+        // for root only, add swap
+        // for home only, add swap
+
+        if (isRootEncrypted) { // if encrypting root
+            QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
+
+            //create keyfile
+            shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
+            shell.run("chmod 0400 /mnt/antiX/root/keyfile");
+
+            //add keyfile to container
+            QString swapUUID;
+            if (swapDevicePreserve != "/dev/none") {
+                swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+
+                QProcess proc;
+                proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile");
+                proc.waitForStarted();
+                proc.write(password.toUtf8() + "\n");
+                proc.waitForFinished();
+            }
+
+            if (isHomeEncrypted) { // if encrypting separate /home
+                QProcess proc;
+                proc.start("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile");
+                proc.waitForStarted();
+                proc.write(password.toUtf8() + "\n");
+                proc.waitForFinished();
+            }
+            QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
+            //write crypttab keyfile entry
+            QFile file("/mnt/antiX/etc/crypttab");
+            if (file.open(QIODevice::WriteOnly)) {
+                QTextStream out(&file);
+                out << "rootfs /dev/disk/by-uuid/" + rootUUID +" none luks \n";
+                if (isHomeEncrypted) {
+                    QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
+                    out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
+                }
+                if (swapDevicePreserve != "/dev/none") {
+                    out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks,nofail \n";
+                }
+            }
+            file.close();
+        } else if (isHomeEncrypted) { // if encrypting /home without encrypting root
+            //create keyfile
+            shell.run("dd if=/dev/urandom of=/mnt/antiX/home/.keyfileDONOTdelete bs=1024 count=4");
+            shell.run("chmod 0400 /mnt/antiX/home/.keyfileDONOTdelete");
+
+            //add keyfile to container
+            QString swapUUID;
+            if (swapDevicePreserve != "/dev/none") {
+                swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+
+                QProcess proc;
+                proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
+                proc.waitForStarted();
+                proc.write(FDEpassCust->text().toUtf8() + "\n");
+                proc.waitForFinished();
+            }
+            QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
+            //write crypttab keyfile entry
+            QFile file("/mnt/antiX/etc/crypttab");
+            if (file.open(QIODevice::WriteOnly)) {
+                QTextStream out(&file);
+                out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
+                if (swapDevicePreserve != "/dev/none") {
+                    out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
+                }
+            }
+            file.close();
+            system("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks");
+        }
+
         // Copy live set up to install and clean up.
         //shell.run("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");
         shell.run("/usr/sbin/live-to-installed /mnt/antiX");
