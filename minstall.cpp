@@ -565,7 +565,6 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
     }
 
     QString cmd;
-    char line[260];
     if (type == "reiserfs") {
         cmd = QString("mkfs.reiserfs -q %1 -l \"%2\"").arg(dev).arg(label);
     } else if (type == "reiser4") {
@@ -593,14 +592,9 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
         // btrfs and set up fsck
         shell.run("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
-        const char *partstr;
         sleep(1);
-        cmd = QString("/sbin/sfdisk -s %1").arg(dev);
-        FILE *fp = popen(cmd.toUtf8(), "r");
-        fgets(line, sizeof line, fp);
-        partstr = strtok(line," ");
-        pclose(fp);
-        int size = atoi(partstr);
+        QString size_str = shell.getOutput("/sbin/sfdisk -s " + dev);
+        quint64 size = size_str.toULongLong();
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
         if (size < 6000) {
@@ -698,7 +692,6 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
 bool MInstall::makeDefaultPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    char line[130];
     int ans;
     int prog = 0;
     bool uefi = isUefi();
@@ -738,17 +731,11 @@ bool MInstall::makeDefaultPartitions()
         free = 0;
     }
 
-    const char *tstr;                    // total size
-
     // calculate new partition sizes
     // get the total disk size
     sleep(1);
-    cmd = QString("/sbin/sfdisk -s %1").arg(drv);
-    FILE *fp = popen(cmd.toUtf8(), "r");
-    fgets(line, sizeof line, fp);
-    tstr = strtok(line," ");
-    pclose(fp);
-    int size = atoi(tstr);
+    QString size_str = shell.getOutput("/sbin/sfdisk -s " + drv);
+    quint64 size = size_str.toULongLong();
     size = size / 1024; // in MiB
     // pre-compensate for rounding errors in disk geometry
     size = size - 32;
