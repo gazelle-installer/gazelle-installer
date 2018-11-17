@@ -554,7 +554,7 @@ bool MInstall::makeEsp(QString drv, int size)
     return true;
 }
 
-bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QString label)
+bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, const QString &label)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
@@ -566,12 +566,12 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
 
     QString cmd;
     char line[260];
-    if (strncmp(type, "reiserfs", 4) == 0) {
+    if (type == "reiserfs") {
         cmd = QString("mkfs.reiserfs -q %1 -l \"%2\"").arg(dev).arg(label);
-    } else if (strncmp(type, "reiser4", 4) == 0) {
+    } else if (type == "reiser4") {
         // reiser4
         cmd = QString("mkfs.reiser4 -f -y %1 -L \"%2\"").arg(dev).arg(label);
-    } else if (strncmp(type, "ext3", 4) == 0) {
+    } else if (type == "ext3") {
         // ext3
         if (bad) {
             // do with badblocks
@@ -580,7 +580,7 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
             // do no badblocks
             cmd = QString("mkfs.ext3 -F %1 -L \"%2\"").arg(dev).arg(label);
         }
-    } else if (strncmp(type, "ext2", 4) == 0) {
+    } else if (type == "ext2") {
         // ext2
         if (bad) {
             // do with badblocks
@@ -589,7 +589,7 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
             // do no badblocks
             cmd = QString("mkfs.ext2 -F %1 -L \"%2\"").arg(dev).arg(label);
         }
-    } else if (strncmp(type, "btrfs", 4) == 0) {
+    } else if (type == "btrfs") {
         // btrfs and set up fsck
         shell.run("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
@@ -609,22 +609,22 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
             cmd = QString("mkfs.btrfs -f %1 -L \"%2\"").arg(dev).arg(label);
         }
         // if compression has been selected by user, set flag
-        if (strncmp(type, "btrfs-zlib", 8) == 0) {
+        if (type == "btrfs-zlib") {
             if (homedev == dev || dev == "/dev/mapper/homefs") { // if formating /home partition
                 home_mntops = "defaults,noatime,compress-force=zlib";
             } else {
                 root_mntops = "defaults,noatime,compress-force=zlib";
             }
-        } else if (strncmp(type, "btrfs-lzo", 8) == 0) {
+        } else if (type == "btrfs-lzo") {
             if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formating /home partition
                 home_mntops = "defaults,noatime,compress-force=lzo";
             } else {
                 root_mntops = "defaults,noatime,compress-force=lzo";
             }
         }
-    } else if (strncmp(type, "xfs", 4) == 0) {
+    } else if (type == "xfs") {
         cmd = QString("mkfs.xfs -f %1 -L \"%2\"").arg(dev).arg(label);
-    } else if (strncmp(type, "jfs", 4) == 0) {
+    } else if (type == "jfs") {
         if (bad) {
             // do with badblocks
             cmd = QString("mkfs.jfs -q -c %1 -L \"%2\"").arg(dev).arg(label);
@@ -647,7 +647,7 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
     }
     system("sleep 1");
 
-    if (strncmp(type, "ext*", 4) == 0) {
+    if (type.startsWith("ext")) {
         // ext4 tuning
         cmd = QString("/sbin/tune2fs -c0 -C0 -i1m %1").arg(dev);
         if (shell.run(cmd) != 0) {
@@ -946,8 +946,8 @@ bool MInstall::makeChosenPartitions()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     int ans;
     int prog = 0;
-    char root_type[20];
-    char home_type[20];
+    QString root_type;
+    QString home_type;
     QString msg;
     QString cmd;
 
@@ -959,8 +959,8 @@ bool MInstall::makeChosenPartitions()
     bool gpt = isGpt(drv);
 
     // get config
-    strncpy(root_type, rootTypeCombo->currentText().toUtf8(), 10);
-    strncpy(home_type, homeTypeCombo->currentText().toUtf8(), 10);
+    root_type = rootTypeCombo->currentText().toUtf8();
+    home_type = homeTypeCombo->currentText().toUtf8();
 
     // Root
     QString rootdev = "/dev/" + rootCombo->currentText().section(" -", 0, 0).trimmed();
@@ -1028,6 +1028,7 @@ bool MInstall::makeChosenPartitions()
     }
 
     // format swap
+
     //if no swap is chosen do nothing
     if (swapdev != "/dev/none") {
         //if partition chosen is already swap, don't do anything
@@ -1212,7 +1213,7 @@ bool MInstall::makeChosenPartitions()
         } else {
             // on root, make sure it exists
             system("sleep 1");
-            mkdir("/mnt/antiX/home",0755);
+            mkdir("/mnt/antiX/home", 0755);
         }
     } else {
         // don't save home
@@ -1228,7 +1229,7 @@ bool MInstall::makeChosenPartitions()
             }
         }
 
-        mkdir("/mnt/antiX/home",0755);
+        mkdir("/mnt/antiX/home", 0755);
 
         if (homedev != "/dev/root") { // not on root
             updateStatus(tr("Formatting the /home partition"), ++prog);
