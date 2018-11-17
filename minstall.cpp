@@ -1469,6 +1469,7 @@ void MInstall::copyLinux()
     //if separate /boot in use, mount that to /mnt/antiX/boot
     if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
         mkdir("/mnt/antiX/boot", 0755);
+        shell.run("fsck.ext4 -y " + bootdev, QStringList("quiet")); // needed to run fsck because sfdisk --part-type can mess up the partition
         if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
             qDebug() << "Could not mount /boot on " + bootdev;
             return;
