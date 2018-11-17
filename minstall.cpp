@@ -881,16 +881,18 @@ bool MInstall::makeDefaultPartitions()
             bootdev = drv + mmcnvmepartdesignator + "2";
             rootdev = drv + mmcnvmepartdesignator + "3";
             swapdev = drv + mmcnvmepartdesignator + "4";
-            rootDevicePreserve = rootdev;
-            swapDevicePreserve = swapdev;
         } else {
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
             updateStatus(tr("Formating EFI System Partition (ESP)"), ++prog);
         }
+        rootDevicePreserve = rootdev;
+        swapDevicePreserve = swapdev;
+
         if(!makeEsp(drv, esp_size)) {
             return false;
         }
+
     } else {
         // new msdos partition table
         cmd = QString("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv);
@@ -905,12 +907,12 @@ bool MInstall::makeDefaultPartitions()
             bootdev = drv + mmcnvmepartdesignator + "1";
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
-            rootDevicePreserve = rootdev;
-            swapDevicePreserve = swapdev;
         } else {
             rootdev = drv + mmcnvmepartdesignator + "1";
             swapdev = drv + mmcnvmepartdesignator + "2";
         }
+        rootDevicePreserve = rootdev;
+        swapDevicePreserve = swapdev;
     }
 
     // create root partition
