@@ -69,6 +69,7 @@ public:
     void buildServiceList();
     void copyLinux();
     void installLinux();
+    void makeFstab(const QString &rootdev, const QString &homedev, const QString &swapdev);
     void prepareToInstall();
     void addItemCombo(QComboBox *cb, const QString *part);
     void removeItemCombo(QComboBox *cb, const QString *part);
