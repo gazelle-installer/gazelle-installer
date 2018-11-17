@@ -557,9 +557,8 @@ bool MInstall::makeEsp(QString drv, int size)
 bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QString label)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-
     QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
-    if (homedev == dev) {  // if formating /home partition
+    if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formating /home partition
         home_mntops = "defaults,noatime";
     } else {
         root_mntops = "defaults,noatime";
@@ -611,13 +610,13 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
         }
         // if compression has been selected by user, set flag
         if (strncmp(type, "btrfs-zlib", 8) == 0) {
-            if (homedev == dev) {  // if formating /home partition
+            if (homedev == dev || dev == "/dev/mapper/homefs") { // if formating /home partition
                 home_mntops = "defaults,noatime,compress-force=zlib";
             } else {
                 root_mntops = "defaults,noatime,compress-force=zlib";
             }
         } else if (strncmp(type, "btrfs-lzo", 8) == 0) {
-            if (homedev == dev) {  // if formating /home partition
+            if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formating /home partition
                 home_mntops = "defaults,noatime,compress-force=lzo";
             } else {
                 root_mntops = "defaults,noatime,compress-force=lzo";
@@ -651,9 +650,9 @@ bool MInstall::makeLinuxPartition(QString dev, const char *type, bool bad, QStri
     if (strncmp(type, "ext*", 4) == 0) {
         // ext4 tuning
         cmd = QString("/sbin/tune2fs -c0 -C0 -i1m %1").arg(dev);
-    }
-    if (shell.run(cmd) != 0) {
-        // error
+        if (shell.run(cmd) != 0) {
+            // error
+        }
     }
     return true;
 }
@@ -1029,7 +1028,6 @@ bool MInstall::makeChosenPartitions()
     }
 
     // format swap
-
     //if no swap is chosen do nothing
     if (swapdev != "/dev/none") {
         //if partition chosen is already swap, don't do anything
@@ -1132,7 +1130,7 @@ bool MInstall::makeChosenPartitions()
             if (gpt) {
                 cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:8200").arg(swapsplit[0]).arg(swapsplit[1]);
             } else {
-                cmd = QString("/sbin/sfdisk /dev/%1 --change-id %2 82").arg(swapsplit[0]).arg(swapsplit[1]);
+                cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 82").arg(swapsplit[0]).arg(swapsplit[1]);
             }
             shell.run(cmd);
             system("sleep 1");
@@ -1164,7 +1162,7 @@ bool MInstall::makeChosenPartitions()
         if (gpt) {
             cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:8303").arg(rootsplit[0]).arg(rootsplit[1]);
         } else {
-            cmd = QString("/sbin/sfdisk /dev/%1 --change-id %2 83").arg(rootsplit[0]).arg(rootsplit[1]);
+            cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 83").arg(rootsplit[0]).arg(rootsplit[1]);
         }
         shell.run(cmd);
         system("sleep 1");
@@ -1195,7 +1193,7 @@ bool MInstall::makeChosenPartitions()
         if (gpt) {
             cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:ef02").arg(bootsplit[0]).arg(bootsplit[1]);
         } else {
-            cmd = QString("/sbin/sfdisk /dev/%1 --change-id %2 83").arg(bootsplit[0]).arg(bootsplit[1]);
+            cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 83").arg(bootsplit[0]).arg(bootsplit[1]);
         }
         if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
             return false;
@@ -1238,7 +1236,7 @@ bool MInstall::makeChosenPartitions()
             if (gpt) {
                 cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:8302").arg(homesplit[0]).arg(homesplit[1]);
             } else {
-                cmd = QString("/sbin/sfdisk /dev/%1 --change-id %2 83").arg(homesplit[0]).arg(homesplit[1]);
+                cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 83").arg(homesplit[0]).arg(homesplit[1]);
             }
             shell.run(cmd);
             system("sleep 1");
@@ -1312,7 +1310,7 @@ void MInstall::copyLinux()
 
     //if separate /boot in use, mount that to /mnt/antiX/boot
     if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
-        mkdir("/mnt/antiX/boot",0755);
+        mkdir("/mnt/antiX/boot", 0755);
         if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
             qDebug() << "Could not mount /boot on " + bootdev;
             return;
