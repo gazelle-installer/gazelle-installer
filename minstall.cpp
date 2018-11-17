@@ -1280,6 +1280,51 @@ void MInstall::installLinux()
     }
 }
 
+// create /etc/fstab file
+void MInstall::makeFstab(const QString &rootdev, const QString &homedev, const QString &swapdev)
+{
+    QString fstype = getPartType(rootdev);
+    QString dump_pass = "1 1";
+
+    if (fstype.startsWith("btrfs")) {
+        dump_pass = "1 0";
+    } else if (fstype.startsWith("reiser") ) {
+        root_mntops += ",notail";
+        dump_pass = "0 0";
+    }
+
+    QFile file("/mnt/antiX/etc/fstab");
+    if (file.open(QIODevice::WriteOnly)) {
+        QTextStream out(&file);
+        out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
+        out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
+        //add bootdev if present
+        //only ext4 (for now) for max compatibility with other linuxes
+        if (!bootdev.isEmpty()){
+            out << bootdev + " /boot ext4 " + root_mntops + " 1 1 \n";
+        }
+        if (homedev != "/dev/root") {
+            fstype = getPartType(homedev);
+            if (isHomeFormatted) {
+                dump_pass = "1 2";
+                if (fstype.startsWith("btrfs")) {
+                    dump_pass = "1 2";
+                } else if (fstype.startsWith("reiser") ) {
+                    home_mntops += ",notail";
+                    dump_pass = "0 0";
+                }
+                out << homedev + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
+            } else { // if not formatted
+                out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
+            }
+        }
+        if (swapdev != "/dev/none") {
+            out << swapdev +" swap swap defauts 0 0 \n";
+        }
+        file.close();
+    }
+}
+
 void MInstall::copyLinux()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -2754,9 +2799,9 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
     // get config
-
     QString rootdev = "/dev/" + rootCombo->currentText().section(" ", 0, 0);
     QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
+    QString swapdev = "/dev/" + swapCombo->currentText().section(" ", 0, 0);
 
     // if encrypting, modify devices to /dev/mapper categories
     if (isRootEncrypted){
@@ -2765,54 +2810,18 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
     if (isHomeEncrypted) {
         homedev = "/dev/mapper/homefs";
     }
+    if (isSwapEncrypted) {
+        swapdev = "/dev/mapper/swapfs";
+    }
 
     timer->stop();
 
     if (exitStatus == QProcess::NormalExit) {
         updateStatus(tr("Fixing configuration"), 99);
-        chmod("/mnt/antiX/var/tmp",01777);
+        chmod("/mnt/antiX/var/tmp", 01777);
         shell.run("cd /mnt/antiX && ln -s var/tmp tmp");
 
-        QString fstype = getPartType(rootdev);
-        QString dump_pass = "1 1";
-
-        if (fstype.startsWith("btrfs")) {
-            dump_pass = "1 0";
-        } else if (fstype.startsWith("reiser") ) {
-            root_mntops += ",notail";
-            dump_pass = "0 0";
-        }
-
-        QFile file("/mnt/antiX/etc/fstab");
-        if (file.open(QIODevice::WriteOnly)) {
-            QTextStream out(&file);
-            out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
-            out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
-            //add bootdev if present
-            //only ext4 (for now) for max compatibility with other linuxes
-            if (!bootdev.isEmpty()){
-                out << bootdev + " /boot ext4 " + root_mntops + " 1 1 \n";
-            }
-            if (homedev != "/dev/root") {
-                fstype = getPartType(homedev);
-                if (isHomeFormatted) {
-                    dump_pass = "1 2";
-                    if (fstype.startsWith("btrfs")) {
-                        dump_pass = "1 2";
-                    } else if (fstype.startsWith("reiser") ) {
-                        home_mntops += ",notail";
-                        dump_pass = "0 0";
-                    }
-                    out << homedev + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
-                } else { // if not formatted
-                    out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
-                }
-            }
-            if (isSwapEncrypted) {
-                out << "/dev/mapper/swapfs swap swap defauts 0 0 \n";
-            }
-            file.close();
-        }
+        makeFstab(rootdev, homedev, swapdev);
 
         //write out crypttab if encrypting for auto-opening
         //basic steps
