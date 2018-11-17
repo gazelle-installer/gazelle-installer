@@ -1220,7 +1220,7 @@ bool MInstall::makeChosenPartitions()
         // don't save home
         shell.run("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1");
 
-        if (checkBoxEncryptHome->isChecked() && homedev != "/dev/root") {
+        if (isHomeEncrypted) {
             updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
             if(!makeLuksPartition(homedev, "homefs", FDEpassCust->text().toUtf8())) {
                 qDebug() << "could not make home LUKS partition";
@@ -2803,9 +2803,9 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
             if (!bootdev.isEmpty()){
                 out << bootdev + " /boot ext4 " + root_mntops + " 1 1 \n";
             }
-            if (homedev != "/dev/root" && !isHomeEncrypted) {
+            if (homedev != "/dev/root") {
                 fstype = getPartType(homedev);
-                if (isHomeFormatted) { // if formatted and not encrypted
+                if (isHomeFormatted) {
                     dump_pass = "1 2";
                     if (fstype.startsWith("btrfs")) {
                         dump_pass = "1 2";
