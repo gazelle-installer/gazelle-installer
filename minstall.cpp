@@ -2797,9 +2797,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         if (file.open(QIODevice::WriteOnly)) {
             QTextStream out(&file);
             out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
-            if(!isRootEncrypted) {
-                out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
-            }
+            out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
             //add bootdev if present
             //only ext4 (for now) for max compatibility with other linuxes
             if (!bootdev.isEmpty()){
