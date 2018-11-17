@@ -398,10 +398,10 @@ void MInstall::writeKeyFile()
             out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
             if (swapDevicePreserve != "/dev/none") {
                 out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
+                system("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks");
             }
         }
         file.close();
-        system("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks");
     }
 }
 
