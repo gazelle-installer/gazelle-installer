@@ -2569,8 +2569,16 @@ void MInstall::refresh()
     QStringList drives = getCmdOuts("partition-info" + exclude + " --min-size=" + MIN_ROOT_DEVICE_SIZE + " -n drives");
     diskCombo->clear();
     grubBootCombo->clear();
-    homeLabelEdit->setEnabled(false);
+
+    rootTypeCombo->setEnabled(false);
     homeTypeCombo->setEnabled(false);
+    checkBoxEncryptRoot->setEnabled(false);
+    checkBoxEncryptHome->setEnabled(false);
+    rootLabelEdit->setEnabled(false);
+    homeLabelEdit->setEnabled(false);
+    homeLabelEdit->setEnabled(false);
+    swapLabelEdit->setEnabled(false);
+
     diskCombo->addItems(drives);
     diskCombo->setCurrentIndex(0);
     grubBootCombo->addItems(drives);
@@ -2742,6 +2750,9 @@ void MInstall::on_diskCombo_activated(QString)
 void MInstall::on_rootCombo_activated(const QString &arg1)
 {
     updatePartCombo(&prevItemRoot, arg1);
+    rootLabelEdit->setEnabled(!arg1.isEmpty());
+    rootTypeCombo->setEnabled(!arg1.isEmpty());
+    checkBoxEncryptRoot->setEnabled(!arg1.isEmpty());
 }
 
 void MInstall::on_rootTypeCombo_activated(QString)
@@ -3039,11 +3050,15 @@ void MInstall::on_buttonSetKeyboard_clicked()
 
 void MInstall::on_homeCombo_currentIndexChanged(const QString &arg1)
 {
-    homeLabelEdit->setEnabled(arg1 !="root");
+    if (arg1.isEmpty()) {
+        return;
+    }
+    homeLabelEdit->setEnabled(arg1 != "root");
     homeTypeCombo->setEnabled(arg1 != "root");
     checkBoxEncryptHome->setEnabled(arg1 != "root");
-    if (checkBoxEncryptRoot->isChecked() && arg1 == "root") {
-        checkBoxEncryptHome->setChecked(true);
+    checkBoxEncryptHome->setChecked(checkBoxEncryptRoot->isChecked() && arg1 == "root");
+    if (arg1 == "root") {
+        homeTypeCombo->setCurrentIndex(rootTypeCombo->currentIndex());
     }
 }
 
