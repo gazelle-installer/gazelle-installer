@@ -2374,7 +2374,9 @@ void MInstall::pageDisplayed(int next)
                                        "<p>Installation requires about %1 of space. %2 or more is preferred. "
                                        "You can use the entire disk or you can put the installation on existing partitions. </p>"
                                        "<p>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.</p>"
-                                       "<p>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</p>").arg(MIN_INSTALL_SIZE).arg(PREFERRED_MIN_INSTALL_SIZE));
+                                       "<p>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</p>").arg(MIN_INSTALL_SIZE).arg(PREFERRED_MIN_INSTALL_SIZE) + tr(""
+                                       "<p>Encrypting your root, home and swap partitions are possible via LUKS encryption.  A password is required (8 characters minimum length)</p>") + tr(""
+                                       "<p>A separate unencrypted boot partition is required"));
         break;
 
     case 2:  // choose partition
