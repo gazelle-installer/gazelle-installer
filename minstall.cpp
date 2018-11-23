@@ -2375,8 +2375,11 @@ void MInstall::pageDisplayed(int next)
                                        "You can use the entire disk or you can put the installation on existing partitions. </p>"
                                        "<p>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.</p>"
                                        "<p>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</p>").arg(MIN_INSTALL_SIZE).arg(PREFERRED_MIN_INSTALL_SIZE) + tr(""
-                                       "<p>Encrypting your root, home and swap partitions are possible via LUKS encryption.  A password is required (8 characters minimum length)</p>") + tr(""
-                                       "<p>A separate unencrypted boot partition is required"));
+                                       "<p>Autoinstall will place home on the root partition.</p>") + tr(""
+                                       "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
+                                       "<p>A separate unencrypted boot partition is required.</p>") + tr(""
+                                       "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
+        ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         break;
 
     case 2:  // choose partition
@@ -2392,7 +2395,9 @@ void MInstall::pageDisplayed(int next)
                                        "<p>Additional compression options are available for drives using btrfs. "
                                        "Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</p>"
                                        "<p><b>Bad Blocks</b><br/>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. "
-                                       "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME));
+                                       "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME)+ tr(""
+                                       "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
+                                       "<p>A separate unencrypted boot partition is required.</p>"));
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         break;
 
