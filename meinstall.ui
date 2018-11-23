@@ -132,7 +132,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="Step_Terms">
       <layout class="QGridLayout" name="_4">
@@ -460,7 +460,7 @@
              <bool>false</bool>
             </property>
             <property name="text">
-             <string>Encrypt?</string>
+             <string>Encrypt</string>
             </property>
            </widget>
           </item>
@@ -1134,7 +1134,7 @@
           <item row="0" column="5">
            <widget class="QLabel" name="label_8">
             <property name="text">
-             <string>Encrypt?</string>
+             <string>Encrypt</string>
             </property>
            </widget>
           </item>
