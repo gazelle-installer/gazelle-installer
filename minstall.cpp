@@ -63,6 +63,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     PROJECTFORUM=settings.value("FORUM_URL").toString();
     INSTALL_FROM_ROOT_DEVICE=settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
     MIN_ROOT_DEVICE_SIZE=settings.value("MIN_ROOT_DRIVE_SIZE").toString();
+    MIN_BOOT_DEVICE_SIZE=settings.value("MIN_BOOT_DRIVE_SIZE", "256").toString();
     DEFAULT_HOSTNAME=settings.value("DEFAULT_HOSTNAME").toString();
     ENABLE_SERVICES=settings.value("ENABLE_SERVICES").toStringList();
     POPULATE_MEDIA_MOUNTPOINTS=settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
@@ -2740,7 +2741,7 @@ void MInstall::on_diskCombo_activated(QString)
     swapCombo->addItems(partitions);
 
     // build bootCombo for all disks, exclude ESP (EFI)
-    partitions = getCmdOuts("partition-info all -n --exclude=" + exclude + "efi");
+    partitions = getCmdOuts("partition-info all -n --exclude=" + exclude + "efi --min-size=" + MIN_BOOT_DEVICE_SIZE);
     bootCombo->addItems(partitions);
 
     on_rootCombo_activated();
