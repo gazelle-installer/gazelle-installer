@@ -405,6 +405,22 @@ void MInstall::writeKeyFile()
     }
 }
 
+// disable hibernate when using encrypted swap
+void MInstall::disablehiberanteinitramfs()
+{
+    QString cmd;
+    if (isSwapEncrypted) {
+        cmd = "touch /mnt/antiX/initramfs-tools/conf.d/resume";
+        shell.run(cmd);
+        QFile file("/mnt/antiX/etc/initramfs-tools/conf.d/resume");
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream out(&file);
+            out << "RESUME=none";
+        }
+        file.close();
+    }
+}
+
 bool MInstall::mountPartition(const QString dev, const QString point, const QString mntops)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -1634,6 +1650,9 @@ bool MInstall::installLoader()
 
     //remove any duplicate codes in list (typically splash)
     finalcmdline.removeDuplicates();
+
+    //remove vga=ask
+    finalcmdline.removeAll("vga=ask");
 
     //remove in null or empty strings that might have crept in
     finalcmdline.removeAll({});
@@ -2900,6 +2919,9 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         makeFstab();
 
         writeKeyFile();
+
+        disablehiberanteinitramfs();
+
 
         // Copy live set up to install and clean up.
         //shell.run("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");

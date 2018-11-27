@@ -78,6 +78,7 @@ public:
     void updatePartitionWidgets();
     void updateStatus(QString msg, int val);
     void writeKeyFile();
+    void disablehiberanteinitramfs();
     bool checkDisk();
     bool checkPassword(const QString &pass);
     bool installLoader();
