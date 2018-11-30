@@ -6,6 +6,7 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_bg.ts \
                 translations/gazelle-installer_ca.ts \
                 translations/gazelle-installer_cs.ts \
+                translations/gazelle-installer_da.ts \
                 translations/gazelle-installer_de.ts \
                 translations/gazelle-installer_el.ts \
                 translations/gazelle-installer_es.ts \
@@ -14,6 +15,7 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_hi.ts \
                 translations/gazelle-installer_hr.ts \
                 translations/gazelle-installer_hu.ts \
+                translations/gazelle-installer_is.ts \
                 translations/gazelle-installer_it.ts \
                 translations/gazelle-installer_ja.ts \
                 translations/gazelle-installer_kk.ts \
@@ -25,6 +27,7 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_ro.ts \
                 translations/gazelle-installer_ru.ts \
                 translations/gazelle-installer_sk.ts \
+                translations/gazelle-installer_sq.ts \
                 translations/gazelle-installer_sv.ts \
                 translations/gazelle-installer_tr.ts \
                 translations/gazelle-installer_uk.ts \
