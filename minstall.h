@@ -22,7 +22,6 @@
 #include <QProgressDialog>
 
 #include <sys/stat.h>
-#include <sys/swap.h>
 #include <unistd.h>
 #include <dirent.h>
 
@@ -36,7 +35,7 @@ protected:
     QTimer *timer;
     QProgressBar *bar;
     QDialog *mmn;
-    void keyPressEvent(QKeyEvent* event);
+    bool eventFilter(QObject *obj, QEvent *event);
 
 public:
     /** constructor */
@@ -45,9 +44,6 @@ public:
     ~MInstall();
 
     bool abortInstall;
-
-    int removedItemIndex;
-    QString removedItem;
     QStringList args;
 
     void goBack(QString msg);
@@ -72,18 +68,26 @@ public:
     void buildServiceList();
     void copyLinux();
     void installLinux();
+    void makeFstab();
     void prepareToInstall();
+    void addItemCombo(QComboBox *cb, const QString *part);
+    void removeItemCombo(QComboBox *cb, const QString *part);
+    void updatePartCombo(QString *prevItem, const QString &part);
     void setLocale();
     void setServices();
     void updatePartitionWidgets();
     void updateStatus(QString msg, int val);
+    void writeKeyFile();
+    void disablehiberanteinitramfs();
     bool checkDisk();
+    bool checkPassword(const QString &pass);
     bool installLoader();
     bool makeChosenPartitions();
     bool makeDefaultPartitions();
     bool makeFloppy();
     bool makeGrub(int rootdev, QString rootpart, const char *rootmnt, bool initrd);
-    bool makeLinuxPartition(QString dev, const char *type, bool bad, QString label);
+    bool makeLinuxPartition(QString dev, const QString &type, bool bad, const QString &label);
+    bool makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password);
     bool makeSwapPartition(QString dev);
     bool makeEsp(QString drv, int size);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
@@ -102,11 +106,18 @@ public:
     QString PROJECTSHORTNAME;
     QString PROJECTURL;
     QString PROJECTFORUM;
+    QString MIN_BOOT_DEVICE_SIZE;
     QString MIN_ROOT_DEVICE_SIZE;
     QString DEFAULT_HOSTNAME;
     QString MIN_INSTALL_SIZE;
     QString PREFERRED_MIN_INSTALL_SIZE;
     QStringList ENABLE_SERVICES;
+
+    // global for now until boot combo box is sorted out
+    QString bootdev;
+    QString swapDevicePreserve;
+    QString rootDevicePreserve;
+    QString homeDevicePreserve;
 
     void setupkeyboardbutton();
     void gotoPage(int next);
@@ -117,16 +128,8 @@ public:
     void refresh();
 
 public slots:
-    virtual void on_passwordCheckBox_stateChanged(int);
-    virtual void on_nextButton_clicked();
-    virtual void on_backButton_clicked();
-    virtual void on_abortInstallButton_clicked();
-    virtual void on_qtpartedButton_clicked();
-    virtual void on_diskCombo_activated(QString item = "");
-    virtual void on_rootCombo_activated(QString item = "");
-    virtual void on_rootTypeCombo_activated(QString item = "");
     void procAbort();
-    virtual bool close();
+    void close();
     //    void moreClicked(QListViewItem *item);
     void delStart();
     void delDone(int, QProcess::ExitStatus exitStatus);
@@ -138,19 +141,61 @@ public slots:
     void procTime();
 
 private slots:
-    void on_viewServicesButton_clicked();
-    void on_grubBootCombo_activated(QString item = "");
+    void on_passwordCheckBox_stateChanged(int);
+    void on_nextButton_clicked();
+    void on_backButton_clicked();
+    void on_abortInstallButton_clicked();
+    void on_qtpartedButton_clicked();
     void on_closeButton_clicked();
-    void on_encryptCheckBox_toggled(bool checked);
-    void on_saveHomeCheck_toggled(bool checked);
+    void on_viewServicesButton_clicked();
     void on_buttonSetKeyboard_clicked();
+
+
     void on_homeCombo_currentIndexChanged(const QString &arg1);
-    void on_swapCombo_currentIndexChanged(const QString &arg1);
     void on_userPasswordEdit2_textChanged(const QString &arg1);
     void on_rootPasswordEdit2_textChanged(const QString &arg1);
     void on_userPasswordEdit_textChanged();
     void on_rootPasswordEdit_textChanged();
 
+    void on_checkBoxEncryptAuto_toggled(bool checked);
+    void on_existing_partitionsButton_clicked(bool checked);
+
+    void on_FDEpassword_textChanged();
+    void on_FDEpassword2_textChanged(const QString &arg1);
+    void on_FDEpassCust_textChanged();
+    void on_FDEpassCust2_textChanged(const QString &arg1);
+
+    void on_checkBoxEncryptRoot_toggled(bool checked);
+    void on_checkBoxEncryptHome_toggled(bool checked);
+    void on_checkBoxEncrpytSwap_toggled(bool checked);
+
+    void on_diskCombo_activated(QString item = "");
+    void on_rootTypeCombo_activated(QString item = "");
+    void on_grubBootCombo_activated(QString item = "");
+    void on_rootCombo_activated(const QString &arg1 = "");
+    void on_homeCombo_activated(const QString &arg1);
+    void on_swapCombo_activated(const QString &arg1);
+    void on_bootCombo_activated(const QString &arg1);
+
 private:
+    bool isHomeEncrypted = false;
+    bool isRootEncrypted = false;
+    bool isSwapEncrypted = false;
+    bool isRootFormatted = false;
+    bool isHomeFormatted = false;
+
     Cmd shell;
+    QString home_mntops = "defaults";
+    QString root_mntops = "defaults";
+
+    // for partition combo updates
+    QHash<QString, int> removedRoot; // remember items removed from combo box: item, index
+    QHash<QString, int> removedHome;
+    QHash<QString, int> removedSwap;
+    QHash<QString, int> removedBoot;
+    QString prevItemRoot; // remember previously selected item in combo box
+    QString prevItemHome;
+    QString prevItemSwap;
+    QString prevItemBoot;
+
 };

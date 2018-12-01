@@ -34,10 +34,22 @@
 QScopedPointer<QFile> logFile;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+void printHelp();
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    if (a.arguments().contains("--help") || a.arguments().contains("-h") ) {
+        printHelp();
+        return 0;
+    }
+    if (a.arguments().contains("--version") || a.arguments().contains("-v") ) {
+       system("echo 'Installer version'; dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:); echo"); // query 'minstall' since we don't know the name of the package
+       return 0;
+    }
+
+
     a.setWindowIcon(QIcon::fromTheme("system-installer", QIcon("/usr/share/pixmaps/msystem.png")));
 
     // Set the logging files
@@ -117,4 +129,16 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     out.flush();    // Clear the buffered data
 }
 
+// print CLI help info
+void printHelp()
+{
+    qDebug() << "Here are some CLI options you can use, please read the description carefully and be aware that these are experimental options\n";
+    qDebug() << "Usage: minstall [<options>]\n";
+    qDebug() << "Options:";
+    qDebug() << "  -n --nocopy    Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files";
+    qDebug() << "  -p --pretend   Test mode for GUI, you can advance to different screens without actially installing";
+    qDebug() << "  -s --sync      Installing with rsync instead of cp on custom partitioning\n"
+                "                 -- doesn't format /root and it doesn't work with encryption";
+    qDebug() << "  -v --version   Show version information";
+}
 
