@@ -35,7 +35,7 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
 FORMS += memain.ui meinstall.ui
 HEADERS += mmain.h minstall.h
 SOURCES += app.cpp mmain.cpp minstall.cpp
-LIBS += -lcrypt -lcmd
+LIBS += -lcmd
 CONFIG += release warn_on thread qt
 
 #RESOURCES += \
