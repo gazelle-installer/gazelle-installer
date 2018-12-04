@@ -1513,8 +1513,7 @@ bool MInstall::installLoader()
 
     // the old initrd is not valid for this hardware
     if (!val.isEmpty()) {
-        cmd = QString("rm -f /mnt/antiX/boot/%1").arg(val);
-        runCmd(cmd);
+        runCmd("rm -f /mnt/antiX/boot/" + val);
     }
 
     if (!grubCheckBox->isChecked()) {
@@ -1529,9 +1528,8 @@ bool MInstall::installLoader()
     if (isRootEncrypted) {
         rootpart = "mapper/rootfs";
     } else {
-        QString rootpart = rootCombo->currentText().section(" ", 0, 0);
+        rootpart = rootCombo->currentText().section(" ", 0, 0);
     }
-
     QString boot;
 
     if (grubMbrButton->isChecked()) {
@@ -1555,26 +1553,26 @@ bool MInstall::installLoader()
         cmd = QString("partition-info find-esp=%1").arg(bootdrv);
         boot = getCmdOut(cmd);
 
-        if (boot == "") {
+        if (boot.isEmpty()) {
             //try fallback method
             //modification for mmc/nvme devices that don't always update the parttype uuid
             cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
             qDebug() << "parted command" << cmd;
             boot = getCmdOut(cmd);
-            if (boot == "") {
+            if (boot.isEmpty()) {
                 qDebug() << "could not find ESP on: " << bootdrv;
                 return false;
             }
             if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
-                boot = QString(bootdrv + "p" + boot);
+                boot = bootdrv + "p" + boot;
             } else {
-                boot = QString(bootdrv + boot);
+                boot = bootdrv + boot;
             }
         }
         qDebug() << "boot for grub routine = " << boot;
     }
     // install Grub?
-    QString msg = QString( tr("OK to install GRUB bootloader at %1 ?")).arg(boot);
+    QString msg = tr("OK to install GRUB bootloader at %1 ?").arg(boot);
     int ans = QMessageBox::warning(this, QString::null, msg,
                                    tr("Yes"), tr("No"));
     if (ans != 0) {
