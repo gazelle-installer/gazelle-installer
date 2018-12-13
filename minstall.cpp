@@ -1653,6 +1653,9 @@ bool MInstall::installLoader()
     //remove vga=ask
     finalcmdline.removeAll("vga=ask");
 
+    //remove boot_image code
+    finalcmdline.removeAll("BOOT_IMAGE=/antiX/vmlinuz");
+
     //remove in null or empty strings that might have crept in
     finalcmdline.removeAll({});
     qDebug() << "Add cmdline options to Grub" << finalcmdline;
