@@ -376,14 +376,13 @@ void MInstall::writeKeyFile()
         }
         file.close();
     } else if (isHomeEncrypted) { // if encrypting /home without encrypting root
-        //create keyfile
-        shell.run("dd if=/dev/urandom of=/mnt/antiX/home/.keyfileDONOTdelete bs=1024 count=4");
-        shell.run("chmod 0400 /mnt/antiX/home/.keyfileDONOTdelete");
-
-        //add keyfile to container
-        QString swapUUID;
         if (swapDevicePreserve != "/dev/none") {
-            swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+            //create keyfile
+            shell.run("dd if=/dev/urandom of=/mnt/antiX/home/.keyfileDONOTdelete bs=1024 count=4");
+            shell.run("chmod 0400 /mnt/antiX/home/.keyfileDONOTdelete");
+
+            //add keyfile to container
+            QString swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
 
             QProcess proc;
             proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
