@@ -1600,6 +1600,8 @@ bool MInstall::installLoader()
     runCmd("mount -o bind /sys /mnt/antiX/sys");
     runCmd("mount -o bind /proc /mnt/antiX/proc");
 
+    QString arch;
+
     // install new Grub now
     if (!grubEspButton->isChecked()) {
         cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot /dev/%1").arg(boot);
@@ -1608,7 +1610,7 @@ bool MInstall::installLoader()
         QString mount = QString("mount /dev/%1 /mnt/antiX/boot/efi").arg(boot);
         runCmd(mount);
         // rename arch to match grub-install target
-        QString arch = getCmdOut("cat /sys/firmware/efi/fw_platform_size");
+        arch = getCmdOut("cat /sys/firmware/efi/fw_platform_size");
         if (arch == "32") {
             arch = "i386";
         } else if (arch == "64") {
@@ -1653,6 +1655,9 @@ bool MInstall::installLoader()
     //remove vga=ask
     finalcmdline.removeAll("vga=ask");
 
+    //remove boot_image code
+    finalcmdline.removeAll("BOOT_IMAGE=/antiX/vmlinuz");
+
     //remove in null or empty strings that might have crept in
     finalcmdline.removeAll({});
     qDebug() << "Add cmdline options to Grub" << finalcmdline;
@@ -1669,6 +1674,19 @@ bool MInstall::installLoader()
     qDebug() << "Add cmdline options to Grub";
     cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(finalcmdlinestring);
     runCmd(cmd);
+
+
+    //copy memtest efi files if needed
+
+    if (isUefi()) {
+        if ( arch == "i386") {
+            runCmd("mkdir -p /mnt/antiX/boot/uefi-mt");
+            runCmd("cp /live/boot-dev/boot/uefi-mt/mtest-32.efi /mnt/antiX/boot/uefi-mt");
+        }else {
+            runCmd("mkdir -p /mnt/antiX/boot/uefi-mt");
+            runCmd("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt");
+        }
+    }
 
     //update grub with new config
 
