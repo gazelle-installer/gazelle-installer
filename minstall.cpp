@@ -999,7 +999,7 @@ bool MInstall::makeDefaultPartitions()
 
     // on root, make sure it exists
     system("sleep 1");
-    mkdir("/mnt/antiX/home",0755);
+    mkdir("/mnt/antiX/home", 0755);
 
     on_diskCombo_activated();
     rootCombo->setCurrentIndex(1);
@@ -2912,15 +2912,10 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
     if (exitStatus == QProcess::NormalExit) {
         updateStatus(tr("Fixing configuration"), 99);
-        chmod("/mnt/antiX/var/tmp", 01777);
-        shell.run("cd /mnt/antiX && ln -s var/tmp tmp");
-
+        shell.run("mkdir -m 1777 /mnt/antiX/tmp");
         makeFstab();
-
         writeKeyFile();
-
         disablehiberanteinitramfs();
-
 
         // Copy live set up to install and clean up.
         //shell.run("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");
