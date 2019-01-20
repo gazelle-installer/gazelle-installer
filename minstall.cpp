@@ -189,6 +189,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
         grubMbrButton->setEnabled(false);
         gmtCheckBox->setChecked(true);
     }
+    checkUefi();
 }
 
 MInstall::~MInstall() {
@@ -777,7 +778,7 @@ bool MInstall::makeDefaultPartitions()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     int ans;
     int prog = 0;
-    bool uefi = isUefi();
+
     QString mmcnvmepartdesignator;
     mmcnvmepartdesignator.clear();
 
@@ -1678,11 +1679,11 @@ bool MInstall::installLoader()
 
     //copy memtest efi files if needed
 
-    if (isUefi()) {
-        if ( arch == "i386") {
+    if (uefi) {
+        if (arch == "i386") {
             runCmd("mkdir -p /mnt/antiX/boot/uefi-mt");
             runCmd("cp /live/boot-dev/boot/uefi-mt/mtest-32.efi /mnt/antiX/boot/uefi-mt");
-        }else {
+        } else {
             runCmd("mkdir -p /mnt/antiX/boot/uefi-mt");
             runCmd("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt");
         }
@@ -1716,14 +1717,15 @@ bool MInstall::isGpt(QString drv)
     return (shell.run(cmd) == 0);
 }
 
-bool MInstall::isUefi()
+void MInstall::checkUefi()
 {
     // return false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
-    if (shell.run("uname -m | grep -q i686") == 0 && shell.run("grep -q 64 /sys/firmware/efi/fw_platform_size") == 0) {
-        return false;
+    if (system("uname -m | grep -q i686") == 0 && system("grep -q 64 /sys/firmware/efi/fw_platform_size") == 0) {
+        uefi = false;
     } else {
-       return (shell.run("test -d /sys/firmware/efi") == 0);
+        uefi = (system("test -d /sys/firmware/efi") == 0);
     }
+    qDebug() << "uefi =" << uefi;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -2816,7 +2818,7 @@ void MInstall::on_grubBootCombo_activated(QString)
     // if GPT, and ESP exists
     if (shell.run(cmd) == 0 && shell.run(detectESP) == 0) {
         grubEspButton->setEnabled(true);
-        if (isUefi()) { // if booted from UEFI
+        if (uefi) { // if booted from UEFI
             grubEspButton->setChecked(true);
         } else {
             grubMbrButton->setChecked(true);
