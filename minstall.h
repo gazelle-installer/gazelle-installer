@@ -46,6 +46,7 @@ public:
     bool abortInstall;
     QStringList args;
 
+    void checkUefi();
     void goBack(QString msg);
     void unmountGoBack(QString msg);
 
@@ -63,7 +64,7 @@ public:
     bool is64bit();
     bool isInsideVB();
     bool isGpt(QString drv);
-    bool isUefi();
+
 
     void buildServiceList();
     void copyLinux();
@@ -183,6 +184,7 @@ private:
     bool isSwapEncrypted = false;
     bool isRootFormatted = false;
     bool isHomeFormatted = false;
+    bool uefi = false;
 
     Cmd shell;
     QString home_mntops = "defaults";
