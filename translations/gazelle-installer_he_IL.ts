@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="hr" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="he_IL" version="2.1">
 <context>
     <name>MInstall</name>
     <message>
@@ -8,20 +8,14 @@
 %1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.
 
 Enjoy using %1</source>
-        <translation>%1 je nezavisna Linux distribucija bazirana na Debian Stable-u.
-
-%1 koristi neke komponente MEPIS Linuxa koje su objavljene pod Apache slobodnom licencom. Neke MEPIS komponente su izmjenjene za %1.
-
-Uživajte koristeći %1</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="90"/>
         <source>Support %1
 
 %1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.</source>
-        <translation>Podržite %1
-
-%1 je podržan od ljudi poput vas. Neki pomažu drugima na forumu podrške - %2, il prevode datotele pomoći na druge jezikeor daju sugestije, pišu dokumentaciju, ili pomažu testirati novi software..</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="449"/>
@@ -36,8 +30,7 @@ The disk with the partition you selected for installation is failing.
         <location filename="minstall.cpp" line="450"/>
         <source>You are strongly advised to abort.
 </source>
-        <translation>Strogo vam preporučamo da prekinete.
-</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="451"/>
@@ -45,14 +38,12 @@ The disk with the partition you selected for installation is failing.
         <source>If unsure, please exit the Installer and run GSmartControl for more information.
 
 </source>
-        <translation>Ako niste sigurni, izađite iz instalacijskog programa i pokrenite GSmartControl za više informacija.
-
-</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="452"/>
         <source>Do you want to abort the installation?</source>
-        <translation>Želite li prekinuti instalaciju?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="454"/>
@@ -72,7 +63,7 @@ The disk with the partition you selected for installation is failing.
         <location filename="minstall.cpp" line="2264"/>
         <location filename="minstall.cpp" line="2292"/>
         <source>Yes</source>
-        <translation>Da</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="454"/>
@@ -92,7 +83,7 @@ The disk with the partition you selected for installation is failing.
         <location filename="minstall.cpp" line="2264"/>
         <location filename="minstall.cpp" line="2292"/>
         <source>No</source>
-        <translation>Ne</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="462"/>
@@ -105,8 +96,7 @@ The disk with the partition you selected for installation is failing.
         <location filename="minstall.cpp" line="463"/>
         <source>The disk with the partition you selected for installation passes the S.M.A.R.T. monitor test (smartctl)
 </source>
-        <translation>TDisk sa particijom koju ste odabrali za instalaciju prošao je S.M.A.R.T. test (smartctl)
-</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="464"/>
@@ -117,7 +107,7 @@ The disk with the partition you selected for installation is failing.
     <message>
         <location filename="minstall.cpp" line="466"/>
         <source>Do you want to continue?</source>
-        <translation>Želite li nastaviti?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="483"/>
@@ -129,7 +119,7 @@ a longer password before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="501"/>
         <source>Ready to install %1 filesystem</source>
-        <translation>Spreman za instalaciju %1 datotečnog sustava</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="755"/>
@@ -144,17 +134,17 @@ a longer password before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="787"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
-        <translation>Je li u redu formatirati cijeli disk (%1) for %2?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="799"/>
         <source>Creating required partitions</source>
-        <translation>Stvaram zahtjevane particije</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="883"/>
         <source>Formating EFI System Partition (ESP)</source>
-        <translation>Formatiram EFI sustav particiju (ESP)</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="950"/>
@@ -168,7 +158,7 @@ a longer password before proceeding.</source>
         <location filename="minstall.cpp" line="960"/>
         <location filename="minstall.cpp" line="1198"/>
         <source>Formatting swap partition</source>
-        <translation>Formatiram swap particiju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="971"/>
@@ -179,7 +169,7 @@ a longer password before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="977"/>
         <source>Formatting root partition</source>
-        <translation>Formatiram root particiju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1070"/>
@@ -196,22 +186,19 @@ The root partition must be at least %1.</source>
         <location filename="minstall.cpp" line="1088"/>
         <source>OK to format and destroy all data on 
 %1 for the / (root) partition?</source>
-        <translation>Je li uredu formatirati i uništiti sve podatke na 
-%1 za / (root) particiju?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1090"/>
         <source>All data on %1 will be deleted, except for /home
 OK to continue?</source>
-        <translation>Svi podaci na %1 će biti izbrisani, osim /home
-Je li u redu nastaviti?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1107"/>
         <source>OK to format and destroy all data on 
 %1 for the swap partition?</source>
-        <translation>Je li uredu formatirati i uništiti sve podatke na 
-%1 za swap particiju?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1120"/>
@@ -223,12 +210,12 @@ Are you sure you want to reformat this partition?</source>
     <message>
         <location filename="minstall.cpp" line="1129"/>
         <source>OK to reuse (no reformat) %1 as the /home partition?</source>
-        <translation>Je li u redu ponovno uporabiti (ne reformatirati) %1 kao /home particiju?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1131"/>
         <source>OK to format and destroy all data on %1 for the /home partition?</source>
-        <translation>Je li uredu formatirati i uništiti sve podatke na  %1 za /home particiju?</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1159"/>
@@ -239,32 +226,32 @@ Are you sure you want to reformat this partition?</source>
     <message>
         <location filename="minstall.cpp" line="1169"/>
         <source>Preparing required partitions</source>
-        <translation>Pripremam potrebne particije</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1230"/>
         <source>Formatting the / (root) partition</source>
-        <translation>Formatiram  / (root) particiju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1278"/>
         <source>Mounting the /home partition</source>
-        <translation>Montiram /home particiju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1304"/>
         <source>Formatting the /home partition</source>
-        <translation>Formatiram  /home particiju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1354"/>
         <source>Mounting the / (root) partition</source>
-        <translation>Montiram / (root) particiju</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1458"/>
         <source>Creating system directories</source>
-        <translation>Stvaram direktorije sustava</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="1576"/>
@@ -547,7 +534,7 @@ Returning to Step 1.</source>
         <location filename="minstall.cpp" line="2552"/>
         <location filename="minstall.cpp" line="2566"/>
         <source>Next</source>
-        <translation>Slijedeće</translation>
+        <translation>קדימה</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2564"/>
@@ -625,7 +612,7 @@ Returning to Step 1.</source>
         <location filename="minstall.cpp" line="3247"/>
         <location filename="minstall.cpp" line="3269"/>
         <source>OK</source>
-        <translation>U redu</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="3268"/>
@@ -646,7 +633,7 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="92"/>
         <source>Back</source>
-        <translation>Natrag</translation>
+        <translation>אחורה</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="99"/>
@@ -656,12 +643,12 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="106"/>
         <source>Next</source>
-        <translation>Slijedeće</translation>
+        <translation>קדימה</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="113"/>
         <source>Alt+N</source>
-        <translation>Alt+N</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="163"/>
@@ -886,12 +873,12 @@ Returning to Step 1.</source>
         <location filename="meinstall.ui" line="1148"/>
         <location filename="meinstall.ui" line="1542"/>
         <source>root</source>
-        <translation>root</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1053"/>
         <source>Type</source>
-        <translation>Vrsta</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1069"/>
@@ -917,7 +904,7 @@ Returning to Step 1.</source>
         <location filename="meinstall.ui" line="1273"/>
         <location filename="meinstall.ui" line="1491"/>
         <source>Alt+A</source>
-        <translation>Alt+A</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1312"/>
@@ -937,17 +924,17 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="1441"/>
         <source>MBR</source>
-        <translation>MBR</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1444"/>
         <source>Alt+B</source>
-        <translation>Alt+B</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1472"/>
         <source>Install on:</source>
-        <translation>Instaliraj na:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1488"/>
@@ -967,7 +954,7 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="1558"/>
         <source>ESP</source>
-        <translation>ESP</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1628"/>
@@ -1032,7 +1019,7 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="1920"/>
         <source>View</source>
-        <translation>Pogled</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1949"/>
@@ -1092,12 +1079,12 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="2357"/>
         <source>username</source>
-        <translation>korisničko ime</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="2370"/>
         <source>Confirm user password:</source>
-        <translation>Potvrdi korisničku lozinku:</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="2386"/>
@@ -1137,7 +1124,7 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="2550"/>
         <source>Close</source>
-        <translation>Zatvori</translation>
+        <translation>סגור</translation>
     </message>
 </context>
 <context>
@@ -1150,7 +1137,7 @@ Returning to Step 1.</source>
     <message>
         <location filename="memain.ui" line="72"/>
         <source>Help</source>
-        <translation>Pomoć</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1173,12 +1160,12 @@ Do you want to continue the installation?</source>
     <message>
         <location filename="app.cpp" line="86"/>
         <source>Yes</source>
-        <translation>Da</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="app.cpp" line="86"/>
         <source>No</source>
-        <translation>Ne</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="app.cpp" line="99"/>
