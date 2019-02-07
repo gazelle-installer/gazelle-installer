@@ -2003,7 +2003,7 @@ bool MInstall::setUserInfo()
         return false;
     }
     // check that user name is not already used
-    QString cmd = QString("grep '^%1' /etc/passwd >/dev/null").arg(userNameEdit->text());
+    QString cmd = QString("grep '^\b%1\b' /etc/passwd >/dev/null").arg(userNameEdit->text());
     if (shell.run(cmd) == 0) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry that name is in use.\n"
