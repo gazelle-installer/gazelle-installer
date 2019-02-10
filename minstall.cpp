@@ -1427,7 +1427,7 @@ void MInstall::makeFstab()
             }
         }
         if (!swapdev.isEmpty() && swapdev != "/dev/none") {
-            out << swapdev +" swap swap defauts 0 0 \n";
+            out << swapdev +" swap swap defaults 0 0 \n";
         }
         file.close();
     }
@@ -1617,8 +1617,8 @@ bool MInstall::installLoader()
         } else if (arch == "64") {
             arch = "x86_64";
         }
-        QString release = getCmdOut("lsb_release -rs");
-        cmd = QString("chroot /mnt/antiX grub-install --target=%1-efi --efi-directory=/boot/efi --bootloader-id=" + PROJECTSHORTNAME +"%2 --recheck").arg(arch).arg(release);
+
+        cmd = QString("chroot /mnt/antiX grub-install --target=%1-efi --efi-directory=/boot/efi --bootloader-id=" + PROJECTSHORTNAME +"%2 --recheck").arg(arch).arg(PROJECTVERSION);
     }
 
     qDebug() << "Installing Grub";
