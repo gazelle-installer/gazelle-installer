@@ -2307,6 +2307,7 @@ void MInstall::stopInstall()
                 system("cryptsetup luksClose swapfs");
             }
             system("sleep 1");
+            system("swapoff -a");
             system("/usr/local/bin/persist-config --shutdown --command reboot");
             return;
         } else {
