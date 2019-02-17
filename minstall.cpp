@@ -2112,6 +2112,20 @@ bool MInstall::setComputerName()
         shell.run("mv -f /mnt/antiX/etc/rc2.d/S01nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1");
     }
 
+    // systemd check
+    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
+
+    if (!systemdcheck.isEmpty()) {
+        if (!sambaCheckBox->isChecked()) {
+	        runCmd("chroot /mnt/antiX systemctl disable smbd");
+	        runCmd("chroot /mnt/antiX systemctl disable nmbd");
+	        runCmd("chroot /mnt/antiX systemctl disable samba-ad-dc");
+	        runCmd("chroot /mnt/antiX systemctl mask smbd");
+	        runCmd("chroot /mnt/antiX systemctl mask nmbd");
+	        runCmd("chroot /mnt/antiX systemctl mask samba-ad-dc");
+	    }
+	}
+
     //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
     QString cmd;
     cmd = QString("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost | head -1 | awk '{print $2}')\"'/" + computerNameEdit->text() + "/' /mnt/antiX/etc/hosts");
@@ -2223,14 +2237,26 @@ void MInstall::setServices()
 
     qDebug() << "Setting Services";
 
+    // systemd check
+    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
+
     QTreeWidgetItemIterator it(csView);
     while (*it) {
         QString service = (*it)->text(0);
         qDebug() << "Service: " << service;
         if ((*it)->checkState(0) == Qt::Checked) {
-            runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+            if (systemdcheck.isEmpty()) {
+                runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+            } else {
+                runCmd("chroot /mnt/antiX systemctl enable " + service);
+            }
         } else {
-            runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
+            if (systemdcheck.isEmpty()) {
+                runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
+            } else {
+                runCmd("chroot /mnt/antiX systemctl disable " + service);
+                runCmd("chroot /mnt/antiX systemctl mask " + service);
+            }
         }
         ++it;
     }
