@@ -607,6 +607,7 @@ void MInstall::updatePartCombo(QString *prevItem, const QString &part)
 bool MInstall::makeSwapPartition(QString dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    system("swapoff -a");
     QString cmd = "/sbin/mkswap " + dev + " -L " + swapLabelEdit->text();
     if (shell.run(cmd) != 0) {
         // error
@@ -1551,25 +1552,25 @@ bool MInstall::installLoader()
 //        }
         // find first ESP on the boot disk
 
-        cmd = QString("partition-info find-esp=%1").arg(bootdrv);
-        boot = getCmdOut(cmd);
+        //cmd = QString("partition-info find-esp=%1").arg(bootdrv);
+        boot = comboBoxESP->currentText().trimmed();
 
-        if (boot.isEmpty()) {
-            //try fallback method
-            //modification for mmc/nvme devices that don't always update the parttype uuid
-            cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
-            qDebug() << "parted command" << cmd;
-            boot = getCmdOut(cmd);
-            if (boot.isEmpty()) {
-                qDebug() << "could not find ESP on: " << bootdrv;
-                return false;
-            }
-            if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
-                boot = bootdrv + "p" + boot;
-            } else {
-                boot = bootdrv + boot;
-            }
-        }
+//        if (boot.isEmpty()) {
+//            //try fallback method
+//            //modification for mmc/nvme devices that don't always update the parttype uuid
+//            cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
+//            qDebug() << "parted command" << cmd;
+//            boot = getCmdOut(cmd);
+//            if (boot.isEmpty()) {
+//                qDebug() << "could not find ESP on: " << bootdrv;
+//                return false;
+//            }
+//            if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
+//                boot = bootdrv + "p" + boot;
+//            } else {
+//                boot = bootdrv + boot;
+//            }
+//        }
         qDebug() << "boot for grub routine = " << boot;
     }
     // install Grub?
@@ -1608,7 +1609,7 @@ bool MInstall::installLoader()
         cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot /dev/%1").arg(boot);
     } else {
         runCmd("mkdir /mnt/antiX/boot/efi");
-        QString mount = QString("mount /dev/%1 /mnt/antiX/boot/efi").arg(boot);
+        QString mount = QString("mount %1 /mnt/antiX/boot/efi").arg(boot);
         runCmd(mount);
         // rename arch to match grub-install target
         arch = getCmdOut("cat /sys/firmware/efi/fw_platform_size");
@@ -2111,6 +2112,20 @@ bool MInstall::setComputerName()
         shell.run("mv -f /mnt/antiX/etc/rc2.d/S01nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1");
     }
 
+    // systemd check
+    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
+
+    if (!systemdcheck.isEmpty()) {
+        if (!sambaCheckBox->isChecked()) {
+	        runCmd("chroot /mnt/antiX systemctl disable smbd");
+	        runCmd("chroot /mnt/antiX systemctl disable nmbd");
+	        runCmd("chroot /mnt/antiX systemctl disable samba-ad-dc");
+	        runCmd("chroot /mnt/antiX systemctl mask smbd");
+	        runCmd("chroot /mnt/antiX systemctl mask nmbd");
+	        runCmd("chroot /mnt/antiX systemctl mask samba-ad-dc");
+	    }
+	}
+
     //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
     QString cmd;
     cmd = QString("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost | head -1 | awk '{print $2}')\"'/" + computerNameEdit->text() + "/' /mnt/antiX/etc/hosts");
@@ -2222,14 +2237,26 @@ void MInstall::setServices()
 
     qDebug() << "Setting Services";
 
+    // systemd check
+    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
+
     QTreeWidgetItemIterator it(csView);
     while (*it) {
         QString service = (*it)->text(0);
         qDebug() << "Service: " << service;
         if ((*it)->checkState(0) == Qt::Checked) {
-            runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+            if (systemdcheck.isEmpty()) {
+                runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+            } else {
+                runCmd("chroot /mnt/antiX systemctl enable " + service);
+            }
         } else {
-            runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
+            if (systemdcheck.isEmpty()) {
+                runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
+            } else {
+                runCmd("chroot /mnt/antiX systemctl disable " + service);
+                runCmd("chroot /mnt/antiX systemctl mask " + service);
+            }
         }
         ++it;
     }
@@ -2280,6 +2307,7 @@ void MInstall::stopInstall()
                 system("cryptsetup luksClose swapfs");
             }
             system("sleep 1");
+            system("swapoff -a");
             system("/usr/local/bin/persist-config --shutdown --command reboot");
             return;
         } else {
@@ -2628,6 +2656,10 @@ void MInstall::refresh()
     diskCombo->setCurrentIndex(0);
     grubBootCombo->addItems(drives);
 
+    comboBoxESP->clear();
+    QStringList ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1");
+    comboBoxESP->addItems(ESPS);
+
     FDEpassword->hide();
     FDEpassword2->hide();
     labelFDEpass->hide();
@@ -2820,6 +2852,9 @@ void MInstall::on_grubBootCombo_activated(QString)
         grubEspButton->setEnabled(true);
         if (uefi) { // if booted from UEFI
             grubEspButton->setChecked(true);
+            comboBoxESP->clear();
+            QStringList ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1");
+            comboBoxESP->addItems(ESPS);
         } else {
             grubMbrButton->setChecked(true);
         }
