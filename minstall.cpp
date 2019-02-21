@@ -1553,7 +1553,7 @@ bool MInstall::installLoader()
         // find first ESP on the boot disk
 
         //cmd = QString("partition-info find-esp=%1").arg(bootdrv);
-        boot = comboBoxESP->currentText().trimmed();
+        boot = grubEspCombo->currentText().trimmed();
 
 //        if (boot.isEmpty()) {
 //            //try fallback method
@@ -2117,14 +2117,14 @@ bool MInstall::setComputerName()
 
     if (!systemdcheck.isEmpty()) {
         if (!sambaCheckBox->isChecked()) {
-	        runCmd("chroot /mnt/antiX systemctl disable smbd");
-	        runCmd("chroot /mnt/antiX systemctl disable nmbd");
-	        runCmd("chroot /mnt/antiX systemctl disable samba-ad-dc");
-	        runCmd("chroot /mnt/antiX systemctl mask smbd");
-	        runCmd("chroot /mnt/antiX systemctl mask nmbd");
-	        runCmd("chroot /mnt/antiX systemctl mask samba-ad-dc");
-	    }
-	}
+            runCmd("chroot /mnt/antiX systemctl disable smbd");
+            runCmd("chroot /mnt/antiX systemctl disable nmbd");
+            runCmd("chroot /mnt/antiX systemctl disable samba-ad-dc");
+            runCmd("chroot /mnt/antiX systemctl mask smbd");
+            runCmd("chroot /mnt/antiX systemctl mask nmbd");
+            runCmd("chroot /mnt/antiX systemctl mask samba-ad-dc");
+        }
+    }
 
     //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
     QString cmd;
@@ -2354,6 +2354,11 @@ int MInstall::showPage(int curr, int next)
 {
     bool pretend = args.contains("--pretend") || args.contains("-p");
 
+    if (next == 4) { // going to Step_Boot
+        grubEspCombo->hide();
+        grubEspLabel->hide();
+    }
+
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
@@ -2361,7 +2366,7 @@ int MInstall::showPage(int curr, int next)
             }
             return 3;
         }
-    } else if  (next == 3 && curr == 2) {// at  Step_Parttion (fwd)
+    } else if  (next == 3 && curr == 2) {// at Step_Partition (fwd)
         if (checkBoxEncrpytSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
             if (!checkPassword(FDEpassCust->text())) {
                 return curr;
@@ -2656,9 +2661,9 @@ void MInstall::refresh()
     diskCombo->setCurrentIndex(0);
     grubBootCombo->addItems(drives);
 
-    comboBoxESP->clear();
+    grubEspCombo->clear();
     QStringList ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1");
-    comboBoxESP->addItems(ESPS);
+    grubEspCombo->addItems(ESPS);
 
     FDEpassword->hide();
     FDEpassword2->hide();
@@ -2852,9 +2857,9 @@ void MInstall::on_grubBootCombo_activated(QString)
         grubEspButton->setEnabled(true);
         if (uefi) { // if booted from UEFI
             grubEspButton->setChecked(true);
-            comboBoxESP->clear();
+            grubEspCombo->clear();
             QStringList ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1");
-            comboBoxESP->addItems(ESPS);
+            grubEspCombo->addItems(ESPS);
         } else {
             grubMbrButton->setChecked(true);
         }
@@ -3319,4 +3324,28 @@ void MInstall::on_swapCombo_activated(const QString &arg1)
 void MInstall::on_bootCombo_activated(const QString &arg1)
 {
     updatePartCombo(&prevItemBoot, arg1);
+}
+
+void MInstall::on_grubMbrButton_clicked()
+{
+    grubEspLabel->hide();
+    grubEspCombo->hide();
+    grubBootDiskLabel->show();
+    grubBootCombo->show();
+}
+
+void MInstall::on_grubRootButton_clicked()
+{
+    grubEspLabel->hide();
+    grubEspCombo->hide();
+    grubBootDiskLabel->hide();
+    grubBootCombo->hide();
+}
+
+void MInstall::on_grubEspButton_clicked()
+{
+    grubEspLabel->show();
+    grubEspCombo->show();
+    grubBootDiskLabel->hide();
+    grubBootCombo->hide();
 }
