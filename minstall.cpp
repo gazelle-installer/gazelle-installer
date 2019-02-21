@@ -2116,13 +2116,15 @@ bool MInstall::setComputerName()
     QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
 
     if (!systemdcheck.isEmpty()) {
-        runCmd("chroot /mnt/antiX systemctl disable smbd");
-        runCmd("chroot /mnt/antiX systemctl disable nmbd");
-        runCmd("chroot /mnt/antiX systemctl disable samba-ad-dc");
-        runCmd("chroot /mnt/antiX systemctl mask smbd");
-        runCmd("chroot /mnt/antiX systemctl mask nmbd");
-        runCmd("chroot /mnt/antiX systemctl mask samba-ad-dc");
-    }
+        if (!sambaCheckBox->isChecked()) {
+	        runCmd("chroot /mnt/antiX systemctl disable smbd");
+	        runCmd("chroot /mnt/antiX systemctl disable nmbd");
+	        runCmd("chroot /mnt/antiX systemctl disable samba-ad-dc");
+	        runCmd("chroot /mnt/antiX systemctl mask smbd");
+	        runCmd("chroot /mnt/antiX systemctl mask nmbd");
+	        runCmd("chroot /mnt/antiX systemctl mask samba-ad-dc");
+	    }
+	}
 
     //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
     QString cmd;
