@@ -1552,25 +1552,25 @@ bool MInstall::installLoader()
 //        }
         // find first ESP on the boot disk
 
-        cmd = QString("partition-info find-esp=%1").arg(bootdrv);
-        boot = getCmdOut(cmd);
+        //cmd = QString("partition-info find-esp=%1").arg(bootdrv);
+        boot = comboBoxESP->currentText().trimmed();
 
-        if (boot.isEmpty()) {
-            //try fallback method
-            //modification for mmc/nvme devices that don't always update the parttype uuid
-            cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
-            qDebug() << "parted command" << cmd;
-            boot = getCmdOut(cmd);
-            if (boot.isEmpty()) {
-                qDebug() << "could not find ESP on: " << bootdrv;
-                return false;
-            }
-            if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
-                boot = bootdrv + "p" + boot;
-            } else {
-                boot = bootdrv + boot;
-            }
-        }
+//        if (boot.isEmpty()) {
+//            //try fallback method
+//            //modification for mmc/nvme devices that don't always update the parttype uuid
+//            cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
+//            qDebug() << "parted command" << cmd;
+//            boot = getCmdOut(cmd);
+//            if (boot.isEmpty()) {
+//                qDebug() << "could not find ESP on: " << bootdrv;
+//                return false;
+//            }
+//            if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
+//                boot = bootdrv + "p" + boot;
+//            } else {
+//                boot = bootdrv + boot;
+//            }
+//        }
         qDebug() << "boot for grub routine = " << boot;
     }
     // install Grub?
@@ -1609,7 +1609,7 @@ bool MInstall::installLoader()
         cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot /dev/%1").arg(boot);
     } else {
         runCmd("mkdir /mnt/antiX/boot/efi");
-        QString mount = QString("mount /dev/%1 /mnt/antiX/boot/efi").arg(boot);
+        QString mount = QString("mount %1 /mnt/antiX/boot/efi").arg(boot);
         runCmd(mount);
         // rename arch to match grub-install target
         arch = getCmdOut("cat /sys/firmware/efi/fw_platform_size");
@@ -2656,6 +2656,10 @@ void MInstall::refresh()
     diskCombo->setCurrentIndex(0);
     grubBootCombo->addItems(drives);
 
+    comboBoxESP->clear();
+    QStringList ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1");
+    comboBoxESP->addItems(ESPS);
+
     FDEpassword->hide();
     FDEpassword2->hide();
     labelFDEpass->hide();
@@ -2848,6 +2852,9 @@ void MInstall::on_grubBootCombo_activated(QString)
         grubEspButton->setEnabled(true);
         if (uefi) { // if booted from UEFI
             grubEspButton->setChecked(true);
+            comboBoxESP->clear();
+            QStringList ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1");
+            comboBoxESP->addItems(ESPS);
         } else {
             grubMbrButton->setChecked(true);
         }
