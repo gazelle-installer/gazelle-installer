@@ -178,6 +178,10 @@ private slots:
     void on_swapCombo_activated(const QString &arg1);
     void on_bootCombo_activated(const QString &arg1);
 
+    void on_grubMbrButton_clicked();
+    void on_grubRootButton_clicked();
+    void on_grubEspButton_clicked();
+
 private:
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
