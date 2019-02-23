@@ -1609,7 +1609,7 @@ bool MInstall::installLoader()
         cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot /dev/%1").arg(boot);
     } else {
         runCmd("mkdir /mnt/antiX/boot/efi");
-        QString mount = QString("mount %1 /mnt/antiX/boot/efi").arg(boot);
+        QString mount = QString("mount /dev/%1 /mnt/antiX/boot/efi").arg(boot);
         runCmd(mount);
         // rename arch to match grub-install target
         arch = getCmdOut("cat /sys/firmware/efi/fw_platform_size");
@@ -2661,9 +2661,7 @@ void MInstall::refresh()
     diskCombo->setCurrentIndex(0);
     grubBootCombo->addItems(drives);
 
-    grubEspCombo->clear();
-    QStringList ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1");
-    grubEspCombo->addItems(ESPS);
+    buildesplist();
 
     FDEpassword->hide();
     FDEpassword2->hide();
@@ -2857,9 +2855,7 @@ void MInstall::on_grubBootCombo_activated(QString)
         grubEspButton->setEnabled(true);
         if (uefi) { // if booted from UEFI
             grubEspButton->setChecked(true);
-            grubEspCombo->clear();
-            QStringList ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1");
-            grubEspCombo->addItems(ESPS);
+            buildesplist();
         } else {
             grubMbrButton->setChecked(true);
         }
@@ -3348,4 +3344,15 @@ void MInstall::on_grubEspButton_clicked()
     grubEspCombo->show();
     grubBootDiskLabel->hide();
     grubBootCombo->hide();
+}
+
+void MInstall::buildesplist()
+{
+    grubEspCombo->clear();
+    QStringList ESPS= getCmdOuts("partition-info find-esps=/dev/" + grubBootCombo->currentText().section(" ", 0, 0));
+    //backup
+    if (ESPS.isEmpty()){
+        ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
+    }
+    grubEspCombo->addItems(ESPS);
 }
