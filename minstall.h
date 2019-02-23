@@ -65,7 +65,7 @@ public:
     bool isInsideVB();
     bool isGpt(QString drv);
 
-
+    void buildesplist();
     void buildServiceList();
     void copyLinux();
     void installLinux();
