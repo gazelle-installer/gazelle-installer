@@ -69,7 +69,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     POPULATE_MEDIA_MOUNTPOINTS=settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
     MIN_INSTALL_SIZE=settings.value("MIN_INSTALL_SIZE").toString();
     PREFERRED_MIN_INSTALL_SIZE=settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
-
+    REMOVE_NOSPLASH=settings.value("REMOVE_NOSPLASH", "false").toBool();
     //check for samba
     QFileInfo info("/etc/init.d/smbd");
     if ( !info.exists()) {
@@ -1660,6 +1660,10 @@ bool MInstall::installLoader()
     //remove boot_image code
     finalcmdline.removeAll("BOOT_IMAGE=/antiX/vmlinuz");
 
+    //remove nosplash boot code if configured in installer.conf
+    if (REMOVE_NOSPLASH) {
+        finalcmdline.removeAll("nosplash");
+    }
     //remove in null or empty strings that might have crept in
     finalcmdline.removeAll({});
     qDebug() << "Add cmdline options to Grub" << finalcmdline;
@@ -2855,6 +2859,14 @@ void MInstall::on_grubBootCombo_activated(QString)
         grubEspButton->setEnabled(true);
         if (uefi) { // if booted from UEFI
             grubEspButton->setChecked(true);
+            grubBootCombo->setEnabled(true);
+            grubBootDiskLabel->setEnabled(true);
+            grubBootCombo->show();
+            grubBootDiskLabel->show();
+            grubEspCombo->setEnabled(true);
+            grubEspCombo->show();
+            grubEspLabel->setEnabled(true);
+            grubEspLabel->show();
             buildesplist();
         } else {
             grubMbrButton->setChecked(true);
@@ -3342,8 +3354,10 @@ void MInstall::on_grubEspButton_clicked()
 {
     grubEspLabel->show();
     grubEspCombo->show();
-    grubBootDiskLabel->hide();
-    grubBootCombo->hide();
+    grubBootDiskLabel->show();
+    grubBootCombo->setEnabled(true);
+    grubEspLabel->setEnabled(true);
+    grubBootCombo->show();
 }
 
 void MInstall::buildesplist()
