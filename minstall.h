@@ -112,6 +112,7 @@ public:
     QString DEFAULT_HOSTNAME;
     QString MIN_INSTALL_SIZE;
     QString PREFERRED_MIN_INSTALL_SIZE;
+    bool REMOVE_NOSPLASH;
     QStringList ENABLE_SERVICES;
 
     // global for now until boot combo box is sorted out
