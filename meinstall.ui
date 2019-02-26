@@ -1449,6 +1449,9 @@
           </property>
           <item row="2" column="2" colspan="3">
            <widget class="QComboBox" name="grubBootCombo">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
