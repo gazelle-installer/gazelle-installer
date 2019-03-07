@@ -623,7 +623,7 @@ bool MInstall::makeEsp(QString drv, int size)
     if (drv.contains("nvme") || drv.contains("mmcblk" )) {
         mmcnvmepartdesignator = "p";
     }
-    int err = shell.run("parted -s " + drv + " mkpart ESP 0 " + QString::number(size) + "MiB");
+    int err = shell.run("parted -s --align optimal " + drv + " mkpart ESP 1MiB " + QString::number(size) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create ESP";
         return false;
@@ -914,7 +914,7 @@ bool MInstall::makeDefaultPartitions()
     // create root partition
     QString start;
     if (esp_size == 0) {
-        start = "0 "; // have to do this because parted fails if 0MiB is used as start point, while 0 (or 0MB) works.
+        start = "1MiB "; //use 1 MiB to aid alignment
     } else {
         start = QString::number(esp_size) + "MiB ";
     }
@@ -922,7 +922,7 @@ bool MInstall::makeDefaultPartitions()
     // create boot partition if necessary
     if (isRootEncrypted){
         int end_boot = esp_size + boot_size;
-        int err = shell.run("parted -s " + drv + " mkpart primary " + start + QString::number(end_boot) + "MiB");
+        int err = shell.run("parted -s --align optimal " + drv + " mkpart primary " + start + QString::number(end_boot) + "MiB");
         if (err != 0) {
             qDebug() << "Could not create boot partition";
             return false;
@@ -932,14 +932,14 @@ bool MInstall::makeDefaultPartitions()
 
     // if encrypting, boot_size=512, or 0 if not  .  start is set to end_boot if encrypting
     int end_root = esp_size + boot_size + remaining;
-    int err = shell.run("parted -s " + drv + " mkpart primary " + start + QString::number(end_root) + "MiB");
+    int err = shell.run("parted -s --align optimal " + drv + " mkpart primary " + start + QString::number(end_root) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create root partition";
         return false;
     }
 
     // create swap partition
-    err = shell.run("parted -s " + drv + " mkpart primary " + QString::number(end_root) + "MiB " + QString::number(end_root + swap) + "MiB");
+    err = shell.run("parted -s --align optimal " + drv + " mkpart primary " + QString::number(end_root) + "MiB " + QString::number(end_root + swap) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create swap partition";
         return false;
