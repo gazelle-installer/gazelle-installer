@@ -49,7 +49,7 @@ FORMS += memain.ui meinstall.ui
 HEADERS += mmain.h minstall.h
 SOURCES += app.cpp mmain.cpp minstall.cpp
 LIBS += -lcmd
-CONFIG += release warn_on thread qt
+CONFIG += release warn_on thread qt c++11
 
 #RESOURCES += \
 #    images.qrc
