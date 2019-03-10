@@ -2690,7 +2690,7 @@ void MInstall::buildServiceList()
 
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
 
-    foreach (const QString &service, ENABLE_SERVICES) {
+    for (const QString &service : ENABLE_SERVICES) {
         QString lang_str = (lang == "EN")? "" : "_" + lang;
         QStringList list = services_desc.value(service + lang_str).toStringList();
         if (list.size() != 2) {
