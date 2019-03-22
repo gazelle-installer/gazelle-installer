@@ -185,7 +185,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
 
     // if it looks like an apple...
     if (shell.run("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus") == 0) {
-        grubRootButton->setChecked(true);
+        grubPbrButton->setChecked(true);
         grubMbrButton->setEnabled(false);
         gmtCheckBox->setChecked(true);
     }
@@ -1544,8 +1544,8 @@ bool MInstall::installLoader()
             qDebug() << "parted -s /dev/" + drive + " set " + part_num + " boot on";
             runCmd("parted -s /dev/" + drive + " set " + part_num + " boot on");
         }
-    } else if (grubRootButton->isChecked()) {
-        boot = rootpart;
+    } else if (grubPbrButton->isChecked()) {
+        boot = grubPartCombo->currentText().section(" ", 0, 0);
     } else if (grubEspButton->isChecked()) {
 //        if (entireDiskButton->isChecked()) { // don't use PMBR if installing on ESP and doing automatic partitioning
 //            runCmd("parted -s /dev/" + bootdrv + " disk_set pmbr_boot off");
@@ -1553,7 +1553,7 @@ bool MInstall::installLoader()
         // find first ESP on the boot disk
 
         //cmd = QString("partition-info find-esp=%1").arg(bootdrv);
-        boot = grubEspCombo->currentText().trimmed();
+        boot = grubPartCombo->currentText().trimmed();
 
 //        if (boot.isEmpty()) {
 //            //try fallback method
@@ -2359,8 +2359,8 @@ int MInstall::showPage(int curr, int next)
     bool pretend = args.contains("--pretend") || args.contains("-p");
 
     if (next == 4) { // going to Step_Boot
-        grubEspCombo->hide();
-        grubEspLabel->hide();
+        grubPartCombo->hide();
+        grubPartLabel->hide();
     }
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
@@ -2665,8 +2665,6 @@ void MInstall::refresh()
     diskCombo->setCurrentIndex(0);
     grubBootCombo->addItems(drives);
 
-    buildesplist();
-
     FDEpassword->hide();
     FDEpassword2->hide();
     labelFDEpass->hide();
@@ -2859,15 +2857,10 @@ void MInstall::on_grubBootCombo_activated(QString)
         grubEspButton->setEnabled(true);
         if (uefi) { // if booted from UEFI
             grubEspButton->setChecked(true);
-            grubBootCombo->setEnabled(true);
-            grubBootDiskLabel->setEnabled(true);
-            grubBootCombo->show();
-            grubBootDiskLabel->show();
-            grubEspCombo->setEnabled(true);
-            grubEspCombo->show();
-            grubEspLabel->setEnabled(true);
-            grubEspLabel->show();
-            buildesplist();
+            grubPartCombo->setEnabled(true);
+            grubPartCombo->show();
+            grubPartLabel->setEnabled(true);
+            grubPartLabel->show();
         } else {
             grubMbrButton->setChecked(true);
         }
@@ -3201,7 +3194,7 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
     FDEpassword2->setVisible(checked);
     labelFDEpass->setVisible(checked);
     labelFDEpass2->setVisible(checked);
-    grubRootButton->setDisabled(checked);
+    grubPbrButton->setDisabled(checked);
 
     if (checked) {
         FDEpassword->setFocus();
@@ -3259,7 +3252,7 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 
 void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 {
-    grubRootButton->setDisabled(checked);
+    grubPbrButton->setDisabled(checked);
     if (homeCombo->currentText() == "root") { // if home on root set disable home encryption checkbox and set same encryption option
         checkBoxEncryptHome->setEnabled(false);
         checkBoxEncryptHome->setChecked(checked);
@@ -3334,39 +3327,59 @@ void MInstall::on_bootCombo_activated(const QString &arg1)
     updatePartCombo(&prevItemBoot, arg1);
 }
 
-void MInstall::on_grubMbrButton_clicked()
+void MInstall::on_grubMbrButton_toggled()
 {
-    grubEspLabel->hide();
-    grubEspCombo->hide();
+    grubPartLabel->hide();
+    grubPartCombo->hide();
     grubBootDiskLabel->show();
     grubBootCombo->show();
 }
 
-void MInstall::on_grubRootButton_clicked()
+void MInstall::on_grubPbrButton_toggled()
 {
-    grubEspLabel->hide();
-    grubEspCombo->hide();
+    buildPartList();
+    grubPartLabel->show();
+    grubPartCombo->show();
     grubBootDiskLabel->hide();
     grubBootCombo->hide();
 }
 
-void MInstall::on_grubEspButton_clicked()
+void MInstall::on_grubEspButton_toggled()
 {
-    grubEspLabel->show();
-    grubEspCombo->show();
-    grubBootDiskLabel->show();
-    grubBootCombo->setEnabled(true);
-    grubEspLabel->setEnabled(true);
-    grubBootCombo->show();
+    buildESPlist();
+    grubPartLabel->show();
+    grubPartCombo->show();
+    grubBootDiskLabel->hide();
+    grubBootCombo->hide();
+    grubPartLabel->setEnabled(true);
 }
 
-void MInstall::buildesplist()
+// build ESP list available to install GRUB
+void MInstall::buildESPlist()
 {
-    grubEspCombo->clear();
-    QStringList ESPS= getCmdOuts("partition-info find-esps=/dev/" + grubBootCombo->currentText().section(" ", 0, 0));
+    grubPartCombo->clear();
+    QStringList esp_list = getCmdOuts("partition-info find-esps=/dev/" + grubBootCombo->currentText().section(" ", 0, 0));
     //backup
-    if (ESPS.isEmpty()){
-        ESPS = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
+    if (esp_list.isEmpty()) {
+        esp_list = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
     }
-    grubEspCombo->addItems(ESPS);
+    grubPartCombo->addItems(esp_list);
 }
+
+// build partition list available to install GRUB (in PBR)
+void MInstall::buildPartList()
+{
+    grubPartCombo->clear();
+    QStringList part_list = shell.getOutput("partition-info all --noheadings --exclude=swap,boot,efi").split("\n");
+    QStringList new_list;
+    for (const QString &part : part_list) {
+        if (shell.run("partition-info is-linux=" + part.section(" ", 0, 0))) { // list only Linux partitions
+            if (shell.getOutput("blkid /dev/" + part.section(" ", 0, 0) + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
+                new_list << part;
+            }
+        }
+    }
+    grubPartCombo->addItems(new_list);
+}
+
+
