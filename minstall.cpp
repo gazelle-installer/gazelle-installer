@@ -1950,6 +1950,7 @@ bool MInstall::setPasswords()
     proc.start("chroot /mnt/antiX passwd root");
     proc.waitForStarted();
     proc.write(rootPasswordEdit->text().toUtf8() + "\n");
+    sleep(1);
     proc.write(rootPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -1963,6 +1964,7 @@ bool MInstall::setPasswords()
     proc.start("chroot /mnt/antiX passwd demo");
     proc.waitForStarted();
     proc.write(userPasswordEdit->text().toUtf8() + "\n");
+    sleep(1);
     proc.write(userPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -3340,6 +3342,7 @@ void MInstall::on_grubPbrButton_toggled()
     buildPartList();
     grubPartLabel->show();
     grubPartCombo->show();
+
     grubBootDiskLabel->hide();
     grubBootCombo->hide();
 }
@@ -3373,7 +3376,7 @@ void MInstall::buildPartList()
     QStringList part_list = shell.getOutput("partition-info all --noheadings --exclude=swap,boot,efi").split("\n");
     QStringList new_list;
     for (const QString &part : part_list) {
-        if (shell.run("partition-info is-linux=" + part.section(" ", 0, 0))) { // list only Linux partitions
+        if (shell.run("partition-info is-linux=" + part.section(" ", 0, 0)) == 0) { // list only Linux partitions
             if (shell.getOutput("blkid /dev/" + part.section(" ", 0, 0) + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
                 new_list << part;
             }
