@@ -1479,7 +1479,7 @@
            </widget>
           </item>
           <item row="3" column="2" colspan="3">
-           <widget class="QComboBox" name="grubEspCombo">
+           <widget class="QComboBox" name="grubPartCombo">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -1511,9 +1511,9 @@
            </spacer>
           </item>
           <item row="3" column="1">
-           <widget class="QLabel" name="grubEspLabel">
+           <widget class="QLabel" name="grubPartLabel">
             <property name="text">
-             <string>ESP Partition to Use:</string>
+             <string>Partition to use:</string>
             </property>
            </widget>
           </item>
@@ -1533,6 +1533,9 @@
             </property>
             <property name="mouseTracking">
              <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>Master Boot Record</string>
             </property>
             <property name="autoFillBackground">
              <bool>false</bool>
@@ -1637,7 +1640,7 @@
            </widget>
           </item>
           <item row="1" column="3">
-           <widget class="QRadioButton" name="grubRootButton">
+           <widget class="QRadioButton" name="grubPbrButton">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -1650,8 +1653,11 @@
               <height>0</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>Partition Boot Record</string>
+            </property>
             <property name="text">
-             <string>root</string>
+             <string>PBR</string>
             </property>
             <property name="checked">
              <bool>false</bool>
@@ -2653,7 +2659,7 @@
   <tabstop>badblocksCheck</tabstop>
   <tabstop>grubCheckBox</tabstop>
   <tabstop>grubMbrButton</tabstop>
-  <tabstop>grubRootButton</tabstop>
+  <tabstop>grubPbrButton</tabstop>
   <tabstop>grubEspButton</tabstop>
   <tabstop>computerNameEdit</tabstop>
   <tabstop>computerDomainEdit</tabstop>
@@ -2688,8 +2694,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>269</x>
-     <y>96</y>
+     <x>249</x>
+     <y>89</y>
     </hint>
     <hint type="destinationlabel">
      <x>146</x>
@@ -2704,8 +2710,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>256</x>
-     <y>78</y>
+     <x>249</x>
+     <y>89</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -2740,8 +2746,8 @@
      <y>57</y>
     </hint>
     <hint type="destinationlabel">
-     <x>262</x>
-     <y>82</y>
+     <x>249</x>
+     <y>89</y>
     </hint>
    </hints>
   </connection>
@@ -2784,12 +2790,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>197</y>
+     <x>81</x>
+     <y>42</y>
     </hint>
     <hint type="destinationlabel">
-     <x>123</x>
-     <y>218</y>
+     <x>47</x>
+     <y>29</y>
     </hint>
    </hints>
   </connection>
@@ -2800,12 +2806,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>265</x>
-     <y>194</y>
+     <x>81</x>
+     <y>42</y>
     </hint>
     <hint type="destinationlabel">
-     <x>272</x>
-     <y>230</y>
+     <x>61</x>
+     <y>29</y>
     </hint>
    </hints>
   </connection>
@@ -2816,12 +2822,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>319</x>
-     <y>194</y>
+     <x>81</x>
+     <y>42</y>
     </hint>
     <hint type="destinationlabel">
-     <x>414</x>
-     <y>231</y>
+     <x>75</x>
+     <y>29</y>
     </hint>
    </hints>
   </connection>
@@ -2832,12 +2838,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>365</x>
-     <y>185</y>
+     <x>81</x>
+     <y>42</y>
     </hint>
     <hint type="destinationlabel">
-     <x>94</x>
-     <y>215</y>
+     <x>47</x>
+     <y>39</y>
     </hint>
    </hints>
   </connection>
