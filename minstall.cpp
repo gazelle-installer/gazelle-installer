@@ -474,6 +474,24 @@ bool MInstall::checkDisk()
     return true;
 }
 
+// check if booted UEFI and if ESP(s) available
+bool MInstall::checkEsp()
+{
+    if (!uefi) {
+        grubEspButton->setEnabled(false);
+        return false;
+    }
+    buildESPlist();
+    // if GPT, and ESP exists
+    if (grubPartCombo->count() > 0) {
+        grubEspButton->setEnabled(true);
+        return true;
+    } else {
+        grubEspButton->setEnabled(false);
+        return false;
+    }
+}
+
 
 // check password length (maybe complexity)
 bool MInstall::checkPassword(const QString &pass)
@@ -2519,7 +2537,7 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 4: // set bootloader
-        on_grubBootCombo_activated();
+        checkEsp();
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
                                        "<p>By default GRUB2 is installed in the Master Boot Record or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
@@ -2845,29 +2863,6 @@ void MInstall::on_rootTypeCombo_activated(QString)
         badblocksCheck->setEnabled(true);
     } else {
         badblocksCheck->setEnabled(false);
-    }
-}
-
-// determine if selected drive uses GPT
-void MInstall::on_grubBootCombo_activated(QString)
-{
-    QString drv = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0);
-    QString cmd = QString("blkid %1 | grep -q PTTYPE=\\\"gpt\\\"").arg(drv);
-    QString detectESP = QString("sgdisk -p %1 | grep -q ' EF00 '").arg(drv);
-    // if GPT, and ESP exists
-    if (shell.run(cmd) == 0 && shell.run(detectESP) == 0) {
-        grubEspButton->setEnabled(true);
-        if (uefi) { // if booted from UEFI
-            grubEspButton->setChecked(true);
-            grubPartCombo->setEnabled(true);
-            grubPartCombo->show();
-            grubPartLabel->setEnabled(true);
-            grubPartLabel->show();
-        } else {
-            grubMbrButton->setChecked(true);
-        }
-    } else {
-        grubEspButton->setEnabled(false);
     }
 }
 
@@ -3361,10 +3356,16 @@ void MInstall::on_grubEspButton_toggled()
 void MInstall::buildESPlist()
 {
     grubPartCombo->clear();
-    QStringList esp_list = getCmdOuts("partition-info find-esps=/dev/" + grubBootCombo->currentText().section(" ", 0, 0));
-    //backup
-    if (esp_list.isEmpty()) {
-        esp_list = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + grubBootCombo->currentText().section(" ", 0, 0) + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
+    QStringList drives = shell.getOutput("partition-info drives --noheadings --exclude=boot | awk '{print $1}'").split("\n");
+    QStringList esp_list;
+
+    for (const QString &drive : drives) {
+        if (isGpt("/dev/" + drive)) {
+            QString esps = shell.getOutput("lsblk -nlo name,parttype /dev/" + drive + " | egrep '(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$' | awk '{print $1}'");
+            if (!esps.isEmpty()) {
+                esp_list << esps.split("\n");
+            }
+        }
     }
     grubPartCombo->addItems(esp_list);
 }
