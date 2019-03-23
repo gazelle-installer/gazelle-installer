@@ -1835,14 +1835,14 @@ bool MInstall::setUserName()
     // saving Desktop changes
     if (saveDesktopCheckBox->isChecked()) {
         shell.run("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
-        cmd = cmd = QString("rsync -a /home/demo/ %1 --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority' --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
+        cmd = QString("rsync -a /home/demo/ %1 --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority' --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
         if (shell.run(cmd) != 0) {
             setCursor(QCursor(Qt::ArrowCursor));
             QMessageBox::critical(this, QString::null,
                                   tr("Sorry, failed to save desktop changes."));
         } else {
-            replaceStringInFile("\\/home\\/demo", "\\/home\\/" + userNameEdit->text(), dpath + "/.conky/conky-startup.sh");
-            replaceStringInFile("\\/home\\/demo", "\\/home\\/" + userNameEdit->text(), dpath + "/.config/dconf/user");
+            cmd = QString("grep -rl \"home/demo\" " + dpath + "| xargs sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'");
+            shell.run(cmd);
         }
     }
     // fix the ownership, demo=newuser
