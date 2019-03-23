@@ -66,6 +66,7 @@ public:
     bool isGpt(QString drv);
 
     bool checkDisk();
+    bool checkEsp();
     bool checkPassword(const QString &pass);
     bool installLoader();
     bool makeChosenPartitions();
@@ -174,7 +175,6 @@ private slots:
 
     void on_diskCombo_activated(QString item = "");
     void on_rootTypeCombo_activated(QString item = "");
-    void on_grubBootCombo_activated(QString item = "");
     void on_rootCombo_activated(const QString &arg1 = "");
     void on_homeCombo_activated(const QString &arg1);
     void on_swapCombo_activated(const QString &arg1);
