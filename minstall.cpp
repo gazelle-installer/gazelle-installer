@@ -3359,11 +3359,19 @@ void MInstall::buildESPlist()
     QStringList drives = shell.getOutput("partition-info drives --noheadings --exclude=boot | awk '{print $1}'").split("\n");
     QStringList esp_list;
 
+    // find ESP for all partitions on all drives
     for (const QString &drive : drives) {
         if (isGpt("/dev/" + drive)) {
             QString esps = shell.getOutput("lsblk -nlo name,parttype /dev/" + drive + " | egrep '(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$' | awk '{print $1}'");
             if (!esps.isEmpty()) {
                 esp_list << esps.split("\n");
+            }
+            // backup detection for drives that don't have UUID for ESP
+            QStringList backup_list = shell.getOutput("fdisk -l -o DEVICE,TYPE /dev/" + drive + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3").split("\n");
+            for (const QString &part : backup_list) {
+                if (!esp_list.contains(part)) {
+                    esp_list << part;
+                }
             }
         }
     }
