@@ -69,7 +69,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     POPULATE_MEDIA_MOUNTPOINTS=settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
     MIN_INSTALL_SIZE=settings.value("MIN_INSTALL_SIZE").toString();
     PREFERRED_MIN_INSTALL_SIZE=settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
-
+    REMOVE_NOSPLASH=settings.value("REMOVE_NOSPLASH", "false").toBool();
     //check for samba
     QFileInfo info("/etc/init.d/smbd");
     if ( !info.exists()) {
@@ -185,7 +185,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
 
     // if it looks like an apple...
     if (shell.run("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus") == 0) {
-        grubRootButton->setChecked(true);
+        grubPbrButton->setChecked(true);
         grubMbrButton->setEnabled(false);
         gmtCheckBox->setChecked(true);
     }
@@ -474,6 +474,24 @@ bool MInstall::checkDisk()
     return true;
 }
 
+// check if booted UEFI and if ESP(s) available
+bool MInstall::checkEsp()
+{
+    if (!uefi) {
+        grubEspButton->setEnabled(false);
+        return false;
+    }
+    buildESPlist();
+    // if GPT, and ESP exists
+    if (grubPartCombo->count() > 0) {
+        grubEspButton->setEnabled(true);
+        return true;
+    } else {
+        grubEspButton->setEnabled(false);
+        return false;
+    }
+}
+
 
 // check password length (maybe complexity)
 bool MInstall::checkPassword(const QString &pass)
@@ -607,6 +625,7 @@ void MInstall::updatePartCombo(QString *prevItem, const QString &part)
 bool MInstall::makeSwapPartition(QString dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    system("swapoff -a");
     QString cmd = "/sbin/mkswap " + dev + " -L " + swapLabelEdit->text();
     if (shell.run(cmd) != 0) {
         // error
@@ -1543,33 +1562,33 @@ bool MInstall::installLoader()
             qDebug() << "parted -s /dev/" + drive + " set " + part_num + " boot on";
             runCmd("parted -s /dev/" + drive + " set " + part_num + " boot on");
         }
-    } else if (grubRootButton->isChecked()) {
-        boot = rootpart;
+    } else if (grubPbrButton->isChecked()) {
+        boot = grubPartCombo->currentText().section(" ", 0, 0);
     } else if (grubEspButton->isChecked()) {
 //        if (entireDiskButton->isChecked()) { // don't use PMBR if installing on ESP and doing automatic partitioning
 //            runCmd("parted -s /dev/" + bootdrv + " disk_set pmbr_boot off");
 //        }
         // find first ESP on the boot disk
 
-        cmd = QString("partition-info find-esp=%1").arg(bootdrv);
-        boot = getCmdOut(cmd);
+        //cmd = QString("partition-info find-esp=%1").arg(bootdrv);
+        boot = grubPartCombo->currentText().trimmed();
 
-        if (boot.isEmpty()) {
-            //try fallback method
-            //modification for mmc/nvme devices that don't always update the parttype uuid
-            cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
-            qDebug() << "parted command" << cmd;
-            boot = getCmdOut(cmd);
-            if (boot.isEmpty()) {
-                qDebug() << "could not find ESP on: " << bootdrv;
-                return false;
-            }
-            if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
-                boot = bootdrv + "p" + boot;
-            } else {
-                boot = bootdrv + boot;
-            }
-        }
+//        if (boot.isEmpty()) {
+//            //try fallback method
+//            //modification for mmc/nvme devices that don't always update the parttype uuid
+//            cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
+//            qDebug() << "parted command" << cmd;
+//            boot = getCmdOut(cmd);
+//            if (boot.isEmpty()) {
+//                qDebug() << "could not find ESP on: " << bootdrv;
+//                return false;
+//            }
+//            if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
+//                boot = bootdrv + "p" + boot;
+//            } else {
+//                boot = bootdrv + boot;
+//            }
+//        }
         qDebug() << "boot for grub routine = " << boot;
     }
     // install Grub?
@@ -1659,6 +1678,10 @@ bool MInstall::installLoader()
     //remove boot_image code
     finalcmdline.removeAll("BOOT_IMAGE=/antiX/vmlinuz");
 
+    //remove nosplash boot code if configured in installer.conf
+    if (REMOVE_NOSPLASH) {
+        finalcmdline.removeAll("nosplash");
+    }
     //remove in null or empty strings that might have crept in
     finalcmdline.removeAll({});
     qDebug() << "Add cmdline options to Grub" << finalcmdline;
@@ -1945,6 +1968,7 @@ bool MInstall::setPasswords()
     proc.start("chroot /mnt/antiX passwd root");
     proc.waitForStarted();
     proc.write(rootPasswordEdit->text().toUtf8() + "\n");
+    sleep(1);
     proc.write(rootPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -1958,6 +1982,7 @@ bool MInstall::setPasswords()
     proc.start("chroot /mnt/antiX passwd demo");
     proc.waitForStarted();
     proc.write(userPasswordEdit->text().toUtf8() + "\n");
+    sleep(1);
     proc.write(userPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -2111,6 +2136,20 @@ bool MInstall::setComputerName()
         shell.run("mv -f /mnt/antiX/etc/rc2.d/S01nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1");
     }
 
+    // systemd check
+    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
+
+    if (!systemdcheck.isEmpty()) {
+        if (!sambaCheckBox->isChecked()) {
+            runCmd("chroot /mnt/antiX systemctl disable smbd");
+            runCmd("chroot /mnt/antiX systemctl disable nmbd");
+            runCmd("chroot /mnt/antiX systemctl disable samba-ad-dc");
+            runCmd("chroot /mnt/antiX systemctl mask smbd");
+            runCmd("chroot /mnt/antiX systemctl mask nmbd");
+            runCmd("chroot /mnt/antiX systemctl mask samba-ad-dc");
+        }
+    }
+
     //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
     QString cmd;
     cmd = QString("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost | head -1 | awk '{print $2}')\"'/" + computerNameEdit->text() + "/' /mnt/antiX/etc/hosts");
@@ -2222,14 +2261,26 @@ void MInstall::setServices()
 
     qDebug() << "Setting Services";
 
+    // systemd check
+    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
+
     QTreeWidgetItemIterator it(csView);
     while (*it) {
         QString service = (*it)->text(0);
         qDebug() << "Service: " << service;
         if ((*it)->checkState(0) == Qt::Checked) {
-            runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+            if (systemdcheck.isEmpty()) {
+                runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+            } else {
+                runCmd("chroot /mnt/antiX systemctl enable " + service);
+            }
         } else {
-            runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
+            if (systemdcheck.isEmpty()) {
+                runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
+            } else {
+                runCmd("chroot /mnt/antiX systemctl disable " + service);
+                runCmd("chroot /mnt/antiX systemctl mask " + service);
+            }
         }
         ++it;
     }
@@ -2280,6 +2331,7 @@ void MInstall::stopInstall()
                 system("cryptsetup luksClose swapfs");
             }
             system("sleep 1");
+            system("swapoff -a");
             system("/usr/local/bin/persist-config --shutdown --command reboot");
             return;
         } else {
@@ -2326,6 +2378,11 @@ int MInstall::showPage(int curr, int next)
 {
     bool pretend = args.contains("--pretend") || args.contains("-p");
 
+    if (next == 4) { // going to Step_Boot
+        grubPartCombo->hide();
+        grubPartLabel->hide();
+    }
+
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
@@ -2333,7 +2390,7 @@ int MInstall::showPage(int curr, int next)
             }
             return 3;
         }
-    } else if  (next == 3 && curr == 2) {// at  Step_Parttion (fwd)
+    } else if  (next == 3 && curr == 2) {// at Step_Partition (fwd)
         if (checkBoxEncrpytSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
             if (!checkPassword(FDEpassCust->text())) {
                 return curr;
@@ -2480,7 +2537,7 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 4: // set bootloader
-        on_grubBootCombo_activated();
+        checkEsp();
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
                                        "<p>By default GRUB2 is installed in the Master Boot Record or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
@@ -2809,25 +2866,6 @@ void MInstall::on_rootTypeCombo_activated(QString)
     }
 }
 
-// determine if selected drive uses GPT
-void MInstall::on_grubBootCombo_activated(QString)
-{
-    QString drv = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0);
-    QString cmd = QString("blkid %1 | grep -q PTTYPE=\\\"gpt\\\"").arg(drv);
-    QString detectESP = QString("sgdisk -p %1 | grep -q ' EF00 '").arg(drv);
-    // if GPT, and ESP exists
-    if (shell.run(cmd) == 0 && shell.run(detectESP) == 0) {
-        grubEspButton->setEnabled(true);
-        if (uefi) { // if booted from UEFI
-            grubEspButton->setChecked(true);
-        } else {
-            grubMbrButton->setChecked(true);
-        }
-    } else {
-        grubEspButton->setEnabled(false);
-    }
-}
-
 void MInstall::procAbort()
 {
     proc->terminate();
@@ -3153,7 +3191,7 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
     FDEpassword2->setVisible(checked);
     labelFDEpass->setVisible(checked);
     labelFDEpass2->setVisible(checked);
-    grubRootButton->setDisabled(checked);
+    grubPbrButton->setDisabled(checked);
 
     if (checked) {
         FDEpassword->setFocus();
@@ -3211,7 +3249,7 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 
 void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 {
-    grubRootButton->setDisabled(checked);
+    grubPbrButton->setDisabled(checked);
     if (homeCombo->currentText() == "root") { // if home on root set disable home encryption checkbox and set same encryption option
         checkBoxEncryptHome->setEnabled(false);
         checkBoxEncryptHome->setChecked(checked);
@@ -3285,3 +3323,75 @@ void MInstall::on_bootCombo_activated(const QString &arg1)
 {
     updatePartCombo(&prevItemBoot, arg1);
 }
+
+void MInstall::on_grubMbrButton_toggled()
+{
+    grubPartLabel->hide();
+    grubPartCombo->hide();
+    grubBootDiskLabel->show();
+    grubBootCombo->show();
+}
+
+void MInstall::on_grubPbrButton_toggled()
+{
+    buildPartList();
+    grubPartLabel->show();
+    grubPartCombo->show();
+
+    grubBootDiskLabel->hide();
+    grubBootCombo->hide();
+}
+
+void MInstall::on_grubEspButton_toggled()
+{
+    buildESPlist();
+    grubPartLabel->show();
+    grubPartCombo->show();
+    grubBootDiskLabel->hide();
+    grubBootCombo->hide();
+    grubPartLabel->setEnabled(true);
+}
+
+// build ESP list available to install GRUB
+void MInstall::buildESPlist()
+{
+    grubPartCombo->clear();
+    QStringList drives = shell.getOutput("partition-info drives --noheadings --exclude=boot | awk '{print $1}'").split("\n");
+    QStringList esp_list;
+
+    // find ESP for all partitions on all drives
+    for (const QString &drive : drives) {
+        if (isGpt("/dev/" + drive)) {
+            QString esps = shell.getOutput("lsblk -nlo name,parttype /dev/" + drive + " | egrep '(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$' | awk '{print $1}'");
+            if (!esps.isEmpty()) {
+                esp_list << esps.split("\n");
+            }
+            // backup detection for drives that don't have UUID for ESP
+            QStringList backup_list = shell.getOutput("fdisk -l -o DEVICE,TYPE /dev/" + drive + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3").split("\n");
+            for (const QString &part : backup_list) {
+                if (!esp_list.contains(part)) {
+                    esp_list << part;
+                }
+            }
+        }
+    }
+    grubPartCombo->addItems(esp_list);
+}
+
+// build partition list available to install GRUB (in PBR)
+void MInstall::buildPartList()
+{
+    grubPartCombo->clear();
+    QStringList part_list = shell.getOutput("partition-info all --noheadings --exclude=swap,boot,efi").split("\n");
+    QStringList new_list;
+    for (const QString &part : part_list) {
+        if (shell.run("partition-info is-linux=" + part.section(" ", 0, 0)) == 0) { // list only Linux partitions
+            if (shell.getOutput("blkid /dev/" + part.section(" ", 0, 0) + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
+                new_list << part;
+            }
+        }
+    }
+    grubPartCombo->addItems(new_list);
+}
+
+
