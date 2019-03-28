@@ -485,6 +485,7 @@ bool MInstall::checkEsp()
     // if GPT, and ESP exists
     if (grubPartCombo->count() > 0) {
         grubEspButton->setEnabled(true);
+        grubEspButton->click();
         return true;
     } else {
         grubEspButton->setEnabled(false);
@@ -846,7 +847,7 @@ bool MInstall::makeDefaultPartitions()
 
     // allocate space for ESP
     int esp_size = 0;
-    if(uefi) { // if booted from UEFI
+    if (uefi) { // if booted from UEFI
         esp_size = 256;
         remaining -= esp_size;
     }
@@ -884,7 +885,7 @@ bool MInstall::makeDefaultPartitions()
         free = 0;
     }
 
-    if(uefi) { // if booted from UEFI make ESP
+    if (uefi) { // if booted from UEFI make ESP
         // new GPT partition table
         int err = shell.run("parted -s " + drv + " mklabel gpt");
         if (err != 0 ) {
@@ -904,7 +905,7 @@ bool MInstall::makeDefaultPartitions()
         rootDevicePreserve = rootdev;
         swapDevicePreserve = swapdev;
 
-        if(!makeEsp(drv, esp_size)) {
+        if (!makeEsp(drv, esp_size)) {
             return false;
         }
 
@@ -967,7 +968,7 @@ bool MInstall::makeDefaultPartitions()
     // if encrypting, set up LUKS containers for root and swap
     if (isRootEncrypted) {
         updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-        if(!makeLuksPartition(rootdev, "rootfs", FDEpassword->text().toUtf8()) || !makeLuksPartition(swapdev, "swapfs", FDEpassword->text().toUtf8())) {
+        if (!makeLuksPartition(rootdev, "rootfs", FDEpassword->text().toUtf8()) || !makeLuksPartition(swapdev, "swapfs", FDEpassword->text().toUtf8())) {
             qDebug() << "could not make LUKS partitions";
             return false;
         } else {
@@ -1002,7 +1003,7 @@ bool MInstall::makeDefaultPartitions()
     }
 
     // if UEFI is not detected, set flags based on GPT. Else don't set a flag...done by makeESP.
-    if(!uefi) { // set appropriate flags
+    if (!uefi) { // set appropriate flags
         if (isGpt(drv)) {
             shell.run("parted -s " + drv + " disk_set pmbr_boot on");
         } else {
@@ -1226,7 +1227,7 @@ bool MInstall::makeChosenPartitions()
 
             if (checkBoxEncrpytSwap->isChecked()) {
                 updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-                if(!makeLuksPartition(swapdev, "swapfs", FDEpassCust->text().toUtf8())) {
+                if (!makeLuksPartition(swapdev, "swapfs", FDEpassCust->text().toUtf8())) {
                     qDebug() << "could not make swap LUKS partition";
                     return false;
                 } else {
@@ -1258,7 +1259,7 @@ bool MInstall::makeChosenPartitions()
 
         if (checkBoxEncryptRoot->isChecked()) {
             updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if(!makeLuksPartition(rootdev, "rootfs", FDEpassCust->text().toUtf8())) {
+            if (!makeLuksPartition(rootdev, "rootfs", FDEpassCust->text().toUtf8())) {
                 qDebug() << "could not make root LUKS partition";
                 return false;
             } else {
@@ -1309,7 +1310,7 @@ bool MInstall::makeChosenPartitions()
 
         if (isHomeEncrypted) {
             updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if(!makeLuksPartition(homedev, "homefs", FDEpassCust->text().toUtf8())) {
+            if (!makeLuksPartition(homedev, "homefs", FDEpassCust->text().toUtf8())) {
                 qDebug() << "could not make home LUKS partition";
                 return false;
             } else {
@@ -2876,7 +2877,7 @@ bool MInstall::eventFilter(QObject* obj, QEvent* event)
 {
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        if(keyEvent->key() == Qt::Key_Escape) {
+        if (keyEvent->key() == Qt::Key_Escape) {
             if (widgetStack->currentWidget() != Step_Boot) { // don't close on GRUB installation by mistake
                 on_closeButton_clicked();
             }
