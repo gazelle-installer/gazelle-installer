@@ -54,6 +54,9 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     this->args = args;
     labelMX->setPixmap(QPixmap("/usr/share/gazelle-installer-data/logo.png"));
 
+    // print version (look for /usr/sbin/minstall since the name of the package might be different)
+    system("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
+
     //setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
     PROJECTNAME=settings.value("PROJECT_NAME").toString();
