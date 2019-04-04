@@ -97,6 +97,7 @@ public:
     void setServices();
     void updatePartCombo(QString *prevItem, const QString &part);
     void updatePartitionWidgets();
+    void updateAdvancedFDE(bool changed);
     void updateStatus(QString msg, int val);
     void writeKeyFile();
 
@@ -168,6 +169,12 @@ private slots:
     void on_FDEpassword2_textChanged(const QString &arg1);
     void on_FDEpassCust_textChanged();
     void on_FDEpassCust2_textChanged(const QString &arg1);
+    void on_buttonBenchmarkFDE_clicked();
+    void on_buttonAdvancedFDE_clicked();
+    void on_buttonAdvancedFDECust_clicked();
+    void on_comboFDEcipher_currentIndexChanged(const QString &arg1);
+    void on_comboFDEchain_currentIndexChanged(const QString &arg1);
+    void on_comboFDEivgen_currentIndexChanged(const QString &arg1);
 
     void on_checkBoxEncryptRoot_toggled(bool checked);
     void on_checkBoxEncryptHome_toggled(bool checked);
@@ -206,4 +213,13 @@ private:
     QString prevItemSwap;
     QString prevItemBoot;
 
+    // Advanced Encryption Settings page
+    int ixPageRefAdvancedFDE;
+    int indexFDEcipher;
+    int indexFDEchain;
+    int indexFDEivgen;
+    int indexFDEivhash;
+    int indexFDEkeysize;
+    int indexFDEhash;
+    long iFDEitertime;
 };
