@@ -92,6 +92,11 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME).arg(PROJECTFORUM));
 
+    // FDE defaults
+
+    ixPageRefAdvancedFDE = 0;
+    updateAdvancedFDE(true);
+
     // timezone
 
     timezoneCombo->clear();
@@ -626,6 +631,32 @@ void MInstall::updatePartCombo(QString *prevItem, const QString &part)
     }
 }
 
+void MInstall::updateAdvancedFDE(bool save)
+{
+    if(save) {
+        indexFDEcipher = comboFDEcipher->currentIndex();
+        indexFDEchain = comboFDEchain->currentIndex();
+        indexFDEivgen = comboFDEivgen->currentIndex();
+        indexFDEivhash = comboFDEivhash->currentIndex();
+        indexFDEkeysize = comboFDEkeysize->currentIndex();
+        indexFDEhash = comboFDEhash->currentIndex();
+        iFDEitertime = spinFDEitertime->value();
+    } else {
+        comboFDEcipher->setCurrentIndex(indexFDEcipher);
+        comboFDEchain->setCurrentIndex(indexFDEchain);
+        comboFDEivgen->setCurrentIndex(indexFDEivgen);
+        comboFDEivhash->setCurrentIndex(indexFDEivhash);
+        comboFDEkeysize->setCurrentIndex(indexFDEkeysize);
+        comboFDEhash->setCurrentIndex(indexFDEhash);
+        spinFDEitertime->setValue(iFDEitertime);
+    }
+
+    // Simulate changes to combo boxes here to avoid nasty surprises.
+    on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
+    on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
+    on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
+}
+
 bool MInstall::makeSwapPartition(QString dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -768,7 +799,19 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
     QProcess proc;
 
     // format partition
-    proc.start("cryptsetup luksFormat --batch-mode " + dev);
+    QString strCipherSpec = comboFDEcipher->currentText() + "-" + comboFDEchain->currentText();
+    if(comboFDEchain->currentText() != "ECB") {
+        strCipherSpec += "-" + comboFDEivgen->currentText();
+        if (comboFDEivgen->currentText() == "ESSIV") {
+            strCipherSpec += ":" + comboFDEivhash->itemData(comboFDEivhash->currentIndex()).toString();
+        }
+    }
+    proc.start("cryptsetup --batch-mode"
+               " --cipher " + strCipherSpec.toLower()
+               + " --key-size " + comboFDEkeysize->currentText().section('-', 0, 0)
+               + " --hash " + comboFDEhash->currentText().toLower().remove('-')
+               + " --iter-time " + spinFDEitertime->cleanText()
+               + " luksFormat " + dev);
     proc.waitForStarted();
     proc.write(password + "\n");
     proc.waitForFinished();
@@ -2382,9 +2425,13 @@ int MInstall::showPage(int curr, int next)
 {
     bool pretend = args.contains("--pretend") || args.contains("-p");
 
-    if (next == 4) { // going to Step_Boot
+    if (next == 5) { // going to Step_Boot
         grubPartCombo->hide();
         grubPartLabel->hide();
+    }
+
+    if (next == 3 && ixPageRefAdvancedFDE != 0) {
+        return next;
     }
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
@@ -2392,7 +2439,7 @@ int MInstall::showPage(int curr, int next)
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
                 return curr;
             }
-            return 3;
+            return 4; // Go to Step_Progress
         }
     } else if  (next == 3 && curr == 2) {// at Step_Partition (fwd)
         if (checkBoxEncrpytSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
@@ -2406,9 +2453,19 @@ int MInstall::showPage(int curr, int next)
                 }
             }
         }
-    } else if (next == 3 && curr == 4) { // at Step_Boot screen (back)
+        return 4; // Go to Step_Progress
+    } else if (curr == 3) { // at Step_FDE
+        if(next == 4) { // Forward
+            updateAdvancedFDE(true);
+        } else { // Backward
+            updateAdvancedFDE(false);
+        }
+        next = ixPageRefAdvancedFDE;
+        ixPageRefAdvancedFDE = 0;
+        return next;
+    } else if (next == 4 && curr == 5) { // at Step_Boot screen (back)
         return 1;
-    } else if (next == 5 && curr == 4) { // at Step_Boot screen (forward)
+    } else if (next == 6 && curr == 5) { // at Step_Boot screen (forward)
         if (pretend) {
             return next + 1; // skip Services screen
         }
@@ -2417,23 +2474,23 @@ int MInstall::showPage(int curr, int next)
         } else {
             return next + 1; // skip Services screen
         }
-    } else if (next == 9 && curr == 8) { // at Step_User_Accounts (forward)
+    } else if (next == 10 && curr == 9) { // at Step_User_Accounts (forward)
         if (pretend) {
             return next;
         }
         if (!setUserInfo()) {
             return curr;
         }
-    } else if (next == 7 && curr == 6) { // at Step_Network (forward)
+    } else if (next == 8 && curr == 7) { // at Step_Network (forward)
         if (pretend) {
             return next;
         }
         if (!setComputerName()) {
             return curr;
         }
-    } else if (next == 5 && curr == 6) { // at Step_Network (forward)
-       return 4; // go to Step_Boot
-    } else if (next == 8 && curr == 7) { // at Step_Localization (forward)
+    } else if (next == 6 && curr == 7) { // at Step_Network (backward)
+       return 5; // go to Step_Boot
+    } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
         if (pretend) {
             return next;
         }
@@ -2447,14 +2504,14 @@ int MInstall::showPage(int curr, int next)
             setCursor(QCursor(Qt::ArrowCursor));
             next +=1;
         }
-    } else if (next == 6 && curr == 5) { // at Step_Services (forward)
+    } else if (next == 7 && curr == 6) { // at Step_Services (forward)
         if (pretend) {
-            return 7; // Step_Localization
+            return 8; // Step_Localization
         }
         setServices();
-        return 7; // goes back to the screen that called Services screen
-    } else if (next == 4 && curr == 5) { // at Step_Services (backward)
-        return 7; // goes back to the screen that called Services screen
+        return 8; // goes back to the screen that called Services screen
+    } else if (next == 5 && curr == 6) { // at Step_Services (backward)
+        return 8; // goes back to the screen that called Services screen
     }
     return next;
 }
@@ -2500,11 +2557,52 @@ void MInstall::pageDisplayed(int next)
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         break;
 
-    case 3: // installation step
+    case 3: // advanced encryption setup
+        
+        ((MMain *)mmn)->setHelpText(tr("<p>"
+                                       "<b>Advanced Encryption Settings</b><br/>This page allows fine-tuning of LUKS encrypted partitions.<br/>"
+                                       "In most cases, the defaults will provide a very secure configuration, even for sensitive applications.<br/>"
+                                       "This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide.<br/>"
+                                       "</p>"
+                                       "<p>"
+                                       "<b>Cipher</b><br />AES, Serpent, or Twofish are available.<br />"
+                                       "<b>AES</b> (also known as <i>Rijndael</i>) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity.<br />"
+                                       "<b>Serpent</b> is a cipher with a higher security margin than Rijndael, and was considered to have the highest security of all ciphers selected for the AES competition. Rijndael won due to its superior performance rather than its security. It performs better on some 64-bit CPUs.<br />"
+                                       "<b>Twofish</b> was created by Bruce Schneier as the successor to Blowfish."
+                                       "<b>CAST6</b> (CAST-256) also participated in the AES competition."
+                                       "</p>"
+                                       "<p>"
+                                       "<b>Cipher chaining mode</b><br/>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.<br />"
+                                       "<b>XTS</b> (<b>X</b>EX-based <b>t</b>weaked codebook with ciphertext <b>s</b>tealing) is modern chaining mode, which supersedes CBC and EBC. It is the default chaining mode, and is highly recommended over CBC and EBC for security reasons. Plain64 can be used with this, since ESSIV was designed to combat issues with CBC.<br />"
+                                       "<b>CBC</b> (<b>C</b>ipher <b>B</b>lock <b>C</b>haining) is a very simple mode of operation. It is vulnerable to some attacks (eg. padding oracle attacks) and is often very slow, as there are no opportunities for parallel operation. For this reason, XTS is recommended instead, and is selected by default.<br />"
+                                       "<b>ECB</b> (<b>E</b>lectronic <b>C</b>ode<b>b</b>ook) is even simpler than CBC and only relies on physical block locations. It is even less secure than CBC and should not be used for sensitive applications."
+                                       "</p>"
+                                       "<p>"
+                                       "<b>IV generation method</b><br/>For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The length of the hash determines the length of the vector, and so <b>not all combinations will work.</b><br/>"
+                                       "ECB mode does not use an initialisation vector, so these fields will all be disabled if ECB is selected for the cipher chaining mode."
+                                       "</p>"
+                                       "<p>"
+                                       "<b>Key size</b><br/>Sets the key size in bits.<br />"
+                                       "The XTS cipher chaining mode splits the key in half (for example, AES256 in XTS mode requires a 512-bit key size)."
+                                       "</p>"
+                                       "<p>"
+                                       "<b>Volume hash algorithm</b><br/>The  hash  used  for PBKDF2 and for the  AF splitter.<br/>"
+                                       "SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken."
+                                       "</p>"
+                                       "<p>"
+                                       "<b>PBKDF2 iteration time</b><br/>The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.<br/>"
+                                       "A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).<br/>"
+                                       "If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered."
+                                       "</p>"
+                                       "<p><b>Benchmark</b><br/>Run a benchmark (<i>cryptsetup benchmark</i>) for common cipher options in its own terminal.</p>").arg(PROJECTNAME));
+        ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
+        break;
+
+    case 4: // installation step
         backButton->setEnabled(false);
         if (args.contains("--pretend") || args.contains("-p")) {
             buildServiceList(); // build anyway
-            gotoPage(4);
+            gotoPage(5);
             return;
         }
         if (!checkDisk()) {
@@ -2540,7 +2638,7 @@ void MInstall::pageDisplayed(int next)
         buildServiceList();
         break;
 
-    case 4: // set bootloader
+    case 5: // set bootloader
         checkEsp();
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
@@ -2550,14 +2648,14 @@ void MInstall::pageDisplayed(int next)
         backButton->setEnabled(false);
         break;
 
-    case 5: // set services
+    case 6: // set services
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         nextButton->setEnabled(true);
         backButton->setEnabled(true);
         break;
 
-    case 6: // set computer name
+    case 7: // set computer name
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
                                        "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
@@ -2566,7 +2664,7 @@ void MInstall::pageDisplayed(int next)
                                        "with a local computer that is running MS-Windows or Mac OSX.</p>"));
         break;
 
-    case 7: // set localization, clock, services button
+    case 8: // set localization, clock, services button
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
                                        "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
@@ -2574,7 +2672,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
         break;
 
-    case 8: // set username and passwords
+    case 9: // set username and passwords
         setCursor(QCursor(Qt::ArrowCursor));
         userNameEdit->setFocus();
         ((MMain *)mmn)->setHelpText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
@@ -2583,7 +2681,7 @@ void MInstall::pageDisplayed(int next)
                                        "If needed, you can add other user accounts later with %1 User Manager. </p>"
                                        "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
                                        "Each password must be entered twice.</p>").arg(PROJECTNAME));
-    case 9: // done
+    case 10: // done
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                                        "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -2693,6 +2791,7 @@ void MInstall::refresh()
     FDEpassword2->hide();
     labelFDEpass->hide();
     labelFDEpass2->hide();
+    buttonAdvancedFDE->hide();
     gbEncrPass->hide();
 
     on_diskCombo_activated();
@@ -2794,7 +2893,7 @@ void MInstall::on_abortInstallButton_clicked()
 // clicking advanced button to go to Services page
 void MInstall::on_viewServicesButton_clicked()
 {
-    gotoPage(5);
+    gotoPage(6);
 }
 
 void MInstall::on_qtpartedButton_clicked()
@@ -2805,6 +2904,12 @@ void MInstall::on_qtpartedButton_clicked()
     shell.run("/sbin/swapon -a 2>&1");
     this->updatePartitionWidgets();
     on_diskCombo_activated();
+}
+
+void MInstall::on_buttonBenchmarkFDE_clicked()
+{
+    shell.run("x-terminal-emulator -e bash -c \"/sbin/cryptsetup benchmark"
+              " && echo && read -n 1 -srp 'Press any key to close the benchmark window.'\"");
 }
 
 // disk selection changed, rebuild dropdown menus
@@ -3195,6 +3300,7 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
     FDEpassword2->setVisible(checked);
     labelFDEpass->setVisible(checked);
     labelFDEpass2->setVisible(checked);
+    buttonAdvancedFDE->setVisible(checked);
     grubPbrButton->setDisabled(checked);
 
     if (checked) {
@@ -3310,6 +3416,67 @@ void MInstall::on_checkBoxEncrpytSwap_toggled(bool checked)
                              tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
                              tr("OK"));
     }
+}
+
+void MInstall::on_buttonAdvancedFDE_clicked()
+{
+    ixPageRefAdvancedFDE = widgetStack->currentIndex();
+    gotoPage(3);
+}
+
+void MInstall::on_buttonAdvancedFDECust_clicked()
+{
+    ixPageRefAdvancedFDE = widgetStack->currentIndex();
+    gotoPage(3);
+}
+
+void MInstall::on_comboFDEcipher_currentIndexChanged(const QString &arg1)
+{
+	comboFDEivhash->clear();
+    if(arg1 == "Serpent" || arg1 == "CAST6") {
+        comboFDEivhash->addItem("SHA-256", QVariant("sha256"));
+        comboFDEivhash->addItem("SHA-224", QVariant("sha224"));
+        comboFDEivhash->addItem("Whirlpool-256", QVariant("wp256"));
+        comboFDEivhash->addItem("SHA-1", QVariant("sha1"));
+        comboFDEivhash->addItem("RIPEMD-256", QVariant("rmd256"));
+        comboFDEivhash->addItem("RIPEMD-160", QVariant("rmd160"));
+        comboFDEivhash->addItem("RIPEMD-128", QVariant("rmd128"));
+        comboFDEivhash->addItem("Tiger", QVariant("tgr192"));
+        comboFDEivhash->addItem("Tiger/160", QVariant("tgr160"));
+        comboFDEivhash->addItem("Tiger/128", QVariant("tgr128"));
+        comboFDEivhash->addItem("MD5", QVariant("md5"));
+        comboFDEivhash->addItem("MD4", QVariant("md4"));
+    } else {
+        comboFDEivhash->addItem("SHA-256", QVariant("sha256"));
+        comboFDEivhash->addItem("Whirlpool-256", QVariant("wp256"));
+        comboFDEivhash->addItem("RIPEMD-256", QVariant("rmd256"));
+        comboFDEivhash->addItem("RIPEMD-128", QVariant("rmd128"));
+        comboFDEivhash->addItem("Tiger", QVariant("tgr192"));
+        comboFDEivhash->addItem("Tiger/128", QVariant("tgr128"));
+        comboFDEivhash->addItem("MD5", QVariant("md5"));
+        comboFDEivhash->addItem("MD4", QVariant("md4"));
+    }
+}
+
+void MInstall::on_comboFDEchain_currentIndexChanged(const QString &arg1)
+{
+    if(arg1 == "ECB") {
+        labelFDEivgen->setEnabled(false);
+        comboFDEivgen->setEnabled(false);
+        comboFDEivhash->setEnabled(false);
+    } else {
+        labelFDEivgen->setEnabled(true);
+        comboFDEivgen->setEnabled(true);
+        comboFDEivhash->setEnabled(true);
+    }
+}
+
+void MInstall::on_comboFDEivgen_currentIndexChanged(const QString &arg1)
+{
+    if (arg1.isEmpty()) {
+        return;
+    }
+    comboFDEivhash->setVisible(arg1 == "ESSIV");
 }
 
 void MInstall::on_homeCombo_activated(const QString &arg1)
