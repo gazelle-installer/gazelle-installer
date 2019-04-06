@@ -92,10 +92,9 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME).arg(PROJECTFORUM));
 
-    // FDE defaults
+    // advanced FDE page defaults
 
-    ixPageRefAdvancedFDE = 0;
-    updateAdvancedFDE(true);
+    loadAdvancedFDE();
 
     // timezone
 
@@ -631,30 +630,29 @@ void MInstall::updatePartCombo(QString *prevItem, const QString &part)
     }
 }
 
-void MInstall::updateAdvancedFDE(bool save)
+void MInstall::loadAdvancedFDE()
 {
-    if(save) {
-        indexFDEcipher = comboFDEcipher->currentIndex();
-        indexFDEchain = comboFDEchain->currentIndex();
-        indexFDEivgen = comboFDEivgen->currentIndex();
-        indexFDEivhash = comboFDEivhash->currentIndex();
-        indexFDEkeysize = comboFDEkeysize->currentIndex();
-        indexFDEhash = comboFDEhash->currentIndex();
-        iFDEitertime = spinFDEitertime->value();
-    } else {
-        comboFDEcipher->setCurrentIndex(indexFDEcipher);
-        comboFDEchain->setCurrentIndex(indexFDEchain);
-        comboFDEivgen->setCurrentIndex(indexFDEivgen);
-        comboFDEivhash->setCurrentIndex(indexFDEivhash);
-        comboFDEkeysize->setCurrentIndex(indexFDEkeysize);
-        comboFDEhash->setCurrentIndex(indexFDEhash);
-        spinFDEitertime->setValue(iFDEitertime);
-    }
-
-    // Simulate changes to combo boxes here to avoid nasty surprises.
+    if(indexFDEcipher >= 0) comboFDEcipher->setCurrentIndex(indexFDEcipher);
     on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
+    if(indexFDEchain >= 0) comboFDEchain->setCurrentIndex(indexFDEchain);
     on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
+    if(indexFDEivgen >= 0) comboFDEivgen->setCurrentIndex(indexFDEivgen);
     on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
+    if(indexFDEivhash >= 0) comboFDEivhash->setCurrentIndex(indexFDEivhash);
+    if(iFDEkeysize > 0) spinFDEkeysize->setValue(iFDEkeysize);
+    if(indexFDEhash >= 0) comboFDEhash->setCurrentIndex(indexFDEhash);
+    if(iFDEroundtime >= 0) spinFDEroundtime->setValue(iFDEroundtime);
+}
+
+void MInstall::saveAdvancedFDE()
+{
+    indexFDEcipher = comboFDEcipher->currentIndex();
+    indexFDEchain = comboFDEchain->currentIndex();
+    indexFDEivgen = comboFDEivgen->currentIndex();
+    indexFDEivhash = comboFDEivhash->currentIndex();
+    iFDEkeysize = spinFDEkeysize->value();
+    indexFDEhash = comboFDEhash->currentIndex();
+    iFDEroundtime = spinFDEroundtime->value();
 }
 
 bool MInstall::makeSwapPartition(QString dev)
@@ -808,9 +806,9 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
     }
     proc.start("cryptsetup --batch-mode"
                " --cipher " + strCipherSpec.toLower()
-               + " --key-size " + comboFDEkeysize->currentText().section('-', 0, 0)
+               + " --key-size " + spinFDEkeysize->cleanText()
                + " --hash " + comboFDEhash->currentText().toLower().remove('-')
-               + " --iter-time " + spinFDEitertime->cleanText()
+               + " --iter-time " + spinFDEroundtime->cleanText()
                + " luksFormat " + dev);
     proc.waitForStarted();
     proc.write(password + "\n");
@@ -2456,9 +2454,9 @@ int MInstall::showPage(int curr, int next)
         return 4; // Go to Step_Progress
     } else if (curr == 3) { // at Step_FDE
         if(next == 4) { // Forward
-            updateAdvancedFDE(true);
+            saveAdvancedFDE();
         } else { // Backward
-            updateAdvancedFDE(false);
+            loadAdvancedFDE();
         }
         next = ixPageRefAdvancedFDE;
         ixPageRefAdvancedFDE = 0;
@@ -2533,7 +2531,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</p>").arg(MIN_INSTALL_SIZE).arg(PREFERRED_MIN_INSTALL_SIZE) + tr(""
                                        "<p>Autoinstall will place home on the root partition.</p>") + tr(""
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
-                                       "<p>A separate unencrypted boot partition is required.</p>") + tr(""
+                                       "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
                                        "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         break;
@@ -2553,48 +2551,52 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Bad Blocks</b><br/>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. "
                                        "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME)+ tr(""
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
-                                       "<p>A separate unencrypted boot partition is required.</p>"));
+                                       "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         break;
 
-    case 3: // advanced encryption setup
+    case 3: // advanced encryption settings
         
         ((MMain *)mmn)->setHelpText(tr("<p>"
                                        "<b>Advanced Encryption Settings</b><br/>This page allows fine-tuning of LUKS encrypted partitions.<br/>"
-                                       "In most cases, the defaults will provide a very secure configuration, even for sensitive applications.<br/>"
-                                       "This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide.<br/>"
+                                       "In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.<br/>"
+                                       "This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide."
                                        "</p>"
                                        "<p>"
-                                       "<b>Cipher</b><br />AES, Serpent, or Twofish are available.<br />"
-                                       "<b>AES</b> (also known as <i>Rijndael</i>) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity.<br />"
-                                       "<b>Serpent</b> is a cipher with a higher security margin than Rijndael, and was considered to have the highest security of all ciphers selected for the AES competition. Rijndael won due to its superior performance rather than its security. It performs better on some 64-bit CPUs.<br />"
-                                       "<b>Twofish</b> was created by Bruce Schneier as the successor to Blowfish."
-                                       "<b>CAST6</b> (CAST-256) also participated in the AES competition."
+                                       "You can use the <b>Benchmark</b> button (which runs <i>cryptsetup benchmark</i> in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.<br/>"
+                                       "Please note that <i>cryptsetup benchmark</i> does not cover all the combinations or selections possible, and generally covers the most commonly used selections."
                                        "</p>"
                                        "<p>"
-                                       "<b>Cipher chaining mode</b><br/>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.<br />"
-                                       "<b>XTS</b> (<b>X</b>EX-based <b>t</b>weaked codebook with ciphertext <b>s</b>tealing) is modern chaining mode, which supersedes CBC and EBC. It is the default chaining mode, and is highly recommended over CBC and EBC for security reasons. Plain64 can be used with this, since ESSIV was designed to combat issues with CBC.<br />"
+                                       "<b>Cipher</b><br/>A variety of ciphers are available.<br/>"
+                                       "<b>AES</b> (also known as <i>Rijndael</i>) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity.<br/>"
+                                       "<b>Serpent</b> was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. Rijndael won due to its superior performance rather than its security. It performs better on some 64-bit CPUs.<br/>"
+                                       "<b>Twofish</b> is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.<br/>"
+                                       "<b>CAST6</b> (CAST-256) was a candidate in the AES contest, however it did not become a finalist.<br/>"
+                                       "<b>Blowfish</b> is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8."
+                                       "</p>"
+                                       "<p>"
+                                       "<b>Chain mode</b><br/>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.<br />"
+                                       "<b>XTS</b> (<b>X</b>EX-based <b>t</b>weaked codebook with ciphertext <b>s</b>tealing) is a modern chain mode, which supersedes CBC and EBC. It is the default chain mode, and is highly recommended over CBC and EBC for security reasons. Plain64 can be used with this, since ESSIV was designed to combat issues with CBC.<br />"
                                        "<b>CBC</b> (<b>C</b>ipher <b>B</b>lock <b>C</b>haining) is a very simple mode of operation. It is vulnerable to some attacks (eg. padding oracle attacks) and is often very slow, as there are no opportunities for parallel operation. For this reason, XTS is recommended instead, and is selected by default.<br />"
                                        "<b>ECB</b> (<b>E</b>lectronic <b>C</b>ode<b>b</b>ook) is even simpler than CBC and only relies on physical block locations. It is even less secure than CBC and should not be used for sensitive applications."
                                        "</p>"
                                        "<p>"
-                                       "<b>IV generation method</b><br/>For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The length of the hash determines the length of the vector, and so <b>not all combinations will work.</b><br/>"
-                                       "ECB mode does not use an initialisation vector, so these fields will all be disabled if ECB is selected for the cipher chaining mode."
+                                       "<b>IV generator</b><br/>For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The length of the hash determines the length of the vector, and so <b>not all combinations will work.</b><br/>"
+                                       "ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode."
                                        "</p>"
                                        "<p>"
-                                       "<b>Key size</b><br/>Sets the key size in bits.<br />"
-                                       "The XTS cipher chaining mode splits the key in half (for example, AES256 in XTS mode requires a 512-bit key size)."
+                                       "<b>Key size</b><br/>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.<br />"
+                                       "The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size)."
                                        "</p>"
                                        "<p>"
-                                       "<b>Volume hash algorithm</b><br/>The  hash  used  for PBKDF2 and for the  AF splitter.<br/>"
+                                       "<b>Volume key hash</b><br/>The hash used for PBKDF2 and for the AF splitter.<br/>"
                                        "SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken."
                                        "</p>"
                                        "<p>"
-                                       "<b>PBKDF2 iteration time</b><br/>The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.<br/>"
+                                       "<b>KDF round time</b><br/>The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.<br/>"
                                        "A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).<br/>"
                                        "If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered."
-                                       "</p>"
-                                       "<p><b>Benchmark</b><br/>Run a benchmark (<i>cryptsetup benchmark</i>) for common cipher options in its own terminal.</p>").arg(PROJECTNAME));
+                                       "</p>").arg(PROJECTNAME));
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         break;
 
@@ -3432,51 +3434,96 @@ void MInstall::on_buttonAdvancedFDECust_clicked()
 
 void MInstall::on_comboFDEcipher_currentIndexChanged(const QString &arg1)
 {
-	comboFDEivhash->clear();
-    if(arg1 == "Serpent" || arg1 == "CAST6") {
-        comboFDEivhash->addItem("SHA-256", QVariant("sha256"));
-        comboFDEivhash->addItem("SHA-224", QVariant("sha224"));
-        comboFDEivhash->addItem("Whirlpool-256", QVariant("wp256"));
-        comboFDEivhash->addItem("SHA-1", QVariant("sha1"));
-        comboFDEivhash->addItem("RIPEMD-256", QVariant("rmd256"));
-        comboFDEivhash->addItem("RIPEMD-160", QVariant("rmd160"));
-        comboFDEivhash->addItem("RIPEMD-128", QVariant("rmd128"));
-        comboFDEivhash->addItem("Tiger", QVariant("tgr192"));
-        comboFDEivhash->addItem("Tiger/160", QVariant("tgr160"));
-        comboFDEivhash->addItem("Tiger/128", QVariant("tgr128"));
-        comboFDEivhash->addItem("MD5", QVariant("md5"));
-        comboFDEivhash->addItem("MD4", QVariant("md4"));
+    int hashgroup = 1;
+    if(arg1 == "Blowfish") {
+        hashgroup = 7;
+        comboFDEchain->clear();
+        comboFDEchain->addItem("CBC");
+        comboFDEchain->addItem("ECB");
     } else {
-        comboFDEivhash->addItem("SHA-256", QVariant("sha256"));
-        comboFDEivhash->addItem("Whirlpool-256", QVariant("wp256"));
-        comboFDEivhash->addItem("RIPEMD-256", QVariant("rmd256"));
-        comboFDEivhash->addItem("RIPEMD-128", QVariant("rmd128"));
-        comboFDEivhash->addItem("Tiger", QVariant("tgr192"));
-        comboFDEivhash->addItem("Tiger/128", QVariant("tgr128"));
-        comboFDEivhash->addItem("MD5", QVariant("md5"));
-        comboFDEivhash->addItem("MD4", QVariant("md4"));
+        if(arg1 == "Serpent" || arg1 == "CAST6") hashgroup = 3;
+		comboFDEchain->clear();
+		comboFDEchain->addItem("XTS");
+		comboFDEchain->addItem("CBC");
+		comboFDEchain->addItem("ECB");
     }
+    on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
+
+	comboFDEivhash->clear();
+    if(hashgroup & 4) comboFDEivhash->addItem("SHA-384", QVariant("sha384"));
+    if(hashgroup & 1) comboFDEivhash->addItem("SHA-256", QVariant("sha256"));
+    if(hashgroup & 2) comboFDEivhash->addItem("SHA-224", QVariant("sha224"));
+    if(hashgroup & 4) comboFDEivhash->addItem("Whirlpool-384", QVariant("wp384"));
+    if(hashgroup & 1) comboFDEivhash->addItem("Whirlpool-256", QVariant("wp256"));
+    if(hashgroup & 1) comboFDEivhash->addItem("Tiger", QVariant("tgr192"));
+    if(hashgroup & 2) comboFDEivhash->addItem("Tiger/160", QVariant("tgr160"));
+    if(hashgroup & 1) comboFDEivhash->addItem("Tiger/128", QVariant("tgr128"));
+    if(hashgroup & 4) comboFDEivhash->addItem("RIPEMD-320", QVariant("rmd320"));
+    if(hashgroup & 1) comboFDEivhash->addItem("RIPEMD-256", QVariant("rmd256"));
+    comboFDEivhash->insertSeparator(100);
+    if(hashgroup & 2) comboFDEivhash->addItem("RIPEMD-160", QVariant("rmd160"));
+    if(hashgroup & 1) comboFDEivhash->addItem("RIPEMD-128", QVariant("rmd128"));
+    if(hashgroup & 2) comboFDEivhash->addItem("SHA-1", QVariant("sha1"));
+    if(hashgroup & 1) comboFDEivhash->addItem("MD5", QVariant("md5"));
+    if(hashgroup & 1) comboFDEivhash->addItem("MD4", QVariant("md4"));
 }
 
 void MInstall::on_comboFDEchain_currentIndexChanged(const QString &arg1)
 {
+    int multKey = 1; // Multiplier for key sizes.
+
     if(arg1 == "ECB") {
         labelFDEivgen->setEnabled(false);
         comboFDEivgen->setEnabled(false);
         comboFDEivhash->setEnabled(false);
+        comboFDEivgen->setCurrentIndex(-1);
     } else {
+        int ixIVGen = -1;
+        if(arg1 == "XTS") {
+            multKey = 2;
+            ixIVGen = comboFDEivgen->findText("Plain64");
+        } else if(arg1 == "CBC") {
+            ixIVGen = comboFDEivgen->findText("ESSIV");
+        }
+        if(ixIVGen >= 0) comboFDEivgen->setCurrentIndex(ixIVGen);
         labelFDEivgen->setEnabled(true);
         comboFDEivgen->setEnabled(true);
         comboFDEivhash->setEnabled(true);
     }
+
+    const QString &strCipher = comboFDEcipher->currentText();
+    if(strCipher == "Blowfish") {
+        spinFDEkeysize->setSingleStep(multKey*8);
+        spinFDEkeysize->setRange(multKey*64, multKey*448);
+    } else if(strCipher == "Twofish" || strCipher == "AES") {
+        spinFDEkeysize->setSingleStep(multKey*64);
+        spinFDEkeysize->setRange(multKey*128, multKey*256);
+    } else {
+        spinFDEkeysize->setSingleStep(multKey*16);
+        spinFDEkeysize->setRange(multKey*128, multKey*256);
+    }
+    spinFDEkeysize->setValue(65536);
 }
 
 void MInstall::on_comboFDEivgen_currentIndexChanged(const QString &arg1)
 {
-    if (arg1.isEmpty()) {
-        return;
+    if(arg1 == "ESSIV") {
+        comboFDEivhash->show();
+        comboFDEivhash->setCurrentIndex(0);
+    } else {
+        comboFDEivhash->hide();
     }
-    comboFDEivhash->setVisible(arg1 == "ESSIV");
+}
+
+void MInstall::on_spinFDEkeysize_valueChanged(int i)
+{
+    bool entered = false;
+    if(!entered) {
+        entered = true;
+        int iSingleStep = spinFDEkeysize->singleStep();
+        int iMod = i % iSingleStep;
+        if(iMod) spinFDEkeysize->setValue(i + (iSingleStep-iMod));
+    }
 }
 
 void MInstall::on_homeCombo_activated(const QString &arg1)
