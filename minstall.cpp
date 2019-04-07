@@ -75,7 +75,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     REMOVE_NOSPLASH=settings.value("REMOVE_NOSPLASH", "false").toBool();
     //check for samba
     QFileInfo info("/etc/init.d/smbd");
-    if ( !info.exists()) {
+    if (!info.exists()) {
         computerGroupLabel->setEnabled(false);
         computerGroupEdit->setEnabled(false);
         computerGroupEdit->setText("");
@@ -632,17 +632,17 @@ void MInstall::updatePartCombo(QString *prevItem, const QString &part)
 
 void MInstall::loadAdvancedFDE()
 {
-    if(indexFDEcipher >= 0) comboFDEcipher->setCurrentIndex(indexFDEcipher);
+    if (indexFDEcipher >= 0) comboFDEcipher->setCurrentIndex(indexFDEcipher);
     on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
-    if(indexFDEchain >= 0) comboFDEchain->setCurrentIndex(indexFDEchain);
+    if (indexFDEchain >= 0) comboFDEchain->setCurrentIndex(indexFDEchain);
     on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
-    if(indexFDEivgen >= 0) comboFDEivgen->setCurrentIndex(indexFDEivgen);
+    if (indexFDEivgen >= 0) comboFDEivgen->setCurrentIndex(indexFDEivgen);
     on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
-    if(indexFDEivhash >= 0) comboFDEivhash->setCurrentIndex(indexFDEivhash);
-    if(iFDEkeysize >= 0) spinFDEkeysize->setValue(iFDEkeysize);
-    if(indexFDEhash >= 0) comboFDEhash->setCurrentIndex(indexFDEhash);
-    if(indexFDErandom >= 0) comboFDErandom->setCurrentIndex(indexFDErandom);
-    if(iFDEroundtime >= 0) spinFDEroundtime->setValue(iFDEroundtime);
+    if (indexFDEivhash >= 0) comboFDEivhash->setCurrentIndex(indexFDEivhash);
+    if (iFDEkeysize >= 0) spinFDEkeysize->setValue(iFDEkeysize);
+    if (indexFDEhash >= 0) comboFDEhash->setCurrentIndex(indexFDEhash);
+    if (indexFDErandom >= 0) comboFDErandom->setCurrentIndex(indexFDErandom);
+    if (iFDEroundtime >= 0) spinFDEroundtime->setValue(iFDEroundtime);
 }
 
 void MInstall::saveAdvancedFDE()
@@ -800,7 +800,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
 
     // format partition
     QString strCipherSpec = comboFDEcipher->currentText() + "-" + comboFDEchain->currentText();
-    if(comboFDEchain->currentText() != "ECB") {
+    if (comboFDEchain->currentText() != "ECB") {
         strCipherSpec += "-" + comboFDEivgen->currentText();
         if (comboFDEivgen->currentText() == "ESSIV") {
             strCipherSpec += ":" + comboFDEivhash->itemData(comboFDEivhash->currentIndex()).toString();
@@ -2456,7 +2456,7 @@ int MInstall::showPage(int curr, int next)
         }
         return 4; // Go to Step_Progress
     } else if (curr == 3) { // at Step_FDE
-        if(next == 4) { // Forward
+        if (next == 4) { // Forward
             saveAdvancedFDE();
         } else { // Backward
             loadAdvancedFDE();
@@ -2559,7 +2559,7 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 3: // advanced encryption settings
-        
+
         ((MMain *)mmn)->setHelpText(tr("<p>"
                                        "<b>Advanced Encryption Settings</b><br/>This page allows fine-tuning of LUKS encrypted partitions.<br/>"
                                        "In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications."
@@ -3447,67 +3447,67 @@ void MInstall::on_buttonAdvancedFDECust_clicked()
 void MInstall::on_comboFDEcipher_currentIndexChanged(const QString &arg1)
 {
     int hashgroup = 1;
-    if(arg1 == "Blowfish") {
+    if (arg1 == "Blowfish") {
         hashgroup = 7;
         comboFDEchain->clear();
         comboFDEchain->addItem("CBC");
         comboFDEchain->addItem("ECB");
     } else {
-        if(arg1 == "Serpent" || arg1 == "CAST6") hashgroup = 3;
-		comboFDEchain->clear();
-		comboFDEchain->addItem("XTS");
-		comboFDEchain->addItem("CBC");
-		comboFDEchain->addItem("ECB");
+        if (arg1 == "Serpent" || arg1 == "CAST6") hashgroup = 3;
+        comboFDEchain->clear();
+        comboFDEchain->addItem("XTS");
+        comboFDEchain->addItem("CBC");
+        comboFDEchain->addItem("ECB");
     }
     on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
 
-	comboFDEivhash->clear();
-    if(hashgroup & 4) comboFDEivhash->addItem("SHA-384", QVariant("sha384"));
-    if(hashgroup & 1) comboFDEivhash->addItem("SHA-256", QVariant("sha256"));
-    if(hashgroup & 2) comboFDEivhash->addItem("SHA-224", QVariant("sha224"));
-    if(hashgroup & 4) comboFDEivhash->addItem("Whirlpool-384", QVariant("wp384"));
-    if(hashgroup & 1) comboFDEivhash->addItem("Whirlpool-256", QVariant("wp256"));
-    if(hashgroup & 1) comboFDEivhash->addItem("Tiger", QVariant("tgr192"));
-    if(hashgroup & 2) comboFDEivhash->addItem("Tiger/160", QVariant("tgr160"));
-    if(hashgroup & 1) comboFDEivhash->addItem("Tiger/128", QVariant("tgr128"));
-    if(hashgroup & 4) comboFDEivhash->addItem("RIPEMD-320", QVariant("rmd320"));
-    if(hashgroup & 1) comboFDEivhash->addItem("RIPEMD-256", QVariant("rmd256"));
+    comboFDEivhash->clear();
+    if (hashgroup & 4) comboFDEivhash->addItem("SHA-384", QVariant("sha384"));
+    if (hashgroup & 1) comboFDEivhash->addItem("SHA-256", QVariant("sha256"));
+    if (hashgroup & 2) comboFDEivhash->addItem("SHA-224", QVariant("sha224"));
+    if (hashgroup & 4) comboFDEivhash->addItem("Whirlpool-384", QVariant("wp384"));
+    if (hashgroup & 1) comboFDEivhash->addItem("Whirlpool-256", QVariant("wp256"));
+    if (hashgroup & 1) comboFDEivhash->addItem("Tiger", QVariant("tgr192"));
+    if (hashgroup & 2) comboFDEivhash->addItem("Tiger/160", QVariant("tgr160"));
+    if (hashgroup & 1) comboFDEivhash->addItem("Tiger/128", QVariant("tgr128"));
+    if (hashgroup & 4) comboFDEivhash->addItem("RIPEMD-320", QVariant("rmd320"));
+    if (hashgroup & 1) comboFDEivhash->addItem("RIPEMD-256", QVariant("rmd256"));
     comboFDEivhash->insertSeparator(100);
-    if(hashgroup & 2) comboFDEivhash->addItem("RIPEMD-160", QVariant("rmd160"));
-    if(hashgroup & 1) comboFDEivhash->addItem("RIPEMD-128", QVariant("rmd128"));
-    if(hashgroup & 2) comboFDEivhash->addItem("SHA-1", QVariant("sha1"));
-    if(hashgroup & 1) comboFDEivhash->addItem("MD5", QVariant("md5"));
-    if(hashgroup & 1) comboFDEivhash->addItem("MD4", QVariant("md4"));
+    if (hashgroup & 2) comboFDEivhash->addItem("RIPEMD-160", QVariant("rmd160"));
+    if (hashgroup & 1) comboFDEivhash->addItem("RIPEMD-128", QVariant("rmd128"));
+    if (hashgroup & 2) comboFDEivhash->addItem("SHA-1", QVariant("sha1"));
+    if (hashgroup & 1) comboFDEivhash->addItem("MD5", QVariant("md5"));
+    if (hashgroup & 1) comboFDEivhash->addItem("MD4", QVariant("md4"));
 }
 
 void MInstall::on_comboFDEchain_currentIndexChanged(const QString &arg1)
 {
     int multKey = 1; // Multiplier for key sizes.
 
-    if(arg1 == "ECB") {
+    if (arg1 == "ECB") {
         labelFDEivgen->setEnabled(false);
         comboFDEivgen->setEnabled(false);
         comboFDEivhash->setEnabled(false);
         comboFDEivgen->setCurrentIndex(-1);
     } else {
         int ixIVGen = -1;
-        if(arg1 == "XTS") {
+        if (arg1 == "XTS") {
             multKey = 2;
             ixIVGen = comboFDEivgen->findText("Plain64");
-        } else if(arg1 == "CBC") {
+        } else if (arg1 == "CBC") {
             ixIVGen = comboFDEivgen->findText("ESSIV");
         }
-        if(ixIVGen >= 0) comboFDEivgen->setCurrentIndex(ixIVGen);
+        if (ixIVGen >= 0) comboFDEivgen->setCurrentIndex(ixIVGen);
         labelFDEivgen->setEnabled(true);
         comboFDEivgen->setEnabled(true);
         comboFDEivhash->setEnabled(true);
     }
 
     const QString &strCipher = comboFDEcipher->currentText();
-    if(strCipher == "Blowfish") {
+    if (strCipher == "Blowfish") {
         spinFDEkeysize->setSingleStep(multKey*8);
         spinFDEkeysize->setRange(multKey*64, multKey*448);
-    } else if(strCipher == "Twofish" || strCipher == "AES") {
+    } else if (strCipher == "Twofish" || strCipher == "AES") {
         spinFDEkeysize->setSingleStep(multKey*64);
         spinFDEkeysize->setRange(multKey*128, multKey*256);
     } else {
@@ -3519,7 +3519,7 @@ void MInstall::on_comboFDEchain_currentIndexChanged(const QString &arg1)
 
 void MInstall::on_comboFDEivgen_currentIndexChanged(const QString &arg1)
 {
-    if(arg1 == "ESSIV") {
+    if (arg1 == "ESSIV") {
         comboFDEivhash->show();
         comboFDEivhash->setCurrentIndex(0);
     } else {
@@ -3530,11 +3530,11 @@ void MInstall::on_comboFDEivgen_currentIndexChanged(const QString &arg1)
 void MInstall::on_spinFDEkeysize_valueChanged(int i)
 {
     bool entered = false;
-    if(!entered) {
+    if (!entered) {
         entered = true;
         int iSingleStep = spinFDEkeysize->singleStep();
         int iMod = i % iSingleStep;
-        if(iMod) spinFDEkeysize->setValue(i + (iSingleStep-iMod));
+        if (iMod) spinFDEkeysize->setValue(i + (iSingleStep-iMod));
     }
 }
 
