@@ -106,8 +106,7 @@
      </property>
      <property name="icon">
       <iconset theme="go-previous">
-       <normaloff/>
-      </iconset>
+       <normaloff>.</normaloff>.</iconset>
      </property>
      <property name="shortcut">
       <string>Alt+K</string>
@@ -121,8 +120,7 @@
      </property>
      <property name="icon">
       <iconset theme="go-next">
-       <normaloff/>
-      </iconset>
+       <normaloff>.</normaloff>.</iconset>
      </property>
      <property name="shortcut">
       <string>Alt+N</string>
@@ -139,8 +137,7 @@
      </property>
      <property name="icon">
       <iconset theme="window-close">
-       <normaloff/>
-      </iconset>
+       <normaloff>.</normaloff>.</iconset>
      </property>
     </widget>
    </item>
@@ -159,11 +156,20 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="Step_Terms">
       <layout class="QGridLayout" name="_4">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
@@ -333,7 +339,16 @@
           <string>1b. Rearrange disk partitions (optional)</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -383,7 +398,16 @@
           <string>1a. Choose disk for installation</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -433,7 +457,16 @@
           <string>1c. Select type of installation</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -512,7 +545,7 @@
              </sizepolicy>
             </property>
             <property name="inputMask">
-             <string notr="true">00000000; </string>
+             <string notr="true">00000000</string>
             </property>
             <property name="cursorPosition">
              <number>0</number>
@@ -520,7 +553,7 @@
             <property name="alignment">
              <set>Qt::AlignRight</set>
             </property>
-            <property name="clearButtonEnabled" stdset="0">
+            <property name="clearButtonEnabled">
              <bool>false</bool>
             </property>
            </widget>
@@ -593,22 +626,6 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="2" colspan="4">
-           <widget class="QPushButton" name="buttonAdvancedFDE">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>Edit advanced encryption settings</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="3" colspan="3">
            <widget class="QLineEdit" name="FDEpassword">
             <property name="maxLength">
@@ -671,6 +688,22 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="3" colspan="3">
+           <widget class="QPushButton" name="buttonAdvancedFDE">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Edit advanced encryption settings</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -691,7 +724,16 @@
      </widget>
      <widget class="QWidget" name="Step_Partitions">
       <layout class="QGridLayout" name="_5">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
@@ -709,7 +751,16 @@
           <string>2b. Preferences</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -858,7 +909,7 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="currentText" stdset="0">
+            <property name="currentText">
              <string notr="true"/>
             </property>
            </widget>
@@ -963,7 +1014,7 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="currentText" stdset="0">
+            <property name="currentText">
              <string notr="true"/>
             </property>
            </widget>
@@ -976,7 +1027,7 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="currentText" stdset="0">
+            <property name="currentText">
              <string notr="true">root</string>
             </property>
             <property name="insertPolicy">
@@ -1148,7 +1199,7 @@
           </item>
           <item row="4" column="2" colspan="2">
            <widget class="QComboBox" name="bootCombo">
-            <property name="currentText" stdset="0">
+            <property name="currentText">
              <string notr="true">root</string>
             </property>
             <item>
@@ -1226,7 +1277,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1" colspan="3">
+          <item row="2" column="2" colspan="2">
            <widget class="QPushButton" name="buttonAdvancedFDECust">
             <property name="text">
              <string>Edit advanced encryption settings</string>
@@ -1582,7 +1633,16 @@
      </widget>
      <widget class="QWidget" name="Step_Progress">
       <layout class="QGridLayout" name="_6">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
@@ -1600,7 +1660,16 @@
           <string>3. Installation in progress</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -1698,7 +1767,16 @@
           <string>Tips</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -1736,7 +1814,16 @@
      </widget>
      <widget class="QWidget" name="Step_Boot">
       <layout class="QGridLayout" name="_7">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
@@ -1767,7 +1854,16 @@
           <string>4. Select Boot Method</string>
          </property>
          <layout class="QGridLayout" name="_8">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -2010,7 +2106,16 @@
      </widget>
      <widget class="QWidget" name="Step_Services">
       <layout class="QGridLayout" name="_9">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
@@ -2028,7 +2133,16 @@
           <string>Common Services to Enable</string>
          </property>
          <layout class="QGridLayout" name="_10">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -2073,7 +2187,16 @@
      </widget>
      <widget class="QWidget" name="Step_Network">
       <layout class="QGridLayout" name="_11">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
@@ -2091,7 +2214,16 @@
           <string>5. Computer Network Names</string>
          </property>
          <layout class="QGridLayout" name="_12">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -2239,7 +2371,16 @@
      </widget>
      <widget class="QWidget" name="Step_Localization">
       <layout class="QGridLayout" name="_13">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
@@ -2313,7 +2454,16 @@
           <string>6b. Configure Clock</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -2378,7 +2528,16 @@
           <string>6a. Localization Defaults</string>
          </property>
          <layout class="QGridLayout" name="_14">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -2474,7 +2633,16 @@
      </widget>
      <widget class="QWidget" name="Step_User_Accounts">
       <layout class="QGridLayout" name="_15">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
@@ -2508,7 +2676,16 @@
           <string>7b. Root (administrator) Account</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -2605,7 +2782,16 @@
           <string>7a. Default User Account</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
@@ -2774,7 +2960,16 @@
      </widget>
      <widget class="QWidget" name="WStackPage">
       <layout class="QGridLayout">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>9</number>
+       </property>
+       <property name="topMargin">
+        <number>9</number>
+       </property>
+       <property name="rightMargin">
+        <number>9</number>
+       </property>
+       <property name="bottomMargin">
         <number>9</number>
        </property>
        <property name="spacing">
@@ -2792,7 +2987,16 @@
           <string>Reminders</string>
          </property>
          <layout class="QGridLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>9</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
            <number>9</number>
           </property>
           <property name="spacing">
