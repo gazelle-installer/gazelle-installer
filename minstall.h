@@ -223,5 +223,6 @@ private:
     int indexFDEivhash = -1;
     int iFDEkeysize = -1;
     int indexFDEhash = -1;
+    int indexFDErandom = -1;
     long iFDEroundtime = -1;
 };
