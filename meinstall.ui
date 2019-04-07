@@ -1481,7 +1481,7 @@
              <string/>
             </property>
             <property name="text">
-             <string>Benchmark</string>
+             <string>Benchmark...</string>
             </property>
            </widget>
           </item>
