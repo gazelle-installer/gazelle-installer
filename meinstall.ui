@@ -156,7 +156,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="Step_Terms">
       <layout class="QGridLayout" name="_4">
@@ -700,7 +700,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Edit advanced encryption settings</string>
+             <string>Advanced encryption settings</string>
             </property>
            </widget>
           </item>
@@ -1280,7 +1280,7 @@
           <item row="2" column="2" colspan="2">
            <widget class="QPushButton" name="buttonAdvancedFDECust">
             <property name="text">
-             <string>Edit advanced encryption settings</string>
+             <string>Advanced encryption settings</string>
             </property>
            </widget>
           </item>
@@ -1303,7 +1303,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_FDE">
-      <layout class="QGridLayout" name="_8">
+      <layout class="QGridLayout" name="_81">
        <item row="1" column="0">
         <widget class="QGroupBox" name="groupBox">
          <property name="sizePolicy">
