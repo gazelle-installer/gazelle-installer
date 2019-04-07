@@ -639,8 +639,9 @@ void MInstall::loadAdvancedFDE()
     if (indexFDEivgen >= 0) comboFDEivgen->setCurrentIndex(indexFDEivgen);
     on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
     if (indexFDEivhash >= 0) comboFDEivhash->setCurrentIndex(indexFDEivhash);
-    if (iFDEkeysize > 0) spinFDEkeysize->setValue(iFDEkeysize);
+    if (iFDEkeysize >= 0) spinFDEkeysize->setValue(iFDEkeysize);
     if (indexFDEhash >= 0) comboFDEhash->setCurrentIndex(indexFDEhash);
+    if (indexFDErandom >= 0) comboFDErandom->setCurrentIndex(indexFDErandom);
     if (iFDEroundtime >= 0) spinFDEroundtime->setValue(iFDEroundtime);
 }
 
@@ -652,6 +653,7 @@ void MInstall::saveAdvancedFDE()
     indexFDEivhash = comboFDEivhash->currentIndex();
     iFDEkeysize = spinFDEkeysize->value();
     indexFDEhash = comboFDEhash->currentIndex();
+    indexFDErandom = comboFDErandom->currentIndex();
     iFDEroundtime = spinFDEroundtime->value();
 }
 
@@ -808,6 +810,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
                " --cipher " + strCipherSpec.toLower()
                + " --key-size " + spinFDEkeysize->cleanText()
                + " --hash " + comboFDEhash->currentText().toLower().remove('-')
+               + " --use-" + comboFDErandom->currentText()
                + " --iter-time " + spinFDEroundtime->cleanText()
                + " luksFormat " + dev);
     proc.waitForStarted();
@@ -2590,12 +2593,16 @@ void MInstall::pageDisplayed(int next)
                                        "ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode."
                                        "</p>"
                                        "<p>"
-                                       "<b>Key size</b><br/>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.<br />"
+                                       "<b>Key size</b><br/>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.<br/>"
                                        "The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size)."
                                        "</p>"
                                        "<p>"
                                        "<b>LUKS key hash</b><br/>The hash used for PBKDF2 and for the AF splitter.<br/>"
                                        "SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken."
+                                       "</p>"
+                                       "<p>"
+                                       "<b>Kernel RNG</b><br/>Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).<br/>"
+                                       "Two options are available: /dev/<b>random</b> which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/<b>urandom</b> which will not block even if there is insufficient entropy (possibly weaker keys)."
                                        "</p>"
                                        "<p>"
                                        "<b>KDF round time</b><br/>The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.<br/>"
