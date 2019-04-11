@@ -2816,7 +2816,7 @@ void MInstall::buildServiceList()
 
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
 
-    for (const QString &service : ENABLE_SERVICES) {
+    for (const QString &service : qAsConst(ENABLE_SERVICES)) {
         QString lang_str = (lang == "EN")? "" : "_" + lang;
         QStringList list = services_desc.value(service + lang_str).toStringList();
         if (list.size() != 2) {
@@ -3577,7 +3577,7 @@ void MInstall::on_grubEspButton_toggled()
 void MInstall::buildESPlist()
 {
     grubPartCombo->clear();
-    QStringList drives = shell.getOutput("partition-info drives --noheadings --exclude=boot | awk '{print $1}'").split("\n");
+    const QStringList drives = shell.getOutput("partition-info drives --noheadings --exclude=boot | awk '{print $1}'").split("\n");
     QStringList esp_list;
 
     // find ESP for all partitions on all drives
@@ -3588,7 +3588,7 @@ void MInstall::buildESPlist()
                 esp_list << esps.split("\n");
             }
             // backup detection for drives that don't have UUID for ESP
-            QStringList backup_list = shell.getOutput("fdisk -l -o DEVICE,TYPE /dev/" + drive + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3").split("\n");
+            const QStringList backup_list = shell.getOutput("fdisk -l -o DEVICE,TYPE /dev/" + drive + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3").split("\n");
             for (const QString &part : backup_list) {
                 if (!esp_list.contains(part)) {
                     esp_list << part;
@@ -3603,7 +3603,7 @@ void MInstall::buildESPlist()
 void MInstall::buildPartList()
 {
     grubPartCombo->clear();
-    QStringList part_list = shell.getOutput("partition-info all --noheadings --exclude=swap,boot,efi").split("\n");
+    const QStringList part_list = shell.getOutput("partition-info all --noheadings --exclude=swap,boot,efi").split("\n");
     QStringList new_list;
     for (const QString &part : part_list) {
         if (shell.run("partition-info is-linux=" + part.section(" ", 0, 0)) == 0) { // list only Linux partitions
