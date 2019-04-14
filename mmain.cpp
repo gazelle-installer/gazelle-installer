@@ -55,7 +55,7 @@ void MMain::setHelpText(const QString &text)
 
 void MMain::closeEvent(QCloseEvent *e)
 {
-    minstall->close();
+    minstall->cleanup();
     QWidget::closeEvent(e);
 }
 
