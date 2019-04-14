@@ -156,7 +156,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>6</number>
      </property>
      <widget class="QWidget" name="Step_Terms">
       <layout class="QGridLayout" name="_4">
@@ -832,7 +832,7 @@
            <number>6</number>
           </property>
           <item row="3" column="5" alignment="Qt::AlignHCenter">
-           <widget class="QCheckBox" name="checkBoxEncrpytSwap">
+           <widget class="QCheckBox" name="checkBoxEncryptSwap">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -2515,7 +2515,7 @@
            </widget>
           </item>
           <item row="1" column="0" colspan="3">
-           <widget class="QCheckBox" name="gmtCheckBox">
+           <widget class="QCheckBox" name="localClockCheckBox">
             <property name="text">
              <string>System clock uses LOCAL</string>
             </property>
@@ -3094,7 +3094,7 @@
   <tabstop>checkBoxEncryptHome</tabstop>
   <tabstop>homeLabelEdit</tabstop>
   <tabstop>swapCombo</tabstop>
-  <tabstop>checkBoxEncrpytSwap</tabstop>
+  <tabstop>checkBoxEncryptSwap</tabstop>
   <tabstop>swapLabelEdit</tabstop>
   <tabstop>bootCombo</tabstop>
   <tabstop>saveHomeCheck</tabstop>
@@ -3108,7 +3108,7 @@
   <tabstop>sambaCheckBox</tabstop>
   <tabstop>computerGroupEdit</tabstop>
   <tabstop>localeCombo</tabstop>
-  <tabstop>gmtCheckBox</tabstop>
+  <tabstop>localClockCheckBox</tabstop>
   <tabstop>radio24h</tabstop>
   <tabstop>radio12h</tabstop>
   <tabstop>timezoneCombo</tabstop>
