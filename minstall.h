@@ -20,7 +20,7 @@
 #include <QProcess>
 #include <QTimer>
 #include <QProgressDialog>
-
+#include <QSettings>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -93,6 +93,7 @@ public:
     void makeFstab();
     void prepareToInstall();
     void removeItemCombo(QComboBox *cb, const QString *part);
+    void saveConfig();
     void setLocale();
     void setServices();
     void updatePartCombo(QString *prevItem, const QString &part);
@@ -180,7 +181,7 @@ private slots:
 
     void on_checkBoxEncryptRoot_toggled(bool checked);
     void on_checkBoxEncryptHome_toggled(bool checked);
-    void on_checkBoxEncrpytSwap_toggled(bool checked);
+    void on_checkBoxEncryptSwap_toggled(bool checked);
 
     void on_diskCombo_activated(QString item = "");
     void on_rootTypeCombo_activated(QString item = "");
@@ -210,6 +211,7 @@ private:
     QHash<QString, int> removedHome;
     QHash<QString, int> removedSwap;
     QHash<QString, int> removedBoot;
+    QSettings *config;
     QString prevItemRoot; // remember previously selected item in combo box
     QString prevItemHome;
     QString prevItemSwap;
