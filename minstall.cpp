@@ -53,9 +53,6 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     this->args = args;
     labelMX->setPixmap(QPixmap("/usr/share/gazelle-installer-data/logo.png"));
 
-    // print version (look for /usr/sbin/minstall since the name of the package might be different)
-    system("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
-
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
     PROJECTNAME=settings.value("PROJECT_NAME").toString();
@@ -2755,8 +2752,10 @@ void MInstall::pageDisplayed(int next)
         if (!args.contains("--pretend") && !args.contains("-p")) {
             saveConfig();
             shell.run("cp \"" + config->fileName() + "\" /mnt/antiX/var/log");
-
             shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
+            // print version (look for /usr/sbin/minstall since the name of the package might be different)
+            qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
+            system("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
         }
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
@@ -3079,6 +3078,7 @@ void MInstall::close()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     //system("umount -l /mnt/antiX/home >/dev/null 2>&1");
     //system("umount -l /mnt/antiX/boot >/dev/null 2>&1");
+    system("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
     system("umount -lR /mnt/antiX >/dev/null 2>&1");
     system("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true'");
     if (isRootEncrypted) {
