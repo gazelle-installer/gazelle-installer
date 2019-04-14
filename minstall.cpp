@@ -668,6 +668,8 @@ void MInstall::saveConfig()
     config->setValue("User/Username", userNameEdit->text());
     config->setValue("User/Autologin", autologinCheckBox->isChecked());
     config->setValue("User/SaveDesktop", saveDesktopCheckBox->isChecked());
+    // copy config file to installed system
+    shell.run("cp \"" + config->fileName() + "\" /mnt/antiX/var/log");
 }
 
 // update partition combos
@@ -2417,36 +2419,24 @@ void MInstall::stopInstall()
         QApplication::beep();
         return;
     } else if (curr >= c-3) {
+        cleanup();
         int ans = QMessageBox::information(this, QString::null,
                                              tr("Installation and configuration is complete.\n"
                                               "To use the new installation, reboot without the installation media.\n\n"
                                               "Do you want to reboot now?"),
                                            tr("Yes"), tr("No"));
         if (args.contains("--pretend") || args.contains("-p")) {
-                qApp->exit(0);
-                return;
+            qApp->exit(0);
+            return;
         }
         if (ans == 0) {
-            system("/bin/rm -rf /mnt/antiX/mnt/antiX");
-            system("/bin/umount -lR /mnt/antiX >/dev/null 2>&1");
-            if (isRootEncrypted) {
-                system("cryptsetup luksClose rootfs");
-            }
-            if (isHomeEncrypted) {
-                system("cryptsetup luksClose homefs");
-            }
-            if (isSwapEncrypted) {
-                system("swapoff /dev/mapper/swapfs");
-                system("cryptsetup luksClose swapfs");
-            }
             system("sleep 1");
             system("swapoff -a");
             system("/usr/local/bin/persist-config --shutdown --command reboot");
             return;
         } else {
-            close();
+            qApp->exit(0);
         }
-
     } else if (curr > 3) {
         int ans = QMessageBox::critical(this, QString::null,
                                         tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
@@ -2751,11 +2741,8 @@ void MInstall::pageDisplayed(int next)
     case 10: // done
         if (!args.contains("--pretend") && !args.contains("-p")) {
             saveConfig();
-            shell.run("cp \"" + config->fileName() + "\" /mnt/antiX/var/log");
-            shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
             // print version (look for /usr/sbin/minstall since the name of the package might be different)
             qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
-            system("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
         }
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
@@ -2817,6 +2804,7 @@ void MInstall::firstRefresh(QDialog *main)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     mmn = main;
     // disable automounting in Thunar
+    auto_mount = shell.getOutput("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
     shell.run("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'");
     refresh();
 }
@@ -3073,14 +3061,21 @@ bool MInstall::eventFilter(QObject* obj, QEvent* event)
 }
 
 // run before closing the app, do some cleanup
-void MInstall::close()
+void MInstall::cleanup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    //system("umount -l /mnt/antiX/home >/dev/null 2>&1");
-    //system("umount -l /mnt/antiX/boot >/dev/null 2>&1");
+
+    system("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'");
+
+    if (args.contains("--pretend") || args.contains("-p")) {
+        return;
+    }
+
     system("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
+    system("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1");
+    system("umount -l /mnt/antiX/proc >/dev/null 2>&1; umount -l /mnt/antiX/sys >/dev/null 2>&1; umount -l /mnt/antiX/dev/shm >/dev/null 2>&1; umount -l /mnt/antiX/dev >/dev/null 2>&1");
     system("umount -lR /mnt/antiX >/dev/null 2>&1");
-    system("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true'");
+
     if (isRootEncrypted) {
         system("cryptsetup luksClose rootfs");
     }
