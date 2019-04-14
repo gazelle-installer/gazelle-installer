@@ -136,7 +136,7 @@ public:
 
 public slots:
     void procAbort();
-    void close();
+    void cleanup();
     //    void moreClicked(QListViewItem *item);
     void delStart();
     void delDone(int, QProcess::ExitStatus exitStatus);
@@ -212,6 +212,7 @@ private:
     QHash<QString, int> removedSwap;
     QHash<QString, int> removedBoot;
     QSettings *config;
+    QString auto_mount;
     QString prevItemRoot; // remember previously selected item in combo box
     QString prevItemHome;
     QString prevItemSwap;
