@@ -18,7 +18,6 @@
 
 #include <QDebug>
 #include <QFileInfo>
-#include <QSettings>
 #include <QtConcurrent/QtConcurrent>
 
 #include "minstall.h"
@@ -57,7 +56,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     // print version (look for /usr/sbin/minstall since the name of the package might be different)
     system("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
 
-    //setup system variables
+    // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
     PROJECTNAME=settings.value("PROJECT_NAME").toString();
     PROJECTSHORTNAME=settings.value("PROJECT_SHORTNAME").toString();
@@ -82,6 +81,9 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
         sambaCheckBox->setChecked(false);
         sambaCheckBox->setEnabled(false);
     }
+
+    // save config
+    config = new QSettings(PROJECTNAME, "minstall", this);
 
     // set default host name
 
@@ -194,7 +196,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     if (shell.run("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus") == 0) {
         grubPbrButton->setChecked(true);
         grubMbrButton->setEnabled(false);
-        gmtCheckBox->setChecked(true);
+        localClockCheckBox->setChecked(true);
     }
     checkUefi();
 }
@@ -605,6 +607,70 @@ void MInstall::removeItemCombo(QComboBox *cb, const QString *part)
     } else {
         return;
     }
+}
+
+// save configuration
+void MInstall::saveConfig()
+{
+    // Disk step
+    config->setValue("Disk/Disk", diskCombo->currentText().section(" ", 0, 0));
+    config->setValue("Disk/Encrypted", checkBoxEncryptAuto->isChecked());
+    config->setValue("Disk/EntireDisk", entireDiskButton->isChecked());
+    // Partition step
+    config->setValue("Partition/Root", rootCombo->currentText().section(" ", 0, 0));
+    config->setValue("Partition/Home", homeCombo->currentText().section(" ", 0, 0));
+    config->setValue("Partition/Swap", swapCombo->currentText().section(" ", 0, 0));
+    config->setValue("Partition/Boot", bootCombo->currentText().section(" ", 0, 0));
+
+    config->setValue("Partition/RootType", rootTypeCombo->currentText());
+    config->setValue("Partition/HomeType", homeTypeCombo->currentText());
+
+    config->setValue("Partition/RootEncrypt", checkBoxEncryptRoot->isChecked());
+    config->setValue("Partition/RootEncrypt", checkBoxEncryptHome->isChecked());
+    config->setValue("Partition/RootEncrypt", checkBoxEncryptSwap->isChecked());
+
+    config->setValue("Partition/RootLabel", rootLabelEdit->text());
+    config->setValue("Partition/HomeLabel", homeLabelEdit->text());
+    config->setValue("Partition/SwapLabel", swapLabelEdit->text());
+
+    config->setValue("Partition/SaveHome", saveHomeCheck->isChecked());
+    config->setValue("Partition/BadBlocksCheck", badblocksCheck->isChecked());
+    // AES step
+    config->setValue("Encryption/Cipher", comboFDEcipher->currentText());
+    config->setValue("Encryption/ChainMode", comboFDEchain->currentText());
+    config->setValue("Encryption/IVgenerator", comboFDEivgen->currentText());
+    config->setValue("Encryption/IVhash", comboFDEivhash->itemData(comboFDEivhash->currentIndex()).toString());
+    config->setValue("Encryption/KeySize", spinFDEkeysize->cleanText());
+    config->setValue("Encryption/LUKSkeyHash", comboFDEhash->currentText().toLower().remove('-'));
+    config->setValue("Encryption/KernelRNG", comboFDErandom->currentText());
+    config->setValue("Encryption/KDFroundTime", spinFDEroundtime->cleanText());
+    // GRUB step
+    config->setValue("GRUB/InstallGRUB", grubCheckBox->isChecked());
+    config->setValue("GRUB/MBR", grubMbrButton->isChecked());
+    config->setValue("GRUB/PBR", grubPbrButton->isChecked());
+    config->setValue("GRUB/ESP", grubEspButton->isChecked());
+    config->setValue("GRUB/GrubDisk", grubBootCombo->currentText().section(" ", 0, 0));
+    config->setValue("GRUB/GrubPartition", grubPartCombo->currentText().section(" ", 0, 0));
+    // Services step
+    QTreeWidgetItemIterator it(csView, QTreeWidgetItemIterator::Checked);
+    while (*it) {
+        config->setValue("Services/" + (*it)->text(0), true);
+        ++it;
+    }
+    // Network step
+    config->setValue("Network/ComputerName", computerNameEdit->text());
+    config->setValue("Network/Domain", computerDomainEdit->text());
+    config->setValue("Network/Workgroup", computerGroupEdit->text());
+    config->setValue("Network/Samba", sambaCheckBox->isChecked());
+    // Localization step
+    config->setValue("Localization/Locale", localeCombo->currentText());
+    config->setValue("Localization/LocalClock", localClockCheckBox->isChecked());
+    config->setValue("Localization/Clock24h", radio24h->isChecked());
+    config->setValue("Localization/Timezone", timezoneCombo->currentText());
+    // User Accounts step
+    config->setValue("User/Username", userNameEdit->text());
+    config->setValue("User/Autologin", autologinCheckBox->isChecked());
+    config->setValue("User/SaveDesktop", saveDesktopCheckBox->isChecked());
 }
 
 // update partition combos
@@ -1110,7 +1176,7 @@ bool MInstall::makeChosenPartitions()
     // Swap
     QString swapdev;
     swapdev = "/dev/" + swapCombo->currentText().section(" -", 0, 0).trimmed();
-    if (checkBoxEncrpytSwap->isChecked() && swapdev != "/dev/none") {
+    if (checkBoxEncryptSwap->isChecked() && swapdev != "/dev/none") {
         isSwapEncrypted = true;
     }
     swapDevicePreserve = swapdev;
@@ -1257,7 +1323,7 @@ bool MInstall::makeChosenPartitions()
         //if swap exists and not encrypted, do nothing
         //check swap fstype
         cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
-        if (shell.run(cmd) != 0 || checkBoxEncrpytSwap->isChecked()) {
+        if (shell.run(cmd) != 0 || checkBoxEncryptSwap->isChecked()) {
             if (shell.run("swapoff " + swapdev) != 0) {
                 if (shell.run("pumount " + swapdev) != 0) {
                 }
@@ -1272,7 +1338,7 @@ bool MInstall::makeChosenPartitions()
             shell.run(cmd);
             system("sleep 1");
 
-            if (checkBoxEncrpytSwap->isChecked()) {
+            if (checkBoxEncryptSwap->isChecked()) {
                 updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
                 if (!makeLuksPartition(swapdev, "swapfs", FDEpassCust->text().toUtf8())) {
                     qDebug() << "could not make swap LUKS partition";
@@ -1391,7 +1457,7 @@ bool MInstall::makeChosenPartitions()
     }
     // mount all swaps
     system("sleep 1");
-    if (checkBoxEncrpytSwap->isChecked() && swapdev != "/dev/none") { // swapon -a doens't mount LUKS swap
+    if (checkBoxEncryptSwap->isChecked() && swapdev != "/dev/none") { // swapon -a doens't mount LUKS swap
         shell.run("swapon " + swapdev);
     }
     shell.run("/sbin/swapon -a 2>&1");
@@ -1989,8 +2055,6 @@ bool MInstall::setUserName()
 //        }
 //    }
 
-
-    shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
     setCursor(QCursor(Qt::ArrowCursor));
     return true;
 }
@@ -2254,7 +2318,7 @@ void MInstall::setLocale()
     // timezone
     shell.run("cp -f /etc/default/rcS /mnt/antiX/etc/default");
     // Set clock to use LOCAL
-    if (gmtCheckBox->isChecked()) {
+    if (localClockCheckBox->isChecked()) {
         shell.run("echo '0.0 0 0.0\n0\nLOCAL' > /etc/adjtime");
     } else {
         shell.run("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime");
@@ -2431,19 +2495,20 @@ int MInstall::showPage(int curr, int next)
         grubPartLabel->hide();
     }
 
-    if (next == 3 && ixPageRefAdvancedFDE != 0) {
+    if (next == 3 && ixPageRefAdvancedFDE != 0) { // at Step_FDE
         return next;
     }
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
+            if (!pretend) config->setValue("EntireDisk", true);
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
                 return curr;
             }
             return 4; // Go to Step_Progress
         }
     } else if  (next == 3 && curr == 2) {// at Step_Partition (fwd)
-        if (checkBoxEncrpytSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        if (checkBoxEncryptSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
             if (!checkPassword(FDEpassCust->text())) {
                 return curr;
             }
@@ -2687,6 +2752,12 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
                                        "Each password must be entered twice.</p>").arg(PROJECTNAME));
     case 10: // done
+        if (!args.contains("--pretend") && !args.contains("-p")) {
+            saveConfig();
+            shell.run("cp \"" + config->fileName() + "\" /mnt/antiX/var/log");
+
+            shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
+        }
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                                        "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -3101,7 +3172,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
         // guess localtime vs UTC
         if (getCmdOut("guess-hwclock") == "localtime") {
-            gmtCheckBox->setChecked(true);
+            localClockCheckBox->setChecked(true);
         }
 
         progressBar->setValue(100);
@@ -3373,15 +3444,15 @@ void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
     if (checked) {
         gbEncrPass->setVisible(true);
         nextButton->setDisabled(true);
-        checkBoxEncrpytSwap->setChecked(true);
+        checkBoxEncryptSwap->setChecked(true);
         FDEpassCust->setFocus();
     } else {
         gbEncrPass->setVisible(checkBoxEncryptHome->isChecked());
         nextButton->setDisabled(checkBoxEncryptHome->isChecked());
-        checkBoxEncrpytSwap->setChecked(checkBoxEncryptHome->isChecked());
+        checkBoxEncryptSwap->setChecked(checkBoxEncryptHome->isChecked());
     }
 
-    if (!checkBoxEncrpytSwap->isChecked()) {
+    if (!checkBoxEncryptSwap->isChecked()) {
         FDEpassCust->clear();
         FDEpassCust2->clear();
     }
@@ -3392,7 +3463,7 @@ void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
     if (checked) {
         gbEncrPass->setVisible(true);
         nextButton->setDisabled(true);
-        checkBoxEncrpytSwap->setChecked(true);
+        checkBoxEncryptSwap->setChecked(true);
         FDEpassCust->setFocus();
         if (saveHomeCheck->isChecked()) {
             QMessageBox::warning(this, QString::null,
@@ -3404,17 +3475,17 @@ void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
     } else {
         gbEncrPass->setVisible(checkBoxEncryptRoot->isChecked());
         nextButton->setDisabled(checkBoxEncryptRoot->isChecked());
-        checkBoxEncrpytSwap->setChecked(checkBoxEncryptRoot->isChecked());
+        checkBoxEncryptSwap->setChecked(checkBoxEncryptRoot->isChecked());
         saveHomeCheck->setEnabled(true);
     }
 
-    if (!checkBoxEncrpytSwap->isChecked()) {
+    if (!checkBoxEncryptSwap->isChecked()) {
         FDEpassCust->clear();
         FDEpassCust2->clear();
     }
 }
 
-void MInstall::on_checkBoxEncrpytSwap_toggled(bool checked)
+void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
 {
     if (checked) {
         QMessageBox::warning(this, QString::null,
