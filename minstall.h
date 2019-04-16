@@ -195,6 +195,7 @@ private slots:
     void on_grubEspButton_toggled();
 
 private:
+    int phase = 0;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
