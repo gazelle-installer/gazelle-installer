@@ -2657,44 +2657,60 @@ void MInstall::pageDisplayed(int next)
 
     case 4: // installation step
         backButton->setEnabled(false);
-        if (args.contains("--pretend") || args.contains("-p")) {
-            buildServiceList(); // build anyway
-            gotoPage(5);
-            return;
-        }
-        if (!checkDisk()) {
-            goBack(tr("Returning to Step 1 to select another disk."));
+        switch (phase) {
+        case 0: // No install started yet.
+            phase = 1;
+            tipsEdit->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
+                                 "<p>Without you there would be no %1.</p>"
+                                 "<p>%2 Dev Team</p>").arg(PROJECTNAME).arg(PROJECTSHORTNAME));
+            ((MMain *)mmn)->setHelpText(tr("<p><b>Installation in Progress</b><br/>"
+                                           " %1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</p>"
+                                           "<p>If you click the Abort button, the installation will be stopped as soon as possible.</p>").arg(PROJECTNAME));
+            // intentional fall-through.
+        case 1: // installation.
+            if (args.contains("--pretend") || args.contains("-p")) {
+                buildServiceList(); // build anyway
+                gotoPage(5);
+                return;
+            }
+            if (!checkDisk()) {
+                goBack(tr("Returning to Step 1 to select another disk."));
+                break;
+            }
+            setCursor(QCursor(Qt::WaitCursor));
+            nextButton->setEnabled(false);
+            prepareToInstall();
+            if (entireDiskButton->isChecked()) {
+                if (!makeDefaultPartitions()) {
+                    // failed
+                    nextButton->setEnabled(true);
+                    goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
+                    break;
+                }
+            } else {
+                if (!makeChosenPartitions()) {
+                    // failed
+                    nextButton->setEnabled(true);
+                    goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
+                    break;
+                }
+            }
+            // end of Phase 1
+            phase = 2;
+            nextButton->setEnabled(true);
+            system("sleep 1");
+            installLinux();
+            buildServiceList();
+            break;
+        case 2: // file copy process.
+        case 3: // still Phase 2, but the user has entered all the info in advance.
+            break;
+        case 4: // post-install procedure.
+            break;
+        default:
             break;
         }
-        setCursor(QCursor(Qt::WaitCursor));
-        tipsEdit->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
-                             "<p>Without you there would be no %1.</p>"
-                             "<p>%2 Dev Team</p>").arg(PROJECTNAME).arg(PROJECTSHORTNAME));
-        ((MMain *)mmn)->setHelpText(tr("<p><b>Installation in Progress</b><br/>"
-                                       " %1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</p>"
-                                       "<p>If you click the Abort button, the installation will be stopped as soon as possible.</p>").arg(PROJECTNAME));
-        nextButton->setEnabled(false);
-        prepareToInstall();
-        if (entireDiskButton->isChecked()) {
-            if (!makeDefaultPartitions()) {
-                // failed
-                nextButton->setEnabled(true);
-                goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
-                break;
-            }
-        } else {
-            if (!makeChosenPartitions()) {
-                // failed
-                nextButton->setEnabled(true);
-                goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
-                break;
-            }
-        }
-        system("sleep 1");
-        installLinux();
-        buildServiceList();
         break;
-
     case 5: // set bootloader
         checkEsp();
         setCursor(QCursor(Qt::ArrowCursor));
@@ -3177,6 +3193,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         on_nextButton_clicked();
     } else {
         nextButton->setEnabled(true);
+        phase = 1;
         unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
     }
 }
