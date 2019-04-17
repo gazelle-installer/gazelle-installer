@@ -78,6 +78,8 @@ public:
     bool makeSwapPartition(QString dev);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
     bool removeKernel();
+    bool validateUserInfo();
+    bool validateComputerName();
     bool setComputerName();
     bool setPasswords();
     bool setUserInfo();
@@ -144,7 +146,6 @@ public slots:
     void copyStart();
     void copyDone(int, QProcess::ExitStatus exitStatus);
     void copyTime();
-    void procTime();
 
 private slots:
     void on_abortInstallButton_clicked();
@@ -218,9 +219,10 @@ private:
     QString prevItemSwap;
     QString prevItemBoot;
 
-    // Phase 2 (user can now enter options while the setup is running)
+    // info for Phase 2 (user can now enter options while the setup is running)
     QStringList listBootESP;
     QStringList listBootPart;
+    bool haveSnapshotUserAccounts;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
