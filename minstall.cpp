@@ -516,6 +516,12 @@ void MInstall::prepareToInstall()
 
     isRootFormatted = false;
     isHomeFormatted = false;
+
+    // Detect snapshot-backup account(s)
+    // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
+    if (shell.run("ls /home | grep -v lost+found | grep -v demo | grep -v snapshot | grep -q [a-zA-Z0-9]") == 0 || shell.run("test -d /live/linux/home/demo") == 0) {
+        haveSnapshotUserAccounts = true;
+    }
 }
 
 void MInstall::addItemCombo(QComboBox *cb, const QString *part)
@@ -1638,6 +1644,8 @@ void MInstall::copyLinux()
 bool MInstall::installLoader()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+
+    updateStatus(tr("Installing GRUB"), 97);
     QString cmd;
     QString val = getCmdOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1709,19 +1717,6 @@ bool MInstall::installLoader()
         return false;
     }
     setCursor(QCursor(Qt::WaitCursor));
-    QProgressDialog *progress = new QProgressDialog(this);
-    bar = new QProgressBar(progress);
-    progress->setWindowModality(Qt::WindowModal);
-    progress->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint |Qt::WindowSystemMenuHint | Qt::WindowStaysOnTopHint);
-    progress->setCancelButton(0);
-    progress->setLabelText(tr("Please wait till GRUB is installed, it might take a couple of minutes."));
-    progress->setAutoClose(false);
-    progress->setBar(bar);
-    bar->setTextVisible(false);
-    timer->start(100);
-    connect(timer, SIGNAL(timeout()), this, SLOT(procTime()));
-    progress->show();
-    progress->installEventFilter(this);
     qApp->processEvents();
     nextButton->setEnabled(false);
 
@@ -1753,7 +1748,6 @@ bool MInstall::installLoader()
     qDebug() << "Installing Grub";
     if (runCmd(cmd) != 0) {
         // error
-        progress->close();
         setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function."));
@@ -1809,7 +1803,7 @@ bool MInstall::installLoader()
     cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(finalcmdlinestring);
     runCmd(cmd);
 
-
+    progressBar->setValue(98);
     //copy memtest efi files if needed
 
     if (uefi) {
@@ -1838,8 +1832,6 @@ bool MInstall::installLoader()
     }
 
     setCursor(QCursor(Qt::ArrowCursor));
-    timer->stop();
-    progress->close();
     nextButton->setEnabled(true);
     return true;
 }
@@ -2104,7 +2096,7 @@ bool MInstall::setPasswords()
     return true;
 }
 
-bool MInstall::setUserInfo()
+bool MInstall::validateUserInfo()
 {
     //validate data before proceeding
     // see if username is reasonable length
@@ -2170,8 +2162,11 @@ bool MInstall::setUserInfo()
                                  "a longer password before proceeding."));
         return false;
     }
-    setCursor(QCursor(Qt::WaitCursor));
-    qApp->processEvents();
+    return true;
+}
+
+bool MInstall::setUserInfo()
+{
     if (!setPasswords()) {
         return false;
     }
@@ -2181,7 +2176,7 @@ bool MInstall::setUserInfo()
 /////////////////////////////////////////////////////////////////////////
 // set the computer name, can not be rerun
 
-bool MInstall::setComputerName()
+bool MInstall::validateComputerName()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // see if name is reasonable
@@ -2213,6 +2208,17 @@ bool MInstall::setComputerName()
                                   tr("Sorry your workgroup needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
             return false;
         }
+    } else {
+        computerGroupEdit->clear();
+    }
+
+    return true;
+}
+
+bool MInstall::setComputerName()
+{
+    QString val = getCmdValue("dpkg -s samba | grep '^Status'", "ok", " ", " ");
+    if (val.compare("installed") == 0) {
         //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
         replaceStringInFile("WORKGROUP", computerGroupEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
     }
@@ -2270,7 +2276,6 @@ bool MInstall::setComputerName()
     shell.run(cmd);
     cmd = QString("echo \"%1\" | cat > /mnt/antiX/etc/defaultdomain").arg(computerDomainEdit->text());
     shell.run(cmd);
-
     return true;
 }
 
@@ -2513,46 +2518,26 @@ int MInstall::showPage(int curr, int next)
         next = ixPageRefAdvancedFDE;
         ixPageRefAdvancedFDE = 0;
         return next;
-    } else if (next == 4 && curr == 5) { // at Step_Boot screen (back)
-        return 1;
     } else if (next == 6 && curr == 5) { // at Step_Boot screen (forward)
-        if (pretend) {
-            return next + 1; // skip Services screen
-        }
-        if (!installLoader()) {
-            return curr;
-        } else {
-            return next + 1; // skip Services screen
-        }
+        return next + 1; // skip Services screen
     } else if (next == 10 && curr == 9) { // at Step_User_Accounts (forward)
-        if (pretend) {
-            return next;
-        }
-        if (!setUserInfo()) {
+        if (!validateUserInfo()) {
             return curr;
         }
+        // Continue
+        phase = 3;
+        next = 4;
     } else if (next == 8 && curr == 7) { // at Step_Network (forward)
-        if (pretend) {
-            return next;
-        }
-        if (!setComputerName()) {
+        if (!validateComputerName()) {
             return curr;
         }
     } else if (next == 6 && curr == 7) { // at Step_Network (backward)
-       return 5; // go to Step_Boot
+       return next - 1; // skip Services screen
     } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
-        if (pretend) {
-            return next;
-        }
-        setLocale();
-        // Detect snapshot-backup account(s)
-        // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
-        if (shell.run("ls /home | grep -v lost+found | grep -v demo | grep -v snapshot | grep -q [a-zA-Z0-9]") == 0 || shell.run("test -d /live/linux/home/demo") == 0) {
-            setCursor(QCursor(Qt::WaitCursor));
-            QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
-            shell.run(cmd);
-            setCursor(QCursor(Qt::ArrowCursor));
-            next +=1;
+        if (haveSnapshotUserAccounts) {
+            // Continue
+            phase = 3;
+            next = 4;
         }
     } else if (next == 7 && curr == 6) { // at Step_Services (forward)
         if (pretend) {
@@ -2704,6 +2689,21 @@ void MInstall::pageDisplayed(int next)
             nextButton->setEnabled(true);
             break;
         case 4: // post-install procedure.
+            nextButton->setEnabled(false);
+            setCursor(QCursor(Qt::WaitCursor));
+            installLoader();
+            updateStatus(tr("Setting system configuration"), 99);
+            setUserInfo();
+            if (haveSnapshotUserAccounts) {
+                QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
+                shell.run(cmd);
+            }
+            setComputerName();
+            setLocale();
+            setCursor(QCursor(Qt::ArrowCursor));
+            updateStatus(tr("Installation successful"), 100);
+            system("sleep 1");
+            gotoPage(10);
             break;
         default:
             break;
@@ -2715,7 +2715,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
                                        "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
                                        "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
-        backButton->setEnabled(false);
+        backButton->setEnabled(true);
         break;
 
     case 6: // set services
@@ -3137,16 +3137,6 @@ void MInstall::delTime()
 }
 
 
-// process time for QProgressDialog
-void MInstall::procTime()
-{
-    if (bar->value() == 100) {
-        bar->reset();
-    }
-    bar->setValue(bar->value() + 1);
-    qApp->processEvents();
-}
-
 /////////////////////////////////////////////////////////////////////////
 // copy process events
 
@@ -3162,7 +3152,7 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
     timer->stop();
 
     if (exitStatus == QProcess::NormalExit) {
-        updateStatus(tr("Fixing configuration"), 99);
+        updateStatus(tr("Fixing configuration"), 96);
         shell.run("mkdir -m 1777 /mnt/antiX/tmp");
         makeFstab();
         writeKeyFile();
@@ -3183,11 +3173,15 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
             localClockCheckBox->setChecked(true);
         }
 
-        progressBar->setValue(100);
-        nextButton->setEnabled(true);
-        QApplication::beep();
-        setCursor(QCursor(Qt::ArrowCursor));
-        on_nextButton_clicked();
+        progressBar->setValue(97);
+        if (phase == 3) {
+            phase = 4;
+            gotoPage(4);
+        } else if (phase == 2) {
+            QApplication::beep();
+            setCursor(QCursor(Qt::ArrowCursor));
+            on_nextButton_clicked();
+        }
     } else {
         nextButton->setEnabled(true);
         phase = 1;
