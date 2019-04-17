@@ -2524,8 +2524,7 @@ int MInstall::showPage(int curr, int next)
         if (!validateUserInfo()) {
             return curr;
         }
-        // Continue
-        phase = 3;
+        haveSysConfig = true;
         next = 4;
     } else if (next == 8 && curr == 7) { // at Step_Network (forward)
         if (!validateComputerName()) {
@@ -2536,7 +2535,7 @@ int MInstall::showPage(int curr, int next)
     } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
         if (haveSnapshotUserAccounts) {
             // Continue
-            phase = 3;
+            haveSysConfig = true;
             next = 4;
         }
     } else if (next == 7 && curr == 6) { // at Step_Services (forward)
@@ -2685,25 +2684,28 @@ void MInstall::pageDisplayed(int next)
             buildServiceList();
             break;
         case 2: // file copy process.
-        case 3: // still Phase 2, but the user has entered all the info in advance.
             nextButton->setEnabled(true);
             break;
-        case 4: // post-install procedure.
-            nextButton->setEnabled(false);
-            setCursor(QCursor(Qt::WaitCursor));
-            installLoader();
-            updateStatus(tr("Setting system configuration"), 99);
-            setUserInfo();
-            if (haveSnapshotUserAccounts) {
-                QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
-                shell.run(cmd);
+        case 3: // post-install procedure.
+            if (haveSysConfig) {
+                nextButton->setEnabled(false);
+                setCursor(QCursor(Qt::WaitCursor));
+                installLoader();
+                updateStatus(tr("Setting system configuration"), 99);
+                setUserInfo();
+                if (haveSnapshotUserAccounts) {
+                    QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
+                    shell.run(cmd);
+                }
+                setComputerName();
+                setLocale();
+                setCursor(QCursor(Qt::ArrowCursor));
+                updateStatus(tr("Installation successful"), 100);
+                system("sleep 1");
+                gotoPage(10);
+            } else {
+                nextButton->setEnabled(true);
             }
-            setComputerName();
-            setLocale();
-            setCursor(QCursor(Qt::ArrowCursor));
-            updateStatus(tr("Installation successful"), 100);
-            system("sleep 1");
-            gotoPage(10);
             break;
         default:
             break;
@@ -3174,13 +3176,15 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         }
 
         progressBar->setValue(97);
-        if (phase == 3) {
-            phase = 4;
-            gotoPage(4);
-        } else if (phase == 2) {
-            QApplication::beep();
-            setCursor(QCursor(Qt::ArrowCursor));
-            on_nextButton_clicked();
+        phase = 3;
+        if(widgetStack->currentIndex() == 4) {
+            if (haveSysConfig) {
+                gotoPage(4); // this triggers the post-install process
+            } else {
+                QApplication::beep();
+                setCursor(QCursor(Qt::ArrowCursor));
+                on_nextButton_clicked();
+            }
         }
     } else {
         nextButton->setEnabled(true);

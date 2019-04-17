@@ -202,6 +202,7 @@ private:
     bool isRootFormatted = false;
     bool isHomeFormatted = false;
     bool uefi = false;
+    bool haveSysConfig = false;
 
     Cmd shell;
     QString home_mntops = "defaults";
