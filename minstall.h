@@ -66,7 +66,6 @@ public:
     bool isGpt(QString drv);
 
     bool checkDisk();
-    bool checkEsp();
     bool checkPassword(const QString &pass);
     bool installLoader();
     bool makeChosenPartitions();
@@ -84,14 +83,14 @@ public:
     bool setUserInfo();
     bool setUserName();
     void addItemCombo(QComboBox *cb, const QString *part);
-    void buildESPlist();
-    void buildPartList();
+    void buildBootLists();
     void buildServiceList();
     void copyLinux();
     void disablehiberanteinitramfs();
     void installLinux();
     void makeFstab();
     void prepareToInstall();
+    void preparePhase2();
     void removeItemCombo(QComboBox *cb, const QString *part);
     void saveConfig();
     void setLocale();
@@ -218,6 +217,10 @@ private:
     QString prevItemHome;
     QString prevItemSwap;
     QString prevItemBoot;
+
+    // Phase 2 (user can now enter options while the setup is running)
+    QStringList listBootESP;
+    QStringList listBootPart;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;

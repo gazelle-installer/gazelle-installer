@@ -480,26 +480,6 @@ bool MInstall::checkDisk()
     return true;
 }
 
-// check if booted UEFI and if ESP(s) available
-bool MInstall::checkEsp()
-{
-    if (!uefi) {
-        grubEspButton->setEnabled(false);
-        return false;
-    }
-    buildESPlist();
-    // if GPT, and ESP exists
-    if (grubPartCombo->count() > 0) {
-        grubEspButton->setEnabled(true);
-        grubEspButton->click();
-        return true;
-    } else {
-        grubEspButton->setEnabled(false);
-        return false;
-    }
-}
-
-
 // check password length (maybe complexity)
 bool MInstall::checkPassword(const QString &pass)
 {
@@ -1064,7 +1044,7 @@ bool MInstall::makeDefaultPartitions()
 
     // if encrypting, boot_size=512, or 0 if not  .  start is set to end_boot if encrypting
     int end_root = esp_size + boot_size + remaining;
-    int err = shell.run("parted -s --align optimal " + drv + " mkpart primary " + start + QString::number(end_root) + "MiB");
+    int err = shell.run("parted -s --align optimal " + drv + " mkpart primary ext4 " + start + QString::number(end_root) + "MiB");
     if (err != 0) {
         qDebug() << "Could not create root partition";
         return false;
@@ -1088,6 +1068,9 @@ bool MInstall::makeDefaultPartitions()
             swapdev="/dev/mapper/swapfs";
         }
     }
+
+    // formatting takes time so finish Phase 1 here.
+    preparePhase2();
 
     updateStatus(tr("Formatting swap partition"), ++prog);
     system("sleep 1");
@@ -1141,6 +1124,15 @@ bool MInstall::makeDefaultPartitions()
     bootCombo->setCurrentIndex(0);
 
     return true;
+}
+
+void MInstall::preparePhase2()
+{
+    if (phase < 2) {
+        phase = 2;
+        buildBootLists();
+        nextButton->setEnabled(true);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1357,17 +1349,36 @@ bool MInstall::makeChosenPartitions()
             shell.run("/sbin/swapon " + swapdev);
         }
     }
+
+    bool formatRoot = false, formatBoot = false;
+    // command to set the partition type
+    if (gpt) {
+        cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
+    } else {
+        cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
+    }
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (!(saveHomeCheck->isChecked() && homedev == "/dev/root") && !(args.contains("--sync") || args.contains("-s"))) {
+        shell.run(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
+        formatRoot = true;
+    }
+    // format and mount /boot if different than root
+    if (bootCombo->currentText() != "root") {
+        shell.run(cmd.arg(bootsplit[0]).arg(bootsplit[1]));
+        formatBoot = true;
+    }
+    // prepare home if not being preserved, and on a different partition
+    if (!(saveHomeCheck->isChecked()) && (homedev != "/dev/root")) {
+        shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
+    }
+    system("sleep 1");
+
+    // formatting takes time so finish Phase 1 here.
+    preparePhase2();
+
+    // maybe format root (if not saving /home on root) // or if using --sync option
+    if (formatRoot) {
         updateStatus(tr("Formatting the / (root) partition"), ++prog);
-        // always set type
-        if (gpt) {
-            cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:8303").arg(rootsplit[0]).arg(rootsplit[1]);
-        } else {
-            cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 83").arg(rootsplit[0]).arg(rootsplit[1]);
-        }
-        shell.run(cmd);
-        system("sleep 1");
 
         if (checkBoxEncryptRoot->isChecked()) {
             updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
@@ -1389,14 +1400,8 @@ bool MInstall::makeChosenPartitions()
     }
 
     // format and mount /boot if different than root
-    if (bootCombo->currentText() != "root") {
+    if (formatBoot) {
         updateStatus(tr("Formatting boot partition"), ++prog);
-        // always set type
-        if (gpt) {
-            cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:ef02").arg(bootsplit[0]).arg(bootsplit[1]);
-        } else {
-            cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 83").arg(bootsplit[0]).arg(bootsplit[1]);
-        }
         if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
             return false;
         }
@@ -1434,14 +1439,6 @@ bool MInstall::makeChosenPartitions()
 
         if (homedev != "/dev/root") { // not on root
             updateStatus(tr("Formatting the /home partition"), ++prog);
-            // always set type
-            if (gpt) {
-                cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:8302").arg(homesplit[0]).arg(homesplit[1]);
-            } else {
-                cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 83").arg(homesplit[0]).arg(homesplit[1]);
-            }
-            shell.run(cmd);
-            system("sleep 1");
 
             if (!makeLinuxPartition(homedev, home_type, badblocksCheck->isChecked(), homeLabelEdit->text())) {
                 return false;
@@ -2695,15 +2692,16 @@ void MInstall::pageDisplayed(int next)
                     break;
                 }
             }
-            // end of Phase 1
-            phase = 2;
-            nextButton->setEnabled(true);
+
+            // end of Phase 1 now if not already done in make*Partitions()
+            preparePhase2();
             system("sleep 1");
             installLinux();
             buildServiceList();
             break;
         case 2: // file copy process.
         case 3: // still Phase 2, but the user has entered all the info in advance.
+            nextButton->setEnabled(true);
             break;
         case 4: // post-install procedure.
             break;
@@ -2712,7 +2710,6 @@ void MInstall::pageDisplayed(int next)
         }
         break;
     case 5: // set bootloader
-        checkEsp();
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
                                        "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
@@ -3638,7 +3635,8 @@ void MInstall::on_grubMbrButton_toggled()
 
 void MInstall::on_grubPbrButton_toggled()
 {
-    buildPartList();
+    grubPartCombo->clear();
+    grubPartCombo->addItems(listBootPart);
     grubPartLabel->show();
     grubPartCombo->show();
 
@@ -3648,7 +3646,8 @@ void MInstall::on_grubPbrButton_toggled()
 
 void MInstall::on_grubEspButton_toggled()
 {
-    buildESPlist();
+    grubPartCombo->clear();
+    grubPartCombo->addItems(listBootESP);
     grubPartLabel->show();
     grubPartCombo->show();
     grubBootDiskLabel->hide();
@@ -3657,45 +3656,46 @@ void MInstall::on_grubEspButton_toggled()
 }
 
 // build ESP list available to install GRUB
-void MInstall::buildESPlist()
+void MInstall::buildBootLists()
 {
-    grubPartCombo->clear();
-    const QStringList drives = shell.getOutput("partition-info drives --noheadings --exclude=boot | awk '{print $1}'").split("\n");
-    QStringList esp_list;
+    // check if booted UEFI and if ESP(s) available
+    grubEspButton->setEnabled(false);
+    if (uefi) {
+        const QStringList drives = shell.getOutput("partition-info drives --noheadings --exclude=boot | awk '{print $1}'").split("\n");
 
-    // find ESP for all partitions on all drives
-    for (const QString &drive : drives) {
-        if (isGpt("/dev/" + drive)) {
-            QString esps = shell.getOutput("lsblk -nlo name,parttype /dev/" + drive + " | egrep '(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$' | awk '{print $1}'");
-            if (!esps.isEmpty()) {
-                esp_list << esps.split("\n");
-            }
-            // backup detection for drives that don't have UUID for ESP
-            const QStringList backup_list = shell.getOutput("fdisk -l -o DEVICE,TYPE /dev/" + drive + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3").split("\n");
-            for (const QString &part : backup_list) {
-                if (!esp_list.contains(part)) {
-                    esp_list << part;
+        // find ESP for all partitions on all drives
+        listBootESP.clear();
+        for (const QString &drive : drives) {
+            if (isGpt("/dev/" + drive)) {
+                QString esps = shell.getOutput("lsblk -nlo name,parttype /dev/" + drive + " | egrep '(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$' | awk '{print $1}'");
+                if (!esps.isEmpty()) {
+                    listBootESP << esps.split("\n");
+                }
+                // backup detection for drives that don't have UUID for ESP
+                const QStringList backup_list = shell.getOutput("fdisk -l -o DEVICE,TYPE /dev/" + drive + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3").split("\n");
+                for (const QString &part : backup_list) {
+                    if (!listBootESP.contains(part)) {
+                        listBootESP << part;
+                    }
                 }
             }
         }
-    }
-    grubPartCombo->addItems(esp_list);
-}
 
-// build partition list available to install GRUB (in PBR)
-void MInstall::buildPartList()
-{
-    grubPartCombo->clear();
+        // if GPT, and ESP exists
+        if (listBootESP.count() > 0) {
+            grubEspButton->setEnabled(true);
+            grubEspButton->click();
+        }
+    }
+
+    // build partition list available to install GRUB (in PBR)
     const QStringList part_list = shell.getOutput("partition-info all --noheadings --exclude=swap,boot,efi").split("\n");
-    QStringList new_list;
+    listBootPart.clear();
     for (const QString &part : part_list) {
         if (shell.run("partition-info is-linux=" + part.section(" ", 0, 0)) == 0) { // list only Linux partitions
             if (shell.getOutput("blkid /dev/" + part.section(" ", 0, 0) + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
-                new_list << part;
+                listBootPart << part;
             }
         }
     }
-    grubPartCombo->addItems(new_list);
 }
-
-
