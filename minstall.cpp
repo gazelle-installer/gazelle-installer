@@ -2405,10 +2405,6 @@ int MInstall::showPage(int curr, int next)
             next = 4;
         }
     } else if (next == 7 && curr == 6) { // at Step_Services (forward)
-        if (pretend) {
-            return 8; // Step_Localization
-        }
-        setServices();
         return 8; // goes back to the screen that called Services screen
     } else if (next == 5 && curr == 6) { // at Step_Services (backward)
         return 8; // goes back to the screen that called Services screen
@@ -2562,6 +2558,7 @@ void MInstall::pageDisplayed(int next)
                 setCursor(QCursor(Qt::WaitCursor));
                 installLoader();
                 updateStatus(tr("Setting system configuration"), 99);
+                setServices();
                 setUserInfo();
                 if (haveSnapshotUserAccounts) {
                     QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
