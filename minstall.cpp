@@ -3244,7 +3244,7 @@ void MInstall::copyTime()
 void MInstall::on_closeButton_clicked()
 {
     // ask for confirmation when installing (except for some steps that don't need confirmation)
-    if (widgetStack->currentIndex() != 0 && widgetStack->currentIndex() != 1 && widgetStack->currentIndex() != 2 && widgetStack->currentIndex() != 9) {
+    if (widgetStack->currentIndex() > 3 && widgetStack->currentIndex() != 10) {
         if (QMessageBox::question(this, tr("Confirmation"), tr("Are you sure you want to quit the application?"),
                                         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             procAbort();
