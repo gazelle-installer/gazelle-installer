@@ -320,7 +320,7 @@ bool MInstall::replaceStringInFile(QString oldtext, QString newtext, QString fil
 
 void MInstall::updateStatus(QString msg, int val)
 {
-    installLabel->setText(msg.toUtf8());
+    progressBar->setFormat("%p% - " + msg.toUtf8());
     progressBar->setValue(val);
     qApp->processEvents();
 }
