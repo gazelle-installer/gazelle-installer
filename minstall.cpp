@@ -1647,13 +1647,6 @@ bool MInstall::installLoader()
 //        }
         qDebug() << "boot for grub routine = " << boot;
     }
-    // install Grub?
-    QString msg = tr("OK to install GRUB bootloader at %1 ?").arg(boot);
-    int ans = QMessageBox::warning(this, QString::null, msg,
-                                   tr("Yes"), tr("No"));
-    if (ans != 0) {
-        return false;
-    }
     setCursor(QCursor(Qt::WaitCursor));
     qApp->processEvents();
     nextButton->setEnabled(false);
