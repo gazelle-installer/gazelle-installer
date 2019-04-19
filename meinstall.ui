@@ -2934,7 +2934,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="WStackPage">
+     <widget class="QWidget" name="Step_End">
       <layout class="QGridLayout">
        <property name="leftMargin">
         <number>9</number>
@@ -2952,6 +2952,32 @@
         <number>6</number>
        </property>
        <item row="0" column="0">
+        <widget class="QGroupBox" name="exitBox">
+         <property name="title">
+          <string>Installation and configuration is complete.</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>To use the new installation, reboot without the installation media.</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBoxExitReboot">
+            <property name="text">
+             <string>Automatically reboot the system when the installer is closed</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QGroupBox" name="reminderBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -2978,7 +3004,7 @@
           <property name="spacing">
            <number>6</number>
           </property>
-          <item row="0" column="0">
+          <item row="1" column="0">
            <widget class="QPlainTextEdit" name="remindersBrowser">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
