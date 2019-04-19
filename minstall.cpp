@@ -103,64 +103,6 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     timezoneCombo->setCurrentIndex(timezoneCombo->findText(getCmdOut("cat /etc/timezone")));
 
 
-//    // keyboard
-//    shell.run("ls -1 /usr/share/keymaps/i386/azerty > /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/i386/qwerty >> /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/i386/qwertz >> /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/i386/dvorak >> /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/i386/fgGIod >> /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/mac >> /tmp/mlocale");
-//    keyboardCombo->clear();
-//    fp = popen("sort /tmp/mlocale", "r");
-//    if (fp != NULL) {
-//        while (fgets(line, sizeof line, fp) != NULL) {  // keyboard
-//    shell.run("ls -1 /usr/share/keymaps/i386/azerty > /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/i386/qwerty >> /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/i386/qwertz >> /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/i386/dvorak >> /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/i386/fgGIod >> /tmp/mlocale");
-//    shell.run("ls -1 /usr/share/keymaps/mac >> /tmp/mlocale");
-    //keyboardCombo->clear();
-//    fp = popen("sort /tmp/mlocale", "r");
-//    if (fp != NULL) {
-//        while (fgets(line, sizeof line, fp) != NULL) {
-//            i = strlen(line) - 9;
-//            line[i] = '\0';
-//            if (line != NULL && strlen(line) > 1) {
-//                keyboardCombo->addItem(line);
-//            }
-//        }
-//        pclose(fp);
-//    }
-//    QString kb;
-//    kb = getCmdOut("grep XKBLAYOUT /etc/default/keyboard");
-//    kb = kb.section('=', 1);
-//    kb = kb.section(',', 0, 0);
-//    kb.remove(QChar('"'));
-//    if (keyboardCombo->findText(kb) != -1) {
-//        keyboardCombo->setCurrentIndex(keyboardCombo->findText(kb));
-//    } else {
-//        keyboardCombo->setCurrentIndex(keyboardCombo->findText("us"));
-//    }
-//            i = strlen(line) - 9;
-//            line[i] = '\0';
-//            if (line != NULL && strlen(line) > 1) {
-//                keyboardCombo->addItem(line);
-//            }
-//        }
-//        pclose(fp);
-//    }
-//    QString kb;
-//    kb = getCmdOut("grep XKBLAYOUT /etc/default/keyboard");
-//    kb = kb.section('=', 1);
-//    kb = kb.section(',', 0, 0);
-//    kb.remove(QChar('"'));
-//    if (keyboardCombo->findText(kb) != -1) {
-//        keyboardCombo->setCurrentIndex(keyboardCombo->findText(kb));
-//    } else {
-//        keyboardCombo->setCurrentIndex(keyboardCombo->findText("us"));
-//    }
-
     setupkeyboardbutton();
 
     // locale
@@ -1683,10 +1625,6 @@ bool MInstall::installLoader()
     } else if (grubPbrButton->isChecked()) {
         boot = grubPartCombo->currentText().section(" ", 0, 0);
     } else if (grubEspButton->isChecked()) {
-//        if (entireDiskButton->isChecked()) { // don't use PMBR if installing on ESP and doing automatic partitioning
-//            runCmd("parted -s /dev/" + bootdrv + " disk_set pmbr_boot off");
-//        }
-        // find first ESP on the boot disk
 
         //cmd = QString("partition-info find-esp=%1").arg(bootdrv);
         boot = grubPartCombo->currentText().trimmed();
@@ -1998,51 +1936,6 @@ bool MInstall::setUserName()
     cmd = QString("touch /mnt/antiX/var/mail/%1").arg(userNameEdit->text());
     shell.run(cmd);
 
-//    // Encrypt /home and swap partition
-//    if (encryptCheckBox->isChecked() && shell.run("modprobe ecryptfs") == 0 ) {
-
-//        // set mounts for chroot
-//        shell.run("mount -o bind /dev /mnt/antiX/dev");
-//        shell.run("mount -o bind /dev/shm /mnt/antiX/dev/shm");
-//        shell.run("mount -o bind /sys /mnt/antiX/sys");
-//        shell.run("mount -o bind /proc /mnt/antiX/proc");
-
-//        // encrypt /home
-//        cmd = "chroot /mnt/antiX ecryptfs-migrate-home -u " + userNameEdit->text();
-//        FILE *fp = popen(cmd.toUtf8(), "w");
-//        bool fpok = true;
-//        cmd = QString("%1\n").arg(rootPasswordEdit->text());
-//        if (fp != NULL) {
-//            sleep(4);
-//            if (fputs(cmd.toUtf8(), fp) >= 0) {
-//                fflush(fp);
-//             } else {
-//                fpok = false;
-//            }
-//            pclose(fp);
-//        } else {
-//            fpok = false;
-//        }
-
-//        if (!fpok) {
-//            shell.run("umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev");
-//            setCursor(QCursor(Qt::ArrowCursor));
-//            QMessageBox::critical(this, QString::null,
-//                                  tr("Sorry, could not encrypt /home/") + userNameEdit->text());
-//            return false;
-//        }
-
-//        // encrypt swap
-//        qDebug() << "Encrypt swap";
-//        if (runCmd("chroot /mnt/antiX ecryptfs-setup-swap --force") != 0) {
-//            qDebug() << "could not encrypt swap partition";
-//        }
-//        // clean up, remove folder only if one usename.* directory is present
-//        if (getCmdOuts("find /mnt/antiX/home -maxdepth 1  -type d -name " + userNameEdit->text() + ".*").length() == 1) {
-//            shell.run("rm -r "+ dpath + ".*");
-//        }
-//    }
-
     setCursor(QCursor(Qt::ArrowCursor));
     return true;
 }
@@ -2284,19 +2177,6 @@ void MInstall::setLocale()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString cmd2;
     QString cmd;
-    //QString kb = keyboardCombo->currentText();
-    //keyboard
-//    QString cmd = QString("chroot /mnt/antiX /usr/sbin/install-keymap \"%1\"").arg(kb);
-//    shell.run(cmd);
-//    if (kb == "uk") {
-//        kb = "gb";
-//    }
-//    if (kb == "us") {
-//        cmd = QString("sed -i 's/.*us/XKBLAYOUT=\"%1/g' /mnt/antiX/etc/default/keyboard").arg(kb);
-//    } else {
-//        cmd = QString("sed -i 's/.*us/XKBLAYOUT=\"%1,us/g' /mnt/antiX/etc/default/keyboard").arg(kb);
-//    }
-//    shell.run(cmd);
 
     //locale
     cmd = QString("chroot /mnt/antiX /usr/sbin/update-locale \"LANG=%1\"").arg(localeCombo->currentText());
@@ -3100,15 +2980,6 @@ void MInstall::cleanup()
     }
 }
 
-/*
-void MInstall::moreClicked(QListViewItem *item)
-{
-  if (dansItem->isOn()) {
-    squidItem->setOn(true);
-  }
-
-}
-*/
 /////////////////////////////////////////////////////////////////////////
 // delete process events
 
@@ -3271,19 +3142,16 @@ void MInstall::setupkeyboardbutton()
     QString kb;
     kb = getCmdOut("grep XKBMODEL /etc/default/keyboard");
     kb = kb.section('=', 1);
-    //kb = kb.section(',', 0, 0);
     kb.replace(","," ");
     kb.remove(QChar('"'));
     QString kb2;
     kb2 = getCmdOut("grep XKBLAYOUT /etc/default/keyboard");
     kb2 = kb2.section('=', 1);
-    //kb2 = kb2.section(',', 0, 0);
     kb2.replace(","," ");
     kb2.remove(QChar('"'));
     QString kb3;
     kb3 = getCmdOut("grep XKBVARIANT /etc/default/keyboard");
     kb3 = kb3.section('=', 1);
-    //kb3 = kb3.section(',', 0, 0);
     kb3.replace(","," ");
     kb3.remove(QChar('"'));
     labelModel->setText(kb);
@@ -3296,23 +3164,6 @@ void MInstall::on_buttonSetKeyboard_clicked()
     mmn->hide();
     shell.run("fskbsetting");
     mmn->show();
-//    QString kb;
-//    kb = getCmdOut("grep XKBMODEL /etc/default/keyboard");
-//    kb = kb.section('=', 1);
-//    //kb = kb.section(',', 0, 0);
-//    kb.remove(QChar('"'));
-//    QString kb2;
-//    kb2 = getCmdOut("grep XKBLAYOUT /etc/default/keyboard");
-//    kb2 = kb2.section('=', 1);
-//    kb2 = kb2.section(',', 0, 0);
-//    kb2.remove(QChar('"'));
-//    QString kb3;
-//    kb3 = getCmdOut("grep XKBVARIANT /etc/default/keyboard");
-//    kb3 = kb3.section('=', 1);
-//    kb3 = kb3.section(',', 0, 0);
-//    kb3.remove(QChar('"'));
-//    //QString cmd = "setxkbmap -model " + kb + " -layout " + kb2 + " -variant " + kb3;
-//    //shell.run(cmd);
     setupkeyboardbutton();
 
 
