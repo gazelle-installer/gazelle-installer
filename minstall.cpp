@@ -2422,23 +2422,16 @@ void MInstall::stopInstall()
         return;
     } else if (curr >= c-3) {
         cleanup();
-        int ans = QMessageBox::information(this, QString::null,
-                                             tr("Installation and configuration is complete.\n"
-                                              "To use the new installation, reboot without the installation media.\n\n"
-                                              "Do you want to reboot now?"),
-                                           tr("Yes"), tr("No"));
         if (args.contains("--pretend") || args.contains("-p")) {
             qApp->exit(0);
             return;
         }
-        if (ans == 0) {
+        if (checkBoxExitReboot->isChecked()) {
             system("sleep 1");
             system("swapoff -a");
-            system("/usr/local/bin/persist-config --shutdown --command reboot");
-            return;
-        } else {
-            qApp->exit(0);
+            system("/usr/local/bin/persist-config --shutdown --command reboot &");
         }
+        qApp->exit(0);
     } else if (curr > 3) {
         int ans = QMessageBox::critical(this, QString::null,
                                         tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
