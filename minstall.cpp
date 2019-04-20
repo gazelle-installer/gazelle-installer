@@ -2386,6 +2386,8 @@ int MInstall::showPage(int curr, int next)
         next = ixPageRefAdvancedFDE;
         ixPageRefAdvancedFDE = 0;
         return next;
+    } else if (next == 3 && curr == 4) { // at Step_Progress (backward)
+        return 9; // go to Step_User_Accounts.
     } else if (next == 6 && curr == 5) { // at Step_Boot screen (forward)
         return next + 1; // skip Services screen
     } else if (next == 10 && curr == 9) { // at Step_User_Accounts (forward)
@@ -2420,6 +2422,10 @@ void MInstall::pageDisplayed(int next)
 
     // progress bar shown only for install and configuration pages.
     installBox->setVisible(next >= 4 && next <= 9);
+
+    if(next >= 5 && next <= 9) {
+        haveSysConfig = false; // (re)editing configuration
+    }
 
     switch (next) {
     case 1: // choose disk
@@ -2514,12 +2520,14 @@ void MInstall::pageDisplayed(int next)
                                        "You can click on the <b>Next</b> button to enter additional required information (boot manager, user accounts, locale and time zones, networking, etc) right now, instead of waiting for the installation to complete.<br/>"
                                        "The final page will lead you back to this page, where the remainder of the installation will proceed without further prompting."
                                        "</p>").arg(PROJECTNAME));
-        backButton->setEnabled(false);
+        backButton->setEnabled(haveSysConfig);
+        nextButton->setEnabled(!haveSysConfig);
         switch (phase) {
         case 0: // No install started yet.
             phase = 1;
             // intentional fall-through.
         case 1: // installation.
+            nextButton->setEnabled(false);
             if (args.contains("--pretend") || args.contains("-p")) {
                 buildServiceList(); // build anyway
                 gotoPage(5);
@@ -2530,7 +2538,6 @@ void MInstall::pageDisplayed(int next)
                 break;
             }
             setCursor(QCursor(Qt::WaitCursor));
-            nextButton->setEnabled(false);
             prepareToInstall();
             if (entireDiskButton->isChecked()) {
                 if (!makeDefaultPartitions()) {
@@ -2555,11 +2562,11 @@ void MInstall::pageDisplayed(int next)
             buildServiceList();
             break;
         case 2: // file copy process.
-            nextButton->setEnabled(true);
             break;
         case 3: // post-install procedure.
             if (haveSysConfig) {
-                nextButton->setEnabled(false);
+                progressBar->setEnabled(true);
+                backButton->setEnabled(false);
                 setCursor(QCursor(Qt::WaitCursor));
                 installLoader();
                 updateStatus(tr("Setting system configuration"), 99);
@@ -2575,8 +2582,6 @@ void MInstall::pageDisplayed(int next)
                 updateStatus(tr("Installation successful"), 100);
                 system("sleep 1");
                 gotoPage(10);
-            } else {
-                nextButton->setEnabled(true);
             }
             break;
         default:
@@ -3040,14 +3045,15 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
             localClockCheckBox->setChecked(true);
         }
 
-        progressBar->setValue(97);
         phase = 3;
-        if(widgetStack->currentIndex() == 4) {
-            if (haveSysConfig) {
-                gotoPage(4); // this triggers the post-install process
-            } else {
-                QApplication::beep();
-                setCursor(QCursor(Qt::ArrowCursor));
+        if (haveSysConfig) {
+            gotoPage(4); // this triggers the post-install process
+        } else {
+            updateStatus(tr("Paused for required operator input"), 97);
+            progressBar->setEnabled(false);
+            QApplication::beep();
+            setCursor(QCursor(Qt::ArrowCursor));
+            if(widgetStack->currentIndex() == 4) {
                 on_nextButton_clicked();
             }
         }
