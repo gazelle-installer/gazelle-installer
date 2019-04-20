@@ -2418,6 +2418,9 @@ void MInstall::pageDisplayed(int next)
 {
     QString val;
 
+    // progress bar shown only for install and configuration pages.
+    installBox->setVisible(next >= 4 && next <= 9);
+
     switch (next) {
     case 1: // choose disk
 
@@ -2501,7 +2504,6 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 4: // installation step
-        installBox->show();
         tipsEdit->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
                              "<p>Without you there would be no %1.</p>"
                              "<p>%2 Dev Team</p>").arg(PROJECTNAME).arg(PROJECTSHORTNAME));
@@ -2626,7 +2628,6 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 10: // done
-        installBox->hide();
         if (!args.contains("--pretend") && !args.contains("-p")) {
             saveConfig();
             // print version (look for /usr/sbin/minstall since the name of the package might be different)
