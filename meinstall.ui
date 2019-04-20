@@ -26,59 +26,67 @@
    <string notr="true">MeInstall</string>
   </property>
   <layout class="QGridLayout" name="_2">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>15</number>
-   </property>
-   <property name="bottomMargin">
-    <number>9</number>
-   </property>
-   <property name="spacing">
-    <number>6</number>
-   </property>
-   <item row="2" column="3">
-    <spacer name="verticalSpacer_4">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="0" column="0" colspan="8">
+    <widget class="QGroupBox" name="installBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
+     <property name="title">
+      <string>Installation in progress</string>
      </property>
-    </spacer>
-   </item>
-   <item row="3" column="5">
-    <spacer name="horizontalSpacer_6">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>122</width>
-       <height>29</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="2">
-    <spacer name="horizontalSpacer_7">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>122</width>
-       <height>29</height>
-      </size>
-     </property>
-    </spacer>
+     <layout class="QGridLayout">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QProgressBar" name="progressBar">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="abortInstallButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="text">
+         <string>Abort</string>
+        </property>
+        <property name="shortcut">
+         <string>Alt+A</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item row="3" column="3">
     <widget class="QLabel" name="labelMX">
@@ -99,49 +107,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="6">
-    <widget class="QPushButton" name="backButton">
-     <property name="text">
-      <string>Back</string>
-     </property>
-     <property name="icon">
-      <iconset theme="go-previous">
-       <normaloff>.</normaloff>.</iconset>
-     </property>
-     <property name="shortcut">
-      <string>Alt+K</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="7">
-    <widget class="QPushButton" name="nextButton">
-     <property name="text">
-      <string>Next</string>
-     </property>
-     <property name="icon">
-      <iconset theme="go-next">
-       <normaloff>.</normaloff>.</iconset>
-     </property>
-     <property name="shortcut">
-      <string>Alt+N</string>
-     </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QPushButton" name="closeButton">
-     <property name="text">
-      <string>Close</string>
-     </property>
-     <property name="icon">
-      <iconset theme="window-close">
-       <normaloff>.</normaloff>.</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="8">
+   <item row="1" column="0" colspan="8">
     <widget class="QStackedWidget" name="widgetStack">
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -161,19 +127,16 @@
      <widget class="QWidget" name="Step_Terms">
       <layout class="QGridLayout" name="_4">
        <property name="leftMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item row="0" column="0">
         <widget class="QGroupBox" name="copyrightBox">
@@ -327,6 +290,18 @@
      </widget>
      <widget class="QWidget" name="Step_Disk">
       <layout class="QGridLayout" name="_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item row="1" column="0" rowspan="2" colspan="2">
         <widget class="QGroupBox" name="rearrangediskBox">
          <property name="sizePolicy">
@@ -725,19 +700,16 @@
      <widget class="QWidget" name="Step_Partitions">
       <layout class="QGridLayout" name="_5">
        <property name="leftMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item row="1" column="0">
         <widget class="QGroupBox" name="partsPreferencesBox">
@@ -1303,7 +1275,19 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_FDE">
-      <layout class="QGridLayout" name="_81">
+      <layout class="QGridLayout" name="_16">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item row="1" column="0">
         <widget class="QGroupBox" name="groupBox">
          <property name="sizePolicy">
@@ -1655,83 +1639,18 @@
      <widget class="QWidget" name="Step_Progress">
       <layout class="QGridLayout" name="_6">
        <property name="leftMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="QGroupBox" name="installBox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>3. Installation in progress</string>
-         </property>
-         <layout class="QGridLayout">
-          <property name="leftMargin">
-           <number>9</number>
-          </property>
-          <property name="topMargin">
-           <number>9</number>
-          </property>
-          <property name="rightMargin">
-           <number>9</number>
-          </property>
-          <property name="bottomMargin">
-           <number>9</number>
-          </property>
-          <property name="spacing">
-           <number>6</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="abortInstallButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
-            </property>
-            <property name="text">
-             <string>Abort</string>
-            </property>
-            <property name="shortcut">
-             <string>Alt+A</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="1" column="0">
         <widget class="QGroupBox" name="tipsBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -1791,19 +1710,16 @@
      <widget class="QWidget" name="Step_Boot">
       <layout class="QGridLayout" name="_7">
        <property name="leftMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item row="2" column="0">
         <spacer name="v_spacer">
@@ -2083,19 +1999,16 @@
      <widget class="QWidget" name="Step_Services">
       <layout class="QGridLayout" name="_9">
        <property name="leftMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item row="0" column="0">
         <widget class="QGroupBox" name="networkServicesBox">
@@ -2164,19 +2077,16 @@
      <widget class="QWidget" name="Step_Network">
       <layout class="QGridLayout" name="_11">
        <property name="leftMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item row="0" column="0">
         <widget class="QGroupBox" name="networkNamesBox">
@@ -2348,19 +2258,16 @@
      <widget class="QWidget" name="Step_Localization">
       <layout class="QGridLayout" name="_13">
        <property name="leftMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item row="3" column="0">
         <widget class="QGroupBox" name="servicesBox">
@@ -2610,19 +2517,16 @@
      <widget class="QWidget" name="Step_User_Accounts">
       <layout class="QGridLayout" name="_15">
        <property name="leftMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item row="6" column="0">
         <spacer>
@@ -2935,21 +2839,18 @@
       </layout>
      </widget>
      <widget class="QWidget" name="Step_End">
-      <layout class="QGridLayout">
+      <layout class="QGridLayout" name="_17">
        <property name="leftMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
-       </property>
-       <property name="spacing">
-        <number>6</number>
+        <number>0</number>
        </property>
        <item row="0" column="0">
         <widget class="QGroupBox" name="exitBox">
@@ -3051,6 +2952,87 @@
      </widget>
     </widget>
    </item>
+   <item row="3" column="7">
+    <widget class="QPushButton" name="nextButton">
+     <property name="text">
+      <string>Next</string>
+     </property>
+     <property name="icon">
+      <iconset theme="go-next">
+       <normaloff>.</normaloff>.</iconset>
+     </property>
+     <property name="shortcut">
+      <string>Alt+N</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="6">
+    <widget class="QPushButton" name="backButton">
+     <property name="text">
+      <string>Back</string>
+     </property>
+     <property name="icon">
+      <iconset theme="go-previous">
+       <normaloff>.</normaloff>.</iconset>
+     </property>
+     <property name="shortcut">
+      <string>Alt+K</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="5">
+    <spacer name="horizontalSpacer_6">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>122</width>
+       <height>29</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="3">
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="closeButton">
+     <property name="text">
+      <string>Close</string>
+     </property>
+     <property name="icon">
+      <iconset theme="window-close">
+       <normaloff>.</normaloff>.</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="2">
+    <spacer name="horizontalSpacer_7">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>122</width>
+       <height>29</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -3106,7 +3088,6 @@
   <tabstop>copyrightBrowser</tabstop>
   <tabstop>csView</tabstop>
   <tabstop>tipsEdit</tabstop>
-  <tabstop>closeButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

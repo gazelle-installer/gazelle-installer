@@ -51,6 +51,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
 
     this->installEventFilter(this);
     this->args = args;
+    installBox->hide();
     labelMX->setPixmap(QPixmap("/usr/share/gazelle-installer-data/logo.png"));
 
     // setup system variables
@@ -1080,6 +1081,7 @@ void MInstall::preparePhase2()
         phase = 2;
         buildBootLists();
         nextButton->setEnabled(true);
+        gotoPage(5);
     }
 }
 
@@ -2499,6 +2501,7 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 4: // installation step
+        installBox->show();
         tipsEdit->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
                              "<p>Without you there would be no %1.</p>"
                              "<p>%2 Dev Team</p>").arg(PROJECTNAME).arg(PROJECTSHORTNAME));
@@ -2620,7 +2623,10 @@ void MInstall::pageDisplayed(int next)
                                        "If needed, you can add other user accounts later with %1 User Manager. </p>"
                                        "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
                                        "Each password must be entered twice.</p>").arg(PROJECTNAME));
+        break;
+
     case 10: // done
+        installBox->hide();
         if (!args.contains("--pretend") && !args.contains("-p")) {
             saveConfig();
             // print version (look for /usr/sbin/minstall since the name of the package might be different)
