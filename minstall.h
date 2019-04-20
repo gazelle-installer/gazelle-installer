@@ -206,6 +206,10 @@ private:
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
 
+    // file copy progress variables
+    long iNodesSrc = 1;
+    long iNodesDst = 1;
+
     // for partition combo updates
     QHash<QString, int> removedRoot; // remember items removed from combo box: item, index
     QHash<QString, int> removedHome;
