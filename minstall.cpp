@@ -1765,7 +1765,6 @@ bool MInstall::installLoader()
     }
 
     setCursor(QCursor(Qt::ArrowCursor));
-    nextButton->setEnabled(true);
     return true;
 }
 
