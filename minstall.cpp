@@ -2985,7 +2985,15 @@ void MInstall::delTime()
 
 void MInstall::copyStart()
 {
+    qApp->processEvents();
+    QStringList vlist = getCmdOuts("df --output=iused /dev/loop0 /mnt/antiX");
+    if(vlist.count() >= 3) {
+        iNodesSrc = vlist.at(1).toLong();
+        iNodesDst = vlist.at(2).toLong();
+    }
+    iNodesSrc /= 80;
     timer->start(2000);
+    qApp->processEvents();
     updateStatus(tr("Copying new system"), 15);
 }
 
@@ -3037,19 +3045,12 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
 void MInstall::copyTime()
 {
-    QString rootdev = "/dev/" + rootCombo->currentText().section(" ", 0, 0);
-    if (isRootEncrypted) {
-        rootdev = "/dev/mapper/rootfs";
+    qApp->processEvents();
+    QStringList vlist = getCmdOuts("df --output=iused /mnt/antiX");
+    long i = 0;
+    if(vlist.count() >= 2) {
+        i = (vlist.at(1).toLong() - iNodesDst) / iNodesSrc;
     }
-
-    QString val = getCmdValue("df /mnt/antiX", rootdev, " ", "/");
-    QRegExp sep("\\s+");
-    QString s = val.section(sep, 2, 2);
-    int i = s.toInt();
-    val = getCmdValue("df /dev/loop0", "/dev/loop0", " ", "/");
-    s = val.section(sep, 2, 2);
-    int j = s.toInt()/27;
-    i = i/j;
     if (i > 79) {
         i = 80;
     }
