@@ -20,7 +20,7 @@
 #include <QProcess>
 #include <QTimer>
 #include <QProgressDialog>
-
+#include <QSettings>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -51,68 +51,76 @@ public:
     void unmountGoBack(QString msg);
 
     // helpers
-    static QString getCmdOut(QString cmd);
-    static QStringList getCmdOuts(QString cmd);
-    static QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
-    static QStringList getCmdValues(QString cmd, QString key, QString keydel, QString valdel);
     bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
+    int runCmd(QString cmd);
+    static QString getCmdOut(QString cmd);
+    static QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
+    static QStringList getCmdOuts(QString cmd);
+    static QStringList getCmdValues(QString cmd, QString key, QString keydel, QString valdel);
     static int command(const QString &string);
     static int getPartitionNumber();
-    int runCmd(QString cmd);
 
     bool is32bit();
     bool is64bit();
     bool isInsideVB();
     bool isGpt(QString drv);
 
-
-    void buildServiceList();
-    void copyLinux();
-    void installLinux();
-    void makeFstab();
-    void prepareToInstall();
-    void addItemCombo(QComboBox *cb, const QString *part);
-    void removeItemCombo(QComboBox *cb, const QString *part);
-    void updatePartCombo(QString *prevItem, const QString &part);
-    void setLocale();
-    void setServices();
-    void updatePartitionWidgets();
-    void updateStatus(QString msg, int val);
-    void writeKeyFile();
-    void disablehiberanteinitramfs();
     bool checkDisk();
     bool checkPassword(const QString &pass);
     bool installLoader();
+    bool validateChosenPartitions();
     bool makeChosenPartitions();
     bool makeDefaultPartitions();
+    bool makeEsp(QString drv, int size);
     bool makeFloppy();
     bool makeGrub(int rootdev, QString rootpart, const char *rootmnt, bool initrd);
     bool makeLinuxPartition(QString dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password);
     bool makeSwapPartition(QString dev);
-    bool makeEsp(QString drv, int size);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
     bool removeKernel();
+    bool validateUserInfo();
+    bool validateComputerName();
     bool setComputerName();
     bool setPasswords();
     bool setUserInfo();
     bool setUserName();
+    void addItemCombo(QComboBox *cb, const QString *part);
+    void buildBootLists();
+    void buildServiceList();
+    void copyLinux();
+    void disablehiberanteinitramfs();
+    void installLinux();
+    void makeFstab();
+    void prepareToInstall();
+    void preparePhase2();
+    void removeItemCombo(QComboBox *cb, const QString *part);
+    void saveConfig();
+    void setLocale();
+    void setServices();
+    void updatePartCombo(QString *prevItem, const QString &part);
+    void updatePartitionWidgets();
+    void loadAdvancedFDE();
+    void saveAdvancedFDE();
+    void updateStatus(QString msg, int val);
+    void writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
     bool POPULATE_MEDIA_MOUNTPOINTS;
 
-    QString getPartType(const QString dev);
+    QString DEFAULT_HOSTNAME;
+    QString MIN_BOOT_DEVICE_SIZE;
+    QString MIN_INSTALL_SIZE;
+    QString MIN_ROOT_DEVICE_SIZE;
+    QString PREFERRED_MIN_INSTALL_SIZE;
+    QString PROJECTFORUM;
     QString PROJECTNAME;
-    QString PROJECTVERSION;
     QString PROJECTSHORTNAME;
     QString PROJECTURL;
-    QString PROJECTFORUM;
-    QString MIN_BOOT_DEVICE_SIZE;
-    QString MIN_ROOT_DEVICE_SIZE;
-    QString DEFAULT_HOSTNAME;
-    QString MIN_INSTALL_SIZE;
-    QString PREFERRED_MIN_INSTALL_SIZE;
+    QString PROJECTVERSION;
+    QString getPartType(const QString dev);
     QStringList ENABLE_SERVICES;
+    bool REMOVE_NOSPLASH;
 
     // global for now until boot combo box is sorted out
     QString bootdev;
@@ -120,17 +128,17 @@ public:
     QString rootDevicePreserve;
     QString homeDevicePreserve;
 
-    void setupkeyboardbutton();
+    int showPage(int curr, int next);
+    void firstRefresh(QDialog *main);
     void gotoPage(int next);
     void pageDisplayed(int next);
-    int showPage(int curr, int next);
-    void stopInstall();
-    void firstRefresh(QDialog *main);
     void refresh();
+    void setupkeyboardbutton();
+    void stopInstall();
 
 public slots:
     void procAbort();
-    void close();
+    void cleanup();
     //    void moreClicked(QListViewItem *item);
     void delStart();
     void delDone(int, QProcess::ExitStatus exitStatus);
@@ -139,17 +147,16 @@ public slots:
     void copyStart();
     void copyDone(int, QProcess::ExitStatus exitStatus);
     void copyTime();
-    void procTime();
 
 private slots:
-    void on_passwordCheckBox_stateChanged(int);
-    void on_nextButton_clicked();
-    void on_backButton_clicked();
     void on_abortInstallButton_clicked();
-    void on_qtpartedButton_clicked();
-    void on_closeButton_clicked();
-    void on_viewServicesButton_clicked();
+    void on_backButton_clicked();
     void on_buttonSetKeyboard_clicked();
+    void on_closeButton_clicked();
+    void on_nextButton_clicked();
+    void on_passwordCheckBox_stateChanged(int);
+    void on_qtpartedButton_clicked();
+    void on_viewServicesButton_clicked();
 
 
     void on_homeCombo_currentIndexChanged(const QString &arg1);
@@ -165,39 +172,74 @@ private slots:
     void on_FDEpassword2_textChanged(const QString &arg1);
     void on_FDEpassCust_textChanged();
     void on_FDEpassCust2_textChanged(const QString &arg1);
+    void on_buttonBenchmarkFDE_clicked();
+    void on_buttonAdvancedFDE_clicked();
+    void on_buttonAdvancedFDECust_clicked();
+    void on_comboFDEcipher_currentIndexChanged(const QString &arg1);
+    void on_comboFDEchain_currentIndexChanged(const QString &arg1);
+    void on_spinFDEkeysize_valueChanged(int i);
+    void on_comboFDEivgen_currentIndexChanged(const QString &arg1);
 
     void on_checkBoxEncryptRoot_toggled(bool checked);
     void on_checkBoxEncryptHome_toggled(bool checked);
-    void on_checkBoxEncrpytSwap_toggled(bool checked);
+    void on_checkBoxEncryptSwap_toggled(bool checked);
 
     void on_diskCombo_activated(QString item = "");
     void on_rootTypeCombo_activated(QString item = "");
-    void on_grubBootCombo_activated(QString item = "");
     void on_rootCombo_activated(const QString &arg1 = "");
     void on_homeCombo_activated(const QString &arg1);
     void on_swapCombo_activated(const QString &arg1);
     void on_bootCombo_activated(const QString &arg1);
 
+    void on_grubCheckBox_toggled(bool checked);
+    void on_grubMbrButton_toggled();
+    void on_grubPbrButton_toggled();
+    void on_grubEspButton_toggled();
+
 private:
+    int phase = 0;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
     bool isRootFormatted = false;
     bool isHomeFormatted = false;
     bool uefi = false;
+    bool haveSysConfig = false;
 
     Cmd shell;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
+
+    // file copy progress variables
+    long iNodesSrc = 1;
+    long iNodesDst = 1;
 
     // for partition combo updates
     QHash<QString, int> removedRoot; // remember items removed from combo box: item, index
     QHash<QString, int> removedHome;
     QHash<QString, int> removedSwap;
     QHash<QString, int> removedBoot;
+    QSettings *config;
+    QString auto_mount;
     QString prevItemRoot; // remember previously selected item in combo box
     QString prevItemHome;
     QString prevItemSwap;
     QString prevItemBoot;
 
+    // info for Phase 2 (user can now enter options while the setup is running)
+    QStringList listBootDrives;
+    QStringList listBootESP;
+    QStringList listBootPart;
+    bool haveSnapshotUserAccounts;
+
+    // Advanced Encryption Settings page
+    int ixPageRefAdvancedFDE = 0;
+    int indexFDEcipher = -1;
+    int indexFDEchain = -1;
+    int indexFDEivgen = -1;
+    int indexFDEivhash = -1;
+    int iFDEkeysize = -1;
+    int indexFDEhash = -1;
+    int indexFDErandom = -1;
+    long iFDEroundtime = -1;
 };
