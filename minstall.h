@@ -53,12 +53,11 @@ public:
     // helpers
     bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
     int runCmd(QString cmd);
-    static QString getCmdOut(QString cmd);
-    static QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
-    static QStringList getCmdOuts(QString cmd);
-    static QStringList getCmdValues(QString cmd, QString key, QString keydel, QString valdel);
+    QString getCmdOut(QString cmd);
+    QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
+    QStringList getCmdOuts(QString cmd);
     static int command(const QString &string);
-    static int getPartitionNumber();
+    int getPartitionNumber();
 
     bool is32bit();
     bool is64bit();
