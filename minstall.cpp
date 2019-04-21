@@ -3028,8 +3028,8 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
         if (haveSysConfig) {
             gotoPage(4); // this triggers the post-install process
         } else {
-            updateStatus(tr("Paused for required operator input"), 97);
             progressBar->setEnabled(false);
+            updateStatus(tr("Paused for required operator input"), 97);
             QApplication::beep();
             setCursor(QCursor(Qt::ArrowCursor));
             if(widgetStack->currentIndex() == 4) {
