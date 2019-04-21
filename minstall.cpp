@@ -571,12 +571,16 @@ void MInstall::saveConfig()
     config->setValue("Encryption/KernelRNG", comboFDErandom->currentText());
     config->setValue("Encryption/KDFroundTime", spinFDEroundtime->cleanText());
     // GRUB step
-    config->setValue("GRUB/InstallGRUB", grubCheckBox->isChecked());
-    config->setValue("GRUB/MBR", grubMbrButton->isChecked());
-    config->setValue("GRUB/PBR", grubPbrButton->isChecked());
-    config->setValue("GRUB/ESP", grubEspButton->isChecked());
-    config->setValue("GRUB/GrubDisk", grubBootCombo->currentText().section(" ", 0, 0));
-    config->setValue("GRUB/GrubPartition", grubPartCombo->currentText().section(" ", 0, 0));
+    if(grubCheckBox->isChecked()) {
+        const char *cfgGrubInstall;
+        if(grubMbrButton->isChecked()) cfgGrubInstall = "MBR";
+        if(grubPbrButton->isChecked()) cfgGrubInstall = "PBR";
+        if(grubEspButton->isChecked()) cfgGrubInstall = "ESP";
+        config->setValue("GRUB/InstallGRUB", cfgGrubInstall);
+        config->setValue("GRUB/GrubLocation", grubBootCombo->currentText().section(" ", 0, 0));
+    } else {
+        config->setValue("GRUB/InstallGRUB", false);
+    }
     // Services step
     QTreeWidgetItemIterator it(csView, QTreeWidgetItemIterator::Checked);
     while (*it) {
@@ -1603,8 +1607,6 @@ bool MInstall::installLoader()
         return true;
     }
 
-    QString bootdrv = grubBootCombo->currentText().section(" ", 0, 0);
-
     //add switch to change root partition info
     QString rootpart;
     if (isRootEncrypted) {
@@ -1612,10 +1614,9 @@ bool MInstall::installLoader()
     } else {
         rootpart = rootCombo->currentText().section(" ", 0, 0);
     }
-    QString boot;
+    QString boot = grubBootCombo->currentText().section(" ", 0, 0).trimmed();
 
     if (grubMbrButton->isChecked()) {
-        boot = bootdrv;
         QString drive = rootpart;
         QString part_num = rootpart;
         part_num.remove(QRegularExpression("\\D+\\d*\\D+")); // remove the non-digit part to get the number of the root partition
@@ -1624,30 +1625,6 @@ bool MInstall::installLoader()
             qDebug() << "parted -s /dev/" + drive + " set " + part_num + " boot on";
             runCmd("parted -s /dev/" + drive + " set " + part_num + " boot on");
         }
-    } else if (grubPbrButton->isChecked()) {
-        boot = grubPartCombo->currentText().section(" ", 0, 0);
-    } else if (grubEspButton->isChecked()) {
-
-        //cmd = QString("partition-info find-esp=%1").arg(bootdrv);
-        boot = grubPartCombo->currentText().trimmed();
-
-//        if (boot.isEmpty()) {
-//            //try fallback method
-//            //modification for mmc/nvme devices that don't always update the parttype uuid
-//            cmd = QString("parted " + bootdrv + " -l -m|grep -m 1 \"boot, esp\"|cut -d: -f1");
-//            qDebug() << "parted command" << cmd;
-//            boot = getCmdOut(cmd);
-//            if (boot.isEmpty()) {
-//                qDebug() << "could not find ESP on: " << bootdrv;
-//                return false;
-//            }
-//            if (bootdrv.contains("nvme") || bootdrv.contains("mmcblk")) {
-//                boot = bootdrv + "p" + boot;
-//            } else {
-//                boot = bootdrv + boot;
-//            }
-//        }
-        qDebug() << "boot for grub routine = " << boot;
     }
     setCursor(QCursor(Qt::WaitCursor));
     qApp->processEvents();
@@ -2346,11 +2323,6 @@ int MInstall::showPage(int curr, int next)
 {
     bool pretend = args.contains("--pretend") || args.contains("-p");
 
-    if (next == 5) { // going to Step_Boot
-        grubPartCombo->hide();
-        grubPartLabel->hide();
-    }
-
     if (next == 3 && ixPageRefAdvancedFDE != 0) { // at Step_FDE
         return next;
     }
@@ -2726,7 +2698,7 @@ void MInstall::refresh()
     if (INSTALL_FROM_ROOT_DEVICE) {
         exclude.clear();
     }
-    QStringList drives = getCmdOuts("partition-info" + exclude + " --min-size=" + MIN_ROOT_DEVICE_SIZE + " -n drives");
+    listBootDrives = getCmdOuts("partition-info" + exclude + " --min-size=" + MIN_ROOT_DEVICE_SIZE + " -n drives");
     diskCombo->clear();
     grubBootCombo->clear();
 
@@ -2739,9 +2711,9 @@ void MInstall::refresh()
     homeLabelEdit->setEnabled(false);
     swapLabelEdit->setEnabled(false);
 
-    diskCombo->addItems(drives);
+    diskCombo->addItems(listBootDrives);
     diskCombo->setCurrentIndex(0);
-    grubBootCombo->addItems(drives);
+    grubBootCombo->addItems(listBootDrives);
 
     FDEpassword->hide();
     FDEpassword2->hide();
@@ -3473,34 +3445,47 @@ void MInstall::on_bootCombo_activated(const QString &arg1)
     updatePartCombo(&prevItemBoot, arg1);
 }
 
+void MInstall::on_grubCheckBox_toggled(bool checked)
+{
+    if(checked) {
+        if(listBootESP.count() > 0) {
+            grubEspButton->setEnabled(true);
+        }
+        if(listBootDrives.count() > 0) {
+            grubMbrButton->setEnabled(true);
+        }
+        if(listBootPart.count() > 0) {
+            grubPbrButton->setEnabled(true);
+        }
+    } else {
+        grubEspButton->setEnabled(false);
+        grubMbrButton->setEnabled(false);
+        grubPbrButton->setEnabled(false);
+    }
+    grubInsLabel->setEnabled(checked);
+    grubBootLabel->setEnabled(checked);
+    grubBootCombo->setEnabled(checked);
+}
+
 void MInstall::on_grubMbrButton_toggled()
 {
-    grubPartLabel->hide();
-    grubPartCombo->hide();
-    grubBootDiskLabel->show();
-    grubBootCombo->show();
+    grubBootCombo->clear();
+    grubBootCombo->addItems(listBootDrives);
+    grubBootLabel->setText(tr("System boot disk:"));
 }
 
 void MInstall::on_grubPbrButton_toggled()
 {
-    grubPartCombo->clear();
-    grubPartCombo->addItems(listBootPart);
-    grubPartLabel->show();
-    grubPartCombo->show();
-
-    grubBootDiskLabel->hide();
-    grubBootCombo->hide();
+    grubBootCombo->clear();
+    grubBootCombo->addItems(listBootPart);
+    grubBootLabel->setText(tr("Partition to use:"));
 }
 
 void MInstall::on_grubEspButton_toggled()
 {
-    grubPartCombo->clear();
-    grubPartCombo->addItems(listBootESP);
-    grubPartLabel->show();
-    grubPartCombo->show();
-    grubBootDiskLabel->hide();
-    grubBootCombo->hide();
-    grubPartLabel->setEnabled(true);
+    grubBootCombo->clear();
+    grubBootCombo->addItems(listBootESP);
+    grubBootLabel->setText(tr("Partition to use:"));
 }
 
 // build ESP list available to install GRUB
