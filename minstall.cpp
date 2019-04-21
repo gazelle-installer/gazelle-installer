@@ -840,7 +840,6 @@ bool MInstall::validateChosenPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     int ans;
-    QString msg;
     if (checkBoxEncryptSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
         if (!checkPassword(FDEpassCust->text())) {
             return false;
@@ -867,91 +866,101 @@ bool MInstall::validateChosenPartitions()
         return false;
     }
 
+    QStringList msgForeignList;
+    QString msgConfirm;
+    QStringList msgFormatList;
+
     // warn if using a non-Linux partition (potential Windows install)
-    QString cmd = QString("partition-info is-linux=%1").arg(rootdev);
-    if (shell.run(cmd) != 0) {
-        msg = tr("The partition you selected for %1, is not a Linux partition. Are you sure you want to reformat this partition?").arg("root");
-        ans = QMessageBox::warning(this, QString::null, msg,
-                                   tr("Yes"), tr("No"));
-        if (ans != 0) {
-            return false;
-        }
-    }
-
-    // format /home?
-    if (homedev != "/dev/root") {
-        cmd = QString("partition-info is-linux=%1").arg(homedev);
-        if (shell.run(cmd) != 0) {
-            msg = tr("The partition you selected for %1, is not a Linux partition.\nAre you sure you want to reformat this partition?").arg("/home");
-            ans = QMessageBox::warning(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-            if (ans != 0) {
-                return false;
-            }
-        }
-        if (saveHomeCheck->isChecked()) {
-            msg = tr("OK to reuse (no reformat) %1 as the /home partition?").arg(homedev);
-        } else {
-            msg = tr("OK to format and destroy all data on %1 for the /home partition?").arg(homedev);
-        }
-
-        ans = QMessageBox::warning(this, QString::null, msg,
-                                   tr("Yes"), tr("No"));
-        if (ans != 0) {
-            return false;
-        }
+    if (shell.run(QString("partition-info is-linux=%1").arg(rootdev)) != 0) {
+        msgForeignList << rootdev << "/ (root)";
     }
 
     // warn on formatting or deletion
     if (!(saveHomeCheck->isChecked() && homedev == "/dev/root")) {
-        msg = QString(tr("OK to format and destroy all data on \n%1 for the / (root) partition?")).arg(rootdev);
+        msgFormatList << rootdev << "/ (root)";
     } else {
-        msg = QString(tr("All data on %1 will be deleted, except for /home\nOK to continue?")).arg(rootdev);
+        msgConfirm += " - " + tr("Delete the data on %1 except for /home").arg(rootdev) + "\n";
     }
-    ans = QMessageBox::warning(this, QString::null, msg,
-                               tr("Yes"), tr("No"));
-    if (ans != 0) {
-        return false;
+
+    // format /home?
+    if (homedev != "/dev/root") {
+        if (shell.run(QString("partition-info is-linux=%1").arg(homedev)) != 0) {
+            msgForeignList << homedev << "/home";
+        }
+        if (saveHomeCheck->isChecked()) {
+            msgConfirm += " - " + tr("Reuse (no reformat) %1 as the /home partition").arg(homedev) + "\n";
+        } else {
+            msgFormatList << homedev << "/home";
+        }
     }
 
     // format swap? (if no swap is chosen do nothing)
     if (swapdev != "/dev/none") {
-        //if partition chosen is already swap, don't do anything
-        //check swap fstype
-        cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
+        if (shell.run(QString("partition-info is-linux=%1").arg(swapdev)) != 0) {
+            msgForeignList << swapdev << "swap";
+        }
+        //if partition chosen is already swap, don't do anything, so check swap fstype
+        QString cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
         if (shell.run(cmd) != 0) {
-            msg = tr("OK to format and destroy all data on \n%1 for the swap partition?").arg(swapdev);
-            ans = QMessageBox::warning(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-            if (ans != 0) {
-                return false;
-            }
+            msgFormatList << swapdev << "swap";
         }
     }
 
+    QString msg;
+
     // format /boot?
     if (bootCombo->currentText() != "root") {
+        msgFormatList << bootdev << "/boot";
         // warn if using a non-Linux partition (potential Windows install)
-        cmd = QString("partition-info is-linux=%1").arg(bootdev);
-        if (shell.run(cmd) != 0) {
-            msg = tr("The partition you selected for %1, is not a Linux partition.\nAre you sure you want to reformat this partition?").arg("/boot");
-            ans = QMessageBox::warning(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-            if (ans != 0) {
-                return false;
-            }
+        if (shell.run(QString("partition-info is-linux=%1").arg(bootdev)) != 0) {
+            msgForeignList << bootdev << "/boot";
         }
         // warn if partition too big (not needed for boot, likely data or other useful partition
         QString size_str = shell.getOutput("lsblk -nbo SIZE " + bootdev + "|head -n1").trimmed();
         bool ok = true;
         quint64 size = size_str.toULongLong(&ok, 10);
         if (size > 2147483648 || !ok) {  // if > 2GiB or not converted properly
-            msg = tr("The partition you selected for /boot, is larger than expected.\nAre you sure you want to reformat this partition?");
-            ans = QMessageBox::warning(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-            if (ans != 0) {
-                return false;
-            }
+            msg = tr("The partition you selected for /boot is larger than expected.") + "\n\n";
+        }
+    }
+
+    static const QString msgPartSel = " - " + tr("%1 for the %2 partition") + "\n";
+    // message to advise of issues found.
+    if (msgForeignList.count() > 0) {
+        msg += tr("The following partitions you selected are not Linux partitions:") + "\n\n";
+        for (QStringList::Iterator it = msgForeignList.begin(); it != msgForeignList.end(); ++it) {
+            QString &s = *it;
+            msg += msgPartSel.arg(s).arg((QString)*(++it));
+        }
+        msg += "\n";
+    }
+    if (!msg.isEmpty()) {
+        msg += tr("Are you sure you want to reformat these partitions?");
+        ans = QMessageBox::warning(this, QString::null, msg,
+                                   tr("Yes"), tr("No"));
+        if (ans != 0) {
+            return false;
+        }
+    }
+    // final message before the installer starts.
+    msg.clear();
+    if (msgFormatList.count() > 0) {
+        msg += tr("The %1 installer will now format and destroy the data on the following partitions:").arg(PROJECTNAME) + "\n\n";
+        for (QStringList::Iterator it = msgFormatList.begin(); it != msgFormatList.end(); ++it) {
+            QString &s = *it;
+            msg += msgPartSel.arg(s).arg((QString)*(++it));
+        }
+    }
+    if (!msgConfirm.isEmpty()) {
+        msg += tr("The %1 installer will now perform the following actions:").arg(PROJECTNAME);
+        msg += "\n\n" + msgConfirm;
+    }
+    if(!msg.isEmpty()) {
+        msg += "\n" + tr("These actions cannot be undone. Do you want to continue?");
+        ans = QMessageBox::warning(this, QString::null, msg,
+                                   tr("Yes"), tr("No"));
+        if (ans != 0) {
+            return false;
         }
     }
 
