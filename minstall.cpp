@@ -835,13 +835,138 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
     return true;
 }
 
+// validate the partition selection and confirm it.
+bool MInstall::validateChosenPartitions()
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    int ans;
+    QString msg;
+    if (checkBoxEncryptSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
+        if (!checkPassword(FDEpassCust->text())) {
+            return false;
+        }
+        if (bootCombo->currentText() == "root") {
+            if (checkBoxEncryptRoot->isChecked()) {
+                QMessageBox::critical(this, QString::null, tr("You must choose a separate boot partition when encrypting root."));
+                return false;
+            }
+        }
+    }
+    QString rootdev = "/dev/" + rootCombo->currentText().section(" -", 0, 0).trimmed();
+    QString homedev = "/dev/" + homeCombo->currentText().section(" -", 0, 0).trimmed();
+    QString swapdev = "/dev/" + swapCombo->currentText().section(" -", 0, 0).trimmed();
+    if (bootCombo->currentText() == "root") {
+        bootdev = rootdev;
+    } else {
+        bootdev = "/dev/" + bootCombo->currentText().section(" -", 0, 0).trimmed();
+    }
+
+    if (rootdev == "/dev/none" || rootdev == "/dev/") {
+        QMessageBox::critical(this, QString::null,
+            tr("You must choose a root partition.\nThe root partition must be at least %1.").arg(MIN_INSTALL_SIZE));
+        return false;
+    }
+
+    // warn if using a non-Linux partition (potential Windows install)
+    QString cmd = QString("partition-info is-linux=%1").arg(rootdev);
+    if (shell.run(cmd) != 0) {
+        msg = tr("The partition you selected for %1, is not a Linux partition. Are you sure you want to reformat this partition?").arg("root");
+        ans = QMessageBox::warning(this, QString::null, msg,
+                                   tr("Yes"), tr("No"));
+        if (ans != 0) {
+            return false;
+        }
+    }
+
+    // format /home?
+    if (homedev != "/dev/root") {
+        cmd = QString("partition-info is-linux=%1").arg(homedev);
+        if (shell.run(cmd) != 0) {
+            msg = tr("The partition you selected for %1, is not a Linux partition.\nAre you sure you want to reformat this partition?").arg("/home");
+            ans = QMessageBox::warning(this, QString::null, msg,
+                                       tr("Yes"), tr("No"));
+            if (ans != 0) {
+                return false;
+            }
+        }
+        if (saveHomeCheck->isChecked()) {
+            msg = tr("OK to reuse (no reformat) %1 as the /home partition?").arg(homedev);
+        } else {
+            msg = tr("OK to format and destroy all data on %1 for the /home partition?").arg(homedev);
+        }
+
+        ans = QMessageBox::warning(this, QString::null, msg,
+                                   tr("Yes"), tr("No"));
+        if (ans != 0) {
+            return false;
+        }
+    }
+
+    // warn on formatting or deletion
+    if (!(saveHomeCheck->isChecked() && homedev == "/dev/root")) {
+        msg = QString(tr("OK to format and destroy all data on \n%1 for the / (root) partition?")).arg(rootdev);
+    } else {
+        msg = QString(tr("All data on %1 will be deleted, except for /home\nOK to continue?")).arg(rootdev);
+    }
+    ans = QMessageBox::warning(this, QString::null, msg,
+                               tr("Yes"), tr("No"));
+    if (ans != 0) {
+        return false;
+    }
+
+    // format swap? (if no swap is chosen do nothing)
+    if (swapdev != "/dev/none") {
+        //if partition chosen is already swap, don't do anything
+        //check swap fstype
+        cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
+        if (shell.run(cmd) != 0) {
+            msg = tr("OK to format and destroy all data on \n%1 for the swap partition?").arg(swapdev);
+            ans = QMessageBox::warning(this, QString::null, msg,
+                                       tr("Yes"), tr("No"));
+            if (ans != 0) {
+                return false;
+            }
+        }
+    }
+
+    // format /boot?
+    if (bootCombo->currentText() != "root") {
+        // warn if using a non-Linux partition (potential Windows install)
+        cmd = QString("partition-info is-linux=%1").arg(bootdev);
+        if (shell.run(cmd) != 0) {
+            msg = tr("The partition you selected for %1, is not a Linux partition.\nAre you sure you want to reformat this partition?").arg("/boot");
+            ans = QMessageBox::warning(this, QString::null, msg,
+                                       tr("Yes"), tr("No"));
+            if (ans != 0) {
+                return false;
+            }
+        }
+        // warn if partition too big (not needed for boot, likely data or other useful partition
+        QString size_str = shell.getOutput("lsblk -nbo SIZE " + bootdev + "|head -n1").trimmed();
+        bool ok = true;
+        quint64 size = size_str.toULongLong(&ok, 10);
+        if (size > 2147483648 || !ok) {  // if > 2GiB or not converted properly
+            msg = tr("The partition you selected for /boot, is larger than expected.\nAre you sure you want to reformat this partition?");
+            ans = QMessageBox::warning(this, QString::null, msg,
+                                       tr("Yes"), tr("No"));
+            if (ans != 0) {
+                return false;
+            }
+        }
+    }
+
+    rootDevicePreserve = rootdev;
+    swapDevicePreserve = swapdev;
+    homeDevicePreserve = (homedev == "/dev/root") ? rootdev : homedev;
+    return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // in this case use all of the drive
 
 bool MInstall::makeDefaultPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    int ans;
     int prog = 0;
 
     QString mmcnvmepartdesignator;
@@ -849,12 +974,6 @@ bool MInstall::makeDefaultPartitions()
 
     QString rootdev, swapdev;
     QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
-    QString msg = QString(tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME));
-    ans = QMessageBox::information(this, QString::null, msg,
-                                   tr("Yes"), tr("No"));
-    if (ans != 0) { // don't format--stop install
-        return false;
-    }
 
     if (drv.contains("nvme") || drv.contains("mmcblk" )) {
         mmcnvmepartdesignator = "p";
@@ -1079,23 +1198,12 @@ bool MInstall::makeDefaultPartitions()
     return true;
 }
 
-void MInstall::preparePhase2()
-{
-    if (phase < 2) {
-        phase = 2;
-        buildBootLists();
-        nextButton->setEnabled(true);
-        gotoPage(5);
-    }
-}
-
 ///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
 
 bool MInstall::makeChosenPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    int ans;
     int prog = 0;
     QString root_type;
     QString home_type;
@@ -1114,135 +1222,25 @@ bool MInstall::makeChosenPartitions()
     home_type = homeTypeCombo->currentText().toUtf8();
 
     // Root
-    QString rootdev = "/dev/" + rootCombo->currentText().section(" -", 0, 0).trimmed();
-    rootDevicePreserve = rootdev;
+    QString rootdev = rootDevicePreserve;
     QStringList rootsplit = getCmdOut("partition-info split-device=" + rootdev).split(" ", QString::SkipEmptyParts);
 
     // Swap
-    QString swapdev;
-    swapdev = "/dev/" + swapCombo->currentText().section(" -", 0, 0).trimmed();
+    QString swapdev = swapDevicePreserve;
     if (checkBoxEncryptSwap->isChecked() && swapdev != "/dev/none") {
         isSwapEncrypted = true;
     }
-    swapDevicePreserve = swapdev;
     QStringList swapsplit = getCmdOut("partition-info split-device=" + swapdev).split(" ", QString::SkipEmptyParts);
 
     // Boot
-    if (bootCombo->currentText() == "root") {
-        bootdev = rootdev;
-    } else {
-        bootdev = "/dev/" + bootCombo->currentText().section(" -", 0, 0).trimmed();
-    }
     QStringList bootsplit = getCmdOut("partition-info split-device=" + bootdev).split(" ", QString::SkipEmptyParts);
 
     // Home
-    QString homedev = "/dev/" + homeCombo->currentText().section(" -", 0, 0).trimmed();
-    homeDevicePreserve = (homedev == "/dev/root") ? rootdev : homedev;
-    if (checkBoxEncryptHome->isChecked() && homedev != "/dev/root") {
+    QString homedev = homeDevicePreserve;
+    if (checkBoxEncryptHome->isChecked() && homedev != rootdev) {
         isHomeEncrypted = true;
     }
     QStringList homesplit = getCmdOut("partition-info split-device=" + homedev).split(" ", QString::SkipEmptyParts);
-
-    if (rootdev == "/dev/none" || rootdev == "/dev/") {
-        QMessageBox::critical(this, QString::null,
-                              tr("You must choose a root partition.\nThe root partition must be at least %1.").arg(MIN_INSTALL_SIZE));
-        return false;
-    }
-
-    // warn if using a non-Linux partition (potential Windows install)
-    cmd = QString("partition-info is-linux=%1").arg(rootdev);
-    if (shell.run(cmd) != 0) {
-        msg = tr("The partition you selected for %1, is not a Linux partition. Are you sure you want to reformat this partition?").arg("root");
-        ans = QMessageBox::warning(this, QString::null, msg,
-                                   tr("Yes"), tr("No"));
-        if (ans != 0) {
-            // don't format--stop install
-            return false;
-        }
-    }
-
-    // warn on formatting or deletion
-    if (!(saveHomeCheck->isChecked() && homedev == "/dev/root")) {
-        msg = QString(tr("OK to format and destroy all data on \n%1 for the / (root) partition?")).arg(rootdev);
-    } else {
-        msg = QString(tr("All data on %1 will be deleted, except for /home\nOK to continue?")).arg(rootdev);
-    }
-    ans = QMessageBox::warning(this, QString::null, msg,
-                               tr("Yes"), tr("No"));
-    if (ans != 0) {
-        // don't format--stop install
-        return false;
-    }
-
-    // format swap
-
-    //if no swap is chosen do nothing
-    if (swapdev != "/dev/none") {
-        //if partition chosen is already swap, don't do anything
-        //check swap fstype
-        cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
-        if (shell.run(cmd) != 0) {
-            msg = tr("OK to format and destroy all data on \n%1 for the swap partition?").arg(swapdev);
-            ans = QMessageBox::warning(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-            if (ans != 0) {
-                // don't format--stop install
-                return false;
-            }
-        }
-    }
-    // format /home?
-    if (homedev != "/dev/root") {
-        cmd = QString("partition-info is-linux=%1").arg(homedev);
-        if (shell.run(cmd) != 0) {
-            msg = tr("The partition you selected for %1, is not a Linux partition.\nAre you sure you want to reformat this partition?").arg("/home");
-            ans = QMessageBox::warning(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-            if (ans != 0) {
-                // don't format--stop install
-                return false;
-            }
-        }
-        if (saveHomeCheck->isChecked()) {
-            msg = tr("OK to reuse (no reformat) %1 as the /home partition?").arg(homedev);
-        } else {
-            msg = tr("OK to format and destroy all data on %1 for the /home partition?").arg(homedev);
-        }
-
-        ans = QMessageBox::warning(this, QString::null, msg,
-                                   tr("Yes"), tr("No"));
-        if (ans != 0) {
-            // don't format--stop install
-            return false;
-        }
-    }
-    // format /boot?
-    if (bootCombo->currentText() != "root") {
-        // warn if using a non-Linux partition (potential Windows install)
-        cmd = QString("partition-info is-linux=%1").arg(bootdev);
-        if (shell.run(cmd) != 0) {
-            msg = tr("The partition you selected for %1, is not a Linux partition.\nAre you sure you want to reformat this partition?").arg("/boot");
-            ans = QMessageBox::warning(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-            if (ans != 0) {
-                // don't format--stop install
-                return false;
-            }
-        }
-        // warn if partition too big (not needed for boot, likely data or other useful partition
-        QString size_str = shell.getOutput("lsblk -nbo SIZE " + bootdev + "|head -n1").trimmed();
-        bool ok = true;
-        quint64 size = size_str.toULongLong(&ok, 10);
-        if (size > 2147483648 || !ok) {  // if > 2GiB or not converted properly
-            msg = tr("The partition you selected for /boot, is larger than expected.\nAre you sure you want to reformat this partition?");
-            ans = QMessageBox::warning(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-            if (ans != 0) {
-                // don't format--stop install
-                return false;
-            }
-        }
-    }
 
     updateStatus(tr("Preparing required partitions"), ++prog);
 
@@ -1413,6 +1411,16 @@ bool MInstall::makeChosenPartitions()
     shell.run("/sbin/swapon -a 2>&1");
 
     return true;
+}
+
+void MInstall::preparePhase2()
+{
+    if (phase < 2) {
+        phase = 2;
+        buildBootLists();
+        nextButton->setEnabled(true);
+        gotoPage(5);
+    }
 }
 
 void MInstall::installLinux()
@@ -2321,31 +2329,27 @@ void MInstall::goBack(QString msg)
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
 {
-    bool pretend = args.contains("--pretend") || args.contains("-p");
-
     if (next == 3 && ixPageRefAdvancedFDE != 0) { // at Step_FDE
         return next;
     }
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
-            if (!pretend) config->setValue("EntireDisk", true);
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
+                return curr;
+            }
+            QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
+            QString msg = tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME);
+            int ans = QMessageBox::warning(this, QString::null, msg,
+                                           tr("Yes"), tr("No"));
+            if (ans != 0) { // don't format - stop install
                 return curr;
             }
             return 4; // Go to Step_Progress
         }
-    } else if  (next == 3 && curr == 2) {// at Step_Partition (fwd)
-        if (checkBoxEncryptSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
-            if (!checkPassword(FDEpassCust->text())) {
-                return curr;
-            }
-            if (bootCombo->currentText() == "root") {
-                if (checkBoxEncryptRoot->isChecked()) {
-                    QMessageBox::critical(this, QString::null, tr("You must choose a separate boot partition when encrypting root."));
-                    return curr;
-                }
-            }
+    } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
+        if (!validateChosenPartitions()) {
+            return curr;
         }
         return 4; // Go to Step_Progress
     } else if (curr == 3) { // at Step_FDE

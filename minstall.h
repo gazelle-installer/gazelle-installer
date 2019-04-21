@@ -68,6 +68,7 @@ public:
     bool checkDisk();
     bool checkPassword(const QString &pass);
     bool installLoader();
+    bool validateChosenPartitions();
     bool makeChosenPartitions();
     bool makeDefaultPartitions();
     bool makeEsp(QString drv, int size);
