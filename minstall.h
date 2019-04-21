@@ -229,7 +229,7 @@ private:
     QStringList listBootDrives;
     QStringList listBootESP;
     QStringList listBootPart;
-    bool haveSnapshotUserAccounts;
+    bool haveSnapshotUserAccounts = false;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
