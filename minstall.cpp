@@ -2319,6 +2319,9 @@ int MInstall::showPage(int curr, int next)
         ixPageRefAdvancedFDE = 0;
         return next;
     } else if (next == 3 && curr == 4) { // at Step_Progress (backward)
+        if (haveSnapshotUserAccounts) {
+            return 8; // skip Step_User_Accounts and go to Step_Localization
+        }
         return 9; // go to Step_User_Accounts.
     } else if (next == 6 && curr == 5) { // at Step_Boot screen (forward)
         return next + 1; // skip Services screen
