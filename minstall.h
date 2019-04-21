@@ -190,6 +190,7 @@ private slots:
     void on_swapCombo_activated(const QString &arg1);
     void on_bootCombo_activated(const QString &arg1);
 
+    void on_grubCheckBox_toggled(bool checked);
     void on_grubMbrButton_toggled();
     void on_grubPbrButton_toggled();
     void on_grubEspButton_toggled();
@@ -221,6 +222,7 @@ private:
     QString prevItemBoot;
 
     // info for Phase 2 (user can now enter options while the setup is running)
+    QStringList listBootDrives;
     QStringList listBootESP;
     QStringList listBootPart;
     bool haveSnapshotUserAccounts;
