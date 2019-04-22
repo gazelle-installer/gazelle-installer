@@ -21,6 +21,7 @@
 #include <QTimer>
 #include <QProgressDialog>
 #include <QSettings>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -53,12 +54,12 @@ public:
     // helpers
     bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
     int runCmd(QString cmd);
-    static QString getCmdOut(QString cmd);
-    static QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
-    static QStringList getCmdOuts(QString cmd);
-    static QStringList getCmdValues(QString cmd, QString key, QString keydel, QString valdel);
+    void csleep(int msec);
+    QString getCmdOut(QString cmd);
+    QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
+    QStringList getCmdOuts(QString cmd);
     static int command(const QString &string);
-    static int getPartitionNumber();
+    int getPartitionNumber();
 
     bool is32bit();
     bool is64bit();
@@ -210,9 +211,8 @@ private:
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
 
-    // file copy progress variables
-    long iNodesSrc = 1;
-    long iNodesDst = 1;
+    // for file copy progress updates
+    fsfilcnt_t iTargetInodes = 0;
 
     // for partition combo updates
     QHash<QString, int> removedRoot; // remember items removed from combo box: item, index
@@ -230,7 +230,7 @@ private:
     QStringList listBootDrives;
     QStringList listBootESP;
     QStringList listBootPart;
-    bool haveSnapshotUserAccounts;
+    bool haveSnapshotUserAccounts = false;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
