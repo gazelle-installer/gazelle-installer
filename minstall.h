@@ -54,6 +54,7 @@ public:
     // helpers
     bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
     int runCmd(QString cmd);
+    void csleep(int msec);
     QString getCmdOut(QString cmd);
     QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
     QStringList getCmdOuts(QString cmd);
