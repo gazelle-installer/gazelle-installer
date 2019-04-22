@@ -812,6 +812,7 @@ bool MInstall::validateChosenPartitions()
     QString rootdev = "/dev/" + rootCombo->currentText().section(" -", 0, 0).trimmed();
     QString homedev = "/dev/" + homeCombo->currentText().section(" -", 0, 0).trimmed();
     QString swapdev = "/dev/" + swapCombo->currentText().section(" -", 0, 0).trimmed();
+    homedev = (homedev == "/dev/root") ? rootdev : homedev;
     if (bootCombo->currentText() == "root") {
         bootdev = rootdev;
     } else {
@@ -834,14 +835,14 @@ bool MInstall::validateChosenPartitions()
     }
 
     // warn on formatting or deletion
-    if (!(saveHomeCheck->isChecked() && homedev == "/dev/root")) {
+    if (!(saveHomeCheck->isChecked() && homedev == rootdev)) {
         msgFormatList << rootdev << "/ (root)";
     } else {
         msgConfirm += " - " + tr("Delete the data on %1 except for /home").arg(rootdev) + "\n";
     }
 
     // format /home?
-    if (homedev != "/dev/root") {
+    if (homedev != rootdev) {
         if (shell.run(QString("partition-info is-linux=%1").arg(homedev)) != 0) {
             msgForeignList << homedev << "/home";
         }
@@ -924,7 +925,7 @@ bool MInstall::validateChosenPartitions()
 
     rootDevicePreserve = rootdev;
     swapDevicePreserve = swapdev;
-    homeDevicePreserve = (homedev == "/dev/root") ? rootdev : homedev;
+    homeDevicePreserve = homedev;
     return true;
 }
 
@@ -1204,6 +1205,7 @@ bool MInstall::makeChosenPartitions()
 
     // Home
     QString homedev = homeDevicePreserve;
+
     if (checkBoxEncryptHome->isChecked() && homedev != rootdev) {
         isHomeEncrypted = true;
     }
@@ -1212,7 +1214,7 @@ bool MInstall::makeChosenPartitions()
     updateStatus(tr("Preparing required partitions"), ++prog);
 
     // unmount /home part if it exists
-    if (homedev != "/dev/root") {
+    if (homedev != rootdev) {
         // has homedev
         if (shell.run("pumount " + homedev) != 0) {
             // error
@@ -1277,7 +1279,7 @@ bool MInstall::makeChosenPartitions()
         cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
-    if (!(saveHomeCheck->isChecked() && homedev == "/dev/root") && !(args.contains("--sync") || args.contains("-s"))) {
+    if (!(saveHomeCheck->isChecked() && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
         shell.run(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
         formatRoot = true;
     }
@@ -1287,7 +1289,7 @@ bool MInstall::makeChosenPartitions()
         formatBoot = true;
     }
     // prepare home if not being preserved, and on a different partition
-    if (!(saveHomeCheck->isChecked()) && (homedev != "/dev/root")) {
+    if (!(saveHomeCheck->isChecked()) && (homedev != rootdev)) {
         shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
     }
     csleep(1000);
@@ -1329,7 +1331,7 @@ bool MInstall::makeChosenPartitions()
     // maybe format home
     if (saveHomeCheck->isChecked()) {
         // save home
-        if (homedev != "/dev/root") {
+        if (homedev != rootdev) {
             // not on root
             updateStatus(tr("Mounting the /home partition"), ++prog);
             if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) {
@@ -1350,13 +1352,13 @@ bool MInstall::makeChosenPartitions()
                 qDebug() << "could not make home LUKS partition";
                 return false;
             } else {
-                homedev="/dev/mapper/homefs";
+                homedev = "/dev/mapper/homefs";
             }
         }
 
         mkdir("/mnt/antiX/home", 0755);
 
-        if (homedev != "/dev/root") { // not on root
+        if (homedev != rootdev) { // not on root
             updateStatus(tr("Formatting the /home partition"), ++prog);
 
             if (!makeLinuxPartition(homedev, home_type, badblocksCheck->isChecked(), homeLabelEdit->text())) {
