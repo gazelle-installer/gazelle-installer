@@ -148,6 +148,15 @@ MInstall::~MInstall() {
 /////////////////////////////////////////////////////////////////////////
 // util functions
 
+void MInstall::csleep(int msec)
+{
+    QTimer cstimer(this);
+    QEventLoop eloop;
+    connect(&cstimer, &QTimer::timeout, &eloop, &QEventLoop::quit);
+    cstimer.start(msec);
+    eloop.exec();
+}
+
 QString MInstall::getCmdOut(QString cmd)
 {
     return shell.getOutput(cmd).section("\n", 0, 0);
@@ -677,7 +686,7 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
         // btrfs and set up fsck
         shell.run("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
-        sleep(1);
+        csleep(1000);
         QString size_str = shell.getOutput("/sbin/sfdisk -s " + dev);
         quint64 size = size_str.toULongLong();
         size = size / 1024; // in MiB
@@ -724,7 +733,7 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
         // error
         return false;
     }
-    shell.run("sleep 1");
+    csleep(1000);
 
     if (type.startsWith("ext")) {
         // ext4 tuning
@@ -959,7 +968,7 @@ bool MInstall::makeDefaultPartitions()
 
     // calculate new partition sizes
     // get the total disk size
-    sleep(1);
+    csleep(1000);
     QString size_str = shell.getOutput("/sbin/sfdisk -s " + drv);
     quint64 size = size_str.toULongLong();
     size = size / 1024; // in MiB
@@ -1103,11 +1112,11 @@ bool MInstall::makeDefaultPartitions()
     preparePhase2();
 
     updateStatus(tr("Formatting swap partition"), ++prog);
-    shell.run("sleep 1");
+    csleep(1000);
     if (!makeSwapPartition(swapdev)) {
         return false;
     }
-    shell.run("sleep 1");
+    csleep(1000);
     shell.run("make-fstab -s");
     shell.run("/sbin/swapon -a 2>&1");
 
@@ -1136,7 +1145,7 @@ bool MInstall::makeDefaultPartitions()
         }
     }
 
-    shell.run("sleep 1");
+    csleep(1000);
 
     // mount partitions
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
@@ -1144,7 +1153,7 @@ bool MInstall::makeDefaultPartitions()
     }
 
     // on root, make sure it exists
-    shell.run("sleep 1");
+    csleep(1000);
     mkdir("/mnt/antiX/home", 0755);
 
     on_diskCombo_activated();
@@ -1237,7 +1246,7 @@ bool MInstall::makeChosenPartitions()
                 cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 82").arg(swapsplit[0]).arg(swapsplit[1]);
             }
             shell.run(cmd);
-            shell.run("sleep 1");
+            csleep(1000);
 
             if (checkBoxEncryptSwap->isChecked()) {
                 updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
@@ -1253,7 +1262,7 @@ bool MInstall::makeChosenPartitions()
                 return false;
             }
             // enable the new swap partition asap
-            shell.run("sleep 1");
+            csleep(1000);
 
             shell.run("make-fstab -s");
             shell.run("/sbin/swapon " + swapdev);
@@ -1281,7 +1290,7 @@ bool MInstall::makeChosenPartitions()
     if (!(saveHomeCheck->isChecked()) && (homedev != "/dev/root")) {
         shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
     }
-    shell.run("sleep 1");
+    csleep(1000);
 
     // formatting takes time so finish Phase 1 here.
     preparePhase2();
@@ -1302,7 +1311,7 @@ bool MInstall::makeChosenPartitions()
         if (!makeLinuxPartition(rootdev, root_type, badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
-        shell.run("sleep 1");
+        csleep(1000);
         isRootFormatted = true;
     }
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
@@ -1328,7 +1337,7 @@ bool MInstall::makeChosenPartitions()
             }
         } else {
             // on root, make sure it exists
-            shell.run("sleep 1");
+            csleep(1000);
             mkdir("/mnt/antiX/home", 0755);
         }
     } else {
@@ -1353,7 +1362,7 @@ bool MInstall::makeChosenPartitions()
             if (!makeLinuxPartition(homedev, home_type, badblocksCheck->isChecked(), homeLabelEdit->text())) {
                 return false;
             }
-            shell.run("sleep 1");
+            csleep(1000);
 
             if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) {
                 return false;
@@ -1362,7 +1371,7 @@ bool MInstall::makeChosenPartitions()
         }
     }
     // mount all swaps
-    shell.run("sleep 1");
+    csleep(1000);
     if (checkBoxEncryptSwap->isChecked() && swapdev != "/dev/none") { // swapon -a doens't mount LUKS swap
         shell.run("swapon " + swapdev);
     }
@@ -1898,7 +1907,7 @@ bool MInstall::setPasswords()
     proc.start("chroot /mnt/antiX passwd root");
     proc.waitForStarted();
     proc.write(rootPasswordEdit->text().toUtf8() + "\n");
-    sleep(1);
+    csleep(1000);
     proc.write(rootPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -1912,7 +1921,7 @@ bool MInstall::setPasswords()
     proc.start("chroot /mnt/antiX passwd demo");
     proc.waitForStarted();
     proc.write(userPasswordEdit->text().toUtf8() + "\n");
-    sleep(1);
+    csleep(1000);
     proc.write(userPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -2244,7 +2253,7 @@ void MInstall::stopInstall()
             return;
         }
         if (checkBoxExitReboot->isChecked()) {
-            shell.run("sleep 1");
+            csleep(1000);
             shell.run("swapoff -a");
             shell.run("/usr/local/bin/persist-config --shutdown --command reboot &");
         }
@@ -2493,7 +2502,7 @@ void MInstall::pageDisplayed(int next)
 
             // end of Phase 1 now if not already done in make*Partitions()
             preparePhase2();
-            shell.run("sleep 1");
+            csleep(1000);
             installLinux();
             buildServiceList();
             break;
@@ -2516,7 +2525,7 @@ void MInstall::pageDisplayed(int next)
                 setLocale();
                 setCursor(QCursor(Qt::ArrowCursor));
                 updateStatus(tr("Installation successful"), 100);
-                shell.run("sleep 1");
+                csleep(1000);
                 gotoPage(10);
             }
             break;
