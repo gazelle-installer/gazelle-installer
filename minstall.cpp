@@ -19,6 +19,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QtConcurrent/QtConcurrent>
+#include <sys/statvfs.h>
 
 #include "minstall.h"
 #include "mmain.h"
@@ -147,40 +148,23 @@ MInstall::~MInstall() {
 /////////////////////////////////////////////////////////////////////////
 // util functions
 
+void MInstall::csleep(int msec)
+{
+    QTimer cstimer(this);
+    QEventLoop eloop;
+    connect(&cstimer, &QTimer::timeout, &eloop, &QEventLoop::quit);
+    cstimer.start(msec);
+    eloop.exec();
+}
+
 QString MInstall::getCmdOut(QString cmd)
 {
-    char line[260];
-    const char* ret = "";
-    FILE* fp = popen(cmd.toUtf8(), "r");
-    if (fp == NULL) {
-        return QString (ret);
-    }
-    int i;
-    if (fgets(line, sizeof line, fp) != NULL) {
-        i = strlen(line);
-        line[--i] = '\0';
-        ret = line;
-    }
-    pclose(fp);
-    return QString (ret);
+    return shell.getOutput(cmd).section("\n", 0, 0);
 }
 
 QStringList MInstall::getCmdOuts(QString cmd)
 {
-    char line[260];
-    FILE* fp = popen(cmd.toUtf8(), "r");
-    QStringList results;
-    if (fp == NULL) {
-        return results;
-    }
-    int i;
-    while (fgets(line, sizeof line, fp) != NULL) {
-        i = strlen(line);
-        line[--i] = '\0';
-        results.append(line);
-    }
-    pclose(fp);
-    return results;
+    return shell.getOutput(cmd).split('\n');
 }
 
 // Check if running from a 32bit environment
@@ -223,32 +207,6 @@ QString MInstall::getCmdValue(QString cmd, QString key, QString keydel, QString 
         }
     }
     return QString (ret);
-}
-
-QStringList MInstall::getCmdValues(QString cmd, QString key, QString keydel, QString valdel)
-{
-    char line[130];
-    FILE* fp = popen(cmd.toUtf8(), "r");
-    QStringList results;
-    if (fp == NULL) {
-        return results;
-    }
-    int i;
-    while (fgets(line, sizeof line, fp) != NULL) {
-        i = strlen(line);
-        line[--i] = '\0';
-        char* keyptr = strstr(line, key.toUtf8());
-        if (keyptr != NULL) {
-            // key found
-            strtok(keyptr, keydel.toUtf8());
-            const char* val = strtok(NULL, valdel.toUtf8());
-            if (val != NULL) {
-                results.append(val);
-            }
-        }
-    }
-    pclose(fp);
-    return results;
 }
 
 bool MInstall::replaceStringInFile(QString oldtext, QString newtext, QString filepath)
@@ -349,7 +307,7 @@ void MInstall::writeKeyFile()
             out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
             if (swapDevicePreserve != "/dev/none") {
                 out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
-                system("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks");
+                shell.run("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks");
             }
         }
         file.close();
@@ -658,7 +616,7 @@ void MInstall::saveAdvancedFDE()
 bool MInstall::makeSwapPartition(QString dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    system("swapoff -a");
+    shell.run("swapoff -a");
     QString cmd = "/sbin/mkswap " + dev + " -L " + swapLabelEdit->text();
     if (shell.run(cmd) != 0) {
         // error
@@ -728,7 +686,7 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
         // btrfs and set up fsck
         shell.run("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
-        sleep(1);
+        csleep(1000);
         QString size_str = shell.getOutput("/sbin/sfdisk -s " + dev);
         quint64 size = size_str.toULongLong();
         size = size / 1024; // in MiB
@@ -775,7 +733,7 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
         // error
         return false;
     }
-    system("sleep 1");
+    csleep(1000);
 
     if (type.startsWith("ext")) {
         // ext4 tuning
@@ -1010,7 +968,7 @@ bool MInstall::makeDefaultPartitions()
 
     // calculate new partition sizes
     // get the total disk size
-    sleep(1);
+    csleep(1000);
     QString size_str = shell.getOutput("/sbin/sfdisk -s " + drv);
     quint64 size = size_str.toULongLong();
     size = size / 1024; // in MiB
@@ -1154,11 +1112,11 @@ bool MInstall::makeDefaultPartitions()
     preparePhase2();
 
     updateStatus(tr("Formatting swap partition"), ++prog);
-    system("sleep 1");
+    csleep(1000);
     if (!makeSwapPartition(swapdev)) {
         return false;
     }
-    system("sleep 1");
+    csleep(1000);
     shell.run("make-fstab -s");
     shell.run("/sbin/swapon -a 2>&1");
 
@@ -1187,7 +1145,7 @@ bool MInstall::makeDefaultPartitions()
         }
     }
 
-    system("sleep 1");
+    csleep(1000);
 
     // mount partitions
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
@@ -1195,7 +1153,7 @@ bool MInstall::makeDefaultPartitions()
     }
 
     // on root, make sure it exists
-    system("sleep 1");
+    csleep(1000);
     mkdir("/mnt/antiX/home", 0755);
 
     on_diskCombo_activated();
@@ -1288,7 +1246,7 @@ bool MInstall::makeChosenPartitions()
                 cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 82").arg(swapsplit[0]).arg(swapsplit[1]);
             }
             shell.run(cmd);
-            system("sleep 1");
+            csleep(1000);
 
             if (checkBoxEncryptSwap->isChecked()) {
                 updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
@@ -1304,7 +1262,7 @@ bool MInstall::makeChosenPartitions()
                 return false;
             }
             // enable the new swap partition asap
-            system("sleep 1");
+            csleep(1000);
 
             shell.run("make-fstab -s");
             shell.run("/sbin/swapon " + swapdev);
@@ -1332,7 +1290,7 @@ bool MInstall::makeChosenPartitions()
     if (!(saveHomeCheck->isChecked()) && (homedev != "/dev/root")) {
         shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
     }
-    system("sleep 1");
+    csleep(1000);
 
     // formatting takes time so finish Phase 1 here.
     preparePhase2();
@@ -1353,7 +1311,7 @@ bool MInstall::makeChosenPartitions()
         if (!makeLinuxPartition(rootdev, root_type, badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
-        system("sleep 1");
+        csleep(1000);
         isRootFormatted = true;
     }
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
@@ -1379,7 +1337,7 @@ bool MInstall::makeChosenPartitions()
             }
         } else {
             // on root, make sure it exists
-            system("sleep 1");
+            csleep(1000);
             mkdir("/mnt/antiX/home", 0755);
         }
     } else {
@@ -1404,7 +1362,7 @@ bool MInstall::makeChosenPartitions()
             if (!makeLinuxPartition(homedev, home_type, badblocksCheck->isChecked(), homeLabelEdit->text())) {
                 return false;
             }
-            system("sleep 1");
+            csleep(1000);
 
             if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) {
                 return false;
@@ -1413,7 +1371,7 @@ bool MInstall::makeChosenPartitions()
         }
     }
     // mount all swaps
-    system("sleep 1");
+    csleep(1000);
     if (checkBoxEncryptSwap->isChecked() && swapdev != "/dev/none") { // swapon -a doens't mount LUKS swap
         shell.run("swapon " + swapdev);
     }
@@ -1771,10 +1729,10 @@ bool MInstall::isGpt(QString drv)
 void MInstall::checkUefi()
 {
     // return false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
-    if (system("uname -m | grep -q i686") == 0 && system("grep -q 64 /sys/firmware/efi/fw_platform_size") == 0) {
+    if (shell.run("uname -m | grep -q i686") == 0 && shell.run("grep -q 64 /sys/firmware/efi/fw_platform_size") == 0) {
         uefi = false;
     } else {
-        uefi = (system("test -d /sys/firmware/efi") == 0);
+        uefi = (shell.run("test -d /sys/firmware/efi") == 0);
     }
     qDebug() << "uefi =" << uefi;
 }
@@ -1949,7 +1907,7 @@ bool MInstall::setPasswords()
     proc.start("chroot /mnt/antiX passwd root");
     proc.waitForStarted();
     proc.write(rootPasswordEdit->text().toUtf8() + "\n");
-    sleep(1);
+    csleep(1000);
     proc.write(rootPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -1963,7 +1921,7 @@ bool MInstall::setPasswords()
     proc.start("chroot /mnt/antiX passwd demo");
     proc.waitForStarted();
     proc.write(userPasswordEdit->text().toUtf8() + "\n");
-    sleep(1);
+    csleep(1000);
     proc.write(userPasswordEdit->text().toUtf8() + "\n");
     proc.waitForFinished();
 
@@ -2295,9 +2253,9 @@ void MInstall::stopInstall()
             return;
         }
         if (checkBoxExitReboot->isChecked()) {
-            system("sleep 1");
-            system("swapoff -a");
-            system("/usr/local/bin/persist-config --shutdown --command reboot &");
+            csleep(1000);
+            shell.run("swapoff -a");
+            shell.run("/usr/local/bin/persist-config --shutdown --command reboot &");
         }
         qApp->exit(0);
     } else if (curr > 3) {
@@ -2316,14 +2274,14 @@ void MInstall::unmountGoBack(QString msg)
     shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
     shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
     if (isRootEncrypted) {
-        system("cryptsetup luksClose rootfs");
+        shell.run("cryptsetup luksClose rootfs");
     }
     if (isHomeEncrypted) {
-        system("cryptsetup luksClose homefs");
+        shell.run("cryptsetup luksClose homefs");
     }
     if (isSwapEncrypted) {
-        system("swapoff /dev/mapper/swapfs");
-        system("cryptsetup luksClose swapfs");
+        shell.run("swapoff /dev/mapper/swapfs");
+        shell.run("cryptsetup luksClose swapfs");
     }
     goBack(msg);
 }
@@ -2371,6 +2329,9 @@ int MInstall::showPage(int curr, int next)
         ixPageRefAdvancedFDE = 0;
         return next;
     } else if (next == 3 && curr == 4) { // at Step_Progress (backward)
+        if (haveSnapshotUserAccounts) {
+            return 8; // skip Step_User_Accounts and go to Step_Localization
+        }
         return 9; // go to Step_User_Accounts.
     } else if (next == 6 && curr == 5) { // at Step_Boot screen (forward)
         return next + 1; // skip Services screen
@@ -2541,7 +2502,7 @@ void MInstall::pageDisplayed(int next)
 
             // end of Phase 1 now if not already done in make*Partitions()
             preparePhase2();
-            system("sleep 1");
+            csleep(1000);
             installLinux();
             buildServiceList();
             break;
@@ -2564,7 +2525,7 @@ void MInstall::pageDisplayed(int next)
                 setLocale();
                 setCursor(QCursor(Qt::ArrowCursor));
                 updateStatus(tr("Installation successful"), 100);
-                system("sleep 1");
+                csleep(1000);
                 gotoPage(10);
             }
             break;
@@ -2943,26 +2904,26 @@ void MInstall::cleanup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
-    system("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'");
+    shell.run("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'");
 
     if (args.contains("--pretend") || args.contains("-p")) {
         return;
     }
 
-    system("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
-    system("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1");
-    system("umount -l /mnt/antiX/proc >/dev/null 2>&1; umount -l /mnt/antiX/sys >/dev/null 2>&1; umount -l /mnt/antiX/dev/shm >/dev/null 2>&1; umount -l /mnt/antiX/dev >/dev/null 2>&1");
-    system("umount -lR /mnt/antiX >/dev/null 2>&1");
+    shell.run("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
+    shell.run("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1");
+    shell.run("umount -l /mnt/antiX/proc >/dev/null 2>&1; umount -l /mnt/antiX/sys >/dev/null 2>&1; umount -l /mnt/antiX/dev/shm >/dev/null 2>&1; umount -l /mnt/antiX/dev >/dev/null 2>&1");
+    shell.run("umount -lR /mnt/antiX >/dev/null 2>&1");
 
     if (isRootEncrypted) {
-        system("cryptsetup luksClose rootfs");
+        shell.run("cryptsetup luksClose rootfs");
     }
     if (isHomeEncrypted) {
-        system("cryptsetup luksClose homefs");
+        shell.run("cryptsetup luksClose homefs");
     }
     if (isSwapEncrypted) {
-        system("swapoff /dev/mapper/swapfs");
-        system("cryptsetup luksClose swapfs");
+        shell.run("swapoff /dev/mapper/swapfs");
+        shell.run("cryptsetup luksClose swapfs");
     }
 }
 
@@ -2998,15 +2959,14 @@ void MInstall::delTime()
 
 void MInstall::copyStart()
 {
-    qApp->processEvents();
-    QStringList vlist = getCmdOuts("df --output=iused /dev/loop0 /mnt/antiX");
-    if(vlist.count() >= 3) {
-        iNodesSrc = vlist.at(1).toLong();
-        iNodesDst = vlist.at(2).toLong();
+    struct statvfs svfs;
+    if (statvfs("/live/linux", &svfs) == 0) {
+        iTargetInodes = svfs.f_files - svfs.f_ffree;
+        if(statvfs("/mnt/antiX", &svfs) == 0) {
+            iTargetInodes += svfs.f_files - svfs.f_ffree;
+        }
     }
-    iNodesSrc /= 80;
     timer->start(2000);
-    qApp->processEvents();
     updateStatus(tr("Copying new system"), 15);
 }
 
@@ -3058,14 +3018,16 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
 void MInstall::copyTime()
 {
-    qApp->processEvents();
-    QStringList vlist = getCmdOuts("df --output=iused /mnt/antiX");
-    long i = 0;
-    if(vlist.count() >= 2) {
-        i = (vlist.at(1).toLong() - iNodesDst) / iNodesSrc;
-    }
-    if (i > 79) {
-        i = 80;
+    struct statvfs svfs;
+    const int progspace = 80;
+    int i = 0;
+    if(iTargetInodes > 0 && statvfs("/mnt/antiX", &svfs) == 0) {
+        i = (int)((svfs.f_files - svfs.f_ffree) / (iTargetInodes / progspace));
+        if (i > (progspace - 1)) {
+            i = progspace;
+        }
+    } else {
+        updateStatus(tr("Copy progress unknown. No file system statistics."), 0);
     }
     progressBar->setValue(i + 15);
 
