@@ -19,6 +19,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QtConcurrent/QtConcurrent>
+#include <sys/statvfs.h>
 
 #include "minstall.h"
 #include "mmain.h"
@@ -2949,15 +2950,14 @@ void MInstall::delTime()
 
 void MInstall::copyStart()
 {
-    qApp->processEvents();
-    QStringList vlist = getCmdOuts("df --output=iused /dev/loop0 /mnt/antiX");
-    if(vlist.count() >= 3) {
-        iNodesSrc = vlist.at(1).toLong();
-        iNodesDst = vlist.at(2).toLong();
+    struct statvfs svfs;
+    if (statvfs("/live/linux", &svfs) == 0) {
+        iTargetInodes = svfs.f_files - svfs.f_ffree;
+        if(statvfs("/mnt/antiX", &svfs) == 0) {
+            iTargetInodes += svfs.f_files - svfs.f_ffree;
+        }
     }
-    iNodesSrc /= 80;
     timer->start(2000);
-    qApp->processEvents();
     updateStatus(tr("Copying new system"), 15);
 }
 
@@ -3009,14 +3009,16 @@ void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
 
 void MInstall::copyTime()
 {
-    qApp->processEvents();
-    QStringList vlist = getCmdOuts("df --output=iused /mnt/antiX");
-    long i = 0;
-    if(vlist.count() >= 2) {
-        i = (vlist.at(1).toLong() - iNodesDst) / iNodesSrc;
-    }
-    if (i > 79) {
-        i = 80;
+    struct statvfs svfs;
+    const int progspace = 80;
+    int i = 0;
+    if(iTargetInodes > 0 && statvfs("/mnt/antiX", &svfs) == 0) {
+        i = (int)((svfs.f_files - svfs.f_ffree) / (iTargetInodes / progspace));
+        if (i > (progspace - 1)) {
+            i = progspace;
+        }
+    } else {
+        updateStatus(tr("Copy progress unknown. No file system statistics."), 0);
     }
     progressBar->setValue(i + 15);
 
