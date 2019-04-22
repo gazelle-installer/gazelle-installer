@@ -21,6 +21,7 @@
 #include <QTimer>
 #include <QProgressDialog>
 #include <QSettings>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -209,9 +210,8 @@ private:
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
 
-    // file copy progress variables
-    long iNodesSrc = 1;
-    long iNodesDst = 1;
+    // for file copy progress updates
+    fsfilcnt_t iTargetInodes = 0;
 
     // for partition combo updates
     QHash<QString, int> removedRoot; // remember items removed from combo box: item, index
