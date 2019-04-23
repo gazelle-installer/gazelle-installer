@@ -421,10 +421,6 @@ void MInstall::processNextPhase()
     if(phase == 0) { // No install started yet.
         phase = 1; // installation.
         nextButton->setEnabled(false);
-        if (!checkDisk()) {
-            goBack(tr("Returning to Step 1 to select another disk."));
-            return;
-        }
         setCursor(QCursor(Qt::WaitCursor));
         prepareToInstall();
         if (entireDiskButton->isChecked()) {
@@ -2414,6 +2410,9 @@ int MInstall::showPage(int curr, int next)
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
                 return curr;
             }
+            if (!checkDisk()) {
+                return curr;
+            }
             QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
             QString msg = tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME);
             int ans = QMessageBox::warning(this, QString::null, msg,
@@ -2425,6 +2424,9 @@ int MInstall::showPage(int curr, int next)
         }
     } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
         if (!validateChosenPartitions()) {
+            return curr;
+        }
+        if (!checkDisk()) {
             return curr;
         }
         return 4; // Go to Step_Progress
@@ -2934,15 +2936,13 @@ bool MInstall::eventFilter(QObject* obj, QEvent* event)
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if (keyEvent->key() == Qt::Key_Escape) {
-            if (widgetStack->currentWidget() != Step_Boot) { // don't close on GRUB installation by mistake
+            if (installBox->isHidden()) { // don't close on installation by mistake
                 on_closeButton_clicked();
             }
             return true;
         }
-        return QObject::eventFilter(obj, event);
-    } else {
-        return QObject::eventFilter(obj, event);
     }
+    return QObject::eventFilter(obj, event);
 }
 
 // run before closing the app, do some cleanup
