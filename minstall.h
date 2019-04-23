@@ -54,6 +54,7 @@ public:
     // helpers
     bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
     int runCmd(QString cmd);
+    QProcess::ExitStatus runCmd2(QString cmd);
     void csleep(int msec);
     QString getCmdOut(QString cmd);
     QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
@@ -94,7 +95,7 @@ public:
     void installLinux();
     void makeFstab();
     void prepareToInstall();
-    void preparePhase2();
+    void processNextPhase();
     void removeItemCombo(QComboBox *cb, const QString *part);
     void saveConfig();
     void setLocale();
@@ -141,12 +142,8 @@ public slots:
     void procAbort();
     void cleanup();
     //    void moreClicked(QListViewItem *item);
-    void delStart();
-    void delDone(int, QProcess::ExitStatus exitStatus);
     void delTime();
 
-    void copyStart();
-    void copyDone(int, QProcess::ExitStatus exitStatus);
     void copyTime();
 
 private slots:
@@ -226,10 +223,11 @@ private:
     QString prevItemSwap;
     QString prevItemBoot;
 
-    // info for Phase 2 (user can now enter options while the setup is running)
+    // info needed for Phase 2 of the process
     QStringList listBootDrives;
     QStringList listBootESP;
     QStringList listBootPart;
+    bool haveSamba = false;
     bool haveSnapshotUserAccounts = false;
 
     // Advanced Encryption Settings page

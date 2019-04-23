@@ -45,6 +45,19 @@ int MInstall::runCmd(QString cmd)
     return future.result();
 }
 
+// shell.run() doesn't distinguish between crashed and failed processes
+QProcess::ExitStatus MInstall::runCmd2(QString cmd)
+{
+    qDebug() << cmd;
+    QEventLoop eloop;
+    connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
+    proc->start(cmd);
+    eloop.exec();
+    QProcess::ExitStatus rexit = proc->exitStatus();
+    disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+    return rexit;
+}
+
 MInstall::MInstall(QWidget *parent, QStringList args) :
     QWidget(parent)
 {
@@ -148,6 +161,7 @@ MInstall::~MInstall() {
 /////////////////////////////////////////////////////////////////////////
 // util functions
 
+// Custom sleep
 void MInstall::csleep(int msec)
 {
     QTimer cstimer(this);
@@ -400,11 +414,75 @@ int MInstall::getPartitionNumber()
     return getCmdOut("cat /proc/partitions | grep '[h,s,v].[a-z][1-9]$' | wc -l").toInt();
 }
 
+// process the next phase of installation if possible
+void MInstall::processNextPhase()
+{
+    // Phase 0 = not started, Phase 1 = in progress, Phase 2 = post-install steps.
+    if(phase == 0) { // No install started yet.
+        phase = 1; // installation.
+        nextButton->setEnabled(false);
+        if (!checkDisk()) {
+            goBack(tr("Returning to Step 1 to select another disk."));
+            return;
+        }
+        setCursor(QCursor(Qt::WaitCursor));
+        prepareToInstall();
+        if (entireDiskButton->isChecked()) {
+            if (!makeDefaultPartitions()) {
+                // failed
+                nextButton->setEnabled(true);
+                goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
+                return;
+            }
+        } else {
+            if (!makeChosenPartitions()) {
+                // failed
+                nextButton->setEnabled(true);
+                goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
+                return;
+            }
+        }
+
+        csleep(1000);
+        installLinux();
+        if (!haveSysConfig) {
+            progressBar->setEnabled(false);
+            updateStatus(tr("Paused for required operator input"), 97);
+            QApplication::beep();
+            setCursor(QCursor(Qt::ArrowCursor));
+            if(widgetStack->currentIndex() == 4) {
+                on_nextButton_clicked();
+            }
+        }
+        phase = 2;
+    }
+    if(phase == 2 && haveSysConfig) {
+        phase = 3;
+        progressBar->setEnabled(true);
+        backButton->setEnabled(false);
+        setCursor(QCursor(Qt::WaitCursor));
+        installLoader();
+        updateStatus(tr("Setting system configuration"), 99);
+        setServices();
+        setUserInfo();
+        if (haveSnapshotUserAccounts) {
+            QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
+            shell.run(cmd);
+        }
+        setComputerName();
+        setLocale();
+        setCursor(QCursor(Qt::ArrowCursor));
+        updateStatus(tr("Installation successful"), 100);
+        csleep(1000);
+        gotoPage(10);
+    }
+}
+
 // unmount antiX in case we are retrying
 void MInstall::prepareToInstall()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    updateStatus(tr("Ready to install %1 filesystem").arg(PROJECTNAME), 0);
+    updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
 
     // unmount /boot/efi if mounted by previous run
     if (shell.run("mountpoint -q /mnt/antiX/boot/efi") == 0) {
@@ -423,6 +501,12 @@ void MInstall::prepareToInstall()
     if (shell.run("ls /home | grep -v lost+found | grep -v demo | grep -v snapshot | grep -q [a-zA-Z0-9]") == 0 || shell.run("test -d /live/linux/home/demo") == 0) {
         haveSnapshotUserAccounts = true;
     }
+
+    // check for the Samba server
+    QString val = getCmdValue("dpkg -s samba | grep '^Status'", "ok", " ", " ");
+    haveSamba = (val.compare("installed") == 0);
+
+    buildServiceList();
 }
 
 void MInstall::addItemCombo(QComboBox *cb, const QString *part)
@@ -1109,8 +1193,9 @@ bool MInstall::makeDefaultPartitions()
         }
     }
 
-    // formatting takes time so finish Phase 1 here.
-    preparePhase2();
+    // formatting takes a while, allow the user to enter other options
+    buildBootLists();
+    gotoPage(5);
 
     updateStatus(tr("Formatting swap partition"), ++prog);
     csleep(1000);
@@ -1294,8 +1379,9 @@ bool MInstall::makeChosenPartitions()
     }
     csleep(1000);
 
-    // formatting takes time so finish Phase 1 here.
-    preparePhase2();
+    // allow the user to enter other options
+    buildBootLists();
+    gotoPage(5);
 
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (formatRoot) {
@@ -1382,16 +1468,6 @@ bool MInstall::makeChosenPartitions()
     return true;
 }
 
-void MInstall::preparePhase2()
-{
-    if (phase < 2) {
-        phase = 2;
-        buildBootLists();
-        nextButton->setEnabled(true);
-        gotoPage(5);
-    }
-}
-
 void MInstall::installLinux()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -1416,13 +1492,16 @@ void MInstall::installLinux()
         // set all connections in advance
         disconnect(timer, SIGNAL(timeout()), 0, 0);
         connect(timer, SIGNAL(timeout()), this, SLOT(delTime()));
-        disconnect(proc, SIGNAL(started()), 0, 0);
-        connect(proc, SIGNAL(started()), this, SLOT(delStart()));
-        disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
-        connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(delDone(int, QProcess::ExitStatus)));
         // remove all folders in root except for /home
+        timer->start(20000);
+        updateStatus(tr("Deleting old system"), 4);
         QString cmd = "/bin/bash -c \"find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;\"";
-        proc->start(cmd);
+        if (runCmd2(cmd) == QProcess::NormalExit) {
+            copyLinux();
+        } else {
+            nextButton->setEnabled(true);
+            unmountGoBack(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
+        }
     }
 }
 
@@ -1538,10 +1617,8 @@ void MInstall::copyLinux()
     // set all connections in advance
     disconnect(timer, SIGNAL(timeout()), 0, 0);
     connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
-    disconnect(proc, SIGNAL(started()), 0, 0);
-    connect(proc, SIGNAL(started()), this, SLOT(copyStart()));
-    disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
-    connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(copyDone(int, QProcess::ExitStatus)));
+    timer->start(2000);
+    updateStatus(tr("Copying new system"), 15);
     // setup and start the process
     QString cmd;
     cmd = "/bin/cp -a";
@@ -1555,10 +1632,41 @@ void MInstall::copyLinux()
     cmd.append(" /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt");
     cmd.append(" /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr");
     cmd.append(" /live/aufs/var /live/aufs/home /mnt/antiX");
-    if (args.contains("--nocopy") || args.contains("-n")) {
-        proc->start("");
-    } else {
-        proc->start(cmd);
+    struct statvfs svfs;
+    if (statvfs("/live/linux", &svfs) == 0) {
+        iTargetInodes = svfs.f_files - svfs.f_ffree;
+        if(statvfs("/mnt/antiX", &svfs) == 0) {
+            iTargetInodes += svfs.f_files - svfs.f_ffree;
+        }
+    }
+    if (!(args.contains("--nocopy") || args.contains("-n"))) {
+        if (runCmd2(cmd) != QProcess::NormalExit) {
+            nextButton->setEnabled(true);
+            unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
+        }
+    }
+
+    // After the copy is over.
+    timer->stop();
+    updateStatus(tr("Fixing configuration"), 96);
+    shell.run("mkdir -m 1777 /mnt/antiX/tmp");
+    makeFstab();
+    writeKeyFile();
+    disablehiberanteinitramfs();
+
+    // Copy live set up to install and clean up.
+    //shell.run("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");
+    shell.run("/usr/sbin/live-to-installed /mnt/antiX");
+    qDebug() << "Desktop menu";
+    runCmd("chroot /mnt/antiX desktop-menu --write-out-global");
+    shell.run("/bin/rm -rf /mnt/antiX/home/demo");
+    shell.run("/bin/rm -rf /mnt/antiX/media/sd*");
+    shell.run("/bin/rm -rf /mnt/antiX/media/hd*");
+    //shell.run("/bin/mv -f /mnt/antiX/etc/X11/xorg.conf /mnt/antiX/etc/X11/xorg.conf.live >/dev/null 2>&1");
+
+    // guess localtime vs UTC
+    if (getCmdOut("guess-hwclock") == "localtime") {
+        localClockCheckBox->setChecked(true);
     }
 }
 
@@ -2015,7 +2123,7 @@ bool MInstall::setUserInfo()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// set the computer name, can not be rerun
+// computer name functions
 
 bool MInstall::validateComputerName()
 {
@@ -2041,8 +2149,7 @@ bool MInstall::validateComputerName()
         return false;
     }
 
-    QString val = getCmdValue("dpkg -s samba | grep '^Status'", "ok", " ", " ");
-    if (val.compare("installed") == 0) {
+    if (haveSamba) {
         // see if name is reasonable
         if (computerGroupEdit->text().length() < 2) {
             QMessageBox::critical(this, QString::null,
@@ -2056,10 +2163,10 @@ bool MInstall::validateComputerName()
     return true;
 }
 
+// set the computer name, can not be rerun
 bool MInstall::setComputerName()
 {
-    QString val = getCmdValue("dpkg -s samba | grep '^Status'", "ok", " ", " ");
-    if (val.compare("installed") == 0) {
+    if (haveSamba) {
         //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
         replaceStringInFile("WORKGROUP", computerGroupEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
     }
@@ -2469,71 +2576,7 @@ void MInstall::pageDisplayed(int next)
                                        "</p>").arg(PROJECTNAME));
         backButton->setEnabled(haveSysConfig);
         nextButton->setEnabled(!haveSysConfig);
-        switch (phase) {
-        case 0: // No install started yet.
-            phase = 1;
-            // intentional fall-through.
-        case 1: // installation.
-            nextButton->setEnabled(false);
-            if (args.contains("--pretend") || args.contains("-p")) {
-                buildServiceList(); // build anyway
-                gotoPage(5);
-                return;
-            }
-            if (!checkDisk()) {
-                goBack(tr("Returning to Step 1 to select another disk."));
-                break;
-            }
-            setCursor(QCursor(Qt::WaitCursor));
-            prepareToInstall();
-            if (entireDiskButton->isChecked()) {
-                if (!makeDefaultPartitions()) {
-                    // failed
-                    nextButton->setEnabled(true);
-                    goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
-                    break;
-                }
-            } else {
-                if (!makeChosenPartitions()) {
-                    // failed
-                    nextButton->setEnabled(true);
-                    goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
-                    break;
-                }
-            }
-
-            // end of Phase 1 now if not already done in make*Partitions()
-            preparePhase2();
-            csleep(1000);
-            installLinux();
-            buildServiceList();
-            break;
-        case 2: // file copy process.
-            break;
-        case 3: // post-install procedure.
-            if (haveSysConfig) {
-                progressBar->setEnabled(true);
-                backButton->setEnabled(false);
-                setCursor(QCursor(Qt::WaitCursor));
-                installLoader();
-                updateStatus(tr("Setting system configuration"), 99);
-                setServices();
-                setUserInfo();
-                if (haveSnapshotUserAccounts) {
-                    QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
-                    shell.run(cmd);
-                }
-                setComputerName();
-                setLocale();
-                setCursor(QCursor(Qt::ArrowCursor));
-                updateStatus(tr("Installation successful"), 100);
-                csleep(1000);
-                gotoPage(10);
-            }
-            break;
-        default:
-            break;
-        }
+        processNextPhase();
         break;
     case 5: // set bootloader
         setCursor(QCursor(Qt::ArrowCursor));
@@ -2542,6 +2585,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
                                        "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
         backButton->setEnabled(true);
+        nextButton->setEnabled(true);
         break;
 
     case 6: // set services
@@ -2932,24 +2976,6 @@ void MInstall::cleanup()
 /////////////////////////////////////////////////////////////////////////
 // delete process events
 
-void MInstall::delStart()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    timer->start(20000);
-    updateStatus(tr("Deleting old system"), 4);
-}
-
-void MInstall::delDone(int, QProcess::ExitStatus exitStatus)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (exitStatus == QProcess::NormalExit) {
-        copyLinux();
-    } else {
-        nextButton->setEnabled(true);
-        unmountGoBack(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
-    }
-}
-
 void MInstall::delTime()
 {
     progressBar->setValue(progressBar->value() + 1);
@@ -2958,65 +2984,6 @@ void MInstall::delTime()
 
 /////////////////////////////////////////////////////////////////////////
 // copy process events
-
-void MInstall::copyStart()
-{
-    struct statvfs svfs;
-    if (statvfs("/live/linux", &svfs) == 0) {
-        iTargetInodes = svfs.f_files - svfs.f_ffree;
-        if(statvfs("/mnt/antiX", &svfs) == 0) {
-            iTargetInodes += svfs.f_files - svfs.f_ffree;
-        }
-    }
-    timer->start(2000);
-    updateStatus(tr("Copying new system"), 15);
-}
-
-void MInstall::copyDone(int, QProcess::ExitStatus exitStatus)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    timer->stop();
-
-    if (exitStatus == QProcess::NormalExit) {
-        updateStatus(tr("Fixing configuration"), 96);
-        shell.run("mkdir -m 1777 /mnt/antiX/tmp");
-        makeFstab();
-        writeKeyFile();
-        disablehiberanteinitramfs();
-
-        // Copy live set up to install and clean up.
-        //shell.run("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");
-        shell.run("/usr/sbin/live-to-installed /mnt/antiX");
-        qDebug() << "Desktop menu";
-        runCmd("chroot /mnt/antiX desktop-menu --write-out-global");
-        shell.run("/bin/rm -rf /mnt/antiX/home/demo");
-        shell.run("/bin/rm -rf /mnt/antiX/media/sd*");
-        shell.run("/bin/rm -rf /mnt/antiX/media/hd*");
-        //shell.run("/bin/mv -f /mnt/antiX/etc/X11/xorg.conf /mnt/antiX/etc/X11/xorg.conf.live >/dev/null 2>&1");
-
-        // guess localtime vs UTC
-        if (getCmdOut("guess-hwclock") == "localtime") {
-            localClockCheckBox->setChecked(true);
-        }
-
-        phase = 3;
-        if (haveSysConfig) {
-            gotoPage(4); // this triggers the post-install process
-        } else {
-            progressBar->setEnabled(false);
-            updateStatus(tr("Paused for required operator input"), 97);
-            QApplication::beep();
-            setCursor(QCursor(Qt::ArrowCursor));
-            if(widgetStack->currentIndex() == 4) {
-                on_nextButton_clicked();
-            }
-        }
-    } else {
-        nextButton->setEnabled(true);
-        phase = 1;
-        unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
-    }
-}
 
 void MInstall::copyTime()
 {
