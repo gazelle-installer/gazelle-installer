@@ -512,7 +512,7 @@ Vuoi davvero chiudere ora?</translation>
         <location filename="minstall.cpp" line="2536"/>
         <location filename="minstall.cpp" line="2556"/>
         <source>&lt;p&gt;A separate unencrypted boot partition is required. For additional settings including cipher selection, use the &lt;b&gt;Edit advanced encryption settings&lt;/b&gt; button.&lt;/p&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;p&gt;Si richiede un&apos;apposita partizione di boot separata e non criptata. Per ulteriori impostazioni, inclusa la selezione di cipher, utilizzare il pulsante &lt;b&gt;Modifica impostazioni avanzate di crittografia&lt;/b&gt; &lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2537"/>
@@ -527,182 +527,182 @@ Vuoi davvero chiudere ora?</translation>
     <message>
         <location filename="minstall.cpp" line="2564"/>
         <source>Advanced Encryption Settings</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni Avanzate di Crittografia</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2564"/>
         <source>This page allows fine-tuning of LUKS encrypted partitions.</source>
-        <translation type="unfinished"/>
+        <translation>Questa pagina consente una regolazione precisa delle partizioni crittografate LUKS.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2565"/>
         <source>In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>Nella maggior parte dei casi, i valori predefiniti forniscono un pratico equilibrio tra sicurezza e prestazioni, che è una buona scelta per le applicazioni sensibili.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2567"/>
         <source>This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.</source>
-        <translation type="unfinished"/>
+        <translation>Questo testo affronta gli aspetti basilari dei parametri utilizzati con LUKS, il che non significa che sia una guida completa alla crittografia.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2568"/>
         <source>Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.</source>
-        <translation type="unfinished"/>
+        <translation>La modifica di una qualsiasi di queste impostazioni senza una buona conoscenza della crittografia può determinare l&apos;uso di una crittografia debole.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2569"/>
         <source>Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.</source>
-        <translation type="unfinished"/>
+        <translation>La modifica di un campo spesso influisce sulle opzioni disponibili sotto di esso. I campi sottostanti possono essere automaticamente modificati con i valori consigliati.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2570"/>
         <source>Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.</source>
-        <translation type="unfinished"/>
+        <translation>Dove si ritiene di ottenere migliori prestazioni o maggiore sicurezza modificando le impostazioni dai valori raccomandati, lo si fa a proprio rischio e pericolo.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2572"/>
         <source>You can use the &lt;b&gt;Benchmark&lt;/b&gt; button (which runs &lt;i&gt;cryptsetup benchmark&lt;/i&gt; in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.</source>
-        <translation type="unfinished"/>
+        <translation>Puoi usare il pulsante &lt;b&gt;Benchmark&lt;/b&gt; (che avvia la  &lt;i&gt;valutazione impostazioni di crittografia&lt;/i&gt; in una sua finestra di terminale) per confrontare le prestazioni delle comuni combinazioni di hash, cifrari e modalità a catena.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2573"/>
         <source>Please note that &lt;i&gt;cryptsetup benchmark&lt;/i&gt; does not cover all the combinations or selections possible, and generally covers the most commonly used selections.</source>
-        <translation type="unfinished"/>
+        <translation>Si noti che &lt;i&gt;valutazione impostazioni di crittografia&lt;/i&gt; non considera tutte le combinazioni o selezioni possibili, e generalmente affronta le selezioni più comunemente utilizzate.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2575"/>
         <source>Cipher</source>
-        <translation type="unfinished"/>
+        <translation>Cifrario</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2575"/>
         <source>A variety of ciphers are available.</source>
-        <translation type="unfinished"/>
+        <translation>Sono disponibili una varietà di cifrari</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2576"/>
         <source>was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.</source>
-        <translation type="unfinished"/>
+        <translation>è stato uno dei cinque migliori algoritmi AES. Si ritiene abbia un margine di sicurezza più elevato di Rijndael e di tutti gli altri AES finalisti. Funziona meglio su alcune CPU a 64 bit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2577"/>
         <source>(also known as &lt;i&gt;Rijndael&lt;/i&gt;) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.</source>
-        <translation type="unfinished"/>
+        <translation>(anche conosciuto come &lt;i&gt;Rijndael&lt;/i&gt;) è un codice molto comune e molte CPU moderne includono istruzioni specifiche per AES, per via della sua ubiquità. Sebbene Rijndael sia stato selezionato su Serpent per le sue prestazioni, non ci si aspetta che siano praticabili attacchi attualmente.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2578"/>
         <source>is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.</source>
-        <translation type="unfinished"/>
+        <translation>è il successore di Blowfish. È diventato uno dei cinque algoritmi AES finalisti, sebbene non sia stato selezionato per lo standard.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2579"/>
         <source>(CAST-256) was a candidate in the AES contest, however it did not become a finalist.</source>
-        <translation type="unfinished"/>
+        <translation>(CAST-256) era un candidato al concorso AES, tuttavia non è diventato un finalista.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2580"/>
         <source>is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.</source>
-        <translation type="unfinished"/>
+        <translation>è un codice a blocchi a 64 bit creato da Bruce Schneier. Non è raccomandato per le applicazioni sensibili in quanto sono supportate solo le modalità CBC ed ECB. Blowfish supporta chiavi, multipli di 8, di dimensioni comprese tra 32 e 448 bit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2582"/>
         <source>Chain mode</source>
-        <translation type="unfinished"/>
+        <translation>Modalità a catena</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2582"/>
         <source>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.</source>
-        <translation type="unfinished"/>
+        <translation>Se i blocchi sono stati tutti crittografati utilizzando la stessa chiave, potrebbe emergere un modello e per riuscire a codificare il testo in chiaro.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2583"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
-        <translation type="unfinished"/>
+        <translation>XEX-based Tweaked codebook with ciphertext Stealing) è una moderna modalità a catena, che supera CBC e EBC. E&apos; la modalità a catena di default (e raccomandata). Usando ESSIV su Plain64 si peggioreranno le prestazioni, con un guadagno in sicurezza trascurabile.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2584"/>
         <source>(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>(Cipher Block Chaining) è più semplice di XTS, ma vulnerabile ad un attacco padding oracle (in parte mitigato da ESSIV) e non è raccomandato per applicazioni sensibili.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2585"/>
         <source>(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>(Electronic CodeBook) è meno sicuro di CBC e non dovrebbe essere usato per applicazioni sensibili.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2587"/>
         <source>IV generator</source>
-        <translation type="unfinished"/>
+        <translation>IV generatore</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2587"/>
         <source>For XTS and CBC, this selects how the &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector is generated. &lt;b&gt;ESSIV&lt;/b&gt; requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.</source>
-        <translation type="unfinished"/>
+        <translation>Per XTS e CBC, questo seleziona come l&apos;&lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector è generato. &lt;b&gt;ESSIV&lt;/b&gt; richiede una funzione di hash e, per questo motivo, sarà disponibile un secondo menu a discesa se questo viene selezionato. Gli hash disponibili dipendono dal cifrario selezionato.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2588"/>
         <source>ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.</source>
-        <translation type="unfinished"/>
+        <translation>La modalità ECB non utilizza un IV, per cui questi campi saranno tutti disabilitati se ECB è selezionata per la modalità a catena.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2590"/>
         <source>Key size</source>
-        <translation type="unfinished"/>
+        <translation>Dimensione chiave</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2590"/>
         <source>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.</source>
-        <translation type="unfinished"/>
+        <translation>Imposta la dimensione della chiave in bit. Le dimensioni delle chiavi disponibili sono limitate dalle modalità a catena e cifratura.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2591"/>
         <source>The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).</source>
-        <translation type="unfinished"/>
+        <translation>La modalità di cifratura a catena XTS divide la chiave a metà (per esempio, AES-256 in modalità XTS richiede una dimensione della chiave di 512-bit).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2593"/>
         <source>LUKS key hash</source>
-        <translation type="unfinished"/>
+        <translation>hash della chiave LUKS</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2593"/>
         <source>The hash used for PBKDF2 and for the AF splitter.</source>
-        <translation type="unfinished"/>
+        <translation>l&apos;hash usata per PBKDF2 e per AF splitter.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2594"/>
         <source>SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.</source>
-        <translation type="unfinished"/>
+        <translation>SHA-1 e RIPEMD-160 non sono più raccomandati per applicazioni sensibili in quanto si è riscontrato che possono essere rotti.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2596"/>
         <source>Kernel RNG</source>
-        <translation type="unfinished"/>
+        <translation>Kernel RNG</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2596"/>
         <source>Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).</source>
-        <translation type="unfinished"/>
+        <translation>Imposta quale generatore di numeri casuali del kernel verrà utilizzato per creare la chiave master del volume (che è una chiave a lungo termine).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2597"/>
         <source>Two options are available: /dev/&lt;b&gt;random&lt;/b&gt; which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/&lt;b&gt;urandom&lt;/b&gt; which will not block even if there is insufficient entropy (possibly weaker keys).</source>
-        <translation type="unfinished"/>
+        <translation>Due opzioni sono disponibili: /dev/&lt;b&gt;random&lt;/b&gt; che blocca fino a quando si ottiene un&apos;entropia sufficiente (può impiegare molto tempo in situazioni di bassa entropia), e /dev/&lt;b&gt;urandom&lt;/b&gt; che non bloccherà anche se l&apos;entropia è insufficiente (è possibile che si abbiano chiavi più deboli).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2599"/>
         <source>KDF round time&lt;/b&gt;&lt;br/&gt;The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.</source>
-        <translation type="unfinished"/>
+        <translation>KDF round time&lt;/b&gt;&lt;br/&gt;La quantità di tempo (in millisecondi) da impiegare con PBKDF2 passphrase processing.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2600"/>
         <source>A value of 0 selects the compiled-in default (run &lt;i&gt;cryptsetup --help&lt;/i&gt; for details).</source>
-        <translation type="unfinished"/>
+        <translation>Un valore di 0 seleziona il valore precompilato di default (esegui &lt;i&gt;cryptsetup --help&lt;/i&gt; per dettagli).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2601"/>
         <source>If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.</source>
-        <translation type="unfinished"/>
+        <translation>Se hai una macchina lenta, potresti voler aumentare questo valore per maggiore sicurezza, in cambio del tempo impiegato per sbloccare un volume dopo che è stata inserita una passphrase.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2614"/>
@@ -995,7 +995,7 @@ Torna allo Step 1.</translation>
         <location filename="meinstall.ui" line="645"/>
         <location filename="meinstall.ui" line="1276"/>
         <source>Confirm password:</source>
-        <translation type="unfinished"/>
+        <translation>Conferma password:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="652"/>
@@ -1013,7 +1013,7 @@ Torna allo Step 1.</translation>
         <location filename="meinstall.ui" line="1283"/>
         <location filename="meinstall.ui" line="1316"/>
         <source>Advanced encryption settings</source>
-        <translation type="unfinished"/>
+        <translation>Impostazioni avanzate di crittografia</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="751"/>
@@ -1139,142 +1139,142 @@ Torna allo Step 1.</translation>
     <message>
         <location filename="meinstall.ui" line="1237"/>
         <source>2c. Encryption options</source>
-        <translation type="unfinished"/>
+        <translation>2c. Opzioni di Crittografia</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1332"/>
         <source>SHA-512</source>
-        <translation type="unfinished"/>
+        <translation>SHA-512</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1337"/>
         <source>SHA-256</source>
-        <translation type="unfinished"/>
+        <translation>SHA-256</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1342"/>
         <source>Whirlpool</source>
-        <translation type="unfinished"/>
+        <translation>Whirlpool</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1347"/>
         <source>SHA-1</source>
-        <translation type="unfinished"/>
+        <translation>SHA-1</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1352"/>
         <source>RIPEMD-160</source>
-        <translation type="unfinished"/>
+        <translation>RIPEMD-160</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1369"/>
         <source>-bit</source>
-        <translation type="unfinished"/>
+        <translation>-bit</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1388"/>
         <source> mS</source>
-        <translation type="unfinished"/>
+        <translation> mS</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1410"/>
         <source>LUKS key hash:</source>
-        <translation type="unfinished"/>
+        <translation>hash della chiave LUKS:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1426"/>
         <source>Key size:</source>
-        <translation type="unfinished"/>
+        <translation>Dimensione Chiave:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1452"/>
         <source>KDF round time:</source>
-        <translation type="unfinished"/>
+        <translation>KDF round time:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1478"/>
         <source>Cipher:</source>
-        <translation type="unfinished"/>
+        <translation>Cifrario:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1498"/>
         <source>Serpent</source>
-        <translation type="unfinished"/>
+        <translation>Serpent</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1503"/>
         <source>AES</source>
-        <translation type="unfinished"/>
+        <translation>AES</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1508"/>
         <source>Twofish</source>
-        <translation type="unfinished"/>
+        <translation>Twofish</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1513"/>
         <source>CAST6</source>
-        <translation type="unfinished"/>
+        <translation>CAST6</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1518"/>
         <source>Blowfish</source>
-        <translation type="unfinished"/>
+        <translation>Blowfish</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1535"/>
         <source>Benchmark...</source>
-        <translation type="unfinished"/>
+        <translation>Benchmark...</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1565"/>
         <source>ESSIV</source>
-        <translation type="unfinished"/>
+        <translation>ESSIV</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1570"/>
         <source>Plain64</source>
-        <translation type="unfinished"/>
+        <translation>Plain64</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1575"/>
         <source>Plain64BE</source>
-        <translation type="unfinished"/>
+        <translation>Plain64BE</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1580"/>
         <source>Plain</source>
-        <translation type="unfinished"/>
+        <translation>Plain</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1585"/>
         <source>BENBI</source>
-        <translation type="unfinished"/>
+        <translation>BENBI</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1599"/>
         <source>IV generator:</source>
-        <translation type="unfinished"/>
+        <translation>IV generatore:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1612"/>
         <source>Chain mode:</source>
-        <translation type="unfinished"/>
+        <translation>Modalita  a catena:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1632"/>
         <source>Kernel RNG:</source>
-        <translation type="unfinished"/>
+        <translation>Kernel RNG:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1640"/>
         <source>random</source>
-        <translation type="unfinished"/>
+        <translation>random</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1645"/>
         <source>urandom</source>
-        <translation type="unfinished"/>
+        <translation>urandom</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1681"/>

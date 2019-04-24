@@ -527,7 +527,7 @@ Vil du virkelig stoppe nu?</translation>
     <message>
         <location filename="minstall.cpp" line="2564"/>
         <source>Advanced Encryption Settings</source>
-        <translation type="unfinished"/>
+        <translation>Avancerede krypteringsindstillinger</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2564"/>

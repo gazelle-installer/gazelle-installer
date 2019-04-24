@@ -568,7 +568,7 @@ Wilt u werkelijk stoppen?</translation>
     <message>
         <location filename="minstall.cpp" line="2575"/>
         <source>Cipher</source>
-        <translation type="unfinished"/>
+        <translation>Cipher</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2575"/>

@@ -522,37 +522,37 @@ Do you really want to stop now?</source>
     <message>
         <location filename="minstall.cpp" line="2564"/>
         <source>Advanced Encryption Settings</source>
-        <translation type="unfinished"/>
+        <translation>Προηγμένες ρυθμίσεις κρυπτογράφησης</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2564"/>
         <source>This page allows fine-tuning of LUKS encrypted partitions.</source>
-        <translation type="unfinished"/>
+        <translation>Τελειοποίηση των κρυπτογραφημένων διαμερισμάτων LUKS.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2565"/>
         <source>In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>Στις περισσότερες περιπτώσεις, οι προεπιλογές παρέχουν μια πρακτική ισορροπία μεταξύ ασφάλειας και απόδοσης που είναι κατάλληλη για ευαίσθητες εφαρμογές.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2567"/>
         <source>This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.</source>
-        <translation type="unfinished"/>
+        <translation>Αυτό το κείμενο καλύπτει τα βασικά στοιχεία των παραμέτρων που χρησιμοποιούνται με το LUKS, αλλά δεν πρόκειται να αποτελέσει έναν ολοκληρωμένο οδηγό για την κρυπτογραφία.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2568"/>
         <source>Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.</source>
-        <translation type="unfinished"/>
+        <translation>Η αλλαγή οποιασδήποτε από αυτές τις ρυθμίσεις χωρίς μια σωστή γνώση στην κρυπτογραφία μπορεί να οδηγήσει σε χρήση ασθενούς κρυπτογράφησης.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2569"/>
         <source>Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.</source>
-        <translation type="unfinished"/>
+        <translation>Η επεξεργασία ενός πεδίου συχνά επηρεάζει τις διαθέσιμες επιλογές κάτω από αυτό. Τα παρακάτω πεδία μπορούν να αλλάξουν αυτόματα στις προτεινόμενες επιλογές.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2570"/>
         <source>Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.</source>
-        <translation type="unfinished"/>
+        <translation>Αν και μπορεί να επιτευχθεί καλύτερη απόδοση ή υψηλότερη ασφάλεια με την αλλαγή των ρυθμίσεων από τις συνιστώμενες επιλογές τους, το κάνετε εξ ολοκλήρου με δική σας ευθύνη.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2572"/>
@@ -567,12 +567,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="minstall.cpp" line="2575"/>
         <source>Cipher</source>
-        <translation type="unfinished"/>
+        <translation>Cipher</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2575"/>
         <source>A variety of ciphers are available.</source>
-        <translation type="unfinished"/>
+        <translation>Διατίθενται διάφορες ψηφιακές κρυπτογραφίες.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2576"/>
@@ -602,12 +602,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="minstall.cpp" line="2582"/>
         <source>Chain mode</source>
-        <translation type="unfinished"/>
+        <translation>Λειτουργία αλυσίδας</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2582"/>
         <source>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.</source>
-        <translation type="unfinished"/>
+        <translation>Εάν όλα τα μπλοκ έχουν κρυπτογραφηθεί χρησιμοποιώντας το ίδιο κλειδί, μπορεί να προκύψει ένα μοτίβο και να είναι δυνατή η πρόβλεψη του απλού κειμένου.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2583"/>
@@ -622,12 +622,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="minstall.cpp" line="2585"/>
         <source>(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>(Electronic CodeBook) είναι λιγότερο ασφαλές από το CBC και δεν πρέπει να χρησιμοποιείται για ευαίσθητες εφαρμογές.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2587"/>
         <source>IV generator</source>
-        <translation type="unfinished"/>
+        <translation>IV generator</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2587"/>
@@ -642,7 +642,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="minstall.cpp" line="2590"/>
         <source>Key size</source>
-        <translation type="unfinished"/>
+        <translation>μέγεθος κλειδιού</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2590"/>
@@ -657,7 +657,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="minstall.cpp" line="2593"/>
         <source>LUKS key hash</source>
-        <translation type="unfinished"/>
+        <translation>LUKS key hash</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2593"/>
