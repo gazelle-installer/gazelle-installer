@@ -510,12 +510,12 @@ Ar tikrai, norite sustabdyti dabar?</translation>
     <message>
         <location filename="minstall.cpp" line="2564"/>
         <source>Advanced Encryption Settings</source>
-        <translation type="unfinished"/>
+        <translation>Išplėstiniai šifravimo nustatymai</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2564"/>
         <source>This page allows fine-tuning of LUKS encrypted partitions.</source>
-        <translation type="unfinished"/>
+        <translation>Šis puslapis leidžia derinti LUKS šifruotus skaidinius.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2565"/>
@@ -555,12 +555,12 @@ Ar tikrai, norite sustabdyti dabar?</translation>
     <message>
         <location filename="minstall.cpp" line="2575"/>
         <source>Cipher</source>
-        <translation type="unfinished"/>
+        <translation>Šifras</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2575"/>
         <source>A variety of ciphers are available.</source>
-        <translation type="unfinished"/>
+        <translation>Yra prieinami įvairūs šifrai.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2576"/>
@@ -590,7 +590,7 @@ Ar tikrai, norite sustabdyti dabar?</translation>
     <message>
         <location filename="minstall.cpp" line="2582"/>
         <source>Chain mode</source>
-        <translation type="unfinished"/>
+        <translation>Grandinės veiksena</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2582"/>
@@ -630,12 +630,12 @@ Ar tikrai, norite sustabdyti dabar?</translation>
     <message>
         <location filename="minstall.cpp" line="2590"/>
         <source>Key size</source>
-        <translation type="unfinished"/>
+        <translation>Rakto dydis</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2590"/>
         <source>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.</source>
-        <translation type="unfinished"/>
+        <translation>Nustato rakto dydį, bitais. Prieinami rakto dydžiai yra apriboti šifru ir grandinės veiksena.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2591"/>
@@ -645,7 +645,7 @@ Ar tikrai, norite sustabdyti dabar?</translation>
     <message>
         <location filename="minstall.cpp" line="2593"/>
         <source>LUKS key hash</source>
-        <translation type="unfinished"/>
+        <translation>LUKS rakto maiša</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2593"/>
@@ -1120,32 +1120,32 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="1237"/>
         <source>2c. Encryption options</source>
-        <translation type="unfinished"/>
+        <translation>2c. Šifravimo parametrai</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1332"/>
         <source>SHA-512</source>
-        <translation type="unfinished"/>
+        <translation>SHA-512</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1337"/>
         <source>SHA-256</source>
-        <translation type="unfinished"/>
+        <translation>SHA-256</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1342"/>
         <source>Whirlpool</source>
-        <translation type="unfinished"/>
+        <translation>Whirlpool</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1347"/>
         <source>SHA-1</source>
-        <translation type="unfinished"/>
+        <translation>SHA-1</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1352"/>
         <source>RIPEMD-160</source>
-        <translation type="unfinished"/>
+        <translation>RIPEMD-160</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1369"/>
@@ -1160,12 +1160,12 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="1410"/>
         <source>LUKS key hash:</source>
-        <translation type="unfinished"/>
+        <translation>LUKS rakto maiša:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1426"/>
         <source>Key size:</source>
-        <translation type="unfinished"/>
+        <translation>Rakto dydis:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1452"/>
@@ -1175,7 +1175,7 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="1478"/>
         <source>Cipher:</source>
-        <translation type="unfinished"/>
+        <translation>Šifras:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1498"/>
@@ -1185,12 +1185,12 @@ Returning to Step 1.</source>
     <message>
         <location filename="meinstall.ui" line="1503"/>
         <source>AES</source>
-        <translation type="unfinished"/>
+        <translation>AES</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1508"/>
         <source>Twofish</source>
-        <translation type="unfinished"/>
+        <translation>Twofish</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1513"/>
