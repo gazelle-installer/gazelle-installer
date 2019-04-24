@@ -8,7 +8,7 @@
 %1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.
 
 Enjoy using %1</source>
-        <translation>O %1 é uma distribuição Linux independente baseada no Debian Stable
+        <translation>O %1 é uma distribuição Linux independente baseada no Debian Stable.
 
 O %1 usa alguns componentes do MEPIS Linux publicados sob Licença Apache (Apache free license). Alguns componentes do MEPIS foram modificados para o %1.
 
@@ -32,7 +32,7 @@ The disk with the partition you selected for installation is failing.
 </source>
         <translation>
 
-O disco com a partição selecionada para a instalação está a falhar. 
+O disco com a partição seleccionada para a instalação está a falhar. 
 
 </translation>
     </message>
@@ -48,7 +48,7 @@ O disco com a partição selecionada para a instalação está a falhar.
         <source>If unsure, please exit the Installer and run GSmartControl for more information.
 
 </source>
-        <translation>Se tiver dúvidas, por favor saia do Instalador e executa a ferramenta GSmartControl para obter mais informação sobre o estado do disco.
+        <translation>Havendo dúvidas, sair do Instalador e executar a ferramenta GSmartControl para obter mais informação sobre o estado do disco.
 
 </translation>
     </message>
@@ -110,7 +110,7 @@ O disco com a partição selecionada para a instalação está a falhar.
         <location filename="minstall.cpp" line="470"/>
         <source>The disk with the partition you selected for installation passes the S.M.A.R.T. monitor test (smartctl)
 </source>
-        <translation>O disco com a partição selecionada para a instalação passa nos testes do monitor S.M.A.R.T. (smartctl) 
+        <translation>O disco com a partição seleccionada para a instalação passa nos testes do monitor S.M.A.R.T. (smartctl) 
 </translation>
     </message>
     <message>
@@ -123,16 +123,16 @@ O disco com a partição selecionada para a instalação está a falhar.
     <message>
         <location filename="minstall.cpp" line="473"/>
         <source>Do you want to continue?</source>
-        <translation>Continuar? </translation>
+        <translation>Continuar?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="509"/>
         <source>The password needs to be at least
 %1 characters long. Please select
 a longer password before proceeding.</source>
-        <translation> A senha necessita ter pelo menos 
-%1 caracteres. Por favor escolha 
-uma senha maior antes de prosseguir.</translation>
+        <translation>A senha tem de ter pelo menos
+%1 caracteres. 
+Escolher uma senha mais longa antes de prosseguir.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="527"/>
@@ -142,12 +142,12 @@ uma senha maior antes de prosseguir.</translation>
     <message>
         <location filename="minstall.cpp" line="822"/>
         <source>Sorry, could not create %1 LUKS partition</source>
-        <translation> Desculpe, a partição LUKS  %1 não conseguiu ser criada</translation>
+        <translation>Não foi possível criar a partição LUKS %1</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="834"/>
         <source>Sorry, could not open %1 LUKS container</source>
-        <translation>Desculpe, não consegui abrir o contentor LUKS %1</translation>
+        <translation>Não foi possível abrir o contentor LUKS %1</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="854"/>
@@ -162,7 +162,7 @@ uma senha maior antes de prosseguir.</translation>
     <message>
         <location filename="minstall.cpp" line="950"/>
         <source>Formating EFI System Partition (ESP)</source>
-        <translation>A formatar Partição de Sistema EFI (ESP)</translation>
+        <translation>A formatar a Partição de Sistema EFI (ESP)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1017"/>
@@ -170,7 +170,7 @@ uma senha maior antes de prosseguir.</translation>
         <location filename="minstall.cpp" line="1308"/>
         <location filename="minstall.cpp" line="1359"/>
         <source>Setting up LUKS encrypted containers</source>
-        <translation>A configurar contentores encriptados LUKS</translation>
+        <translation>A configurar contentores encriptados por LUKS</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1027"/>
@@ -182,31 +182,31 @@ uma senha maior antes de prosseguir.</translation>
         <location filename="minstall.cpp" line="1038"/>
         <location filename="minstall.cpp" line="1328"/>
         <source>Formatting boot partition</source>
-        <translation>A formatar Partição de Sistema (boot)</translation>
+        <translation>A formatar a partição de arranque (boot)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1044"/>
         <source>Formatting root partition</source>
-        <translation>A formatar a partição raíz (root) « / »</translation>
+        <translation>A formatar a partição raíz (root)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1137"/>
         <source>You must choose a root partition.
 The root partition must be at least %1.</source>
-        <translation>Deve escolher uma partição de raíz (root).
-A partição de raíz deve ter pelo menos %1</translation>
+        <translation>Escolher uma partição raíz (root, / ).
+A partição raíz deve ter pelo menos %1.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1144"/>
         <source>The partition you selected for %1, is not a Linux partition. Are you sure you want to reformat this partition?</source>
-        <translation>A partilão selecionada para %1 não é uma partição Linux. Tem a certeza que deseja reformatar esta partição?</translation>
+        <translation>A partição seleccionada para %1 não é uma partição Linux. Reformatar, de facto, esta partição?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1155"/>
         <source>OK to format and destroy all data on 
 %1 for the / (root) partition?</source>
         <translation>Formatar e apagar todos os dados em
-%1 para a partição / (root)?</translation>
+%1 para partição / (raíz, root)?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1157"/>
@@ -220,14 +220,15 @@ Continuar?</translation>
         <source>OK to format and destroy all data on 
 %1 for the swap partition?</source>
         <translation>Formatar e apagar todos os dados em
-%1 para a partição swap?</translation>
+%1 para partição swap?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1187"/>
         <location filename="minstall.cpp" line="1213"/>
         <source>The partition you selected for %1, is not a Linux partition.
 Are you sure you want to reformat this partition?</source>
-        <translation>Tem a certeza que deseja reformatar esta partição?</translation>
+        <translation>A partição seleccionda para %1, não é uma partição Linux.
+Reformatar, de facto, esta partição?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1196"/>
@@ -243,7 +244,7 @@ Are you sure you want to reformat this partition?</source>
         <location filename="minstall.cpp" line="1226"/>
         <source>The partition you selected for /boot, is larger than expected.
 Are you sure you want to reformat this partition?</source>
-        <translation>A partilão escolhida pda /boot é maior do que o esperado. De certeza que pretende reformatar esta partição?</translation>
+        <translation>A partição escolhida para /boot é maior do que o esperado. Reformatar, de facto, esta partição?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1236"/>
@@ -283,12 +284,12 @@ Are you sure you want to reformat this partition?</source>
     <message>
         <location filename="minstall.cpp" line="1655"/>
         <source>Please wait till GRUB is installed, it might take a couple of minutes.</source>
-        <translation>Por favor aguarde até que o GRUB esteja instalado; pode demorar alguns minutos.</translation>
+        <translation>Aguardar até que o GRUB esteja instalado; pode demorar alguns minutos.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1697"/>
         <source>Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function.</source>
-        <translation>Desculpe, mas a instalção do GRUB falhou. Isto pode dever-se a uma alteração na formatação do disco. Pode desmarcar o GRUB e terminar a instalação, e depois iniciar o computador novamente com o meio externo executável para reparar a instalação com a função de reinstalação do GRUB.</translation>
+        <translation>Falha ao instalar o GRUB. Isto pode dever-se a uma alteração na formatação do disco. Pode desmarcar a caixa para instalação do GRUB, terminar a instalação do sistema, e depois reiniciar o computador com o meio externo executável para reparar a instalação com a ferramenta de reinstalação do GRUB.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1820"/>
@@ -299,7 +300,7 @@ Are you sure you want to reformat this partition?</source>
         <location filename="minstall.cpp" line="1826"/>
         <source>Would you like to save the old home directory
 and create a new home directory?</source>
-        <translation>Guardar a informação do diretório home existente
+        <translation>Guardar o diretório home existente
 e criar um novo diretório home?</translation>
     </message>
     <message>
@@ -307,9 +308,9 @@ e criar um novo diretório home?</translation>
         <source>Sorry, failed to save old home directory. Before proceeding,
 you'll have to select a different username or
 delete a previously saved copy of your home directory.</source>
-        <translation>O processo de guardar a informação do diretório home existente falhou.
+        <translation>O processo de guardar o diretório home existente falhou.
 Antes de prosseguir, deve ser selecionado um nome de utilizador diferente
-ou apagada uma cópia anterior do diretório home.</translation>
+ou apagado um diretório home anteriormente guardado.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1851"/>
@@ -348,7 +349,7 @@ Antes de prosseguir, deve ser selecionado um nome de utilizador diferente.</tran
     <message>
         <location filename="minstall.cpp" line="1924"/>
         <source>Sorry, failed to set ownership of user directory.</source>
-        <translation>A atribuição de propriedade à pasta do utilizador falhou.</translation>
+        <translation>A atribuição de propriedade/detenção à pasta do utilizador falhou.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2026"/>
@@ -446,7 +447,7 @@ Escolher um nome diferente.</translation>
 name before proceeding.</source>
         <translation>O nome do domínio do computador
 deve conter pelo menos 2 caracteres.
-Escolher um nome .mais longo</translation>
+Escolher um nome mais longo</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2144"/>
@@ -462,7 +463,7 @@ Escolher um nome diferente.</translation>
         <source>Sorry your workgroup needs to be at least
 2 characters long. You'll have to select a different
 name before proceeding.</source>
-        <translation>O grupo de trabalho deve conter
+        <translation>O nome do grupo de trabalho deve conter
 pelo menos 2 caracteres.
 Escolher um nome mais longo.</translation>
     </message>
@@ -487,84 +488,84 @@ Interromper realmente o processo agora?</translation>
     <message>
         <location filename="minstall.cpp" line="2452"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
-        <translation>Deve escolher uma partição boot diferente quando encriptar a raiz (root)</translation>
+        <translation>Tem que ser escolhida uma partição de arranque (boot) diferente quando a raiz (root) for encriptada.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2528"/>
         <source>&lt;p&gt;&lt;b&gt;General Instructions&lt;/b&gt;&lt;br/&gt;BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.&lt;/p&gt;&lt;p&gt;On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.&lt;/p&gt;&lt;p&gt;Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions. &lt;/p&gt;&lt;p&gt;If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.&lt;/p&gt;&lt;p&gt;The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Instruções Gerais&lt;/b&gt;&lt;br/&gt;ANTES DE PROSSEGUIR, FECHAR TODAS AS OUTRAS APLICAÇÕES.&lt;/p&gt;&lt;p&gt;Em cada página, ler as instruções, fazer as escolhas requeridas e clicar em «Próximo». Será pedida confirmação de continuação antes de quaisquer acções destrutivas serem executadas.&lt;/p&gt;&lt;p&gt;A instalação necessita de cerca de %1 de espaço em disco; no entanto, é recomendado usar %2 ou mais. Pode ser usado todo o disco ou podem ser usadas partições. &lt;/p&gt;&lt;p&gt;Em computadores com sistema operativo Mac OS ou Windows (Vista ou posterior), poderá ser necessário usar o software do sistema existente para fazer partições e instalar o gestor do arranque (boot manager) antes de proceder à instalação.&lt;/p&gt;&lt;p&gt;Os sistemas de ficheiros Linux ext2, ext3, ext4, jfs, xfs, btrfs e reiserfs são compatíveis; o sistema de ficheiros ext4 é o recomendado.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Instruções Gerais&lt;/b&gt;&lt;br/&gt;ANTES DE PROSSEGUIR, FECHAR TODAS AS OUTRAS APLICAÇÕES.&lt;/p&gt;&lt;p&gt;Em cada página, ler as instruções, fazer as escolhas requeridas e clicar em «Próximo». Será pedida confirmação de continuação antes de quaisquer acções destrutivas serem executadas.&lt;/p&gt;&lt;p&gt;A instalação necessita de cerca de %1 de espaço em disco; no entanto, é recomendado usar %2 ou mais. Pode ser usado todo o disco ou podem ser usadas partições. &lt;/p&gt;&lt;p&gt;Em computadores com sistema operativo Mac ou Windows (Vista ou posterior), poderá ser necessário usar o software do sistema existente para fazer partições e instalar o gestor de arranque (boot manager) antes de proceder à instalação.&lt;/p&gt;&lt;p&gt;Esta instalação é compatível com os sistemas de ficheiros Linux ext2, ext3, ext4, jfs, xfs, btrfs e reiserfs; o ext4 é o recomendado.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2534"/>
         <source>&lt;p&gt;Autoinstall will place home on the root partition.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;A instalação automátiva vai colocar home na raiz (root)&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;A instalação automática colocará home na raiz (root)&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2535"/>
         <location filename="minstall.cpp" line="2555"/>
         <source>&lt;p&gt;&lt;b&gt;Encryption&lt;/b&gt;&lt;br/&gt;Encryption is possible via LUKS.  A password is required (8 characters minimum length)&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Encriptação&lt;/b&gt;&lt;br/&gt;A encriptação é possível via LUKS.  É necessária uma senha (com o mínimo de 8 caracters)&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Encriptação&lt;/b&gt;&lt;br/&gt;É possível encriptação via LUKS.  É necessária uma senha (com o mínimo de 8 caracters)&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2536"/>
         <location filename="minstall.cpp" line="2556"/>
         <source>&lt;p&gt;A separate unencrypted boot partition is required. For additional settings including cipher selection, use the &lt;b&gt;Edit advanced encryption settings&lt;/b&gt; button.&lt;/p&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;p&gt;É necessária uma partição boot não encriptada. Para configurações adicionais, incluindo selecção de cifra, usar o botão &lt;b&gt;Editar definições avançadas de encriptação&lt;/b&gt;.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2537"/>
         <source>&lt;p&gt;When encryption is used with autoinstall, the separate boot partition will be automatically created&lt;/p&gt;</source>
-        <translation>&gt;&lt;p&gt;; Quando é utilizada encriptção com a instalação automática, uma partição boot separada será automaticamente criada&lt;/p&gt;</translation>
+        <translation>&gt;&lt;p&gt;Quando é feita uma instalação automática, é automaticamente criada uma partição boot separada&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2544"/>
         <source>&lt;p&gt;&lt;b&gt;Limitations&lt;/b&gt;&lt;br/&gt;Remember, this software is provided AS-IS with no warranty what-so-ever. It&apos;s solely your responsibility to backup your data before proceeding.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Choose Partitions&lt;/b&gt;&lt;br/&gt;%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.&lt;/p&gt;&lt;p&gt;If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Upgrading&lt;/b&gt;&lt;br/&gt;To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.&lt;/p&gt;&lt;p&gt;If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Preferred Filesystem Type&lt;/b&gt;&lt;br/&gt;For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. &lt;/p&gt;&lt;p&gt;Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bad Blocks&lt;/b&gt;&lt;br/&gt;If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Limitações&lt;/b&gt;&lt;br/&gt;Este software é disponibilizado COMO ESTÁ, sem qualquer tipo de garantia. É da exclusiva responsabilidade do utilizador fazer uma cópia de segurança dos dados que tenha no computador, antes de prosseguir.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Escolher Partições&lt;/b&gt;&lt;br/&gt;O %1 requere uma partição raíz ( / , root). A partição de trocas (swap) é opcional mas altamente recomendada. Para usar a função Hibernar (Suspender-para-o-Disco) do %1 é necessária uma partição de trocas (swap) maior do que a memória RAM física no computador.&lt;/p&gt;&lt;p&gt;Ter uma partição /home separada facilitará no futuro a substituição do sistema por uma nova versão. Mas se o sistema instalado não tiver numa partição /home separada, já não será possível criá-la.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Actualizar&lt;/b&gt;&lt;br/&gt;Para substituir um sistema/instalação Linux por uma nova versão, marcar a caixa «Preservar dados em /home» e seleccionar a partição /home (caso exista).&lt;/p&gt;&lt;p&gt;Ao preservar a árvore do directório /home da partição raíz/root (quando não existe uma partição /home separada) o instalador não reformatará a partição raíz/root, o que resultará num processo de instalação muito mais demorado do que o habitual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Tipo de Sistema de Ficheiros Preferido&lt;/b&gt;&lt;br/&gt;O %1, pode ser instalado em partições formatadas como ext2, ext3, ext4, jfs, xfs, btrfs ou reiser. &lt;/p&gt;&lt;p&gt;Partições formatadas como btrfs podem usar opções adicionais de compressão. O sistema lzo proporciona rapidez de compressão, mas a taxa de compressão é menor. O sistema zlib proporciona maior compressão, mas menor rapidez.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Blocos Defeituosos&lt;/b&gt;&lt;br/&gt;Os tipos de formatação ext2, ext3 e ext4 proporcionam a opção de verificação e correcção de blocos defeituosos no disco (estruturalmente o disco é composto de blocos). A verificação dos blocos é muito morosa, pelo que é uma opção que pode ser descartada, a menos que haja suspeitas de que o disco já tem problemas.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Limitações&lt;/b&gt;&lt;br/&gt;Este software é disponibilizado COMO ESTÁ, sem qualquer tipo de garantia. É da exclusiva responsabilidade do utilizador fazer uma cópia de segurança dos dados que tenha no computador, antes de prosseguir.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Escolher Partições&lt;/b&gt;&lt;br/&gt;O %1 requer uma partição raíz ( / , root). A partição de trocas (swap) é opcional mas altamente recomendada. Para usar a função Hibernar (Suspender-para-o-Disco) do %1 é necessária uma partição de trocas (swap) maior do que a memória RAM física no computador.&lt;/p&gt;&lt;p&gt;Ter uma partição /home separada facilitará no futuro a substituição do sistema por uma nova versão. Mas se o sistema instalado não tiver numa partição /home separada, não será possível criá-la posteriormente.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Actualizar&lt;/b&gt;&lt;br/&gt;Para substituir um sistema/instalação Linux por uma nova versão, marcar a caixa «Preservar dados em /home» e seleccionar a partição /home (caso exista).&lt;/p&gt;&lt;p&gt;Ao preservar para a nova instalação a árvore do directório /home existente na partição raíz (quando não existe uma partição /home separada) o instalador não reformatará a partição / (raíz, root), o que resultará num processo de instalação muito mais demorado do que o habitual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Tipo de Sistema de Ficheiros Preferido&lt;/b&gt;&lt;br/&gt;O %1, pode ser instalado em partições formatadas como ext2, ext3, ext4, jfs, xfs, btrfs ou reiser. &lt;/p&gt;&lt;p&gt;Partições formatadas como btrfs podem usar opções adicionais de compressão. O sistema lzo proporciona rapidez de compressão, mas a taxa de compressão é menor. O sistema zlib proporciona maior compressão, mas menor rapidez.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Blocos Defeituosos&lt;/b&gt;&lt;br/&gt;Os tipos de formatação ext2, ext3 e ext4 proporcionam a opção de verificação e correcção de blocos defeituosos no disco (estruturalmente o disco é composto de blocos). A verificação dos blocos é muito morosa, pelo que é uma opção que pode ser descartada, a menos que haja suspeitas de que o disco já tem problemas.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2564"/>
         <source>Advanced Encryption Settings</source>
-        <translation type="unfinished"/>
+        <translation>Definições Avançadas de Encriptação</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2564"/>
         <source>This page allows fine-tuning of LUKS encrypted partitions.</source>
-        <translation type="unfinished"/>
+        <translation>Nesta página é possível ajustar as partições com encriptação LUKS.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2565"/>
         <source>In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>Em geral, as predefinições proporcionam um equilíbrio satisfatório entre segurança e desempenho, adequado para aplicações sensíveis.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2567"/>
         <source>This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.</source>
-        <translation type="unfinished"/>
+        <translation>Este texto dá apenas informação básica sobre os parâmetros usados com o LUKS (Linux Unified Key Setup); não é um guia completo sobre criptografia.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2568"/>
         <source>Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.</source>
-        <translation type="unfinished"/>
+        <translation>Alterar qualquer destas definições sem um bom conhecimento de criptografia pode resultar numa encriptação pouco eficiente.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2569"/>
         <source>Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.</source>
-        <translation type="unfinished"/>
+        <translation>Editar um campo, muitas vezes afecta as opções associadas. Os campos abaixo podem vir a ser automaticamente alterados para os valores recomendados.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2570"/>
         <source>Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.</source>
-        <translation type="unfinished"/>
+        <translation>Embora possa ser obtido melhor desempenho ou maior segurança alterando os valores recomendados das definições, isso acarreta riscos que serão da inteira responsabilidade do utilizador.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2572"/>
         <source>You can use the &lt;b&gt;Benchmark&lt;/b&gt; button (which runs &lt;i&gt;cryptsetup benchmark&lt;/i&gt; in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.</source>
-        <translation type="unfinished"/>
+        <translation>Pode ser usado o botão &lt;b&gt;Comparar&lt;/b&gt; (que executa o &lt;i&gt;cryptsetup benchmark&lt;/i&gt; na sua própria janela de terminal) para comparar o desempenho de combinações comuns de funções hash, cifras e modos de encadeamento (chain modes).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2573"/>
         <source>Please note that &lt;i&gt;cryptsetup benchmark&lt;/i&gt; does not cover all the combinations or selections possible, and generally covers the most commonly used selections.</source>
-        <translation type="unfinished"/>
+        <translation>Notar que o &lt;i&gt;cryptsetup benchmark&lt;/i&gt; não cobre todas as combinações ou selecções possíveis, cobrindo geralmente apenas as selecções mais comummente usadas.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2575"/>
@@ -574,27 +575,27 @@ Interromper realmente o processo agora?</translation>
     <message>
         <location filename="minstall.cpp" line="2575"/>
         <source>A variety of ciphers are available.</source>
-        <translation type="unfinished"/>
+        <translation>Está disponível uma variedade de cifras.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2576"/>
         <source>was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.</source>
-        <translation type="unfinished"/>
+        <translation>era uma das cinco finalistas para AES (Advanced Encryption Standards). É considerada como tendo uma maior margem de segurança do que a Rijndael e todas as outras finalistas. Tem melhor desempenho em algumas CPUs de 64-bit</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2577"/>
         <source>(also known as &lt;i&gt;Rijndael&lt;/i&gt;) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.</source>
-        <translation type="unfinished"/>
+        <translation>(também conhecida como &lt;i&gt;Rijndael&lt;/i&gt;) é uma cifra muito comum e muitas CPUs modernas incluiem instruções específicas para AES, dada a sua generalização. Embora a Rijndael tenha tido preferência sobre a Serpent pelo seu desempenho, presentemente não se esperam ataques eficazes.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2578"/>
         <source>is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.</source>
-        <translation type="unfinished"/>
+        <translation>é a sucessora da Blowfish. Foi uma das cinco finalistas para AES, embora não tenha sido seleccionada para a norma.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2579"/>
         <source>(CAST-256) was a candidate in the AES contest, however it did not become a finalist.</source>
-        <translation type="unfinished"/>
+        <translation>(CAST-256) foi candidata ao concurso para AES, mas não chegou a finalista.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2580"/>
@@ -604,102 +605,102 @@ Interromper realmente o processo agora?</translation>
     <message>
         <location filename="minstall.cpp" line="2582"/>
         <source>Chain mode</source>
-        <translation type="unfinished"/>
+        <translation>Modo de encadeamento (chain mode)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2582"/>
         <source>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.</source>
-        <translation type="unfinished"/>
+        <translation>Se os blocos fossem todos encriptados usando a mesma chave, poderia emergir um padrão que permitisse prenunciar o texto em claro.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2583"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
-        <translation type="unfinished"/>
+        <translation>XEX-based Tweaked codebook with ciphertext Stealing) é um modo de encadeamento moderno, que substitui o CBC e o EBC. É modo de encadeamento predefinido (e recomendado). Usar o ESSIV sobre o Plain64 penalizará o desempenho, tendo um ganho de segurança conhecido mas negligenciável.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2584"/>
         <source>(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>(Cipher Block Chaining) é mais simples do que XTS, mas é vulnerável a um ataque por oráculo de enchimento (padding oracle attack) (de algum modo mitigado por ESSIV) e não é recomendado para aplicações sensíveis.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2585"/>
         <source>(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>(Electronic CodeBook) é menos seguro do que CBC e não deve ser usado para aplicações sensíveis.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2587"/>
         <source>IV generator</source>
-        <translation type="unfinished"/>
+        <translation>Gerador de IV</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2587"/>
         <source>For XTS and CBC, this selects how the &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector is generated. &lt;b&gt;ESSIV&lt;/b&gt; requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.</source>
-        <translation type="unfinished"/>
+        <translation>Para XTS e CBC, selecciona a forma como o &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector (vector de iniciação) é gerado. O &lt;b&gt;ESSIV&lt;/b&gt; requer uma função hash e, por essa razão, uma segunda caixa pendente (drop-down) ficará disponível se esta opção for seleccionada. As funções hash disponíveis dependem da cifra seleccionada.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2588"/>
         <source>ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.</source>
-        <translation type="unfinished"/>
+        <translation>O modo ECB não usa um IV, pelo que estes campos serão todos desactivados se for seleccionado ECB para modo de encadeamento</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2590"/>
         <source>Key size</source>
-        <translation type="unfinished"/>
+        <translation>Tamanho da chave</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2590"/>
         <source>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.</source>
-        <translation type="unfinished"/>
+        <translation>Define o tamanho da chave, em bits. Os tamanhos disponíveis estão limitados pela cifra e pelo modo de encadeamento.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2591"/>
         <source>The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).</source>
-        <translation type="unfinished"/>
+        <translation>O modo de encadeamento de cifra XTS divide a chave ao meio (por exemplo, um AES-256 no modo XTS requer uma chave de 512 bits).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2593"/>
         <source>LUKS key hash</source>
-        <translation type="unfinished"/>
+        <translation>Hash chave LUKS</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2593"/>
         <source>The hash used for PBKDF2 and for the AF splitter.</source>
-        <translation type="unfinished"/>
+        <translation>Hash usada para a PBKDF2 e para o divisor AF.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2594"/>
         <source>SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.</source>
-        <translation type="unfinished"/>
+        <translation>SHA-1 e RIPEMD-160 deixaram de ser recomendadas para aplicações sensíveis, pois já foram quebradas.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2596"/>
         <source>Kernel RNG</source>
-        <translation type="unfinished"/>
+        <translation>RNG do núcleo (kernel)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2596"/>
         <source>Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).</source>
-        <translation type="unfinished"/>
+        <translation>Define que gerador de números aleatórios do núcleo (RNG) será usado para criar a chave do volume de chaves mestras (que é uma chave de longo prazo). </translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2597"/>
         <source>Two options are available: /dev/&lt;b&gt;random&lt;/b&gt; which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/&lt;b&gt;urandom&lt;/b&gt; which will not block even if there is insufficient entropy (possibly weaker keys).</source>
-        <translation type="unfinished"/>
+        <translation>Há duas opções disponíveis: /dev/&lt;b&gt;random&lt;/b&gt; que bloqueia até que seja obtida suficiente entropia (pode demorar bastante em situações de baixa entropia) e /dev/&lt;b&gt;urandom&lt;/b&gt; que não bloqueará mesmo que a entropia seja insuficiente (possivelmente chaves mais fracas).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2599"/>
         <source>KDF round time&lt;/b&gt;&lt;br/&gt;The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.</source>
-        <translation type="unfinished"/>
+        <translation>Duração de ciclo KDF&lt;/b&gt;&lt;br/&gt;Tempo (em milisegundos) a despender com o processamento de frases-senha de PBKDF2.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2600"/>
         <source>A value of 0 selects the compiled-in default (run &lt;i&gt;cryptsetup --help&lt;/i&gt; for details).</source>
-        <translation type="unfinished"/>
+        <translation>O valor 0 selecciona a predefinição incluída (executar &lt;i&gt;cryptsetup --help&lt;/i&gt; para mais informação).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2601"/>
         <source>If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.</source>
-        <translation type="unfinished"/>
+        <translation>Se o computador for lento, este valor pode ser aumentado para segurança adicional à custa do aumento do tempo de desbloqueio dos volumes após uma frase-senha ser introduzida.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2614"/>
@@ -925,7 +926,7 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="meinstall.ui" line="301"/>
         <source>Change Keyboard Settings</source>
-        <translation>Alterar as Definições do Teclado</translation>
+        <translation>Alterar as definições do teclado</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="308"/>
@@ -992,7 +993,7 @@ A voltar ao Passo 1.</translation>
         <location filename="meinstall.ui" line="645"/>
         <location filename="meinstall.ui" line="1276"/>
         <source>Confirm password:</source>
-        <translation type="unfinished"/>
+        <translation>Confirmar a senha:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="652"/>
@@ -1010,7 +1011,7 @@ A voltar ao Passo 1.</translation>
         <location filename="meinstall.ui" line="1283"/>
         <location filename="meinstall.ui" line="1316"/>
         <source>Advanced encryption settings</source>
-        <translation type="unfinished"/>
+        <translation>Definições avançadas de encriptação</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="751"/>
@@ -1136,42 +1137,42 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="meinstall.ui" line="1237"/>
         <source>2c. Encryption options</source>
-        <translation type="unfinished"/>
+        <translation>2c. Opções de encriptação</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1332"/>
         <source>SHA-512</source>
-        <translation type="unfinished"/>
+        <translation>SHA-512</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1337"/>
         <source>SHA-256</source>
-        <translation type="unfinished"/>
+        <translation>SHA-256</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1342"/>
         <source>Whirlpool</source>
-        <translation type="unfinished"/>
+        <translation>Whirlpool</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1347"/>
         <source>SHA-1</source>
-        <translation type="unfinished"/>
+        <translation>SHA-1</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1352"/>
         <source>RIPEMD-160</source>
-        <translation type="unfinished"/>
+        <translation>RIPEMD-160</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1369"/>
         <source>-bit</source>
-        <translation type="unfinished"/>
+        <translation>-bit</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1388"/>
         <source> mS</source>
-        <translation type="unfinished"/>
+        <translation> mS</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1410"/>
@@ -1181,7 +1182,7 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="meinstall.ui" line="1426"/>
         <source>Key size:</source>
-        <translation type="unfinished"/>
+        <translation>Tamanho da chave:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1452"/>
@@ -1191,62 +1192,62 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="meinstall.ui" line="1478"/>
         <source>Cipher:</source>
-        <translation type="unfinished"/>
+        <translation>Cifra:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1498"/>
         <source>Serpent</source>
-        <translation type="unfinished"/>
+        <translation>Serpent</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1503"/>
         <source>AES</source>
-        <translation type="unfinished"/>
+        <translation>AES</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1508"/>
         <source>Twofish</source>
-        <translation type="unfinished"/>
+        <translation>Twofish</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1513"/>
         <source>CAST6</source>
-        <translation type="unfinished"/>
+        <translation>CAST6</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1518"/>
         <source>Blowfish</source>
-        <translation type="unfinished"/>
+        <translation>Blowfish</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1535"/>
         <source>Benchmark...</source>
-        <translation type="unfinished"/>
+        <translation>Comparar...</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1565"/>
         <source>ESSIV</source>
-        <translation type="unfinished"/>
+        <translation>ESSIV</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1570"/>
         <source>Plain64</source>
-        <translation type="unfinished"/>
+        <translation>Plain64</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1575"/>
         <source>Plain64BE</source>
-        <translation type="unfinished"/>
+        <translation>Plain64BE</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1580"/>
         <source>Plain</source>
-        <translation type="unfinished"/>
+        <translation>Plain</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1585"/>
         <source>BENBI</source>
-        <translation type="unfinished"/>
+        <translation>BENBI</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1599"/>
@@ -1266,12 +1267,12 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="meinstall.ui" line="1640"/>
         <source>random</source>
-        <translation type="unfinished"/>
+        <translation>random</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1645"/>
         <source>urandom</source>
-        <translation type="unfinished"/>
+        <translation>urandom</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1681"/>
@@ -1307,7 +1308,7 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="meinstall.ui" line="1959"/>
         <source>Partition to use:</source>
-        <translation type="unfinished"/>
+        <translation>Partição a usar:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1981"/>
@@ -1357,7 +1358,7 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="meinstall.ui" line="2103"/>
         <source>PBR</source>
-        <translation type="unfinished"/>
+        <translation>PBR</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2154"/>
