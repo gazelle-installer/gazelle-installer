@@ -1390,7 +1390,7 @@ Retour à l&apos;étape 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="1084"/>
         <source>Type</source>
-        <translation>Tapez</translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1100"/>
