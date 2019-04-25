@@ -469,10 +469,24 @@ void MInstall::processNextPhase()
         setComputerName();
         setLocale();
         setCursor(QCursor(Qt::ArrowCursor));
+        if (checkSaveAutoFile->isChecked()) {
+            saveConfig();
+        }
         phase = 4;
         updateStatus(tr("Installation successful"), 100);
         csleep(1000);
         gotoPage(11);
+    }
+    if (phase == 4) {
+        if (checkAutoExit->isChecked()) {
+            if (radioAutoExitReboot->isChecked()) {
+                stopInstall(1);
+            } else if (radioAutoExitShutdown->isChecked()) {
+                stopInstall(2);
+            }
+        }
+        // print version (look for /usr/sbin/minstall since the name of the package might be different)
+        qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
     }
 }
 
@@ -2317,7 +2331,7 @@ void MInstall::setServices()
 
 }
 
-void MInstall::stopInstall()
+void MInstall::stopInstall(int poweraction)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     int curr = widgetStack->currentIndex();
@@ -2333,10 +2347,15 @@ void MInstall::stopInstall()
             qApp->exit(0);
             return;
         }
-        if (checkBoxExitReboot->isChecked()) {
+        if (poweraction) {
             csleep(1000);
             shell.run("swapoff -a");
-            shell.run("/usr/local/bin/persist-config --shutdown --command reboot &");
+            QString powercmd = "/usr/local/bin/persist-config --shutdown --command %1";
+            if (poweraction == 1) {
+                shell.run(powercmd.arg("reboot"));
+            } else if (poweraction == 2) {
+                shell.run(powercmd.arg("halt"));
+            }
         }
         qApp->exit(0);
     } else if (curr > 3) {
@@ -2624,13 +2643,6 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 11: // done
-        if (!args.contains("--pretend") && !args.contains("-p")) {
-            if (checkSaveAutoFile->isChecked()) {
-                saveConfig();
-            }
-            // print version (look for /usr/sbin/minstall since the name of the package might be different)
-            qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
-        }
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                                        "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -2676,7 +2688,7 @@ void MInstall::gotoPage(int next)
     }
     if (next > c-1) {
         // finished
-        stopInstall();
+        stopInstall(checkBoxExitReboot->isChecked() ? 1 : 0);
         gotoPage(0);
         return;
     }
