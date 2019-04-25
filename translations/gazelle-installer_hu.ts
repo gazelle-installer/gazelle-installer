@@ -996,6 +996,76 @@ Returning to Step 1.</source>
         <translation>Következő</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1086,9 +1156,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. A partíciók átrendezése (opcionális)</translation>
+        <translation type="vanished">1b. A partíciók átrendezése (opcionális)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1101,9 +1170,8 @@ Returning to Step 1.</source>
         <translation>Fuss partíció eszköz...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Válassz lemezt a telepítésre</translation>
+        <translation type="vanished">1a. Válassz lemezt a telepítésre</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1111,9 +1179,8 @@ Returning to Step 1.</source>
         <translation>Ezt a lemezt használd:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Válassz telepítési típust</translation>
+        <translation type="vanished">1c. Válassz telepítési típust</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1161,9 +1228,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Beállítások</translation>
+        <translation type="vanished">2b. Beállítások</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1176,9 +1242,8 @@ Returning to Step 1.</source>
         <translation>Hibás blokkok keresése (tovább tart)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. Válassz partíciókat</translation>
+        <translation type="vanished">2a. Válassz partíciókat</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1279,11 +1344,6 @@ Returning to Step 1.</source>
     <message>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1446,9 +1506,8 @@ Returning to Step 1.</source>
         <translation>Tippek</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Válassz Indítási Módot</translation>
+        <translation type="vanished">4. Válassz Indítási Módot</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1520,9 +1579,8 @@ Returning to Step 1.</source>
         <translation>Leírás</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Számítógép hálózati nevek</translation>
+        <translation type="vanished">5. Számítógép hálózati nevek</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1555,9 +1613,8 @@ Returning to Step 1.</source>
         <translation>Számítógép név:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Szolgáltatás beállításai (haladó) </translation>
+        <translation type="vanished">6d. Szolgáltatás beállításai (haladó) </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1570,9 +1627,8 @@ Returning to Step 1.</source>
         <translation>kilátás </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Óra Beállítása</translation>
+        <translation type="vanished">6b. Óra Beállítása</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1585,9 +1641,8 @@ Returning to Step 1.</source>
         <translation>A számítógép órája LOCAL-re van állítva</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Lokalizációs Alapértelmezések</translation>
+        <translation type="vanished">6a. Lokalizációs Alapértelmezések</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1595,9 +1650,8 @@ Returning to Step 1.</source>
         <translation>Hely:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Válasszon időzónát</translation>
+        <translation type="vanished">6c. Válasszon időzónát</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1605,9 +1659,8 @@ Returning to Step 1.</source>
         <translation>Időzóna:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Root (rendszergazda) Fiók</translation>
+        <translation type="vanished">7b. Root (rendszergazda) Fiók</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1620,9 +1673,8 @@ Returning to Step 1.</source>
         <translation>Root jelszó:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Alapértelmezett Felhasználói Fiók</translation>
+        <translation type="vanished">7a. Alapértelmezett Felhasználói Fiók</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

@@ -1047,6 +1047,76 @@ Returning to Step 1.</source>
         <translation>Дальше</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1137,9 +1207,8 @@ Returning to Step 1.</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Настройки клавиатуры&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. Переустройство разделов жесткого диска (по желанию)</translation>
+        <translation type="vanished">1b. Переустройство разделов жесткого диска (по желанию)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1152,9 +1221,8 @@ Returning to Step 1.</source>
         <translation>Запустить инструмент работы с разделами...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1а. Выберите диск для установки</translation>
+        <translation type="vanished">1а. Выберите диск для установки</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1162,9 +1230,8 @@ Returning to Step 1.</source>
         <translation>Использовать диск:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Выберите тип установки</translation>
+        <translation type="vanished">1c. Выберите тип установки</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1212,9 +1279,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Предпочтения</translation>
+        <translation type="vanished">2b. Предпочтения</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1227,9 +1293,8 @@ Returning to Step 1.</source>
         <translation>Проверить &quot;битые блоки&quot; (занимает больше времени)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2а. Выберите разделы</translation>
+        <translation type="vanished">2а. Выберите разделы</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1331,11 +1396,6 @@ Returning to Step 1.</source>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
         <translation>Положение</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1316"/>
@@ -1497,9 +1557,8 @@ Returning to Step 1.</source>
         <translation>Подсказки</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Выберите способ загрузки</translation>
+        <translation type="vanished">4. Выберите способ загрузки</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1571,9 +1630,8 @@ Returning to Step 1.</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Имена компьютерной сети</translation>
+        <translation type="vanished">5. Имена компьютерной сети</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1606,9 +1664,8 @@ Returning to Step 1.</source>
         <translation>Имя компьютера:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Настройки служб (расширенные)</translation>
+        <translation type="vanished">6d. Настройки служб (расширенные)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1621,9 +1678,8 @@ Returning to Step 1.</source>
         <translation>Вид</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Настройка часов</translation>
+        <translation type="vanished">6b. Настройка часов</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1636,9 +1692,8 @@ Returning to Step 1.</source>
         <translation>Системные часы используют местное время</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6а. Локализация по умолчанию</translation>
+        <translation type="vanished">6а. Локализация по умолчанию</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1646,9 +1701,8 @@ Returning to Step 1.</source>
         <translation>Языковые установки:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Настройки часового пояса</translation>
+        <translation type="vanished">6c. Настройки часового пояса</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1656,9 +1710,8 @@ Returning to Step 1.</source>
         <translation>Часовой пояс:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Суперпользователь (администратор)</translation>
+        <translation type="vanished">7b. Суперпользователь (администратор)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1671,9 +1724,8 @@ Returning to Step 1.</source>
         <translation>Пароль суперпользователя:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7а. Пользователь по умолчанию</translation>
+        <translation type="vanished">7а. Пользователь по умолчанию</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

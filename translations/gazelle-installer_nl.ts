@@ -1046,6 +1046,76 @@ Terugkeren naar Stap 1.</translation>
         <translation>Volgende</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1136,9 +1206,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Toetsenbord Instellingen&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b Schijfpartities opnieuw inrichten (optioneel)</translation>
+        <translation type="vanished">1b Schijfpartities opnieuw inrichten (optioneel)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1151,9 +1220,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Run partitie tool...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Kies schijf voor de installatie</translation>
+        <translation type="vanished">1a. Kies schijf voor de installatie</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1161,9 +1229,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Gebruik schijf:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Kies type installatie</translation>
+        <translation type="vanished">1c. Kies type installatie</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1211,9 +1278,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Gevorderde versleutelinstellingen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Voorkeuren</translation>
+        <translation type="vanished">2b. Voorkeuren</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1226,9 +1292,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Zoek naar Bad-Blocks (duurt langer)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a Partities kiezen</translation>
+        <translation type="vanished">2a Partities kiezen</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1332,9 +1397,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Locatie</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1209"/>
         <source>2c. Encryption options</source>
-        <translation>2c. Versleutelopties</translation>
+        <translation type="vanished">2c. Versleutelopties</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1316"/>
@@ -1496,9 +1560,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Tips</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Selecteer opstartmethode</translation>
+        <translation type="vanished">4. Selecteer opstartmethode</translation>
     </message>
     <message>
         <source>Partition to use:</source>
@@ -1574,9 +1637,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Beschrijving</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Computer Netwerk Namen</translation>
+        <translation type="vanished">5. Computer Netwerk Namen</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1609,9 +1671,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Computernaam:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d.  Services instellingen (geavanceerd)</translation>
+        <translation type="vanished">6d.  Services instellingen (geavanceerd)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1624,9 +1685,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Bekijk</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Configureer Klok</translation>
+        <translation type="vanished">6b. Configureer Klok</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1639,9 +1699,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Systeemklok gebruikt LOCAL</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Localisatie Standaarden</translation>
+        <translation type="vanished">6a. Localisatie Standaarden</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1649,9 +1708,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Lokale:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Tijdzone Instellingen</translation>
+        <translation type="vanished">6c. Tijdzone Instellingen</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1659,9 +1717,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Tijdzone:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Root (administrator) Account</translation>
+        <translation type="vanished">7b. Root (administrator) Account</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1674,9 +1731,8 @@ Terugkeren naar Stap 1.</translation>
         <translation>Root wachtwoord:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Standaard Gerbruikersaccount</translation>
+        <translation type="vanished">7a. Standaard Gerbruikersaccount</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

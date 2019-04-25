@@ -1029,6 +1029,76 @@ Retornant al primer pas.</translation>
         <translation>Següent</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1119,9 +1189,8 @@ Retornant al primer pas.</translation>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Disposició del teclat&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. Modifica les particions del disc (opcional)</translation>
+        <translation type="vanished">1b. Modifica les particions del disc (opcional)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1134,9 +1203,8 @@ Retornant al primer pas.</translation>
         <translation>Executa l&apos;eina de partició...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Trieu el disc d&apos;instal·lació</translation>
+        <translation type="vanished">1a. Trieu el disc d&apos;instal·lació</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1144,9 +1212,8 @@ Retornant al primer pas.</translation>
         <translation>Usa el disc:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Trieu el tipus d&apos;instal·lació</translation>
+        <translation type="vanished">1c. Trieu el tipus d&apos;instal·lació</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1194,9 +1261,8 @@ Retornant al primer pas.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Preferències </translation>
+        <translation type="vanished">2b. Preferències </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1209,9 +1275,8 @@ Retornant al primer pas.</translation>
         <translation>Comprova blocs defectuosos (triga més)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a: Tria particions</translation>
+        <translation type="vanished">2a: Tria particions</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1313,11 +1378,6 @@ Retornant al primer pas.</translation>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
         <translation>Ubicació</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1316"/>
@@ -1479,9 +1539,8 @@ Retornant al primer pas.</translation>
         <translation>Trucs</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Trieu el mètode d&apos;arrencada</translation>
+        <translation type="vanished">4. Trieu el mètode d&apos;arrencada</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1553,9 +1612,8 @@ Retornant al primer pas.</translation>
         <translation>Descripció </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Noms de xarxa d&apos;ordinadors </translation>
+        <translation type="vanished">5. Noms de xarxa d&apos;ordinadors </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1588,9 +1646,8 @@ Retornant al primer pas.</translation>
         <translation>Nom d&apos;ordinador: </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Configuració de Serveis (avançat) </translation>
+        <translation type="vanished">6d. Configuració de Serveis (avançat) </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1603,9 +1660,8 @@ Retornant al primer pas.</translation>
         <translation>Veure </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Configura el Rellotge</translation>
+        <translation type="vanished">6b. Configura el Rellotge</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1618,9 +1674,8 @@ Retornant al primer pas.</translation>
         <translation>El rellotge del sistema usa LOCAL</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Localització per omissió</translation>
+        <translation type="vanished">6a. Localització per omissió</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1628,9 +1683,8 @@ Retornant al primer pas.</translation>
         <translation>Locale: </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Paràmetres del fus horari</translation>
+        <translation type="vanished">6c. Paràmetres del fus horari</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1638,9 +1692,8 @@ Retornant al primer pas.</translation>
         <translation>Fus horari: </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Compte d&apos;Usuari Principal (root)</translation>
+        <translation type="vanished">7b. Compte d&apos;Usuari Principal (root)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1653,9 +1706,8 @@ Retornant al primer pas.</translation>
         <translation>Contrasenya de root: </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Compte d&apos;usuari per omissió</translation>
+        <translation type="vanished">7a. Compte d&apos;usuari per omissió</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>
