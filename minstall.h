@@ -194,6 +194,8 @@ private slots:
     void on_grubPbrButton_toggled();
     void on_grubEspButton_toggled();
 
+    void on_progressBar_valueChanged(int value);
+
 private:
     int phase = 0;
     bool isHomeEncrypted = false;
@@ -210,6 +212,11 @@ private:
 
     // for file copy progress updates
     fsfilcnt_t iTargetInodes = 0;
+
+    // for the tips display
+    int ixTip = 0;
+    int ixTipStart = -1;
+    int iLastProgress = -1;
 
     // for partition combo updates
     QHash<QString, int> removedRoot; // remember items removed from combo box: item, index
