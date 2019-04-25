@@ -54,12 +54,13 @@ public:
     // helpers
     bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
     int runCmd(QString cmd);
-    static QString getCmdOut(QString cmd);
-    static QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
-    static QStringList getCmdOuts(QString cmd);
-    static QStringList getCmdValues(QString cmd, QString key, QString keydel, QString valdel);
+    QProcess::ExitStatus runCmd2(QString cmd);
+    void csleep(int msec);
+    QString getCmdOut(QString cmd);
+    QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
+    QStringList getCmdOuts(QString cmd);
     static int command(const QString &string);
-    static int getPartitionNumber();
+    int getPartitionNumber();
 
     bool is32bit();
     bool is64bit();
@@ -67,9 +68,9 @@ public:
     bool isGpt(QString drv);
 
     bool checkDisk();
-    bool checkEsp();
     bool checkPassword(const QString &pass);
     bool installLoader();
+    bool validateChosenPartitions();
     bool makeChosenPartitions();
     bool makeDefaultPartitions();
     bool makeEsp(QString drv, int size);
@@ -80,19 +81,21 @@ public:
     bool makeSwapPartition(QString dev);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
     bool removeKernel();
+    bool validateUserInfo();
+    bool validateComputerName();
     bool setComputerName();
     bool setPasswords();
     bool setUserInfo();
     bool setUserName();
     void addItemCombo(QComboBox *cb, const QString *part);
-    void buildESPlist();
-    void buildPartList();
+    void buildBootLists();
     void buildServiceList();
     void copyLinux();
     void disablehiberanteinitramfs();
     void installLinux();
     void makeFstab();
     void prepareToInstall();
+    void processNextPhase();
     void removeItemCombo(QComboBox *cb, const QString *part);
     void saveConfig();
     void setLocale();
@@ -133,20 +136,15 @@ public:
     void pageDisplayed(int next);
     void refresh();
     void setupkeyboardbutton();
-    void stopInstall();
+    void stopInstall(int poweraction);
 
 public slots:
     void procAbort();
     void cleanup();
     //    void moreClicked(QListViewItem *item);
-    void delStart();
-    void delDone(int, QProcess::ExitStatus exitStatus);
     void delTime();
 
-    void copyStart();
-    void copyDone(int, QProcess::ExitStatus exitStatus);
     void copyTime();
-    void procTime();
 
 private slots:
     void on_abortInstallButton_clicked();
@@ -191,17 +189,22 @@ private slots:
     void on_swapCombo_activated(const QString &arg1);
     void on_bootCombo_activated(const QString &arg1);
 
+    void on_grubCheckBox_toggled(bool checked);
     void on_grubMbrButton_toggled();
     void on_grubPbrButton_toggled();
     void on_grubEspButton_toggled();
 
+    void on_progressBar_valueChanged(int value);
+
 private:
+    int phase = 0;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
     bool isRootFormatted = false;
     bool isHomeFormatted = false;
     bool uefi = false;
+    bool haveSysConfig = false;
 
     Cmd shell;
     QString home_mntops = "defaults";
@@ -209,6 +212,11 @@ private:
 
     // for file copy progress updates
     fsfilcnt_t iTargetInodes = 0;
+
+    // for the tips display
+    int ixTip = 0;
+    int ixTipStart = -1;
+    int iLastProgress = -1;
 
     // for partition combo updates
     QHash<QString, int> removedRoot; // remember items removed from combo box: item, index
@@ -221,6 +229,13 @@ private:
     QString prevItemHome;
     QString prevItemSwap;
     QString prevItemBoot;
+
+    // info needed for Phase 2 of the process
+    QStringList listBootDrives;
+    QStringList listBootESP;
+    QStringList listBootPart;
+    bool haveSamba = false;
+    bool haveSnapshotUserAccounts = false;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
