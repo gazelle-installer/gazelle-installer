@@ -311,7 +311,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>1b. Rearrange disk partitions (optional)</string>
+          <string>Rearrange disk partitions (optional)</string>
          </property>
          <layout class="QGridLayout">
           <property name="leftMargin">
@@ -370,7 +370,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>1a. Choose disk for installation</string>
+          <string>Choose disk for installation</string>
          </property>
          <layout class="QGridLayout">
           <property name="leftMargin">
@@ -429,7 +429,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>1c. Select type of installation</string>
+          <string>Select type of installation</string>
          </property>
          <layout class="QGridLayout">
           <property name="leftMargin">
@@ -720,7 +720,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>2b. Preferences</string>
+          <string>Preferences</string>
          </property>
          <layout class="QGridLayout">
           <property name="leftMargin">
@@ -785,7 +785,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>2a. Choose partitions</string>
+          <string>Choose partitions</string>
          </property>
          <layout class="QGridLayout">
           <property name="leftMargin">
@@ -1206,7 +1206,7 @@
           <bool>true</bool>
          </property>
          <property name="title">
-          <string>2c. Encryption options</string>
+          <string>Encryption options</string>
          </property>
          <property name="flat">
           <bool>false</bool>
@@ -1743,7 +1743,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>4. Select Boot Method</string>
+          <string>Select Boot Method</string>
          </property>
          <layout class="QGridLayout" name="_8">
           <property name="leftMargin">
@@ -2065,7 +2065,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>5. Computer Network Names</string>
+          <string>Computer Network Names</string>
          </property>
          <layout class="QGridLayout" name="_12">
           <property name="leftMargin">
@@ -2252,7 +2252,7 @@
           </size>
          </property>
          <property name="title">
-          <string>6d. Service Settings (advanced)</string>
+          <string>Service Settings (advanced)</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
@@ -2302,7 +2302,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>6b. Configure Clock</string>
+          <string>Configure Clock</string>
          </property>
          <layout class="QGridLayout">
           <property name="leftMargin">
@@ -2376,7 +2376,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>6a. Localization Defaults</string>
+          <string>Localization Defaults</string>
          </property>
          <layout class="QGridLayout" name="_14">
           <property name="leftMargin">
@@ -2435,7 +2435,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>6c. Timezone Settings</string>
+          <string>Timezone Settings</string>
          </property>
          <layout class="QGridLayout" name="tzGridLayout">
           <item row="0" column="0">
@@ -2521,7 +2521,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>7b. Root (administrator) Account</string>
+          <string>Root (administrator) Account</string>
          </property>
          <layout class="QGridLayout">
           <property name="leftMargin">
@@ -2627,7 +2627,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>7a. Default User Account</string>
+          <string>Default User Account</string>
          </property>
          <layout class="QGridLayout">
           <property name="leftMargin">
