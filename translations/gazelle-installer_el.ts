@@ -1047,6 +1047,76 @@ Returning to Step 1.</source>
         <translation>Επόμενο</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1137,9 +1207,8 @@ Returning to Step 1.</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Ρύθμιση Γλώσσας&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. Επανατακτοποίηση κατατμήσεων του δίσκου</translation>
+        <translation type="vanished">1b. Επανατακτοποίηση κατατμήσεων του δίσκου</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1152,9 +1221,8 @@ Returning to Step 1.</source>
         <translation>Τρέξτε το εργαλείο.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Επιλέξτε δίσκο για την εγκατάσταση</translation>
+        <translation type="vanished">1a. Επιλέξτε δίσκο για την εγκατάσταση</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1162,9 +1230,8 @@ Returning to Step 1.</source>
         <translation>Δίσκος</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Επιλέξτε το είδος εγκατάστασης</translation>
+        <translation type="vanished">1c. Επιλέξτε το είδος εγκατάστασης</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1212,9 +1279,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Προτιμήσεις</translation>
+        <translation type="vanished">2b. Προτιμήσεις</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1227,9 +1293,8 @@ Returning to Step 1.</source>
         <translation>Ελέγξτε για badblocks (κρατά παραπάνω χρόνο)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. Επιλέξτε κατατμήσεις</translation>
+        <translation type="vanished">2a. Επιλέξτε κατατμήσεις</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1331,11 +1396,6 @@ Returning to Step 1.</source>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
         <translation>Τοποθεσία:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1316"/>
@@ -1497,9 +1557,8 @@ Returning to Step 1.</source>
         <translation>Συμβουλές</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Επιλεξτε Μέθοδο Εγκατάστασης</translation>
+        <translation type="vanished">4. Επιλεξτε Μέθοδο Εγκατάστασης</translation>
     </message>
     <message>
         <source>Partition to use:</source>
@@ -1575,9 +1634,8 @@ Returning to Step 1.</source>
         <translation>Περιγραφή</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Ονόματα Υπολογιστών Δικτύου</translation>
+        <translation type="vanished">5. Ονόματα Υπολογιστών Δικτύου</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1610,9 +1668,8 @@ Returning to Step 1.</source>
         <translation>Όνομα Υπολογιστή:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Ρυθμίσεις υπηρεσίας (για προχωρημένους)</translation>
+        <translation type="vanished">6d. Ρυθμίσεις υπηρεσίας (για προχωρημένους)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1625,9 +1682,8 @@ Returning to Step 1.</source>
         <translation>Άποψη</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Ρύθμιση Ωρολογίου</translation>
+        <translation type="vanished">6b. Ρύθμιση Ωρολογίου</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1640,9 +1696,8 @@ Returning to Step 1.</source>
         <translation>Το ρολόι του συστήματος χρησιμοποιεί ώρα LOCAL</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Προεπιλογές Τοπικοποίησης (Localization)</translation>
+        <translation type="vanished">6a. Προεπιλογές Τοπικοποίησης (Localization)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1650,9 +1705,8 @@ Returning to Step 1.</source>
         <translation>Locale:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Ρυθμόσεις Ζώνης ώρας</translation>
+        <translation type="vanished">6c. Ρυθμόσεις Ζώνης ώρας</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1660,9 +1714,8 @@ Returning to Step 1.</source>
         <translation>Ζώνη ώρας:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Λογαριασμός Root (Διαχειριστή)</translation>
+        <translation type="vanished">7b. Λογαριασμός Root (Διαχειριστή)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1675,9 +1728,8 @@ Returning to Step 1.</source>
         <translation>Κωδικός του χρήστη root:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Λογαριασμός Προεπιλεγμένου Χρήστη</translation>
+        <translation type="vanished">7a. Λογαριασμός Προεπιλεγμένου Χρήστη</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

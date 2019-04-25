@@ -1005,6 +1005,76 @@ Returning to Step 1.</source>
         <translation>Ďalej</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1095,9 +1165,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. Upraviť diskové oddiely (voliteľné)</translation>
+        <translation type="vanished">1b. Upraviť diskové oddiely (voliteľné)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1110,9 +1179,8 @@ Returning to Step 1.</source>
         <translation>Spúšťa sa nástroj na delenie disku...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Vybrať disk pre inštaláciu</translation>
+        <translation type="vanished">1a. Vybrať disk pre inštaláciu</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1120,9 +1188,8 @@ Returning to Step 1.</source>
         <translation>Použiť disk:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Vyberte typ inštalácie</translation>
+        <translation type="vanished">1c. Vyberte typ inštalácie</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1170,9 +1237,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Nastavenia</translation>
+        <translation type="vanished">2b. Nastavenia</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1185,9 +1251,8 @@ Returning to Step 1.</source>
         <translation>Zkontrolovať chybné sektory (trvá dlhšie)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. Vybrať diskové oddiely</translation>
+        <translation type="vanished">2a. Vybrať diskové oddiely</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1288,11 +1353,6 @@ Returning to Step 1.</source>
     <message>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1455,9 +1515,8 @@ Returning to Step 1.</source>
         <translation>Rady</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Vybrať spôsob zavadenia systému</translation>
+        <translation type="vanished">4. Vybrať spôsob zavadenia systému</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1529,9 +1588,8 @@ Returning to Step 1.</source>
         <translation>Popis</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Sieťové názvy PC</translation>
+        <translation type="vanished">5. Sieťové názvy PC</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1564,9 +1622,8 @@ Returning to Step 1.</source>
         <translation>Názov PC:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Nastavenia služieb (rozšírené)</translation>
+        <translation type="vanished">6d. Nastavenia služieb (rozšírené)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1579,9 +1636,8 @@ Returning to Step 1.</source>
         <translation>Zobraziť</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Nastaviť hodiny</translation>
+        <translation type="vanished">6b. Nastaviť hodiny</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1594,9 +1650,8 @@ Returning to Step 1.</source>
         <translation>Systémové hodiny používajú lokalizáciu</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Predvolené nastavenia lokalizácie </translation>
+        <translation type="vanished">6a. Predvolené nastavenia lokalizácie </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1604,9 +1659,8 @@ Returning to Step 1.</source>
         <translation>Lokalizácia:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Nastavenie časového pásma</translation>
+        <translation type="vanished">6c. Nastavenie časového pásma</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1614,9 +1668,8 @@ Returning to Step 1.</source>
         <translation>Časově pásmo:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Konto Root (administrátor)</translation>
+        <translation type="vanished">7b. Konto Root (administrátor)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1629,9 +1682,8 @@ Returning to Step 1.</source>
         <translation>Heslo pre root konto:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Konto predvoleného užívateľa</translation>
+        <translation type="vanished">7a. Konto predvoleného užívateľa</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

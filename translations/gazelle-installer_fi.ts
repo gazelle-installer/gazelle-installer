@@ -1050,6 +1050,76 @@ Palataan vaiheeseen 1.</translation>
         <translation>Seuraava</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1140,9 +1210,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Näppäimistön asetukset&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. Järjestä levyn osiot uudelleen (valinnainen)</translation>
+        <translation type="vanished">1b. Järjestä levyn osiot uudelleen (valinnainen)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1155,9 +1224,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Suorita osiotyökalu...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Valitse levy asennusta varten</translation>
+        <translation type="vanished">1a. Valitse levy asennusta varten</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1165,9 +1233,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Käytä levyä:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Valitse asennuksen tyyppi</translation>
+        <translation type="vanished">1c. Valitse asennuksen tyyppi</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1215,9 +1282,8 @@ Palataan vaiheeseen 1.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Asetukset</translation>
+        <translation type="vanished">2b. Asetukset</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1230,9 +1296,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Tarkista mahdollisesti huonot lohkot (kestää kauemmin)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. Valitse osioinnit</translation>
+        <translation type="vanished">2a. Valitse osioinnit</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1334,11 +1399,6 @@ Palataan vaiheeseen 1.</translation>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
         <translation>Paikka</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1316"/>
@@ -1500,9 +1560,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Vinkkejä</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Valitse käynnistystapa</translation>
+        <translation type="vanished">4. Valitse käynnistystapa</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1574,9 +1633,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Kuvaus</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Tietokoneen verkkonimet</translation>
+        <translation type="vanished">5. Tietokoneen verkkonimet</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1609,9 +1667,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Tietokoneen nimi:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Palveluiden asetukset (edistynyt)</translation>
+        <translation type="vanished">6d. Palveluiden asetukset (edistynyt)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1624,9 +1681,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Näytä</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Konfiguroi kellonkaika</translation>
+        <translation type="vanished">6b. Konfiguroi kellonkaika</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1639,9 +1695,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Käytä paikallista aikaa järjestelmän kellonaikana</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Oletuslokalisaatiot</translation>
+        <translation type="vanished">6a. Oletuslokalisaatiot</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1649,9 +1704,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Sijainti:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Aikavyöhykkeen asetukset</translation>
+        <translation type="vanished">6c. Aikavyöhykkeen asetukset</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1659,9 +1713,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Aikavyöhyke:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Pääkäyttäjän (ylläpitäjä) käyttäjätili</translation>
+        <translation type="vanished">7b. Pääkäyttäjän (ylläpitäjä) käyttäjätili</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1674,9 +1727,8 @@ Palataan vaiheeseen 1.</translation>
         <translation>Pääkäyttäjän salasana:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Oletuskäyttäjätili</translation>
+        <translation type="vanished">7a. Oletuskäyttäjätili</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

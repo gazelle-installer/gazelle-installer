@@ -927,6 +927,76 @@ Returning to Step 1.</source>
         <translation>İleri</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1017,11 +1087,6 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
-        <source>1b. Rearrange disk partitions (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="341"/>
         <source>Modify partitions:</source>
         <translation type="unfinished"></translation>
@@ -1032,9 +1097,8 @@ Returning to Step 1.</source>
         <translation>bölümlendirme aracını çalıştır...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Kurulacak diski seç</translation>
+        <translation type="vanished">1a. Kurulacak diski seç</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1042,9 +1106,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Kurulum türünü seçin</translation>
+        <translation type="vanished">1c. Kurulum türünü seçin</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1092,9 +1155,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Yeğlenenler</translation>
+        <translation type="vanished">2b. Yeğlenenler</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1104,11 +1166,6 @@ Returning to Step 1.</source>
     <message>
         <location filename="../meinstall.ui" line="769"/>
         <source>Check for badblocks (takes longer)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="788"/>
-        <source>2a. Choose partitions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1210,11 +1267,6 @@ Returning to Step 1.</source>
     <message>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1377,9 +1429,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Önyükleme Yöntemini Seçin</translation>
+        <translation type="vanished">4. Önyükleme Yöntemini Seçin</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1451,9 +1502,8 @@ Returning to Step 1.</source>
         <translation>Açıklama</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>Bilgisayar Ağ Adları</translation>
+        <translation type="vanished">Bilgisayar Ağ Adları</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1486,11 +1536,6 @@ Returning to Step 1.</source>
         <translation>Bilgisayar adı:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
-        <source>6d. Service Settings (advanced)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="2273"/>
         <source>Adjust which services should run at startup</source>
         <translation type="unfinished"></translation>
@@ -1499,11 +1544,6 @@ Returning to Step 1.</source>
         <location filename="../meinstall.ui" line="2276"/>
         <source>View</source>
         <translation>Görünüm</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="2305"/>
-        <source>6b. Configure Clock</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1516,9 +1556,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Yerelleştirme Öntanımlıları</translation>
+        <translation type="vanished">6a. Yerelleştirme Öntanımlıları</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1526,9 +1565,8 @@ Returning to Step 1.</source>
         <translation>Bölge</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Saat Dilimi Ayarları</translation>
+        <translation type="vanished">6c. Saat Dilimi Ayarları</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1536,9 +1574,8 @@ Returning to Step 1.</source>
         <translation>Saat dilimi:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Kök (yönetici) Hesabı</translation>
+        <translation type="vanished">7b. Kök (yönetici) Hesabı</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1551,9 +1588,8 @@ Returning to Step 1.</source>
         <translation>Kök parolası:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Öntanımlı Kullanıcı Hesabı</translation>
+        <translation type="vanished">7a. Öntanımlı Kullanıcı Hesabı</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

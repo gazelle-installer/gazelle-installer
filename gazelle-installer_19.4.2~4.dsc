@@ -13,20 +13,20 @@ Build-Depends: qt5-default, qttools5-dev-tools, debhelper (>= 9.2), libcmd
 Package-List:
  mx-installer deb system optional arch=any
 Checksums-Sha1:
- 32fc57938ce37891e5cc96ce1111d2e96e801f3c 190048 gazelle-installer_19.4.2~4.tar.xz
+ 82ec6451893df45310bd9b7e1e2129b69205462e 189984 gazelle-installer_19.4.2~4.tar.xz
 Checksums-Sha256:
- a41ed1b9e918d3958044185d03548a56d1e609955ea88a89f1a8da49620678b8 190048 gazelle-installer_19.4.2~4.tar.xz
+ 3f2b9fc8d41a4cceab5158d51b3eca84d00a068ba603b86e18d81fe19b6cf96c 189984 gazelle-installer_19.4.2~4.tar.xz
 Files:
- 684c996be6514647dcda7ef23c03644e 190048 gazelle-installer_19.4.2~4.tar.xz
+ fcd3fdbc2727434a57e8f59c3724c0d0 189984 gazelle-installer_19.4.2~4.tar.xz
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFHBAEBCAAxFiEE8ndToY6S45N+YzXncJOMeAZ57pgFAlzB6sITHGFkcmlhbkBt
-eGxpbnV4Lm9yZwAKCRBwk4x4BnnumKKMCADLGfAEaTpSj6SYka/PjDPr4gqeu71x
-yL5+6CvH3w5xqoj7OrRZHHYBK8OwsFVyXxieMNQi6fRx3aS0ZVj6L9GF1/hyRJiH
-tn1vPV3owtCOs+TEzA9LNbdHbWX+Wny8kFrdOnwUYTXlyx0W6WSlX8IAczqUBHla
-H2cwbdqvqjH/oZoLsNOJl5g0XOwX/l92qOaRzEMcdiRhUxHQjIlgBqVpyOee2Sno
-VJcA+ORKzNHvzLFxmHqvPo6R0F0LgtFtCXGfvaSBNBjbv7XzCf8MhfUZJ7wvsCUc
-7o4S7G26Ko7O0bSBQQ+mbHRCzLXxFdbZB/eQcMCQa74XIrFVjmfIWkj9
-=k1Sg
+iQFHBAEBCAAxFiEE8ndToY6S45N+YzXncJOMeAZ57pgFAlzB9I8THGFkcmlhbkBt
+eGxpbnV4Lm9yZwAKCRBwk4x4BnnumHQ+B/9aPECbbgi6Px5/CEbwhHqhItC4BAC4
+RYk2u+Wq4NVbFuCrfT8awxFbrQtzVCGjA96cuES9s1PvmaoxF9OoioIlnXjYaj+D
+aXTcUyDTPa3PsBTkiefhGdpEi9/FXag8R3TTJHLCMBoTx9IJeXLd0JvWp5r3x1Z7
+6NVqQLY9EdEjL0w8/RDfOaAgEp+dbEQ4WmEgH0cy2hHIfDW5bYNYqHFvlKdvlv/S
+TY53+zCVfQOb9z+YzrddWRu6MGygNn2Dnp8V7ZjzGIjfjY65JG4NdBrh4UNp1kx2
+s8Uxy5qk7SRxX5EajH7lQ19RN+/4m0JxQAEbmstPg2Xf12IeEIoLdCT3
+=FlNL
 -----END PGP SIGNATURE-----

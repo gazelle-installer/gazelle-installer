@@ -1026,6 +1026,76 @@ Step 1 へ処理を戻します。</translation>
         <translation>次へ</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1116,9 +1186,8 @@ Step 1 へ処理を戻します。</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. ディスクパーティションの再構成 (任意)</translation>
+        <translation type="vanished">1b. ディスクパーティションの再構成 (任意)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1131,9 +1200,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>パーティションツールの起動...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. インストールするディスクの選択</translation>
+        <translation type="vanished">1a. インストールするディスクの選択</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1141,9 +1209,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>使用ディスク:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. インストールする種類の選択</translation>
+        <translation type="vanished">1c. インストールする種類の選択</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1191,9 +1258,8 @@ Step 1 へ処理を戻します。</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. 設定</translation>
+        <translation type="vanished">2b. 設定</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1206,9 +1272,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>不良ブロックの確認 (時間を要します)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. パーティションの選択</translation>
+        <translation type="vanished">2a. パーティションの選択</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1309,11 +1374,6 @@ Step 1 へ処理を戻します。</translation>
     <message>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1476,9 +1536,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>Tips</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. 起動方法の選択</translation>
+        <translation type="vanished">4. 起動方法の選択</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1550,9 +1609,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>説明</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. コンピュータネットワーク名</translation>
+        <translation type="vanished">5. コンピュータネットワーク名</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1585,9 +1643,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>コンピュータ名:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. サービス設定 (高度)</translation>
+        <translation type="vanished">6d. サービス設定 (高度)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1600,9 +1657,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>表示</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. 時間設定</translation>
+        <translation type="vanished">6b. 時間設定</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1615,9 +1671,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>ローカルタイムを使用する</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. 場所のデフォルト</translation>
+        <translation type="vanished">6a. 場所のデフォルト</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1625,9 +1680,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>ロケール:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. タイムゾーン設定</translation>
+        <translation type="vanished">6c. タイムゾーン設定</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1635,9 +1689,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>タイムゾーン:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7a. Root (管理者) アカウント</translation>
+        <translation type="vanished">7a. Root (管理者) アカウント</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1650,9 +1703,8 @@ Step 1 へ処理を戻します。</translation>
         <translation>root パスワード:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. デフォルトユーザーアカウント</translation>
+        <translation type="vanished">7a. デフォルトユーザーアカウント</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>
