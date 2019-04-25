@@ -417,14 +417,11 @@ int MInstall::getPartitionNumber()
 // process the next phase of installation if possible
 void MInstall::processNextPhase()
 {
-    // Phase 0 = not started, Phase 1 = in progress, Phase 2 = post-install steps.
+    // Phase 0 = install not started yet, Phase 1 = install in progress
+    // Phase 2 = waiting for operator input, Phase 3 = post-install steps.
     if(phase == 0) { // No install started yet.
         phase = 1; // installation.
         nextButton->setEnabled(false);
-        if (!checkDisk()) {
-            goBack(tr("Returning to Step 1 to select another disk."));
-            return;
-        }
         setCursor(QCursor(Qt::WaitCursor));
         prepareToInstall();
         if (entireDiskButton->isChecked()) {
@@ -1489,14 +1486,15 @@ void MInstall::installLinux()
         // no--it's being reused
         updateStatus(tr("Mounting the / (root) partition"), 3);
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
-        // set all connections in advance
-        disconnect(timer, SIGNAL(timeout()), 0, 0);
-        connect(timer, SIGNAL(timeout()), this, SLOT(delTime()));
         // remove all folders in root except for /home
+        connect(timer, SIGNAL(timeout()), this, SLOT(delTime()));
         timer->start(20000);
         updateStatus(tr("Deleting old system"), 4);
         QString cmd = "/bin/bash -c \"find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;\"";
-        if (runCmd2(cmd) == QProcess::NormalExit) {
+        QProcess::ExitStatus rexit = runCmd2(cmd);
+        timer->stop();
+        disconnect(timer, SIGNAL(timeout()), 0, 0);
+        if (rexit == QProcess::NormalExit) {
             copyLinux();
         } else {
             nextButton->setEnabled(true);
@@ -1614,8 +1612,6 @@ void MInstall::copyLinux()
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
-    // set all connections in advance
-    disconnect(timer, SIGNAL(timeout()), 0, 0);
     connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
     timer->start(2000);
     updateStatus(tr("Copying new system"), 15);
@@ -1648,6 +1644,7 @@ void MInstall::copyLinux()
 
     // After the copy is over.
     timer->stop();
+    disconnect(timer, SIGNAL(timeout()), 0, 0);
     updateStatus(tr("Fixing configuration"), 96);
     shell.run("mkdir -m 1777 /mnt/antiX/tmp");
     makeFstab();
@@ -2049,31 +2046,15 @@ bool MInstall::validateUserInfo()
 {
     //validate data before proceeding
     // see if username is reasonable length
-    if (strlen(userNameEdit->text().toUtf8()) < 2) {
+    if (strlen(userNameEdit->text().toUtf8()) < 1) {
         QMessageBox::critical(this, QString::null,
-                              tr("The user name needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer name before proceeding."));
+                              tr("Please enter a user name."));
         return false;
     } else if (!userNameEdit->text().contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
         QMessageBox::critical(this, QString::null,
                               tr("The user name cannot contain special\n"
                                  " characters or spaces.\n"
                                  "Please choose another name before proceeding."));
-        return false;
-    }
-    if (strlen(userPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(this, QString::null,
-                              tr("The user password needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer password before proceeding."));
-        return false;
-    }
-    if (strlen(rootPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(this, QString::null,
-                              tr("The root password needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer password before proceeding."));
         return false;
     }
     // check that user name is not already used
@@ -2085,6 +2066,16 @@ bool MInstall::validateUserInfo()
         return false;
     }
 
+    if (strlen(userPasswordEdit->text().toUtf8()) < 1) {
+        QMessageBox::critical(this, QString::null,
+                              tr("Please enter the user password."));
+        return false;
+    }
+    if (strlen(rootPasswordEdit->text().toUtf8()) < 1) {
+        QMessageBox::critical(this, QString::null,
+                              tr("Please enter the root password."));
+        return false;
+    }
     if (strcmp(userPasswordEdit->text().toUtf8(), userPasswordEdit2->text().toUtf8()) != 0) {
         QMessageBox::critical(this, QString::null,
                               tr("The user password entries do\n"
@@ -2095,20 +2086,6 @@ bool MInstall::validateUserInfo()
         QMessageBox::critical(this, QString::null,
                               tr("The root password entries do\n"
                                  " not match.  Please try again."));
-        return false;
-    }
-    if (strlen(userPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(this, QString::null,
-                              tr("The user password needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer password before proceeding."));
-        return false;
-    }
-    if (strlen(rootPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(this, QString::null,
-                              tr("The root password needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer password before proceeding."));
         return false;
     }
     return true;
@@ -2414,6 +2391,9 @@ int MInstall::showPage(int curr, int next)
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
                 return curr;
             }
+            if (!checkDisk()) {
+                return curr;
+            }
             QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
             QString msg = tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME);
             int ans = QMessageBox::warning(this, QString::null, msg,
@@ -2425,6 +2405,9 @@ int MInstall::showPage(int curr, int next)
         }
     } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
         if (!validateChosenPartitions()) {
+            return curr;
+        }
+        if (!checkDisk()) {
             return curr;
         }
         return 4; // Go to Step_Progress
@@ -2479,6 +2462,7 @@ void MInstall::pageDisplayed(int next)
 
     if(next >= 5 && next <= 9) {
         haveSysConfig = false; // (re)editing configuration
+        ixTipStart = ixTip;
     }
 
     switch (next) {
@@ -2564,16 +2548,24 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 4: // installation step
-        tipsEdit->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
-                             "<p>Without you there would be no %1.</p>"
-                             "<p>%2 Dev Team</p>").arg(PROJECTNAME).arg(PROJECTSHORTNAME));
-        ((MMain *)mmn)->setHelpText(tr("<p><b>Installation in Progress</b><br/>"
-                                       " %1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</p>"
-                                       "<p>If you click the Abort button, the installation will be stopped as soon as possible.</p>"
-                                       "<p><b>Multitasking within the %1 installer</b><br/>"
-                                       "You can click on the <b>Next</b> button to enter additional required information (boot manager, user accounts, locale and time zones, networking, etc) right now, instead of waiting for the installation to complete.<br/>"
-                                       "The final page will lead you back to this page, where the remainder of the installation will proceed without further prompting."
-                                       "</p>").arg(PROJECTNAME));
+        if (phase == 0) {
+            tipsEdit->setText("<p><b>" + tr("Additional information required") + "</b><br/>"
+                              + tr("The %1 installer is about to request more information from you. Please wait.").arg(PROJECTNAME)
+                              + "</p>");
+        } else if(ixTipStart >= 0) {
+            iLastProgress = progressBar->value();
+            on_progressBar_valueChanged(iLastProgress);
+        }
+        ((MMain *)mmn)->setHelpText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
+                                    + tr("%1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
+                                    + "</p><p>"
+                                    + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
+                                    + "</p><p>"
+                                    + "<b>" + tr("Multitasking within the %1 installer").arg(PROJECTNAME) + "</b><br/>"
+                                    + tr("You can click on the <b>Next</b> or <b>Back</b> buttons while %1 is being installed to enter the information required for the installation.").arg(PROJECTNAME)
+                                    + "</p><p>"
+                                    + tr("Feel free to complete these steps at your own pace. If you finish early, the installation will continue and finish without interruption. Otherwise, the installer will pause until you have finished.")
+                                    + "</p>");
         backButton->setEnabled(haveSysConfig);
         nextButton->setEnabled(!haveSysConfig);
         processNextPhase();
@@ -2934,15 +2926,13 @@ bool MInstall::eventFilter(QObject* obj, QEvent* event)
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if (keyEvent->key() == Qt::Key_Escape) {
-            if (widgetStack->currentWidget() != Step_Boot) { // don't close on GRUB installation by mistake
+            if (installBox->isHidden()) { // don't close on installation by mistake
                 on_closeButton_clicked();
             }
             return true;
         }
-        return QObject::eventFilter(obj, event);
-    } else {
-        return QObject::eventFilter(obj, event);
     }
+    return QObject::eventFilter(obj, event);
 }
 
 // run before closing the app, do some cleanup
@@ -2999,9 +2989,26 @@ void MInstall::copyTime()
         updateStatus(tr("Copy progress unknown. No file system statistics."), 0);
     }
     progressBar->setValue(i + 15);
+}
 
-    switch (i) {
-    case 1:
+void MInstall::on_progressBar_valueChanged(int value)
+{
+    if (iLastProgress < 0 || widgetStack->currentIndex() != 4) {
+        return; // no point xdisplaying a new hint if it will be invisible
+    }
+
+    const int tipcount = 6;
+    int imax = (progressBar->maximum() - iLastProgress);
+    if (imax != 0 && ixTipStart < tipcount) {
+        imax /= (tipcount - ixTipStart);
+        ixTip = ixTipStart + (value - iLastProgress) / imax;
+    } else {
+        ixTip = tipcount;
+    }
+
+    switch(ixTip)
+    {
+    case 0:
         tipsEdit->setText(tr("<p><b>Getting Help</b><br/>"
                              "Basic information about %1 is at %2.</p><p>"
                              "There are volunteers to help you at the %3 forum, %4</p>"
@@ -3009,20 +3016,20 @@ void MInstall::copyTime()
                              "in some detail. Usually statements like 'it didn't work' are not helpful.</p>").arg(PROJECTNAME).arg(PROJECTURL).arg(PROJECTSHORTNAME).arg(PROJECTFORUM));
         break;
 
-    case 15:
+    case 1:
         tipsEdit->setText(tr("<p><b>Repairing Your Installation</b><br/>"
                              "If %1 stops working from the hard drive, sometimes it's possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.</p>"
                              "<p>You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!</p>").arg(PROJECTNAME));
         break;
 
-    case 30:
+    case 2:
         tipsEdit->setText(tr("<p><b>Support %1</b><br/>"
                              "%1 is supported by people like you. Some help others at the "
                              "support forum - %2 - or translate help files into different "
                              "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
         break;
 
-    case 45:
+    case 3:
         tipsEdit->setText(tr("<p><b>Adjusting Your Sound Mixer</b><br/>"
                              " %1 attempts to configure the sound mixer for you but sometimes it will be "
                              "necessary for you to turn up volumes and unmute channels in the mixer "
@@ -3030,12 +3037,15 @@ void MInstall::copyTime()
                              "<p>The mixer shortcut is located in the menu. Click on it to open the mixer. </p>").arg(PROJECTNAME));
         break;
 
-    case 60:
+    case 4:
         tipsEdit->setText(tr("<p><b>Keep Your Copy of %1 up-to-date</b><br/>"
                              "For more information and updates please visit</p><p> %2</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
         break;
 
     default:
+        tipsEdit->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
+                             "<p>Without you there would be no %1.</p>"
+                             "<p>%2 Dev Team</p>").arg(PROJECTNAME).arg(PROJECTSHORTNAME));
         break;
     }
 }
@@ -3106,9 +3116,9 @@ void MInstall::on_userPasswordEdit2_textChanged(const QString &arg1)
 {
     QPalette pal = userPasswordEdit->palette();
     if (arg1 != userPasswordEdit->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 20));
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
     } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 10));
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
     }
     userPasswordEdit->setPalette(pal);
     userPasswordEdit2->setPalette(pal);
@@ -3118,9 +3128,9 @@ void MInstall::on_rootPasswordEdit2_textChanged(const QString &arg1)
 {
     QPalette pal = rootPasswordEdit->palette();
     if (arg1 != rootPasswordEdit->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 20));
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
     } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 10));
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
     }
     rootPasswordEdit->setPalette(pal);
     rootPasswordEdit2->setPalette(pal);
@@ -3175,10 +3185,10 @@ void MInstall::on_FDEpassword2_textChanged(const QString &arg1)
 {
     QPalette pal = FDEpassword->palette();
     if (arg1 != FDEpassword->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 20));
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
         nextButton->setDisabled(true);
     } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 10));
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
         nextButton->setEnabled(true);
     }
     FDEpassword->setPalette(pal);
@@ -3197,10 +3207,10 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 {
     QPalette pal = FDEpassCust->palette();
     if (arg1 != FDEpassCust->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 20));
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
         nextButton->setDisabled(true);
     } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 10));
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
         nextButton->setEnabled(true);
     }
     FDEpassCust->setPalette(pal);
