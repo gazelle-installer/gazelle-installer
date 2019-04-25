@@ -10,7 +10,7 @@
 %1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.
 
 Enjoy using %1</source>
-        <translation>O %1 é uma distribuição Linux independente baseada no Debian Stable
+        <translation>O %1 é uma distribuição Linux independente baseada no Debian Stable.
 
 O %1 usa alguns componentes do MEPIS Linux publicados sob Licença Apache (Apache free license). Alguns componentes do MEPIS foram modificados para o %1.
 
@@ -34,7 +34,7 @@ The disk with the partition you selected for installation is failing.
 </source>
         <translation>
 
-O disco com a partição selecionada para a instalação está a falhar. 
+O disco com a partição seleccionada para a instalação está a falhar. 
 
 </translation>
     </message>
@@ -50,7 +50,7 @@ O disco com a partição selecionada para a instalação está a falhar.
         <source>If unsure, please exit the Installer and run GSmartControl for more information.
 
 </source>
-        <translation>Se tiver dúvidas, por favor saia do Instalador e executa a ferramenta GSmartControl para obter mais informação sobre o estado do disco.
+        <translation>Havendo dúvidas, sair do Instalador e executar a ferramenta GSmartControl para obter mais informação sobre o estado do disco.
 
 </translation>
     </message>
@@ -98,7 +98,7 @@ O disco com a partição selecionada para a instalação está a falhar.
         <location filename="../minstall.cpp" line="384"/>
         <source>The disk with the partition you selected for installation passes the S.M.A.R.T. monitor test (smartctl)
 </source>
-        <translation>O disco com a partição selecionada para a instalação passa nos testes do monitor S.M.A.R.T. (smartctl) 
+        <translation>O disco com a partição seleccionada para a instalação passa nos testes do monitor S.M.A.R.T. (smartctl) 
 </translation>
     </message>
     <message>
@@ -111,16 +111,16 @@ O disco com a partição selecionada para a instalação está a falhar.
     <message>
         <location filename="../minstall.cpp" line="387"/>
         <source>Do you want to continue?</source>
-        <translation>Continuar? </translation>
+        <translation>Continuar?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="403"/>
         <source>The password needs to be at least
 %1 characters long. Please select
 a longer password before proceeding.</source>
-        <translation> A senha necessita ter pelo menos 
-%1 caracteres. Por favor escolha 
-uma senha maior antes de prosseguir.</translation>
+        <translation>A senha tem de ter pelo menos
+%1 caracteres. 
+Escolher uma senha mais longa antes de prosseguir.</translation>
     </message>
     <message>
         <source>Ready to install %1 filesystem</source>
@@ -129,12 +129,12 @@ uma senha maior antes de prosseguir.</translation>
     <message>
         <location filename="../minstall.cpp" line="874"/>
         <source>Sorry, could not create %1 LUKS partition</source>
-        <translation> Desculpe, a partição LUKS  %1 não conseguiu ser criada</translation>
+        <translation>Não foi possível criar a partição LUKS %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="886"/>
         <source>Sorry, could not open %1 LUKS container</source>
-        <translation>Desculpe, não consegui abrir o contentor LUKS %1</translation>
+        <translation>Não foi possível abrir o contentor LUKS %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2412"/>
@@ -149,7 +149,7 @@ uma senha maior antes de prosseguir.</translation>
     <message>
         <location filename="../minstall.cpp" line="1131"/>
         <source>Formating EFI System Partition (ESP)</source>
-        <translation>A formatar Partição de Sistema EFI (ESP)</translation>
+        <translation>A formatar a Partição de Sistema EFI (ESP)</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1198"/>
@@ -157,7 +157,7 @@ uma senha maior antes de prosseguir.</translation>
         <location filename="../minstall.cpp" line="1403"/>
         <location filename="../minstall.cpp" line="1448"/>
         <source>Setting up LUKS encrypted containers</source>
-        <translation>A configurar contentores encriptados LUKS</translation>
+        <translation>A configurar contentores encriptados por LUKS</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1212"/>
@@ -169,19 +169,19 @@ uma senha maior antes de prosseguir.</translation>
         <location filename="../minstall.cpp" line="1223"/>
         <location filename="../minstall.cpp" line="1423"/>
         <source>Formatting boot partition</source>
-        <translation>A formatar Partição de Sistema (boot)</translation>
+        <translation>A formatar a partição de arranque (boot)</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1229"/>
         <source>Formatting root partition</source>
-        <translation>A formatar a partição raíz (root) « / »</translation>
+        <translation>A formatar a partição raíz (root)</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="920"/>
         <source>You must choose a root partition.
 The root partition must be at least %1.</source>
-        <translation>Deve escolher uma partição de raíz (root).
-A partição de raíz deve ter pelo menos %1</translation>
+        <translation>Escolher uma partição raíz (root, / ).
+A partição raíz deve ter pelo menos %1.</translation>
     </message>
     <message>
         <source>The partition you selected for %1, is not a Linux partition. Are you sure you want to reformat this partition?</source>
@@ -264,7 +264,7 @@ Are you sure you want to reformat this partition?</source>
     <message>
         <location filename="../minstall.cpp" line="1757"/>
         <source>Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function.</source>
-        <translation>Desculpe, mas a instalção do GRUB falhou. Isto pode dever-se a uma alteração na formatação do disco. Pode desmarcar o GRUB e terminar a instalação, e depois iniciar o computador novamente com o meio externo executável para reparar a instalação com a função de reinstalação do GRUB.</translation>
+        <translation>Falha ao instalar o GRUB. Isto pode dever-se a uma alteração na formatação do disco. Pode desmarcar a caixa para instalação do GRUB, terminar a instalação do sistema, e depois reiniciar o computador com o meio externo executável para reparar a instalação com a ferramenta de reinstalação do GRUB.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1875"/>
@@ -275,7 +275,7 @@ Are you sure you want to reformat this partition?</source>
         <location filename="../minstall.cpp" line="1881"/>
         <source>Would you like to save the old home directory
 and create a new home directory?</source>
-        <translation>Guardar a informação do diretório home existente
+        <translation>Guardar o diretório home existente
 e criar um novo diretório home?</translation>
     </message>
     <message>
@@ -283,9 +283,9 @@ e criar um novo diretório home?</translation>
         <source>Sorry, failed to save old home directory. Before proceeding,
 you&apos;ll have to select a different username or
 delete a previously saved copy of your home directory.</source>
-        <translation>O processo de guardar a informação do diretório home existente falhou.
+        <translation>O processo de guardar o diretório home existente falhou.
 Antes de prosseguir, deve ser selecionado um nome de utilizador diferente
-ou apagada uma cópia anterior do diretório home.</translation>
+ou apagado um diretório home anteriormente guardado.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1906"/>
@@ -324,7 +324,7 @@ Antes de prosseguir, deve ser selecionado um nome de utilizador diferente.</tran
     <message>
         <location filename="../minstall.cpp" line="1979"/>
         <source>Sorry, failed to set ownership of user directory.</source>
-        <translation>A atribuição de propriedade à pasta do utilizador falhou.</translation>
+        <translation>A atribuição de propriedade/detenção à pasta do utilizador falhou.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2034"/>
@@ -413,7 +413,7 @@ Escolher um nome diferente.</translation>
 name before proceeding.</source>
         <translation>O nome do domínio do computador
 deve conter pelo menos 2 caracteres.
-Escolher um nome .mais longo</translation>
+Escolher um nome mais longo</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2134"/>
@@ -429,7 +429,7 @@ Escolher um nome diferente.</translation>
         <source>Sorry your workgroup needs to be at least
 2 characters long. You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>O grupo de trabalho deve conter
+        <translation>O nome do grupo de trabalho deve conter
 pelo menos 2 caracteres.
 Escolher um nome mais longo.</translation>
     </message>
@@ -453,7 +453,7 @@ Interromper realmente o processo agora?</translation>
     <message>
         <location filename="../minstall.cpp" line="903"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
-        <translation>Deve escolher uma partição boot diferente quando encriptar a raiz (root)</translation>
+        <translation>Tem que ser escolhida uma partição de arranque (boot) diferente quando a raiz (root) for encriptada.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="497"/>
@@ -552,18 +552,18 @@ Please try again.</source>
     <message>
         <location filename="../minstall.cpp" line="2486"/>
         <source>&lt;p&gt;&lt;b&gt;General Instructions&lt;/b&gt;&lt;br/&gt;BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.&lt;/p&gt;&lt;p&gt;On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.&lt;/p&gt;&lt;p&gt;Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions. &lt;/p&gt;&lt;p&gt;If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.&lt;/p&gt;&lt;p&gt;The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Instruções Gerais&lt;/b&gt;&lt;br/&gt;ANTES DE PROSSEGUIR, FECHAR TODAS AS OUTRAS APLICAÇÕES.&lt;/p&gt;&lt;p&gt;Em cada página, ler as instruções, fazer as escolhas requeridas e clicar em «Próximo». Será pedida confirmação de continuação antes de quaisquer acções destrutivas serem executadas.&lt;/p&gt;&lt;p&gt;A instalação necessita de cerca de %1 de espaço em disco; no entanto, é recomendado usar %2 ou mais. Pode ser usado todo o disco ou podem ser usadas partições. &lt;/p&gt;&lt;p&gt;Em computadores com sistema operativo Mac OS ou Windows (Vista ou posterior), poderá ser necessário usar o software do sistema existente para fazer partições e instalar o gestor do arranque (boot manager) antes de proceder à instalação.&lt;/p&gt;&lt;p&gt;Os sistemas de ficheiros Linux ext2, ext3, ext4, jfs, xfs, btrfs e reiserfs são compatíveis; o sistema de ficheiros ext4 é o recomendado.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Instruções Gerais&lt;/b&gt;&lt;br/&gt;ANTES DE PROSSEGUIR, FECHAR TODAS AS OUTRAS APLICAÇÕES.&lt;/p&gt;&lt;p&gt;Em cada página, ler as instruções, fazer as escolhas requeridas e clicar em «Próximo». Será pedida confirmação de continuação antes de quaisquer acções destrutivas serem executadas.&lt;/p&gt;&lt;p&gt;A instalação necessita de cerca de %1 de espaço em disco; no entanto, é recomendado usar %2 ou mais. Pode ser usado todo o disco ou podem ser usadas partições. &lt;/p&gt;&lt;p&gt;Em computadores com sistema operativo Mac ou Windows (Vista ou posterior), poderá ser necessário usar o software do sistema existente para fazer partições e instalar o gestor de arranque (boot manager) antes de proceder à instalação.&lt;/p&gt;&lt;p&gt;Esta instalação é compatível com os sistemas de ficheiros Linux ext2, ext3, ext4, jfs, xfs, btrfs e reiserfs; o ext4 é o recomendado.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2492"/>
         <source>&lt;p&gt;Autoinstall will place home on the root partition.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;A instalação automátiva vai colocar home na raiz (root)&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;A instalação automática colocará home na raiz (root)&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2493"/>
         <location filename="../minstall.cpp" line="2513"/>
         <source>&lt;p&gt;&lt;b&gt;Encryption&lt;/b&gt;&lt;br/&gt;Encryption is possible via LUKS.  A password is required (8 characters minimum length)&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Encriptação&lt;/b&gt;&lt;br/&gt;A encriptação é possível via LUKS.  É necessária uma senha (com o mínimo de 8 caracters)&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Encriptação&lt;/b&gt;&lt;br/&gt;É possível encriptação via LUKS.  É necessária uma senha (com o mínimo de 8 caracters)&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2494"/>
@@ -574,12 +574,12 @@ Please try again.</source>
     <message>
         <location filename="../minstall.cpp" line="2495"/>
         <source>&lt;p&gt;When encryption is used with autoinstall, the separate boot partition will be automatically created&lt;/p&gt;</source>
-        <translation>&gt;&lt;p&gt;; Quando é utilizada encriptção com a instalação automática, uma partição boot separada será automaticamente criada&lt;/p&gt;</translation>
+        <translation>&gt;&lt;p&gt;Quando é feita uma instalação automática, é automaticamente criada uma partição boot separada&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2502"/>
         <source>&lt;p&gt;&lt;b&gt;Limitations&lt;/b&gt;&lt;br/&gt;Remember, this software is provided AS-IS with no warranty what-so-ever. It&apos;s solely your responsibility to backup your data before proceeding.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Choose Partitions&lt;/b&gt;&lt;br/&gt;%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.&lt;/p&gt;&lt;p&gt;If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Upgrading&lt;/b&gt;&lt;br/&gt;To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.&lt;/p&gt;&lt;p&gt;If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Preferred Filesystem Type&lt;/b&gt;&lt;br/&gt;For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. &lt;/p&gt;&lt;p&gt;Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bad Blocks&lt;/b&gt;&lt;br/&gt;If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Limitações&lt;/b&gt;&lt;br/&gt;Este software é disponibilizado COMO ESTÁ, sem qualquer tipo de garantia. É da exclusiva responsabilidade do utilizador fazer uma cópia de segurança dos dados que tenha no computador, antes de prosseguir.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Escolher Partições&lt;/b&gt;&lt;br/&gt;O %1 requere uma partição raíz ( / , root). A partição de trocas (swap) é opcional mas altamente recomendada. Para usar a função Hibernar (Suspender-para-o-Disco) do %1 é necessária uma partição de trocas (swap) maior do que a memória RAM física no computador.&lt;/p&gt;&lt;p&gt;Ter uma partição /home separada facilitará no futuro a substituição do sistema por uma nova versão. Mas se o sistema instalado não tiver numa partição /home separada, já não será possível criá-la.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Actualizar&lt;/b&gt;&lt;br/&gt;Para substituir um sistema/instalação Linux por uma nova versão, marcar a caixa «Preservar dados em /home» e seleccionar a partição /home (caso exista).&lt;/p&gt;&lt;p&gt;Ao preservar a árvore do directório /home da partição raíz/root (quando não existe uma partição /home separada) o instalador não reformatará a partição raíz/root, o que resultará num processo de instalação muito mais demorado do que o habitual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Tipo de Sistema de Ficheiros Preferido&lt;/b&gt;&lt;br/&gt;O %1, pode ser instalado em partições formatadas como ext2, ext3, ext4, jfs, xfs, btrfs ou reiser. &lt;/p&gt;&lt;p&gt;Partições formatadas como btrfs podem usar opções adicionais de compressão. O sistema lzo proporciona rapidez de compressão, mas a taxa de compressão é menor. O sistema zlib proporciona maior compressão, mas menor rapidez.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Blocos Defeituosos&lt;/b&gt;&lt;br/&gt;Os tipos de formatação ext2, ext3 e ext4 proporcionam a opção de verificação e correcção de blocos defeituosos no disco (estruturalmente o disco é composto de blocos). A verificação dos blocos é muito morosa, pelo que é uma opção que pode ser descartada, a menos que haja suspeitas de que o disco já tem problemas.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Limitações&lt;/b&gt;&lt;br/&gt;Este software é disponibilizado COMO ESTÁ, sem qualquer tipo de garantia. É da exclusiva responsabilidade do utilizador fazer uma cópia de segurança dos dados que tenha no computador, antes de prosseguir.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Escolher Partições&lt;/b&gt;&lt;br/&gt;O %1 requer uma partição raíz ( / , root). A partição de trocas (swap) é opcional mas altamente recomendada. Para usar a função Hibernar (Suspender-para-o-Disco) do %1 é necessária uma partição de trocas (swap) maior do que a memória RAM física no computador.&lt;/p&gt;&lt;p&gt;Ter uma partição /home separada facilitará no futuro a substituição do sistema por uma nova versão. Mas se o sistema instalado não tiver numa partição /home separada, não será possível criá-la posteriormente.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Actualizar&lt;/b&gt;&lt;br/&gt;Para substituir um sistema/instalação Linux por uma nova versão, marcar a caixa «Preservar dados em /home» e seleccionar a partição /home (caso exista).&lt;/p&gt;&lt;p&gt;Ao preservar para a nova instalação a árvore do directório /home existente na partição raíz (quando não existe uma partição /home separada) o instalador não reformatará a partição / (raíz, root), o que resultará num processo de instalação muito mais demorado do que o habitual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Tipo de Sistema de Ficheiros Preferido&lt;/b&gt;&lt;br/&gt;O %1, pode ser instalado em partições formatadas como ext2, ext3, ext4, jfs, xfs, btrfs ou reiser. &lt;/p&gt;&lt;p&gt;Partições formatadas como btrfs podem usar opções adicionais de compressão. O sistema lzo proporciona rapidez de compressão, mas a taxa de compressão é menor. O sistema zlib proporciona maior compressão, mas menor rapidez.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Blocos Defeituosos&lt;/b&gt;&lt;br/&gt;Os tipos de formatação ext2, ext3 e ext4 proporcionam a opção de verificação e correcção de blocos defeituosos no disco (estruturalmente o disco é composto de blocos). A verificação dos blocos é muito morosa, pelo que é uma opção que pode ser descartada, a menos que haja suspeitas de que o disco já tem problemas.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2522"/>
@@ -1194,7 +1194,7 @@ A voltar ao Passo 1.</translation>
     <message>
         <location filename="../meinstall.ui" line="264"/>
         <source>Change Keyboard Settings</source>
-        <translation>Alterar as Definições do Teclado</translation>
+        <translation>Alterar as definições do teclado</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="271"/>
