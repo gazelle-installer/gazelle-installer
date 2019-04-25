@@ -2042,14 +2042,13 @@ bool MInstall::validateUserInfo()
 {
     //validate data before proceeding
     // see if username is reasonable length
-    if (strlen(userNameEdit->text().toUtf8()) < 1) {
+    if (userNameEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter a user name."));
         return false;
     } else if (!userNameEdit->text().contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
         QMessageBox::critical(this, QString::null,
-                              tr("The user name cannot contain special\n"
-                                 " characters or spaces.\n"
+                              tr("The user name cannot contain special characters or spaces.\n"
                                  "Please choose another name before proceeding."));
         return false;
     }
@@ -2058,30 +2057,30 @@ bool MInstall::validateUserInfo()
     if (shell.run(cmd) == 0) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry that name is in use.\n"
-                                 "Please select a different name.\n"));
+                                 "Please select a different name."));
         return false;
     }
 
-    if (strlen(userPasswordEdit->text().toUtf8()) < 1) {
+    if (userPasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter the user password."));
         return false;
     }
-    if (strlen(rootPasswordEdit->text().toUtf8()) < 1) {
+    if (rootPasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter the root password."));
         return false;
     }
-    if (strcmp(userPasswordEdit->text().toUtf8(), userPasswordEdit2->text().toUtf8()) != 0) {
+    if (userPasswordEdit->text() != userPasswordEdit2->text()) {
         QMessageBox::critical(this, QString::null,
-                              tr("The user password entries do\n"
-                                 "not match.  Please try again."));
+                              tr("The user password entries do not match.\n"
+                                 "Please try again."));
         return false;
     }
-    if (strcmp(rootPasswordEdit->text().toUtf8(), rootPasswordEdit2->text().toUtf8()) != 0) {
+    if (rootPasswordEdit->text() != rootPasswordEdit2->text()) {
         QMessageBox::critical(this, QString::null,
-                              tr("The root password entries do\n"
-                                 " not match.  Please try again."));
+                              tr("The root password entries do not match.\n"
+                                 "Please try again."));
         return false;
     }
     return true;
@@ -2616,10 +2615,11 @@ void MInstall::pageDisplayed(int next)
                                     + "</p><p>"
                                     + tr("If you choose to automatically exit the installer, it will be closed immediately after completion and the system will be shutdown or rebooted without anymore manual intervention, depending on which option is selected.")
                                     + "</p><p>"
-                                    + tr("Use the <b>Save installation configuration file to disk</b> option to save a file containing the settings used for this installation. This can be used in the future to perform an unattended or automated installation.") + "<br/>"
-                                    + tr("The file will be saved to where %1 is installed, in the \"%2\" folder.").arg(PROJECTNAME, "/var/log")
+                                    + tr("Use the <b>Save automation file to disk</b> option to save a file containing the settings used for this installation. This can be used in the future to perform an unattended or automated installation.") + "<br/>"
+                                    + "<b>" + tr("This file may contain sensitive information such as user names and passwords.") + "</b><br/>"
+                                    + tr("The file will be saved to where %1 is installed, in the %2 folder.").arg(PROJECTNAME, "<b>/var/log</b>")
                                     + "</p><p>"
-                                    + tr("Although not currently implemented or supported, installation automation using a configuration file is planned for a future version of the %1 installer.").arg(PROJECTNAME)
+                                    + tr("Although not currently implemented or supported, the ability to use an automation file is planned for a future version of the %1 installer.").arg(PROJECTNAME)
                                     + "</p>");
         break;
 
