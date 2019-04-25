@@ -3136,9 +3136,9 @@ void MInstall::on_userPasswordEdit2_textChanged(const QString &arg1)
 {
     QPalette pal = userPasswordEdit->palette();
     if (arg1 != userPasswordEdit->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 100));
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
     } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 100));
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
     }
     userPasswordEdit->setPalette(pal);
     userPasswordEdit2->setPalette(pal);
@@ -3148,9 +3148,9 @@ void MInstall::on_rootPasswordEdit2_textChanged(const QString &arg1)
 {
     QPalette pal = rootPasswordEdit->palette();
     if (arg1 != rootPasswordEdit->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 100));
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
     } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 100));
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
     }
     rootPasswordEdit->setPalette(pal);
     rootPasswordEdit2->setPalette(pal);
@@ -3205,10 +3205,10 @@ void MInstall::on_FDEpassword2_textChanged(const QString &arg1)
 {
     QPalette pal = FDEpassword->palette();
     if (arg1 != FDEpassword->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 100));
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
         nextButton->setDisabled(true);
     } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 100));
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
         nextButton->setEnabled(true);
     }
     FDEpassword->setPalette(pal);
@@ -3227,10 +3227,10 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 {
     QPalette pal = FDEpassCust->palette();
     if (arg1 != FDEpassCust->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 100));
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
         nextButton->setDisabled(true);
     } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 100));
+        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
         nextButton->setEnabled(true);
     }
     FDEpassCust->setPalette(pal);
