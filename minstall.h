@@ -136,7 +136,7 @@ public:
     void pageDisplayed(int next);
     void refresh();
     void setupkeyboardbutton();
-    void stopInstall();
+    void stopInstall(int poweraction);
 
 public slots:
     void procAbort();

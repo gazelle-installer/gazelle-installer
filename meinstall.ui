@@ -2876,7 +2876,7 @@
            </spacer>
           </item>
           <item row="1" column="3">
-           <widget class="QRadioButton" name="radioAutoReboot">
+           <widget class="QRadioButton" name="radioAutoExitReboot">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -2886,7 +2886,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QRadioButton" name="radioAutoShutdown">
+           <widget class="QRadioButton" name="radioAutoExitShutdown">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -3252,7 +3252,7 @@
   <connection>
    <sender>checkAutoExit</sender>
    <signal>toggled(bool)</signal>
-   <receiver>radioAutoShutdown</receiver>
+   <receiver>radioAutoExitShutdown</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3268,7 +3268,7 @@
   <connection>
    <sender>checkAutoExit</sender>
    <signal>toggled(bool)</signal>
-   <receiver>radioAutoReboot</receiver>
+   <receiver>radioAutoExitReboot</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
