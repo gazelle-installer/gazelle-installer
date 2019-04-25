@@ -1050,6 +1050,76 @@ Regresando al Paso 1.</translation>
         <translation>Siguiente</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1140,9 +1210,8 @@ Regresando al Paso 1.</translation>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuración del Teclado&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. Reubicar particiones de discos (opcional)</translation>
+        <translation type="vanished">1b. Reubicar particiones de discos (opcional)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1155,9 +1224,8 @@ Regresando al Paso 1.</translation>
         <translation>Ejecutar la herramienta de partición...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Seleccionar disco para la instalación</translation>
+        <translation type="vanished">1a. Seleccionar disco para la instalación</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1165,9 +1233,8 @@ Regresando al Paso 1.</translation>
         <translation>Utilizar disco:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Seleccionar el tipo de instalación</translation>
+        <translation type="vanished">1c. Seleccionar el tipo de instalación</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1215,9 +1282,8 @@ Regresando al Paso 1.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Preferencias</translation>
+        <translation type="vanished">2b. Preferencias</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1230,9 +1296,8 @@ Regresando al Paso 1.</translation>
         <translation>Verificar bloques dañados (mayor duración)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. Seleccionar particiones</translation>
+        <translation type="vanished">2a. Seleccionar particiones</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1334,11 +1399,6 @@ Regresando al Paso 1.</translation>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
         <translation>Ubicación</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1316"/>
@@ -1500,9 +1560,8 @@ Regresando al Paso 1.</translation>
         <translation>Consejos</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Seleccionar el método de arranque</translation>
+        <translation type="vanished">4. Seleccionar el método de arranque</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1574,9 +1633,8 @@ Regresando al Paso 1.</translation>
         <translation>Descripción</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Nombres de las redes de computadoras</translation>
+        <translation type="vanished">5. Nombres de las redes de computadoras</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1609,9 +1667,8 @@ Regresando al Paso 1.</translation>
         <translation>Nombre del ordenador:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Ajustes de los Servicios (avanzado)</translation>
+        <translation type="vanished">6d. Ajustes de los Servicios (avanzado)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1624,9 +1681,8 @@ Regresando al Paso 1.</translation>
         <translation>Ver</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Configurar el Reloj</translation>
+        <translation type="vanished">6b. Configurar el Reloj</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1639,9 +1695,8 @@ Regresando al Paso 1.</translation>
         <translation>El reloj del sistema usa LOCAL</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Localización por defecto</translation>
+        <translation type="vanished">6a. Localización por defecto</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1649,9 +1704,8 @@ Regresando al Paso 1.</translation>
         <translation>Localización:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Ajustes de la Zona Horaria</translation>
+        <translation type="vanished">6c. Ajustes de la Zona Horaria</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1659,9 +1713,8 @@ Regresando al Paso 1.</translation>
         <translation>Zona horaria:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Cuenta de Root (administrador)</translation>
+        <translation type="vanished">7b. Cuenta de Root (administrador)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1674,9 +1727,8 @@ Regresando al Paso 1.</translation>
         <translation>Contraseña de root:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Cuenta del Usuario Predeterminado</translation>
+        <translation type="vanished">7a. Cuenta del Usuario Predeterminado</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

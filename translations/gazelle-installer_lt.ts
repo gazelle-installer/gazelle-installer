@@ -1009,6 +1009,76 @@ Returning to Step 1.</source>
         <translation>Kitas</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1099,9 +1169,8 @@ Returning to Step 1.</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Klaviatūros nustatymai&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. Perskirstykite disko skaidinius (nebūtina)</translation>
+        <translation type="vanished">1b. Perskirstykite disko skaidinius (nebūtina)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1114,9 +1183,8 @@ Returning to Step 1.</source>
         <translation>Paleisti skaidymo įrankį...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. Pasirinkite diską įdiegimui</translation>
+        <translation type="vanished">1a. Pasirinkite diską įdiegimui</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1124,9 +1192,8 @@ Returning to Step 1.</source>
         <translation>Naudoti diską:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. Pasirinkite įdiegimo tipą</translation>
+        <translation type="vanished">1c. Pasirinkite įdiegimo tipą</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1174,9 +1241,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. Nuostatos</translation>
+        <translation type="vanished">2b. Nuostatos</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1189,9 +1255,8 @@ Returning to Step 1.</source>
         <translation>Tikrinti blogus blokus (užtrunka ilgiau)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. Pasirinkite skaidinius</translation>
+        <translation type="vanished">2a. Pasirinkite skaidinius</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1293,11 +1358,6 @@ Returning to Step 1.</source>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
         <translation>Vieta</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1316"/>
@@ -1459,9 +1519,8 @@ Returning to Step 1.</source>
         <translation>Patarimai</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. Pasirinkite OS paleidimo metodą</translation>
+        <translation type="vanished">4. Pasirinkite OS paleidimo metodą</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1533,9 +1592,8 @@ Returning to Step 1.</source>
         <translation>Aprašas</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. Kompiuterio tinklo pavadinimai</translation>
+        <translation type="vanished">5. Kompiuterio tinklo pavadinimai</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1568,9 +1626,8 @@ Returning to Step 1.</source>
         <translation>Kompiuterio pavadinimas:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. Tarnybų nustatymai (išplėstiniai)</translation>
+        <translation type="vanished">6d. Tarnybų nustatymai (išplėstiniai)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1583,9 +1640,8 @@ Returning to Step 1.</source>
         <translation>Rodyti</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. Konfigūruoti laikrodį</translation>
+        <translation type="vanished">6b. Konfigūruoti laikrodį</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1598,9 +1654,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. Lokalizavimo numatytosios reikšmės</translation>
+        <translation type="vanished">6a. Lokalizavimo numatytosios reikšmės</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1608,9 +1663,8 @@ Returning to Step 1.</source>
         <translation>Lokalė:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. Laiko juostos nustatymai</translation>
+        <translation type="vanished">6c. Laiko juostos nustatymai</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1618,9 +1672,8 @@ Returning to Step 1.</source>
         <translation>Laiko juosta:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Root (administratoriaus) paskyra</translation>
+        <translation type="vanished">7b. Root (administratoriaus) paskyra</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1633,9 +1686,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. Numatytojo naudotojo paskyra</translation>
+        <translation type="vanished">7a. Numatytojo naudotojo paskyra</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

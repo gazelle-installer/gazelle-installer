@@ -958,6 +958,76 @@ Returning to Step 1.</source>
         <translation>ይቀጥሉ</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="314"/>
+        <source>Rearrange disk partitions (optional)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="373"/>
+        <source>Choose disk for installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="432"/>
+        <source>Select type of installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="723"/>
+        <source>Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="788"/>
+        <source>Choose partitions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1209"/>
+        <source>Encryption options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1746"/>
+        <source>Select Boot Method</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2068"/>
+        <source>Computer Network Names</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2255"/>
+        <source>Service Settings (advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2305"/>
+        <source>Configure Clock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2379"/>
+        <source>Localization Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2438"/>
+        <source>Timezone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2524"/>
+        <source>Root (administrator) Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="2630"/>
+        <source>Default User Account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="2826"/>
         <source>Installation Automation</source>
         <translation type="unfinished"></translation>
@@ -1048,9 +1118,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
         <source>1b. Rearrange disk partitions (optional)</source>
-        <translation>1b. የ ዲስክ ክፍልፋይ እንደገና ማዘጋጃ (በ ምርጫ)</translation>
+        <translation type="vanished">1b. የ ዲስክ ክፍልፋይ እንደገና ማዘጋጃ (በ ምርጫ)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="341"/>
@@ -1063,9 +1132,8 @@ Returning to Step 1.</source>
         <translation>የ መከፋፈያ መሳሪያ ማስኬጃ...</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
         <source>1a. Choose disk for installation</source>
-        <translation>1a. የሚገጠምበትን ዲስክ ይምረጡ</translation>
+        <translation type="vanished">1a. የሚገጠምበትን ዲስክ ይምረጡ</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="403"/>
@@ -1073,9 +1141,8 @@ Returning to Step 1.</source>
         <translation>ይጠቀሙ</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
         <source>1c. Select type of installation</source>
-        <translation>1c. የ አገጣጠም አይነት ይምረጡ</translation>
+        <translation type="vanished">1c. የ አገጣጠም አይነት ይምረጡ</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="459"/>
@@ -1123,9 +1190,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
         <source>2b. Preferences</source>
-        <translation>2b. ምርጫዎች</translation>
+        <translation type="vanished">2b. ምርጫዎች</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="750"/>
@@ -1138,9 +1204,8 @@ Returning to Step 1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
         <source>2a. Choose partitions</source>
-        <translation>2a. ክፍልፋይ ይምረጡ </translation>
+        <translation type="vanished">2a. ክፍልፋይ ይምረጡ </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="826"/>
@@ -1241,11 +1306,6 @@ Returning to Step 1.</source>
     <message>
         <location filename="../meinstall.ui" line="1193"/>
         <source>Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1209"/>
-        <source>2c. Encryption options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1408,9 +1468,8 @@ Returning to Step 1.</source>
         <translation>ጠቃሚ ምክር</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
         <source>4. Select Boot Method</source>
-        <translation>4. የ ማስነሻ ዘዴ ይምረጡ</translation>
+        <translation type="vanished">4. የ ማስነሻ ዘዴ ይምረጡ</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1940"/>
@@ -1482,9 +1541,8 @@ Returning to Step 1.</source>
         <translation>መግለጫ</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
         <source>5. Computer Network Names</source>
-        <translation>5. የ ኮምፒዩተር ኔትዎርክ ስም</translation>
+        <translation type="vanished">5. የ ኮምፒዩተር ኔትዎርክ ስም</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2095"/>
@@ -1517,9 +1575,8 @@ Returning to Step 1.</source>
         <translation>የ ኮምፒዩተር ስም:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
         <source>6d. Service Settings (advanced)</source>
-        <translation>6d. ግልጋሎት ማሰናጃ (የረቀቀ)</translation>
+        <translation type="vanished">6d. ግልጋሎት ማሰናጃ (የረቀቀ)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2273"/>
@@ -1532,9 +1589,8 @@ Returning to Step 1.</source>
         <translation>መመልከቻ</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
         <source>6b. Configure Clock</source>
-        <translation>6b. ሰአት ማሰናጃ</translation>
+        <translation type="vanished">6b. ሰአት ማሰናጃ</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2333"/>
@@ -1547,9 +1603,8 @@ Returning to Step 1.</source>
         <translation>የ ስርአት ሰአት የ አካባቢውን ሰአት ይጠቀማል</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
         <source>6a. Localization Defaults</source>
-        <translation>6a. ነባር ቋንቋ Defaults</translation>
+        <translation type="vanished">6a. ነባር ቋንቋ Defaults</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2409"/>
@@ -1557,9 +1612,8 @@ Returning to Step 1.</source>
         <translation>ቋንቋ:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
         <source>6c. Timezone Settings</source>
-        <translation>6c. የ ሰአት ክልል ማሰናጃ</translation>
+        <translation type="vanished">6c. የ ሰአት ክልል ማሰናጃ</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2450"/>
@@ -1567,9 +1621,8 @@ Returning to Step 1.</source>
         <translation>የ ሰአት ክልል:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
         <source>7b. Root (administrator) Account</source>
-        <translation>7b. Root (አስተዳዳሪ) መግለጫ</translation>
+        <translation type="vanished">7b. Root (አስተዳዳሪ) መግለጫ</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2595"/>
@@ -1582,9 +1635,8 @@ Returning to Step 1.</source>
         <translation>የ root መግቢያ ቃል:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
         <source>7a. Default User Account</source>
-        <translation>7a. ነባር የ ተጠቃሚ መግለጫ </translation>
+        <translation type="vanished">7a. ነባር የ ተጠቃሚ መግለጫ </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2710"/>

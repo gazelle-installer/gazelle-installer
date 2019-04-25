@@ -26,32 +26,32 @@ Changes:
    * implement the automatic exit action options
    * improve password box red and green contrast
 Checksums-Sha1:
- efa5fd24ec3c919a7fa0181987bbadea53a411b1 1228 gazelle-installer_19.4.2~4.dsc
- 32fc57938ce37891e5cc96ce1111d2e96e801f3c 190048 gazelle-installer_19.4.2~4.tar.xz
- cec07cdabefc44079049014597a43014f11f0dd9 11582 gazelle-installer_19.4.2~4_amd64.buildinfo
- aeb80f95959324c6d48b2c91f2d8d32145985efd 1106414 mx-installer-dbgsym_19.4.2~4_amd64.deb
- 56d97299bfa8ff89aa666a63922e3bef7b19fca7 272234 mx-installer_19.4.2~4_amd64.deb
+ 465862c6d0c66ea906edef0ae83ac1f867d449ab 1228 gazelle-installer_19.4.2~4.dsc
+ 82ec6451893df45310bd9b7e1e2129b69205462e 189984 gazelle-installer_19.4.2~4.tar.xz
+ e7d57c6a8bbd882202f18a65dbac316924c1a37c 11582 gazelle-installer_19.4.2~4_amd64.buildinfo
+ 37e978af4955a3d4d1d6f67b354d70fd52ab0d74 1106666 mx-installer-dbgsym_19.4.2~4_amd64.deb
+ 9e406eb6b1842bcb896edbdf9b37c98d13f7acce 267706 mx-installer_19.4.2~4_amd64.deb
 Checksums-Sha256:
- 45e9cdbd1028d79cbc7b34849a4811154213bf95d56609ba6d5099508840d8f3 1228 gazelle-installer_19.4.2~4.dsc
- a41ed1b9e918d3958044185d03548a56d1e609955ea88a89f1a8da49620678b8 190048 gazelle-installer_19.4.2~4.tar.xz
- 7aefe60ae96e73156533f84433c6a27c71db850046ff7bd826c0ca175f52d1c0 11582 gazelle-installer_19.4.2~4_amd64.buildinfo
- ec0e795a1e088903ef00541ad5df10e658611d8ca755df7b0c8ba4e521bbf8ea 1106414 mx-installer-dbgsym_19.4.2~4_amd64.deb
- c8c8a7dfe58a62c700de9e046b5d3e5d062da60e6e5192762e03380767017edb 272234 mx-installer_19.4.2~4_amd64.deb
+ e10782f2a8615769e8a10c8946b9ec6f4ca30c214e1791789351151c279d37ce 1228 gazelle-installer_19.4.2~4.dsc
+ 3f2b9fc8d41a4cceab5158d51b3eca84d00a068ba603b86e18d81fe19b6cf96c 189984 gazelle-installer_19.4.2~4.tar.xz
+ cefdc42ad4304f90dc69f0ba8ed7858ae0c2483b561bd1bdebc24d0edf03e1c7 11582 gazelle-installer_19.4.2~4_amd64.buildinfo
+ b3418f73d8bda7e52ca0e247473f72697cc3900ff77782d69d19ec88fbcf8609 1106666 mx-installer-dbgsym_19.4.2~4_amd64.deb
+ 638f299e65d2b4686215453af10020c72638dc5507f8234595617157c0841a16 267706 mx-installer_19.4.2~4_amd64.deb
 Files:
- 5dc1ff76f388dc96ed80252a520d8b72 1228 system optional gazelle-installer_19.4.2~4.dsc
- 684c996be6514647dcda7ef23c03644e 190048 system optional gazelle-installer_19.4.2~4.tar.xz
- 7e7981a208e2544c8953d66e82acbc55 11582 system optional gazelle-installer_19.4.2~4_amd64.buildinfo
- 2a1749dd7f8f955322ae1477b6d5cdf9 1106414 debug optional mx-installer-dbgsym_19.4.2~4_amd64.deb
- 076cd571dedb7693df06df26730b2334 272234 system optional mx-installer_19.4.2~4_amd64.deb
+ d89c2e696f0524c19e67c13ec59f872d 1228 system optional gazelle-installer_19.4.2~4.dsc
+ fcd3fdbc2727434a57e8f59c3724c0d0 189984 system optional gazelle-installer_19.4.2~4.tar.xz
+ 02c66ee1d8ef25abf89d54c3603bc5f6 11582 system optional gazelle-installer_19.4.2~4_amd64.buildinfo
+ a72b6b208bd81e0c8bd61dd3a32b02e2 1106666 debug optional mx-installer-dbgsym_19.4.2~4_amd64.deb
+ 78d7a0ccb8e65f44f591f513ed2f7d91 267706 system optional mx-installer_19.4.2~4_amd64.deb
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFHBAEBCAAxFiEE8ndToY6S45N+YzXncJOMeAZ57pgFAlzB6sMTHGFkcmlhbkBt
-eGxpbnV4Lm9yZwAKCRBwk4x4BnnumFspCACsiCU73LMyqCQS16NDra+jyS7TJWey
-HzebkijEV1Sr3DSQZ+E4pZ+cds/1qEiXwLqLLX1OLeinYnsezTfO5eVWwoSI0G31
-h/+41Fk0FcRZftKuJ0rsNEay8pP3pVcdv+4vQhWchwgeNlnJKinzESAAaQlyPDnD
-ssCJhIwHupYqOkAOLvg5BxTgkK1euGAICLLMZIyUTDkajKqr9yRNru34e4gi5e5W
-p7fAWAiRf0b60bEKxcz146+vK+vqjPBisVfTBUvH480rinsoajv9IwUbgLsyReWX
-iS8NE4OwV1rFYc2DQ/IdfimhZ3b5whmuuIDue4RsNaxHp+2EWx7YCSy3
-=UjA0
+iQFHBAEBCAAxFiEE8ndToY6S45N+YzXncJOMeAZ57pgFAlzB9JATHGFkcmlhbkBt
+eGxpbnV4Lm9yZwAKCRBwk4x4BnnumMdPB/9GBf44U4Y7j9mZT5NOPvT22EzHnsOs
+Hn7iXSowrsCR+JUHOFsCaWMZOC7yV7SHUHMr81M1FIsjdQ5+jaBLJw/ik91Ml7GI
+DQcPDNJ3PqBsdS6dVDrRGDsvBrwDag3KXa6XL4CSvryvBktnhZ3gDQ6xecR+iqfU
+fzhldxQWOYwFO3kEhcmz9Z5drQ3wkp0o5inTw3sRFoZcpaF9ukJcJRPiHvRO5Q9C
+jRzfz92+F/51rLrIvXdiXYrQwIDrfzKf/9MKoCbXfgeGvOPejjbjsVnike71aebm
+13dhOZg0gTjbrH/4qd13cl9zscsh8+cTUz0CxX+poNsVPb2ti7qU7co0
+=q+st
 -----END PGP SIGNATURE-----
