@@ -2046,31 +2046,15 @@ bool MInstall::validateUserInfo()
 {
     //validate data before proceeding
     // see if username is reasonable length
-    if (strlen(userNameEdit->text().toUtf8()) < 2) {
+    if (strlen(userNameEdit->text().toUtf8()) < 1) {
         QMessageBox::critical(this, QString::null,
-                              tr("The user name needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer name before proceeding."));
+                              tr("Please enter a user name."));
         return false;
     } else if (!userNameEdit->text().contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
         QMessageBox::critical(this, QString::null,
                               tr("The user name cannot contain special\n"
                                  " characters or spaces.\n"
                                  "Please choose another name before proceeding."));
-        return false;
-    }
-    if (strlen(userPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(this, QString::null,
-                              tr("The user password needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer password before proceeding."));
-        return false;
-    }
-    if (strlen(rootPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(this, QString::null,
-                              tr("The root password needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer password before proceeding."));
         return false;
     }
     // check that user name is not already used
@@ -2082,6 +2066,16 @@ bool MInstall::validateUserInfo()
         return false;
     }
 
+    if (strlen(userPasswordEdit->text().toUtf8()) < 1) {
+        QMessageBox::critical(this, QString::null,
+                              tr("Please enter the user password."));
+        return false;
+    }
+    if (strlen(rootPasswordEdit->text().toUtf8()) < 1) {
+        QMessageBox::critical(this, QString::null,
+                              tr("Please enter the root password."));
+        return false;
+    }
     if (strcmp(userPasswordEdit->text().toUtf8(), userPasswordEdit2->text().toUtf8()) != 0) {
         QMessageBox::critical(this, QString::null,
                               tr("The user password entries do\n"
@@ -2092,20 +2086,6 @@ bool MInstall::validateUserInfo()
         QMessageBox::critical(this, QString::null,
                               tr("The root password entries do\n"
                                  " not match.  Please try again."));
-        return false;
-    }
-    if (strlen(userPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(this, QString::null,
-                              tr("The user password needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer password before proceeding."));
-        return false;
-    }
-    if (strlen(rootPasswordEdit->text().toUtf8()) < 2) {
-        QMessageBox::critical(this, QString::null,
-                              tr("The root password needs to be at least\n"
-                                 "2 characters long. Please select\n"
-                                 "a longer password before proceeding."));
         return false;
     }
     return true;
