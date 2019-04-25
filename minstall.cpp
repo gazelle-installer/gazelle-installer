@@ -469,9 +469,24 @@ void MInstall::processNextPhase()
         setComputerName();
         setLocale();
         setCursor(QCursor(Qt::ArrowCursor));
+        if (checkSaveAutoFile->isChecked()) {
+            saveConfig();
+        }
+        phase = 4;
         updateStatus(tr("Installation successful"), 100);
         csleep(1000);
-        gotoPage(10);
+        gotoPage(11);
+    }
+    if (phase == 4) {
+        if (checkAutoExit->isChecked()) {
+            if (radioAutoExitReboot->isChecked()) {
+                stopInstall(1);
+            } else if (radioAutoExitShutdown->isChecked()) {
+                stopInstall(2);
+            }
+        }
+        // print version (look for /usr/sbin/minstall since the name of the package might be different)
+        qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
     }
 }
 
@@ -1708,9 +1723,6 @@ bool MInstall::installLoader()
             runCmd("parted -s /dev/" + drive + " set " + part_num + " boot on");
         }
     }
-    setCursor(QCursor(Qt::WaitCursor));
-    qApp->processEvents();
-    nextButton->setEnabled(false);
 
     // set mounts for chroot
     runCmd("mount -o bind /dev /mnt/antiX/dev");
@@ -1747,7 +1759,6 @@ bool MInstall::installLoader()
         if (runCmd("mountpoint -q /mnt/antiX/boot/efi") == 0) {
             runCmd("umount /mnt/antiX/boot/efi");
         }
-        nextButton->setEnabled(true);
         return false;
     }
 
@@ -1823,7 +1834,6 @@ bool MInstall::installLoader()
         runCmd("umount /mnt/antiX/boot/efi");
     }
 
-    setCursor(QCursor(Qt::ArrowCursor));
     return true;
 }
 
@@ -2046,14 +2056,13 @@ bool MInstall::validateUserInfo()
 {
     //validate data before proceeding
     // see if username is reasonable length
-    if (strlen(userNameEdit->text().toUtf8()) < 1) {
+    if (userNameEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter a user name."));
         return false;
     } else if (!userNameEdit->text().contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
         QMessageBox::critical(this, QString::null,
-                              tr("The user name cannot contain special\n"
-                                 " characters or spaces.\n"
+                              tr("The user name cannot contain special characters or spaces.\n"
                                  "Please choose another name before proceeding."));
         return false;
     }
@@ -2062,30 +2071,30 @@ bool MInstall::validateUserInfo()
     if (shell.run(cmd) == 0) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry that name is in use.\n"
-                                 "Please select a different name.\n"));
+                                 "Please select a different name."));
         return false;
     }
 
-    if (strlen(userPasswordEdit->text().toUtf8()) < 1) {
+    if (userPasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter the user password."));
         return false;
     }
-    if (strlen(rootPasswordEdit->text().toUtf8()) < 1) {
+    if (rootPasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter the root password."));
         return false;
     }
-    if (strcmp(userPasswordEdit->text().toUtf8(), userPasswordEdit2->text().toUtf8()) != 0) {
+    if (userPasswordEdit->text() != userPasswordEdit2->text()) {
         QMessageBox::critical(this, QString::null,
-                              tr("The user password entries do\n"
-                                 "not match.  Please try again."));
+                              tr("The user password entries do not match.\n"
+                                 "Please try again."));
         return false;
     }
-    if (strcmp(rootPasswordEdit->text().toUtf8(), rootPasswordEdit2->text().toUtf8()) != 0) {
+    if (rootPasswordEdit->text() != rootPasswordEdit2->text()) {
         QMessageBox::critical(this, QString::null,
-                              tr("The root password entries do\n"
-                                 " not match.  Please try again."));
+                              tr("The root password entries do not match.\n"
+                                 "Please try again."));
         return false;
     }
     return true;
@@ -2322,7 +2331,7 @@ void MInstall::setServices()
 
 }
 
-void MInstall::stopInstall()
+void MInstall::stopInstall(int poweraction)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     int curr = widgetStack->currentIndex();
@@ -2338,10 +2347,15 @@ void MInstall::stopInstall()
             qApp->exit(0);
             return;
         }
-        if (checkBoxExitReboot->isChecked()) {
+        if (poweraction) {
             csleep(1000);
             shell.run("swapoff -a");
-            shell.run("/usr/local/bin/persist-config --shutdown --command reboot &");
+            QString powercmd = "/usr/local/bin/persist-config --shutdown --command %1";
+            if (poweraction == 1) {
+                shell.run(powercmd.arg("reboot"));
+            } else if (poweraction == 2) {
+                shell.run(powercmd.arg("halt"));
+            }
         }
         qApp->exit(0);
     } else if (curr > 3) {
@@ -2421,18 +2435,13 @@ int MInstall::showPage(int curr, int next)
         ixPageRefAdvancedFDE = 0;
         return next;
     } else if (next == 3 && curr == 4) { // at Step_Progress (backward)
-        if (haveSnapshotUserAccounts) {
-            return 8; // skip Step_User_Accounts and go to Step_Localization
-        }
-        return 9; // go to Step_User_Accounts.
+        return 10; // go to Step_Auto
     } else if (next == 6 && curr == 5) { // at Step_Boot screen (forward)
         return next + 1; // skip Services screen
     } else if (next == 10 && curr == 9) { // at Step_User_Accounts (forward)
         if (!validateUserInfo()) {
             return curr;
         }
-        haveSysConfig = true;
-        next = 4;
     } else if (next == 8 && curr == 7) { // at Step_Network (forward)
         if (!validateComputerName()) {
             return curr;
@@ -2441,14 +2450,19 @@ int MInstall::showPage(int curr, int next)
        return next - 1; // skip Services screen
     } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
         if (haveSnapshotUserAccounts) {
-            // Continue
-            haveSysConfig = true;
-            next = 4;
+            next = 10; // skip User Accounts screen
         }
     } else if (next == 7 && curr == 6) { // at Step_Services (forward)
         return 8; // goes back to the screen that called Services screen
     } else if (next == 5 && curr == 6) { // at Step_Services (backward)
         return 8; // goes back to the screen that called Services screen
+    } else if (next == 11 && curr == 10) { // at Step_Auto (forward)
+        haveSysConfig = true;
+        return 4; // back to the install
+    } else if (next == 9 && curr == 10) { // at Step_Auto (backward)
+        if (haveSnapshotUserAccounts) {
+            return 8; // skip Step_User_Accounts and go to Step_Localization
+        }
     }
     return next;
 }
@@ -2458,9 +2472,9 @@ void MInstall::pageDisplayed(int next)
     QString val;
 
     // progress bar shown only for install and configuration pages.
-    installBox->setVisible(next >= 4 && next <= 9);
+    installBox->setVisible(next >= 4 && next <= 10);
 
-    if(next >= 5 && next <= 9) {
+    if(next >= 5 && next <= 10) {
         haveSysConfig = false; // (re)editing configuration
         ixTipStart = ixTip;
     }
@@ -2561,7 +2575,7 @@ void MInstall::pageDisplayed(int next)
                                     + "</p><p>"
                                     + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
                                     + "</p><p>"
-                                    + "<b>" + tr("Multitasking within the %1 installer").arg(PROJECTNAME) + "</b><br/>"
+                                    + "<b>" + tr("Change settings while you wait") + "</b><br/>"
                                     + tr("You can click on the <b>Next</b> or <b>Back</b> buttons while %1 is being installed to enter the information required for the installation.").arg(PROJECTNAME)
                                     + "</p><p>"
                                     + tr("Feel free to complete these steps at your own pace. If you finish early, the installation will continue and finish without interruption. Otherwise, the installer will pause until you have finished.")
@@ -2615,12 +2629,20 @@ void MInstall::pageDisplayed(int next)
                                        "Each password must be entered twice.</p>").arg(PROJECTNAME));
         break;
 
-    case 10: // done
-        if (!args.contains("--pretend") && !args.contains("-p")) {
-            saveConfig();
-            // print version (look for /usr/sbin/minstall since the name of the package might be different)
-            qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
-        }
+    case 10: // automation
+        ((MMain *)mmn)->setHelpText("<p><b>" + tr("Installation Automation") + "</b><br/>" + tr("These settings control what occurs after the %1 installation has finished.").arg(PROJECTNAME)
+                                    + "</p><p>"
+                                    + tr("If you choose to automatically exit the installer, it will be closed immediately after completion and the system will be shutdown or rebooted without anymore manual intervention, depending on which option is selected.")
+                                    + "</p><p>"
+                                    + tr("Use the <b>Save automation file to disk</b> option to save a file containing the settings used for this installation. This can be used in the future to perform an unattended or automated installation.") + "<br/>"
+                                    + "<b>" + tr("This file may contain sensitive information such as user names and passwords.") + "</b><br/>"
+                                    + tr("The file will be saved to where %1 is installed, in the %2 folder.").arg(PROJECTNAME, "<b>/var/log</b>")
+                                    + "</p><p>"
+                                    + tr("Although not currently implemented or supported, the ability to use an automation file is planned for a future version of the %1 installer.").arg(PROJECTNAME)
+                                    + "</p>");
+        break;
+
+    case 11: // done
         setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                                        "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -2648,10 +2670,11 @@ void MInstall::gotoPage(int next)
         // entering first page
         nextButton->setDefault(true);
         nextButton->setText(tr("Next"));
-        backButton->setEnabled(false);
+        backButton->hide();
     } else {
         // default
         backButton->setEnabled(true);
+        backButton->show();
     }
 
     int c = widgetStack->count();
@@ -2665,7 +2688,7 @@ void MInstall::gotoPage(int next)
     }
     if (next > c-1) {
         // finished
-        stopInstall();
+        stopInstall(checkBoxExitReboot->isChecked() ? 1 : 0);
         gotoPage(0);
         return;
     }
@@ -2993,17 +3016,17 @@ void MInstall::copyTime()
 
 void MInstall::on_progressBar_valueChanged(int value)
 {
-    if (iLastProgress < 0 || widgetStack->currentIndex() != 4) {
+    if (ixTipStart < 0 || widgetStack->currentIndex() != 4) {
         return; // no point xdisplaying a new hint if it will be invisible
     }
 
     const int tipcount = 6;
-    int imax = (progressBar->maximum() - iLastProgress);
-    if (imax != 0 && ixTipStart < tipcount) {
-        imax /= (tipcount - ixTipStart);
-        ixTip = ixTipStart + (value - iLastProgress) / imax;
-    } else {
-        ixTip = tipcount;
+    ixTip = tipcount;
+    if (ixTipStart < tipcount) {
+        int imax = (progressBar->maximum() - iLastProgress) / (tipcount - ixTipStart);
+        if (imax != 0) {
+            ixTip = ixTipStart + (value - iLastProgress) / imax;
+        }
     }
 
     switch(ixTip)
@@ -3053,7 +3076,7 @@ void MInstall::on_progressBar_valueChanged(int value)
 void MInstall::on_closeButton_clicked()
 {
     // ask for confirmation when installing (except for some steps that don't need confirmation)
-    if (widgetStack->currentIndex() > 3 && widgetStack->currentIndex() != 10) {
+    if (phase > 0 && phase < 4) {
         if (QMessageBox::question(this, tr("Confirmation"), tr("Are you sure you want to quit the application?"),
                                         QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
             procAbort();
