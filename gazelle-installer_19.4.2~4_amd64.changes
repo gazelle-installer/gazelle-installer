@@ -1,0 +1,57 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Format: 1.8
+Date: Thu, 25 Apr 2019 13:11:29 -0400
+Source: gazelle-installer
+Binary: mx-installer
+Architecture: source amd64
+Version: 19.4.2~4
+Distribution: UNRELEASED
+Urgency: medium
+Maintainer: dolphinoracle <dolphinoracle@gmail.com>
+Changed-By: Adrian <adrian@mxlinux.org>
+Description:
+ mx-installer - Customizable GUI installer for MX Linux and antiX Linux
+Changes:
+ gazelle-installer (19.4.2~4) UNRELEASED; urgency=medium
+ .
+   * time-saving branch: enter user information while copying files
+   * fixed some user account issues
+   * GUI stability improvement
+   * reduce CLI spam
+   * improve copy progress update
+   * simplified the copy and delete process handling code
+   * build the service list before the install starts
+   * implement the automatic exit action options
+   * improve password box red and green contrast
+Checksums-Sha1:
+ efa5fd24ec3c919a7fa0181987bbadea53a411b1 1228 gazelle-installer_19.4.2~4.dsc
+ 32fc57938ce37891e5cc96ce1111d2e96e801f3c 190048 gazelle-installer_19.4.2~4.tar.xz
+ cec07cdabefc44079049014597a43014f11f0dd9 11582 gazelle-installer_19.4.2~4_amd64.buildinfo
+ aeb80f95959324c6d48b2c91f2d8d32145985efd 1106414 mx-installer-dbgsym_19.4.2~4_amd64.deb
+ 56d97299bfa8ff89aa666a63922e3bef7b19fca7 272234 mx-installer_19.4.2~4_amd64.deb
+Checksums-Sha256:
+ 45e9cdbd1028d79cbc7b34849a4811154213bf95d56609ba6d5099508840d8f3 1228 gazelle-installer_19.4.2~4.dsc
+ a41ed1b9e918d3958044185d03548a56d1e609955ea88a89f1a8da49620678b8 190048 gazelle-installer_19.4.2~4.tar.xz
+ 7aefe60ae96e73156533f84433c6a27c71db850046ff7bd826c0ca175f52d1c0 11582 gazelle-installer_19.4.2~4_amd64.buildinfo
+ ec0e795a1e088903ef00541ad5df10e658611d8ca755df7b0c8ba4e521bbf8ea 1106414 mx-installer-dbgsym_19.4.2~4_amd64.deb
+ c8c8a7dfe58a62c700de9e046b5d3e5d062da60e6e5192762e03380767017edb 272234 mx-installer_19.4.2~4_amd64.deb
+Files:
+ 5dc1ff76f388dc96ed80252a520d8b72 1228 system optional gazelle-installer_19.4.2~4.dsc
+ 684c996be6514647dcda7ef23c03644e 190048 system optional gazelle-installer_19.4.2~4.tar.xz
+ 7e7981a208e2544c8953d66e82acbc55 11582 system optional gazelle-installer_19.4.2~4_amd64.buildinfo
+ 2a1749dd7f8f955322ae1477b6d5cdf9 1106414 debug optional mx-installer-dbgsym_19.4.2~4_amd64.deb
+ 076cd571dedb7693df06df26730b2334 272234 system optional mx-installer_19.4.2~4_amd64.deb
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFHBAEBCAAxFiEE8ndToY6S45N+YzXncJOMeAZ57pgFAlzB6sMTHGFkcmlhbkBt
+eGxpbnV4Lm9yZwAKCRBwk4x4BnnumFspCACsiCU73LMyqCQS16NDra+jyS7TJWey
+HzebkijEV1Sr3DSQZ+E4pZ+cds/1qEiXwLqLLX1OLeinYnsezTfO5eVWwoSI0G31
+h/+41Fk0FcRZftKuJ0rsNEay8pP3pVcdv+4vQhWchwgeNlnJKinzESAAaQlyPDnD
+ssCJhIwHupYqOkAOLvg5BxTgkK1euGAICLLMZIyUTDkajKqr9yRNru34e4gi5e5W
+p7fAWAiRf0b60bEKxcz146+vK+vqjPBisVfTBUvH480rinsoajv9IwUbgLsyReWX
+iS8NE4OwV1rFYc2DQ/IdfimhZ3b5whmuuIDue4RsNaxHp+2EWx7YCSy3
+=UjA0
+-----END PGP SIGNATURE-----
