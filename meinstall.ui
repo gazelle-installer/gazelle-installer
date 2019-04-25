@@ -2835,7 +2835,7 @@
           <item row="2" column="0" colspan="5">
            <widget class="QCheckBox" name="checkSaveAutoFile">
             <property name="text">
-             <string>Save installation configuration file to disk</string>
+             <string>Save automation file to disk</string>
             </property>
            </widget>
           </item>
