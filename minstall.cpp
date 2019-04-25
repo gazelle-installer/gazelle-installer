@@ -748,7 +748,7 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
-    if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formating /home partition
+    if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
         home_mntops = "defaults,noatime";
     } else {
         root_mntops = "defaults,noatime";
@@ -794,13 +794,13 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
         }
         // if compression has been selected by user, set flag
         if (type == "btrfs-zlib") {
-            if (homedev == dev || dev == "/dev/mapper/homefs") { // if formating /home partition
+            if (homedev == dev || dev == "/dev/mapper/homefs") { // if formatting /home partition
                 home_mntops = "defaults,noatime,compress-force=zlib";
             } else {
                 root_mntops = "defaults,noatime,compress-force=zlib";
             }
         } else if (type == "btrfs-lzo") {
-            if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formating /home partition
+            if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
                 home_mntops = "defaults,noatime,compress-force=lzo";
             } else {
                 root_mntops = "defaults,noatime,compress-force=lzo";
@@ -1128,7 +1128,7 @@ bool MInstall::makeDefaultPartitions()
         } else {
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
-            updateStatus(tr("Formating EFI System Partition (ESP)"), ++prog);
+            updateStatus(tr("Formatting EFI System Partition (ESP)"), ++prog);
         }
         rootDevicePreserve = rootdev;
         swapDevicePreserve = swapdev;
@@ -2070,7 +2070,7 @@ bool MInstall::validateUserInfo()
     QString cmd = QString("grep '^\\b%1\\b' /etc/passwd >/dev/null").arg(userNameEdit->text());
     if (shell.run(cmd) == 0) {
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry that name is in use.\n"
+                              tr("Sorry, that name is in use.\n"
                                  "Please select a different name."));
         return false;
     }
@@ -2117,21 +2117,21 @@ bool MInstall::validateComputerName()
     // see if name is reasonable
     if (computerNameEdit->text().length() < 2) {
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry your computer name needs to be\nat least 2 characters long. You'll have to\nselect a different name before proceeding."));
+                              tr("Sorry, your computer name needs to be\nat least 2 characters long. You'll have to\nselect a different name before proceeding."));
         return false;
     } else if (computerNameEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry your computer name contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
+                              tr("Sorry, your computer name contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return false;
     }
     // see if name is reasonable
     if (computerDomainEdit->text().length() < 2) {
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry your computer domain needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
+                              tr("Sorry, your computer domain needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
         return false;
     } else if (computerDomainEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry your computer domain contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
+                              tr("Sorry, your computer domain contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return false;
     }
 
@@ -2139,7 +2139,7 @@ bool MInstall::validateComputerName()
         // see if name is reasonable
         if (computerGroupEdit->text().length() < 2) {
             QMessageBox::critical(this, QString::null,
-                                  tr("Sorry your workgroup needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
+                                  tr("Sorry, your workgroup needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
             return false;
         }
     } else {
@@ -2576,9 +2576,9 @@ void MInstall::pageDisplayed(int next)
                                     + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
                                     + "</p><p>"
                                     + "<b>" + tr("Change settings while you wait") + "</b><br/>"
-                                    + tr("You can click on the <b>Next</b> or <b>Back</b> buttons while %1 is being installed to enter the information required for the installation.").arg(PROJECTNAME)
+                                    + tr("While %1 is being installed, you can click on the <b>Next</b> or <b>Back</b> buttons to enter other information required for the installation.").arg(PROJECTNAME)
                                     + "</p><p>"
-                                    + tr("Feel free to complete these steps at your own pace. If you finish early, the installation will continue and finish without interruption. Otherwise, the installer will pause until you have finished.")
+                                    + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
                                     + "</p>");
         backButton->setEnabled(haveSysConfig);
         nextButton->setEnabled(!haveSysConfig);
@@ -2632,7 +2632,7 @@ void MInstall::pageDisplayed(int next)
     case 10: // automation
         ((MMain *)mmn)->setHelpText("<p><b>" + tr("Installation Automation") + "</b><br/>" + tr("These settings control what occurs after the %1 installation has finished.").arg(PROJECTNAME)
                                     + "</p><p>"
-                                    + tr("If you choose to automatically exit the installer, it will be closed immediately after completion and the system will be shutdown or rebooted without anymore manual intervention, depending on which option is selected.")
+                                    + tr("If you choose to automatically exit the installer, it will be closed immediately after completion and the system will be shutdown or rebooted without any more manual intervention, depending on which option is selected.")
                                     + "</p><p>"
                                     + tr("Use the <b>Save automation file to disk</b> option to save a file containing the settings used for this installation. This can be used in the future to perform an unattended or automated installation.") + "<br/>"
                                     + "<b>" + tr("This file may contain sensitive information such as user names and passwords.") + "</b><br/>"
