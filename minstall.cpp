@@ -111,22 +111,47 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     loadAdvancedFDE();
 
     // timezone
-
     timezoneCombo->clear();
-    QString tzone = shell.getOutput("awk -F '\\t' '!/^#/ { print $3 }' /usr/share/zoneinfo/zone.tab | sort");
-    timezoneCombo->addItems(tzone.split("\n"));
-    timezoneCombo->setCurrentIndex(timezoneCombo->findText(getCmdOut("cat /etc/timezone")));
-
+    QFile file("/usr/share/zoneinfo/zone.tab");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        while(!file.atEnd()) {
+            QString line(file.readLine().trimmed());
+            if(!line.startsWith('#')) {
+                timezoneCombo->addItem(line.section("\t", 2, 2).trimmed());
+            }
+        }
+        file.close();
+    }
+    timezoneCombo->model()->sort(0);
+    file.setFileName("/etc/timezone");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        timezoneCombo->setCurrentIndex(timezoneCombo->findText(file.readLine().trimmed()));
+        file.close();
+    }
 
     setupkeyboardbutton();
 
     // locale
     localeCombo->clear();
-    QString loc_temp = shell.getOutput("cat /usr/share/antiX/locales.template");
-    localeCombo->addItems(loc_temp.split("\n")); // add all
-    localeCombo->removeItem(localeCombo->findText("#", Qt::MatchStartsWith)); // remove commented out lines
+    file.setFileName("/usr/share/antiX/locales.template");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        while (!file.atEnd()) {
+            const QByteArray &line = file.readLine().trimmed();
+            if(!line.startsWith('#')) localeCombo->addItem(line);
+        }
+        file.close();
+    }
+    file.setFileName("/etc/default/locale");
     QString locale;
-    locale = getCmdOut("grep ^LANG /etc/default/locale").section('=',1);
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        while (!file.atEnd()) {
+            QString line(file.readLine());
+            if(line.startsWith("LANG")) {
+                locale = line.section('=', 1).trimmed();
+            }
+        }
+        file.close();
+    }
     if (localeCombo->findText(locale) != -1) {
         localeCombo->setCurrentIndex(localeCombo->findText(locale));
     } else {
@@ -134,8 +159,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     }
 
     // clock 24/12 default
-    QString lang = getCmdOut("cat /etc/default/locale|grep LANG");
-    if (lang.contains("en_US.UTF-8") || lang.contains("LANG=ar_EG.UTF-8") || lang.contains("LANG=el_GR.UTF-8") || lang.contains("LANG=sq_AL.UTF-8")) {
+    if (locale == "en_US.UTF-8" || locale == "LANG=ar_EG.UTF-8" || locale == "LANG=el_GR.UTF-8" || locale == "LANG=sq_AL.UTF-8") {
         radio12h->setChecked(true);
     }
 
@@ -3091,24 +3115,23 @@ void MInstall::on_closeButton_clicked()
 void MInstall::setupkeyboardbutton()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    QString kb;
-    kb = getCmdOut("grep XKBMODEL /etc/default/keyboard");
-    kb = kb.section('=', 1);
-    kb.replace(","," ");
-    kb.remove(QChar('"'));
-    QString kb2;
-    kb2 = getCmdOut("grep XKBLAYOUT /etc/default/keyboard");
-    kb2 = kb2.section('=', 1);
-    kb2.replace(","," ");
-    kb2.remove(QChar('"'));
-    QString kb3;
-    kb3 = getCmdOut("grep XKBVARIANT /etc/default/keyboard");
-    kb3 = kb3.section('=', 1);
-    kb3.replace(","," ");
-    kb3.remove(QChar('"'));
-    labelModel->setText(kb);
-    labelLayout->setText(kb2);
-    labelVariant->setText(kb3);
+    QFile file("/etc/default/keyboard");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        while (!file.atEnd()) {
+            QString line(file.readLine().trimmed());
+            QLabel *plabel = NULL;
+            if (line.startsWith("XKBMODEL")) plabel = labelModel;
+            else if (line.startsWith("XKBLAYOUT")) plabel = labelLayout;
+            else if (line.startsWith("XKBVARIANT")) plabel = labelVariant;
+            if (plabel != NULL) {
+                line = line.section('=', 1);
+                line.replace(",", " ");
+                line.remove(QChar('"'));
+                plabel->setText(line);
+            }
+        }
+        file.close();
+    }
 }
 
 void MInstall::on_buttonSetKeyboard_clicked()
