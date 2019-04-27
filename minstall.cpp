@@ -84,15 +84,6 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     MIN_INSTALL_SIZE=settings.value("MIN_INSTALL_SIZE").toString();
     PREFERRED_MIN_INSTALL_SIZE=settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
     REMOVE_NOSPLASH=settings.value("REMOVE_NOSPLASH", "false").toBool();
-    //check for samba
-    QFileInfo info("/etc/init.d/smbd");
-    if (!info.exists()) {
-        computerGroupLabel->setEnabled(false);
-        computerGroupEdit->setEnabled(false);
-        computerGroupEdit->setText("");
-        sambaCheckBox->setChecked(false);
-        sambaCheckBox->setEnabled(false);
-    }
 
     // save config
     config = new QSettings(PROJECTNAME, "minstall", this);
@@ -110,58 +101,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
 
     loadAdvancedFDE();
 
-    // timezone
-    timezoneCombo->clear();
-    QFile file("/usr/share/zoneinfo/zone.tab");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while(!file.atEnd()) {
-            QString line(file.readLine().trimmed());
-            if(!line.startsWith('#')) {
-                timezoneCombo->addItem(line.section("\t", 2, 2).trimmed());
-            }
-        }
-        file.close();
-    }
-    timezoneCombo->model()->sort(0);
-    file.setFileName("/etc/timezone");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        timezoneCombo->setCurrentIndex(timezoneCombo->findText(file.readLine().trimmed()));
-        file.close();
-    }
-
     setupkeyboardbutton();
-
-    // locale
-    localeCombo->clear();
-    file.setFileName("/usr/share/antiX/locales.template");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while (!file.atEnd()) {
-            const QByteArray &line = file.readLine().trimmed();
-            if(!line.startsWith('#')) localeCombo->addItem(line);
-        }
-        file.close();
-    }
-    file.setFileName("/etc/default/locale");
-    QString locale;
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while (!file.atEnd()) {
-            QString line(file.readLine());
-            if(line.startsWith("LANG")) {
-                locale = line.section('=', 1).trimmed();
-            }
-        }
-        file.close();
-    }
-    if (localeCombo->findText(locale) != -1) {
-        localeCombo->setCurrentIndex(localeCombo->findText(locale));
-    } else {
-        localeCombo->setCurrentIndex(localeCombo->findText("en_US"));
-    }
-
-    // clock 24/12 default
-    if (locale == "en_US.UTF-8" || locale == "LANG=ar_EG.UTF-8" || locale == "LANG=el_GR.UTF-8" || locale == "LANG=sq_AL.UTF-8") {
-        radio12h->setChecked(true);
-    }
 
     proc = new QProcess(this);
     timer = new QTimer(this);
@@ -169,14 +109,6 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
     homeLabelEdit->setText("home" + PROJECTSHORTNAME);
     swapLabelEdit->setText("swap" + PROJECTSHORTNAME);
-
-    // if it looks like an apple...
-    if (shell.run("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus") == 0) {
-        grubPbrButton->setChecked(true);
-        grubMbrButton->setEnabled(false);
-        localClockCheckBox->setChecked(true);
-    }
-    checkUefi();
 }
 
 MInstall::~MInstall() {
@@ -514,7 +446,7 @@ void MInstall::processNextPhase()
     }
 }
 
-// unmount antiX in case we are retrying
+// gather required information and prepare installation
 void MInstall::prepareToInstall()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -532,12 +464,82 @@ void MInstall::prepareToInstall()
     isRootFormatted = false;
     isHomeFormatted = false;
 
+    // if it looks like an apple...
+    if (shell.run("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus") == 0) {
+        grubPbrButton->setChecked(true);
+        grubMbrButton->setEnabled(false);
+        localClockCheckBox->setChecked(true);
+    } else if (grubMbrButton->isEnabled()){
+        grubMbrButton->setChecked(true);
+    }
+    checkUefi();
+
+    // timezone
+    timezoneCombo->clear();
+    QFile file("/usr/share/zoneinfo/zone.tab");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        while(!file.atEnd()) {
+            QString line(file.readLine().trimmed());
+            if(!line.startsWith('#')) {
+                timezoneCombo->addItem(line.section("\t", 2, 2).trimmed());
+            }
+        }
+        file.close();
+    }
+    timezoneCombo->model()->sort(0);
+    file.setFileName("/etc/timezone");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        timezoneCombo->setCurrentIndex(timezoneCombo->findText(file.readLine().trimmed()));
+        file.close();
+    }
+
+    // locale
+    localeCombo->clear();
+    file.setFileName("/usr/share/antiX/locales.template");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        while (!file.atEnd()) {
+            const QByteArray &line = file.readLine().trimmed();
+            if(!line.startsWith('#')) localeCombo->addItem(line);
+        }
+        file.close();
+    }
+    file.setFileName("/etc/default/locale");
+    QString locale;
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        while (!file.atEnd()) {
+            QString line(file.readLine());
+            if(line.startsWith("LANG")) {
+                locale = line.section('=', 1).trimmed();
+            }
+        }
+        file.close();
+    }
+    if (localeCombo->findText(locale) != -1) {
+        localeCombo->setCurrentIndex(localeCombo->findText(locale));
+    } else {
+        localeCombo->setCurrentIndex(localeCombo->findText("en_US"));
+    }
+
+    // clock 24/12 default
+    if (locale == "en_US.UTF-8" || locale == "LANG=ar_EG.UTF-8" || locale == "LANG=el_GR.UTF-8" || locale == "LANG=sq_AL.UTF-8") {
+        radio12h->setChecked(true);
+    }
+
     // Detect snapshot-backup account(s)
     // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
     if (shell.run("ls /home | grep -v lost+found | grep -v demo | grep -v snapshot | grep -q [a-zA-Z0-9]") == 0 || shell.run("test -d /live/linux/home/demo") == 0) {
         haveSnapshotUserAccounts = true;
     }
 
+    //check for samba
+    QFileInfo info("/etc/init.d/smbd");
+    if (!info.exists()) {
+        computerGroupLabel->setEnabled(false);
+        computerGroupEdit->setEnabled(false);
+        computerGroupEdit->setText("");
+        sambaCheckBox->setChecked(false);
+        sambaCheckBox->setEnabled(false);
+    }
     // check for the Samba server
     QString val = getCmdValue("dpkg -s samba | grep '^Status'", "ok", " ", " ");
     haveSamba = (val.compare("installed") == 0);
@@ -2519,6 +2521,9 @@ void MInstall::pageDisplayed(int next)
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
                                        "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
+        if (diskCombo->count() == 0) {
+            updateDiskInfo();
+        }
         break;
 
     case 2:  // choose partition
@@ -2730,36 +2735,6 @@ void MInstall::firstRefresh(QDialog *main)
     // disable automounting in Thunar
     auto_mount = shell.getOutput("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
     shell.run("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'");
-    refresh();
-}
-
-void MInstall::updatePartitionWidgets()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    int numberPartitions = this->getPartitionNumber();
-
-    if (numberPartitions > 0) {
-        existing_partitionsButton->show();
-    }
-    else {
-        existing_partitionsButton->hide();
-        entireDiskButton->toggle();
-    }
-}
-
-// widget being shown
-void MInstall::refresh()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    this->updatePartitionWidgets();
-    //  shell.run("umount -a 2>/dev/null");
-    QString exclude = " --exclude=boot";
-    if (INSTALL_FROM_ROOT_DEVICE) {
-        exclude.clear();
-    }
-    listBootDrives = getCmdOuts("partition-info" + exclude + " --min-size=" + MIN_ROOT_DEVICE_SIZE + " -n drives");
-    diskCombo->clear();
-    grubBootCombo->clear();
 
     rootTypeCombo->setEnabled(false);
     homeTypeCombo->setEnabled(false);
@@ -2767,12 +2742,7 @@ void MInstall::refresh()
     checkBoxEncryptHome->setEnabled(false);
     rootLabelEdit->setEnabled(false);
     homeLabelEdit->setEnabled(false);
-    homeLabelEdit->setEnabled(false);
     swapLabelEdit->setEnabled(false);
-
-    diskCombo->addItems(listBootDrives);
-    diskCombo->setCurrentIndex(0);
-    grubBootCombo->addItems(listBootDrives);
 
     FDEpassword->hide();
     FDEpassword2->hide();
@@ -2780,10 +2750,47 @@ void MInstall::refresh()
     labelFDEpass2->hide();
     buttonAdvancedFDE->hide();
     gbEncrPass->hide();
-
-    on_diskCombo_activated();
+    existing_partitionsButton->hide();
 
     gotoPage(0);
+}
+
+void MInstall::updatePartitionWidgets()
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+
+    int numberPartitions = this->getPartitionNumber();
+
+    if (numberPartitions > 0) {
+        existing_partitionsButton->show();
+        existing_partitionsButton->setChecked(true);
+    } else {
+        existing_partitionsButton->hide();
+        entireDiskButton->setChecked(true);
+    }
+}
+
+// widget being shown
+void MInstall::updateDiskInfo()
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+
+    diskCombo->setEnabled(false);
+    diskCombo->clear();
+    diskCombo->addItem(tr("Loading..."));
+
+    updatePartitionWidgets();
+    //  shell.run("umount -a 2>/dev/null");
+    QString exclude = " --exclude=boot";
+    if (INSTALL_FROM_ROOT_DEVICE) {
+        exclude.clear();
+    }
+    listBootDrives = getCmdOuts("partition-info" + exclude + " --min-size=" + MIN_ROOT_DEVICE_SIZE + " -n drives");
+    diskCombo->clear();
+    diskCombo->addItems(listBootDrives);
+    diskCombo->setCurrentIndex(0);
+    diskCombo->setEnabled(true);
+    on_diskCombo_activated();
 }
 
 void MInstall::buildServiceList()
@@ -2885,11 +2892,13 @@ void MInstall::on_viewServicesButton_clicked()
 
 void MInstall::on_qtpartedButton_clicked()
 {
+    qtpartedButton->setEnabled(false);
     shell.run("/sbin/swapoff -a 2>&1");
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
     shell.run("make-fstab -s");
     shell.run("/sbin/swapon -a 2>&1");
-    this->updatePartitionWidgets();
+    updatePartitionWidgets();
+    qtpartedButton->setEnabled(true);
     on_diskCombo_activated();
 }
 

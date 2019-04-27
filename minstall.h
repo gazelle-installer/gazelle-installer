@@ -134,7 +134,7 @@ public:
     void firstRefresh(QDialog *main);
     void gotoPage(int next);
     void pageDisplayed(int next);
-    void refresh();
+    void updateDiskInfo();
     void setupkeyboardbutton();
     void stopInstall(int poweraction);
 

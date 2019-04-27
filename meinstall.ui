@@ -1816,9 +1816,6 @@
             <property name="text">
              <string>PBR</string>
             </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
            </widget>
           </item>
           <item row="1" column="1">
@@ -1947,15 +1944,6 @@
             </property>
             <property name="shortcut">
              <string>Alt+B</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-            <property name="autoRepeat">
-             <bool>false</bool>
-            </property>
-            <property name="autoExclusive">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
