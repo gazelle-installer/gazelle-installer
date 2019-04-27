@@ -2342,6 +2342,8 @@ void MInstall::stopInstall(int poweraction)
             shell.run(powercmd.arg("halt"));
         }
     }
+    cleanup();
+    qApp->exit(0);
 }
 
 void MInstall::unmountGoBack(QString msg)
