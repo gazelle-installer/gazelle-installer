@@ -2496,12 +2496,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
-        nextButton->setEnabled(false);
         updatePartInfo();
-        if (rootCombo->isEnabled() && homeCombo->isEnabled()
-            && bootCombo->isEnabled() && swapCombo->isEnabled()) {
-            nextButton->setEnabled(true);
-        }
         break;
 
     case 3: // advanced encryption settings
@@ -2871,8 +2866,8 @@ void MInstall::updatePartInfo()
 
     if (phase < 1) {
         setCursor(QCursor(Qt::WaitCursor));
-        diskCombo->setEnabled(false);
-        qtpartedButton->setEnabled(false);
+        backButton->setEnabled(false);
+        nextButton->setEnabled(false);
         const QString &sloading = tr("Loading...");
         rootCombo->setEnabled(false);
         swapCombo->setEnabled(false);
@@ -2928,11 +2923,8 @@ void MInstall::updatePartInfo()
 
     on_rootCombo_activated();
     if (phase < 1) {
-        qtpartedButton->setEnabled(true);
-        diskCombo->setEnabled(true);
-        if (widgetStack->currentWidget() == Step_Partitions) {
-            nextButton->setEnabled(true);
-        }
+        backButton->setEnabled(true);
+        nextButton->setEnabled(true);
         setCursor(QCursor(Qt::ArrowCursor));
     }
 }
