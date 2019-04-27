@@ -919,6 +919,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
 bool MInstall::validateChosenPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+
     int ans;
     if (checkBoxEncryptSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
         if (!checkPassword(FDEpassCust->text())) {
@@ -1280,7 +1281,8 @@ bool MInstall::makeDefaultPartitions()
     csleep(1000);
     mkdir("/mnt/antiX/home", 0755);
 
-    on_diskCombo_activated();
+    indexPartInfoDisk = -1; // invalidate existing partition info
+    updatePartInfo();
     rootCombo->setCurrentIndex(1);
     swapCombo->setCurrentIndex(1);
     homeCombo->setCurrentIndex(0);
@@ -2543,6 +2545,12 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
+        nextButton->setEnabled(false);
+        updatePartInfo();
+        if (rootCombo->isEnabled() && homeCombo->isEnabled()
+            && bootCombo->isEnabled() && swapCombo->isEnabled()) {
+            nextButton->setEnabled(true);
+        }
         break;
 
     case 3: // advanced encryption settings
@@ -2790,7 +2798,6 @@ void MInstall::updateDiskInfo()
     diskCombo->addItems(listBootDrives);
     diskCombo->setCurrentIndex(0);
     diskCombo->setEnabled(true);
-    on_diskCombo_activated();
 }
 
 void MInstall::buildServiceList()
@@ -2892,14 +2899,16 @@ void MInstall::on_viewServicesButton_clicked()
 
 void MInstall::on_qtpartedButton_clicked()
 {
+    nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
     shell.run("/sbin/swapoff -a 2>&1");
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
     shell.run("make-fstab -s");
     shell.run("/sbin/swapon -a 2>&1");
     updatePartitionWidgets();
+    indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
-    on_diskCombo_activated();
+    nextButton->setEnabled(true);
 }
 
 void MInstall::on_buttonBenchmarkFDE_clicked()
@@ -2909,9 +2918,12 @@ void MInstall::on_buttonBenchmarkFDE_clicked()
 }
 
 // disk selection changed, rebuild dropdown menus
-void MInstall::on_diskCombo_activated(QString)
+void MInstall::updatePartInfo()
 {
-    QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
+    if (indexPartInfoDisk == diskCombo->currentIndex()) return;
+    diskCombo->setEnabled(false);
+    qtpartedButton->setEnabled(false);
+    indexPartInfoDisk = diskCombo->currentIndex();
 
     const QString &sloading = tr("Loading...");
     rootCombo->setEnabled(false);
@@ -2926,6 +2938,8 @@ void MInstall::on_diskCombo_activated(QString)
     swapCombo->addItem(sloading);
     homeCombo->addItem(sloading);
     bootCombo->addItem(sloading);
+
+    QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
 
     // build rootCombo
     QString exclude;
@@ -2964,6 +2978,11 @@ void MInstall::on_diskCombo_activated(QString)
     bootCombo->setEnabled(true);
 
     on_rootCombo_activated();
+    qtpartedButton->setEnabled(true);
+    diskCombo->setEnabled(true);
+    if (widgetStack->currentWidget() == Step_Partitions) {
+        nextButton->setEnabled(true);
+    }
 }
 
 // root partition changed, rebuild home, swap, boot combo boxes
