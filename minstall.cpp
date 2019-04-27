@@ -3131,7 +3131,7 @@ void MInstall::on_buttonSetKeyboard_clicked()
 
 void MInstall::on_homeCombo_currentIndexChanged(const QString &arg1)
 {
-    if (arg1.isEmpty()) {
+    if (!homeCombo->isEnabled() || arg1.isEmpty()) {
         return;
     }
     homeLabelEdit->setEnabled(arg1 != "root");
