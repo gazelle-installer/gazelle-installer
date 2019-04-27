@@ -139,7 +139,7 @@ public:
     void stopInstall(int poweraction);
 
 public slots:
-    void procAbort();
+    bool procAbort();
     void cleanup();
     //    void moreClicked(QListViewItem *item);
     void delTime();

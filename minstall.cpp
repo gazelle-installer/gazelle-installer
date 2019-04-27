@@ -2362,36 +2362,14 @@ void MInstall::setServices()
 void MInstall::stopInstall(int poweraction)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    int curr = widgetStack->currentIndex();
-    int c = widgetStack->count();
-
-    if (curr == 3) {
-        procAbort();
-        QApplication::beep();
-        return;
-    } else if (curr >= c-3) {
-        cleanup();
-        if (args.contains("--pretend") || args.contains("-p")) {
-            qApp->exit(0);
-            return;
-        }
-        if (poweraction) {
-            csleep(1000);
-            shell.run("swapoff -a");
-            QString powercmd = "/usr/local/bin/persist-config --shutdown --command %1";
-            if (poweraction == 1) {
-                shell.run(powercmd.arg("reboot"));
-            } else if (poweraction == 2) {
-                shell.run(powercmd.arg("halt"));
-            }
-        }
-        qApp->exit(0);
-    } else if (curr > 3) {
-        int ans = QMessageBox::critical(this, QString::null,
-                                        tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
-                                        tr("Yes"), tr("No"));
-        if (ans != 0) {
-            return;
+    if (poweraction) {
+        csleep(1000);
+        shell.run("swapoff -a");
+        QString powercmd = "/usr/local/bin/persist-config --shutdown --command %1";
+        if (poweraction == 1) {
+            shell.run(powercmd.arg("reboot"));
+        } else if (poweraction == 2) {
+            shell.run(powercmd.arg("halt"));
         }
     }
 }
@@ -3003,10 +2981,20 @@ void MInstall::on_rootTypeCombo_activated(QString)
     }
 }
 
-void MInstall::procAbort()
+bool MInstall::procAbort()
 {
+    // ask for confirmation when installing (except for some steps that don't need confirmation)
+    if (phase > 0 && phase < 4) {
+        if(QMessageBox::warning(this, tr("Confirmation"),
+                                tr("The installation and configuration is incomplete.\n"
+                                   "Do you really want to stop now?"),
+                                QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
+            return false;
+        }
+    }
     proc->terminate();
     QTimer::singleShot(5000, proc, SLOT(kill()));
+    return true;
 }
 
 bool MInstall::eventFilter(QObject* obj, QEvent* event)
@@ -3140,17 +3128,7 @@ void MInstall::on_progressBar_valueChanged(int value)
 
 void MInstall::on_closeButton_clicked()
 {
-    // ask for confirmation when installing (except for some steps that don't need confirmation)
-    if (phase > 0 && phase < 4) {
-        if (QMessageBox::question(this, tr("Confirmation"), tr("Are you sure you want to quit the application?"),
-                                        QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-            procAbort();
-            ((MMain *)mmn)->closeClicked();
-        }
-    } else {
-        procAbort();
-        ((MMain *)mmn)->closeClicked();
-    }
+    ((MMain *)mmn)->close();
 }
 
 void MInstall::setupkeyboardbutton()
