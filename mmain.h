@@ -29,11 +29,12 @@ public:
     QString PROJECTSHORTNAME;
 
     void setHelpText(const QString &text);
-    void closeEvent(QCloseEvent * e);
     static QString getCmdOut(QString cmd);
 
+protected:
+    void closeEvent(QCloseEvent * event);
+
 public slots:
-    virtual void closeClicked();
     virtual void showEvent(QShowEvent *);
     virtual void resizeEvent(QResizeEvent *);
 };
