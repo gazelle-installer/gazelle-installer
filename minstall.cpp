@@ -2913,17 +2913,19 @@ void MInstall::on_diskCombo_activated(QString)
 {
     QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
 
+    const QString &sloading = tr("Loading...");
+    rootCombo->setEnabled(false);
+    swapCombo->setEnabled(false);
+    homeCombo->setEnabled(false);
+    bootCombo->setEnabled(false);
     rootCombo->clear();
     swapCombo->clear();
     homeCombo->clear();
     bootCombo->clear();
-    swapCombo->addItem("none");
-    homeCombo->blockSignals(true);
-    homeCombo->addItem("root");
-    homeCombo->blockSignals(false);
-    bootCombo->blockSignals(true);
-    bootCombo->addItem("root");
-    bootCombo->blockSignals(false);
+    rootCombo->addItem(sloading);
+    swapCombo->addItem(sloading);
+    homeCombo->addItem(sloading);
+    bootCombo->addItem(sloading);
 
     // build rootCombo
     QString exclude;
@@ -2931,24 +2933,35 @@ void MInstall::on_diskCombo_activated(QString)
         exclude = "boot,";
     }
     QStringList partitions = getCmdOuts(QString("partition-info -n --exclude=" + exclude + "swap --min-size=" + MIN_ROOT_DEVICE_SIZE + " %1").arg(drv));
-    rootCombo->addItem(""); // add an empty item to make sure nothing is selected by default
-    rootCombo->addItems(partitions);
-    if (partitions.size() == 0) {
-        rootCombo->clear();
+    rootCombo->clear();
+    if (partitions.size() > 0) {
+        rootCombo->addItem(""); // add an empty item to make sure nothing is selected by default
+        rootCombo->addItems(partitions);
+    } else {
         rootCombo->addItem("none");
     }
+    rootCombo->setEnabled(true);
 
     // build homeCombo for all disks
     partitions = getCmdOuts("partition-info all -n --exclude=" + exclude + "swap --min-size=1000");
+    homeCombo->clear();
+    homeCombo->addItem("root");
     homeCombo->addItems(partitions);
+    homeCombo->setEnabled(true);
 
     // build swapCombo for all disks
     partitions = getCmdOuts("partition-info all -n --exclude=" + exclude);
+    swapCombo->clear();
+    swapCombo->addItem("none");
     swapCombo->addItems(partitions);
+    swapCombo->setEnabled(true);
 
     // build bootCombo for all disks, exclude ESP (EFI)
     partitions = getCmdOuts("partition-info all -n --exclude=" + exclude + "efi --min-size=" + MIN_BOOT_DEVICE_SIZE);
+    bootCombo->clear();
+    bootCombo->addItem("root");
     bootCombo->addItems(partitions);
+    bootCombo->setEnabled(true);
 
     on_rootCombo_activated();
 }
