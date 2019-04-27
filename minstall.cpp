@@ -378,7 +378,6 @@ void MInstall::processNextPhase()
     if(phase == 0) { // No install started yet.
         phase = 1; // installation.
         nextButton->setEnabled(false);
-        setCursor(QCursor(Qt::WaitCursor));
         prepareToInstall();
         if (entireDiskButton->isChecked()) {
             if (!makeDefaultPartitions()) {
@@ -402,7 +401,6 @@ void MInstall::processNextPhase()
             progressBar->setEnabled(false);
             updateStatus(tr("Paused for required operator input"), 97);
             QApplication::beep();
-            setCursor(QCursor(Qt::ArrowCursor));
             if(widgetStack->currentIndex() == 4) {
                 on_nextButton_clicked();
             }
@@ -413,7 +411,6 @@ void MInstall::processNextPhase()
         phase = 3;
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
-        setCursor(QCursor(Qt::WaitCursor));
         installLoader();
         updateStatus(tr("Setting system configuration"), 99);
         setServices();
@@ -424,7 +421,6 @@ void MInstall::processNextPhase()
         }
         setComputerName();
         setLocale();
-        setCursor(QCursor(Qt::ArrowCursor));
         if (checkSaveAutoFile->isChecked()) {
             saveConfig();
         }
@@ -871,8 +867,6 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
 bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    setCursor(QCursor(Qt::WaitCursor));
-    qApp->processEvents();
 
     QProcess proc;
 
@@ -895,7 +889,6 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
     proc.write(password + "\n");
     proc.waitForFinished();
     if (proc.exitCode() != 0) {
-        setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, could not create %1 LUKS partition").arg(fs_name));
         return false;
@@ -907,7 +900,6 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
     proc.write(password + "\n");
     proc.waitForFinished();
     if (proc.exitCode() != 0) {
-        setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
@@ -1780,7 +1772,6 @@ bool MInstall::installLoader()
     qDebug() << "Installing Grub";
     if (runCmd(cmd) != 0) {
         // error
-        setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function."));
         runCmd("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
@@ -1901,7 +1892,6 @@ bool MInstall::setUserName()
         // already exists
         closedir(dir);
         msg = tr("The home directory for %1 already exists.Would you like to reuse the old home directory?").arg(userNameEdit->text());
-        setCursor(QCursor(Qt::ArrowCursor));
         ans = QMessageBox::information(this, QString::null, msg,
                                        tr("Yes"), tr("No"));
         if (ans != 0) {
@@ -1936,17 +1926,14 @@ bool MInstall::setUserName()
                                                tr("Yes"), tr("No"));
                 if (ans == 0) {
                     // delete the directory
-                    setCursor(QCursor(Qt::WaitCursor));
                     cmd = QString("rm -f %1").arg(dpath);
                     if (shell.run(cmd) != 0) {
-                        setCursor(QCursor(Qt::ArrowCursor));
                         QMessageBox::critical(this, QString::null,
                                               tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
                         return false;
                     }
                 } else {
                     // don't save, reuse or delete -- can't proceed
-                    setCursor(QCursor(Qt::ArrowCursor));
                     QMessageBox::critical(this, QString::null,
                                           tr("You've chosen to not use, save or delete the old home directory.\nBefore proceeding, you'll have to select a different username."));
                     return false;
@@ -1954,19 +1941,16 @@ bool MInstall::setUserName()
             }
         }
     }
-    setCursor(QCursor(Qt::WaitCursor));
     if ((dir = opendir(dpath.toUtf8())) == NULL) {
         // dir does not exist, must create it
         // copy skel to demo
         if (shell.run("cp -a /mnt/antiX/etc/skel /mnt/antiX/home") != 0) {
-            setCursor(QCursor(Qt::ArrowCursor));
             QMessageBox::critical(this, QString::null,
                                   tr("Sorry, failed to create user directory."));
             return false;
         }
         cmd = QString("mv -f /mnt/antiX/home/skel %1").arg(dpath);
         if (shell.run(cmd) != 0) {
-            setCursor(QCursor(Qt::ArrowCursor));
             QMessageBox::critical(this, QString::null,
                                   tr("Sorry, failed to name user directory."));
             return false;
@@ -1991,7 +1975,6 @@ bool MInstall::setUserName()
         shell.run("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
         cmd = QString("rsync -a /home/demo/ %1 --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority' --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
         if (shell.run(cmd) != 0) {
-            setCursor(QCursor(Qt::ArrowCursor));
             QMessageBox::critical(this, QString::null,
                                   tr("Sorry, failed to save desktop changes."));
         } else {
@@ -2002,7 +1985,6 @@ bool MInstall::setUserName()
     // fix the ownership, demo=newuser
     cmd = QString("chown -R demo:demo %1").arg(dpath);
     if (shell.run(cmd) != 0) {
-        setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, failed to set ownership of user directory."));
         return false;
@@ -2027,7 +2009,6 @@ bool MInstall::setUserName()
     cmd = QString("touch /mnt/antiX/var/mail/%1").arg(userNameEdit->text());
     shell.run(cmd);
 
-    setCursor(QCursor(Qt::ArrowCursor));
     return true;
 }
 
@@ -2045,9 +2026,6 @@ bool MInstall::setPasswords()
         return true;
     }
 
-    setCursor(QCursor(Qt::WaitCursor));
-    qApp->processEvents();
-
     QProcess proc;
     proc.start("chroot /mnt/antiX passwd root");
     proc.waitForStarted();
@@ -2057,7 +2035,6 @@ bool MInstall::setPasswords()
     proc.waitForFinished();
 
     if (proc.exitCode() != 0) {
-        setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set root password."));
         return false;
@@ -2071,12 +2048,11 @@ bool MInstall::setPasswords()
     proc.waitForFinished();
 
     if (proc.exitCode() != 0) {
-        setCursor(QCursor(Qt::ArrowCursor));
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set user password."));
         return false;
     }
-    setCursor(QCursor(Qt::ArrowCursor));
+
     return true;
 }
 
@@ -2319,9 +2295,6 @@ void MInstall::setLocale()
 void MInstall::setServices()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    setCursor(QCursor(Qt::WaitCursor));
-
-    qDebug() << "Setting Services";
 
     // systemd check
     QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
@@ -2354,9 +2327,6 @@ void MInstall::setServices()
         shell.run("mv -f /mnt/antiX/etc/rc2.d/S01virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
         shell.run("mv -f /mnt/antiX/etc/rcS.d/S21virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
     }
-
-    setCursor(QCursor(Qt::ArrowCursor));
-
 }
 
 void MInstall::stopInstall(int poweraction)
@@ -2487,8 +2457,6 @@ void MInstall::pageDisplayed(int next)
 
     switch (next) {
     case 1: // choose disk
-
-        setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>General Instructions</b><br/>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</p>"
                                        "<p>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. "
                                        "You will be prompted for confirmation before any destructive actions are performed.</p>"
@@ -2502,12 +2470,15 @@ void MInstall::pageDisplayed(int next)
                                        "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         if (diskCombo->count() == 0) {
+            setCursor(QCursor(Qt::WaitCursor));
+            nextButton->setEnabled(false);
             updateDiskInfo();
+            nextButton->setEnabled(true);
+            setCursor(QCursor(Qt::ArrowCursor));
         }
         break;
 
     case 2:  // choose partition
-        setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
                                        "It's solely your responsibility to backup your data before proceeding.</p>"
                                        "<p><b>Choose Partitions</b><br/>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</p>"
@@ -2532,7 +2503,6 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 3: // advanced encryption settings
-
         ((MMain *)mmn)->setHelpText("<p><b>"
                                     + tr("Advanced Encryption Settings") + "</b><br/>" + tr("This page allows fine-tuning of LUKS encrypted partitions.") + "<br/>"
                                     + tr("In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.")
@@ -2600,7 +2570,6 @@ void MInstall::pageDisplayed(int next)
         processNextPhase();
         break;
     case 5: // set bootloader
-        setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
                                        "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
                                        "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
@@ -2610,14 +2579,12 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 6: // set services
-        setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         nextButton->setEnabled(true);
         backButton->setEnabled(true);
         break;
 
     case 7: // set computer name
-        setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
                                        "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
                                        "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
@@ -2626,7 +2593,6 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 8: // set localization, clock, services button
-        setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
                                        "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
                                        "<p><b>Timezone Settings</b><br/>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</p>"
@@ -2634,7 +2600,6 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 9: // set username and passwords
-        setCursor(QCursor(Qt::ArrowCursor));
         userNameEdit->setFocus();
         ((MMain *)mmn)->setHelpText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
                                        "You should not use the root user as your daily user account. "
@@ -2658,7 +2623,6 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 11: // done
-        setCursor(QCursor(Qt::ArrowCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                                        "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
                                        "The best way to learn about them is to browse through the Menu and try them. "
@@ -2877,6 +2841,7 @@ void MInstall::on_viewServicesButton_clicked()
 
 void MInstall::on_qtpartedButton_clicked()
 {
+    setCursor(QCursor(Qt::WaitCursor));
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
     shell.run("/sbin/swapoff -a 2>&1");
@@ -2887,6 +2852,7 @@ void MInstall::on_qtpartedButton_clicked()
     indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
     nextButton->setEnabled(true);
+    setCursor(QCursor(Qt::ArrowCursor));
 }
 
 void MInstall::on_buttonBenchmarkFDE_clicked()
@@ -2899,23 +2865,26 @@ void MInstall::on_buttonBenchmarkFDE_clicked()
 void MInstall::updatePartInfo()
 {
     if (indexPartInfoDisk == diskCombo->currentIndex()) return;
-    diskCombo->setEnabled(false);
-    qtpartedButton->setEnabled(false);
     indexPartInfoDisk = diskCombo->currentIndex();
 
-    const QString &sloading = tr("Loading...");
-    rootCombo->setEnabled(false);
-    swapCombo->setEnabled(false);
-    homeCombo->setEnabled(false);
-    bootCombo->setEnabled(false);
-    rootCombo->clear();
-    swapCombo->clear();
-    homeCombo->clear();
-    bootCombo->clear();
-    rootCombo->addItem(sloading);
-    swapCombo->addItem(sloading);
-    homeCombo->addItem(sloading);
-    bootCombo->addItem(sloading);
+    if (phase < 1) {
+        setCursor(QCursor(Qt::WaitCursor));
+        diskCombo->setEnabled(false);
+        qtpartedButton->setEnabled(false);
+        const QString &sloading = tr("Loading...");
+        rootCombo->setEnabled(false);
+        swapCombo->setEnabled(false);
+        homeCombo->setEnabled(false);
+        bootCombo->setEnabled(false);
+        rootCombo->clear();
+        swapCombo->clear();
+        homeCombo->clear();
+        bootCombo->clear();
+        rootCombo->addItem(sloading);
+        swapCombo->addItem(sloading);
+        homeCombo->addItem(sloading);
+        bootCombo->addItem(sloading);
+    }
 
     QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
 
@@ -2956,10 +2925,13 @@ void MInstall::updatePartInfo()
     bootCombo->setEnabled(true);
 
     on_rootCombo_activated();
-    qtpartedButton->setEnabled(true);
-    diskCombo->setEnabled(true);
-    if (widgetStack->currentWidget() == Step_Partitions) {
-        nextButton->setEnabled(true);
+    if (phase < 1) {
+        qtpartedButton->setEnabled(true);
+        diskCombo->setEnabled(true);
+        if (widgetStack->currentWidget() == Step_Partitions) {
+            nextButton->setEnabled(true);
+        }
+        setCursor(QCursor(Qt::ArrowCursor));
     }
 }
 
