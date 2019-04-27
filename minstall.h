@@ -182,7 +182,7 @@ private slots:
     void on_checkBoxEncryptHome_toggled(bool checked);
     void on_checkBoxEncryptSwap_toggled(bool checked);
 
-    void on_diskCombo_activated(QString item = "");
+    void updatePartInfo();
     void on_rootTypeCombo_activated(QString item = "");
     void on_rootCombo_activated(const QString &arg1 = "");
     void on_homeCombo_activated(const QString &arg1);
@@ -229,6 +229,7 @@ private:
     QString prevItemHome;
     QString prevItemSwap;
     QString prevItemBoot;
+    int indexPartInfoDisk = -1;
 
     // info needed for Phase 2 of the process
     QStringList listBootDrives;
