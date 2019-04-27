@@ -53,19 +53,19 @@ void MMain::setHelpText(const QString &text)
     mainHelp->setText(text);
 }
 
-void MMain::closeEvent(QCloseEvent *e)
+void MMain::closeEvent(QCloseEvent *event)
 {
-    minstall->cleanup();
-    QWidget::closeEvent(e);
+    if (minstall->procAbort()) {
+        event->accept();
+        minstall->cleanup();
+        QWidget::closeEvent(event);
+    } else {
+        event->ignore();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////
 // public slots
-
-void MMain::closeClicked()
-{
-    close();
-}
 
 void MMain::showEvent(QShowEvent *)
 {
