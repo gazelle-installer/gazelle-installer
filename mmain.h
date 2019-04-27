@@ -29,7 +29,6 @@ public:
     QString PROJECTSHORTNAME;
 
     void setHelpText(const QString &text);
-    static QString getCmdOut(QString cmd);
 
 protected:
     void closeEvent(QCloseEvent * event);
