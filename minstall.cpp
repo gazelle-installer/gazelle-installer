@@ -426,11 +426,15 @@ void MInstall::processNextPhase()
         }
         phase = 4;
         updateStatus(tr("Installation successful"), 100);
+        if (checkAutoExit->isChecked()) {
+            checkBoxExitReboot->hide();
+        }
         csleep(1000);
         gotoPage(11);
     }
     if (phase == 4) {
         if (checkAutoExit->isChecked()) {
+            killShutdownEjectPrompt(false);
             if (radioAutoExitReboot->isChecked()) {
                 stopInstall(1);
             } else if (radioAutoExitShutdown->isChecked()) {
@@ -2350,6 +2354,33 @@ void MInstall::stopInstall(int poweraction)
     }
     cleanup();
     qApp->exit(0);
+}
+
+// disable the CD ejection prompt that occurs at shutdown or reboot
+// the syste then shuts down instead of waiting for the Enter key
+void MInstall::killShutdownEjectPrompt(bool stilleject)
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    QString strout;
+    QFile file("/etc/live/bin/live-umount");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        QTextStream in(&file);
+        QRegularExpression match("^(\\s*)\\b((eject_cd\\ \\$TO_EJECT)|(wait_for_user))\\b(\\s*)$");
+        if (stilleject) match.setPattern("^(\\s*)\\b(wait_for_user)\\b(\\s*)$");
+        while (!in.atEnd()) {
+            const QString &line = in.readLine();
+            if (line.contains(match)) {
+                strout += ":\n";
+            } else {
+                strout += line + "\n";
+            }
+        }
+        file.close();
+        if (file.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
+            file.write(strout.toUtf8());
+            file.close();
+        }
+    }
 }
 
 void MInstall::unmountGoBack(QString msg)

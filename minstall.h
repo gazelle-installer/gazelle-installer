@@ -134,6 +134,7 @@ public:
     void updateDiskInfo();
     void setupkeyboardbutton();
     void stopInstall(int poweraction);
+    void killShutdownEjectPrompt(bool stilleject);
 
 public slots:
     bool procAbort();
