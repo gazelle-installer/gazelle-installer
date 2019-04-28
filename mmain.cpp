@@ -30,9 +30,6 @@ MMain::MMain(QStringList args = QStringList())
 {
     setupUi(this);
     minstall = new MInstall(mainFrame, args);
-    minstall->resize(mainFrame->size());
-    mainHelp->resize(tab->size());
-    helpbackdrop->resize(mainHelp->size());
 
     //setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
@@ -41,6 +38,12 @@ MMain::MMain(QStringList args = QStringList())
     PROJECTVERSION = settings.value("VERSION").toString();
     setWindowTitle(PROJECTNAME + " " + tr("Installer"));
     firstShow = true;
+
+    setWindowFlags(Qt::Window); // for the close, min and max buttons
+    // ensure the help widgets are displayed correctly when started
+    // the heap-allocated event is deleted by Qt when it is posted
+    QResizeEvent *evresize = new QResizeEvent(size(), size());
+    qApp->postEvent(this, evresize);
 }
 
 MMain::~MMain() {
