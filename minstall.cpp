@@ -475,9 +475,9 @@ void MInstall::prepareToInstall()
     QFile file("/usr/share/zoneinfo/zone.tab");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         while(!file.atEnd()) {
-            QString line(file.readLine().trimmed());
+            const QString line(file.readLine().trimmed());
             if(!line.startsWith('#')) {
-                timezoneCombo->addItem(line.section("\t", 2, 2).trimmed());
+                timezoneCombo->addItem(line.section("\t", 2, 2));
             }
         }
         file.close();
@@ -485,7 +485,8 @@ void MInstall::prepareToInstall()
     timezoneCombo->model()->sort(0);
     file.setFileName("/etc/timezone");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
-        timezoneCombo->setCurrentIndex(timezoneCombo->findText(file.readLine().trimmed()));
+        const QString line(file.readLine().trimmed());
+        timezoneCombo->setCurrentIndex(timezoneCombo->findText(line));
         file.close();
     }
 
@@ -494,7 +495,7 @@ void MInstall::prepareToInstall()
     file.setFileName("/usr/share/antiX/locales.template");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         while (!file.atEnd()) {
-            const QByteArray &line = file.readLine().trimmed();
+            const QString line(file.readLine().trimmed());
             if(!line.startsWith('#')) localeCombo->addItem(line);
         }
         file.close();
@@ -503,7 +504,7 @@ void MInstall::prepareToInstall()
     QString locale;
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         while (!file.atEnd()) {
-            QString line(file.readLine());
+            const QString line(file.readLine());
             if(line.startsWith("LANG")) {
                 locale = line.section('=', 1).trimmed();
             }
@@ -2071,12 +2072,17 @@ bool MInstall::validateUserInfo()
         return false;
     }
     // check that user name is not already used
-    QString cmd = QString("grep '^\\b%1\\b' /etc/passwd >/dev/null").arg(userNameEdit->text());
-    if (shell.run(cmd) == 0) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, that name is in use.\n"
-                                 "Please select a different name."));
-        return false;
+    QFile file("/etc/passwd");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        const QByteArray &match = QString("%1:").arg(userNameEdit->text()).toUtf8();
+        while (!file.atEnd()) {
+            if (file.readLine().startsWith(match)) {
+                QMessageBox::critical(this, QString::null,
+                                      tr("Sorry, that name is in use.\n"
+                                         "Please select a different name."));
+                return false;
+            }
+        }
     }
 
     if (userPasswordEdit->text().isEmpty()) {
