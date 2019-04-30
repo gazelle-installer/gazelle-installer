@@ -28,10 +28,7 @@
   <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
-   <property name="spacing">
-    <number>6</number>
-   </property>
+  <layout class="QHBoxLayout">
    <item>
     <widget class="QTabWidget" name="mainTabs">
      <property name="sizePolicy">

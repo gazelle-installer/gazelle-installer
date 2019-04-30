@@ -422,14 +422,12 @@ void MInstall::processNextPhase()
         setComputerName();
         setLocale();
         saveConfig();
+        // print version (look for /usr/sbin/minstall since the name of the package might be different)
+        qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
         phase = 4;
         updateStatus(tr("Installation successful"), 100);
         csleep(1000);
         gotoPage(10);
-    }
-    if (phase == 4) {
-        // print version (look for /usr/sbin/minstall since the name of the package might be different)
-        qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
     }
 }
 
@@ -2452,9 +2450,11 @@ void MInstall::pageDisplayed(int next)
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         if (diskCombo->count() == 0) {
             setCursor(QCursor(Qt::WaitCursor));
+            backButton->setEnabled(false);
             nextButton->setEnabled(false);
             updateDiskInfo();
             nextButton->setEnabled(true);
+            backButton->setEnabled(true);
             setCursor(QCursor(Qt::ArrowCursor));
         }
         break;
@@ -2629,14 +2629,14 @@ void MInstall::gotoPage(int next)
     }
     if (next > c-1) {
         // finished
-        if (checkBoxExitReboot->isChecked()) {
-            csleep(1000);
-            shell.run("swapoff -a");
-            shell.run("/usr/local/bin/persist-config --shutdown --command reboot");
-        }
+        setCursor(QCursor(Qt::WaitCursor));
+        nextButton->setEnabled(false);
         cleanup();
+        if (checkBoxExitReboot->isChecked()) {
+            shell.run("swapoff -a");
+            shell.run("/usr/local/bin/persist-config --shutdown --command reboot &");
+        }
         qApp->exit(0);
-        next = c-1;
         return;
     }
     // display the next page
@@ -2961,9 +2961,11 @@ void MInstall::cleanup()
 
     shell.run("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
     shell.run("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1");
+    sync();
     shell.run("umount -l /mnt/antiX/proc >/dev/null 2>&1; umount -l /mnt/antiX/sys >/dev/null 2>&1; umount -l /mnt/antiX/dev/shm >/dev/null 2>&1; umount -l /mnt/antiX/dev >/dev/null 2>&1");
     shell.run("umount -lR /mnt/antiX >/dev/null 2>&1");
 
+    sync();
     if (isRootEncrypted) {
         shell.run("cryptsetup luksClose rootfs");
     }
@@ -2974,6 +2976,7 @@ void MInstall::cleanup()
         shell.run("swapoff /dev/mapper/swapfs");
         shell.run("cryptsetup luksClose swapfs");
     }
+    sync();
 }
 
 /////////////////////////////////////////////////////////////////////////
