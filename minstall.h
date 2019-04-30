@@ -133,13 +133,10 @@ public:
     void pageDisplayed(int next);
     void updateDiskInfo();
     void setupkeyboardbutton();
-    void stopInstall(int poweraction);
-    void killShutdownEjectPrompt(bool stilleject);
 
 public slots:
     bool procAbort();
     void cleanup();
-    //    void moreClicked(QListViewItem *item);
     void delTime();
 
     void copyTime();

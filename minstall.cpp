@@ -421,26 +421,13 @@ void MInstall::processNextPhase()
         }
         setComputerName();
         setLocale();
-        if (checkSaveAutoFile->isChecked()) {
-            saveConfig();
-        }
+        saveConfig();
         phase = 4;
         updateStatus(tr("Installation successful"), 100);
-        if (checkAutoExit->isChecked()) {
-            checkBoxExitReboot->hide();
-        }
         csleep(1000);
-        gotoPage(11);
+        gotoPage(10);
     }
     if (phase == 4) {
-        if (checkAutoExit->isChecked()) {
-            killShutdownEjectPrompt(false);
-            if (radioAutoExitReboot->isChecked()) {
-                stopInstall(1);
-            } else if (radioAutoExitShutdown->isChecked()) {
-                stopInstall(2);
-            }
-        }
         // print version (look for /usr/sbin/minstall since the name of the package might be different)
         qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
     }
@@ -2339,50 +2326,6 @@ void MInstall::setServices()
     }
 }
 
-void MInstall::stopInstall(int poweraction)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (poweraction) {
-        csleep(1000);
-        shell.run("swapoff -a");
-        QString powercmd = "/usr/local/bin/persist-config --shutdown --command %1";
-        if (poweraction == 1) {
-            shell.run(powercmd.arg("reboot"));
-        } else if (poweraction == 2) {
-            shell.run(powercmd.arg("halt"));
-        }
-    }
-    cleanup();
-    qApp->exit(0);
-}
-
-// disable the CD ejection prompt that occurs at shutdown or reboot
-// the syste then shuts down instead of waiting for the Enter key
-void MInstall::killShutdownEjectPrompt(bool stilleject)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    QString strout;
-    QFile file("/etc/live/bin/live-umount");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        QTextStream in(&file);
-        QRegularExpression match("^(\\s*)\\b((eject_cd\\ \\$TO_EJECT)|(wait_for_user))\\b(\\s*)$");
-        if (stilleject) match.setPattern("^(\\s*)\\b(wait_for_user)\\b(\\s*)$");
-        while (!in.atEnd()) {
-            const QString &line = in.readLine();
-            if (line.contains(match)) {
-                strout += ":\n";
-            } else {
-                strout += line + "\n";
-            }
-        }
-        file.close();
-        if (file.open(QFile::WriteOnly | QFile::Text | QFile::Truncate)) {
-            file.write(strout.toUtf8());
-            file.close();
-        }
-    }
-}
-
 void MInstall::unmountGoBack(QString msg)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -2450,13 +2393,18 @@ int MInstall::showPage(int curr, int next)
         ixPageRefAdvancedFDE = 0;
         return next;
     } else if (next == 3 && curr == 4) { // at Step_Progress (backward)
-        return 10; // go to Step_Auto
+        if (haveSnapshotUserAccounts) {
+            return 8; // skip Step_User_Accounts and go to Step_Localization
+        }
+        return 9; // go to Step_Users
     } else if (next == 6 && curr == 5) { // at Step_Boot screen (forward)
         return next + 1; // skip Services screen
     } else if (next == 10 && curr == 9) { // at Step_User_Accounts (forward)
         if (!validateUserInfo()) {
             return curr;
         }
+        haveSysConfig = true;
+        next = 4;
     } else if (next == 8 && curr == 7) { // at Step_Network (forward)
         if (!validateComputerName()) {
             return curr;
@@ -2465,19 +2413,13 @@ int MInstall::showPage(int curr, int next)
        return next - 1; // skip Services screen
     } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
         if (haveSnapshotUserAccounts) {
-            next = 10; // skip User Accounts screen
+            haveSysConfig = true;
+            next = 4; // Continue
         }
     } else if (next == 7 && curr == 6) { // at Step_Services (forward)
         return 8; // goes back to the screen that called Services screen
     } else if (next == 5 && curr == 6) { // at Step_Services (backward)
         return 8; // goes back to the screen that called Services screen
-    } else if (next == 11 && curr == 10) { // at Step_Auto (forward)
-        haveSysConfig = true;
-        return 4; // back to the install
-    } else if (next == 9 && curr == 10) { // at Step_Auto (backward)
-        if (haveSnapshotUserAccounts) {
-            return 8; // skip Step_User_Accounts and go to Step_Localization
-        }
     }
     return next;
 }
@@ -2487,9 +2429,9 @@ void MInstall::pageDisplayed(int next)
     QString val;
 
     // progress bar shown only for install and configuration pages.
-    installBox->setVisible(next >= 4 && next <= 10);
+    installBox->setVisible(next >= 4 && next <= 9);
 
-    if(next >= 5 && next <= 10) {
+    if(next >= 5 && next <= 9) {
         haveSysConfig = false; // (re)editing configuration
         ixTipStart = ixTip;
     }
@@ -2643,20 +2585,7 @@ void MInstall::pageDisplayed(int next)
                                        "Each password must be entered twice.</p>").arg(PROJECTNAME));
         break;
 
-    case 10: // automation
-        ((MMain *)mmn)->setHelpText("<p><b>" + tr("Installation Automation") + "</b><br/>" + tr("These settings control what occurs after the %1 installation has finished.").arg(PROJECTNAME)
-                                    + "</p><p>"
-                                    + tr("If you choose to automatically exit the installer, it will be closed immediately after completion and the system will be shutdown or rebooted without any more manual intervention, depending on which option is selected.")
-                                    + "</p><p>"
-                                    + tr("Use the <b>Save automation file to disk</b> option to save a file containing the settings used for this installation. This can be used in the future to perform an unattended or automated installation.") + "<br/>"
-                                    + "<b>" + tr("This file may contain sensitive information such as user names and passwords.") + "</b><br/>"
-                                    + tr("The file will be saved to where %1 is installed, in the %2 folder.").arg(PROJECTNAME, "<b>/var/log</b>")
-                                    + "</p><p>"
-                                    + tr("Although not currently implemented or supported, the ability to use an automation file is planned for a future version of the %1 installer.").arg(PROJECTNAME)
-                                    + "</p>");
-        break;
-
-    case 11: // done
+    case 10: // done
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                                        "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
                                        "The best way to learn about them is to browse through the Menu and try them. "
@@ -2693,7 +2622,6 @@ void MInstall::gotoPage(int next)
     int c = widgetStack->count();
     if (next >= c-1) {
         // entering the last page
-        backButton->setEnabled(false);
         backButton->hide();
         nextButton->setText(tr("Finish"));
     } else {
@@ -2701,8 +2629,14 @@ void MInstall::gotoPage(int next)
     }
     if (next > c-1) {
         // finished
-        stopInstall(checkBoxExitReboot->isChecked() ? 1 : 0);
-        gotoPage(0);
+        if (checkBoxExitReboot->isChecked()) {
+            csleep(1000);
+            shell.run("swapoff -a");
+            shell.run("/usr/local/bin/persist-config --shutdown --command reboot");
+        }
+        cleanup();
+        qApp->exit(0);
+        next = c-1;
         return;
     }
     // display the next page
