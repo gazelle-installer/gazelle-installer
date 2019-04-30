@@ -20,6 +20,7 @@
 #include <QFileInfo>
 #include <QtConcurrent/QtConcurrent>
 #include <sys/statvfs.h>
+#include <sys/stat.h>
 
 #include "minstall.h"
 #include "mmain.h"
@@ -212,12 +213,13 @@ void MInstall::writeKeyFile()
     // for root only, add swap
     // for home only, add swap
 
+    QString cmdrandom = "dd if=/dev/" + comboFDErandom->currentText() + " of=%1 bs=1024 count=4";
     if (isRootEncrypted) { // if encrypting root
         QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
 
         //create keyfile
-        shell.run("dd if=/dev/urandom of=/mnt/antiX/root/keyfile bs=1024 count=4");
-        shell.run("chmod 0400 /mnt/antiX/root/keyfile");
+        shell.run(cmdrandom.arg("/mnt/antiX/root/keyfile"));
+        chmod("/mnt/antiX/root/keyfile", 0400);
 
         //add keyfile to container
         QString swapUUID;
@@ -257,8 +259,8 @@ void MInstall::writeKeyFile()
         QString swapUUID;
         if (swapDevicePreserve != "/dev/none") {
             //create keyfile
-            shell.run("dd if=/dev/urandom of=/mnt/antiX/home/.keyfileDONOTdelete bs=1024 count=4");
-            shell.run("chmod 0400 /mnt/antiX/home/.keyfileDONOTdelete");
+            shell.run(cmdrandom.arg("/mnt/antiX/home/.keyfileDONOTdelete"));
+            chmod("/mnt/antiX/home/.keyfileDONOTdelete", 0400);
 
             //add keyfile to container
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
