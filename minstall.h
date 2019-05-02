@@ -34,7 +34,6 @@ class MInstall : public QWidget, public Ui::MeInstall {
 protected:
     QProcess *proc;
     QTimer *timer;
-    QProgressBar *bar;
     QDialog *mmn;
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -74,13 +73,11 @@ public:
     bool makeChosenPartitions();
     bool makeDefaultPartitions();
     bool makeEsp(QString drv, int size);
-    bool makeFloppy();
     bool makeGrub(int rootdev, QString rootpart, const char *rootmnt, bool initrd);
     bool makeLinuxPartition(QString dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password);
     bool makeSwapPartition(QString dev);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
-    bool removeKernel();
     bool validateUserInfo();
     bool validateComputerName();
     bool setComputerName();
@@ -134,14 +131,12 @@ public:
     void firstRefresh(QDialog *main);
     void gotoPage(int next);
     void pageDisplayed(int next);
-    void refresh();
+    void updateDiskInfo();
     void setupkeyboardbutton();
-    void stopInstall(int poweraction);
 
 public slots:
-    void procAbort();
+    bool procAbort();
     void cleanup();
-    //    void moreClicked(QListViewItem *item);
     void delTime();
 
     void copyTime();
@@ -182,7 +177,7 @@ private slots:
     void on_checkBoxEncryptHome_toggled(bool checked);
     void on_checkBoxEncryptSwap_toggled(bool checked);
 
-    void on_diskCombo_activated(QString item = "");
+    void updatePartInfo();
     void on_rootTypeCombo_activated(QString item = "");
     void on_rootCombo_activated(const QString &arg1 = "");
     void on_homeCombo_activated(const QString &arg1);
@@ -229,6 +224,7 @@ private:
     QString prevItemHome;
     QString prevItemSwap;
     QString prevItemBoot;
+    int indexPartInfoDisk = -1;
 
     // info needed for Phase 2 of the process
     QStringList listBootDrives;
