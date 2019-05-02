@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
+    <width>700</width>
     <height>500</height>
    </rect>
   </property>
@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>780</width>
-    <height>500</height>
+    <width>570</width>
+    <height>360</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -28,23 +28,14 @@
   <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
-   <property name="spacing">
-    <number>6</number>
-   </property>
+  <layout class="QHBoxLayout">
    <item>
     <widget class="QTabWidget" name="mainTabs">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-       <horstretch>0</horstretch>
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>3</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>290</width>
-       <height>0</height>
-      </size>
      </property>
      <property name="tabPosition">
       <enum>QTabWidget::North</enum>
@@ -65,9 +56,6 @@
       <bool>false</bool>
      </property>
      <widget class="QWidget" name="tab">
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
       <attribute name="title">
        <string>Help</string>
       </attribute>
@@ -75,7 +63,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>9</y>
+         <y>0</y>
          <width>291</width>
          <height>421</height>
         </rect>
@@ -86,25 +74,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>291</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>291</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
        <property name="styleSheet">
         <string notr="true">background-color: rgba(255, 255, 255, 85);
-color: rgb(24, 12, 12);
-padding: 8px</string>
+color: rgb(24, 12, 12);</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -135,13 +107,10 @@ padding: 8px</string>
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>10</y>
+         <y>0</y>
          <width>291</width>
          <height>371</height>
         </rect>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -158,6 +127,9 @@ padding: 8px</string>
        <property name="pixmap">
         <pixmap>../../../../usr/share/gazelle-installer-data/backdrop-textbox.png</pixmap>
        </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
       </widget>
       <zorder>helpbackdrop</zorder>
       <zorder>mainHelp</zorder>
@@ -168,7 +140,7 @@ padding: 8px</string>
     <widget class="QFrame" name="mainFrame">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>0</horstretch>
+       <horstretch>8</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
