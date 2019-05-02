@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QDateTime>
 #include <QFont>
 #include <QString>
@@ -91,6 +92,8 @@ int main(int argc, char *argv[])
 
     if (getuid() == 0) {
         MMain mmain(a.arguments());
+        const QRect &geo = a.desktop()->availableGeometry(&mmain);
+        mmain.move((geo.width()-mmain.width())/2, (geo.height()-mmain.height())/2);
         mmain.show();
         return a.exec();
     } else {
