@@ -45,3 +45,6 @@ debian
 
 # Exclude binary
 minstall
+
+# Exclude build folder
+build
