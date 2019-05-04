@@ -378,6 +378,11 @@ void MInstall::processNextPhase()
     // Phase 0 = install not started yet, Phase 1 = install in progress
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps.
     if(phase == 0) { // No install started yet.
+        updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
+        if (!checkDisk()) {
+            gotoPage(1);
+            return;
+        }
         phase = 1; // installation.
         prepareToInstall();
         if (entireDiskButton->isChecked()) {
@@ -436,7 +441,6 @@ void MInstall::processNextPhase()
 void MInstall::prepareToInstall()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
 
     // unmount /boot/efi if mounted by previous run
     if (shell.run("mountpoint -q /mnt/antiX/boot/efi") == 0) {
@@ -2362,9 +2366,6 @@ int MInstall::showPage(int curr, int next)
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
                 return curr;
             }
-            if (!checkDisk()) {
-                return curr;
-            }
             QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
             QString msg = tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME);
             int ans = QMessageBox::warning(this, QString::null, msg,
@@ -2376,9 +2377,6 @@ int MInstall::showPage(int curr, int next)
         }
     } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
         if (!validateChosenPartitions()) {
-            return curr;
-        }
-        if (!checkDisk()) {
             return curr;
         }
         return 4; // Go to Step_Progress
