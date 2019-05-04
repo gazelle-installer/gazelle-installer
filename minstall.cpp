@@ -35,6 +35,7 @@ int MInstall::command(const QString &cmd)
 // helping function that runs a bash command in an event loop
 int MInstall::runCmd(QString cmd)
 {
+    if (phase < 0) return EXIT_FAILURE;
     QEventLoop loop;
     QFutureWatcher<int> futureWatcher;
     QFuture<int> future;
@@ -49,6 +50,7 @@ int MInstall::runCmd(QString cmd)
 // shell.run() doesn't distinguish between crashed and failed processes
 QProcess::ExitStatus MInstall::runCmd2(QString cmd)
 {
+    if (phase < 0) return QProcess::CrashExit;
     qDebug() << cmd;
     QEventLoop eloop;
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
@@ -200,6 +202,7 @@ void MInstall::updateStatus(QString msg, int val)
 // write out crypttab if encrypting for auto-opening
 void MInstall::writeKeyFile()
 {
+    if (phase < 0) return;
     // create keyfile
     // add key file to luks containers
     // get uuid of devices
@@ -289,6 +292,7 @@ void MInstall::writeKeyFile()
 // disable hibernate when using encrypted swap
 void MInstall::disablehiberanteinitramfs()
 {
+    if (phase < 0) return;
     QString cmd;
     if (isSwapEncrypted) {
         cmd = "touch /mnt/antiX/initramfs-tools/conf.d/resume";
@@ -305,6 +309,7 @@ void MInstall::disablehiberanteinitramfs()
 bool MInstall::mountPartition(const QString dev, const QString point, const QString mntops)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return -1;
     mkdir(point.toUtf8(), 0755);
     QString cmd = QString("/bin/mount %1 %2 -o %3").arg(dev).arg(point).arg(mntops);
 
@@ -318,6 +323,7 @@ bool MInstall::mountPartition(const QString dev, const QString point, const QStr
 bool MInstall::checkDisk()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
     QString msg;
     int ans;
     QString output;
@@ -373,36 +379,33 @@ int MInstall::getPartitionNumber()
 }
 
 // process the next phase of installation if possible
-void MInstall::processNextPhase()
+bool MInstall::processNextPhase()
 {
+    // Phase < 0 (eg. Phase -1) = install has been aborted
+    if (phase < 0) return false;
     // Phase 0 = install not started yet, Phase 1 = install in progress
-    // Phase 2 = waiting for operator input, Phase 3 = post-install steps.
-    if(phase == 0) { // No install started yet.
+    // Phase 2 = waiting for operator input, Phase 3 = post-install steps
+    if (phase == 0) { // no install started yet
         updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
-        if (!checkDisk()) {
-            gotoPage(1);
-            return;
-        }
+        if (!checkDisk()) return false;
         phase = 1; // installation.
         prepareToInstall();
         if (entireDiskButton->isChecked()) {
             if (!makeDefaultPartitions()) {
                 // failed
-                nextButton->setEnabled(true);
                 goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
-                return;
+                return false;
             }
         } else {
             if (!makeChosenPartitions()) {
                 // failed
-                nextButton->setEnabled(true);
                 goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
-                return;
+                return false;
             }
         }
 
         csleep(1000);
-        installLinux();
+        if (!installLinux()) return false;
         if (!haveSysConfig) {
             progressBar->setEnabled(false);
             updateStatus(tr("Paused for required operator input"), 97);
@@ -413,19 +416,19 @@ void MInstall::processNextPhase()
         }
         phase = 2;
     }
-    if(phase == 2 && haveSysConfig) {
+    if (phase == 2 && haveSysConfig) {
         phase = 3;
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
-        installLoader();
+        if (!installLoader()) return false;
         updateStatus(tr("Setting system configuration"), 99);
         setServices();
-        setUserInfo();
+        if (!setUserInfo()) return false;
         if (haveSnapshotUserAccounts) {
             QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
             shell.run(cmd);
         }
-        setComputerName();
+        if (!setComputerName()) return false;
         setLocale();
         saveConfig();
         // print version (look for /usr/sbin/minstall since the name of the package might be different)
@@ -435,12 +438,14 @@ void MInstall::processNextPhase()
         csleep(1000);
         gotoPage(10);
     }
+    return true;
 }
 
 // gather required information and prepare installation
 void MInstall::prepareToInstall()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return;
 
     // unmount /boot/efi if mounted by previous run
     if (shell.run("mountpoint -q /mnt/antiX/boot/efi") == 0) {
@@ -609,6 +614,7 @@ void MInstall::removeItemCombo(QComboBox *cb, const QString *part)
 // save configuration
 void MInstall::saveConfig()
 {
+    if (phase < 0) return;
     // Disk step
     config->setValue("Disk/Disk", diskCombo->currentText().section(" ", 0, 0));
     config->setValue("Disk/Encrypted", checkBoxEncryptAuto->isChecked());
@@ -729,6 +735,7 @@ void MInstall::saveAdvancedFDE()
 bool MInstall::makeSwapPartition(QString dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
     shell.run("swapoff -a");
     QString cmd = "/sbin/mkswap " + dev + " -L " + swapLabelEdit->text();
     if (shell.run(cmd) != 0) {
@@ -742,6 +749,7 @@ bool MInstall::makeSwapPartition(QString dev)
 bool MInstall::makeEsp(QString drv, int size)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
     QString mmcnvmepartdesignator;
     if (drv.contains("nvme") || drv.contains("mmcblk" )) {
         mmcnvmepartdesignator = "p";
@@ -764,6 +772,7 @@ bool MInstall::makeEsp(QString drv, int size)
 bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, const QString &label)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
     QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
     if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
         home_mntops = "defaults,noatime";
@@ -862,6 +871,7 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
 bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
 
     QProcess proc;
 
@@ -1045,6 +1055,7 @@ bool MInstall::validateChosenPartitions()
 bool MInstall::makeDefaultPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
     int prog = 0;
 
     QString mmcnvmepartdesignator;
@@ -1284,6 +1295,7 @@ bool MInstall::makeDefaultPartitions()
 bool MInstall::makeChosenPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
     int prog = 0;
     QString root_type;
     QString home_type;
@@ -1495,10 +1507,11 @@ bool MInstall::makeChosenPartitions()
     return true;
 }
 
-void MInstall::installLinux()
+bool MInstall::installLinux()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString rootdev;
+    if (phase < 0) return false;
 
     //use /dev/mapper designations if ecryption is checked
     if (isRootEncrypted) {
@@ -1511,7 +1524,7 @@ void MInstall::installLinux()
     // maybe root was formatted or using --sync option
     if (isRootFormatted || args.contains("--sync") || args.contains("-s")) {
         // yes it was
-        copyLinux();
+        if(!copyLinux()) return false;
     } else {
         // no--it's being reused
         updateStatus(tr("Mounting the / (root) partition"), 3);
@@ -1525,17 +1538,19 @@ void MInstall::installLinux()
         timer->stop();
         disconnect(timer, SIGNAL(timeout()), 0, 0);
         if (rexit == QProcess::NormalExit) {
-            copyLinux();
+            if(!copyLinux()) return false;
         } else {
-            nextButton->setEnabled(true);
             unmountGoBack(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
+            return false;
         }
     }
+    return true;
 }
 
 // create /etc/fstab file
 void MInstall::makeFstab()
 {
+    if (phase < 0) return;
     // get config
     QString rootdev = rootDevicePreserve;
     QString homedev = homeDevicePreserve;
@@ -1617,9 +1632,10 @@ void MInstall::makeFstab()
     runCmd("umount /mnt/antiX/dev");
 }
 
-void MInstall::copyLinux()
+bool MInstall::copyLinux()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
     // make empty dirs for opt, dev, proc, sys, run,
     // home already done
     updateStatus(tr("Creating system directories"), 9);
@@ -1635,7 +1651,7 @@ void MInstall::copyLinux()
         shell.run("fsck.ext4 -y " + bootdev, QStringList("quiet")); // needed to run fsck because sfdisk --part-type can mess up the partition
         if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
             qDebug() << "Could not mount /boot on " + bootdev;
-            return;
+            return false;
         }
     }
 
@@ -1665,16 +1681,19 @@ void MInstall::copyLinux()
             iTargetInodes += svfs.f_files - svfs.f_ffree;
         }
     }
+    QProcess::ExitStatus rexit = QProcess::NormalExit;
     if (!(args.contains("--nocopy") || args.contains("-n"))) {
-        if (runCmd2(cmd) != QProcess::NormalExit) {
-            nextButton->setEnabled(true);
-            unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
-        }
+        rexit = runCmd2(cmd);
     }
 
     // After the copy is over.
     timer->stop();
     disconnect(timer, SIGNAL(timeout()), 0, 0);
+    if (rexit != QProcess::NormalExit) {
+        unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
+        return false;
+    }
+
     updateStatus(tr("Fixing configuration"), 96);
     shell.run("mkdir -m 1777 /mnt/antiX/tmp");
     makeFstab();
@@ -1695,6 +1714,8 @@ void MInstall::copyLinux()
     if (getCmdOut("guess-hwclock") == "localtime") {
         localClockCheckBox->setChecked(true);
     }
+
+    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1704,6 +1725,7 @@ void MInstall::copyLinux()
 bool MInstall::installLoader()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
 
     updateStatus(tr("Installing GRUB"), 97);
     QString cmd;
@@ -1874,6 +1896,7 @@ void MInstall::checkUefi()
 bool MInstall::setUserName()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
     if (args.contains("--nocopy") || args.contains("-n")) {
         return true;
     }
@@ -2017,6 +2040,7 @@ QString MInstall::getPartType(const QString dev)
 bool MInstall::setPasswords()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
     if (args.contains("--nocopy") || args.contains("-n")) {
         return true;
     }
@@ -2106,6 +2130,7 @@ bool MInstall::validateUserInfo()
 
 bool MInstall::setUserInfo()
 {
+    if (phase < 0) return false;
     if (!setPasswords()) {
         return false;
     }
@@ -2156,6 +2181,7 @@ bool MInstall::validateComputerName()
 // set the computer name, can not be rerun
 bool MInstall::setComputerName()
 {
+    if (phase < 0) return false;
     if (haveSamba) {
         //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
         replaceStringInFile("WORKGROUP", computerGroupEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
@@ -2220,6 +2246,7 @@ bool MInstall::setComputerName()
 void MInstall::setLocale()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return;
     QString cmd2;
     QString cmd;
 
@@ -2295,6 +2322,7 @@ void MInstall::setLocale()
 void MInstall::setServices()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return;
 
     // systemd check
     QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
@@ -2329,7 +2357,7 @@ void MInstall::setServices()
     }
 }
 
-void MInstall::unmountGoBack(QString msg)
+void MInstall::unmountGoBack(const QString &msg)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
@@ -2347,10 +2375,13 @@ void MInstall::unmountGoBack(QString msg)
     goBack(msg);
 }
 
-void MInstall::goBack(QString msg)
+void MInstall::goBack(const QString &msg)
 {
-    QMessageBox::critical(this, QString::null, msg);
-    gotoPage(1);
+    if (phase >= 0) {
+        ((MMain *)mmn)->mainFrame->setEnabled(false);
+        QMessageBox::critical(this, QString::null, msg);
+        setCursor(QCursor(Qt::WaitCursor));
+    }
 }
 
 
@@ -2450,8 +2481,12 @@ void MInstall::pageDisplayed(int next)
         if (diskCombo->count() == 0) {
             setCursor(QCursor(Qt::WaitCursor));
             updateDiskInfo();
-            setCursor(QCursor(Qt::ArrowCursor));
+        } else if (phase < 0) {
+            updatePartitionWidgets();
         }
+        phase = 0;
+        ((MMain *)mmn)->mainFrame->setEnabled(true);
+        setCursor(QCursor(Qt::ArrowCursor));
         break;
 
     case 2:  // choose partition
@@ -2544,7 +2579,7 @@ void MInstall::pageDisplayed(int next)
             backButton->setEnabled(haveSysConfig);
             nextButton->setEnabled(!haveSysConfig);
         }
-        processNextPhase();
+        if (!processNextPhase()) gotoPage(1);
         return; // avoid enabling both Back and Next buttons at the end
         break;
     case 5: // set bootloader
@@ -2903,6 +2938,7 @@ void MInstall::on_rootTypeCombo_activated(QString)
 
 bool MInstall::procAbort()
 {
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
         if(QMessageBox::warning(this, tr("Confirmation"),
@@ -2912,8 +2948,18 @@ bool MInstall::procAbort()
             return false;
         }
     }
+    ((MMain *)mmn)->mainFrame->setEnabled(false);
     proc->terminate();
     QTimer::singleShot(5000, proc, SLOT(kill()));
+    shell.terminate();
+    QTimer::singleShot(1000, &shell, SLOT(kill()));
+    // help the installer if it was stuck at the config pages
+    if (phase == 2 && !haveSysConfig) {
+        phase = -1;
+        gotoPage(1);
+    } else {
+        phase = -1;
+    }
     return true;
 }
 
@@ -3130,7 +3176,6 @@ void MInstall::on_userPasswordEdit_textChanged()
     userPasswordEdit->setPalette(QApplication::palette());
     userPasswordEdit2->setPalette(QApplication::palette());
 }
-
 
 void MInstall::on_rootPasswordEdit_textChanged()
 {
