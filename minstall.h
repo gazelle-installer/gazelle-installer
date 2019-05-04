@@ -47,8 +47,8 @@ public:
     QStringList args;
 
     void checkUefi();
-    void goBack(QString msg);
-    void unmountGoBack(QString msg);
+    void goBack(const QString &msg);
+    void unmountGoBack(const QString &msg);
 
     // helpers
     bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
@@ -87,12 +87,12 @@ public:
     void addItemCombo(QComboBox *cb, const QString *part);
     void buildBootLists();
     void buildServiceList();
-    void copyLinux();
+    bool copyLinux();
     void disablehiberanteinitramfs();
-    void installLinux();
+    bool installLinux();
     void makeFstab();
     void prepareToInstall();
-    void processNextPhase();
+    bool processNextPhase();
     void removeItemCombo(QComboBox *cb, const QString *part);
     void saveConfig();
     void setLocale();
