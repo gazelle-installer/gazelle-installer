@@ -379,7 +379,6 @@ void MInstall::processNextPhase()
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps.
     if(phase == 0) { // No install started yet.
         phase = 1; // installation.
-        nextButton->setEnabled(false);
         prepareToInstall();
         if (entireDiskButton->isChecked()) {
             if (!makeDefaultPartitions()) {
@@ -2452,16 +2451,13 @@ void MInstall::pageDisplayed(int next)
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         if (diskCombo->count() == 0) {
             setCursor(QCursor(Qt::WaitCursor));
-            backButton->setEnabled(false);
-            nextButton->setEnabled(false);
             updateDiskInfo();
-            nextButton->setEnabled(true);
-            backButton->setEnabled(true);
             setCursor(QCursor(Qt::ArrowCursor));
         }
         break;
 
     case 2:  // choose partition
+        setCursor(QCursor(Qt::WaitCursor));
         ((MMain *)mmn)->setHelpText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
                                        "It's solely your responsibility to backup your data before proceeding.</p>"
                                        "<p><b>Choose Partitions</b><br/>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</p>"
@@ -2478,6 +2474,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
         ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         updatePartInfo();
+        setCursor(QCursor(Qt::ArrowCursor));
         break;
 
     case 3: // advanced encryption settings
@@ -2526,6 +2523,7 @@ void MInstall::pageDisplayed(int next)
 
     case 4: // installation step
         if (phase == 0) {
+            setCursor(QCursor(Qt::BusyCursor)); // restored after entering boot config screen
             tipsEdit->setText("<p><b>" + tr("Additional information required") + "</b><br/>"
                               + tr("The %1 installer is about to request more information from you. Please wait.").arg(PROJECTNAME)
                               + "</p>");
@@ -2543,23 +2541,25 @@ void MInstall::pageDisplayed(int next)
                                     + "</p><p>"
                                     + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
                                     + "</p>");
-        backButton->setEnabled(haveSysConfig);
-        nextButton->setEnabled(!haveSysConfig);
+        widgetStack->setEnabled(true);
+        if (phase > 0 && phase < 4) {
+            backButton->setEnabled(haveSysConfig);
+            nextButton->setEnabled(!haveSysConfig);
+        }
         processNextPhase();
+        return; // avoid enabling both Back and Next buttons at the end
         break;
     case 5: // set bootloader
         ((MMain *)mmn)->setHelpText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
                                        "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
                                        "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
                                        "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
-        backButton->setEnabled(true);
-        nextButton->setEnabled(true);
+
+        setCursor(QCursor(Qt::ArrowCursor)); // restore wait cursor set in install screen
         break;
 
     case 6: // set services
         ((MMain *)mmn)->setHelpText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
-        nextButton->setEnabled(true);
-        backButton->setEnabled(true);
         break;
 
     case 7: // set computer name
@@ -2588,6 +2588,7 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 10: // done
+        closeButton->setEnabled(false);
         ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                                        "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
                                        "The best way to learn about them is to browse through the Menu and try them. "
@@ -2599,25 +2600,29 @@ void MInstall::pageDisplayed(int next)
     default:
         // case 0 or any other
         ((MMain *)mmn)->setHelpText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME));
+        nextButton->setDefault(true);
         break;
     }
+
+    backButton->setEnabled(true);
+    nextButton->setEnabled(true);
 }
 
 void MInstall::gotoPage(int next)
 {
+    backButton->setEnabled(false);
+    nextButton->setEnabled(false);
+    widgetStack->setEnabled(false);
     int curr = widgetStack->currentIndex();
     next = showPage(curr, next);
-    nextButton->setEnabled(true);
 
     // modify ui for standard cases
     if (next == 0) {
         // entering first page
-        nextButton->setDefault(true);
         nextButton->setText(tr("Next"));
         backButton->hide();
     } else {
         // default
-        backButton->setEnabled(true);
         backButton->show();
     }
 
@@ -2632,7 +2637,6 @@ void MInstall::gotoPage(int next)
     if (next > c-1) {
         // finished
         setCursor(QCursor(Qt::WaitCursor));
-        nextButton->setEnabled(false);
         cleanup();
         if (checkBoxExitReboot->isChecked()) {
             shell.run("swapoff -a");
@@ -2643,9 +2647,11 @@ void MInstall::gotoPage(int next)
     }
     // display the next page
     widgetStack->setCurrentIndex(next);
+    qApp->processEvents();
 
     // anything to do after displaying the page
     pageDisplayed(next);
+    widgetStack->setEnabled(true);
 }
 
 void MInstall::firstRefresh(QDialog *main)
@@ -2782,19 +2788,12 @@ void MInstall::on_passwordCheckBox_stateChanged(int state)
 
 void MInstall::on_nextButton_clicked()
 {
-    int next = widgetStack->currentIndex() + 1;
-    // make sure button is released
-    nextButton->setDown(false);
-
-    gotoPage(next);
+    gotoPage(widgetStack->currentIndex() + 1);
 }
 
 void MInstall::on_backButton_clicked()
 {
-    int curr = widgetStack->currentIndex();
-    int next = curr - 1;
-
-    gotoPage(next);
+    gotoPage(widgetStack->currentIndex() - 1);
 }
 
 void MInstall::on_abortInstallButton_clicked()
@@ -2838,14 +2837,7 @@ void MInstall::updatePartInfo()
     indexPartInfoDisk = diskCombo->currentIndex();
 
     if (phase < 1) {
-        setCursor(QCursor(Qt::WaitCursor));
-        backButton->setEnabled(false);
-        nextButton->setEnabled(false);
         const QString &sloading = tr("Loading...");
-        rootCombo->setEnabled(false);
-        swapCombo->setEnabled(false);
-        homeCombo->setEnabled(false);
-        bootCombo->setEnabled(false);
         rootCombo->clear();
         swapCombo->clear();
         homeCombo->clear();
@@ -2871,35 +2863,26 @@ void MInstall::updatePartInfo()
     } else {
         rootCombo->addItem("none");
     }
-    rootCombo->setEnabled(true);
 
     // build homeCombo for all disks
     partitions = getCmdOuts("partition-info all -n --exclude=" + exclude + "swap --min-size=1000");
     homeCombo->clear();
     homeCombo->addItem("root");
     homeCombo->addItems(partitions);
-    homeCombo->setEnabled(true);
 
     // build swapCombo for all disks
     partitions = getCmdOuts("partition-info all -n --exclude=" + exclude);
     swapCombo->clear();
     swapCombo->addItem("none");
     swapCombo->addItems(partitions);
-    swapCombo->setEnabled(true);
 
     // build bootCombo for all disks, exclude ESP (EFI)
     partitions = getCmdOuts("partition-info all -n --exclude=" + exclude + "efi --min-size=" + MIN_BOOT_DEVICE_SIZE);
     bootCombo->clear();
     bootCombo->addItem("root");
     bootCombo->addItems(partitions);
-    bootCombo->setEnabled(true);
 
     on_rootCombo_activated();
-    if (phase < 1) {
-        backButton->setEnabled(true);
-        nextButton->setEnabled(true);
-        setCursor(QCursor(Qt::ArrowCursor));
-    }
 }
 
 // root partition changed, rebuild home, swap, boot combo boxes
