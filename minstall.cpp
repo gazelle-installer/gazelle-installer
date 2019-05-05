@@ -69,7 +69,6 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     this->installEventFilter(this);
     this->args = args;
     installBox->hide();
-    labelMX->setPixmap(QPixmap("/usr/share/gazelle-installer-data/logo.png"));
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);

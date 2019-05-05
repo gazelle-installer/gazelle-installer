@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Type=Application
 Exec=sudo -E minstall
-Icon=msystem
+Icon=/usr/share/gazelle-installer-data/logo.png
 Name=Installer
 Name[am]=መግጠሚያ
 Name[ar]=تنصيب
