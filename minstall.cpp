@@ -33,7 +33,7 @@ int MInstall::command(const QString &cmd)
 }
 
 // helping function that runs a bash command in an event loop
-int MInstall::runCmd(QString cmd)
+int MInstall::runCmd(const QString &cmd)
 {
     if (phase < 0) return EXIT_FAILURE;
     QEventLoop loop;
@@ -48,7 +48,7 @@ int MInstall::runCmd(QString cmd)
 }
 
 // shell.run() doesn't distinguish between crashed and failed processes
-QProcess::ExitStatus MInstall::runCmd2(QString cmd)
+QProcess::ExitStatus MInstall::runCmd2(const QString &cmd)
 {
     if (phase < 0) return QProcess::CrashExit;
     qDebug() << cmd;
@@ -129,12 +129,12 @@ void MInstall::csleep(int msec)
     eloop.exec();
 }
 
-QString MInstall::getCmdOut(QString cmd)
+QString MInstall::getCmdOut(const QString &cmd)
 {
     return shell.getOutput(cmd).section("\n", 0, 0);
 }
 
-QStringList MInstall::getCmdOuts(QString cmd)
+QStringList MInstall::getCmdOuts(const QString &cmd)
 {
     return shell.getOutput(cmd).split('\n');
 }
@@ -159,7 +159,7 @@ bool MInstall::isInsideVB()
 }
 
 
-QString MInstall::getCmdValue(QString cmd, QString key, QString keydel, QString valdel)
+QString MInstall::getCmdValue(const QString &cmd, const QString &key, const QString &keydel, const QString &valdel)
 {
     const char *ret = "";
     char line[260];
@@ -181,17 +181,17 @@ QString MInstall::getCmdValue(QString cmd, QString key, QString keydel, QString 
     return QString (ret);
 }
 
-bool MInstall::replaceStringInFile(QString oldtext, QString newtext, QString filepath)
+bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
 {
 
-    QString cmd = QString("sed -i 's/%1/%2/g' %3").arg(oldtext).arg(newtext).arg(filepath);
+    QString cmd = QString("sed -i 's/%1/%2/g' %3").arg(oldtext, newtext, filepath);
     if (shell.run(cmd) != 0) {
         return false;
     }
     return true;
 }
 
-void MInstall::updateStatus(QString msg, int val)
+void MInstall::updateStatus(const QString &msg, int val)
 {
     progressBar->setFormat("%p% - " + msg.toUtf8());
     progressBar->setValue(val);
@@ -731,7 +731,7 @@ void MInstall::saveAdvancedFDE()
     iFDEroundtime = spinFDEroundtime->value();
 }
 
-bool MInstall::makeSwapPartition(QString dev)
+bool MInstall::makeSwapPartition(const QString &dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -745,7 +745,7 @@ bool MInstall::makeSwapPartition(QString dev)
 }
 
 // create ESP at the begining of the drive
-bool MInstall::makeEsp(QString drv, int size)
+bool MInstall::makeEsp(const QString &drv, int size)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -768,7 +768,7 @@ bool MInstall::makeEsp(QString drv, int size)
     return true;
 }
 
-bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, const QString &label)
+bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -1859,7 +1859,7 @@ bool MInstall::installLoader()
     return true;
 }
 
-bool MInstall::isGpt(QString drv)
+bool MInstall::isGpt(const QString &drv)
 {
     QString cmd = QString("blkid %1 | grep -q PTTYPE=\\\"gpt\\\"").arg(drv);
     return (shell.run(cmd) == 0);
@@ -1989,7 +1989,7 @@ bool MInstall::setUserName()
 }
 
 // get the type of the partition
-QString MInstall::getPartType(const QString dev)
+QString MInstall::getPartType(const QString &dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     return shell.getOutput("blkid " + dev + " -o value -s TYPE");

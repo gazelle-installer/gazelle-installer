@@ -51,20 +51,20 @@ public:
     void unmountGoBack(const QString &msg);
 
     // helpers
-    bool replaceStringInFile(QString oldtext, QString newtext, QString filepath);
-    int runCmd(QString cmd);
-    QProcess::ExitStatus runCmd2(QString cmd);
+    bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
+    int runCmd(const QString &cmd);
+    QProcess::ExitStatus runCmd2(const QString &cmd);
     void csleep(int msec);
-    QString getCmdOut(QString cmd);
-    QString getCmdValue(QString cmd, QString key, QString keydel, QString valdel);
-    QStringList getCmdOuts(QString cmd);
+    QString getCmdOut(const QString &cmd);
+    QString getCmdValue(const QString &cmd, const QString &key, const QString &keydel, const QString &valdel);
+    QStringList getCmdOuts(const QString &cmd);
     static int command(const QString &string);
     int getPartitionNumber();
 
     bool is32bit();
     bool is64bit();
     bool isInsideVB();
-    bool isGpt(QString drv);
+    bool isGpt(const QString &drv);
 
     bool checkDisk();
     bool checkPassword(const QString &pass);
@@ -72,11 +72,10 @@ public:
     bool validateChosenPartitions();
     bool makeChosenPartitions();
     bool makeDefaultPartitions();
-    bool makeEsp(QString drv, int size);
-    bool makeGrub(int rootdev, QString rootpart, const char *rootmnt, bool initrd);
-    bool makeLinuxPartition(QString dev, const QString &type, bool bad, const QString &label);
+    bool makeEsp(const QString &drv, int size);
+    bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password);
-    bool makeSwapPartition(QString dev);
+    bool makeSwapPartition(const QString &dev);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
     bool validateUserInfo();
     bool validateComputerName();
@@ -101,7 +100,7 @@ public:
     void updatePartitionWidgets();
     void loadAdvancedFDE();
     void saveAdvancedFDE();
-    void updateStatus(QString msg, int val);
+    void updateStatus(const QString &msg, int val);
     void writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
@@ -117,7 +116,7 @@ public:
     QString PROJECTSHORTNAME;
     QString PROJECTURL;
     QString PROJECTVERSION;
-    QString getPartType(const QString dev);
+    QString getPartType(const QString &dev);
     QStringList ENABLE_SERVICES;
     bool REMOVE_NOSPLASH;
 
