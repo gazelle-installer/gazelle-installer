@@ -137,7 +137,6 @@ public:
 public slots:
     bool procAbort();
     void cleanup();
-    void delTime();
 
     void copyTime();
 
