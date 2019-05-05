@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     }
 
 
-    a.setWindowIcon(QIcon::fromTheme("system-installer", QIcon("/usr/share/pixmaps/msystem.png")));
+    a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
 
     // Set the logging files
     logFile.reset(new QFile("/var/log/minstall.log"));
