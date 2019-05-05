@@ -407,7 +407,7 @@ bool MInstall::processNextPhase()
         if (!installLinux()) return false;
         if (!haveSysConfig) {
             progressBar->setEnabled(false);
-            updateStatus(tr("Paused for required operator input"), 97);
+            updateStatus(tr("Paused for required operator input"), 95);
             QApplication::beep();
             if(widgetStack->currentIndex() == 4) {
                 on_nextButton_clicked();
@@ -1520,14 +1520,9 @@ bool MInstall::installLinux()
         updateStatus(tr("Mounting the / (root) partition"), 3);
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
         // remove all folders in root except for /home
-        connect(timer, SIGNAL(timeout()), this, SLOT(delTime()));
-        timer->start(20000);
         updateStatus(tr("Deleting old system"), 4);
         QString cmd = "/bin/bash -c \"find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;\"";
-        QProcess::ExitStatus rexit = runCmd2(cmd);
-        timer->stop();
-        disconnect(timer, SIGNAL(timeout()), 0, 0);
-        if (rexit == QProcess::NormalExit) {
+        if (runCmd2(cmd) == QProcess::NormalExit) {
             if(!copyLinux()) return false;
         } else {
             unmountGoBack(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
@@ -1628,7 +1623,7 @@ bool MInstall::copyLinux()
     if (phase < 0) return false;
     // make empty dirs for opt, dev, proc, sys, run,
     // home already done
-    updateStatus(tr("Creating system directories"), 9);
+    updateStatus(tr("Creating system directories"), 11);
     mkdir("/mnt/antiX/opt", 0755);
     mkdir("/mnt/antiX/dev", 0755);
     mkdir("/mnt/antiX/proc", 0755);
@@ -1648,9 +1643,7 @@ bool MInstall::copyLinux()
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
-    connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
-    timer->start(2000);
-    updateStatus(tr("Copying new system"), 15);
+    updateStatus(tr("Copying new system"), 13);
     // setup and start the process
     QString cmd;
     cmd = "/bin/cp -a";
@@ -1671,20 +1664,21 @@ bool MInstall::copyLinux()
             iTargetInodes += svfs.f_files - svfs.f_ffree;
         }
     }
+
     QProcess::ExitStatus rexit = QProcess::NormalExit;
     if (!(args.contains("--nocopy") || args.contains("-n"))) {
+        connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
+        timer->start(2000);
         rexit = runCmd2(cmd);
+        timer->stop();
+        disconnect(timer, SIGNAL(timeout()), 0, 0);
     }
-
-    // After the copy is over.
-    timer->stop();
-    disconnect(timer, SIGNAL(timeout()), 0, 0);
     if (rexit != QProcess::NormalExit) {
         unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
         return false;
     }
 
-    updateStatus(tr("Fixing configuration"), 96);
+    updateStatus(tr("Fixing configuration"), 94);
     shell.run("mkdir -m 1777 /mnt/antiX/tmp");
     makeFstab();
     writeKeyFile();
@@ -1717,7 +1711,7 @@ bool MInstall::installLoader()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    updateStatus(tr("Installing GRUB"), 97);
+    updateStatus(tr("Installing GRUB"), 95);
     QString cmd;
     QString val = getCmdOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1832,7 +1826,6 @@ bool MInstall::installLoader()
     cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(finalcmdlinestring);
     runCmd(cmd);
 
-    progressBar->setValue(98);
     //copy memtest efi files if needed
 
     if (uefi) {
@@ -1844,14 +1837,17 @@ bool MInstall::installLoader()
             runCmd("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt");
         }
     }
+    progressBar->setValue(96);
 
     //update grub with new config
 
     qDebug() << "Update Grub";
     runCmd("chroot /mnt/antiX update-grub");
+    progressBar->setValue(97);
 
     qDebug() << "Update initramfs";
     runCmd("chroot /mnt/antiX update-initramfs -u -t -k all");
+    progressBar->setValue(98);
     qDebug() << "clear chroot env";
     runCmd("umount /mnt/antiX/proc");
     runCmd("umount /mnt/antiX/sys");
@@ -3012,15 +3008,6 @@ void MInstall::cleanup()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// delete process events
-
-void MInstall::delTime()
-{
-    progressBar->setValue(progressBar->value() + 1);
-}
-
-
-/////////////////////////////////////////////////////////////////////////
 // copy process events
 
 void MInstall::copyTime()
@@ -3036,7 +3023,7 @@ void MInstall::copyTime()
     } else {
         updateStatus(tr("Copy progress unknown. No file system statistics."), 0);
     }
-    progressBar->setValue(i + 15);
+    progressBar->setValue(i + 13);
 }
 
 void MInstall::on_progressBar_valueChanged(int value)
