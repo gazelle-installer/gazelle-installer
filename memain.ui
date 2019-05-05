@@ -64,7 +64,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>291</width>
+         <width>181</width>
          <height>421</height>
         </rect>
        </property>
@@ -108,8 +108,8 @@ color: rgb(24, 12, 12);</string>
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>291</width>
-         <height>371</height>
+         <width>181</width>
+         <height>421</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -125,7 +125,7 @@ color: rgb(24, 12, 12);</string>
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>../../../../usr/share/gazelle-installer-data/backdrop-textbox.png</pixmap>
+        <pixmap>../../../../../../../usr/share/gazelle-installer-data/backdrop-textbox.png</pixmap>
        </property>
        <property name="scaledContents">
         <bool>true</bool>

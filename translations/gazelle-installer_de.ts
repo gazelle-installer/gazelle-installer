@@ -4,7 +4,7 @@
 <context>
     <name>MInstall</name>
     <message>
-        <location filename="../minstall.cpp" line="106"/>
+        <location filename="../minstall.cpp" line="97"/>
         <source>%1 is an independent Linux distribution based on Debian Stable.
 
 %1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.
@@ -17,7 +17,7 @@ Enjoy using %1</source>
 Viel Spaß mit %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="107"/>
+        <location filename="../minstall.cpp" line="98"/>
         <source>Support %1
 
 %1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.</source>
@@ -26,7 +26,7 @@ Viel Spaß mit %1</translation>
 %1 wird von Leuten wie Ihnen unterstützt. Einige helfen anderen Nutzern im Forum - %2 oder übersetzen Dateien in andere Sprachen oder machen Verbesserungsvorschläge, schreiben Dokumentationen oder helfen beim Testen neuer Programme.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="370"/>
+        <location filename="../minstall.cpp" line="327"/>
         <source>
 
 The disk with the partition you selected for installation is failing.
@@ -39,15 +39,15 @@ Das Laufwerk mit der Partition, die Sie für die Installation gewählt haben, is
 </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="371"/>
+        <location filename="../minstall.cpp" line="328"/>
         <source>You are strongly advised to abort.
 </source>
         <translation>Es wird dringend empfohlen abzubrechen.
 </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="372"/>
-        <location filename="../minstall.cpp" line="386"/>
+        <location filename="../minstall.cpp" line="329"/>
+        <location filename="../minstall.cpp" line="343"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.
 
 </source>
@@ -56,38 +56,36 @@ Das Laufwerk mit der Partition, die Sie für die Installation gewählt haben, is
 </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="373"/>
+        <location filename="../minstall.cpp" line="330"/>
         <source>Do you want to abort the installation?</source>
         <translation>Wollen Sie die Installation abbrechen?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="375"/>
-        <location filename="../minstall.cpp" line="389"/>
-        <location filename="../minstall.cpp" line="995"/>
-        <location filename="../minstall.cpp" line="1016"/>
-        <location filename="../minstall.cpp" line="1878"/>
-        <location filename="../minstall.cpp" line="1883"/>
-        <location filename="../minstall.cpp" line="1908"/>
-        <location filename="../minstall.cpp" line="2364"/>
-        <location filename="../minstall.cpp" line="2414"/>
+        <location filename="../minstall.cpp" line="332"/>
+        <location filename="../minstall.cpp" line="346"/>
+        <location filename="../minstall.cpp" line="1005"/>
+        <location filename="../minstall.cpp" line="1026"/>
+        <location filename="../minstall.cpp" line="1887"/>
+        <location filename="../minstall.cpp" line="1892"/>
+        <location filename="../minstall.cpp" line="1917"/>
+        <location filename="../minstall.cpp" line="2371"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="375"/>
-        <location filename="../minstall.cpp" line="389"/>
-        <location filename="../minstall.cpp" line="995"/>
-        <location filename="../minstall.cpp" line="1016"/>
-        <location filename="../minstall.cpp" line="1878"/>
-        <location filename="../minstall.cpp" line="1883"/>
-        <location filename="../minstall.cpp" line="1908"/>
-        <location filename="../minstall.cpp" line="2364"/>
-        <location filename="../minstall.cpp" line="2414"/>
+        <location filename="../minstall.cpp" line="332"/>
+        <location filename="../minstall.cpp" line="346"/>
+        <location filename="../minstall.cpp" line="1005"/>
+        <location filename="../minstall.cpp" line="1026"/>
+        <location filename="../minstall.cpp" line="1887"/>
+        <location filename="../minstall.cpp" line="1892"/>
+        <location filename="../minstall.cpp" line="1917"/>
+        <location filename="../minstall.cpp" line="2371"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="383"/>
+        <location filename="../minstall.cpp" line="340"/>
         <source>Smartmon tool output:
 
 </source>
@@ -96,26 +94,26 @@ Das Laufwerk mit der Partition, die Sie für die Installation gewählt haben, is
 </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="384"/>
+        <location filename="../minstall.cpp" line="341"/>
         <source>The disk with the partition you selected for installation passes the S.M.A.R.T. monitor test (smartctl)
 </source>
         <translation>Das Laufwerk mit der Partition, die Sie für die Installation gewählt haben, hat den S.M.A.R.T. Monitor Test (smartctl) bestanden
 </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="385"/>
+        <location filename="../minstall.cpp" line="342"/>
         <source>but the tests indicate it will have a higher than average failure rate in the upcoming year.
 </source>
         <translation>aber die Tests geben zu erkennen, dass im nächsten Jahr mit einer überdurchschnittlichen Fehlerrate zu rechnen ist.
 </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="387"/>
+        <location filename="../minstall.cpp" line="344"/>
         <source>Do you want to continue?</source>
         <translation>Wollen Sie fortfahren?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="403"/>
+        <location filename="../minstall.cpp" line="360"/>
         <source>The password needs to be at least
 %1 characters long. Please select
 a longer password before proceeding.</source>
@@ -128,57 +126,56 @@ längeres Passwort auswählen.</translation>
         <translation type="vanished">Bereit zur Installation des %1 Dateisystems</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="874"/>
+        <location filename="../minstall.cpp" line="884"/>
         <source>Sorry, could not create %1 LUKS partition</source>
         <translation>Die LUKS Partition %1 konnte nicht angelegt werden.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="886"/>
+        <location filename="../minstall.cpp" line="895"/>
         <source>Sorry, could not open %1 LUKS container</source>
         <translation>Der LUKS Container  %1 konnte nicht geöffnet werden. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2412"/>
+        <location filename="../minstall.cpp" line="2369"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
         <translation>Einverstanden mit der Formatierung der Festplatte (%1) und Benutzung der ganzen Platte durch %2?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1047"/>
+        <location filename="../minstall.cpp" line="1057"/>
         <source>Creating required partitions</source>
         <translation>Erstelle benötigte Partitionen</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1131"/>
         <source>Formating EFI System Partition (ESP)</source>
-        <translation>Formatiere EFI-Systempartition (ESP)</translation>
+        <translation type="vanished">Formatiere EFI-Systempartition (ESP)</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1198"/>
-        <location filename="../minstall.cpp" line="1351"/>
-        <location filename="../minstall.cpp" line="1403"/>
-        <location filename="../minstall.cpp" line="1448"/>
+        <location filename="../minstall.cpp" line="1208"/>
+        <location filename="../minstall.cpp" line="1362"/>
+        <location filename="../minstall.cpp" line="1414"/>
+        <location filename="../minstall.cpp" line="1459"/>
         <source>Setting up LUKS encrypted containers</source>
         <translation>Der verschlüsselte LUKS Container wird eingerichtet.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1212"/>
-        <location filename="../minstall.cpp" line="1340"/>
+        <location filename="../minstall.cpp" line="1222"/>
+        <location filename="../minstall.cpp" line="1351"/>
         <source>Formatting swap partition</source>
         <translation>Formatiere Auslagerungsspeicher-Partition (swap)</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1223"/>
-        <location filename="../minstall.cpp" line="1423"/>
+        <location filename="../minstall.cpp" line="1233"/>
+        <location filename="../minstall.cpp" line="1434"/>
         <source>Formatting boot partition</source>
         <translation>Die Boot-Partition wird formatiert.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1229"/>
+        <location filename="../minstall.cpp" line="1239"/>
         <source>Formatting root partition</source>
         <translation>Formatiere Systempartition (root)</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="920"/>
+        <location filename="../minstall.cpp" line="930"/>
         <source>You must choose a root partition.
 The root partition must be at least %1.</source>
         <translation>Die Auswahl einer Root-Partition ist erforderlich.
@@ -227,32 +224,32 @@ Are you sure you want to reformat this partition?</source>
 Soll diese Partition wirklich formatiert werden?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1311"/>
+        <location filename="../minstall.cpp" line="1322"/>
         <source>Preparing required partitions</source>
         <translation>Bereite benötigte Partitionen vor</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1400"/>
+        <location filename="../minstall.cpp" line="1411"/>
         <source>Formatting the / (root) partition</source>
         <translation>Formatiere Systempartition / (root)</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1434"/>
+        <location filename="../minstall.cpp" line="1445"/>
         <source>Mounting the /home partition</source>
         <translation>Hänge /home Partition ein</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1460"/>
+        <location filename="../minstall.cpp" line="1471"/>
         <source>Formatting the /home partition</source>
         <translation>Formatiere /home Partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1502"/>
+        <location filename="../minstall.cpp" line="1513"/>
         <source>Mounting the / (root) partition</source>
         <translation>Hänge Systempartition / (root) ein</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1610"/>
+        <location filename="../minstall.cpp" line="1621"/>
         <source>Creating system directories</source>
         <translation>Erstelle Systemverzeichnisse</translation>
     </message>
@@ -265,24 +262,24 @@ Soll diese Partition wirklich formatiert werden?</translation>
         <translation type="vanished">Bitte warten, bis GRUB installiert ist; das könnte einige Minuten dauern...</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1757"/>
+        <location filename="../minstall.cpp" line="1767"/>
         <source>Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function.</source>
         <translation>Leider ist die Installation von GRUB fehlgeschlagen. Möglicherweise wurde dies durch die vorangegangene Formatierung verursacht. Sie können die GRUB-Installation abwählen und die Installation abschließen. Danach wieder von der LiveDVD oder LiveUSB starten und die Reparatur durch Wiederholung der GRUB-Installation durchführen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1875"/>
+        <location filename="../minstall.cpp" line="1885"/>
         <source>The home directory for %1 already exists.Would you like to reuse the old home directory?</source>
         <translation>Das Home-Verzeichnis existiert bereits für %1. Möchten Sie das alte Home-Verzeichnis wiederverwenden?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1881"/>
+        <location filename="../minstall.cpp" line="1890"/>
         <source>Would you like to save the old home directory
 and create a new home directory?</source>
         <translation>Möchten Sie das alte Home-Verzeichnis sichern
 und ein neues Home-Verzeichnis anlegen?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1897"/>
+        <location filename="../minstall.cpp" line="1906"/>
         <source>Sorry, failed to save old home directory. Before proceeding,
 you&apos;ll have to select a different username or
 delete a previously saved copy of your home directory.</source>
@@ -291,51 +288,51 @@ müssen Sie einen anderen Benutzernamen auswählen oder
 eine bereits früher angelegte Kopie Ihres Home-Verzeichnisses löschen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1906"/>
+        <location filename="../minstall.cpp" line="1915"/>
         <source>Would you like to delete the old home directory for %1?</source>
         <translation>Möchten Sie das alte Home-Verzeichnis von %1 löschen?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1916"/>
+        <location filename="../minstall.cpp" line="1923"/>
         <source>Sorry, failed to delete old home directory. Before proceeding, 
 you&apos;ll have to select a different username.</source>
         <translation>Konnte das alte Home-Verzeichnis nicht löschen. Bevor Sie weitermachen,
 müssen Sie einen anderen Benutzernamen auswählen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1923"/>
+        <location filename="../minstall.cpp" line="1929"/>
         <source>You&apos;ve chosen to not use, save or delete the old home directory.
 Before proceeding, you&apos;ll have to select a different username.</source>
         <translation>Sie haben beschlossen das alte Home-Verzeichnis nicht zu benutzen, zu sichern oder zu löschen.
 Bevor Sie weitermachen, müssen Sie einen anderen Benutzernamen auswählen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1936"/>
+        <location filename="../minstall.cpp" line="1940"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Konnte das Benutzer-Verzeichnis nicht anlegen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1943"/>
+        <location filename="../minstall.cpp" line="1946"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Konnte das Benutzer-Verzeichnis nicht umbenennen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1968"/>
+        <location filename="../minstall.cpp" line="1970"/>
         <source>Sorry, failed to save desktop changes.</source>
         <translation>Änderungen am Desktop konnten leider nicht gespeichert werden.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1979"/>
+        <location filename="../minstall.cpp" line="1980"/>
         <source>Sorry, failed to set ownership of user directory.</source>
         <translation>Konnte das Eigentumsrecht des Benutzer-Verzeichnisses nicht setzen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2034"/>
+        <location filename="../minstall.cpp" line="2030"/>
         <source>Sorry, unable to set root password.</source>
         <translation>Konnte das root-Passwort nicht setzen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2048"/>
+        <location filename="../minstall.cpp" line="2043"/>
         <source>Sorry, unable to set user password.</source>
         <translation>Konnte Benutzerpasswort nicht setzen.</translation>
     </message>
@@ -393,46 +390,41 @@ nicht überein.  Bitte gleiches Passwort zweimal eingeben.</translation>
 nicht überein.  Bitte gleiches Passwort zweimal eingeben.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2120"/>
         <source>Sorry your computer name needs to be
 at least 2 characters long. You&apos;ll have to
 select a different name before proceeding.</source>
-        <translation>Der Name des Computers muss mindestens
+        <translation type="vanished">Der Name des Computers muss mindestens
 2 Zeichen lang sein. Bitte wählen Sie einen 
 längeren Namen, bevor Sie weitermachen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2124"/>
         <source>Sorry your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>Der Computername enthält leider ungültige Zeichen.. 
+        <translation type="vanished">Der Computername enthält leider ungültige Zeichen.. 
 Bitte wählen Sie einen anderen Namen, 
 bevor Sie weitermachen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2130"/>
         <source>Sorry your computer domain needs to be at least
 2 characters long. You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>Der Domainname des Computers muss mindestens
+        <translation type="vanished">Der Domainname des Computers muss mindestens
 2 Zeichen lang sein. Bitte wählen Sie einen 
 längeren Namen, bevor Sie weitermachen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2134"/>
         <source>Sorry your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>Der Domainname des Computers enthält leider ungültige Zeichen.
+        <translation type="vanished">Der Domainname des Computers enthält leider ungültige Zeichen.
 Bitte wählen Sie einen anderen Namen, bevor Sie weitermachen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2142"/>
         <source>Sorry your workgroup needs to be at least
 2 characters long. You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>Der Name der Arbeitsgruppe muss mindestens
+        <translation type="vanished">Der Name der Arbeitsgruppe muss mindestens
 2 Zeichen lang sein. Bitte wählen Sie einen 
 längeren Namen, bevor Sie weitermachen.</translation>
     </message>
@@ -447,87 +439,86 @@ Um die neue Installation zu benutzen, bitte den Rechner ohne Installationsmedium
 Rechner jetzt neu starten?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2363"/>
+        <location filename="../minstall.cpp" line="2927"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>Die Installation und die Konfiguration sind unvollständig.
 Möchten Sie jetzt wirklich den Vorgang beenden?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="903"/>
+        <location filename="../minstall.cpp" line="913"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Für die Verschlüsselung der Root-Partition ist eine eigene Boot-Partition erforderlich.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="497"/>
+        <location filename="../minstall.cpp" line="439"/>
         <source>Preparing to install %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="937"/>
+        <location filename="../minstall.cpp" line="947"/>
         <source>Delete the data on %1 except for /home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="946"/>
+        <location filename="../minstall.cpp" line="956"/>
         <source>Reuse (no reformat) %1 as the /home partition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="978"/>
+        <location filename="../minstall.cpp" line="988"/>
         <source>The partition you selected for /boot is larger than expected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="982"/>
+        <location filename="../minstall.cpp" line="992"/>
         <source>%1 for the %2 partition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="985"/>
+        <location filename="../minstall.cpp" line="995"/>
         <source>The following partitions you selected are not Linux partitions:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="993"/>
+        <location filename="../minstall.cpp" line="1003"/>
         <source>Are you sure you want to reformat these partitions?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1003"/>
+        <location filename="../minstall.cpp" line="1013"/>
         <source>The %1 installer will now format and destroy the data on the following partitions:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1010"/>
+        <location filename="../minstall.cpp" line="1020"/>
         <source>The %1 installer will now perform the following actions:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1014"/>
+        <location filename="../minstall.cpp" line="1024"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1693"/>
+        <location filename="../minstall.cpp" line="1141"/>
+        <source>Formatting EFI System Partition (ESP)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="1704"/>
         <source>Installing GRUB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2061"/>
+        <location filename="../minstall.cpp" line="2056"/>
         <source>Please enter a user name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2065"/>
+        <location filename="../minstall.cpp" line="2060"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2073"/>
-        <source>Sorry that name is in use.
-Please select a different name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -553,214 +544,249 @@ Please try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2486"/>
+        <location filename="../minstall.cpp" line="2120"/>
+        <source>Sorry, your computer name needs to be
+at least 2 characters long. You&apos;ll have to
+select a different name before proceeding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2124"/>
+        <source>Sorry, your computer name contains invalid characters.
+You&apos;ll have to select a different
+name before proceeding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2130"/>
+        <source>Sorry, your computer domain needs to be at least
+2 characters long. You&apos;ll have to select a different
+name before proceeding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2134"/>
+        <source>Sorry, your computer domain contains invalid characters.
+You&apos;ll have to select a different
+name before proceeding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2142"/>
+        <source>Sorry, your workgroup needs to be at least
+2 characters long. You&apos;ll have to select a different
+name before proceeding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2440"/>
         <source>&lt;p&gt;&lt;b&gt;General Instructions&lt;/b&gt;&lt;br/&gt;BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.&lt;/p&gt;&lt;p&gt;On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.&lt;/p&gt;&lt;p&gt;Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions. &lt;/p&gt;&lt;p&gt;If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.&lt;/p&gt;&lt;p&gt;The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Allgemeine Instruktionen&lt;/b&gt;&lt;br/&gt;VOR DEM WEITEREN VORGEHEN ALLE ANDEREN PROGRAMME BEENDEN.&lt;/p&gt;&lt;p&gt;Auf jeder Seite zuerst die Instruktionen lesen, dann die Auswahl treffen und schließlich Weiter anklicken, sobald Sie dazu bereit sind. Sie werden um Bestätigung gebeten bevor irgendeine destruktive Maßnahme ausgeführt wird.&lt;/p&gt;&lt;p&gt;Die Installation benötigt etwa %1 Festplattenspeicher. %2 oder mehr wird empfohlen. Die Installation kann entweder auf der ganzen Festplatte oder einer bereits existierenden Partition durchgeführt werden. &lt;/p&gt;&lt;p&gt;Bei Verwendung von Mac OS oder Windows OS (von Vista aufwärts) ist möglicherweise für die Konfiguration von Partitionen und dem Boot-Manager vor dem Start der Installation die Benutzung der entsprechenden Programme dieser Betriebssysteme notwendig.&lt;/p&gt;&lt;p&gt;Die Linux-Dateisysteme ext2, ext3, ext4, jfs, xfs, btrfs und reiserfs werden unterstützt, wobei ext4 empfohlen wird.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2492"/>
+        <location filename="../minstall.cpp" line="2446"/>
         <source>&lt;p&gt;Autoinstall will place home on the root partition.&lt;/p&gt;</source>
         <translation>&lt;p&gt;Mit der Autoinstallation wird das Home-Verzeichnis in der Root-Partition eingerichtet.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2493"/>
-        <location filename="../minstall.cpp" line="2513"/>
+        <location filename="../minstall.cpp" line="2447"/>
+        <location filename="../minstall.cpp" line="2475"/>
         <source>&lt;p&gt;&lt;b&gt;Encryption&lt;/b&gt;&lt;br/&gt;Encryption is possible via LUKS.  A password is required (8 characters minimum length)&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Verschlüsselung&lt;/b&gt;&lt;br/&gt;Die Verschlüsselung wird mit Hilfe von LUKS eingerichtet. Ein Passwort (mit einer minimalen Länge von 8 Zeichen) ist erforderlich&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2494"/>
-        <location filename="../minstall.cpp" line="2514"/>
+        <location filename="../minstall.cpp" line="2448"/>
+        <location filename="../minstall.cpp" line="2476"/>
         <source>&lt;p&gt;A separate unencrypted boot partition is required. For additional settings including cipher selection, use the &lt;b&gt;Edit advanced encryption settings&lt;/b&gt; button.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2495"/>
+        <location filename="../minstall.cpp" line="2449"/>
         <source>&lt;p&gt;When encryption is used with autoinstall, the separate boot partition will be automatically created&lt;/p&gt;</source>
         <translation>&lt;p&gt;Bei der Autoinstallation mit Verschlüsselung wird eine eigene Boot-Partition automatisch eingerichtet.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2502"/>
+        <location filename="../minstall.cpp" line="2464"/>
         <source>&lt;p&gt;&lt;b&gt;Limitations&lt;/b&gt;&lt;br/&gt;Remember, this software is provided AS-IS with no warranty what-so-ever. It&apos;s solely your responsibility to backup your data before proceeding.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Choose Partitions&lt;/b&gt;&lt;br/&gt;%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.&lt;/p&gt;&lt;p&gt;If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Upgrading&lt;/b&gt;&lt;br/&gt;To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.&lt;/p&gt;&lt;p&gt;If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Preferred Filesystem Type&lt;/b&gt;&lt;br/&gt;For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. &lt;/p&gt;&lt;p&gt;Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bad Blocks&lt;/b&gt;&lt;br/&gt;If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Einschränkungen&lt;/b&gt;&lt;br/&gt;Bitte denken Sie daran: diese Software wird geliefert WIE-SIE-IST mit keinerlei Gewähr für die Funktion. Es liegt ausschliesslich in Ihrer Verantwortung, Ihre Daten zu sichern, bevor Sie fortfahren.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Partitionsauswahl&lt;/b&gt;&lt;br/&gt;%1 benötigt eine Root-Partition. Die Swap-Partition ist optional, wird jedoch dringend empfohlen. Wenn Sie den Ruhezustand-Modus Suspend-to-Disk von %1 benutzen möchten, benötigen Sie eine Swap-Partition, die grösser als der vorhandenene physikalische RAM-Speicher ist.&lt;/p&gt;&lt;p&gt;Wenn Sie eine separate /home-Partition auswählen, gestalten sich für Sie zukünftige Upgrades einfacher. Dieses wird jedoch nicht der Fall sein, wenn Sie ein Upgrade von einem System machen möchten, dass keine separate Home-Partition hat.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Upgrade&lt;/b&gt;&lt;br/&gt;Um ein Upgrade einer existierenden Linux Installation durchzuführen, wählen Sie die bereits vorhandene /home-Partition und markieren Sie die Einstellung zum Erhalten der Daten in /home.&lt;/p&gt;&lt;p&gt;Wenn Sie ein existierendes /home-Verzeichnis auf der /root-Partition zum Beibehalten markieren, wird bei der Installation die /root-Partition nicht erneut formatiert. Die Installation dauert dadurch deutlich länger als gewöhnlich.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bevorzugter Filesystem Typ&lt;/b&gt;&lt;br/&gt;Für die Formatierung der Partitionen können Sie bei %1 die Formate ext2, ext3, ext4, jfs, xfs, btrfs oder reiser auswählen. &lt;/p&gt;&lt;p&gt;Für Laufwerke mit btrfs stehen zusätzlich Optionen für die Kompression zur Auswahl bereit. Lzo ist schnell, erzeugt aber eine geringere Kompressionsrate. Zlib ist langsamer, bietet dafür aber eine stärkere Kompression.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Fehlerhafte Blöcke&lt;/b&gt;&lt;br/&gt;Wenn Sie ext2, ext3 oder ext4 als Formatierungstyp auswählen, können Sie optional das Laufwerk auf fehlerhafte Blöcke überprüfen und korrigieren lassen. Diese Überprüfung ist sehr zeitaufwendig. Sie können diesen Schritt überspringen, es sei denn, Sie haben den Verdacht, dass ihr Laufwerk Fehler aufweist. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2522"/>
+        <location filename="../minstall.cpp" line="2484"/>
         <source>Advanced Encryption Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2522"/>
+        <location filename="../minstall.cpp" line="2484"/>
         <source>This page allows fine-tuning of LUKS encrypted partitions.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2523"/>
+        <location filename="../minstall.cpp" line="2485"/>
         <source>In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2525"/>
+        <location filename="../minstall.cpp" line="2487"/>
         <source>This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2526"/>
+        <location filename="../minstall.cpp" line="2488"/>
         <source>Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2527"/>
+        <location filename="../minstall.cpp" line="2489"/>
         <source>Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2528"/>
+        <location filename="../minstall.cpp" line="2490"/>
         <source>Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2530"/>
+        <location filename="../minstall.cpp" line="2492"/>
         <source>You can use the &lt;b&gt;Benchmark&lt;/b&gt; button (which runs &lt;i&gt;cryptsetup benchmark&lt;/i&gt; in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2531"/>
+        <location filename="../minstall.cpp" line="2493"/>
         <source>Please note that &lt;i&gt;cryptsetup benchmark&lt;/i&gt; does not cover all the combinations or selections possible, and generally covers the most commonly used selections.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2533"/>
+        <location filename="../minstall.cpp" line="2495"/>
         <source>Cipher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2533"/>
+        <location filename="../minstall.cpp" line="2495"/>
         <source>A variety of ciphers are available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2534"/>
+        <location filename="../minstall.cpp" line="2496"/>
         <source>was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2535"/>
+        <location filename="../minstall.cpp" line="2497"/>
         <source>(also known as &lt;i&gt;Rijndael&lt;/i&gt;) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2536"/>
+        <location filename="../minstall.cpp" line="2498"/>
         <source>is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2537"/>
+        <location filename="../minstall.cpp" line="2499"/>
         <source>(CAST-256) was a candidate in the AES contest, however it did not become a finalist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2538"/>
+        <location filename="../minstall.cpp" line="2500"/>
         <source>is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2540"/>
+        <location filename="../minstall.cpp" line="2502"/>
         <source>Chain mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2540"/>
+        <location filename="../minstall.cpp" line="2502"/>
         <source>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2541"/>
+        <location filename="../minstall.cpp" line="2503"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2542"/>
+        <location filename="../minstall.cpp" line="2504"/>
         <source>(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2543"/>
+        <location filename="../minstall.cpp" line="2505"/>
         <source>(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2545"/>
+        <location filename="../minstall.cpp" line="2507"/>
         <source>IV generator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2545"/>
+        <location filename="../minstall.cpp" line="2507"/>
         <source>For XTS and CBC, this selects how the &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector is generated. &lt;b&gt;ESSIV&lt;/b&gt; requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2546"/>
+        <location filename="../minstall.cpp" line="2508"/>
         <source>ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2548"/>
+        <location filename="../minstall.cpp" line="2510"/>
         <source>Key size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2548"/>
+        <location filename="../minstall.cpp" line="2510"/>
         <source>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2549"/>
+        <location filename="../minstall.cpp" line="2511"/>
         <source>The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2551"/>
+        <location filename="../minstall.cpp" line="2513"/>
         <source>LUKS key hash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2551"/>
+        <location filename="../minstall.cpp" line="2513"/>
         <source>The hash used for PBKDF2 and for the AF splitter.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2552"/>
+        <location filename="../minstall.cpp" line="2514"/>
         <source>SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2554"/>
+        <location filename="../minstall.cpp" line="2516"/>
         <source>Kernel RNG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2554"/>
+        <location filename="../minstall.cpp" line="2516"/>
         <source>Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2555"/>
+        <location filename="../minstall.cpp" line="2517"/>
         <source>Two options are available: /dev/&lt;b&gt;random&lt;/b&gt; which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/&lt;b&gt;urandom&lt;/b&gt; which will not block even if there is insufficient entropy (possibly weaker keys).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2557"/>
+        <location filename="../minstall.cpp" line="2519"/>
         <source>KDF round time&lt;/b&gt;&lt;br/&gt;The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2558"/>
+        <location filename="../minstall.cpp" line="2520"/>
         <source>A value of 0 selects the compiled-in default (run &lt;i&gt;cryptsetup --help&lt;/i&gt; for details).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2559"/>
+        <location filename="../minstall.cpp" line="2521"/>
         <source>If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -769,23 +795,23 @@ Please try again.</source>
         <translation type="vanished">Zurück zu Schritt 1, um ein anderes Laufwerk auszuwählen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3012"/>
+        <location filename="../minstall.cpp" line="3006"/>
         <source>Copy progress unknown. No file system statistics.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3452"/>
+        <location filename="../minstall.cpp" line="3435"/>
         <source>System boot disk:</source>
         <translation type="unfinished">Systemstart-Laufwerk:</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3459"/>
-        <location filename="../minstall.cpp" line="3466"/>
+        <location filename="../minstall.cpp" line="3442"/>
+        <location filename="../minstall.cpp" line="3449"/>
         <source>Partition to use:</source>
         <translation type="unfinished">genutzte Partition:</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3069"/>
+        <location filename="../minstall.cpp" line="3063"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Danksagung&lt;/b&gt;&lt;br/&gt;Herzlichen Dank an alle, die %1 unterstützen mit Zeit, Geld, Vorschlägen, Arbeit, Lob, Ideen, Weiterempfehlungen, und/oder Zuspruch.&lt;/p&gt;&lt;p&gt;Ohne Euch gäbe es kein %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
     </message>
@@ -794,233 +820,209 @@ Please try again.</source>
         <translation type="vanished">&lt;p&gt;&lt;b&gt;Die Installation läuft&lt;/b&gt;&lt;br/&gt; %1 wird gerade installiert. Eine komplette Neuinstallation benötigt etwa zwischen 3-20 Minuten in Abhängigkeit von der Leistungsfähigkeit des Rechners und der Größe der zu formatierenden Partitionen.&lt;/p&gt;&lt;p&gt;Falls Sie auf Abbrechen klicken, wird die Installation so schnell wie möglich beendet.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="431"/>
+        <location filename="../minstall.cpp" line="387"/>
         <source>Failed to create required partitions.
 Returning to Step 1.</source>
         <translation>Konnte die benötigten Partitionen nicht anlegen.
 Zurück zu Schritt 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="438"/>
+        <location filename="../minstall.cpp" line="394"/>
         <source>Failed to prepare chosen partitions.
 Returning to Step 1.</source>
         <translation>Konnte die benötigten Partitionen nicht vorbereiten.
 Zurück zu Schritt 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="462"/>
+        <location filename="../minstall.cpp" line="416"/>
         <source>Setting system configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="476"/>
+        <location filename="../minstall.cpp" line="429"/>
         <source>Installation successful</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2566"/>
+        <location filename="../minstall.cpp" line="2071"/>
+        <source>Sorry, that name is in use.
+Please select a different name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2528"/>
         <source>Additional information required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2567"/>
+        <location filename="../minstall.cpp" line="2529"/>
         <source>The %1 installer is about to request more information from you. Please wait.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2573"/>
+        <location filename="../minstall.cpp" line="2535"/>
         <source>Installation in Progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2574"/>
+        <location filename="../minstall.cpp" line="2536"/>
         <source>%1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2576"/>
+        <location filename="../minstall.cpp" line="2538"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2578"/>
+        <location filename="../minstall.cpp" line="2540"/>
         <source>Change settings while you wait</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2579"/>
-        <source>You can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons while %1 is being installed to enter the information required for the installation.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2581"/>
-        <source>Feel free to complete these steps at your own pace. If you finish early, the installation will continue and finish without interruption. Otherwise, the installer will pause until you have finished.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2589"/>
+        <location filename="../minstall.cpp" line="2550"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Boot-Methode auswählen&lt;/b&gt;&lt;br/&gt;%1 benutzt den GRUB-Bootloader, um %1 und MS-Windows zu starten. &lt;p&gt;Der GRUB-Bootloader wird standardmäßig in den Master Boot Record (MBR) oder in die ESP (EFI-System Partition für 64-Bit UEFI-Boot-Systeme) des Boot-Laufwerkes eingetragen und ersetzt den zuvor benutzten Bootloader. Das ist normal.&lt;/p&gt;&lt;p&gt;Wenn Sie sich entscheiden, GRUB2 auf der Root-Partition (PBR) statt im MBR zu installieren, wird GRUB2 am Beginn der Root-Partition installiert. Diese Option ist nur für Experten gedacht.&lt;/p&gt;&lt;p&gt;Wenn Sie das Kontrollkästchen Install GRUB nicht auswählen, wird GRUB zu diesem Zeitpunkt nicht installiert werden. Diese Option ist nur für Experten gedacht.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2599"/>
+        <location filename="../minstall.cpp" line="2559"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Systemdienste einschalten&lt;/b&gt;&lt;br/&gt;
 Wählen Sie hier die Systemdienste, die Sie in ihrer Systemkonfiguration haben wollen und die beim Start von %1 automatisch gestartet werden sollen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2606"/>
+        <location filename="../minstall.cpp" line="2565"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Computer Identifikation&lt;/b&gt;&lt;br/&gt;Der Computername ist ein allgemein eindeutiger Name, der Ihren Computer, falls er einem Netzwerk angeschlossen ist, eindeutig identifiziert. Der Computer Domainname braucht nur verwendet zu werden, falls Ihr ISP oder das lokale Netzwerk dieses erfordern.&lt;/p&gt;&lt;p&gt;Die Computer- und Domainnamen dürfen nur alphanumerische Zeichen, Punkte und Bindestriche enthalten. Sie dürfen keine Leerzeichen enthalten und nicht mit Bindestrich beginnen oder enden.&lt;/p&gt;&lt;p&gt;Der SaMBa Server muss aktiviert sein, um damit einige Ihrer Verzeichnisse oder Drucker mit anderen Computern gemeinsam zu nutzen, die mit MS-Windows oder Mac OS X betrieben werden.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2615"/>
+        <location filename="../minstall.cpp" line="2573"/>
         <source>&lt;p&gt;&lt;b&gt;Localization Defaults&lt;/b&gt;&lt;br/&gt;Set the default keyboard and locale. These will apply unless they are overridden later by the user.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configure Clock&lt;/b&gt;&lt;br/&gt;If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for &apos;System clock uses LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Timezone Settings&lt;/b&gt;&lt;br/&gt;The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Service Settings&lt;/b&gt;&lt;br/&gt;Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! </source>
         <translation>&lt;p&gt;&lt;b&gt;Standard-Lokalisierung&lt;/b&gt;&lt;br/&gt;Standard Tastatur und Sprache festlegen. Diese werden übernommen, außer der Nutzer überschreibt sie später.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Uhr konfigurieren &lt;/b&gt;&lt;br/&gt;Falls Sie einen Apple- oder einen reinen Unix-Computer besitzen, wird die Systemzeit standardmäßig auf GMT oder Universalzeit gestellt. Um das zu ändern, wählen Sie die Box für &apos;Systemzeit verwendet LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Zeitzonen-Einstellungen&lt;/b&gt;&lt;br/&gt;Das System startet mit GMT/UTC als voreingestellter Zeitzone. Um die Zeitzone zu ändern, klicken Sie nach dem Neustart der neuen Installation mit einem Rechtsklick auf die Uhr in der Leiste und wählen Eigenschaften.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Dienste-Einstellungen&lt;/b&gt;&lt;br/&gt;Die meisten Nutzer sollten die Standardeinstellungen nicht verändern. Benutzer mit leistungsschwächeren Computern möchten manchmal nicht benötigte Dienst deaktivieren, um die RAM-Nutzung so niedrig wie möglich zu halten. Seien Sie sicher, dass Sie wissen, was Sie tun!</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2624"/>
+        <location filename="../minstall.cpp" line="2581"/>
         <source>&lt;p&gt;&lt;b&gt;Default User Login&lt;/b&gt;&lt;br/&gt;The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwords&lt;/b&gt;&lt;br/&gt;Enter a new password for your default user account and for the root account. Each password must be entered twice.&lt;/p&gt;</source>
         <translation>Standard Benutzer Login&lt;/b&gt;&lt;br/&gt;Der Benutzer root entspricht dem Administrator in einigen anderen Betriebssystemen. Sie sollten den root Benutzer nicht für Ihren täglichen Gebrauch benutzen. Bitte geben Sie einen Namen für ein neues (Standard-) Benutzerkonto an, das Sie dann täglich benutzen. Wenn notwendig, können Sie später weitere Benutzer mit der %1 Benutzerverwaltung hinzufügen. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwörter&lt;/b&gt;&lt;br/&gt;Bitte geben Sie ein neues Passwort für Ihr Standard-Benutzerkonto und für das root Systemverwalterkonto ein. Jedes der Passworte muss zweimal eingegeben werden.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2633"/>
-        <source>Installation Automation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2633"/>
-        <source>These settings control what occurs after the %1 installation has finished.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2635"/>
-        <source>If you choose to automatically exit the installer, it will be closed immediately after completion and the system will be shutdown or rebooted without anymore manual intervention, depending on which option is selected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2637"/>
-        <source>Use the &lt;b&gt;Save automation file to disk&lt;/b&gt; option to save a file containing the settings used for this installation. This can be used in the future to perform an unattended or automated installation.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2638"/>
-        <source>This file may contain sensitive information such as user names and passwords.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2639"/>
-        <source>The file will be saved to where %1 is installed, in the %2 folder.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2641"/>
-        <source>Although not currently implemented or supported, the ability to use an automation file is planned for a future version of the %1 installer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="2647"/>
+        <location filename="../minstall.cpp" line="2590"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Glückwunsch!&lt;/b&gt;&lt;br/&gt;Sie haben die Installation von %1 Linux erfolgreich durchgeführt.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Programme suchen und finden&lt;/b&gt;&lt;br/&gt;Es gibt Hunderte von hervorragenden Programmen, die mit %1 installiert wurden. Der schnellste Weg sie zu finden führt über das Menü. Durchforschen Sie es und probieren Sie die Programme aus. Viele Programme wurden speziell für das %1 Projekt entwickelt. Diese finden Sie in den Hauptmenüs. &lt;p&gt;Zusätzlich beinhaltet %1 viele Standard-Linux-Programme, die nur in einer Textkonsole laufen und daher nicht im Menü erscheinen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2657"/>
+        <location filename="../minstall.cpp" line="2600"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
         <translation>Viel Spaß mit %1&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2672"/>
-        <location filename="../minstall.cpp" line="2687"/>
+        <location filename="../minstall.cpp" line="2615"/>
+        <location filename="../minstall.cpp" line="2629"/>
         <source>Next</source>
         <translation>Weiter</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2685"/>
+        <location filename="../minstall.cpp" line="2627"/>
         <source>Finish</source>
         <translation>Abschließen</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1507"/>
+        <location filename="../minstall.cpp" line="1518"/>
         <source>Deleting old system</source>
         <translation>Lösche das altes System</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1516"/>
+        <location filename="../minstall.cpp" line="1527"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
         <translation>Konnte die alte %1 Instalation auf dem Ziellaufwerk nicht löschen.
 Zurück zu Schritt 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1632"/>
+        <location filename="../minstall.cpp" line="1643"/>
         <source>Copying new system</source>
         <translation>Kopiere das neues System</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1663"/>
+        <location filename="../minstall.cpp" line="1674"/>
         <source>Fixing configuration</source>
         <translation>Schließe die Konfiguration ab</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="447"/>
+        <location filename="../minstall.cpp" line="403"/>
         <source>Paused for required operator input</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1656"/>
+        <location filename="../minstall.cpp" line="1667"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Konnte %1 nicht auf das Ziellaufwerk schreiben.
 Zurück zu Schritt 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3035"/>
+        <location filename="../minstall.cpp" line="2541"/>
+        <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2543"/>
+        <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2699"/>
+        <location filename="../minstall.cpp" line="2843"/>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="3029"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Wo gibt es Hilfe?&lt;/b&gt;&lt;br/&gt;Grundlegende Informationen zu %1 gibt es auf %2. &lt;/p&gt;&lt;p&gt;Viele Freiwillige helfen im %3 Forum, %4.&lt;/p&gt;&lt;p&gt;Wenn Sie um Hilfe bitten, denken Sie bitte daran, eine genaue Problembeschreibung anzugeben und Details zu Ihrer Hardware-Ausstattung mitzuteilen. Angaben wie: &apos;Es funktioniert nicht&apos; sind dabei nicht besonders hilfreich.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3043"/>
+        <location filename="../minstall.cpp" line="3037"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Reparatur der Installation&lt;/b&gt;&lt;br/&gt;Falls %1 von der Festplatte nicht mehr startet oder nicht mehr richtig funktioniert, ist es oftmals möglich das Problem dadurch zu lösen, dass man von LiveDVD oder LiveUSB startet und eines der Programme zur Systemkonfiguration von %1 oder eines der regulären Linux-Programme benutzt, um das System zu reparieren.&lt;/p&gt;&lt;p&gt;Sie können Ihre %1 LiveDVD oder LiveUSB auch benutzen, um Daten von MS-Windows-Systemen zu retten!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3049"/>
+        <location filename="../minstall.cpp" line="3043"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Unterstützung für %1&lt;/b&gt;&lt;br/&gt;%1 wird von Leuten wie Ihnen unterstützt. Einige helfen anderen Nutzern im Forum - %2 - oder übersetzen Dateien in andere Sprachen oder machen Verbesserungsvorschläge, schreiben Dokumentationen oder helfen beim Testen neuer Programme.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3056"/>
+        <location filename="../minstall.cpp" line="3050"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Einstellung des Sound Mixers&lt;/b&gt;&lt;br/&gt; %1 versucht, den Sound Mixer für Sie einzustellen, aber manchmal ist es notwendig Lautstärke-Einstellungen anzupassen oder abgeschaltete Kanäle im Mixer einzuschalten, um etwas hören zu können.&lt;/p&gt;&lt;p&gt;Ein Mixer-Schnellstart-Symbol befindet sich in der Kontrollleiste. Um den Mixer zu öffnen, einfach darauf klicken. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3064"/>
+        <location filename="../minstall.cpp" line="3058"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Halten Sie ihr %1 stets aktuell&lt;/b&gt;&lt;br/&gt;Für mehr Informationen und Aktualisierungen besuchen Sie bitte &lt;/p&gt;&lt;p&gt;%2.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3080"/>
+        <location filename="../minstall.cpp" line="2926"/>
         <source>Confirmation</source>
         <translation>Bestätigung</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3080"/>
         <source>Are you sure you want to quit the application?</source>
-        <translation>Sicherheitsabfrage: Programm wirklich beenden? </translation>
+        <translation type="vanished">Sicherheitsabfrage: Programm wirklich beenden? </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3277"/>
+        <location filename="../minstall.cpp" line="3260"/>
         <source>If you choose to encrypt home partition you cannot use the option to preserve data in that partition</source>
         <translation>Bei der Wahl zur Verschlüsselung der Home-Partition kann die Option zu Beibehaltung der Daten dieser Partition nicht ausgewählt werden.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3278"/>
-        <location filename="../minstall.cpp" line="3300"/>
+        <location filename="../minstall.cpp" line="3261"/>
+        <location filename="../minstall.cpp" line="3283"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3299"/>
+        <location filename="../minstall.cpp" line="3282"/>
         <source>This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation>Mit dieser Option wird die Verschlüsselung der Swap-Partition ausgewählt. Die Swap-Partition kann daher nicht von anderen installierten Systemen gemeinsam genutzt werden.</translation>
     </message>
@@ -1028,7 +1030,7 @@ Zurück zu Schritt 1.</translation>
 <context>
     <name>MMain</name>
     <message>
-        <location filename="../mmain.cpp" line="42"/>
+        <location filename="../mmain.cpp" line="39"/>
         <source>Installer</source>
         <translation>Installationsprogramm</translation>
     </message>
@@ -1036,177 +1038,149 @@ Zurück zu Schritt 1.</translation>
 <context>
     <name>MeInstall</name>
     <message>
-        <location filename="../meinstall.ui" line="3069"/>
+        <location filename="../meinstall.ui" line="2869"/>
         <source>Back</source>
         <translation>Zurück</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="3076"/>
+        <location filename="../meinstall.ui" line="2876"/>
         <source>Alt+K</source>
         <translation>Alt+K</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="3052"/>
+        <location filename="../meinstall.ui" line="2852"/>
         <source>Next</source>
         <translation>Weiter</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="314"/>
+        <location filename="../meinstall.ui" line="252"/>
         <source>Rearrange disk partitions (optional)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="373"/>
+        <location filename="../meinstall.ui" line="311"/>
         <source>Choose disk for installation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="432"/>
+        <location filename="../meinstall.ui" line="370"/>
         <source>Select type of installation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="723"/>
+        <location filename="../meinstall.ui" line="661"/>
         <source>Preferences</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="788"/>
+        <location filename="../meinstall.ui" line="726"/>
         <source>Choose partitions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1209"/>
+        <location filename="../meinstall.ui" line="1147"/>
         <source>Encryption options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1746"/>
+        <location filename="../meinstall.ui" line="1684"/>
         <source>Select Boot Method</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2068"/>
+        <location filename="../meinstall.ui" line="1994"/>
         <source>Computer Network Names</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2255"/>
+        <location filename="../meinstall.ui" line="2181"/>
         <source>Service Settings (advanced)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2305"/>
+        <location filename="../meinstall.ui" line="2231"/>
         <source>Configure Clock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2379"/>
+        <location filename="../meinstall.ui" line="2305"/>
         <source>Localization Defaults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2438"/>
+        <location filename="../meinstall.ui" line="2364"/>
         <source>Timezone Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2524"/>
+        <location filename="../meinstall.ui" line="2450"/>
         <source>Root (administrator) Account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2630"/>
+        <location filename="../meinstall.ui" line="2556"/>
         <source>Default User Account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2826"/>
-        <source>Installation Automation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="2838"/>
-        <source>Save automation file to disk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="2845"/>
-        <source>Automatically exit when complete and:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="2884"/>
-        <source>Reboot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="2894"/>
-        <source>Shutdown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="2952"/>
+        <location filename="../meinstall.ui" line="2752"/>
         <source>Installation complete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="3059"/>
+        <location filename="../meinstall.ui" line="2859"/>
         <source>Alt+N</source>
         <translation>Alt+N</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="3109"/>
+        <location filename="../meinstall.ui" line="2883"/>
         <source>Close</source>
         <translation>Schließen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="150"/>
+        <location filename="../meinstall.ui" line="125"/>
         <source>Terms of Use</source>
         <translation>Nutzungsbedingungen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="38"/>
+        <location filename="../meinstall.ui" line="32"/>
         <source>Installation in progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="216"/>
         <source>ModelText</source>
-        <translation>ModelText</translation>
+        <translation type="vanished">ModelText</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="236"/>
+        <location filename="../meinstall.ui" line="180"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="243"/>
+        <location filename="../meinstall.ui" line="150"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variante:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="250"/>
         <source>LayoutText</source>
-        <translation>LayoutText</translation>
+        <translation type="vanished">LayoutText</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="257"/>
         <source>VariantText</source>
-        <translation>VariantText</translation>
+        <translation type="vanished">VariantText</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="264"/>
+        <location filename="../meinstall.ui" line="173"/>
         <source>Change Keyboard Settings</source>
         <translation>Änderung der Tastatur-Einstellungen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="271"/>
+        <location filename="../meinstall.ui" line="143"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Modell:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="278"/>
+        <location filename="../meinstall.ui" line="136"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tastatur-Einstellungen&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
@@ -1215,12 +1189,12 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">1b. Partitionierung der Festplatte ändern (optional)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="341"/>
+        <location filename="../meinstall.ui" line="279"/>
         <source>Modify partitions:</source>
         <translation>Partitionen verändern:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="357"/>
+        <location filename="../meinstall.ui" line="295"/>
         <source>Run partition tool...</source>
         <translation>Partitionswerkzeug starten...</translation>
     </message>
@@ -1229,7 +1203,7 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">1a. Laufwerk für die Installation auswählen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="403"/>
+        <location filename="../meinstall.ui" line="341"/>
         <source>Use disk:</source>
         <translation>Folgenden Datenträger benutzen:</translation>
     </message>
@@ -1238,47 +1212,47 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">1c. Art der Installation auswählen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="459"/>
+        <location filename="../meinstall.ui" line="397"/>
         <source>Auto-install using entire disk </source>
         <translation>Automatische Installation auf der gesamten Festplatte</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="478"/>
-        <location filename="../meinstall.ui" line="1168"/>
+        <location filename="../meinstall.ui" line="416"/>
+        <location filename="../meinstall.ui" line="1106"/>
         <source>Encrypt</source>
         <translation>Verschlüsseln</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="491"/>
+        <location filename="../meinstall.ui" line="429"/>
         <source>Custom install on existing partitions</source>
         <translation>Benutzergeführte Installation auf existierenden Partitionen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="561"/>
+        <location filename="../meinstall.ui" line="499"/>
         <source>MB </source>
         <translation>MB </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="620"/>
-        <location filename="../meinstall.ui" line="1248"/>
+        <location filename="../meinstall.ui" line="558"/>
+        <location filename="../meinstall.ui" line="1186"/>
         <source>Confirm password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="627"/>
-        <location filename="../meinstall.ui" line="1241"/>
+        <location filename="../meinstall.ui" line="565"/>
+        <location filename="../meinstall.ui" line="1179"/>
         <source>Encryption password:</source>
         <translation>Verschlüsselungspasswort:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="659"/>
+        <location filename="../meinstall.ui" line="597"/>
         <source>Leave free space up to:</source>
         <translation>Platz freilassen bis max:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="678"/>
-        <location filename="../meinstall.ui" line="1255"/>
-        <location filename="../meinstall.ui" line="1300"/>
+        <location filename="../meinstall.ui" line="616"/>
+        <location filename="../meinstall.ui" line="1193"/>
+        <location filename="../meinstall.ui" line="1238"/>
         <source>Advanced encryption settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1287,12 +1261,12 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">2b. Voreinstellungen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="750"/>
+        <location filename="../meinstall.ui" line="688"/>
         <source>Preserve data in /home (if upgrading)</source>
         <translation>Daten im /home Verzeichnis beibehalten (bei Upgrade)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="769"/>
+        <location filename="../meinstall.ui" line="707"/>
         <source>Check for badblocks (takes longer)</source>
         <translation>Auf fehlerhafte Blöcke (badblocks) untersuchen (dauert länger)</translation>
     </message>
@@ -1301,238 +1275,238 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">2a. Partitonen wählen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="826"/>
-        <location filename="../meinstall.ui" line="1025"/>
+        <location filename="../meinstall.ui" line="764"/>
+        <location filename="../meinstall.ui" line="963"/>
         <source>ext4</source>
         <translation>ext4</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="831"/>
-        <location filename="../meinstall.ui" line="1030"/>
+        <location filename="../meinstall.ui" line="769"/>
+        <location filename="../meinstall.ui" line="968"/>
         <source>ext3</source>
         <translation>ext3</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="836"/>
-        <location filename="../meinstall.ui" line="1035"/>
+        <location filename="../meinstall.ui" line="774"/>
+        <location filename="../meinstall.ui" line="973"/>
         <source>ext2</source>
         <translation>ext2</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="841"/>
-        <location filename="../meinstall.ui" line="1040"/>
+        <location filename="../meinstall.ui" line="779"/>
+        <location filename="../meinstall.ui" line="978"/>
         <source>jfs</source>
         <translation>jfs</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="846"/>
-        <location filename="../meinstall.ui" line="1045"/>
+        <location filename="../meinstall.ui" line="784"/>
+        <location filename="../meinstall.ui" line="983"/>
         <source>xfs</source>
         <translation>xfs</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="851"/>
-        <location filename="../meinstall.ui" line="1050"/>
+        <location filename="../meinstall.ui" line="789"/>
+        <location filename="../meinstall.ui" line="988"/>
         <source>btrfs</source>
         <translation>btrfs</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="856"/>
-        <location filename="../meinstall.ui" line="1055"/>
+        <location filename="../meinstall.ui" line="794"/>
+        <location filename="../meinstall.ui" line="993"/>
         <source>btrfs-zlib</source>
         <translation>btrfs-zlib</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="861"/>
-        <location filename="../meinstall.ui" line="1060"/>
+        <location filename="../meinstall.ui" line="799"/>
+        <location filename="../meinstall.ui" line="998"/>
         <source>btrfs-lzo</source>
         <translation>btrfs-lzo</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="866"/>
-        <location filename="../meinstall.ui" line="1065"/>
+        <location filename="../meinstall.ui" line="804"/>
+        <location filename="../meinstall.ui" line="1003"/>
         <source>reiserfs</source>
         <translation>reiserfs</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="871"/>
-        <location filename="../meinstall.ui" line="1070"/>
+        <location filename="../meinstall.ui" line="809"/>
+        <location filename="../meinstall.ui" line="1008"/>
         <source>reiser4</source>
         <translation>Reiser4</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="892"/>
+        <location filename="../meinstall.ui" line="830"/>
         <source>boot:</source>
         <translation>boot:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="917"/>
+        <location filename="../meinstall.ui" line="855"/>
         <source>Label</source>
         <translation>Bezeichnung</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="936"/>
+        <location filename="../meinstall.ui" line="874"/>
         <source>root:</source>
         <translation>Root:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="952"/>
+        <location filename="../meinstall.ui" line="890"/>
         <source>swap:</source>
         <translation>Swap:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1010"/>
-        <location filename="../meinstall.ui" line="1179"/>
+        <location filename="../meinstall.ui" line="948"/>
+        <location filename="../meinstall.ui" line="1117"/>
         <source>root</source>
         <translation>root</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1084"/>
+        <location filename="../meinstall.ui" line="1022"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1100"/>
+        <location filename="../meinstall.ui" line="1038"/>
         <source>home:</source>
         <translation>Home:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1193"/>
+        <location filename="../meinstall.ui" line="1131"/>
         <source>Location</source>
         <translation>Speicherort</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1316"/>
+        <location filename="../meinstall.ui" line="1254"/>
         <source>SHA-512</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1321"/>
+        <location filename="../meinstall.ui" line="1259"/>
         <source>SHA-256</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1326"/>
+        <location filename="../meinstall.ui" line="1264"/>
         <source>Whirlpool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1331"/>
+        <location filename="../meinstall.ui" line="1269"/>
         <source>SHA-1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1336"/>
+        <location filename="../meinstall.ui" line="1274"/>
         <source>RIPEMD-160</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1353"/>
+        <location filename="../meinstall.ui" line="1291"/>
         <source>-bit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1372"/>
+        <location filename="../meinstall.ui" line="1310"/>
         <source> mS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1394"/>
+        <location filename="../meinstall.ui" line="1332"/>
         <source>LUKS key hash:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1410"/>
+        <location filename="../meinstall.ui" line="1348"/>
         <source>Key size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1436"/>
+        <location filename="../meinstall.ui" line="1374"/>
         <source>KDF round time:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1462"/>
+        <location filename="../meinstall.ui" line="1400"/>
         <source>Cipher:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1482"/>
+        <location filename="../meinstall.ui" line="1420"/>
         <source>Serpent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1487"/>
+        <location filename="../meinstall.ui" line="1425"/>
         <source>AES</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1492"/>
+        <location filename="../meinstall.ui" line="1430"/>
         <source>Twofish</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1497"/>
+        <location filename="../meinstall.ui" line="1435"/>
         <source>CAST6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1502"/>
+        <location filename="../meinstall.ui" line="1440"/>
         <source>Blowfish</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1519"/>
+        <location filename="../meinstall.ui" line="1457"/>
         <source>Benchmark...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1549"/>
+        <location filename="../meinstall.ui" line="1487"/>
         <source>ESSIV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1554"/>
+        <location filename="../meinstall.ui" line="1492"/>
         <source>Plain64</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1559"/>
+        <location filename="../meinstall.ui" line="1497"/>
         <source>Plain64BE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1564"/>
+        <location filename="../meinstall.ui" line="1502"/>
         <source>Plain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1569"/>
+        <location filename="../meinstall.ui" line="1507"/>
         <source>BENBI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1583"/>
+        <location filename="../meinstall.ui" line="1521"/>
         <source>IV generator:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1596"/>
+        <location filename="../meinstall.ui" line="1534"/>
         <source>Chain mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1616"/>
+        <location filename="../meinstall.ui" line="1554"/>
         <source>Kernel RNG:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1624"/>
+        <location filename="../meinstall.ui" line="1562"/>
         <source>random</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1629"/>
+        <location filename="../meinstall.ui" line="1567"/>
         <source>urandom</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1541,13 +1515,13 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">3. Installation läuft</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="81"/>
+        <location filename="../meinstall.ui" line="75"/>
         <source>Abort</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="84"/>
-        <location filename="../meinstall.ui" line="1858"/>
+        <location filename="../meinstall.ui" line="78"/>
+        <location filename="../meinstall.ui" line="1793"/>
         <source>Alt+A</source>
         <translation>Alt+A</translation>
     </message>
@@ -1556,7 +1530,7 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">Bereit zum installieren des antiX Linux Dateisystem</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1662"/>
+        <location filename="../meinstall.ui" line="1600"/>
         <source>Tips</source>
         <translation>Tipps</translation>
     </message>
@@ -1569,17 +1543,17 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">genutzte Partition:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1940"/>
+        <location filename="../meinstall.ui" line="1875"/>
         <source>Master Boot Record</source>
         <translation>Master Boot Record</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1946"/>
+        <location filename="../meinstall.ui" line="1881"/>
         <source>MBR</source>
         <translation>MBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1949"/>
+        <location filename="../meinstall.ui" line="1884"/>
         <source>Alt+B</source>
         <translation>Alt+B</translation>
     </message>
@@ -1588,52 +1562,52 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">Installiere auf:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1874"/>
+        <location filename="../meinstall.ui" line="1809"/>
         <source>System boot disk:</source>
         <translation>Systemstart-Laufwerk:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1792"/>
+        <location filename="../meinstall.ui" line="1730"/>
         <source>EFI System Partition</source>
         <translation>EFI-Systempartition</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1795"/>
+        <location filename="../meinstall.ui" line="1733"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1855"/>
+        <location filename="../meinstall.ui" line="1790"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>GRUB für Linux und Windows installieren</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1814"/>
+        <location filename="../meinstall.ui" line="1752"/>
         <source>Partition Boot Record</source>
         <translation>Partition Boot Record</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1817"/>
+        <location filename="../meinstall.ui" line="1755"/>
         <source>PBR</source>
         <translation>PBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1839"/>
+        <location filename="../meinstall.ui" line="1774"/>
         <source>Location to install on:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1990"/>
+        <location filename="../meinstall.ui" line="1916"/>
         <source>Common Services to Enable</source>
         <translation>Übliche Dienste einschalten</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2030"/>
+        <location filename="../meinstall.ui" line="1956"/>
         <source>Service</source>
         <translation>Dienst</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2035"/>
+        <location filename="../meinstall.ui" line="1961"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
@@ -1642,32 +1616,32 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">5. Computer Netzwerk Namen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2095"/>
+        <location filename="../meinstall.ui" line="2021"/>
         <source>Workgroup</source>
         <translation>Workgroup</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2108"/>
+        <location filename="../meinstall.ui" line="2034"/>
         <source>Workgroup:</source>
         <translation>Arbeitsgruppe:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2124"/>
+        <location filename="../meinstall.ui" line="2050"/>
         <source>SaMBa Server for MS Networking</source>
         <translation>Samba Server für MS-Netzwerk</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2140"/>
+        <location filename="../meinstall.ui" line="2066"/>
         <source>example.dom</source>
         <translation>beispiel.dom</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2153"/>
+        <location filename="../meinstall.ui" line="2079"/>
         <source>Computer domain:</source>
         <translation>Computer-Domain:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2185"/>
+        <location filename="../meinstall.ui" line="2111"/>
         <source>Computer name:</source>
         <translation>Computername:</translation>
     </message>
@@ -1676,12 +1650,12 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">6d. Einstellungen von Diensten (fortgeschritten) </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2273"/>
+        <location filename="../meinstall.ui" line="2199"/>
         <source>Adjust which services should run at startup</source>
         <translation>Wählen Sie die Dienste, die beim Start laufen sollen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2276"/>
+        <location filename="../meinstall.ui" line="2202"/>
         <source>View</source>
         <translation>Anzeigen</translation>
     </message>
@@ -1690,12 +1664,12 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">6b. Uhrzeit einstellen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2333"/>
+        <location filename="../meinstall.ui" line="2259"/>
         <source>Format:</source>
         <translation>Zeitformat:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2350"/>
+        <location filename="../meinstall.ui" line="2276"/>
         <source>System clock uses LOCAL</source>
         <translation>Systemuhr läuft in lokaler Zeit LOCAL</translation>
     </message>
@@ -1704,7 +1678,7 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">6a. Standardlokalisierung</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2409"/>
+        <location filename="../meinstall.ui" line="2335"/>
         <source>Locale:</source>
         <translation>Sprache:</translation>
     </message>
@@ -1713,7 +1687,7 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">6c. Zeitzone einstellen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2450"/>
+        <location filename="../meinstall.ui" line="2376"/>
         <source>Timezone:</source>
         <translation>Zeitzone:</translation>
     </message>
@@ -1722,12 +1696,12 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">7b. Root (Administrator) Konto</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2595"/>
+        <location filename="../meinstall.ui" line="2521"/>
         <source>Confirm root password:</source>
         <translation>root-Passwort bestätigen:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2611"/>
+        <location filename="../meinstall.ui" line="2537"/>
         <source>Root password:</source>
         <translation>root-Passwort</translation>
     </message>
@@ -1736,57 +1710,57 @@ Zurück zu Schritt 1.</translation>
         <translation type="vanished">7a. Standard-Benutzerkonto</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2710"/>
+        <location filename="../meinstall.ui" line="2636"/>
         <source>username</source>
         <translation>Benutzername</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2723"/>
+        <location filename="../meinstall.ui" line="2649"/>
         <source>Confirm user password:</source>
         <translation>Benutzerpasswort bestätigen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2739"/>
+        <location filename="../meinstall.ui" line="2665"/>
         <source>Default user password:</source>
         <translation>Standard-Benutzerpasswort</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2755"/>
+        <location filename="../meinstall.ui" line="2681"/>
         <source>Default user login name:</source>
         <translation>Standard-Benutzername</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2774"/>
+        <location filename="../meinstall.ui" line="2700"/>
         <source>Autologin</source>
         <translation>Automatisches Login</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2787"/>
+        <location filename="../meinstall.ui" line="2713"/>
         <source>Show passwords</source>
         <translation>Passwörter zeigen</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2800"/>
+        <location filename="../meinstall.ui" line="2726"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
         <translation>Modifikationen, die im jetzt laufenden Live-System vorgenommen wurden, bleiben in der Ziel-Installation erhalten.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2803"/>
+        <location filename="../meinstall.ui" line="2729"/>
         <source>Save live desktop changes</source>
         <translation>Änderungen des Live-Desktop speichern</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2958"/>
+        <location filename="../meinstall.ui" line="2758"/>
         <source>To use the new installation, reboot without the installation media.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2965"/>
+        <location filename="../meinstall.ui" line="2765"/>
         <source>Automatically reboot the system when the installer is closed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2984"/>
+        <location filename="../meinstall.ui" line="2784"/>
         <source>Reminders</source>
         <translation>Erinnerungen</translation>
     </message>
@@ -1799,7 +1773,7 @@ Zurück zu Schritt 1.</translation>
         <translation>antiX Linux Installation</translation>
     </message>
     <message>
-        <location filename="../memain.ui" line="72"/>
+        <location filename="../memain.ui" line="60"/>
         <source>Help</source>
         <translation>Hilfe</translation>
     </message>
@@ -1807,7 +1781,7 @@ Zurück zu Schritt 1.</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../app.cpp" line="74"/>
+        <location filename="../app.cpp" line="75"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -1816,7 +1790,7 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Falls möglich, beenden Sie es bitte, oder führen &apos;pkill minstall&apos; im Terminal aus.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="82"/>
+        <location filename="../app.cpp" line="83"/>
         <source>You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot unless you select Legacy Boot or similar at restart.
 We recommend you quit now and restart in Legacy Boot
 
@@ -1827,17 +1801,17 @@ Wir empfehlen jetzt zu beenden und im Legacy Boot Modus neu zu starten
 Mit der Installation fortfahren?</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="86"/>
+        <location filename="../app.cpp" line="87"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="86"/>
+        <location filename="../app.cpp" line="87"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="99"/>
+        <location filename="../app.cpp" line="102"/>
         <source>You must run this app as root.</source>
         <translation>Diese Anwendung muss als Benutzer &quot;root&quot; ausgeführt werden.</translation>
     </message>
