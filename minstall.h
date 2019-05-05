@@ -232,6 +232,9 @@ private:
     QStringList listBootPart;
     bool haveSamba = false;
     bool haveSnapshotUserAccounts = false;
+    enum OldHomeAction {
+        OldHomeUse, OldHomeSave, OldHomeDelete
+    } oldHomeAction;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
