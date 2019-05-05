@@ -1217,6 +1217,10 @@ bool MInstall::makeDefaultPartitions()
         return false;
     }
 
+    // formatting takes a while, allow the user to enter other options
+    buildBootLists();
+    gotoPage(5);
+
     // if encrypting, set up LUKS containers for root and swap
     if (isRootEncrypted) {
         updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
@@ -1228,10 +1232,6 @@ bool MInstall::makeDefaultPartitions()
             swapdev="/dev/mapper/swapfs";
         }
     }
-
-    // formatting takes a while, allow the user to enter other options
-    buildBootLists();
-    gotoPage(5);
 
     updateStatus(tr("Formatting swap partition"), ++prog);
     csleep(1000);
@@ -1336,16 +1336,6 @@ bool MInstall::makeChosenPartitions()
 
     updateStatus(tr("Preparing required partitions"), ++prog);
 
-    // unmount /home part if it exists
-    if (homedev != rootdev) {
-        // has homedev
-        if (shell.run("pumount " + homedev) != 0) {
-            // error
-            if (shell.run("swapoff " + homedev) != 0) {
-            }
-        }
-    }
-
     // unmount root part
     if (shell.run("pumount " + rootdev) != 0) {
         // error
@@ -1353,53 +1343,20 @@ bool MInstall::makeChosenPartitions()
         }
     }
 
-    //if no swap is chosen do nothing
-    if (swapdev != "/dev/none") {
-        //if swap exists and not encrypted, do nothing
-        //check swap fstype
-        cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
-        if (shell.run(cmd) != 0 || checkBoxEncryptSwap->isChecked()) {
-            if (shell.run("swapoff " + swapdev) != 0) {
-                if (shell.run("pumount " + swapdev) != 0) {
-                }
-            }
-            updateStatus(tr("Formatting swap partition"), ++prog);
-            // always set type
-            if (gpt) {
-                cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:8200").arg(swapsplit[0]).arg(swapsplit[1]);
-            } else {
-                cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 82").arg(swapsplit[0]).arg(swapsplit[1]);
-            }
-            shell.run(cmd);
-            csleep(1000);
-
-            if (checkBoxEncryptSwap->isChecked()) {
-                updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-                if (!makeLuksPartition(swapdev, "swapfs", FDEpassCust->text().toUtf8())) {
-                    qDebug() << "could not make swap LUKS partition";
-                    return false;
-                } else {
-                    swapdev ="/dev/mapper/swapfs";
-                }
-            }
-
-            if (!makeSwapPartition(swapdev)) {
-                return false;
-            }
-            // enable the new swap partition asap
-            csleep(1000);
-
-            shell.run("make-fstab -s");
-            shell.run("/sbin/swapon " + swapdev);
-        }
-    }
-
-    bool formatRoot = false, formatBoot = false;
+    bool formatRoot = false, formatBoot = false, formatSwap = false;
     // command to set the partition type
     if (gpt) {
         cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
     } else {
         cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
+    }
+    // maybe format swap
+    if (swapdev != "/dev/none") {
+        if (shell.run("swapoff " + swapdev) != 0) {
+            shell.run("pumount " + swapdev);
+        }
+        shell.run(cmd.arg(rootsplit[0], rootsplit[1]));
+        formatSwap = true;
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (!(saveHomeCheck->isChecked() && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
@@ -1412,19 +1369,51 @@ bool MInstall::makeChosenPartitions()
         formatBoot = true;
     }
     // prepare home if not being preserved, and on a different partition
-    if (!(saveHomeCheck->isChecked()) && (homedev != rootdev)) {
-        shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
+    if (homedev != rootdev) {
+        if (shell.run("pumount " + homedev) != 0) {
+            shell.run("swapoff " + homedev);
+        }
+        if (!(saveHomeCheck->isChecked())) {
+            shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
+        }
     }
+
     csleep(1000);
 
     // allow the user to enter other options
     buildBootLists();
     gotoPage(5);
 
+    //if no swap is chosen do nothing
+    if (formatSwap) {
+        //if swap exists and not encrypted, do nothing
+        //check swap fstype
+        cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
+        if (shell.run(cmd) != 0 || checkBoxEncryptSwap->isChecked()) {
+            if (checkBoxEncryptSwap->isChecked()) {
+                updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
+                if (!makeLuksPartition(swapdev, "swapfs", FDEpassCust->text().toUtf8())) {
+                    qDebug() << "could not make swap LUKS partition";
+                    return false;
+                } else {
+                    swapdev ="/dev/mapper/swapfs";
+                }
+            }
+
+            updateStatus(tr("Formatting swap partition"), ++prog);
+            if (!makeSwapPartition(swapdev)) {
+                return false;
+            }
+            // enable the new swap partition asap
+            csleep(1000);
+
+            shell.run("make-fstab -s");
+            shell.run("/sbin/swapon " + swapdev);
+        }
+    }
+
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (formatRoot) {
-        updateStatus(tr("Formatting the / (root) partition"), ++prog);
-
         if (checkBoxEncryptRoot->isChecked()) {
             updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
             if (!makeLuksPartition(rootdev, "rootfs", FDEpassCust->text().toUtf8())) {
@@ -1434,6 +1423,8 @@ bool MInstall::makeChosenPartitions()
                 rootdev="/dev/mapper/rootfs";
             }
         }
+
+        updateStatus(tr("Formatting the / (root) partition"), ++prog);
         if (!makeLinuxPartition(rootdev, root_type, badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
