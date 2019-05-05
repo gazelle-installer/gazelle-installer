@@ -1890,65 +1890,37 @@ bool MInstall::setUserName()
     if (args.contains("--nocopy") || args.contains("-n")) {
         return true;
     }
-    int ans;
     DIR *dir;
-    QString msg, cmd;
+    QString cmd;
 
     // see if user directory already exists
     QString dpath = QString("/mnt/antiX/home/%1").arg(userNameEdit->text());
     if ((dir = opendir(dpath.toUtf8())) != NULL) {
         // already exists
         closedir(dir);
-        msg = tr("The home directory for %1 already exists.Would you like to reuse the old home directory?").arg(userNameEdit->text());
-        ans = QMessageBox::information(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-        if (ans != 0) {
-            // don't reuse -- maybe save the old home
-            msg = tr("Would you like to save the old home directory\nand create a new home directory?");
-            ans = QMessageBox::information(this, QString::null, msg,
-                                           tr("Yes"), tr("No"));
-            if (ans == 0) {
-                // save the old directory
-                cmd = QString("mv -f %1 %2.001").arg(dpath).arg(dpath);
-                if (shell.run(cmd) != 0) {
-                    cmd = QString("mv -f %1 %2.002").arg(dpath).arg(dpath);
-                    if (shell.run(cmd) != 0) {
-                        cmd = QString("mv -f %1 %2.003").arg(dpath).arg(dpath);
-                        if (shell.run(cmd) != 0) {
-                            cmd = QString("mv -f %1 %2.004").arg(dpath).arg(dpath);
-                            if (shell.run(cmd) != 0) {
-                                cmd = QString("mv -f %1 %2.005").arg(dpath).arg(dpath);
-                                if (shell.run(cmd) != 0) {
-                                    QMessageBox::critical(this, QString::null,
-                                                          tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                // don't save and don't reuse -- delete?
-                msg = tr("Would you like to delete the old home directory for %1?").arg(userNameEdit->text());
-                ans = QMessageBox::information(this, QString::null, msg,
-                                               tr("Yes"), tr("No"));
-                if (ans == 0) {
-                    // delete the directory
-                    cmd = QString("rm -f %1").arg(dpath);
-                    if (shell.run(cmd) != 0) {
-                        QMessageBox::critical(this, QString::null,
-                                              tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
-                        return false;
-                    }
-                } else {
-                    // don't save, reuse or delete -- can't proceed
-                    QMessageBox::critical(this, QString::null,
-                                          tr("You've chosen to not use, save or delete the old home directory.\nBefore proceeding, you'll have to select a different username."));
-                    return false;
-                }
+        if (oldHomeAction == OldHomeSave) {
+            // save the old directory
+            int rexit = -1;
+            cmd = QString("mv -f %1 %1.00%2").arg(dpath);
+            for (int ixi = 1; ixi < 10 && rexit != 0; ++ixi) {
+                rexit = shell.run(cmd.arg(ixi));
+            }
+            if (rexit != 0) {
+                QMessageBox::critical(this, QString::null,
+                                      tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
+                return false;
+            }
+        } else if (oldHomeAction == OldHomeDelete) {
+            // delete the directory
+            cmd = QString("rm -rf %1").arg(dpath);
+            if (shell.run(cmd) != 0) {
+                QMessageBox::critical(this, QString::null,
+                                      tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
+                return false;
             }
         }
     }
+
     if ((dir = opendir(dpath.toUtf8())) == NULL) {
         // dir does not exist, must create it
         // copy skel to demo
@@ -2114,6 +2086,47 @@ bool MInstall::validateUserInfo()
                               tr("The root password entries do not match.\n"
                                  "Please try again."));
         return false;
+    }
+
+    // Check for pre-existing /home directory
+    // see if user directory already exists
+    QString dpath = QString("/mnt/antiX/home/%1").arg(userNameEdit->text());
+    DIR *dir;
+    if ((dir = opendir(dpath.toUtf8())) != NULL) {
+        // already exists
+        closedir(dir);
+        int ans;
+        QString msg;
+        msg = tr("The home directory for %1 already exists.Would you like to reuse the old home directory?").arg(userNameEdit->text());
+        ans = QMessageBox::information(this, QString::null, msg,
+                                       tr("Yes"), tr("No"));
+        if (ans == 0) {
+            // use the old home
+            oldHomeAction = OldHomeUse;
+        } else {
+            // don't reuse -- maybe save the old home
+            msg = tr("Would you like to save the old home directory\nand create a new home directory?");
+            ans = QMessageBox::information(this, QString::null, msg,
+                                           tr("Yes"), tr("No"));
+            if (ans == 0) {
+                // save the old directory
+                oldHomeAction = OldHomeSave;
+            } else {
+                // don't save and don't reuse -- delete?
+                msg = tr("Would you like to delete the old home directory for %1?").arg(userNameEdit->text());
+                ans = QMessageBox::information(this, QString::null, msg,
+                                               tr("Yes"), tr("No"));
+                if (ans == 0) {
+                    // delete the directory
+                    oldHomeAction = OldHomeDelete;
+                } else {
+                    // don't save, reuse or delete -- can't proceed
+                    QMessageBox::critical(this, QString::null,
+                                          tr("You've chosen to not use, save or delete the old home directory.\nBefore proceeding, you'll have to select a different username."));
+                    return false;
+                }
+            }
+        }
     }
     return true;
 }
