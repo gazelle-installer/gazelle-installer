@@ -389,18 +389,22 @@ bool MInstall::processNextPhase()
         if (!checkDisk()) return false;
         phase = 1; // installation.
         prepareToInstall();
-        // the format* parameters are passed by reference and modified by make*Partitions()
-        bool formatRoot = false, formatBoot = false, formatSwap = false, formatHome = false;
+        // these parameters are passed by reference and modified by make*Partitions()
+        bool formatBoot = false, formatSwap = false;
+        QByteArray encPass;
+        QString rootType, homeType;
         if (entireDiskButton->isChecked()) {
-            formatRoot = true;
+            rootType = "ext4";
             formatSwap = true;
-            if (!makeDefaultPartitions(formatBoot, formatHome)) {
+            encPass = FDEpassword->text().toUtf8();
+            if (!makeDefaultPartitions(formatBoot)) {
                 // failed
                 goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
                 return false;
             }
         } else {
-            if (!makeChosenPartitions(formatRoot, formatBoot, formatSwap, formatHome)) {
+            encPass = FDEpassCust->text().toUtf8();
+            if (!makeChosenPartitions(rootType, homeType, formatBoot, formatSwap)) {
                 // failed
                 goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
                 return false;
@@ -411,7 +415,7 @@ bool MInstall::processNextPhase()
         buildBootLists();
         gotoPage(5);
 
-        if (!formatPartitions(formatRoot, formatBoot, formatSwap, formatHome)) return false;
+        if (!formatPartitions(encPass, rootType, homeType, formatBoot, formatSwap)) return false;
         csleep(1000);
         if (!installLinux()) return false;
         if (!haveSysConfig) {
@@ -777,7 +781,7 @@ bool MInstall::makeEsp(const QString &drv, int size)
     return true;
 }
 
-bool MInstall::formatPartitions(bool formatRoot, bool formatBoot, bool formatSwap, bool formatHome)
+bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot, bool formatSwap)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -791,7 +795,7 @@ bool MInstall::formatPartitions(bool formatRoot, bool formatBoot, bool formatSwa
     if (formatSwap) {
         if (isSwapEncrypted) {
             updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(swapdev, "swapfs", FDEpassword->text().toUtf8())) return false;
+            if (!makeLuksPartition(swapdev, "swapfs", encPass)) return false;
             swapdev = "/dev/mapper/swapfs";
         }
         updateStatus(tr("Formatting swap partition"), ++prog);
@@ -804,14 +808,14 @@ bool MInstall::formatPartitions(bool formatRoot, bool formatBoot, bool formatSwa
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
-    if (formatRoot) {
+    if (!rootType.isEmpty()) {
         if (isRootEncrypted) {
             updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(rootdev, "rootfs", FDEpassword->text().toUtf8())) return false;
+            if (!makeLuksPartition(rootdev, "rootfs", encPass)) return false;
             rootdev="/dev/mapper/rootfs";
         }
         updateStatus(tr("Formatting the / (root) partition"), ++prog);
-        if (!makeLinuxPartition(rootdev, rootTypeCombo->currentText(), badblocksCheck->isChecked(), rootLabelEdit->text())) {
+        if (!makeLinuxPartition(rootdev, rootType, badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
         csleep(1000);
@@ -829,15 +833,15 @@ bool MInstall::formatPartitions(bool formatRoot, bool formatBoot, bool formatSwa
     }
 
     // maybe format home
-    if (formatHome) {
+    if (!homeType.isEmpty()) {
         if (isHomeEncrypted) {
             updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(homedev, "homefs", FDEpassCust->text().toUtf8())) return false;
+            if (!makeLuksPartition(homedev, "homefs", encPass)) return false;
             homedev = "/dev/mapper/homefs";
         }
 
         updateStatus(tr("Formatting the /home partition"), ++prog);
-        if (!makeLinuxPartition(homedev, homeTypeCombo->currentText().toUtf8(), badblocksCheck->isChecked(), homeLabelEdit->text())) {
+        if (!makeLinuxPartition(homedev, homeType, badblocksCheck->isChecked(), homeLabelEdit->text())) {
             return false;
         }
         shell.run("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1");
@@ -857,7 +861,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
+    QString homedev = homeDevicePreserve;
     if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
         home_mntops = "defaults,noatime";
     } else {
@@ -1136,7 +1140,7 @@ bool MInstall::validateChosenPartitions()
 ///////////////////////////////////////////////////////////////////////////
 // in this case use all of the drive
 
-bool MInstall::makeDefaultPartitions(bool &formatBoot, bool &formatHome)
+bool MInstall::makeDefaultPartitions(bool &formatBoot)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -1309,30 +1313,17 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot, bool &formatHome)
         }
     }
 
-    csleep(1000);
-
-    indexPartInfoDisk = -1; // invalidate existing partition info
-    updatePartInfo();
-    rootCombo->setCurrentIndex(1);
-    swapCombo->setCurrentIndex(1);
-    homeCombo->setCurrentIndex(0);
-    bootCombo->setCurrentIndex(0);
-    rootTypeCombo->setCurrentText("ext4");
     homeDevicePreserve = rootDevicePreserve;
-    formatHome = false;
-
     return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
 
-bool MInstall::makeChosenPartitions(bool &formatRoot, bool &formatBoot, bool &formatSwap, bool &formatHome)
+bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot, bool &formatSwap)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    QString root_type;
-    QString home_type;
     QString cmd;
 
     if (checkBoxEncryptRoot->isChecked()) {
@@ -1341,10 +1332,6 @@ bool MInstall::makeChosenPartitions(bool &formatRoot, bool &formatBoot, bool &fo
 
     QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0).trimmed();
     bool gpt = isGpt(drv);
-
-    // get config
-    root_type = rootTypeCombo->currentText().toUtf8();
-    home_type = homeTypeCombo->currentText().toUtf8();
 
     // Root
     QString rootdev = rootDevicePreserve;
@@ -1394,7 +1381,7 @@ bool MInstall::makeChosenPartitions(bool &formatRoot, bool &formatBoot, bool &fo
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (!(saveHomeCheck->isChecked() && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
         shell.run(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
-        formatRoot = true;
+        rootType = rootTypeCombo->currentText().toUtf8();
     }
     // format and mount /boot if different than root
     if (bootCombo->currentText() != "root") {
@@ -1408,7 +1395,7 @@ bool MInstall::makeChosenPartitions(bool &formatRoot, bool &formatBoot, bool &fo
         }
         if (!(saveHomeCheck->isChecked())) {
             shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
-            formatHome = true;
+            homeType = homeTypeCombo->currentText().toUtf8();
         }
     }
     return true;
@@ -1417,16 +1404,8 @@ bool MInstall::makeChosenPartitions(bool &formatRoot, bool &formatBoot, bool &fo
 bool MInstall::installLinux()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    QString rootdev;
+    QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
     if (phase < 0) return false;
-
-    //use /dev/mapper designations if ecryption is checked
-    if (isRootEncrypted) {
-        rootdev = "/dev/mapper/rootfs";
-    } else {
-        QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
-        QString rootdev = "/dev/" + rootCombo->currentText().section(" -", 0, 0).trimmed();
-    }
 
     // maybe root was formatted or using --sync option
     if (isRootFormatted || args.contains("--sync") || args.contains("-s")) {
@@ -1643,22 +1622,17 @@ bool MInstall::installLoader()
     }
 
     //add switch to change root partition info
-    QString rootpart;
-    if (isRootEncrypted) {
-        rootpart = "mapper/rootfs";
-    } else {
-        rootpart = rootCombo->currentText().section(" ", 0, 0);
-    }
     QString boot = grubBootCombo->currentText().section(" ", 0, 0).trimmed();
 
     if (grubMbrButton->isChecked()) {
-        QString drive = rootpart;
-        QString part_num = rootpart;
+        QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
+        QString drive = rootdev;
+        QString part_num = rootdev;
         part_num.remove(QRegularExpression("\\D+\\d*\\D+")); // remove the non-digit part to get the number of the root partition
         drive.remove(QRegularExpression("\\d*$|p\\d*$"));    // remove partition number to get the root drive
-        if (!isGpt("/dev/" + drive)) {
-            qDebug() << "parted -s /dev/" + drive + " set " + part_num + " boot on";
-            runCmd("parted -s /dev/" + drive + " set " + part_num + " boot on");
+        if (!isGpt(drive)) {
+            qDebug() << "parted -s " + drive + " set " + part_num + " boot on";
+            runCmd("parted -s " + drive + " set " + part_num + " boot on");
         }
     }
 
@@ -2193,17 +2167,9 @@ void MInstall::setLocale()
         shell.run("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime");
     }
     shell.run("hwclock --hctosys");
-    QString rootdev, homedev;
-    if (isRootEncrypted) {
-        rootdev = "/dev/mapper/rootfs";
-    } else {
-        rootdev = "/dev/" + rootCombo->currentText().section(" ", 0, 0);
-    }
+    QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
+    QString homedev = (isHomeEncrypted ? "/dev/mapper/homefs" : homeDevicePreserve);
 
-    homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
-    if (isHomeEncrypted) {
-        homedev = "/dev/mapper/homefs";
-    }
     shell.run("umount -R /mnt/antiX");
     mountPartition(rootdev, "/mnt/antiX", root_mntops);
     if (homedev != "/dev/root" && homedev != rootdev) {
@@ -2807,7 +2773,6 @@ void MInstall::updatePartInfo()
     QStringList partitions = getCmdOuts(QString("partition-info -n --exclude=" + exclude + "swap --min-size=" + MIN_ROOT_DEVICE_SIZE + " %1").arg(drv));
     rootCombo->clear();
     if (partitions.size() > 0) {
-        rootCombo->addItem(""); // add an empty item to make sure nothing is selected by default
         rootCombo->addItems(partitions);
     } else {
         rootCombo->addItem("none");
