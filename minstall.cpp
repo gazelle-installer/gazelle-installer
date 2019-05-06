@@ -2631,7 +2631,10 @@ void MInstall::pageDisplayed(int next)
 
     default:
         // case 0 or any other
-        ((MMain *)mmn)->setHelpText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME));
+        ((MMain *)mmn)->setHelpText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n " + tr("<p><b>Support %1</b><br/>"
+                                                                                                  "%1 is supported by people like you. Some help others at the "
+                                                                                                  "support forum - %2 - or translate help files into different "
+                                                                                                  "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
         nextButton->setDefault(true);
         break;
     }
