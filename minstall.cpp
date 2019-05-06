@@ -1355,7 +1355,7 @@ bool MInstall::makeChosenPartitions()
         if (shell.run("swapoff " + swapdev) != 0) {
             shell.run("pumount " + swapdev);
         }
-        shell.run(cmd.arg(rootsplit[0], rootsplit[1]));
+        shell.run(cmd.arg(swapsplit[0], swapsplit[1]));
         formatSwap = true;
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
