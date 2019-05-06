@@ -389,20 +389,29 @@ bool MInstall::processNextPhase()
         if (!checkDisk()) return false;
         phase = 1; // installation.
         prepareToInstall();
+        // the format* parameters are passed by reference and modified by make*Partitions()
+        bool formatRoot = false, formatBoot = false, formatSwap = false, formatHome = false;
         if (entireDiskButton->isChecked()) {
-            if (!makeDefaultPartitions()) {
+            formatRoot = true;
+            formatSwap = true;
+            if (!makeDefaultPartitions(formatBoot, formatHome)) {
                 // failed
                 goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
                 return false;
             }
         } else {
-            if (!makeChosenPartitions()) {
+            if (!makeChosenPartitions(formatRoot, formatBoot, formatSwap, formatHome)) {
                 // failed
                 goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
                 return false;
             }
         }
+        // allow the user to enter other options
+        csleep(1000);
+        buildBootLists();
+        gotoPage(5);
 
+        if (!formatPartitions(formatRoot, formatBoot, formatSwap, formatHome)) return false;
         csleep(1000);
         if (!installLinux()) return false;
         if (!haveSysConfig) {
@@ -768,6 +777,82 @@ bool MInstall::makeEsp(const QString &drv, int size)
     return true;
 }
 
+bool MInstall::formatPartitions(bool formatRoot, bool formatBoot, bool formatSwap, bool formatHome)
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
+    int prog = progressBar->value();
+
+    QString rootdev = rootDevicePreserve;
+    QString swapdev = swapDevicePreserve;
+    QString homedev = homeDevicePreserve;
+
+    //if no swap is chosen do nothing
+    if (formatSwap) {
+        if (isSwapEncrypted) {
+            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
+            if (!makeLuksPartition(swapdev, "swapfs", FDEpassword->text().toUtf8())) return false;
+            swapdev = "/dev/mapper/swapfs";
+        }
+        updateStatus(tr("Formatting swap partition"), ++prog);
+        if (!makeSwapPartition(swapdev)) return false;
+        // enable the new swap partition asap
+        shell.run("sync");
+        csleep(500);
+        shell.run("make-fstab -s");
+        shell.run("/sbin/swapon " + swapdev);
+    }
+
+    // maybe format root (if not saving /home on root), or if using --sync option
+    if (formatRoot) {
+        if (isRootEncrypted) {
+            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
+            if (!makeLuksPartition(rootdev, "rootfs", FDEpassword->text().toUtf8())) return false;
+            rootdev="/dev/mapper/rootfs";
+        }
+        updateStatus(tr("Formatting the / (root) partition"), ++prog);
+        if (!makeLinuxPartition(rootdev, rootTypeCombo->currentText(), badblocksCheck->isChecked(), rootLabelEdit->text())) {
+            return false;
+        }
+        csleep(1000);
+        isRootFormatted = true;
+        root_mntops = "defaults,noatime";
+    }
+    if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) return false;
+
+    // format and mount /boot if different than root
+    if (formatBoot) {
+        updateStatus(tr("Formatting boot partition"), ++prog);
+        if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
+            return false;
+        }
+    }
+
+    // maybe format home
+    if (formatHome) {
+        if (isHomeEncrypted) {
+            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
+            if (!makeLuksPartition(homedev, "homefs", FDEpassCust->text().toUtf8())) return false;
+            homedev = "/dev/mapper/homefs";
+        }
+
+        updateStatus(tr("Formatting the /home partition"), ++prog);
+        if (!makeLinuxPartition(homedev, homeTypeCombo->currentText().toUtf8(), badblocksCheck->isChecked(), homeLabelEdit->text())) {
+            return false;
+        }
+        shell.run("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1");
+        csleep(1000);
+        isHomeFormatted = true;
+    }
+    mkdir("/mnt/antiX/home", 0755);
+    if (homedev != rootDevicePreserve) {
+        // not on root
+        updateStatus(tr("Mounting the /home partition"), ++prog);
+        if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) return false;
+    }
+    return true;
+}
+
 bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -1051,14 +1136,13 @@ bool MInstall::validateChosenPartitions()
 ///////////////////////////////////////////////////////////////////////////
 // in this case use all of the drive
 
-bool MInstall::makeDefaultPartitions()
+bool MInstall::makeDefaultPartitions(bool &formatBoot, bool &formatHome)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
     int prog = 0;
 
     QString mmcnvmepartdesignator;
-    mmcnvmepartdesignator.clear();
 
     QString rootdev, swapdev;
     QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
@@ -1154,8 +1238,6 @@ bool MInstall::makeDefaultPartitions()
             swapdev = drv + mmcnvmepartdesignator + "3";
             updateStatus(tr("Formatting EFI System Partition (ESP)"), ++prog);
         }
-        rootDevicePreserve = rootdev;
-        swapDevicePreserve = swapdev;
 
         if (!makeEsp(drv, esp_size)) {
             return false;
@@ -1179,9 +1261,9 @@ bool MInstall::makeDefaultPartitions()
             rootdev = drv + mmcnvmepartdesignator + "1";
             swapdev = drv + mmcnvmepartdesignator + "2";
         }
-        rootDevicePreserve = rootdev;
-        swapDevicePreserve = swapdev;
     }
+    rootDevicePreserve = rootdev;
+    swapDevicePreserve = swapdev;
 
     // create root partition
     QString start;
@@ -1200,6 +1282,7 @@ bool MInstall::makeDefaultPartitions()
             return false;
         }
         start = QString::number(end_boot) + "MiB ";
+        formatBoot = true;
     }
 
     // if encrypting, boot_size=512, or 0 if not  .  start is set to end_boot if encrypting
@@ -1217,47 +1300,6 @@ bool MInstall::makeDefaultPartitions()
         return false;
     }
 
-    // formatting takes a while, allow the user to enter other options
-    buildBootLists();
-    gotoPage(5);
-
-    // if encrypting, set up LUKS containers for root and swap
-    if (isRootEncrypted) {
-        updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-        if (!makeLuksPartition(rootdev, "rootfs", FDEpassword->text().toUtf8()) || !makeLuksPartition(swapdev, "swapfs", FDEpassword->text().toUtf8())) {
-            qDebug() << "could not make LUKS partitions";
-            return false;
-        } else {
-            rootdev="/dev/mapper/rootfs";
-            swapdev="/dev/mapper/swapfs";
-        }
-    }
-
-    updateStatus(tr("Formatting swap partition"), ++prog);
-    csleep(1000);
-    if (!makeSwapPartition(swapdev)) {
-        return false;
-    }
-    csleep(1000);
-    shell.run("make-fstab -s");
-    shell.run("/sbin/swapon -a 2>&1");
-
-    // format /boot filesystem if encrypting
-    if (isRootEncrypted) {
-        updateStatus(tr("Formatting boot partition"), ++prog);
-        if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
-            return false;
-        }
-    }
-
-    updateStatus(tr("Formatting root partition"), ++prog);
-    if (!makeLinuxPartition(rootdev, "ext4", false, rootLabelEdit->text())) {
-        return false;
-    } else {
-        root_mntops = "defaults,noatime";
-        isRootFormatted = true;
-    }
-
     // if UEFI is not detected, set flags based on GPT. Else don't set a flag...done by makeESP.
     if (!uefi) { // set appropriate flags
         if (isGpt(drv)) {
@@ -1269,21 +1311,15 @@ bool MInstall::makeDefaultPartitions()
 
     csleep(1000);
 
-    // mount partitions
-    if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
-        return false;
-    }
-
-    // on root, make sure it exists
-    csleep(1000);
-    mkdir("/mnt/antiX/home", 0755);
-
     indexPartInfoDisk = -1; // invalidate existing partition info
     updatePartInfo();
     rootCombo->setCurrentIndex(1);
     swapCombo->setCurrentIndex(1);
     homeCombo->setCurrentIndex(0);
     bootCombo->setCurrentIndex(0);
+    rootTypeCombo->setCurrentText("ext4");
+    homeDevicePreserve = rootDevicePreserve;
+    formatHome = false;
 
     return true;
 }
@@ -1291,14 +1327,12 @@ bool MInstall::makeDefaultPartitions()
 ///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
 
-bool MInstall::makeChosenPartitions()
+bool MInstall::makeChosenPartitions(bool &formatRoot, bool &formatBoot, bool &formatSwap, bool &formatHome)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    int prog = 0;
     QString root_type;
     QString home_type;
-    QString msg;
     QString cmd;
 
     if (checkBoxEncryptRoot->isChecked()) {
@@ -1334,7 +1368,7 @@ bool MInstall::makeChosenPartitions()
     }
     QStringList homesplit = getCmdOut("partition-info split-device=" + homedev).split(" ", QString::SkipEmptyParts);
 
-    updateStatus(tr("Preparing required partitions"), ++prog);
+    updateStatus(tr("Preparing required partitions"), 1);
 
     // unmount root part
     if (shell.run("pumount " + rootdev) != 0) {
@@ -1343,7 +1377,6 @@ bool MInstall::makeChosenPartitions()
         }
     }
 
-    bool formatRoot = false, formatBoot = false, formatSwap = false;
     // command to set the partition type
     if (gpt) {
         cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
@@ -1375,125 +1408,9 @@ bool MInstall::makeChosenPartitions()
         }
         if (!(saveHomeCheck->isChecked())) {
             shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
+            formatHome = true;
         }
     }
-
-    csleep(1000);
-
-    // allow the user to enter other options
-    buildBootLists();
-    gotoPage(5);
-
-    //if no swap is chosen do nothing
-    if (formatSwap) {
-        //if swap exists and not encrypted, do nothing
-        //check swap fstype
-        cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
-        if (shell.run(cmd) != 0 || checkBoxEncryptSwap->isChecked()) {
-            if (checkBoxEncryptSwap->isChecked()) {
-                updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-                if (!makeLuksPartition(swapdev, "swapfs", FDEpassCust->text().toUtf8())) {
-                    qDebug() << "could not make swap LUKS partition";
-                    return false;
-                } else {
-                    swapdev ="/dev/mapper/swapfs";
-                }
-            }
-
-            updateStatus(tr("Formatting swap partition"), ++prog);
-            if (!makeSwapPartition(swapdev)) {
-                return false;
-            }
-            // enable the new swap partition asap
-            csleep(1000);
-
-            shell.run("make-fstab -s");
-            shell.run("/sbin/swapon " + swapdev);
-        }
-    }
-
-    // maybe format root (if not saving /home on root) // or if using --sync option
-    if (formatRoot) {
-        if (checkBoxEncryptRoot->isChecked()) {
-            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(rootdev, "rootfs", FDEpassCust->text().toUtf8())) {
-                qDebug() << "could not make root LUKS partition";
-                return false;
-            } else {
-                rootdev="/dev/mapper/rootfs";
-            }
-        }
-
-        updateStatus(tr("Formatting the / (root) partition"), ++prog);
-        if (!makeLinuxPartition(rootdev, root_type, badblocksCheck->isChecked(), rootLabelEdit->text())) {
-            return false;
-        }
-        csleep(1000);
-        isRootFormatted = true;
-    }
-    if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
-        return false;
-    }
-
-    // format and mount /boot if different than root
-    if (formatBoot) {
-        updateStatus(tr("Formatting boot partition"), ++prog);
-        if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
-            return false;
-        }
-    }
-
-    // maybe format home
-    if (saveHomeCheck->isChecked()) {
-        // save home
-        if (homedev != rootdev) {
-            // not on root
-            updateStatus(tr("Mounting the /home partition"), ++prog);
-            if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) {
-                return false;
-            }
-        } else {
-            // on root, make sure it exists
-            csleep(1000);
-            mkdir("/mnt/antiX/home", 0755);
-        }
-    } else {
-        // don't save home
-        shell.run("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1");
-
-        if (isHomeEncrypted) {
-            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(homedev, "homefs", FDEpassCust->text().toUtf8())) {
-                qDebug() << "could not make home LUKS partition";
-                return false;
-            } else {
-                homedev = "/dev/mapper/homefs";
-            }
-        }
-
-        mkdir("/mnt/antiX/home", 0755);
-
-        if (homedev != rootdev) { // not on root
-            updateStatus(tr("Formatting the /home partition"), ++prog);
-
-            if (!makeLinuxPartition(homedev, home_type, badblocksCheck->isChecked(), homeLabelEdit->text())) {
-                return false;
-            }
-            csleep(1000);
-
-            if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) {
-                return false;
-            }
-            isHomeFormatted = true;
-        }
-    }
-    // mount all swaps
-    csleep(1000);
-    if (checkBoxEncryptSwap->isChecked() && swapdev != "/dev/none") { // swapon -a doens't mount LUKS swap
-        shell.run("swapon " + swapdev);
-    }
-    shell.run("/sbin/swapon -a 2>&1");
-
     return true;
 }
 

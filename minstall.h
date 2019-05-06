@@ -70,9 +70,10 @@ public:
     bool checkPassword(const QString &pass);
     bool installLoader();
     bool validateChosenPartitions();
-    bool makeChosenPartitions();
-    bool makeDefaultPartitions();
+    bool makeChosenPartitions(bool &formatRoot, bool &formatBoot, bool &formatSwap, bool &formatHome);
+    bool makeDefaultPartitions(bool &formatBoot, bool &formatHome);
     bool makeEsp(const QString &drv, int size);
+    bool formatPartitions(bool formatRoot, bool formatBoot, bool formatSwap, bool formatHome);
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password);
     bool makeSwapPartition(const QString &dev);
