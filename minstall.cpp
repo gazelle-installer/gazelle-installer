@@ -415,7 +415,10 @@ bool MInstall::processNextPhase()
         buildBootLists();
         gotoPage(5);
 
-        if (!formatPartitions(encPass, rootType, homeType, formatBoot, formatSwap)) return false;
+        if (!formatPartitions(encPass, rootType, homeType, formatBoot, formatSwap)) {
+            goBack(tr("Failed to format required partitions."));
+            return false;
+        }
         csleep(1000);
         if (!installLinux()) return false;
         if (!haveSysConfig) {
@@ -2009,7 +2012,8 @@ bool MInstall::validateUserInfo()
                 } else {
                     // don't save, reuse or delete -- can't proceed
                     QMessageBox::critical(this, QString::null,
-                                          tr("You've chosen to not use, save or delete the old home directory.\nBefore proceeding, you'll have to select a different username."));
+                                          tr("You've chosen to not use, save or delete the old home directory.\n"
+                                             "Before proceeding, you'll have to select a different username."));
                     return false;
                 }
             }
@@ -2260,7 +2264,7 @@ void MInstall::unmountGoBack(const QString &msg)
 void MInstall::goBack(const QString &msg)
 {
     if (phase >= 0) {
-        ((MMain *)mmn)->mainFrame->setEnabled(false);
+        this->setEnabled(false);
         QMessageBox::critical(this, QString::null, msg);
         setCursor(QCursor(Qt::WaitCursor));
     }
@@ -2359,7 +2363,6 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
                                        "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
-        ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         if (diskCombo->count() == 0) {
             setCursor(QCursor(Qt::WaitCursor));
             updateDiskInfo();
@@ -2367,7 +2370,7 @@ void MInstall::pageDisplayed(int next)
             updatePartitionWidgets();
         }
         phase = 0;
-        ((MMain *)mmn)->mainFrame->setEnabled(true);
+        this->setEnabled(true);
         setCursor(QCursor(Qt::ArrowCursor));
         break;
 
@@ -2387,7 +2390,6 @@ void MInstall::pageDisplayed(int next)
                                        "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME)+ tr(""
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
-        ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         updatePartInfo();
         setCursor(QCursor(Qt::ArrowCursor));
         break;
@@ -2433,7 +2435,6 @@ void MInstall::pageDisplayed(int next)
                                     + tr("A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).") + "<br/>"
                                     + tr("If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.")
                                     + "</p>");
-        ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         break;
 
     case 4: // installation step
@@ -2829,7 +2830,7 @@ bool MInstall::procAbort()
             return false;
         }
     }
-    ((MMain *)mmn)->mainFrame->setEnabled(false);
+    this->setEnabled(false);
     proc->terminate();
     QTimer::singleShot(5000, proc, SLOT(kill()));
     shell.terminate();
@@ -3000,8 +3001,6 @@ void MInstall::on_buttonSetKeyboard_clicked()
     shell.run("fskbsetting");
     mmn->show();
     setupkeyboardbutton();
-
-
 }
 
 void MInstall::on_homeCombo_currentIndexChanged(const QString &arg1)
