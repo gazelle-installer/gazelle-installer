@@ -56,9 +56,8 @@ QProcess::ExitStatus MInstall::runCmd2(const QString &cmd)
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     proc->start(cmd);
     eloop.exec();
-    QProcess::ExitStatus rexit = proc->exitStatus();
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
-    return rexit;
+    return proc->exitStatus();
 }
 
 MInstall::MInstall(QWidget *parent, QStringList args) :
@@ -794,13 +793,35 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
     QString swapdev = swapDevicePreserve;
     QString homedev = homeDevicePreserve;
 
+    // set up LUKS containers
+    const QString &statup = tr("Setting up LUKS encrypted containers");
+    if (isSwapEncrypted) {
+        updateStatus(statup, ++prog);
+        if (formatSwap) {
+            if (!makeLuksPartition(swapdev, encPass)) return false;
+        }
+        if (!openLuksPartition(swapdev, "swapfs", encPass)) return false;
+        swapdev = "/dev/mapper/swapfs";
+    }
+    if (isRootEncrypted) {
+        updateStatus(statup, ++prog);
+        if (!rootType.isEmpty()) {
+            if (!makeLuksPartition(rootdev, encPass)) return false;
+        }
+        if (!openLuksPartition(rootdev, "rootfs", encPass)) return false;
+        rootdev = "/dev/mapper/rootfs";
+    }
+    if (isHomeEncrypted) {
+        updateStatus(statup, ++prog);
+        if (!homeType.isEmpty()) {
+            if (!makeLuksPartition(homedev, encPass)) return false;
+        }
+        if (!openLuksPartition(homedev, "homefs", encPass)) return false;
+        homedev = "/dev/mapper/homefs";
+    }
+
     //if no swap is chosen do nothing
     if (formatSwap) {
-        if (isSwapEncrypted) {
-            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(swapdev, "swapfs", encPass)) return false;
-            swapdev = "/dev/mapper/swapfs";
-        }
         updateStatus(tr("Formatting swap partition"), ++prog);
         if (!makeSwapPartition(swapdev)) return false;
         // enable the new swap partition asap
@@ -812,11 +833,6 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
 
     // maybe format root (if not saving /home on root), or if using --sync option
     if (!rootType.isEmpty()) {
-        if (isRootEncrypted) {
-            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(rootdev, "rootfs", encPass)) return false;
-            rootdev="/dev/mapper/rootfs";
-        }
         updateStatus(tr("Formatting the / (root) partition"), ++prog);
         if (!makeLinuxPartition(rootdev, rootType, badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
@@ -837,12 +853,6 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
 
     // maybe format home
     if (!homeType.isEmpty()) {
-        if (isHomeEncrypted) {
-            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(homedev, "homefs", encPass)) return false;
-            homedev = "/dev/mapper/homefs";
-        }
-
         updateStatus(tr("Formatting the /home partition"), ++prog);
         if (!makeLinuxPartition(homedev, homeType, badblocksCheck->isChecked(), homeLabelEdit->text())) {
             return false;
@@ -959,12 +969,13 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
 }
 
 // Create and open Luks partitions; return false if it cannot create one
-bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password)
+bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    QProcess proc;
+    QEventLoop eloop;
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
 
     // format partition
     QString strCipherSpec = comboFDEcipher->currentText() + "-" + comboFDEchain->currentText();
@@ -974,30 +985,42 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
             strCipherSpec += ":" + comboFDEivhash->itemData(comboFDEivhash->currentIndex()).toString();
         }
     }
-    proc.start("cryptsetup --batch-mode"
-               " --cipher " + strCipherSpec.toLower()
-               + " --key-size " + spinFDEkeysize->cleanText()
-               + " --hash " + comboFDEhash->currentText().toLower().remove('-')
-               + " --use-" + comboFDErandom->currentText()
-               + " --iter-time " + spinFDEroundtime->cleanText()
-               + " luksFormat " + dev);
-    proc.waitForStarted();
-    proc.write(password + "\n");
-    proc.waitForFinished();
-    if (proc.exitCode() != 0) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, could not create %1 LUKS partition").arg(fs_name));
+    proc->start("cryptsetup --batch-mode"
+                " --cipher " + strCipherSpec.toLower()
+                + " --key-size " + spinFDEkeysize->cleanText()
+                + " --hash " + comboFDEhash->currentText().toLower().remove('-')
+                + " --use-" + comboFDErandom->currentText()
+                + " --iter-time " + spinFDEroundtime->cleanText()
+                + " luksFormat " + dev);
+    proc->waitForStarted();
+    proc->write(password + "\n");
+    eloop.exec();
+
+    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
+    if (proc->exitStatus() != QProcess::NormalExit || proc->exitCode() != 0) {
+        goBack(tr("Sorry, could not create %1 LUKS partition").arg(dev));
         return false;
     }
+    return true;
+}
+
+bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password)
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
+
+    QEventLoop eloop;
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
 
     // open containers, assigning container names
-    proc.start("cryptsetup luksOpen " + dev + " " + fs_name);
-    proc.waitForStarted();
-    proc.write(password + "\n");
-    proc.waitForFinished();
-    if (proc.exitCode() != 0) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, could not open %1 LUKS container").arg(fs_name));
+    proc->start("cryptsetup luksOpen " + dev + " " + fs_name);
+    proc->waitForStarted();
+    proc->write(password + "\n");
+    eloop.exec();
+
+    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
+    if (proc->exitStatus() != QProcess::NormalExit || proc->exitCode() != 0) {
+        goBack(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
     }
     return true;
