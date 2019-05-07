@@ -2885,6 +2885,7 @@ void MInstall::on_rootTypeCombo_activated(QString)
 
 bool MInstall::procAbort()
 {
+    this->setEnabled(false);
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
@@ -2892,10 +2893,11 @@ bool MInstall::procAbort()
                                 tr("The installation and configuration is incomplete.\n"
                                    "Do you really want to stop now?"),
                                 QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
+            this->setEnabled(true);
             return false;
         }
     }
-    this->setEnabled(false);
+    setCursor(QCursor(Qt::WaitCursor));
     proc->terminate();
     QTimer::singleShot(5000, proc, SLOT(kill()));
     shell.terminate();
