@@ -431,10 +431,10 @@ bool MInstall::processNextPhase()
                     return false;
                 }
             }
-            shell.run("partprobe");
         }
 
         // allow the user to enter other options
+        shell.run("partprobe");
         buildBootLists();
         gotoPage(5);
 
@@ -2468,11 +2468,9 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
                                        "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
-        if (diskCombo->count() == 0) {
+        if (diskCombo->count() == 0 || phase < 0) {
             setCursor(QCursor(Qt::WaitCursor));
             updateDiskInfo();
-        } else if (phase < 0) {
-            updatePartitionWidgets();
         }
         phase = 0;
         this->setEnabled(true);
@@ -2741,6 +2739,7 @@ void MInstall::updateDiskInfo()
         exclude.clear();
     }
     listBootDrives = getCmdOuts("partition-info" + exclude + " --min-size=" + MIN_ROOT_DEVICE_SIZE + " -n drives");
+    indexPartInfoDisk = -1;
     diskCombo->clear();
     diskCombo->addItems(listBootDrives);
     diskCombo->setCurrentIndex(0);
