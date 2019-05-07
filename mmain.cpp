@@ -58,7 +58,7 @@ void MMain::setHelpText(const QString &text)
 
 void MMain::closeEvent(QCloseEvent *event)
 {
-    if (minstall->procAbort()) {
+    if (minstall->abort(true)) {
         event->accept();
         minstall->cleanup();
         QWidget::closeEvent(event);
