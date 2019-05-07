@@ -100,7 +100,6 @@ public:
     void disablehiberanteinitramfs();
     bool installLinux();
     void makeFstab();
-    void prepareToInstall();
     bool processNextPhase();
     void removeItemCombo(QComboBox *cb, const QString *part);
     void saveConfig();
@@ -259,4 +258,6 @@ private:
 
     // private functions
     void updateStatus(const QString &msg, int val = -1);
+    bool pretendToInstall(int start, int stop, int sleep);
+    void prepareToInstall(const bool pretend);
 };

@@ -199,6 +199,19 @@ void MInstall::updateStatus(const QString &msg, int val)
     qApp->processEvents();
 }
 
+bool MInstall::pretendToInstall(int start, int stop, int sleep)
+{
+    for (int ixi = start; ixi <= stop; ++ixi) {
+        updateStatus(tr("Pretending to install %1").arg(PROJECTNAME), ixi);
+        csleep(sleep);
+        if (phase < 0) {
+            csleep(1000);
+            return false;
+        }
+    }
+    return true;
+}
+
 // write out crypttab if encrypting for auto-opening
 void MInstall::writeKeyFile()
 {
@@ -384,6 +397,7 @@ int MInstall::getPartitionNumber()
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
+    const bool pretend = (args.contains("--pretend") || args.contains("-p"));
     // Phase < 0 = install has been aborted (Phase -2 on close)
     if (phase < 0) return false;
     // Phase 0 = install not started yet, Phase 1 = install in progress
@@ -392,39 +406,48 @@ bool MInstall::processNextPhase()
         updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
         if (!checkDisk()) return false;
         phase = 1; // installation.
-        prepareToInstall();
+        prepareToInstall(pretend);
+
         // these parameters are passed by reference and modified by make*Partitions()
         bool formatBoot = false, formatSwap = false;
         QByteArray encPass;
         QString rootType, homeType;
-        if (entireDiskButton->isChecked()) {
-            rootType = "ext4";
-            formatSwap = true;
-            encPass = FDEpassword->text().toUtf8();
-            if (!makeDefaultPartitions(formatBoot)) {
-                // failed
-                goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
-                return false;
+
+        if (!pretend) {
+            if (entireDiskButton->isChecked()) {
+                rootType = "ext4";
+                formatSwap = true;
+                encPass = FDEpassword->text().toUtf8();
+                if (!makeDefaultPartitions(formatBoot)) {
+                    // failed
+                    goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
+                    return false;
+                }
+            } else {
+                encPass = FDEpassCust->text().toUtf8();
+                if (!makeChosenPartitions(rootType, homeType, formatBoot, formatSwap)) {
+                    // failed
+                    goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
+                    return false;
+                }
             }
-        } else {
-            encPass = FDEpassCust->text().toUtf8();
-            if (!makeChosenPartitions(rootType, homeType, formatBoot, formatSwap)) {
-                // failed
-                goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
-                return false;
-            }
+            shell.run("partprobe");
         }
+
         // allow the user to enter other options
-        shell.run("partprobe");
         buildBootLists();
         gotoPage(5);
 
-        if (!formatPartitions(encPass, rootType, homeType, formatBoot, formatSwap)) {
-            goBack(tr("Failed to format required partitions."));
+        if (!pretend) {
+            if (!formatPartitions(encPass, rootType, homeType, formatBoot, formatSwap)) {
+                goBack(tr("Failed to format required partitions."));
+                return false;
+            }
+            csleep(1000);
+            if (!installLinux()) return false;
+        } else if (!pretendToInstall(1, 94, 100)) {
             return false;
         }
-        csleep(1000);
-        if (!installLinux()) return false;
         if (!haveSysConfig) {
             progressBar->setEnabled(false);
             updateStatus(tr("Paused for required operator input"), 95);
@@ -439,17 +462,21 @@ bool MInstall::processNextPhase()
         phase = 3;
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
-        if (!installLoader()) return false;
-        updateStatus(tr("Setting system configuration"), 99);
-        setServices();
-        if (!setUserInfo()) return false;
-        if (haveSnapshotUserAccounts) {
-            QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
-            shell.run(cmd);
+        if (!pretend) {
+            if (!installLoader()) return false;
+            updateStatus(tr("Setting system configuration"), 99);
+            setServices();
+            if (!setUserInfo()) return false;
+            if (haveSnapshotUserAccounts) {
+                QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
+                shell.run(cmd);
+            }
+            if (!setComputerName()) return false;
+            setLocale();
+            saveConfig();
+        } else if (!pretendToInstall(95, 99, 1000)){
+            return false;
         }
-        if (!setComputerName()) return false;
-        setLocale();
-        saveConfig();
         // print version (look for /usr/sbin/minstall since the name of the package might be different)
         qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
         phase = 4;
@@ -461,19 +488,20 @@ bool MInstall::processNextPhase()
 }
 
 // gather required information and prepare installation
-void MInstall::prepareToInstall()
+void MInstall::prepareToInstall(const bool pretend)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return;
 
-    // unmount /boot/efi if mounted by previous run
-    if (shell.run("mountpoint -q /mnt/antiX/boot/efi") == 0) {
-        shell.run("umount /mnt/antiX/boot/efi");
+    if (!pretend) {
+        // unmount /boot/efi if mounted by previous run
+        if (shell.run("mountpoint -q /mnt/antiX/boot/efi") == 0) {
+            shell.run("umount /mnt/antiX/boot/efi");
+        }
+        // unmount /home if it exists
+        shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
+        shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
     }
-
-    // unmount /home if it exists
-    shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
-    shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
 
     isRootFormatted = false;
     isHomeFormatted = false;
