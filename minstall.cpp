@@ -19,6 +19,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QtConcurrent/QtConcurrent>
+#include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
 
@@ -214,13 +215,15 @@ void MInstall::writeKeyFile()
     // for root only, add swap
     // for home only, add swap
 
-    QString cmdrandom = "dd if=/dev/" + comboFDErandom->currentText() + " of=%1 bs=1024 count=4";
+    QString rngfile = "/dev/" + comboFDErandom->currentText();
+    const unsigned int keylength = 4096;
     if (isRootEncrypted) { // if encrypting root
+        bool newkey = (key.length() == 0);
         QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
 
         //create keyfile
-        shell.run(cmdrandom.arg("/mnt/antiX/root/keyfile"));
-        chmod("/mnt/antiX/root/keyfile", 0400);
+        if (newkey) key.load(rngfile.toUtf8(), keylength);
+        key.save("/mnt/antiX/root/keyfile", 0400);
 
         //add keyfile to container
         QString swapUUID;
@@ -234,7 +237,7 @@ void MInstall::writeKeyFile()
             proc.waitForFinished();
         }
 
-        if (isHomeEncrypted) { // if encrypting separate /home
+        if (isHomeEncrypted && newkey) { // if encrypting separate /home
             QProcess proc;
             proc.start("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile");
             proc.waitForStarted();
@@ -260,8 +263,9 @@ void MInstall::writeKeyFile()
         QString swapUUID;
         if (swapDevicePreserve != "/dev/none") {
             //create keyfile
-            shell.run(cmdrandom.arg("/mnt/antiX/home/.keyfileDONOTdelete"));
-            chmod("/mnt/antiX/home/.keyfileDONOTdelete", 0400);
+            key.load(rngfile.toUtf8(), keylength);
+            key.save("/mnt/antiX/home/.keyfileDONOTdelete", 0400);
+            key.erase();
 
             //add keyfile to container
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
@@ -985,13 +989,15 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
             strCipherSpec += ":" + comboFDEivhash->itemData(comboFDEivhash->currentIndex()).toString();
         }
     }
-    proc->start("cryptsetup --batch-mode"
-                " --cipher " + strCipherSpec.toLower()
-                + " --key-size " + spinFDEkeysize->cleanText()
-                + " --hash " + comboFDEhash->currentText().toLower().remove('-')
-                + " --use-" + comboFDErandom->currentText()
-                + " --iter-time " + spinFDEroundtime->cleanText()
-                + " luksFormat " + dev);
+    QString cmd = "cryptsetup --batch-mode"
+                  " --cipher " + strCipherSpec.toLower()
+                  + " --key-size " + spinFDEkeysize->cleanText()
+                  + " --hash " + comboFDEhash->currentText().toLower().remove('-')
+                  + " --use-" + comboFDErandom->currentText()
+                  + " --iter-time " + spinFDEroundtime->cleanText()
+                  + " luksFormat " + dev;
+    qDebug() << cmd;
+    proc->start(cmd);
     proc->waitForStarted();
     proc->write(password + "\n");
     eloop.exec();
@@ -1004,7 +1010,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
     return true;
 }
 
-bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password)
+bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -1013,7 +1019,9 @@ bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, con
     connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
 
     // open containers, assigning container names
-    proc->start("cryptsetup luksOpen " + dev + " " + fs_name);
+    QString cmd = "cryptsetup luksOpen " + dev + " " + fs_name + " " + options;
+    qDebug() << cmd;
+    proc->start(cmd);
     proc->waitForStarted();
     proc->write(password + "\n");
     eloop.exec();
@@ -1350,6 +1358,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
+    const bool saveHome = saveHomeCheck->isChecked();
     QString cmd;
 
     if (checkBoxEncryptRoot->isChecked()) {
@@ -1405,7 +1414,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         formatSwap = true;
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
-    if (!(saveHomeCheck->isChecked() && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
+    if (!(saveHome && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
         shell.run(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
         rootType = rootTypeCombo->currentText().toUtf8();
     }
@@ -1419,10 +1428,44 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         if (shell.run("pumount " + homedev) != 0) {
             shell.run("swapoff " + homedev);
         }
-        if (!(saveHomeCheck->isChecked())) {
+        if (!saveHome) {
             shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
             homeType = homeTypeCombo->currentText().toUtf8();
         }
+    }
+
+    // if preserving /home, obtain some basic information
+    if (saveHome) {
+        const QByteArray &pass = FDEpassCust->text().toUtf8();
+        // mount the home partition
+        if (isRootEncrypted) {
+            shell.run("cryptsetup luksClose rootfs");
+            if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly")) return false;
+            rootdev = "/dev/mapper/rootfs";
+        }
+        if (!mountPartition(rootdev, "/mnt/antiX", "ro")) return false;
+        // mount the root partition
+        if (homedev != rootdev) {
+            if (isHomeEncrypted) {
+                shell.run("cryptsetup luksClose homefs");
+                if (!openLuksPartition(homedev, "homefs", pass, "--readonly")) return false;
+                homedev = "/dev/mapper/homefs";
+            }
+            if (!mountPartition(homedev, "/mnt/antiX/home", "ro")) return false;
+        }
+
+        // store a listing of /home to compare with the user name given later
+        listHomes = getCmdOuts("ls -1 /mnt/antiX/home/");
+        // recycle the old key for /home if possible
+        key.load("/mnt/antiX/root/keyfile", -1);
+
+        // unmount partitions
+        if (homedev != rootdev) {
+            shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
+            if (isHomeEncrypted) shell.run("cryptsetup luksClose homefs");
+        }
+        shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+        if (isRootEncrypted) shell.run("cryptsetup luksClose rootfs");
     }
     return true;
 }
@@ -2003,11 +2046,8 @@ bool MInstall::validateUserInfo()
 
     // Check for pre-existing /home directory
     // see if user directory already exists
-    QString dpath = QString("/mnt/antiX/home/%1").arg(userNameEdit->text());
-    DIR *dir;
-    if ((dir = opendir(dpath.toUtf8())) != NULL) {
+    if (listHomes.contains(userNameEdit->text())) {
         // already exists
-        closedir(dir);
         int ans;
         QString msg;
         msg = tr("The home directory for %1 already exists.Would you like to reuse the old home directory?").arg(userNameEdit->text());
@@ -3176,18 +3216,10 @@ void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
         nextButton->setDisabled(true);
         checkBoxEncryptSwap->setChecked(true);
         FDEpassCust->setFocus();
-        if (saveHomeCheck->isChecked()) {
-            QMessageBox::warning(this, QString::null,
-                                 tr("If you choose to encrypt home partition you cannot use the option to preserve data in that partition"),
-                                 tr("OK"));
-            saveHomeCheck->setChecked(false);
-        }
-        saveHomeCheck->setEnabled(false);
     } else {
         gbEncrPass->setVisible(checkBoxEncryptRoot->isChecked());
         nextButton->setDisabled(checkBoxEncryptRoot->isChecked());
         checkBoxEncryptSwap->setChecked(checkBoxEncryptRoot->isChecked());
-        saveHomeCheck->setEnabled(true);
     }
 
     if (!checkBoxEncryptSwap->isChecked()) {
@@ -3413,4 +3445,71 @@ void MInstall::buildBootLists()
             }
         }
     }
+}
+
+/////////////////////////////////////////////////////////////////////////
+// SafeCache Class - for temporarily caching sensitive files
+
+SafeCache::SafeCache()
+{
+    reserve(16384);
+}
+
+SafeCache::~SafeCache()
+{
+    erase();
+}
+
+// to completely free the key use parameters NULL, 0
+bool SafeCache::load(const char *filename, int length)
+{
+    bool ok = false;
+    erase();
+
+    // open and stat the file if specified
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) return false;
+    struct stat statbuf;
+    if (fstat(fd, &statbuf) == 0) {
+        if (statbuf.st_size > 0 && (length < 0 || length > statbuf.st_size)) {
+            if (statbuf.st_size > capacity()) length = capacity();
+            else length = statbuf.st_size;
+        }
+    }
+    if (length >= 0) resize(length);
+
+    // read the the file (if specified) into the buffer
+    length = size();
+    int remain = length;
+    while (remain > 0) {
+        ssize_t chunk = read(fd, data() + (length - remain), remain);
+        if (chunk < 0) goto ending;
+        remain -= chunk;
+        fsync(fd);
+    }
+    ok = true;
+
+ ending:
+    close(fd);
+    return ok;
+}
+
+bool SafeCache::save(const char *filename, mode_t mode)
+{
+    bool ok = false;
+    int fd = open(filename, O_CREAT|O_TRUNC|O_WRONLY);
+    if (fd == -1) return false;
+    if (write(fd, constData(), size()) == size()) goto ending;
+    if (fchmod(fd, mode) != 0) goto ending;
+    ok = true;
+
+ ending:
+    close(fd);
+    return ok;
+}
+
+void SafeCache::erase()
+{
+    fill(0xAA);
+    fill(0x55);
 }
