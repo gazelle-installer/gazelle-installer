@@ -52,7 +52,6 @@ public:
     /** destructor */
     ~MInstall();
 
-    bool abortInstall;
     QStringList args;
 
     void checkUefi();
@@ -143,11 +142,10 @@ public:
     void pageDisplayed(int next);
     void updateDiskInfo();
     void setupkeyboardbutton();
+    bool abort(bool onclose);
 
 public slots:
-    bool procAbort();
     void cleanup();
-
     void copyTime();
 
 private slots:
