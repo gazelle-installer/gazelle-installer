@@ -1998,11 +1998,10 @@ bool MInstall::setPasswords()
     QEventLoop eloop;
     connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
 
-    proc->start("chroot /mnt/antiX passwd root");
+    proc->start("chroot /mnt/antiX chpasswd");
     proc->waitForStarted();
-    proc->write(rootPasswordEdit->text().toUtf8() + "\n");
-    csleep(1000);
-    proc->write(rootPasswordEdit->text().toUtf8() + "\n");
+    proc->write("root:" + rootPasswordEdit->text().toUtf8());
+    proc->closeWriteChannel();
     eloop.exec();
 
     if (proc->exitCode() != 0) {
@@ -2011,11 +2010,10 @@ bool MInstall::setPasswords()
         return false;
     }
 
-    proc->start("chroot /mnt/antiX passwd demo");
+    proc->start("chroot /mnt/antiX chpasswd");
     proc->waitForStarted();
-    proc->write(userPasswordEdit->text().toUtf8() + "\n");
-    csleep(1000);
-    proc->write(userPasswordEdit->text().toUtf8() + "\n");
+    proc->write("demo:" + userPasswordEdit->text().toUtf8());
+    proc->closeWriteChannel();
     eloop.exec();
 
     disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
