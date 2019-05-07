@@ -194,6 +194,7 @@ bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtex
 void MInstall::updateStatus(const QString &msg, int val)
 {
     progressBar->setFormat("%p% - " + msg.toUtf8());
+    if (val < 0) val = progressBar->value() + 1;
     progressBar->setValue(val);
     qApp->processEvents();
 }
@@ -791,7 +792,6 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    int prog = progressBar->value();
 
     QString rootdev = rootDevicePreserve;
     QString swapdev = swapDevicePreserve;
@@ -800,7 +800,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
     // set up LUKS containers
     const QString &statup = tr("Setting up LUKS encrypted containers");
     if (isSwapEncrypted) {
-        updateStatus(statup, ++prog);
+        updateStatus(statup);
         if (formatSwap) {
             if (!makeLuksPartition(swapdev, encPass)) return false;
         }
@@ -808,7 +808,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
         swapdev = "/dev/mapper/swapfs";
     }
     if (isRootEncrypted) {
-        updateStatus(statup, ++prog);
+        updateStatus(statup);
         if (!rootType.isEmpty()) {
             if (!makeLuksPartition(rootdev, encPass)) return false;
         }
@@ -816,7 +816,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
         rootdev = "/dev/mapper/rootfs";
     }
     if (isHomeEncrypted) {
-        updateStatus(statup, ++prog);
+        updateStatus(statup);
         if (!homeType.isEmpty()) {
             if (!makeLuksPartition(homedev, encPass)) return false;
         }
@@ -826,7 +826,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
 
     //if no swap is chosen do nothing
     if (formatSwap) {
-        updateStatus(tr("Formatting swap partition"), ++prog);
+        updateStatus(tr("Formatting swap partition"));
         if (!makeSwapPartition(swapdev)) return false;
         // enable the new swap partition asap
         shell.run("sync");
@@ -837,7 +837,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
 
     // maybe format root (if not saving /home on root), or if using --sync option
     if (!rootType.isEmpty()) {
-        updateStatus(tr("Formatting the / (root) partition"), ++prog);
+        updateStatus(tr("Formatting the / (root) partition"));
         if (!makeLinuxPartition(rootdev, rootType, badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
@@ -849,7 +849,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
 
     // format and mount /boot if different than root
     if (formatBoot) {
-        updateStatus(tr("Formatting boot partition"), ++prog);
+        updateStatus(tr("Formatting boot partition"));
         if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
             return false;
         }
@@ -857,7 +857,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
 
     // maybe format home
     if (!homeType.isEmpty()) {
-        updateStatus(tr("Formatting the /home partition"), ++prog);
+        updateStatus(tr("Formatting the /home partition"));
         if (!makeLinuxPartition(homedev, homeType, badblocksCheck->isChecked(), homeLabelEdit->text())) {
             return false;
         }
@@ -868,7 +868,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
     mkdir("/mnt/antiX/home", 0755);
     if (homedev != rootDevicePreserve) {
         // not on root
-        updateStatus(tr("Mounting the /home partition"), ++prog);
+        updateStatus(tr("Mounting the /home partition"));
         if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) return false;
     }
     return true;
@@ -1181,7 +1181,6 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    int prog = 0;
 
     QString mmcnvmepartdesignator;
 
@@ -1193,7 +1192,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
     }
 
     // entire disk, create partitions
-    updateStatus(tr("Creating required partitions"), ++prog);
+    updateStatus(tr("Creating required partitions"));
 
     // ready to partition
     // try to be sure that entire drive is available
@@ -1277,7 +1276,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
         } else {
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
-            updateStatus(tr("Formatting EFI System Partition (ESP)"), ++prog);
+            updateStatus(tr("Formatting EFI System Partition (ESP)"));
         }
 
         if (!makeEsp(drv, esp_size)) {
@@ -1393,7 +1392,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     }
     QStringList homesplit = getCmdOut("partition-info split-device=" + homedev).split(" ", QString::SkipEmptyParts);
 
-    updateStatus(tr("Preparing required partitions"), 1);
+    updateStatus(tr("Preparing required partitions"));
 
     // unmount root part
     if (shell.run("pumount " + rootdev) != 0) {
@@ -1485,10 +1484,10 @@ bool MInstall::installLinux()
         if(!copyLinux()) return false;
     } else {
         // no--it's being reused
-        updateStatus(tr("Mounting the / (root) partition"), 3);
+        updateStatus(tr("Mounting the / (root) partition"));
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
         // remove all folders in root except for /home
-        updateStatus(tr("Deleting old system"), 4);
+        updateStatus(tr("Deleting old system"));
         QString cmd = "/bin/bash -c \"find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;\"";
         if (runCmd2(cmd) == QProcess::NormalExit) {
             if(!copyLinux()) return false;
@@ -1591,7 +1590,8 @@ bool MInstall::copyLinux()
     if (phase < 0) return false;
     // make empty dirs for opt, dev, proc, sys, run,
     // home already done
-    updateStatus(tr("Creating system directories"), 11);
+
+    updateStatus(tr("Creating system directories"));
     mkdir("/mnt/antiX/opt", 0755);
     mkdir("/mnt/antiX/dev", 0755);
     mkdir("/mnt/antiX/proc", 0755);
@@ -1611,7 +1611,8 @@ bool MInstall::copyLinux()
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
-    updateStatus(tr("Copying new system"), 13);
+    updateStatus(tr("Copying new system"));
+    iCopyBarStart = progressBar->value();
     // setup and start the process
     QString cmd;
     cmd = "/bin/cp -a";
@@ -1636,7 +1637,7 @@ bool MInstall::copyLinux()
     QProcess::ExitStatus rexit = QProcess::NormalExit;
     if (!(args.contains("--nocopy") || args.contains("-n"))) {
         connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
-        timer->start(2000);
+        timer->start(1000);
         rexit = runCmd2(cmd);
         timer->stop();
         disconnect(timer, SIGNAL(timeout()), 0, 0);
@@ -2980,7 +2981,7 @@ void MInstall::cleanup()
 void MInstall::copyTime()
 {
     struct statvfs svfs;
-    const int progspace = 80;
+    const int progspace = 93 - iCopyBarStart;
     int i = 0;
     if(iTargetInodes > 0 && statvfs("/mnt/antiX", &svfs) == 0) {
         i = (int)((svfs.f_files - svfs.f_ffree) / (iTargetInodes / progspace));
@@ -2990,7 +2991,7 @@ void MInstall::copyTime()
     } else {
         updateStatus(tr("Copy progress unknown. No file system statistics."), 0);
     }
-    progressBar->setValue(i + 13);
+    progressBar->setValue(i + iCopyBarStart);
 }
 
 void MInstall::on_progressBar_valueChanged(int value)
