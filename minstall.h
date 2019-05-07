@@ -210,6 +210,7 @@ private:
     bool uefi = false;
     bool haveSysConfig = false;
 
+    QWidget *nextFocus = NULL;
     Cmd shell;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
