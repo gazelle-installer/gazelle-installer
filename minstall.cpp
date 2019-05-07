@@ -2862,7 +2862,7 @@ void MInstall::updatePartInfo()
     bootCombo->addItem("root");
     bootCombo->addItems(partitions);
 
-    on_rootCombo_activated();
+    on_rootCombo_activated(rootCombo->currentText());
 }
 
 // root partition changed, rebuild home, swap, boot combo boxes
