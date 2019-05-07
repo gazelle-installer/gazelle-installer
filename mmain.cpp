@@ -41,9 +41,11 @@ MMain::MMain(QStringList args = QStringList())
 
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     // ensure the help widgets are displayed correctly when started
-    // the heap-allocated event is deleted by Qt when it is posted
+    // this heap-allocated object will be deleted by Qt when posted
     QResizeEvent *evresize = new QResizeEvent(size(), size());
     qApp->postEvent(this, evresize);
+    QEvent evpalette(QEvent::ApplicationPaletteChange);
+    changeEvent(&evpalette);
 }
 
 MMain::~MMain() {
@@ -83,4 +85,18 @@ void MMain::resizeEvent(QResizeEvent *)
     minstall->resize(mainFrame->size());
     mainHelp->resize(tab->size());
     helpbackdrop->resize(mainHelp->size());
+}
+
+void MMain::changeEvent(QEvent *event)
+{
+    const QEvent::Type etype = event->type();
+    if (etype == QEvent::ApplicationPaletteChange
+        || etype == QEvent::PaletteChange || etype == QEvent::StyleChange)
+    {
+        QPalette pal = mainHelp->style()->standardPalette();
+        QColor col = pal.color(QPalette::Base);
+        col.setAlpha(85);
+        pal.setColor(QPalette::Base, col);
+        mainHelp->setPalette(pal);
+    }
 }

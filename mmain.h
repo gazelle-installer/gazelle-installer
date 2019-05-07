@@ -32,6 +32,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent * event);
+    void changeEvent(QEvent *event);
 
 public slots:
     virtual void showEvent(QShowEvent *);
