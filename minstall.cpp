@@ -828,26 +828,29 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
     // set up LUKS containers
     const QString &statup = tr("Setting up LUKS encrypted containers");
     if (isSwapEncrypted) {
-        updateStatus(statup);
         if (formatSwap) {
+            updateStatus(statup);
             if (!makeLuksPartition(swapdev, encPass)) return false;
         }
+        updateStatus(statup);
         if (!openLuksPartition(swapdev, "swapfs", encPass)) return false;
         swapdev = "/dev/mapper/swapfs";
     }
     if (isRootEncrypted) {
-        updateStatus(statup);
         if (!rootType.isEmpty()) {
+            updateStatus(statup);
             if (!makeLuksPartition(rootdev, encPass)) return false;
         }
+        updateStatus(statup);
         if (!openLuksPartition(rootdev, "rootfs", encPass)) return false;
         rootdev = "/dev/mapper/rootfs";
     }
     if (isHomeEncrypted) {
-        updateStatus(statup);
         if (!homeType.isEmpty()) {
+            updateStatus(statup);
             if (!makeLuksPartition(homedev, encPass)) return false;
         }
+        updateStatus(statup);
         if (!openLuksPartition(homedev, "homefs", encPass)) return false;
         homedev = "/dev/mapper/homefs";
     }
