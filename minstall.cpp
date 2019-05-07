@@ -1447,7 +1447,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         }
         if (!mountPartition(rootdev, "/mnt/antiX", "ro")) return false;
         // mount the root partition
-        if (homedev != rootdev) {
+        if (homedev != rootDevicePreserve) {
             if (isHomeEncrypted) {
                 shell.run("cryptsetup luksClose homefs");
                 if (!openLuksPartition(homedev, "homefs", pass, "--readonly")) return false;
@@ -1462,7 +1462,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         key.load("/mnt/antiX/root/keyfile", -1);
 
         // unmount partitions
-        if (homedev != rootdev) {
+        if (homedev != rootDevicePreserve) {
             shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
             if (isHomeEncrypted) shell.run("cryptsetup luksClose homefs");
         }
