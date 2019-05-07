@@ -3553,7 +3553,7 @@ bool SafeCache::load(const char *filename, int length)
 bool SafeCache::save(const char *filename, mode_t mode)
 {
     bool ok = false;
-    int fd = open(filename, O_CREAT|O_TRUNC|O_WRONLY);
+    int fd = open(filename, O_CREAT|O_TRUNC|O_WRONLY, mode);
     if (fd == -1) return false;
     if (write(fd, constData(), size()) == size()) goto ending;
     if (fchmod(fd, mode) != 0) goto ending;
