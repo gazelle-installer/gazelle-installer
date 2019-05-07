@@ -415,7 +415,7 @@ bool MInstall::processNextPhase()
             }
         }
         // allow the user to enter other options
-        csleep(1000);
+        shell.run("partprobe");
         buildBootLists();
         gotoPage(5);
 
@@ -2702,6 +2702,7 @@ void MInstall::updateDiskInfo()
     diskCombo->clear();
     diskCombo->addItem(tr("Loading..."));
 
+    shell.run("partprobe");
     updatePartitionWidgets();
     //  shell.run("umount -a 2>/dev/null");
     QString exclude = " --exclude=boot";
@@ -2812,6 +2813,7 @@ void MInstall::on_qtpartedButton_clicked()
     qtpartedButton->setEnabled(false);
     shell.run("/sbin/swapoff -a 2>&1");
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
+    shell.run("partprobe");
     shell.run("make-fstab -s");
     shell.run("/sbin/swapon -a 2>&1");
     updatePartitionWidgets();
