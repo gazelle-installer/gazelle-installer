@@ -110,7 +110,6 @@ public:
     void updatePartitionWidgets();
     void loadAdvancedFDE();
     void saveAdvancedFDE();
-    void updateStatus(const QString &msg, int val);
     void writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
@@ -217,6 +216,7 @@ private:
 
     // for file copy progress updates
     fsfilcnt_t iTargetInodes = 0;
+    int iCopyBarStart;
 
     // for the tips display
     int ixTip = 0;
@@ -256,4 +256,7 @@ private:
     int indexFDEhash = -1;
     int indexFDErandom = -1;
     long iFDEroundtime = -1;
+
+    // private functions
+    void updateStatus(const QString &msg, int val = -1);
 };
