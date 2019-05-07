@@ -1066,6 +1066,7 @@ bool MInstall::validateChosenPartitions()
     if (rootdev == "/dev/none" || rootdev == "/dev/") {
         QMessageBox::critical(this, QString::null,
             tr("You must choose a root partition.\nThe root partition must be at least %1.").arg(MIN_INSTALL_SIZE));
+        nextFocus = rootCombo;
         return false;
     }
 
@@ -1997,7 +1998,7 @@ bool MInstall::setPasswords()
 
 bool MInstall::validateUserInfo()
 {
-    //validate data before proceeding
+    nextFocus = userNameEdit;
     // see if username is reasonable length
     if (userNameEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
@@ -2026,23 +2027,27 @@ bool MInstall::validateUserInfo()
     if (userPasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter the user password."));
+        nextFocus = userPasswordEdit;
         return false;
     }
     if (rootPasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter the root password."));
+        nextFocus = rootPasswordEdit;
         return false;
     }
     if (userPasswordEdit->text() != userPasswordEdit2->text()) {
         QMessageBox::critical(this, QString::null,
                               tr("The user password entries do not match.\n"
                                  "Please try again."));
+        nextFocus = userPasswordEdit;
         return false;
     }
     if (rootPasswordEdit->text() != rootPasswordEdit2->text()) {
         QMessageBox::critical(this, QString::null,
                               tr("The root password entries do not match.\n"
                                  "Please try again."));
+        nextFocus = rootPasswordEdit;
         return false;
     }
 
@@ -2079,11 +2084,13 @@ bool MInstall::validateUserInfo()
                     QMessageBox::critical(this, QString::null,
                                           tr("You've chosen to not use, save or delete the old home directory.\n"
                                              "Before proceeding, you'll have to select a different username."));
+                    nextFocus = userNameEdit;
                     return false;
                 }
             }
         }
     }
+    nextFocus = NULL;
     return true;
 }
 
@@ -2103,6 +2110,7 @@ bool MInstall::validateComputerName()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // see if name is reasonable
+    nextFocus = computerNameEdit;
     if (computerNameEdit->text().length() < 2) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, your computer name needs to be\nat least 2 characters long. You'll have to\nselect a different name before proceeding."));
@@ -2113,6 +2121,7 @@ bool MInstall::validateComputerName()
         return false;
     }
     // see if name is reasonable
+    nextFocus = computerDomainEdit;
     if (computerDomainEdit->text().length() < 2) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, your computer domain needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
@@ -2128,12 +2137,14 @@ bool MInstall::validateComputerName()
         if (computerGroupEdit->text().length() < 2) {
             QMessageBox::critical(this, QString::null,
                                   tr("Sorry, your workgroup needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
+            nextFocus = computerGroupEdit;
             return false;
         }
     } else {
         computerGroupEdit->clear();
     }
 
+    nextFocus = NULL;
     return true;
 }
 
@@ -2559,13 +2570,13 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 9: // set username and passwords
-        userNameEdit->setFocus();
         ((MMain *)mmn)->setHelpText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
                                        "You should not use the root user as your daily user account. "
                                        "Please enter the name for a new (default) user account that you will use on a daily basis. "
                                        "If needed, you can add other user accounts later with %1 User Manager. </p>"
                                        "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
                                        "Each password must be entered twice.</p>").arg(PROJECTNAME));
+        if (!nextFocus) nextFocus = userNameEdit;
         break;
 
     case 10: // done
@@ -2633,6 +2644,10 @@ void MInstall::gotoPage(int next)
     // anything to do after displaying the page
     pageDisplayed(next);
     widgetStack->setEnabled(true);
+    if (nextFocus) {
+        nextFocus->setFocus();
+        nextFocus = NULL;
+    }
 }
 
 void MInstall::firstRefresh(QDialog *main)
