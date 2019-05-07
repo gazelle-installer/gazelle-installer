@@ -29,6 +29,15 @@
 #include "ui_meinstall.h"
 #include "cmd.h"
 
+class SafeCache : public QByteArray {
+public:
+    SafeCache();
+    ~SafeCache();
+    bool load(const char *filename, int length);
+    bool save(const char *filename, mode_t mode = 0400);
+    void erase();
+};
+
 class MInstall : public QWidget, public Ui::MeInstall {
     Q_OBJECT
 protected:
@@ -77,7 +86,7 @@ public:
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
     bool makeSwapPartition(const QString &dev);
-    bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password);
+    bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString());
     bool mountPartition(const QString dev, const QString point, const QString mntops);
     bool validateUserInfo();
     bool validateComputerName();
@@ -204,6 +213,8 @@ private:
     Cmd shell;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
+    QStringList listHomes;
+    SafeCache key;
 
     // for file copy progress updates
     fsfilcnt_t iTargetInodes = 0;
