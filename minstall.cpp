@@ -3002,7 +3002,7 @@ void MInstall::copyTime()
 void MInstall::on_progressBar_valueChanged(int value)
 {
     if (ixTipStart < 0 || widgetStack->currentIndex() != 4) {
-        return; // no point xdisplaying a new hint if it will be invisible
+        return; // no point displaying a new hint if it will be invisible
     }
 
     const int tipcount = 6;
