@@ -1995,28 +1995,32 @@ bool MInstall::setPasswords()
         return true;
     }
 
-    QProcess proc;
-    proc.start("chroot /mnt/antiX passwd root");
-    proc.waitForStarted();
-    proc.write(rootPasswordEdit->text().toUtf8() + "\n");
-    csleep(1000);
-    proc.write(rootPasswordEdit->text().toUtf8() + "\n");
-    proc.waitForFinished();
+    QEventLoop eloop;
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
 
-    if (proc.exitCode() != 0) {
+    proc->start("chroot /mnt/antiX passwd root");
+    proc->waitForStarted();
+    proc->write(rootPasswordEdit->text().toUtf8() + "\n");
+    csleep(1000);
+    proc->write(rootPasswordEdit->text().toUtf8() + "\n");
+    eloop.exec();
+
+    if (proc->exitCode() != 0) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set root password."));
         return false;
     }
 
-    proc.start("chroot /mnt/antiX passwd demo");
-    proc.waitForStarted();
-    proc.write(userPasswordEdit->text().toUtf8() + "\n");
+    proc->start("chroot /mnt/antiX passwd demo");
+    proc->waitForStarted();
+    proc->write(userPasswordEdit->text().toUtf8() + "\n");
     csleep(1000);
-    proc.write(userPasswordEdit->text().toUtf8() + "\n");
-    proc.waitForFinished();
+    proc->write(userPasswordEdit->text().toUtf8() + "\n");
+    eloop.exec();
 
-    if (proc.exitCode() != 0) {
+    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
+
+    if (proc->exitCode() != 0) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set user password."));
         return false;
