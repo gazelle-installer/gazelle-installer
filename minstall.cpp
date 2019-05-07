@@ -383,7 +383,7 @@ int MInstall::getPartitionNumber()
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
-    // Phase < 0 (eg. Phase -1) = install has been aborted
+    // Phase < 0 = install has been aborted (Phase -2 on close)
     if (phase < 0) return false;
     // Phase 0 = install not started yet, Phase 1 = install in progress
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps
@@ -2538,7 +2538,7 @@ void MInstall::pageDisplayed(int next)
             backButton->setEnabled(haveSysConfig);
             nextButton->setEnabled(!haveSysConfig);
         }
-        if (!processNextPhase()) gotoPage(1);
+        if (!processNextPhase() && phase > -2) gotoPage(1);
         return; // avoid enabling both Back and Next buttons at the end
         break;
     case 5: // set bootloader
@@ -2794,7 +2794,7 @@ void MInstall::on_backButton_clicked()
 
 void MInstall::on_abortInstallButton_clicked()
 {
-    procAbort();
+    abort(false);
     QApplication::beep();
 }
 
@@ -2898,7 +2898,7 @@ void MInstall::on_rootTypeCombo_activated(QString)
     }
 }
 
-bool MInstall::procAbort()
+bool MInstall::abort(bool onclose)
 {
     this->setEnabled(false);
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -2918,7 +2918,9 @@ bool MInstall::procAbort()
     shell.terminate();
     QTimer::singleShot(1000, &shell, SLOT(kill()));
     // help the installer if it was stuck at the config pages
-    if (phase == 2 && !haveSysConfig) {
+    if (onclose) {
+        phase = -2;
+    } else if (phase == 2 && !haveSysConfig) {
         phase = -1;
         gotoPage(1);
     } else {
