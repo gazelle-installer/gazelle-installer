@@ -19,6 +19,7 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QtConcurrent/QtConcurrent>
+#include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
 
@@ -33,7 +34,7 @@ int MInstall::command(const QString &cmd)
 }
 
 // helping function that runs a bash command in an event loop
-int MInstall::runCmd(QString cmd)
+int MInstall::runCmd(const QString &cmd)
 {
     if (phase < 0) return EXIT_FAILURE;
     QEventLoop loop;
@@ -48,7 +49,7 @@ int MInstall::runCmd(QString cmd)
 }
 
 // shell.run() doesn't distinguish between crashed and failed processes
-QProcess::ExitStatus MInstall::runCmd2(QString cmd)
+QProcess::ExitStatus MInstall::runCmd2(const QString &cmd)
 {
     if (phase < 0) return QProcess::CrashExit;
     qDebug() << cmd;
@@ -56,9 +57,8 @@ QProcess::ExitStatus MInstall::runCmd2(QString cmd)
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     proc->start(cmd);
     eloop.exec();
-    QProcess::ExitStatus rexit = proc->exitStatus();
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
-    return rexit;
+    return proc->exitStatus();
 }
 
 MInstall::MInstall(QWidget *parent, QStringList args) :
@@ -129,12 +129,12 @@ void MInstall::csleep(int msec)
     eloop.exec();
 }
 
-QString MInstall::getCmdOut(QString cmd)
+QString MInstall::getCmdOut(const QString &cmd)
 {
     return shell.getOutput(cmd).section("\n", 0, 0);
 }
 
-QStringList MInstall::getCmdOuts(QString cmd)
+QStringList MInstall::getCmdOuts(const QString &cmd)
 {
     return shell.getOutput(cmd).split('\n');
 }
@@ -159,7 +159,7 @@ bool MInstall::isInsideVB()
 }
 
 
-QString MInstall::getCmdValue(QString cmd, QString key, QString keydel, QString valdel)
+QString MInstall::getCmdValue(const QString &cmd, const QString &key, const QString &keydel, const QString &valdel)
 {
     const char *ret = "";
     char line[260];
@@ -181,21 +181,35 @@ QString MInstall::getCmdValue(QString cmd, QString key, QString keydel, QString 
     return QString (ret);
 }
 
-bool MInstall::replaceStringInFile(QString oldtext, QString newtext, QString filepath)
+bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
 {
 
-    QString cmd = QString("sed -i 's/%1/%2/g' %3").arg(oldtext).arg(newtext).arg(filepath);
+    QString cmd = QString("sed -i 's/%1/%2/g' %3").arg(oldtext, newtext, filepath);
     if (shell.run(cmd) != 0) {
         return false;
     }
     return true;
 }
 
-void MInstall::updateStatus(QString msg, int val)
+void MInstall::updateStatus(const QString &msg, int val)
 {
     progressBar->setFormat("%p% - " + msg.toUtf8());
+    if (val < 0) val = progressBar->value() + 1;
     progressBar->setValue(val);
     qApp->processEvents();
+}
+
+bool MInstall::pretendToInstall(int start, int stop, int sleep)
+{
+    for (int ixi = start; ixi <= stop; ++ixi) {
+        updateStatus(tr("Pretending to install %1").arg(PROJECTNAME), ixi);
+        csleep(sleep);
+        if (phase < 0) {
+            csleep(1000);
+            return false;
+        }
+    }
+    return true;
 }
 
 // write out crypttab if encrypting for auto-opening
@@ -215,13 +229,15 @@ void MInstall::writeKeyFile()
     // for root only, add swap
     // for home only, add swap
 
-    QString cmdrandom = "dd if=/dev/" + comboFDErandom->currentText() + " of=%1 bs=1024 count=4";
+    QString rngfile = "/dev/" + comboFDErandom->currentText();
+    const unsigned int keylength = 4096;
     if (isRootEncrypted) { // if encrypting root
+        bool newkey = (key.length() == 0);
         QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
 
         //create keyfile
-        shell.run(cmdrandom.arg("/mnt/antiX/root/keyfile"));
-        chmod("/mnt/antiX/root/keyfile", 0400);
+        if (newkey) key.load(rngfile.toUtf8(), keylength);
+        key.save("/mnt/antiX/root/keyfile", 0400);
 
         //add keyfile to container
         QString swapUUID;
@@ -235,7 +251,7 @@ void MInstall::writeKeyFile()
             proc.waitForFinished();
         }
 
-        if (isHomeEncrypted) { // if encrypting separate /home
+        if (isHomeEncrypted && newkey) { // if encrypting separate /home
             QProcess proc;
             proc.start("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile");
             proc.waitForStarted();
@@ -261,8 +277,9 @@ void MInstall::writeKeyFile()
         QString swapUUID;
         if (swapDevicePreserve != "/dev/none") {
             //create keyfile
-            shell.run(cmdrandom.arg("/mnt/antiX/home/.keyfileDONOTdelete"));
-            chmod("/mnt/antiX/home/.keyfileDONOTdelete", 0400);
+            key.load(rngfile.toUtf8(), keylength);
+            key.save("/mnt/antiX/home/.keyfileDONOTdelete", 0400);
+            key.erase();
 
             //add keyfile to container
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
@@ -380,7 +397,8 @@ int MInstall::getPartitionNumber()
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
-    // Phase < 0 (eg. Phase -1) = install has been aborted
+    const bool pretend = (args.contains("--pretend") || args.contains("-p"));
+    // Phase < 0 = install has been aborted (Phase -2 on close)
     if (phase < 0) return false;
     // Phase 0 = install not started yet, Phase 1 = install in progress
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps
@@ -388,26 +406,51 @@ bool MInstall::processNextPhase()
         updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
         if (!checkDisk()) return false;
         phase = 1; // installation.
-        prepareToInstall();
-        if (entireDiskButton->isChecked()) {
-            if (!makeDefaultPartitions()) {
-                // failed
-                goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
-                return false;
-            }
-        } else {
-            if (!makeChosenPartitions()) {
-                // failed
-                goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
-                return false;
+        prepareToInstall(pretend);
+
+        // these parameters are passed by reference and modified by make*Partitions()
+        bool formatBoot = false, formatSwap = false;
+        QByteArray encPass;
+        QString rootType, homeType;
+
+        if (!pretend) {
+            if (entireDiskButton->isChecked()) {
+                rootType = "ext4";
+                formatSwap = true;
+                encPass = FDEpassword->text().toUtf8();
+                if (!makeDefaultPartitions(formatBoot)) {
+                    // failed
+                    goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
+                    return false;
+                }
+            } else {
+                encPass = FDEpassCust->text().toUtf8();
+                if (!makeChosenPartitions(rootType, homeType, formatBoot, formatSwap)) {
+                    // failed
+                    goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
+                    return false;
+                }
             }
         }
 
-        csleep(1000);
-        if (!installLinux()) return false;
+        // allow the user to enter other options
+        shell.run("partprobe");
+        buildBootLists();
+        gotoPage(5);
+
+        if (!pretend) {
+            if (!formatPartitions(encPass, rootType, homeType, formatBoot, formatSwap)) {
+                goBack(tr("Failed to format required partitions."));
+                return false;
+            }
+            csleep(1000);
+            if (!installLinux()) return false;
+        } else if (!pretendToInstall(1, 94, 100)) {
+            return false;
+        }
         if (!haveSysConfig) {
             progressBar->setEnabled(false);
-            updateStatus(tr("Paused for required operator input"), 97);
+            updateStatus(tr("Paused for required operator input"), 95);
             QApplication::beep();
             if(widgetStack->currentIndex() == 4) {
                 on_nextButton_clicked();
@@ -419,17 +462,21 @@ bool MInstall::processNextPhase()
         phase = 3;
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
-        if (!installLoader()) return false;
-        updateStatus(tr("Setting system configuration"), 99);
-        setServices();
-        if (!setUserInfo()) return false;
-        if (haveSnapshotUserAccounts) {
-            QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
-            shell.run(cmd);
+        if (!pretend) {
+            if (!installLoader()) return false;
+            updateStatus(tr("Setting system configuration"), 99);
+            setServices();
+            if (!setUserInfo()) return false;
+            if (haveSnapshotUserAccounts) {
+                QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
+                shell.run(cmd);
+            }
+            if (!setComputerName()) return false;
+            setLocale();
+            saveConfig();
+        } else if (!pretendToInstall(95, 99, 1000)){
+            return false;
         }
-        if (!setComputerName()) return false;
-        setLocale();
-        saveConfig();
         // print version (look for /usr/sbin/minstall since the name of the package might be different)
         qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
         phase = 4;
@@ -441,19 +488,20 @@ bool MInstall::processNextPhase()
 }
 
 // gather required information and prepare installation
-void MInstall::prepareToInstall()
+void MInstall::prepareToInstall(const bool pretend)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return;
 
-    // unmount /boot/efi if mounted by previous run
-    if (shell.run("mountpoint -q /mnt/antiX/boot/efi") == 0) {
-        shell.run("umount /mnt/antiX/boot/efi");
+    if (!pretend) {
+        // unmount /boot/efi if mounted by previous run
+        if (shell.run("mountpoint -q /mnt/antiX/boot/efi") == 0) {
+            shell.run("umount /mnt/antiX/boot/efi");
+        }
+        // unmount /home if it exists
+        shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
+        shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
     }
-
-    // unmount /home if it exists
-    shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
-    shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
 
     isRootFormatted = false;
     isHomeFormatted = false;
@@ -731,7 +779,7 @@ void MInstall::saveAdvancedFDE()
     iFDEroundtime = spinFDEroundtime->value();
 }
 
-bool MInstall::makeSwapPartition(QString dev)
+bool MInstall::makeSwapPartition(const QString &dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -745,7 +793,7 @@ bool MInstall::makeSwapPartition(QString dev)
 }
 
 // create ESP at the begining of the drive
-bool MInstall::makeEsp(QString drv, int size)
+bool MInstall::makeEsp(const QString &drv, int size)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -768,11 +816,97 @@ bool MInstall::makeEsp(QString drv, int size)
     return true;
 }
 
-bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, const QString &label)
+bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot, bool formatSwap)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
+
+    QString rootdev = rootDevicePreserve;
+    QString swapdev = swapDevicePreserve;
+    QString homedev = homeDevicePreserve;
+
+    // set up LUKS containers
+    const QString &statup = tr("Setting up LUKS encrypted containers");
+    if (isSwapEncrypted) {
+        updateStatus(statup);
+        if (formatSwap) {
+            if (!makeLuksPartition(swapdev, encPass)) return false;
+        }
+        if (!openLuksPartition(swapdev, "swapfs", encPass)) return false;
+        swapdev = "/dev/mapper/swapfs";
+    }
+    if (isRootEncrypted) {
+        updateStatus(statup);
+        if (!rootType.isEmpty()) {
+            if (!makeLuksPartition(rootdev, encPass)) return false;
+        }
+        if (!openLuksPartition(rootdev, "rootfs", encPass)) return false;
+        rootdev = "/dev/mapper/rootfs";
+    }
+    if (isHomeEncrypted) {
+        updateStatus(statup);
+        if (!homeType.isEmpty()) {
+            if (!makeLuksPartition(homedev, encPass)) return false;
+        }
+        if (!openLuksPartition(homedev, "homefs", encPass)) return false;
+        homedev = "/dev/mapper/homefs";
+    }
+
+    //if no swap is chosen do nothing
+    if (formatSwap) {
+        updateStatus(tr("Formatting swap partition"));
+        if (!makeSwapPartition(swapdev)) return false;
+        // enable the new swap partition asap
+        shell.run("sync");
+        csleep(500);
+        shell.run("make-fstab -s");
+        shell.run("/sbin/swapon " + swapdev);
+    }
+
+    // maybe format root (if not saving /home on root), or if using --sync option
+    if (!rootType.isEmpty()) {
+        updateStatus(tr("Formatting the / (root) partition"));
+        if (!makeLinuxPartition(rootdev, rootType, badblocksCheck->isChecked(), rootLabelEdit->text())) {
+            return false;
+        }
+        csleep(1000);
+        isRootFormatted = true;
+        root_mntops = "defaults,noatime";
+    }
+    if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) return false;
+
+    // format and mount /boot if different than root
+    if (formatBoot) {
+        updateStatus(tr("Formatting boot partition"));
+        if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
+            return false;
+        }
+    }
+
+    // maybe format home
+    if (!homeType.isEmpty()) {
+        updateStatus(tr("Formatting the /home partition"));
+        if (!makeLinuxPartition(homedev, homeType, badblocksCheck->isChecked(), homeLabelEdit->text())) {
+            return false;
+        }
+        shell.run("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1");
+        csleep(1000);
+        isHomeFormatted = true;
+    }
+    mkdir("/mnt/antiX/home", 0755);
+    if (homedev != rootDevicePreserve) {
+        // not on root
+        updateStatus(tr("Mounting the /home partition"));
+        if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) return false;
+    }
+    return true;
+}
+
+bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label)
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
+    QString homedev = homeDevicePreserve;
     if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
         home_mntops = "defaults,noatime";
     } else {
@@ -867,12 +1001,13 @@ bool MInstall::makeLinuxPartition(QString dev, const QString &type, bool bad, co
 }
 
 // Create and open Luks partitions; return false if it cannot create one
-bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password)
+bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    QProcess proc;
+    QEventLoop eloop;
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
 
     // format partition
     QString strCipherSpec = comboFDEcipher->currentText() + "-" + comboFDEchain->currentText();
@@ -882,30 +1017,48 @@ bool MInstall::makeLuksPartition(const QString &dev, const QString &fs_name, con
             strCipherSpec += ":" + comboFDEivhash->itemData(comboFDEivhash->currentIndex()).toString();
         }
     }
-    proc.start("cryptsetup --batch-mode"
-               " --cipher " + strCipherSpec.toLower()
-               + " --key-size " + spinFDEkeysize->cleanText()
-               + " --hash " + comboFDEhash->currentText().toLower().remove('-')
-               + " --use-" + comboFDErandom->currentText()
-               + " --iter-time " + spinFDEroundtime->cleanText()
-               + " luksFormat " + dev);
-    proc.waitForStarted();
-    proc.write(password + "\n");
-    proc.waitForFinished();
-    if (proc.exitCode() != 0) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, could not create %1 LUKS partition").arg(fs_name));
+    QString cmd = "cryptsetup --batch-mode"
+                  " --cipher " + strCipherSpec.toLower()
+                  + " --key-size " + spinFDEkeysize->cleanText()
+                  + " --hash " + comboFDEhash->currentText().toLower().remove('-')
+                  + " --use-" + comboFDErandom->currentText()
+                  + " --iter-time " + spinFDEroundtime->cleanText()
+                  + " luksFormat " + dev;
+    qDebug() << cmd;
+    proc->start(cmd);
+    proc->waitForStarted();
+    proc->write(password + "\n");
+    eloop.exec();
+
+    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
+    if (proc->exitStatus() != QProcess::NormalExit || proc->exitCode() != 0) {
+        goBack(tr("Sorry, could not create %1 LUKS partition").arg(dev));
         return false;
     }
+    return true;
+}
+
+bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options)
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (phase < 0) return false;
+
+    QEventLoop eloop;
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
 
     // open containers, assigning container names
-    proc.start("cryptsetup luksOpen " + dev + " " + fs_name);
-    proc.waitForStarted();
-    proc.write(password + "\n");
-    proc.waitForFinished();
-    if (proc.exitCode() != 0) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, could not open %1 LUKS container").arg(fs_name));
+    QString cmd = "cryptsetup luksOpen " + dev;
+    if (!fs_name.isEmpty()) cmd += " " + fs_name;
+    if (!options.isEmpty()) cmd += " " + options;
+    qDebug() << cmd;
+    proc->start(cmd);
+    proc->waitForStarted();
+    proc->write(password + "\n");
+    eloop.exec();
+
+    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
+    if (proc->exitStatus() != QProcess::NormalExit || proc->exitCode() != 0) {
+        goBack(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
     }
     return true;
@@ -941,6 +1094,7 @@ bool MInstall::validateChosenPartitions()
     if (rootdev == "/dev/none" || rootdev == "/dev/") {
         QMessageBox::critical(this, QString::null,
             tr("You must choose a root partition.\nThe root partition must be at least %1.").arg(MIN_INSTALL_SIZE));
+        nextFocus = rootCombo;
         return false;
     }
 
@@ -1051,14 +1205,12 @@ bool MInstall::validateChosenPartitions()
 ///////////////////////////////////////////////////////////////////////////
 // in this case use all of the drive
 
-bool MInstall::makeDefaultPartitions()
+bool MInstall::makeDefaultPartitions(bool &formatBoot)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    int prog = 0;
 
     QString mmcnvmepartdesignator;
-    mmcnvmepartdesignator.clear();
 
     QString rootdev, swapdev;
     QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
@@ -1068,7 +1220,7 @@ bool MInstall::makeDefaultPartitions()
     }
 
     // entire disk, create partitions
-    updateStatus(tr("Creating required partitions"), ++prog);
+    updateStatus(tr("Creating required partitions"));
 
     // ready to partition
     // try to be sure that entire drive is available
@@ -1152,10 +1304,8 @@ bool MInstall::makeDefaultPartitions()
         } else {
             rootdev = drv + mmcnvmepartdesignator + "2";
             swapdev = drv + mmcnvmepartdesignator + "3";
-            updateStatus(tr("Formatting EFI System Partition (ESP)"), ++prog);
+            updateStatus(tr("Formatting EFI System Partition (ESP)"));
         }
-        rootDevicePreserve = rootdev;
-        swapDevicePreserve = swapdev;
 
         if (!makeEsp(drv, esp_size)) {
             return false;
@@ -1179,9 +1329,9 @@ bool MInstall::makeDefaultPartitions()
             rootdev = drv + mmcnvmepartdesignator + "1";
             swapdev = drv + mmcnvmepartdesignator + "2";
         }
-        rootDevicePreserve = rootdev;
-        swapDevicePreserve = swapdev;
     }
+    rootDevicePreserve = rootdev;
+    swapDevicePreserve = swapdev;
 
     // create root partition
     QString start;
@@ -1200,6 +1350,7 @@ bool MInstall::makeDefaultPartitions()
             return false;
         }
         start = QString::number(end_boot) + "MiB ";
+        formatBoot = true;
     }
 
     // if encrypting, boot_size=512, or 0 if not  .  start is set to end_boot if encrypting
@@ -1217,47 +1368,6 @@ bool MInstall::makeDefaultPartitions()
         return false;
     }
 
-    // if encrypting, set up LUKS containers for root and swap
-    if (isRootEncrypted) {
-        updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-        if (!makeLuksPartition(rootdev, "rootfs", FDEpassword->text().toUtf8()) || !makeLuksPartition(swapdev, "swapfs", FDEpassword->text().toUtf8())) {
-            qDebug() << "could not make LUKS partitions";
-            return false;
-        } else {
-            rootdev="/dev/mapper/rootfs";
-            swapdev="/dev/mapper/swapfs";
-        }
-    }
-
-    // formatting takes a while, allow the user to enter other options
-    buildBootLists();
-    gotoPage(5);
-
-    updateStatus(tr("Formatting swap partition"), ++prog);
-    csleep(1000);
-    if (!makeSwapPartition(swapdev)) {
-        return false;
-    }
-    csleep(1000);
-    shell.run("make-fstab -s");
-    shell.run("/sbin/swapon -a 2>&1");
-
-    // format /boot filesystem if encrypting
-    if (isRootEncrypted) {
-        updateStatus(tr("Formatting boot partition"), ++prog);
-        if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
-            return false;
-        }
-    }
-
-    updateStatus(tr("Formatting root partition"), ++prog);
-    if (!makeLinuxPartition(rootdev, "ext4", false, rootLabelEdit->text())) {
-        return false;
-    } else {
-        root_mntops = "defaults,noatime";
-        isRootFormatted = true;
-    }
-
     // if UEFI is not detected, set flags based on GPT. Else don't set a flag...done by makeESP.
     if (!uefi) { // set appropriate flags
         if (isGpt(drv)) {
@@ -1267,38 +1377,18 @@ bool MInstall::makeDefaultPartitions()
         }
     }
 
-    csleep(1000);
-
-    // mount partitions
-    if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
-        return false;
-    }
-
-    // on root, make sure it exists
-    csleep(1000);
-    mkdir("/mnt/antiX/home", 0755);
-
-    indexPartInfoDisk = -1; // invalidate existing partition info
-    updatePartInfo();
-    rootCombo->setCurrentIndex(1);
-    swapCombo->setCurrentIndex(1);
-    homeCombo->setCurrentIndex(0);
-    bootCombo->setCurrentIndex(0);
-
+    homeDevicePreserve = rootDevicePreserve;
     return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
 
-bool MInstall::makeChosenPartitions()
+bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot, bool &formatSwap)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    int prog = 0;
-    QString root_type;
-    QString home_type;
-    QString msg;
+    const bool saveHome = saveHomeCheck->isChecked();
     QString cmd;
 
     if (checkBoxEncryptRoot->isChecked()) {
@@ -1307,10 +1397,6 @@ bool MInstall::makeChosenPartitions()
 
     QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0).trimmed();
     bool gpt = isGpt(drv);
-
-    // get config
-    root_type = rootTypeCombo->currentText().toUtf8();
-    home_type = homeTypeCombo->currentText().toUtf8();
 
     // Root
     QString rootdev = rootDevicePreserve;
@@ -1334,17 +1420,7 @@ bool MInstall::makeChosenPartitions()
     }
     QStringList homesplit = getCmdOut("partition-info split-device=" + homedev).split(" ", QString::SkipEmptyParts);
 
-    updateStatus(tr("Preparing required partitions"), ++prog);
-
-    // unmount /home part if it exists
-    if (homedev != rootdev) {
-        // has homedev
-        if (shell.run("pumount " + homedev) != 0) {
-            // error
-            if (shell.run("swapoff " + homedev) != 0) {
-            }
-        }
-    }
+    updateStatus(tr("Preparing required partitions"));
 
     // unmount root part
     if (shell.run("pumount " + rootdev) != 0) {
@@ -1353,58 +1429,24 @@ bool MInstall::makeChosenPartitions()
         }
     }
 
-    //if no swap is chosen do nothing
-    if (swapdev != "/dev/none") {
-        //if swap exists and not encrypted, do nothing
-        //check swap fstype
-        cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
-        if (shell.run(cmd) != 0 || checkBoxEncryptSwap->isChecked()) {
-            if (shell.run("swapoff " + swapdev) != 0) {
-                if (shell.run("pumount " + swapdev) != 0) {
-                }
-            }
-            updateStatus(tr("Formatting swap partition"), ++prog);
-            // always set type
-            if (gpt) {
-                cmd = QString("/sbin/sgdisk /dev/%1 --typecode=%2:8200").arg(swapsplit[0]).arg(swapsplit[1]);
-            } else {
-                cmd = QString("/sbin/sfdisk /dev/%1 --part-type %2 82").arg(swapsplit[0]).arg(swapsplit[1]);
-            }
-            shell.run(cmd);
-            csleep(1000);
-
-            if (checkBoxEncryptSwap->isChecked()) {
-                updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-                if (!makeLuksPartition(swapdev, "swapfs", FDEpassCust->text().toUtf8())) {
-                    qDebug() << "could not make swap LUKS partition";
-                    return false;
-                } else {
-                    swapdev ="/dev/mapper/swapfs";
-                }
-            }
-
-            if (!makeSwapPartition(swapdev)) {
-                return false;
-            }
-            // enable the new swap partition asap
-            csleep(1000);
-
-            shell.run("make-fstab -s");
-            shell.run("/sbin/swapon " + swapdev);
-        }
-    }
-
-    bool formatRoot = false, formatBoot = false;
     // command to set the partition type
     if (gpt) {
         cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
     } else {
         cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
     }
+    // maybe format swap
+    if (swapdev != "/dev/none") {
+        if (shell.run("swapoff " + swapdev) != 0) {
+            shell.run("pumount " + swapdev);
+        }
+        shell.run(cmd.arg(swapsplit[0], swapsplit[1]));
+        formatSwap = true;
+    }
     // maybe format root (if not saving /home on root) // or if using --sync option
-    if (!(saveHomeCheck->isChecked() && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
+    if (!(saveHome && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
         shell.run(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
-        formatRoot = true;
+        rootType = rootTypeCombo->currentText().toUtf8();
     }
     // format and mount /boot if different than root
     if (bootCombo->currentText() != "root") {
@@ -1412,113 +1454,57 @@ bool MInstall::makeChosenPartitions()
         formatBoot = true;
     }
     // prepare home if not being preserved, and on a different partition
-    if (!(saveHomeCheck->isChecked()) && (homedev != rootdev)) {
-        shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
-    }
-    csleep(1000);
-
-    // allow the user to enter other options
-    buildBootLists();
-    gotoPage(5);
-
-    // maybe format root (if not saving /home on root) // or if using --sync option
-    if (formatRoot) {
-        updateStatus(tr("Formatting the / (root) partition"), ++prog);
-
-        if (checkBoxEncryptRoot->isChecked()) {
-            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(rootdev, "rootfs", FDEpassCust->text().toUtf8())) {
-                qDebug() << "could not make root LUKS partition";
-                return false;
-            } else {
-                rootdev="/dev/mapper/rootfs";
-            }
+    if (homedev != rootdev) {
+        if (shell.run("pumount " + homedev) != 0) {
+            shell.run("swapoff " + homedev);
         }
-        if (!makeLinuxPartition(rootdev, root_type, badblocksCheck->isChecked(), rootLabelEdit->text())) {
-            return false;
-        }
-        csleep(1000);
-        isRootFormatted = true;
-    }
-    if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) {
-        return false;
-    }
-
-    // format and mount /boot if different than root
-    if (formatBoot) {
-        updateStatus(tr("Formatting boot partition"), ++prog);
-        if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
-            return false;
+        if (!saveHome) {
+            shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
+            homeType = homeTypeCombo->currentText().toUtf8();
         }
     }
 
-    // maybe format home
-    if (saveHomeCheck->isChecked()) {
-        // save home
-        if (homedev != rootdev) {
-            // not on root
-            updateStatus(tr("Mounting the /home partition"), ++prog);
-            if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) {
-                return false;
-            }
-        } else {
-            // on root, make sure it exists
-            csleep(1000);
-            mkdir("/mnt/antiX/home", 0755);
+    // if preserving /home, obtain some basic information
+    if (saveHome) {
+        const QByteArray &pass = FDEpassCust->text().toUtf8();
+        // mount the home partition
+        if (isRootEncrypted) {
+            shell.run("cryptsetup luksClose rootfs");
+            if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly")) return false;
+            rootdev = "/dev/mapper/rootfs";
         }
-    } else {
-        // don't save home
-        shell.run("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1");
-
-        if (isHomeEncrypted) {
-            updateStatus(tr("Setting up LUKS encrypted containers"), ++prog);
-            if (!makeLuksPartition(homedev, "homefs", FDEpassCust->text().toUtf8())) {
-                qDebug() << "could not make home LUKS partition";
-                return false;
-            } else {
+        if (!mountPartition(rootdev, "/mnt/antiX", "ro")) return false;
+        // mount the root partition
+        if (homedev != rootDevicePreserve) {
+            if (isHomeEncrypted) {
+                shell.run("cryptsetup luksClose homefs");
+                if (!openLuksPartition(homedev, "homefs", pass, "--readonly")) return false;
                 homedev = "/dev/mapper/homefs";
             }
+            if (!mountPartition(homedev, "/mnt/antiX/home", "ro")) return false;
         }
 
-        mkdir("/mnt/antiX/home", 0755);
+        // store a listing of /home to compare with the user name given later
+        listHomes = getCmdOuts("ls -1 /mnt/antiX/home/");
+        // recycle the old key for /home if possible
+        key.load("/mnt/antiX/root/keyfile", -1);
 
-        if (homedev != rootdev) { // not on root
-            updateStatus(tr("Formatting the /home partition"), ++prog);
-
-            if (!makeLinuxPartition(homedev, home_type, badblocksCheck->isChecked(), homeLabelEdit->text())) {
-                return false;
-            }
-            csleep(1000);
-
-            if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) {
-                return false;
-            }
-            isHomeFormatted = true;
+        // unmount partitions
+        if (homedev != rootDevicePreserve) {
+            shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
+            if (isHomeEncrypted) shell.run("cryptsetup luksClose homefs");
         }
+        shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+        if (isRootEncrypted) shell.run("cryptsetup luksClose rootfs");
     }
-    // mount all swaps
-    csleep(1000);
-    if (checkBoxEncryptSwap->isChecked() && swapdev != "/dev/none") { // swapon -a doens't mount LUKS swap
-        shell.run("swapon " + swapdev);
-    }
-    shell.run("/sbin/swapon -a 2>&1");
-
     return true;
 }
 
 bool MInstall::installLinux()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    QString rootdev;
+    QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
     if (phase < 0) return false;
-
-    //use /dev/mapper designations if ecryption is checked
-    if (isRootEncrypted) {
-        rootdev = "/dev/mapper/rootfs";
-    } else {
-        QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
-        QString rootdev = "/dev/" + rootCombo->currentText().section(" -", 0, 0).trimmed();
-    }
 
     // maybe root was formatted or using --sync option
     if (isRootFormatted || args.contains("--sync") || args.contains("-s")) {
@@ -1526,17 +1512,12 @@ bool MInstall::installLinux()
         if(!copyLinux()) return false;
     } else {
         // no--it's being reused
-        updateStatus(tr("Mounting the / (root) partition"), 3);
+        updateStatus(tr("Mounting the / (root) partition"));
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
         // remove all folders in root except for /home
-        connect(timer, SIGNAL(timeout()), this, SLOT(delTime()));
-        timer->start(20000);
-        updateStatus(tr("Deleting old system"), 4);
+        updateStatus(tr("Deleting old system"));
         QString cmd = "/bin/bash -c \"find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;\"";
-        QProcess::ExitStatus rexit = runCmd2(cmd);
-        timer->stop();
-        disconnect(timer, SIGNAL(timeout()), 0, 0);
-        if (rexit == QProcess::NormalExit) {
+        if (runCmd2(cmd) == QProcess::NormalExit) {
             if(!copyLinux()) return false;
         } else {
             unmountGoBack(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
@@ -1637,7 +1618,8 @@ bool MInstall::copyLinux()
     if (phase < 0) return false;
     // make empty dirs for opt, dev, proc, sys, run,
     // home already done
-    updateStatus(tr("Creating system directories"), 9);
+
+    updateStatus(tr("Creating system directories"));
     mkdir("/mnt/antiX/opt", 0755);
     mkdir("/mnt/antiX/dev", 0755);
     mkdir("/mnt/antiX/proc", 0755);
@@ -1657,9 +1639,8 @@ bool MInstall::copyLinux()
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
-    connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
-    timer->start(2000);
-    updateStatus(tr("Copying new system"), 15);
+    updateStatus(tr("Copying new system"));
+    iCopyBarStart = progressBar->value();
     // setup and start the process
     QString cmd;
     cmd = "/bin/cp -a";
@@ -1680,20 +1661,21 @@ bool MInstall::copyLinux()
             iTargetInodes += svfs.f_files - svfs.f_ffree;
         }
     }
+
     QProcess::ExitStatus rexit = QProcess::NormalExit;
     if (!(args.contains("--nocopy") || args.contains("-n"))) {
+        connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
+        timer->start(1000);
         rexit = runCmd2(cmd);
+        timer->stop();
+        disconnect(timer, SIGNAL(timeout()), 0, 0);
     }
-
-    // After the copy is over.
-    timer->stop();
-    disconnect(timer, SIGNAL(timeout()), 0, 0);
     if (rexit != QProcess::NormalExit) {
         unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
         return false;
     }
 
-    updateStatus(tr("Fixing configuration"), 96);
+    updateStatus(tr("Fixing configuration"), 94);
     shell.run("mkdir -m 1777 /mnt/antiX/tmp");
     makeFstab();
     writeKeyFile();
@@ -1726,7 +1708,7 @@ bool MInstall::installLoader()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    updateStatus(tr("Installing GRUB"), 97);
+    updateStatus(tr("Installing GRUB"), 95);
     QString cmd;
     QString val = getCmdOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1741,22 +1723,17 @@ bool MInstall::installLoader()
     }
 
     //add switch to change root partition info
-    QString rootpart;
-    if (isRootEncrypted) {
-        rootpart = "mapper/rootfs";
-    } else {
-        rootpart = rootCombo->currentText().section(" ", 0, 0);
-    }
     QString boot = grubBootCombo->currentText().section(" ", 0, 0).trimmed();
 
     if (grubMbrButton->isChecked()) {
-        QString drive = rootpart;
-        QString part_num = rootpart;
+        QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
+        QString drive = rootdev;
+        QString part_num = rootdev;
         part_num.remove(QRegularExpression("\\D+\\d*\\D+")); // remove the non-digit part to get the number of the root partition
         drive.remove(QRegularExpression("\\d*$|p\\d*$"));    // remove partition number to get the root drive
-        if (!isGpt("/dev/" + drive)) {
-            qDebug() << "parted -s /dev/" + drive + " set " + part_num + " boot on";
-            runCmd("parted -s /dev/" + drive + " set " + part_num + " boot on");
+        if (!isGpt(drive)) {
+            qDebug() << "parted -s " + drive + " set " + part_num + " boot on";
+            runCmd("parted -s " + drive + " set " + part_num + " boot on");
         }
     }
 
@@ -1841,7 +1818,6 @@ bool MInstall::installLoader()
     cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(finalcmdlinestring);
     runCmd(cmd);
 
-    progressBar->setValue(98);
     //copy memtest efi files if needed
 
     if (uefi) {
@@ -1853,14 +1829,17 @@ bool MInstall::installLoader()
             runCmd("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt");
         }
     }
+    progressBar->setValue(96);
 
     //update grub with new config
 
     qDebug() << "Update Grub";
     runCmd("chroot /mnt/antiX update-grub");
+    progressBar->setValue(97);
 
     qDebug() << "Update initramfs";
     runCmd("chroot /mnt/antiX update-initramfs -u -t -k all");
+    progressBar->setValue(98);
     qDebug() << "clear chroot env";
     runCmd("umount /mnt/antiX/proc");
     runCmd("umount /mnt/antiX/sys");
@@ -1872,7 +1851,7 @@ bool MInstall::installLoader()
     return true;
 }
 
-bool MInstall::isGpt(QString drv)
+bool MInstall::isGpt(const QString &drv)
 {
     QString cmd = QString("blkid %1 | grep -q PTTYPE=\\\"gpt\\\"").arg(drv);
     return (shell.run(cmd) == 0);
@@ -1899,65 +1878,37 @@ bool MInstall::setUserName()
     if (args.contains("--nocopy") || args.contains("-n")) {
         return true;
     }
-    int ans;
     DIR *dir;
-    QString msg, cmd;
+    QString cmd;
 
     // see if user directory already exists
     QString dpath = QString("/mnt/antiX/home/%1").arg(userNameEdit->text());
     if ((dir = opendir(dpath.toUtf8())) != NULL) {
         // already exists
         closedir(dir);
-        msg = tr("The home directory for %1 already exists.Would you like to reuse the old home directory?").arg(userNameEdit->text());
-        ans = QMessageBox::information(this, QString::null, msg,
-                                       tr("Yes"), tr("No"));
-        if (ans != 0) {
-            // don't reuse -- maybe save the old home
-            msg = tr("Would you like to save the old home directory\nand create a new home directory?");
-            ans = QMessageBox::information(this, QString::null, msg,
-                                           tr("Yes"), tr("No"));
-            if (ans == 0) {
-                // save the old directory
-                cmd = QString("mv -f %1 %2.001").arg(dpath).arg(dpath);
-                if (shell.run(cmd) != 0) {
-                    cmd = QString("mv -f %1 %2.002").arg(dpath).arg(dpath);
-                    if (shell.run(cmd) != 0) {
-                        cmd = QString("mv -f %1 %2.003").arg(dpath).arg(dpath);
-                        if (shell.run(cmd) != 0) {
-                            cmd = QString("mv -f %1 %2.004").arg(dpath).arg(dpath);
-                            if (shell.run(cmd) != 0) {
-                                cmd = QString("mv -f %1 %2.005").arg(dpath).arg(dpath);
-                                if (shell.run(cmd) != 0) {
-                                    QMessageBox::critical(this, QString::null,
-                                                          tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                // don't save and don't reuse -- delete?
-                msg = tr("Would you like to delete the old home directory for %1?").arg(userNameEdit->text());
-                ans = QMessageBox::information(this, QString::null, msg,
-                                               tr("Yes"), tr("No"));
-                if (ans == 0) {
-                    // delete the directory
-                    cmd = QString("rm -f %1").arg(dpath);
-                    if (shell.run(cmd) != 0) {
-                        QMessageBox::critical(this, QString::null,
-                                              tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
-                        return false;
-                    }
-                } else {
-                    // don't save, reuse or delete -- can't proceed
-                    QMessageBox::critical(this, QString::null,
-                                          tr("You've chosen to not use, save or delete the old home directory.\nBefore proceeding, you'll have to select a different username."));
-                    return false;
-                }
+        if (oldHomeAction == OldHomeSave) {
+            // save the old directory
+            int rexit = -1;
+            cmd = QString("mv -f %1 %1.00%2").arg(dpath);
+            for (int ixi = 1; ixi < 10 && rexit != 0; ++ixi) {
+                rexit = shell.run(cmd.arg(ixi));
+            }
+            if (rexit != 0) {
+                QMessageBox::critical(this, QString::null,
+                                      tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
+                return false;
+            }
+        } else if (oldHomeAction == OldHomeDelete) {
+            // delete the directory
+            cmd = QString("rm -rf %1").arg(dpath);
+            if (shell.run(cmd) != 0) {
+                QMessageBox::critical(this, QString::null,
+                                      tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
+                return false;
             }
         }
     }
+
     if ((dir = opendir(dpath.toUtf8())) == NULL) {
         // dir does not exist, must create it
         // copy skel to demo
@@ -2030,7 +1981,7 @@ bool MInstall::setUserName()
 }
 
 // get the type of the partition
-QString MInstall::getPartType(const QString dev)
+QString MInstall::getPartType(const QString &dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     return shell.getOutput("blkid " + dev + " -o value -s TYPE");
@@ -2044,28 +1995,30 @@ bool MInstall::setPasswords()
         return true;
     }
 
-    QProcess proc;
-    proc.start("chroot /mnt/antiX passwd root");
-    proc.waitForStarted();
-    proc.write(rootPasswordEdit->text().toUtf8() + "\n");
-    csleep(1000);
-    proc.write(rootPasswordEdit->text().toUtf8() + "\n");
-    proc.waitForFinished();
+    QEventLoop eloop;
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
 
-    if (proc.exitCode() != 0) {
+    proc->start("chroot /mnt/antiX chpasswd");
+    proc->waitForStarted();
+    proc->write("root:" + rootPasswordEdit->text().toUtf8());
+    proc->closeWriteChannel();
+    eloop.exec();
+
+    if (proc->exitCode() != 0) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set root password."));
         return false;
     }
 
-    proc.start("chroot /mnt/antiX passwd demo");
-    proc.waitForStarted();
-    proc.write(userPasswordEdit->text().toUtf8() + "\n");
-    csleep(1000);
-    proc.write(userPasswordEdit->text().toUtf8() + "\n");
-    proc.waitForFinished();
+    proc->start("chroot /mnt/antiX chpasswd");
+    proc->waitForStarted();
+    proc->write("demo:" + userPasswordEdit->text().toUtf8());
+    proc->closeWriteChannel();
+    eloop.exec();
 
-    if (proc.exitCode() != 0) {
+    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
+
+    if (proc->exitCode() != 0) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set user password."));
         return false;
@@ -2076,7 +2029,7 @@ bool MInstall::setPasswords()
 
 bool MInstall::validateUserInfo()
 {
-    //validate data before proceeding
+    nextFocus = userNameEdit;
     // see if username is reasonable length
     if (userNameEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
@@ -2105,25 +2058,70 @@ bool MInstall::validateUserInfo()
     if (userPasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter the user password."));
+        nextFocus = userPasswordEdit;
         return false;
     }
     if (rootPasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, QString::null,
                               tr("Please enter the root password."));
+        nextFocus = rootPasswordEdit;
         return false;
     }
     if (userPasswordEdit->text() != userPasswordEdit2->text()) {
         QMessageBox::critical(this, QString::null,
                               tr("The user password entries do not match.\n"
                                  "Please try again."));
+        nextFocus = userPasswordEdit;
         return false;
     }
     if (rootPasswordEdit->text() != rootPasswordEdit2->text()) {
         QMessageBox::critical(this, QString::null,
                               tr("The root password entries do not match.\n"
                                  "Please try again."));
+        nextFocus = rootPasswordEdit;
         return false;
     }
+
+    // Check for pre-existing /home directory
+    // see if user directory already exists
+    if (listHomes.contains(userNameEdit->text())) {
+        // already exists
+        int ans;
+        QString msg;
+        msg = tr("The home directory for %1 already exists.Would you like to reuse the old home directory?").arg(userNameEdit->text());
+        ans = QMessageBox::information(this, QString::null, msg,
+                                       tr("Yes"), tr("No"));
+        if (ans == 0) {
+            // use the old home
+            oldHomeAction = OldHomeUse;
+        } else {
+            // don't reuse -- maybe save the old home
+            msg = tr("Would you like to save the old home directory\nand create a new home directory?");
+            ans = QMessageBox::information(this, QString::null, msg,
+                                           tr("Yes"), tr("No"));
+            if (ans == 0) {
+                // save the old directory
+                oldHomeAction = OldHomeSave;
+            } else {
+                // don't save and don't reuse -- delete?
+                msg = tr("Would you like to delete the old home directory for %1?").arg(userNameEdit->text());
+                ans = QMessageBox::information(this, QString::null, msg,
+                                               tr("Yes"), tr("No"));
+                if (ans == 0) {
+                    // delete the directory
+                    oldHomeAction = OldHomeDelete;
+                } else {
+                    // don't save, reuse or delete -- can't proceed
+                    QMessageBox::critical(this, QString::null,
+                                          tr("You've chosen to not use, save or delete the old home directory.\n"
+                                             "Before proceeding, you'll have to select a different username."));
+                    nextFocus = userNameEdit;
+                    return false;
+                }
+            }
+        }
+    }
+    nextFocus = NULL;
     return true;
 }
 
@@ -2143,6 +2141,7 @@ bool MInstall::validateComputerName()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // see if name is reasonable
+    nextFocus = computerNameEdit;
     if (computerNameEdit->text().length() < 2) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, your computer name needs to be\nat least 2 characters long. You'll have to\nselect a different name before proceeding."));
@@ -2153,6 +2152,7 @@ bool MInstall::validateComputerName()
         return false;
     }
     // see if name is reasonable
+    nextFocus = computerDomainEdit;
     if (computerDomainEdit->text().length() < 2) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, your computer domain needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
@@ -2168,12 +2168,14 @@ bool MInstall::validateComputerName()
         if (computerGroupEdit->text().length() < 2) {
             QMessageBox::critical(this, QString::null,
                                   tr("Sorry, your workgroup needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
+            nextFocus = computerGroupEdit;
             return false;
         }
     } else {
         computerGroupEdit->clear();
     }
 
+    nextFocus = NULL;
     return true;
 }
 
@@ -2276,17 +2278,9 @@ void MInstall::setLocale()
         shell.run("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime");
     }
     shell.run("hwclock --hctosys");
-    QString rootdev, homedev;
-    if (isRootEncrypted) {
-        rootdev = "/dev/mapper/rootfs";
-    } else {
-        rootdev = "/dev/" + rootCombo->currentText().section(" ", 0, 0);
-    }
+    QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
+    QString homedev = (isHomeEncrypted ? "/dev/mapper/homefs" : homeDevicePreserve);
 
-    homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0);
-    if (isHomeEncrypted) {
-        homedev = "/dev/mapper/homefs";
-    }
     shell.run("umount -R /mnt/antiX");
     mountPartition(rootdev, "/mnt/antiX", root_mntops);
     if (homedev != "/dev/root" && homedev != rootdev) {
@@ -2377,7 +2371,7 @@ void MInstall::unmountGoBack(const QString &msg)
 void MInstall::goBack(const QString &msg)
 {
     if (phase >= 0) {
-        ((MMain *)mmn)->mainFrame->setEnabled(false);
+        this->setEnabled(false);
         QMessageBox::critical(this, QString::null, msg);
         setCursor(QCursor(Qt::WaitCursor));
     }
@@ -2476,15 +2470,12 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
                                        "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
-        ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
-        if (diskCombo->count() == 0) {
+        if (diskCombo->count() == 0 || phase < 0) {
             setCursor(QCursor(Qt::WaitCursor));
             updateDiskInfo();
-        } else if (phase < 0) {
-            updatePartitionWidgets();
         }
         phase = 0;
-        ((MMain *)mmn)->mainFrame->setEnabled(true);
+        this->setEnabled(true);
         setCursor(QCursor(Qt::ArrowCursor));
         break;
 
@@ -2504,7 +2495,6 @@ void MInstall::pageDisplayed(int next)
                                        "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME)+ tr(""
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
-        ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         updatePartInfo();
         setCursor(QCursor(Qt::ArrowCursor));
         break;
@@ -2550,7 +2540,6 @@ void MInstall::pageDisplayed(int next)
                                     + tr("A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).") + "<br/>"
                                     + tr("If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.")
                                     + "</p>");
-        ((MMain *)mmn)->mainHelp->resize(((MMain *)mmn)->tab->size());
         break;
 
     case 4: // installation step
@@ -2578,7 +2567,7 @@ void MInstall::pageDisplayed(int next)
             backButton->setEnabled(haveSysConfig);
             nextButton->setEnabled(!haveSysConfig);
         }
-        if (!processNextPhase()) gotoPage(1);
+        if (!processNextPhase() && phase > -2) gotoPage(1);
         return; // avoid enabling both Back and Next buttons at the end
         break;
     case 5: // set bootloader
@@ -2610,13 +2599,13 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 9: // set username and passwords
-        userNameEdit->setFocus();
         ((MMain *)mmn)->setHelpText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
                                        "You should not use the root user as your daily user account. "
                                        "Please enter the name for a new (default) user account that you will use on a daily basis. "
                                        "If needed, you can add other user accounts later with %1 User Manager. </p>"
                                        "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
                                        "Each password must be entered twice.</p>").arg(PROJECTNAME));
+        if (!nextFocus) nextFocus = userNameEdit;
         break;
 
     case 10: // done
@@ -2687,6 +2676,10 @@ void MInstall::gotoPage(int next)
     // anything to do after displaying the page
     pageDisplayed(next);
     widgetStack->setEnabled(true);
+    if (nextFocus) {
+        nextFocus->setFocus();
+        nextFocus = NULL;
+    }
 }
 
 void MInstall::firstRefresh(QDialog *main)
@@ -2740,6 +2733,7 @@ void MInstall::updateDiskInfo()
     diskCombo->clear();
     diskCombo->addItem(tr("Loading..."));
 
+    shell.run("partprobe");
     updatePartitionWidgets();
     //  shell.run("umount -a 2>/dev/null");
     QString exclude = " --exclude=boot";
@@ -2747,6 +2741,7 @@ void MInstall::updateDiskInfo()
         exclude.clear();
     }
     listBootDrives = getCmdOuts("partition-info" + exclude + " --min-size=" + MIN_ROOT_DEVICE_SIZE + " -n drives");
+    indexPartInfoDisk = -1;
     diskCombo->clear();
     diskCombo->addItems(listBootDrives);
     diskCombo->setCurrentIndex(0);
@@ -2833,7 +2828,7 @@ void MInstall::on_backButton_clicked()
 
 void MInstall::on_abortInstallButton_clicked()
 {
-    procAbort();
+    abort(false);
     QApplication::beep();
 }
 
@@ -2850,6 +2845,7 @@ void MInstall::on_qtpartedButton_clicked()
     qtpartedButton->setEnabled(false);
     shell.run("/sbin/swapoff -a 2>&1");
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
+    shell.run("partprobe");
     shell.run("make-fstab -s");
     shell.run("/sbin/swapon -a 2>&1");
     updatePartitionWidgets();
@@ -2893,7 +2889,6 @@ void MInstall::updatePartInfo()
     QStringList partitions = getCmdOuts(QString("partition-info -n --exclude=" + exclude + "swap --min-size=" + MIN_ROOT_DEVICE_SIZE + " %1").arg(drv));
     rootCombo->clear();
     if (partitions.size() > 0) {
-        rootCombo->addItem(""); // add an empty item to make sure nothing is selected by default
         rootCombo->addItems(partitions);
     } else {
         rootCombo->addItem("none");
@@ -2917,7 +2912,7 @@ void MInstall::updatePartInfo()
     bootCombo->addItem("root");
     bootCombo->addItems(partitions);
 
-    on_rootCombo_activated();
+    on_rootCombo_activated(rootCombo->currentText());
 }
 
 // root partition changed, rebuild home, swap, boot combo boxes
@@ -2938,8 +2933,9 @@ void MInstall::on_rootTypeCombo_activated(QString)
     }
 }
 
-bool MInstall::procAbort()
+bool MInstall::abort(bool onclose)
 {
+    this->setEnabled(false);
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
@@ -2947,16 +2943,19 @@ bool MInstall::procAbort()
                                 tr("The installation and configuration is incomplete.\n"
                                    "Do you really want to stop now?"),
                                 QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
+            this->setEnabled(true);
             return false;
         }
     }
-    ((MMain *)mmn)->mainFrame->setEnabled(false);
+    setCursor(QCursor(Qt::WaitCursor));
     proc->terminate();
     QTimer::singleShot(5000, proc, SLOT(kill()));
     shell.terminate();
     QTimer::singleShot(1000, &shell, SLOT(kill()));
     // help the installer if it was stuck at the config pages
-    if (phase == 2 && !haveSysConfig) {
+    if (onclose) {
+        phase = -2;
+    } else if (phase == 2 && !haveSysConfig) {
         phase = -1;
         gotoPage(1);
     } else {
@@ -3011,21 +3010,12 @@ void MInstall::cleanup()
 }
 
 /////////////////////////////////////////////////////////////////////////
-// delete process events
-
-void MInstall::delTime()
-{
-    progressBar->setValue(progressBar->value() + 1);
-}
-
-
-/////////////////////////////////////////////////////////////////////////
 // copy process events
 
 void MInstall::copyTime()
 {
     struct statvfs svfs;
-    const int progspace = 80;
+    const int progspace = 93 - iCopyBarStart;
     int i = 0;
     if(iTargetInodes > 0 && statvfs("/mnt/antiX", &svfs) == 0) {
         i = (int)((svfs.f_files - svfs.f_ffree) / (iTargetInodes / progspace));
@@ -3035,13 +3025,13 @@ void MInstall::copyTime()
     } else {
         updateStatus(tr("Copy progress unknown. No file system statistics."), 0);
     }
-    progressBar->setValue(i + 15);
+    progressBar->setValue(i + iCopyBarStart);
 }
 
 void MInstall::on_progressBar_valueChanged(int value)
 {
     if (ixTipStart < 0 || widgetStack->currentIndex() != 4) {
-        return; // no point xdisplaying a new hint if it will be invisible
+        return; // no point displaying a new hint if it will be invisible
     }
 
     const int tipcount = 6;
@@ -3130,8 +3120,6 @@ void MInstall::on_buttonSetKeyboard_clicked()
     shell.run("fskbsetting");
     mmn->show();
     setupkeyboardbutton();
-
-
 }
 
 void MInstall::on_homeCombo_currentIndexChanged(const QString &arg1)
@@ -3284,18 +3272,10 @@ void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
         nextButton->setDisabled(true);
         checkBoxEncryptSwap->setChecked(true);
         FDEpassCust->setFocus();
-        if (saveHomeCheck->isChecked()) {
-            QMessageBox::warning(this, QString::null,
-                                 tr("If you choose to encrypt home partition you cannot use the option to preserve data in that partition"),
-                                 tr("OK"));
-            saveHomeCheck->setChecked(false);
-        }
-        saveHomeCheck->setEnabled(false);
     } else {
         gbEncrPass->setVisible(checkBoxEncryptRoot->isChecked());
         nextButton->setDisabled(checkBoxEncryptRoot->isChecked());
         checkBoxEncryptSwap->setChecked(checkBoxEncryptRoot->isChecked());
-        saveHomeCheck->setEnabled(true);
     }
 
     if (!checkBoxEncryptSwap->isChecked()) {
@@ -3521,4 +3501,71 @@ void MInstall::buildBootLists()
             }
         }
     }
+}
+
+/////////////////////////////////////////////////////////////////////////
+// SafeCache Class - for temporarily caching sensitive files
+
+SafeCache::SafeCache()
+{
+    reserve(16384);
+}
+
+SafeCache::~SafeCache()
+{
+    erase();
+}
+
+// to completely free the key use parameters NULL, 0
+bool SafeCache::load(const char *filename, int length)
+{
+    bool ok = false;
+    erase();
+
+    // open and stat the file if specified
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) return false;
+    struct stat statbuf;
+    if (fstat(fd, &statbuf) == 0) {
+        if (statbuf.st_size > 0 && (length < 0 || length > statbuf.st_size)) {
+            if (statbuf.st_size > capacity()) length = capacity();
+            else length = statbuf.st_size;
+        }
+    }
+    if (length >= 0) resize(length);
+
+    // read the the file (if specified) into the buffer
+    length = size();
+    int remain = length;
+    while (remain > 0) {
+        ssize_t chunk = read(fd, data() + (length - remain), remain);
+        if (chunk < 0) goto ending;
+        remain -= chunk;
+        fsync(fd);
+    }
+    ok = true;
+
+ ending:
+    close(fd);
+    return ok;
+}
+
+bool SafeCache::save(const char *filename, mode_t mode)
+{
+    bool ok = false;
+    int fd = open(filename, O_CREAT|O_TRUNC|O_WRONLY);
+    if (fd == -1) return false;
+    if (write(fd, constData(), size()) == size()) goto ending;
+    if (fchmod(fd, mode) != 0) goto ending;
+    ok = true;
+
+ ending:
+    close(fd);
+    return ok;
+}
+
+void SafeCache::erase()
+{
+    fill(0xAA);
+    fill(0x55);
 }
