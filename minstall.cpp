@@ -1019,7 +1019,9 @@ bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, con
     connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
 
     // open containers, assigning container names
-    QString cmd = "cryptsetup luksOpen " + dev + " " + fs_name + " " + options;
+    QString cmd = "cryptsetup luksOpen " + dev;
+    if (!fs_name.isEmpty()) cmd += " " + fs_name;
+    if (!options.isEmpty()) cmd += " " + options;
     qDebug() << cmd;
     proc->start(cmd);
     proc->waitForStarted();
