@@ -31,6 +31,7 @@
 #include <QDebug>
 
 #include "mmain.h"
+#include "version.h"
 
 QScopedPointer<QFile> logFile;
 
@@ -45,8 +46,9 @@ int main(int argc, char *argv[])
         printHelp();
         return 0;
     }
+
     if (a.arguments().contains("--version") || a.arguments().contains("-v") ) {
-       system("echo 'Installer version'; dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:); echo"); // query 'minstall' since we don't know the name of the package
+       qDebug() << "Installer version:" << VERSION;
        return 0;
     }
 
@@ -91,6 +93,7 @@ int main(int argc, char *argv[])
     }
 
     if (getuid() == 0) {
+        qDebug() << "Installer version:" << VERSION;
         MMain mmain(a.arguments());
         const QRect &geo = a.desktop()->availableGeometry(&mmain);
         mmain.move((geo.width()-mmain.width())/2, (geo.height()-mmain.height())/2);

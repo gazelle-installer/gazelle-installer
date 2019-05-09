@@ -477,8 +477,6 @@ bool MInstall::processNextPhase()
         } else if (!pretendToInstall(95, 99, 1000)){
             return false;
         }
-        // print version (look for /usr/sbin/minstall since the name of the package might be different)
-        qDebug() << shell.getOutput("echo 'Installer version:' $(dpkg-query -f '${Version}' -W $(dpkg -S /usr/sbin/minstall | cut -f1 -d:))");
         phase = 4;
         updateStatus(tr("Installation successful"), 100);
         csleep(1000);

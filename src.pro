@@ -46,7 +46,8 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_zh_CN.ts \
                 translations/gazelle-installer_zh_TW.ts
 FORMS += memain.ui meinstall.ui
-HEADERS += mmain.h minstall.h
+HEADERS += mmain.h minstall.h \
+    version.h
 SOURCES += app.cpp mmain.cpp minstall.cpp
 LIBS += -lcmd
 CONFIG += release warn_on thread qt c++11
