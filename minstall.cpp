@@ -1760,7 +1760,7 @@ bool MInstall::installLoader()
             arch = "x86_64";
         }
 
-        cmd = QString("chroot /mnt/antiX grub-install --target=%1-efi --efi-directory=/boot/efi --bootloader-id=" + PROJECTSHORTNAME +"%2 --recheck").arg(arch).arg(PROJECTVERSION);
+        cmd = QString("chroot /mnt/antiX grub-install --no-nvram --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
     }
 
     qDebug() << "Installing Grub";
@@ -1773,6 +1773,14 @@ bool MInstall::installLoader()
             runCmd("umount /mnt/antiX/boot/efi");
         }
         return false;
+    }
+
+    // update NVRAM boot entries (only if installing on ESP)
+    if (grubEspButton->isChecked()) {
+        cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
+        if (runCmd(cmd) != 0) {
+            QMessageBox::warning(this, QString::null, tr("NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu."));
+        }
     }
 
     //added non-live boot codes to those in /etc/default/grub, remove duplicates
