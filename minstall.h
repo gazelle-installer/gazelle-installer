@@ -61,7 +61,7 @@ public:
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
     int runCmd(const QString &cmd);
-    QProcess::ExitStatus runCmd2(const QString &cmd);
+    bool runProc(const QString &cmd, const QByteArray &input = QByteArray());
     void csleep(int msec);
     QString getCmdOut(const QString &cmd);
     QString getCmdValue(const QString &cmd, const QString &key, const QString &keydel, const QString &valdel);
