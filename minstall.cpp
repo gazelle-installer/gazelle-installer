@@ -49,16 +49,21 @@ int MInstall::runCmd(const QString &cmd)
 }
 
 // shell.run() doesn't distinguish between crashed and failed processes
-QProcess::ExitStatus MInstall::runCmd2(const QString &cmd)
+bool MInstall::runProc(const QString &cmd, const QByteArray &input)
 {
     if (phase < 0) return QProcess::CrashExit;
     qDebug() << cmd;
     QEventLoop eloop;
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     proc->start(cmd);
+    if (!input.isEmpty()) {
+        proc->waitForStarted();
+        proc->write(input);
+        proc->closeWriteChannel();
+    }
     eloop.exec();
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
-    return proc->exitStatus();
+    return (proc->exitStatus() == QProcess::NormalExit && proc->exitCode() == 0);
 }
 
 MInstall::MInstall(QWidget *parent, QStringList args) :
@@ -231,9 +236,9 @@ void MInstall::writeKeyFile()
 
     QString rngfile = "/dev/" + comboFDErandom->currentText();
     const unsigned int keylength = 4096;
+    QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
     if (isRootEncrypted) { // if encrypting root
         bool newkey = (key.length() == 0);
-        QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
 
         //create keyfile
         if (newkey) key.load(rngfile.toUtf8(), keylength);
@@ -244,19 +249,13 @@ void MInstall::writeKeyFile()
         if (swapDevicePreserve != "/dev/none") {
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
 
-            QProcess proc;
-            proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile");
-            proc.waitForStarted();
-            proc.write(password.toUtf8() + "\n");
-            proc.waitForFinished();
+            runProc("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile",
+                    password.toUtf8() + "\n");
         }
 
         if (isHomeEncrypted && newkey) { // if encrypting separate /home
-            QProcess proc;
-            proc.start("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile");
-            proc.waitForStarted();
-            proc.write(password.toUtf8() + "\n");
-            proc.waitForFinished();
+            runProc("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile",
+                    password.toUtf8() + "\n");
         }
         QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
         //write crypttab keyfile entry
@@ -284,11 +283,8 @@ void MInstall::writeKeyFile()
             //add keyfile to container
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
 
-            QProcess proc;
-            proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
-            proc.waitForStarted();
-            proc.write(FDEpassCust->text().toUtf8() + "\n");
-            proc.waitForFinished();
+            runProc("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete",
+                    password.toUtf8() + "\n");
         }
         QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
         //write crypttab keyfile entry
@@ -463,17 +459,18 @@ bool MInstall::processNextPhase()
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
         if (!pretend) {
-            if (!installLoader()) return false;
-            updateStatus(tr("Setting system configuration"), 99);
+            updateStatus(tr("Setting system configuration"), 95);
             setServices();
+            if (!setComputerName()) return false;
+            setLocale();
             if (!setUserInfo()) return false;
             if (haveSnapshotUserAccounts) {
                 QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
                 shell.run(cmd);
             }
-            if (!setComputerName()) return false;
-            setLocale();
             saveConfig();
+            shell.run("sync"); // the sync(2) system call will block the GUI
+            if (!installLoader()) return false;
         } else if (!pretendToInstall(95, 99, 1000)){
             return false;
         }
@@ -706,7 +703,9 @@ void MInstall::saveConfig()
     // Services step
     QTreeWidgetItemIterator it(csView, QTreeWidgetItemIterator::Checked);
     while (*it) {
-        config->setValue("Services/" + (*it)->text(0), true);
+        if ((*it)->parent() != NULL) {
+            config->setValue("Services/" + (*it)->text(0), true);
+        }
         ++it;
     }
     // Network step
@@ -777,19 +776,6 @@ void MInstall::saveAdvancedFDE()
     iFDEroundtime = spinFDEroundtime->value();
 }
 
-bool MInstall::makeSwapPartition(const QString &dev)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (phase < 0) return false;
-    shell.run("swapoff -a");
-    QString cmd = "/sbin/mkswap " + dev + " -L " + swapLabelEdit->text();
-    if (shell.run(cmd) != 0) {
-        // error
-        return false;
-    }
-    return true;
-}
-
 // create ESP at the begining of the drive
 bool MInstall::makeEsp(const QString &drv, int size)
 {
@@ -856,12 +842,8 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
     //if no swap is chosen do nothing
     if (formatSwap) {
         updateStatus(tr("Formatting swap partition"));
-        if (!makeSwapPartition(swapdev)) return false;
-        // enable the new swap partition asap
-        shell.run("sync");
-        csleep(500);
-        shell.run("make-fstab -s");
-        shell.run("/sbin/swapon " + swapdev);
+        const QString cmd("/sbin/mkswap %1 -L %2");
+        if (!runProc(cmd.arg(swapdev, swapLabelEdit->text()))) return false;
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
@@ -1007,9 +989,6 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    QEventLoop eloop;
-    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
-
     // format partition
     QString strCipherSpec = comboFDEcipher->currentText() + "-" + comboFDEchain->currentText();
     if (comboFDEchain->currentText() != "ECB") {
@@ -1025,14 +1004,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
                   + " --use-" + comboFDErandom->currentText()
                   + " --iter-time " + spinFDEroundtime->cleanText()
                   + " luksFormat " + dev;
-    qDebug() << cmd;
-    proc->start(cmd);
-    proc->waitForStarted();
-    proc->write(password + "\n");
-    eloop.exec();
-
-    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
-    if (proc->exitStatus() != QProcess::NormalExit || proc->exitCode() != 0) {
+    if (!runProc(cmd, password + "\n")) {
         goBack(tr("Sorry, could not create %1 LUKS partition").arg(dev));
         return false;
     }
@@ -1044,21 +1016,11 @@ bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, con
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    QEventLoop eloop;
-    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
-
     // open containers, assigning container names
     QString cmd = "cryptsetup luksOpen " + dev;
     if (!fs_name.isEmpty()) cmd += " " + fs_name;
     if (!options.isEmpty()) cmd += " " + options;
-    qDebug() << cmd;
-    proc->start(cmd);
-    proc->waitForStarted();
-    proc->write(password + "\n");
-    eloop.exec();
-
-    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
-    if (proc->exitStatus() != QProcess::NormalExit || proc->exitCode() != 0) {
+    if (!runProc(cmd, password + "\n")) {
         goBack(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
     }
@@ -1222,10 +1184,6 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
 
     // entire disk, create partitions
     updateStatus(tr("Creating required partitions"));
-
-    // ready to partition
-    // try to be sure that entire drive is available
-    shell.run("/sbin/swapoff -a 2>&1");
 
     // unmount root part
     rootdev = drv + mmcnvmepartdesignator + "1";
@@ -1423,13 +1381,6 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
 
     updateStatus(tr("Preparing required partitions"));
 
-    // unmount root part
-    if (shell.run("pumount " + rootdev) != 0) {
-        // error
-        if (shell.run("swapoff " + rootdev) != 0) {
-        }
-    }
-
     // command to set the partition type
     if (gpt) {
         cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
@@ -1438,14 +1389,13 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     }
     // maybe format swap
     if (swapdev != "/dev/none") {
-        if (shell.run("swapoff " + swapdev) != 0) {
-            shell.run("pumount " + swapdev);
-        }
+        shell.run("pumount " + swapdev);
         shell.run(cmd.arg(swapsplit[0], swapsplit[1]));
         formatSwap = true;
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (!(saveHome && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
+        shell.run("pumount " + rootdev);
         shell.run(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
         rootType = rootTypeCombo->currentText().toUtf8();
     }
@@ -1456,9 +1406,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     }
     // prepare home if not being preserved, and on a different partition
     if (homedev != rootdev) {
-        if (shell.run("pumount " + homedev) != 0) {
-            shell.run("swapoff " + homedev);
-        }
+        shell.run("pumount " + homedev);
         if (!saveHome) {
             shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
             homeType = homeTypeCombo->currentText().toUtf8();
@@ -1517,8 +1465,9 @@ bool MInstall::installLinux()
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
         // remove all folders in root except for /home
         updateStatus(tr("Deleting old system"));
-        QString cmd = "/bin/bash -c \"find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;\"";
-        if (runCmd2(cmd) == QProcess::NormalExit) {
+        runProc("/bin/bash -c \"find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;\"");
+
+        if (proc->exitStatus() == QProcess::NormalExit) {
             if(!copyLinux()) return false;
         } else {
             unmountGoBack(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
@@ -1663,17 +1612,16 @@ bool MInstall::copyLinux()
         }
     }
 
-    QProcess::ExitStatus rexit = QProcess::NormalExit;
     if (!(args.contains("--nocopy") || args.contains("-n"))) {
         connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
         timer->start(1000);
-        rexit = runCmd2(cmd);
+        runProc(cmd);
+        if (proc->exitStatus() != QProcess::NormalExit) {
+            unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
+            return false;
+        }
         timer->stop();
         disconnect(timer, SIGNAL(timeout()), 0, 0);
-    }
-    if (rexit != QProcess::NormalExit) {
-        unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
-        return false;
     }
 
     updateStatus(tr("Fixing configuration"), 94);
@@ -1709,7 +1657,7 @@ bool MInstall::installLoader()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    updateStatus(tr("Installing GRUB"), 95);
+    updateStatus(tr("Installing GRUB"), 96);
     QString cmd;
     QString val = getCmdOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1760,7 +1708,7 @@ bool MInstall::installLoader()
             arch = "x86_64";
         }
 
-        cmd = QString("chroot /mnt/antiX grub-install --target=%1-efi --efi-directory=/boot/efi --bootloader-id=" + PROJECTSHORTNAME +"%2 --recheck").arg(arch).arg(PROJECTVERSION);
+        cmd = QString("chroot /mnt/antiX grub-install --no-nvram --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
     }
 
     qDebug() << "Installing Grub";
@@ -1773,6 +1721,14 @@ bool MInstall::installLoader()
             runCmd("umount /mnt/antiX/boot/efi");
         }
         return false;
+    }
+
+    // update NVRAM boot entries (only if installing on ESP)
+    if (grubEspButton->isChecked()) {
+        cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
+        if (runCmd(cmd) != 0) {
+            QMessageBox::warning(this, QString::null, tr("NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu."));
+        }
     }
 
     //added non-live boot codes to those in /etc/default/grub, remove duplicates
@@ -1830,17 +1786,17 @@ bool MInstall::installLoader()
             runCmd("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt");
         }
     }
-    progressBar->setValue(96);
+    progressBar->setValue(97);
 
     //update grub with new config
 
     qDebug() << "Update Grub";
     runCmd("chroot /mnt/antiX update-grub");
-    progressBar->setValue(97);
+    progressBar->setValue(98);
 
     qDebug() << "Update initramfs";
     runCmd("chroot /mnt/antiX update-initramfs -u -t -k all");
-    progressBar->setValue(98);
+    progressBar->setValue(99);
     qDebug() << "clear chroot env";
     runCmd("umount /mnt/antiX/proc");
     runCmd("umount /mnt/antiX/sys");
@@ -1996,30 +1952,14 @@ bool MInstall::setPasswords()
         return true;
     }
 
-    QEventLoop eloop;
-    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
+    const QString cmd = "chroot /mnt/antiX chpasswd";
 
-    proc->start("chroot /mnt/antiX chpasswd");
-    proc->waitForStarted();
-    proc->write("root:" + rootPasswordEdit->text().toUtf8());
-    proc->closeWriteChannel();
-    eloop.exec();
-
-    if (proc->exitCode() != 0) {
+    if (!runProc(cmd, "root:" + rootPasswordEdit->text().toUtf8())) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set root password."));
         return false;
     }
-
-    proc->start("chroot /mnt/antiX chpasswd");
-    proc->waitForStarted();
-    proc->write("demo:" + userPasswordEdit->text().toUtf8());
-    proc->closeWriteChannel();
-    eloop.exec();
-
-    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
-
-    if (proc->exitCode() != 0) {
+    if (!runProc(cmd, "demo:" + userPasswordEdit->text().toUtf8())) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set user password."));
         return false;
@@ -2279,14 +2219,6 @@ void MInstall::setLocale()
         shell.run("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime");
     }
     shell.run("hwclock --hctosys");
-    QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
-    QString homedev = (isHomeEncrypted ? "/dev/mapper/homefs" : homeDevicePreserve);
-
-    shell.run("umount -R /mnt/antiX");
-    mountPartition(rootdev, "/mnt/antiX", root_mntops);
-    if (homedev != "/dev/root" && homedev != rootdev) {
-        mountPartition(homedev, "/mnt/antiX/home", home_mntops);
-    }
     shell.run("cp -f /etc/adjtime /mnt/antiX/etc/");
 
     // Set clock format
@@ -2323,20 +2255,22 @@ void MInstall::setServices()
 
     QTreeWidgetItemIterator it(csView);
     while (*it) {
-        QString service = (*it)->text(0);
-        qDebug() << "Service: " << service;
-        if ((*it)->checkState(0) == Qt::Checked) {
-            if (systemdcheck.isEmpty()) {
-                runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+        if ((*it)->parent() != NULL) {
+            QString service = (*it)->text(0);
+            qDebug() << "Service: " << service;
+            if ((*it)->checkState(0) == Qt::Checked) {
+                if (systemdcheck.isEmpty()) {
+                    runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+                } else {
+                    runCmd("chroot /mnt/antiX systemctl enable " + service);
+                }
             } else {
-                runCmd("chroot /mnt/antiX systemctl enable " + service);
-            }
-        } else {
-            if (systemdcheck.isEmpty()) {
-                runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
-            } else {
-                runCmd("chroot /mnt/antiX systemctl disable " + service);
-                runCmd("chroot /mnt/antiX systemctl mask " + service);
+                if (systemdcheck.isEmpty()) {
+                    runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
+                } else {
+                    runCmd("chroot /mnt/antiX systemctl disable " + service);
+                    runCmd("chroot /mnt/antiX systemctl mask " + service);
+                }
             }
         }
         ++it;
@@ -2363,7 +2297,6 @@ void MInstall::unmountGoBack(const QString &msg)
         shell.run("cryptsetup luksClose homefs");
     }
     if (isSwapEncrypted) {
-        shell.run("swapoff /dev/mapper/swapfs");
         shell.run("cryptsetup luksClose swapfs");
     }
     goBack(msg);
@@ -2664,7 +2597,6 @@ void MInstall::gotoPage(int next)
         setCursor(QCursor(Qt::WaitCursor));
         cleanup();
         if (checkBoxExitReboot->isChecked()) {
-            shell.run("swapoff -a");
             shell.run("/usr/local/bin/persist-config --shutdown --command reboot &");
         }
         qApp->exit(0);
@@ -2844,11 +2776,8 @@ void MInstall::on_qtpartedButton_clicked()
     setCursor(QCursor(Qt::WaitCursor));
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
-    shell.run("/sbin/swapoff -a 2>&1");
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
     shell.run("partprobe");
-    shell.run("make-fstab -s");
-    shell.run("/sbin/swapon -a 2>&1");
     updatePartitionWidgets();
     indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
@@ -3004,7 +2933,6 @@ void MInstall::cleanup()
         shell.run("cryptsetup luksClose homefs");
     }
     if (isSwapEncrypted) {
-        shell.run("swapoff /dev/mapper/swapfs");
         shell.run("cryptsetup luksClose swapfs");
     }
     sync();
