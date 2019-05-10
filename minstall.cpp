@@ -236,9 +236,9 @@ void MInstall::writeKeyFile()
 
     QString rngfile = "/dev/" + comboFDErandom->currentText();
     const unsigned int keylength = 4096;
+    QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
     if (isRootEncrypted) { // if encrypting root
         bool newkey = (key.length() == 0);
-        QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
 
         //create keyfile
         if (newkey) key.load(rngfile.toUtf8(), keylength);
@@ -284,7 +284,7 @@ void MInstall::writeKeyFile()
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
 
             runProc("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete",
-                    FDEpassCust->text().toUtf8() + "\n");
+                    password.toUtf8() + "\n");
         }
         QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
         //write crypttab keyfile entry
