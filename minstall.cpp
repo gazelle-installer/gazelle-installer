@@ -776,19 +776,6 @@ void MInstall::saveAdvancedFDE()
     iFDEroundtime = spinFDEroundtime->value();
 }
 
-bool MInstall::makeSwapPartition(const QString &dev)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (phase < 0) return false;
-    shell.run("swapoff -a");
-    QString cmd = "/sbin/mkswap " + dev + " -L " + swapLabelEdit->text();
-    if (shell.run(cmd) != 0) {
-        // error
-        return false;
-    }
-    return true;
-}
-
 // create ESP at the begining of the drive
 bool MInstall::makeEsp(const QString &drv, int size)
 {
@@ -855,7 +842,8 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
     //if no swap is chosen do nothing
     if (formatSwap) {
         updateStatus(tr("Formatting swap partition"));
-        if (!makeSwapPartition(swapdev)) return false;
+        const QString cmd("/sbin/mkswap %1 -L %2");
+        if (!runProc(cmd.arg(swapdev, swapLabelEdit->text()))) return false;
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
@@ -1197,10 +1185,6 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
     // entire disk, create partitions
     updateStatus(tr("Creating required partitions"));
 
-    // ready to partition
-    // try to be sure that entire drive is available
-    shell.run("/sbin/swapoff -a 2>&1");
-
     // unmount root part
     rootdev = drv + mmcnvmepartdesignator + "1";
     QString cmd = QString("/bin/umount -l %1 >/dev/null 2>&1").arg(rootdev);
@@ -1397,13 +1381,6 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
 
     updateStatus(tr("Preparing required partitions"));
 
-    // unmount root part
-    if (shell.run("pumount " + rootdev) != 0) {
-        // error
-        if (shell.run("swapoff " + rootdev) != 0) {
-        }
-    }
-
     // command to set the partition type
     if (gpt) {
         cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
@@ -1412,14 +1389,13 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     }
     // maybe format swap
     if (swapdev != "/dev/none") {
-        if (shell.run("swapoff " + swapdev) != 0) {
-            shell.run("pumount " + swapdev);
-        }
+        shell.run("pumount " + swapdev);
         shell.run(cmd.arg(swapsplit[0], swapsplit[1]));
         formatSwap = true;
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (!(saveHome && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
+        shell.run("pumount " + rootdev);
         shell.run(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
         rootType = rootTypeCombo->currentText().toUtf8();
     }
@@ -1430,9 +1406,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     }
     // prepare home if not being preserved, and on a different partition
     if (homedev != rootdev) {
-        if (shell.run("pumount " + homedev) != 0) {
-            shell.run("swapoff " + homedev);
-        }
+        shell.run("pumount " + homedev);
         if (!saveHome) {
             shell.run(cmd.arg(homesplit[0]).arg(homesplit[1]));
             homeType = homeTypeCombo->currentText().toUtf8();
@@ -2323,7 +2297,6 @@ void MInstall::unmountGoBack(const QString &msg)
         shell.run("cryptsetup luksClose homefs");
     }
     if (isSwapEncrypted) {
-        shell.run("swapoff /dev/mapper/swapfs");
         shell.run("cryptsetup luksClose swapfs");
     }
     goBack(msg);
@@ -2624,7 +2597,6 @@ void MInstall::gotoPage(int next)
         setCursor(QCursor(Qt::WaitCursor));
         cleanup();
         if (checkBoxExitReboot->isChecked()) {
-            shell.run("swapoff -a");
             shell.run("/usr/local/bin/persist-config --shutdown --command reboot &");
         }
         qApp->exit(0);
@@ -2804,7 +2776,6 @@ void MInstall::on_qtpartedButton_clicked()
     setCursor(QCursor(Qt::WaitCursor));
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
-    shell.run("/sbin/swapoff -a 2>&1");
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
     shell.run("partprobe");
     updatePartitionWidgets();
@@ -2962,7 +2933,6 @@ void MInstall::cleanup()
         shell.run("cryptsetup luksClose homefs");
     }
     if (isSwapEncrypted) {
-        shell.run("swapoff /dev/mapper/swapfs");
         shell.run("cryptsetup luksClose swapfs");
     }
     sync();
