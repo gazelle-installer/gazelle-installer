@@ -1725,7 +1725,7 @@ bool MInstall::installLoader()
 
     // update NVRAM boot entries (only if installing on ESP)
     if (grubEspButton->isChecked()) {
-        cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
+        cmd = QString("chroot /mnt/antiX grub-install --install-modules= --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
         if (runCmd(cmd) != 0) {
             QMessageBox::warning(this, QString::null, tr("NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu."));
         }
