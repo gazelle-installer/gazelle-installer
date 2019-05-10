@@ -473,6 +473,7 @@ bool MInstall::processNextPhase()
             if (!setComputerName()) return false;
             setLocale();
             saveConfig();
+            shell.run("sync"); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
         } else if (!pretendToInstall(95, 99, 1000)){
             return false;
@@ -2287,14 +2288,6 @@ void MInstall::setLocale()
         shell.run("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime");
     }
     shell.run("hwclock --hctosys");
-    QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
-    QString homedev = (isHomeEncrypted ? "/dev/mapper/homefs" : homeDevicePreserve);
-
-    shell.run("umount -R /mnt/antiX");
-    mountPartition(rootdev, "/mnt/antiX", root_mntops);
-    if (homedev != "/dev/root" && homedev != rootdev) {
-        mountPartition(homedev, "/mnt/antiX/home", home_mntops);
-    }
     shell.run("cp -f /etc/adjtime /mnt/antiX/etc/");
 
     // Set clock format
