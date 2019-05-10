@@ -707,7 +707,9 @@ void MInstall::saveConfig()
     // Services step
     QTreeWidgetItemIterator it(csView, QTreeWidgetItemIterator::Checked);
     while (*it) {
-        config->setValue("Services/" + (*it)->text(0), true);
+        if ((*it)->parent() != NULL) {
+            config->setValue("Services/" + (*it)->text(0), true);
+        }
         ++it;
     }
     // Network step
@@ -2324,20 +2326,22 @@ void MInstall::setServices()
 
     QTreeWidgetItemIterator it(csView);
     while (*it) {
-        QString service = (*it)->text(0);
-        qDebug() << "Service: " << service;
-        if ((*it)->checkState(0) == Qt::Checked) {
-            if (systemdcheck.isEmpty()) {
-                runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+        if ((*it)->parent() != NULL) {
+            QString service = (*it)->text(0);
+            qDebug() << "Service: " << service;
+            if ((*it)->checkState(0) == Qt::Checked) {
+                if (systemdcheck.isEmpty()) {
+                    runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
+                } else {
+                    runCmd("chroot /mnt/antiX systemctl enable " + service);
+                }
             } else {
-                runCmd("chroot /mnt/antiX systemctl enable " + service);
-            }
-        } else {
-            if (systemdcheck.isEmpty()) {
-                runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
-            } else {
-                runCmd("chroot /mnt/antiX systemctl disable " + service);
-                runCmd("chroot /mnt/antiX systemctl mask " + service);
+                if (systemdcheck.isEmpty()) {
+                    runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
+                } else {
+                    runCmd("chroot /mnt/antiX systemctl disable " + service);
+                    runCmd("chroot /mnt/antiX systemctl mask " + service);
+                }
             }
         }
         ++it;
