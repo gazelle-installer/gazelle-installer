@@ -49,16 +49,21 @@ int MInstall::runCmd(const QString &cmd)
 }
 
 // shell.run() doesn't distinguish between crashed and failed processes
-QProcess::ExitStatus MInstall::runCmd2(const QString &cmd)
+bool MInstall::runProc(const QString &cmd, const QByteArray &input)
 {
     if (phase < 0) return QProcess::CrashExit;
     qDebug() << cmd;
     QEventLoop eloop;
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     proc->start(cmd);
+    if (!input.isEmpty()) {
+        proc->waitForStarted();
+        proc->write(input);
+        proc->closeWriteChannel();
+    }
     eloop.exec();
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
-    return proc->exitStatus();
+    return (proc->exitStatus() == QProcess::NormalExit && proc->exitCode() == 0);
 }
 
 MInstall::MInstall(QWidget *parent, QStringList args) :
@@ -244,19 +249,13 @@ void MInstall::writeKeyFile()
         if (swapDevicePreserve != "/dev/none") {
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
 
-            QProcess proc;
-            proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile");
-            proc.waitForStarted();
-            proc.write(password.toUtf8() + "\n");
-            proc.waitForFinished();
+            runProc("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile",
+                    password.toUtf8() + "\n");
         }
 
         if (isHomeEncrypted && newkey) { // if encrypting separate /home
-            QProcess proc;
-            proc.start("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile");
-            proc.waitForStarted();
-            proc.write(password.toUtf8() + "\n");
-            proc.waitForFinished();
+            runProc("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile",
+                    password.toUtf8() + "\n");
         }
         QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
         //write crypttab keyfile entry
@@ -284,11 +283,8 @@ void MInstall::writeKeyFile()
             //add keyfile to container
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
 
-            QProcess proc;
-            proc.start("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete");
-            proc.waitForStarted();
-            proc.write(FDEpassCust->text().toUtf8() + "\n");
-            proc.waitForFinished();
+            runProc("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete",
+                    FDEpassCust->text().toUtf8() + "\n");
         }
         QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
         //write crypttab keyfile entry
@@ -1010,9 +1006,6 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    QEventLoop eloop;
-    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
-
     // format partition
     QString strCipherSpec = comboFDEcipher->currentText() + "-" + comboFDEchain->currentText();
     if (comboFDEchain->currentText() != "ECB") {
@@ -1028,14 +1021,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
                   + " --use-" + comboFDErandom->currentText()
                   + " --iter-time " + spinFDEroundtime->cleanText()
                   + " luksFormat " + dev;
-    qDebug() << cmd;
-    proc->start(cmd);
-    proc->waitForStarted();
-    proc->write(password + "\n");
-    eloop.exec();
-
-    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
-    if (proc->exitStatus() != QProcess::NormalExit || proc->exitCode() != 0) {
+    if (!runProc(cmd, password + "\n")) {
         goBack(tr("Sorry, could not create %1 LUKS partition").arg(dev));
         return false;
     }
@@ -1047,21 +1033,11 @@ bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, con
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    QEventLoop eloop;
-    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
-
     // open containers, assigning container names
     QString cmd = "cryptsetup luksOpen " + dev;
     if (!fs_name.isEmpty()) cmd += " " + fs_name;
     if (!options.isEmpty()) cmd += " " + options;
-    qDebug() << cmd;
-    proc->start(cmd);
-    proc->waitForStarted();
-    proc->write(password + "\n");
-    eloop.exec();
-
-    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
-    if (proc->exitStatus() != QProcess::NormalExit || proc->exitCode() != 0) {
+    if (!runProc(cmd, password + "\n")) {
         goBack(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
     }
@@ -1520,8 +1496,9 @@ bool MInstall::installLinux()
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
         // remove all folders in root except for /home
         updateStatus(tr("Deleting old system"));
-        QString cmd = "/bin/bash -c \"find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;\"";
-        if (runCmd2(cmd) == QProcess::NormalExit) {
+        runProc("/bin/bash -c \"find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;\"");
+
+        if (proc->exitStatus() == QProcess::NormalExit) {
             if(!copyLinux()) return false;
         } else {
             unmountGoBack(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
@@ -1666,17 +1643,16 @@ bool MInstall::copyLinux()
         }
     }
 
-    QProcess::ExitStatus rexit = QProcess::NormalExit;
     if (!(args.contains("--nocopy") || args.contains("-n"))) {
         connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
         timer->start(1000);
-        rexit = runCmd2(cmd);
+        runProc(cmd);
+        if (proc->exitStatus() != QProcess::NormalExit) {
+            unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
+            return false;
+        }
         timer->stop();
         disconnect(timer, SIGNAL(timeout()), 0, 0);
-    }
-    if (rexit != QProcess::NormalExit) {
-        unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
-        return false;
     }
 
     updateStatus(tr("Fixing configuration"), 94);
@@ -2007,30 +1983,14 @@ bool MInstall::setPasswords()
         return true;
     }
 
-    QEventLoop eloop;
-    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
+    const QString cmd = "chroot /mnt/antiX chpasswd";
 
-    proc->start("chroot /mnt/antiX chpasswd");
-    proc->waitForStarted();
-    proc->write("root:" + rootPasswordEdit->text().toUtf8());
-    proc->closeWriteChannel();
-    eloop.exec();
-
-    if (proc->exitCode() != 0) {
+    if (!runProc(cmd, "root:" + rootPasswordEdit->text().toUtf8())) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set root password."));
         return false;
     }
-
-    proc->start("chroot /mnt/antiX chpasswd");
-    proc->waitForStarted();
-    proc->write("demo:" + userPasswordEdit->text().toUtf8());
-    proc->closeWriteChannel();
-    eloop.exec();
-
-    disconnect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), 0, 0);
-
-    if (proc->exitCode() != 0) {
+    if (!runProc(cmd, "demo:" + userPasswordEdit->text().toUtf8())) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set user password."));
         return false;
