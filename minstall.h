@@ -61,7 +61,7 @@ public:
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
     int runCmd(const QString &cmd);
-    QProcess::ExitStatus runCmd2(const QString &cmd);
+    bool runProc(const QString &cmd, const QByteArray &input = QByteArray());
     void csleep(int msec);
     QString getCmdOut(const QString &cmd);
     QString getCmdValue(const QString &cmd, const QString &key, const QString &keydel, const QString &valdel);
@@ -84,7 +84,6 @@ public:
     bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot, bool formatSwap);
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
-    bool makeSwapPartition(const QString &dev);
     bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString());
     bool mountPartition(const QString dev, const QString point, const QString mntops);
     bool validateUserInfo();
