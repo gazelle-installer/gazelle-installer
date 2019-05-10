@@ -463,8 +463,7 @@ bool MInstall::processNextPhase()
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
         if (!pretend) {
-            if (!installLoader()) return false;
-            updateStatus(tr("Setting system configuration"), 99);
+            updateStatus(tr("Setting system configuration"), 95);
             setServices();
             if (!setUserInfo()) return false;
             if (haveSnapshotUserAccounts) {
@@ -474,6 +473,7 @@ bool MInstall::processNextPhase()
             if (!setComputerName()) return false;
             setLocale();
             saveConfig();
+            if (!installLoader()) return false;
         } else if (!pretendToInstall(95, 99, 1000)){
             return false;
         }
@@ -1709,7 +1709,7 @@ bool MInstall::installLoader()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    updateStatus(tr("Installing GRUB"), 95);
+    updateStatus(tr("Installing GRUB"), 96);
     QString cmd;
     QString val = getCmdOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1838,17 +1838,17 @@ bool MInstall::installLoader()
             runCmd("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt");
         }
     }
-    progressBar->setValue(96);
+    progressBar->setValue(97);
 
     //update grub with new config
 
     qDebug() << "Update Grub";
     runCmd("chroot /mnt/antiX update-grub");
-    progressBar->setValue(97);
+    progressBar->setValue(98);
 
     qDebug() << "Update initramfs";
     runCmd("chroot /mnt/antiX update-initramfs -u -t -k all");
-    progressBar->setValue(98);
+    progressBar->setValue(99);
     qDebug() << "clear chroot env";
     runCmd("umount /mnt/antiX/proc");
     runCmd("umount /mnt/antiX/sys");
