@@ -461,13 +461,13 @@ bool MInstall::processNextPhase()
         if (!pretend) {
             updateStatus(tr("Setting system configuration"), 95);
             setServices();
+            if (!setComputerName()) return false;
+            setLocale();
             if (!setUserInfo()) return false;
             if (haveSnapshotUserAccounts) {
                 QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
                 shell.run(cmd);
             }
-            if (!setComputerName()) return false;
-            setLocale();
             saveConfig();
             shell.run("sync"); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
