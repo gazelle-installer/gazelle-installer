@@ -84,7 +84,6 @@ public:
     bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot, bool formatSwap);
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
-    bool makeSwapPartition(const QString &dev);
     bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString());
     bool mountPartition(const QString dev, const QString point, const QString mntops);
     bool validateUserInfo();
