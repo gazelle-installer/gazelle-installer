@@ -51,7 +51,7 @@ int MInstall::runCmd(const QString &cmd)
 // shell.run() doesn't distinguish between crashed and failed processes
 bool MInstall::runProc(const QString &cmd, const QByteArray &input)
 {
-    if (phase < 0) return QProcess::CrashExit;
+    if (phase < 0) return false;
     qDebug() << cmd;
     QEventLoop eloop;
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
