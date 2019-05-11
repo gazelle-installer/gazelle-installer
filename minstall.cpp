@@ -430,7 +430,7 @@ bool MInstall::processNextPhase()
         }
 
         // allow the user to enter other options
-        shell.run("partprobe");
+        runProc("/sbin/partprobe");
         buildBootLists();
         gotoPage(5);
 
@@ -469,7 +469,7 @@ bool MInstall::processNextPhase()
                 shell.run(cmd);
             }
             saveConfig();
-            shell.run("sync"); // the sync(2) system call will block the GUI
+            runProc("/bin/sync"); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
         } else if (!pretendToInstall(95, 99, 1000)){
             return false;
@@ -1725,7 +1725,7 @@ bool MInstall::installLoader()
 
     // update NVRAM boot entries (only if installing on ESP)
     if (grubEspButton->isChecked()) {
-        cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
+        cmd = QString("chroot /mnt/antiX grub-install --install-modules= --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
         if (runCmd(cmd) != 0) {
             QMessageBox::warning(this, QString::null, tr("NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu."));
         }
@@ -2666,7 +2666,8 @@ void MInstall::updateDiskInfo()
     diskCombo->clear();
     diskCombo->addItem(tr("Loading..."));
 
-    shell.run("partprobe");
+    runProc("/sbin/swapoff -a"); // kludge - live boot automatically activates swap
+    runProc("/sbin/partprobe");
     updatePartitionWidgets();
     //  shell.run("umount -a 2>/dev/null");
     QString exclude = " --exclude=boot";
@@ -2777,7 +2778,7 @@ void MInstall::on_qtpartedButton_clicked()
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
-    shell.run("partprobe");
+    runProc("/sbin/partprobe");
     updatePartitionWidgets();
     indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
