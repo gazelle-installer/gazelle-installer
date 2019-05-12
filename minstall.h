@@ -194,6 +194,7 @@ private slots:
 
 private:
     int phase = 0;
+    bool pretend = false;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
@@ -255,5 +256,5 @@ private:
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     bool pretendToInstall(int start, int stop, int sleep);
-    void prepareToInstall(const bool pretend);
+    void prepareToInstall();
 };
