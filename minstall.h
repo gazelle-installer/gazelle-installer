@@ -64,13 +64,10 @@ public:
     bool runProc(const QString &cmd, const QByteArray &input = QByteArray());
     void csleep(int msec);
     QString getCmdOut(const QString &cmd);
-    QString getCmdValue(const QString &cmd, const QString &key, const QString &keydel, const QString &valdel);
     QStringList getCmdOuts(const QString &cmd);
     static int command(const QString &string);
     int getPartitionNumber();
 
-    bool is32bit();
-    bool is64bit();
     bool isInsideVB();
     bool isGpt(const QString &drv);
 
