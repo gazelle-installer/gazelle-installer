@@ -144,46 +144,10 @@ QStringList MInstall::getCmdOuts(const QString &cmd)
     return shell.getOutput(cmd).split('\n');
 }
 
-// Check if running from a 32bit environment
-bool MInstall::is32bit()
-{
-    return (getCmdOut("uname -m") == "i686");
-}
-
-// Check if running from a 64bit environment
-bool MInstall::is64bit()
-{
-    return (getCmdOut("uname -m") == "x86_64");
-}
-
-
 // Check if running inside VirtualBox
 bool MInstall::isInsideVB()
 {
     return (shell.run("lspci -d 80ee:beef  | grep -q .") == 0);
-}
-
-
-QString MInstall::getCmdValue(const QString &cmd, const QString &key, const QString &keydel, const QString &valdel)
-{
-    const char *ret = "";
-    char line[260];
-
-    QStringList strings = getCmdOuts(cmd);
-    for (QStringList::Iterator it = strings.begin(); it != strings.end(); ++it) {
-        strcpy(line, ((QString)*it).toUtf8());
-        char* keyptr = strstr(line, key.toUtf8());
-        if (keyptr != NULL) {
-            // key found
-            strtok(keyptr, keydel.toUtf8());
-            const char* val = strtok(NULL, valdel.toUtf8());
-            if (val != NULL) {
-                ret = val;
-            }
-            break;
-        }
-    }
-    return QString (ret);
 }
 
 bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
@@ -579,7 +543,7 @@ void MInstall::prepareToInstall(const bool pretend)
         sambaCheckBox->setEnabled(false);
     }
     // check for the Samba server
-    QString val = getCmdValue("dpkg -s samba | grep '^Status'", "ok", " ", " ");
+    QString val = getCmdOut("dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'");
     haveSamba = (val.compare("installed") == 0);
 
     buildServiceList();
