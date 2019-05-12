@@ -64,13 +64,10 @@ public:
     bool runProc(const QString &cmd, const QByteArray &input = QByteArray());
     void csleep(int msec);
     QString getCmdOut(const QString &cmd);
-    QString getCmdValue(const QString &cmd, const QString &key, const QString &keydel, const QString &valdel);
     QStringList getCmdOuts(const QString &cmd);
     static int command(const QString &string);
     int getPartitionNumber();
 
-    bool is32bit();
-    bool is64bit();
     bool isInsideVB();
     bool isGpt(const QString &drv);
 
@@ -197,6 +194,7 @@ private slots:
 
 private:
     int phase = 0;
+    bool pretend = false;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
@@ -258,5 +256,5 @@ private:
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     bool pretendToInstall(int start, int stop, int sleep);
-    void prepareToInstall(const bool pretend);
+    void prepareToInstall();
 };
