@@ -397,6 +397,7 @@ bool MInstall::processNextPhase()
         runProc("/sbin/partprobe");
         buildBootLists();
         gotoPage(5);
+        iCopyBarB = grubEspButton->isChecked() ? 93 : 94;
 
         if (!pretend) {
             if (!formatPartitions(encPass, rootType, homeType, formatBoot, formatSwap)) {
@@ -405,12 +406,12 @@ bool MInstall::processNextPhase()
             }
             csleep(1000);
             if (!installLinux()) return false;
-        } else if (!pretendToInstall(1, 94, 100)) {
+        } else if (!pretendToInstall(1, iCopyBarB, 100)) {
             return false;
         }
         if (!haveSysConfig) {
             progressBar->setEnabled(false);
-            updateStatus(tr("Paused for required operator input"), 95);
+            updateStatus(tr("Paused for required operator input"), iCopyBarB + 1);
             QApplication::beep();
             if(widgetStack->currentIndex() == 4) {
                 on_nextButton_clicked();
@@ -423,7 +424,7 @@ bool MInstall::processNextPhase()
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
         if (!pretend) {
-            updateStatus(tr("Setting system configuration"), 95);
+            updateStatus(tr("Setting system configuration"), iCopyBarB + 1);
             setServices();
             if (!setComputerName()) return false;
             setLocale();
@@ -435,7 +436,7 @@ bool MInstall::processNextPhase()
             saveConfig();
             runProc("/bin/sync"); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
-        } else if (!pretendToInstall(95, 99, 1000)){
+        } else if (!pretendToInstall(iCopyBarB + 1, 99, 1000)){
             return false;
         }
         phase = 4;
@@ -1554,7 +1555,7 @@ bool MInstall::copyLinux()
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
     updateStatus(tr("Copying new system"));
-    iCopyBarStart = progressBar->value();
+    iCopyBarA = progressBar->value();
     // setup and start the process
     QString cmd;
     cmd = "/bin/cp -a";
@@ -1621,7 +1622,8 @@ bool MInstall::installLoader()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    updateStatus(tr("Installing GRUB"), 96);
+    const QString &statup = tr("Installing GRUB");
+    updateStatus(statup);
     QString cmd;
     QString val = getCmdOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1689,6 +1691,7 @@ bool MInstall::installLoader()
 
     // update NVRAM boot entries (only if installing on ESP)
     if (grubEspButton->isChecked()) {
+        updateStatus(statup);
         cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
         if (runCmd(cmd) != 0) {
             QMessageBox::warning(this, QString::null, tr("NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu."));
@@ -1750,17 +1753,17 @@ bool MInstall::installLoader()
             runCmd("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt");
         }
     }
-    progressBar->setValue(97);
+    updateStatus(statup);
 
     //update grub with new config
 
     qDebug() << "Update Grub";
     runCmd("chroot /mnt/antiX update-grub");
-    progressBar->setValue(98);
+    updateStatus(statup);
 
     qDebug() << "Update initramfs";
     runCmd("chroot /mnt/antiX update-initramfs -u -t -k all");
-    progressBar->setValue(99);
+    updateStatus(statup);
     qDebug() << "clear chroot env";
     runCmd("umount /mnt/antiX/proc");
     runCmd("umount /mnt/antiX/sys");
@@ -2909,17 +2912,17 @@ void MInstall::cleanup()
 void MInstall::copyTime()
 {
     struct statvfs svfs;
-    const int progspace = 93 - iCopyBarStart;
+    const int progspace = iCopyBarB - iCopyBarA;
     int i = 0;
     if(iTargetInodes > 0 && statvfs("/mnt/antiX", &svfs) == 0) {
         i = (int)((svfs.f_files - svfs.f_ffree) / (iTargetInodes / progspace));
-        if (i > (progspace - 1)) {
+        if (i > progspace) {
             i = progspace;
         }
     } else {
         updateStatus(tr("Copy progress unknown. No file system statistics."), 0);
     }
-    progressBar->setValue(i + iCopyBarStart);
+    progressBar->setValue(i + iCopyBarA);
 }
 
 void MInstall::on_progressBar_valueChanged(int value)

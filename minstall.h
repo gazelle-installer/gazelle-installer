@@ -212,7 +212,8 @@ private:
 
     // for file copy progress updates
     fsfilcnt_t iTargetInodes = 0;
-    int iCopyBarStart;
+    int iCopyBarA;
+    int iCopyBarB;
 
     // for the tips display
     int ixTip = 0;
