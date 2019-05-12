@@ -51,7 +51,7 @@ int MInstall::runCmd(const QString &cmd)
 // shell.run() doesn't distinguish between crashed and failed processes
 bool MInstall::runProc(const QString &cmd, const QByteArray &input)
 {
-    if (phase < 0) return QProcess::CrashExit;
+    if (phase < 0) return false;
     qDebug() << cmd;
     QEventLoop eloop;
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
@@ -75,6 +75,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     this->args = args;
     installBox->hide();
 
+    pretend = (args.contains("--pretend") || args.contains("-p"));
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
     PROJECTNAME=settings.value("PROJECT_NAME").toString();
@@ -144,46 +145,10 @@ QStringList MInstall::getCmdOuts(const QString &cmd)
     return shell.getOutput(cmd).split('\n');
 }
 
-// Check if running from a 32bit environment
-bool MInstall::is32bit()
-{
-    return (getCmdOut("uname -m") == "i686");
-}
-
-// Check if running from a 64bit environment
-bool MInstall::is64bit()
-{
-    return (getCmdOut("uname -m") == "x86_64");
-}
-
-
 // Check if running inside VirtualBox
 bool MInstall::isInsideVB()
 {
     return (shell.run("lspci -d 80ee:beef  | grep -q .") == 0);
-}
-
-
-QString MInstall::getCmdValue(const QString &cmd, const QString &key, const QString &keydel, const QString &valdel)
-{
-    const char *ret = "";
-    char line[260];
-
-    QStringList strings = getCmdOuts(cmd);
-    for (QStringList::Iterator it = strings.begin(); it != strings.end(); ++it) {
-        strcpy(line, ((QString)*it).toUtf8());
-        char* keyptr = strstr(line, key.toUtf8());
-        if (keyptr != NULL) {
-            // key found
-            strtok(keyptr, keydel.toUtf8());
-            const char* val = strtok(NULL, valdel.toUtf8());
-            if (val != NULL) {
-                ret = val;
-            }
-            break;
-        }
-    }
-    return QString (ret);
 }
 
 bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
@@ -393,7 +358,6 @@ int MInstall::getPartitionNumber()
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
-    const bool pretend = (args.contains("--pretend") || args.contains("-p"));
     // Phase < 0 = install has been aborted (Phase -2 on close)
     if (phase < 0) return false;
     // Phase 0 = install not started yet, Phase 1 = install in progress
@@ -402,7 +366,7 @@ bool MInstall::processNextPhase()
         updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
         if (!checkDisk()) return false;
         phase = 1; // installation.
-        prepareToInstall(pretend);
+        prepareToInstall();
 
         // these parameters are passed by reference and modified by make*Partitions()
         bool formatBoot = false, formatSwap = false;
@@ -430,7 +394,7 @@ bool MInstall::processNextPhase()
         }
 
         // allow the user to enter other options
-        shell.run("partprobe");
+        runProc("/sbin/partprobe");
         buildBootLists();
         gotoPage(5);
 
@@ -469,7 +433,7 @@ bool MInstall::processNextPhase()
                 shell.run(cmd);
             }
             saveConfig();
-            shell.run("sync"); // the sync(2) system call will block the GUI
+            runProc("/bin/sync"); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
         } else if (!pretendToInstall(95, 99, 1000)){
             return false;
@@ -483,7 +447,7 @@ bool MInstall::processNextPhase()
 }
 
 // gather required information and prepare installation
-void MInstall::prepareToInstall(const bool pretend)
+void MInstall::prepareToInstall()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return;
@@ -579,7 +543,7 @@ void MInstall::prepareToInstall(const bool pretend)
         sambaCheckBox->setEnabled(false);
     }
     // check for the Samba server
-    QString val = getCmdValue("dpkg -s samba | grep '^Status'", "ok", " ", " ");
+    QString val = getCmdOut("dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'");
     haveSamba = (val.compare("installed") == 0);
 
     buildServiceList();
@@ -1725,7 +1689,7 @@ bool MInstall::installLoader()
 
     // update NVRAM boot entries (only if installing on ESP)
     if (grubEspButton->isChecked()) {
-        cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
+        cmd = QString("chroot /mnt/antiX grub-install --install-modules= --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
         if (runCmd(cmd) != 0) {
             QMessageBox::warning(this, QString::null, tr("NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu."));
         }
@@ -2619,9 +2583,11 @@ void MInstall::firstRefresh(QDialog *main)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     mmn = main;
-    // disable automounting in Thunar
-    auto_mount = shell.getOutput("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
-    shell.run("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'");
+    if (!pretend) {
+        // disable automounting in Thunar
+        auto_mount = shell.getOutput("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
+        shell.run("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'");
+    }
 
     rootTypeCombo->setEnabled(false);
     homeTypeCombo->setEnabled(false);
@@ -2666,7 +2632,8 @@ void MInstall::updateDiskInfo()
     diskCombo->clear();
     diskCombo->addItem(tr("Loading..."));
 
-    shell.run("partprobe");
+    if (!pretend) runProc("/sbin/swapoff -a"); // kludge - live boot automatically activates swap
+    runProc("/sbin/partprobe");
     updatePartitionWidgets();
     //  shell.run("umount -a 2>/dev/null");
     QString exclude = " --exclude=boot";
@@ -2777,7 +2744,7 @@ void MInstall::on_qtpartedButton_clicked()
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
-    shell.run("partprobe");
+    runProc("/sbin/partprobe");
     updatePartitionWidgets();
     indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
@@ -2912,12 +2879,10 @@ bool MInstall::eventFilter(QObject* obj, QEvent* event)
 void MInstall::cleanup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (pretend) return;
 
     shell.run("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'");
 
-    if (args.contains("--pretend") || args.contains("-p")) {
-        return;
-    }
 
     shell.run("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
     shell.run("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1");
