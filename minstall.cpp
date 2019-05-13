@@ -161,6 +161,18 @@ bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtex
     return true;
 }
 
+void MInstall::updateCursor(const Qt::CursorShape shape)
+{
+    if (shape != Qt::ArrowCursor) {
+        qApp->setOverrideCursor(QCursor(shape));
+    } else {
+        while (qApp->overrideCursor() != NULL) {
+            qApp->restoreOverrideCursor();
+        }
+    }
+    qApp->processEvents();
+}
+
 void MInstall::updateStatus(const QString &msg, int val)
 {
     progressBar->setFormat("%p% - " + msg.toUtf8());
@@ -2272,7 +2284,7 @@ void MInstall::goBack(const QString &msg)
     if (phase >= 0) {
         this->setEnabled(false);
         QMessageBox::critical(this, QString::null, msg);
-        setCursor(QCursor(Qt::WaitCursor));
+        updateCursor(Qt::WaitCursor);
     }
 }
 
@@ -2377,16 +2389,16 @@ void MInstall::pageDisplayed(int next)
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
                                        "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
         if (diskCombo->count() == 0 || phase < 0) {
-            setCursor(QCursor(Qt::WaitCursor));
+            updateCursor(Qt::WaitCursor);
             updateDiskInfo();
         }
         phase = 0;
         this->setEnabled(true);
-        setCursor(QCursor(Qt::ArrowCursor));
+        updateCursor();
         break;
 
     case 2:  // choose partition
-        setCursor(QCursor(Qt::WaitCursor));
+        updateCursor(Qt::WaitCursor);
         ((MMain *)mmn)->setHelpText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
                                        "It's solely your responsibility to backup your data before proceeding.</p>"
                                        "<p><b>Choose Partitions</b><br/>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</p>"
@@ -2402,7 +2414,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
         updatePartInfo();
-        setCursor(QCursor(Qt::ArrowCursor));
+        updateCursor();
         break;
 
     case 3: // advanced encryption settings
@@ -2450,7 +2462,7 @@ void MInstall::pageDisplayed(int next)
 
     case 4: // installation step
         if (phase == 0) {
-            setCursor(QCursor(Qt::BusyCursor)); // restored after entering boot config screen
+            updateCursor(Qt::BusyCursor); // restored after entering boot config screen
             tipsEdit->setText("<p><b>" + tr("Additional information required") + "</b><br/>"
                               + tr("The %1 installer is about to request more information from you. Please wait.").arg(PROJECTNAME)
                               + "</p>");
@@ -2482,7 +2494,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
                                        "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
 
-        setCursor(QCursor(Qt::ArrowCursor)); // restore wait cursor set in install screen
+        updateCursor(); // restore wait cursor set in install screen
         break;
 
     case 6: // set services
@@ -2566,7 +2578,7 @@ void MInstall::gotoPage(int next)
     }
     if (next > c-1) {
         // finished
-        setCursor(QCursor(Qt::WaitCursor));
+        updateCursor(Qt::WaitCursor);
         cleanup();
         if (checkBoxExitReboot->isChecked()) {
             shell.run("/usr/local/bin/persist-config --shutdown --command reboot &");
@@ -2748,7 +2760,7 @@ void MInstall::on_viewServicesButton_clicked()
 
 void MInstall::on_qtpartedButton_clicked()
 {
-    setCursor(QCursor(Qt::WaitCursor));
+    updateCursor(Qt::WaitCursor);
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
@@ -2757,7 +2769,7 @@ void MInstall::on_qtpartedButton_clicked()
     indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
     nextButton->setEnabled(true);
-    setCursor(QCursor(Qt::ArrowCursor));
+    updateCursor();
 }
 
 void MInstall::on_buttonBenchmarkFDE_clicked()
@@ -2852,7 +2864,7 @@ bool MInstall::abort(bool onclose)
             return false;
         }
     }
-    setCursor(QCursor(Qt::WaitCursor));
+    updateCursor(Qt::WaitCursor);
     proc->terminate();
     QTimer::singleShot(5000, proc, SLOT(kill()));
     shell.terminate();
