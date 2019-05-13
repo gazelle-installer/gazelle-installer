@@ -976,7 +976,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
     return true;
 }
 
-bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options)
+bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options, const bool failHard)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -986,7 +986,7 @@ bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, con
     if (!fs_name.isEmpty()) cmd += " " + fs_name;
     if (!options.isEmpty()) cmd += " " + options;
     if (!runProc(cmd, password + "\n")) {
-        goBack(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
+        if (failHard) goBack(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
     }
     return true;
@@ -1369,40 +1369,51 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         }
     }
 
-    // if preserving /home, obtain some basic information
-    if (saveHome) {
-        const QByteArray &pass = FDEpassCust->text().toUtf8();
-        // mount the home partition
-        if (isRootEncrypted) {
-            shell.run("cryptsetup luksClose rootfs");
-            if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly")) return false;
-            rootdev = "/dev/mapper/rootfs";
-        }
-        if (!mountPartition(rootdev, "/mnt/antiX", "ro")) return false;
-        // mount the root partition
-        if (homedev != rootDevicePreserve) {
-            if (isHomeEncrypted) {
-                shell.run("cryptsetup luksClose homefs");
-                if (!openLuksPartition(homedev, "homefs", pass, "--readonly")) return false;
-                homedev = "/dev/mapper/homefs";
-            }
-            if (!mountPartition(homedev, "/mnt/antiX/home", "ro")) return false;
-        }
-
-        // store a listing of /home to compare with the user name given later
-        listHomes = getCmdOuts("ls -1 /mnt/antiX/home/");
-        // recycle the old key for /home if possible
-        key.load("/mnt/antiX/root/keyfile", -1);
-
-        // unmount partitions
-        if (homedev != rootDevicePreserve) {
-            shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
-            if (isHomeEncrypted) shell.run("cryptsetup luksClose homefs");
-        }
-        shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
-        if (isRootEncrypted) shell.run("cryptsetup luksClose rootfs");
-    }
     return true;
+}
+
+bool MInstall::saveHomeBasic()
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (!(saveHomeCheck->isChecked())) return true;
+    // if preserving /home, obtain some basic information
+    bool ok = false;
+    const QByteArray &pass = FDEpassCust->text().toUtf8();
+    QString rootdev = rootDevicePreserve;
+    QString homedev = homeDevicePreserve;
+    // mount the root partition
+    if (isRootEncrypted) {
+        shell.run("cryptsetup luksClose rootfs");
+        if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly", false)) return false;
+        rootdev = "/dev/mapper/rootfs";
+    }
+    if (!mountPartition(rootdev, "/mnt/antiX", "ro")) goto ending2;
+    // mount the home partition
+    if (homedev != rootDevicePreserve) {
+        if (isHomeEncrypted) {
+            shell.run("cryptsetup luksClose homefs");
+            if (!openLuksPartition(homedev, "homefs", pass, "--readonly", false)) goto ending2;
+            homedev = "/dev/mapper/homefs";
+        }
+        if (!mountPartition(homedev, "/mnt/antiX/home", "ro")) goto ending1;
+    }
+
+    // store a listing of /home to compare with the user name given later
+    listHomes = getCmdOuts("ls -1 /mnt/antiX/home/");
+    // recycle the old key for /home if possible
+    key.load("/mnt/antiX/root/keyfile", -1);
+
+    ok = true;
+ ending1:
+    // unmount partitions
+    if (homedev != rootDevicePreserve) {
+        shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
+        if (isHomeEncrypted) shell.run("cryptsetup luksClose homefs");
+    }
+ ending2:
+    shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+    if (isRootEncrypted) shell.run("cryptsetup luksClose rootfs");
+    return ok;
 }
 
 bool MInstall::installLinux()
@@ -2293,6 +2304,13 @@ int MInstall::showPage(int curr, int next)
         }
     } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
         if (!validateChosenPartitions()) {
+            return curr;
+        }
+        if (!saveHomeBasic()) {
+            const QString &msg = tr("The data in /home cannot be preserved because the required information could not be obtained.") + "\n"
+                    + tr("If the partition containing /home is encrypted, please ensure the correct \"Encrypt\" boxes are selected, and that the entered password is correct.") + "\n"
+                    + tr("The installer cannot encrypt an existing /home directory or partition.");
+            QMessageBox::critical(this, QString::null, msg);
             return curr;
         }
         return 4; // Go to Step_Progress

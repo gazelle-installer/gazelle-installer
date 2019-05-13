@@ -81,7 +81,7 @@ public:
     bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot, bool formatSwap);
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
-    bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString());
+    bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString(), const bool failHard = true);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
     bool validateUserInfo();
     bool validateComputerName();
@@ -258,4 +258,5 @@ private:
     void updateStatus(const QString &msg, int val = -1);
     bool pretendToInstall(int start, int stop, int sleep);
     void prepareToInstall();
+    bool saveHomeBasic();
 };
