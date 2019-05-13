@@ -1059,11 +1059,7 @@ bool MInstall::validateChosenPartitions()
         if (shell.run(QString("partition-info is-linux=%1").arg(swapdev)) != 0) {
             msgForeignList << swapdev << "swap";
         }
-        //if partition chosen is already swap, don't do anything, so check swap fstype
-        QString cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
-        if (shell.run(cmd) != 0) {
-            msgFormatList << swapdev << "swap";
-        }
+        msgFormatList << swapdev << "swap";
     }
 
     QString msg;
