@@ -161,6 +161,18 @@ bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtex
     return true;
 }
 
+void MInstall::updateCursor(const Qt::CursorShape shape)
+{
+    if (shape != Qt::ArrowCursor) {
+        qApp->setOverrideCursor(QCursor(shape));
+    } else {
+        while (qApp->overrideCursor() != NULL) {
+            qApp->restoreOverrideCursor();
+        }
+    }
+    qApp->processEvents();
+}
+
 void MInstall::updateStatus(const QString &msg, int val)
 {
     progressBar->setFormat("%p% - " + msg.toUtf8());
@@ -976,7 +988,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
     return true;
 }
 
-bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options)
+bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options, const bool failHard)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -986,7 +998,7 @@ bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, con
     if (!fs_name.isEmpty()) cmd += " " + fs_name;
     if (!options.isEmpty()) cmd += " " + options;
     if (!runProc(cmd, password + "\n")) {
-        goBack(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
+        if (failHard) goBack(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
     }
     return true;
@@ -1059,11 +1071,7 @@ bool MInstall::validateChosenPartitions()
         if (shell.run(QString("partition-info is-linux=%1").arg(swapdev)) != 0) {
             msgForeignList << swapdev << "swap";
         }
-        //if partition chosen is already swap, don't do anything, so check swap fstype
-        QString cmd = QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev);
-        if (shell.run(cmd) != 0) {
-            msgFormatList << swapdev << "swap";
-        }
+        msgFormatList << swapdev << "swap";
     }
 
     QString msg;
@@ -1369,40 +1377,51 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         }
     }
 
-    // if preserving /home, obtain some basic information
-    if (saveHome) {
-        const QByteArray &pass = FDEpassCust->text().toUtf8();
-        // mount the home partition
-        if (isRootEncrypted) {
-            shell.run("cryptsetup luksClose rootfs");
-            if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly")) return false;
-            rootdev = "/dev/mapper/rootfs";
-        }
-        if (!mountPartition(rootdev, "/mnt/antiX", "ro")) return false;
-        // mount the root partition
-        if (homedev != rootDevicePreserve) {
-            if (isHomeEncrypted) {
-                shell.run("cryptsetup luksClose homefs");
-                if (!openLuksPartition(homedev, "homefs", pass, "--readonly")) return false;
-                homedev = "/dev/mapper/homefs";
-            }
-            if (!mountPartition(homedev, "/mnt/antiX/home", "ro")) return false;
-        }
-
-        // store a listing of /home to compare with the user name given later
-        listHomes = getCmdOuts("ls -1 /mnt/antiX/home/");
-        // recycle the old key for /home if possible
-        key.load("/mnt/antiX/root/keyfile", -1);
-
-        // unmount partitions
-        if (homedev != rootDevicePreserve) {
-            shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
-            if (isHomeEncrypted) shell.run("cryptsetup luksClose homefs");
-        }
-        shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
-        if (isRootEncrypted) shell.run("cryptsetup luksClose rootfs");
-    }
     return true;
+}
+
+bool MInstall::saveHomeBasic()
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    if (!(saveHomeCheck->isChecked())) return true;
+    // if preserving /home, obtain some basic information
+    bool ok = false;
+    const QByteArray &pass = FDEpassCust->text().toUtf8();
+    QString rootdev = rootDevicePreserve;
+    QString homedev = homeDevicePreserve;
+    // mount the root partition
+    if (isRootEncrypted) {
+        shell.run("cryptsetup luksClose rootfs");
+        if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly", false)) return false;
+        rootdev = "/dev/mapper/rootfs";
+    }
+    if (!mountPartition(rootdev, "/mnt/antiX", "ro")) goto ending2;
+    // mount the home partition
+    if (homedev != rootDevicePreserve) {
+        if (isHomeEncrypted) {
+            shell.run("cryptsetup luksClose homefs");
+            if (!openLuksPartition(homedev, "homefs", pass, "--readonly", false)) goto ending2;
+            homedev = "/dev/mapper/homefs";
+        }
+        if (!mountPartition(homedev, "/mnt/antiX/home", "ro")) goto ending1;
+    }
+
+    // store a listing of /home to compare with the user name given later
+    listHomes = getCmdOuts("ls -1 /mnt/antiX/home/");
+    // recycle the old key for /home if possible
+    key.load("/mnt/antiX/root/keyfile", -1);
+
+    ok = true;
+ ending1:
+    // unmount partitions
+    if (homedev != rootDevicePreserve) {
+        shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
+        if (isHomeEncrypted) shell.run("cryptsetup luksClose homefs");
+    }
+ ending2:
+    shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+    if (isRootEncrypted) shell.run("cryptsetup luksClose rootfs");
+    return ok;
 }
 
 bool MInstall::installLinux()
@@ -2265,7 +2284,7 @@ void MInstall::goBack(const QString &msg)
     if (phase >= 0) {
         this->setEnabled(false);
         QMessageBox::critical(this, QString::null, msg);
-        setCursor(QCursor(Qt::WaitCursor));
+        updateCursor(Qt::WaitCursor);
     }
 }
 
@@ -2293,6 +2312,13 @@ int MInstall::showPage(int curr, int next)
         }
     } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
         if (!validateChosenPartitions()) {
+            return curr;
+        }
+        if (!saveHomeBasic()) {
+            const QString &msg = tr("The data in /home cannot be preserved because the required information could not be obtained.") + "\n"
+                    + tr("If the partition containing /home is encrypted, please ensure the correct \"Encrypt\" boxes are selected, and that the entered password is correct.") + "\n"
+                    + tr("The installer cannot encrypt an existing /home directory or partition.");
+            QMessageBox::critical(this, QString::null, msg);
             return curr;
         }
         return 4; // Go to Step_Progress
@@ -2363,16 +2389,16 @@ void MInstall::pageDisplayed(int next)
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
                                        "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
         if (diskCombo->count() == 0 || phase < 0) {
-            setCursor(QCursor(Qt::WaitCursor));
+            updateCursor(Qt::WaitCursor);
             updateDiskInfo();
         }
         phase = 0;
         this->setEnabled(true);
-        setCursor(QCursor(Qt::ArrowCursor));
+        updateCursor();
         break;
 
     case 2:  // choose partition
-        setCursor(QCursor(Qt::WaitCursor));
+        updateCursor(Qt::WaitCursor);
         ((MMain *)mmn)->setHelpText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
                                        "It's solely your responsibility to backup your data before proceeding.</p>"
                                        "<p><b>Choose Partitions</b><br/>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</p>"
@@ -2388,7 +2414,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                                        "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
         updatePartInfo();
-        setCursor(QCursor(Qt::ArrowCursor));
+        updateCursor();
         break;
 
     case 3: // advanced encryption settings
@@ -2436,7 +2462,7 @@ void MInstall::pageDisplayed(int next)
 
     case 4: // installation step
         if (phase == 0) {
-            setCursor(QCursor(Qt::BusyCursor)); // restored after entering boot config screen
+            updateCursor(Qt::BusyCursor); // restored after entering boot config screen
             tipsEdit->setText("<p><b>" + tr("Additional information required") + "</b><br/>"
                               + tr("The %1 installer is about to request more information from you. Please wait.").arg(PROJECTNAME)
                               + "</p>");
@@ -2468,7 +2494,7 @@ void MInstall::pageDisplayed(int next)
                                        "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
                                        "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
 
-        setCursor(QCursor(Qt::ArrowCursor)); // restore wait cursor set in install screen
+        updateCursor(); // restore wait cursor set in install screen
         break;
 
     case 6: // set services
@@ -2552,7 +2578,7 @@ void MInstall::gotoPage(int next)
     }
     if (next > c-1) {
         // finished
-        setCursor(QCursor(Qt::WaitCursor));
+        updateCursor(Qt::WaitCursor);
         cleanup();
         if (checkBoxExitReboot->isChecked()) {
             shell.run("/usr/local/bin/persist-config --shutdown --command reboot &");
@@ -2734,7 +2760,7 @@ void MInstall::on_viewServicesButton_clicked()
 
 void MInstall::on_qtpartedButton_clicked()
 {
-    setCursor(QCursor(Qt::WaitCursor));
+    updateCursor(Qt::WaitCursor);
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
     shell.run("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager");
@@ -2743,7 +2769,7 @@ void MInstall::on_qtpartedButton_clicked()
     indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
     nextButton->setEnabled(true);
-    setCursor(QCursor(Qt::ArrowCursor));
+    updateCursor();
 }
 
 void MInstall::on_buttonBenchmarkFDE_clicked()
@@ -2838,7 +2864,7 @@ bool MInstall::abort(bool onclose)
             return false;
         }
     }
-    setCursor(QCursor(Qt::WaitCursor));
+    updateCursor(Qt::WaitCursor);
     proc->terminate();
     QTimer::singleShot(5000, proc, SLOT(kill()));
     shell.terminate();
