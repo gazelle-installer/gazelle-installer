@@ -256,6 +256,7 @@ private:
 
     // private functions
     void updateStatus(const QString &msg, int val = -1);
+    void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     bool pretendToInstall(int start, int stop, int sleep);
     void prepareToInstall();
     bool saveHomeBasic();
