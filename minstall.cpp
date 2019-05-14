@@ -3156,7 +3156,6 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 
 void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 {
-    grubPbrButton->setDisabled(checked);
     if (homeCombo->currentText() == "root") { // if home on root set disable home encryption checkbox and set same encryption option
         checkBoxEncryptHome->setEnabled(false);
         checkBoxEncryptHome->setChecked(checked);
@@ -3164,18 +3163,10 @@ void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 
     if (checked) {
         gbEncrPass->setVisible(true);
-        nextButton->setDisabled(true);
         checkBoxEncryptSwap->setChecked(true);
-        FDEpassCust->setFocus();
     } else {
         gbEncrPass->setVisible(checkBoxEncryptHome->isChecked());
-        nextButton->setDisabled(checkBoxEncryptHome->isChecked());
         checkBoxEncryptSwap->setChecked(checkBoxEncryptHome->isChecked());
-    }
-
-    if (!checkBoxEncryptSwap->isChecked()) {
-        FDEpassCust->clear();
-        FDEpassCust2->clear();
     }
 }
 
@@ -3183,24 +3174,20 @@ void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
 {
     if (checked) {
         gbEncrPass->setVisible(true);
-        nextButton->setDisabled(true);
         checkBoxEncryptSwap->setChecked(true);
-        FDEpassCust->setFocus();
     } else {
         gbEncrPass->setVisible(checkBoxEncryptRoot->isChecked());
-        nextButton->setDisabled(checkBoxEncryptRoot->isChecked());
         checkBoxEncryptSwap->setChecked(checkBoxEncryptRoot->isChecked());
-    }
-
-    if (!checkBoxEncryptSwap->isChecked()) {
-        FDEpassCust->clear();
-        FDEpassCust2->clear();
     }
 }
 
 void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
 {
+    nextButton->setDisabled(checked);
     if (checked) {
+        FDEpassCust2->clear();
+        FDEpassCust->clear();
+        FDEpassCust->setFocus();
         QMessageBox::warning(this, QString::null,
                              tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
                              tr("OK"));
@@ -3339,7 +3326,7 @@ void MInstall::on_grubCheckBox_toggled(bool checked)
             grubMbrButton->setEnabled(true);
         }
         if(listBootPart.count() > 0) {
-            grubPbrButton->setEnabled(true);
+            grubPbrButton->setDisabled(checkBoxEncryptRoot->isChecked());
         }
     } else {
         grubEspButton->setEnabled(false);
