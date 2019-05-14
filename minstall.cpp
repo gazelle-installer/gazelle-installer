@@ -57,7 +57,6 @@ bool MInstall::runProc(const QString &cmd, const QByteArray &input)
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     proc->start(cmd);
     if (!input.isEmpty()) {
-        proc->waitForStarted();
         proc->write(input);
         proc->closeWriteChannel();
     }
@@ -1932,12 +1931,12 @@ bool MInstall::setPasswords()
 
     const QString cmd = "chroot /mnt/antiX chpasswd";
 
-    if (!runProc(cmd, "root:" + rootPasswordEdit->text().toUtf8())) {
+    if (!runProc(cmd, QString("root:" + rootPasswordEdit->text() + "\n").toUtf8())) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set root password."));
         return false;
     }
-    if (!runProc(cmd, "demo:" + userPasswordEdit->text().toUtf8())) {
+    if (!runProc(cmd, QString("demo:" + userPasswordEdit->text() + "\n").toUtf8())) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set user password."));
         return false;
