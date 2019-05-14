@@ -2134,7 +2134,7 @@ bool MInstall::setComputerName()
     }
 
     // systemd check
-    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
+    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init");
 
     if (!systemdcheck.isEmpty()) {
         if (!sambaCheckBox->isChecked()) {
