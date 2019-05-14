@@ -2228,7 +2228,7 @@ void MInstall::setServices()
     if (phase < 0) return;
 
     // systemd check
-    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
+    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init");
 
     QTreeWidgetItemIterator it(csView);
     while (*it) {
