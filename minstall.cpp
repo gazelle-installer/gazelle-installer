@@ -416,7 +416,7 @@ bool MInstall::processNextPhase()
                 goBack(tr("Failed to format required partitions."));
                 return false;
             }
-            csleep(1000);
+            runProc("partprobe");
             if (!installLinux()) return false;
         } else if (!pretendToInstall(1, iCopyBarB, 100)) {
             return false;
