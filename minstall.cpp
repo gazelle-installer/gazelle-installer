@@ -63,6 +63,7 @@ bool MInstall::runProc(const QString &cmd, const QByteArray &input)
     }
     eloop.exec();
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+    qDebug() << "Exit code: " << proc->exitCode() << ", status: " << proc->exitStatus();
     return (proc->exitStatus() == QProcess::NormalExit && proc->exitCode() == 0);
 }
 
