@@ -1844,16 +1844,14 @@ bool MInstall::setUserName()
                 rexit = shell.run(cmd.arg(ixi));
             }
             if (rexit != 0) {
-                QMessageBox::critical(this, QString::null,
-                                      tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
+                goBack(tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
                 return false;
             }
         } else if (oldHomeAction == OldHomeDelete) {
             // delete the directory
             cmd = QString("rm -rf %1").arg(dpath);
             if (shell.run(cmd) != 0) {
-                QMessageBox::critical(this, QString::null,
-                                      tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
+                goBack(tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
                 return false;
             }
         }
@@ -1863,14 +1861,12 @@ bool MInstall::setUserName()
         // dir does not exist, must create it
         // copy skel to demo
         if (shell.run("cp -a /mnt/antiX/etc/skel /mnt/antiX/home") != 0) {
-            QMessageBox::critical(this, QString::null,
-                                  tr("Sorry, failed to create user directory."));
+            goBack(tr("Sorry, failed to create user directory."));
             return false;
         }
         cmd = QString("mv -f /mnt/antiX/home/skel %1").arg(dpath);
         if (shell.run(cmd) != 0) {
-            QMessageBox::critical(this, QString::null,
-                                  tr("Sorry, failed to name user directory."));
+            goBack(tr("Sorry, failed to name user directory."));
             return false;
         }
     } else {
@@ -1893,7 +1889,7 @@ bool MInstall::setUserName()
         shell.run("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
         cmd = QString("rsync -a /home/demo/ %1 --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority' --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
         if (shell.run(cmd) != 0) {
-            QMessageBox::critical(this, QString::null,
+            QMessageBox::warning(this, QString::null,
                                   tr("Sorry, failed to save desktop changes."));
         } else {
             cmd = QString("grep -rl \"home/demo\" " + dpath + "| xargs sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'");
@@ -1903,8 +1899,7 @@ bool MInstall::setUserName()
     // fix the ownership, demo=newuser
     cmd = QString("chown -R demo:demo %1").arg(dpath);
     if (shell.run(cmd) != 0) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, failed to set ownership of user directory."));
+        goBack(tr("Sorry, failed to set ownership of user directory."));
         return false;
     }
 
@@ -1948,13 +1943,11 @@ bool MInstall::setPasswords()
     const QString cmd = "chroot /mnt/antiX chpasswd";
 
     if (!runProc(cmd, QString("root:" + rootPasswordEdit->text() + "\n").toUtf8())) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, unable to set root password."));
+        goBack(tr("Sorry, unable to set root password."));
         return false;
     }
     if (!runProc(cmd, QString("demo:" + userPasswordEdit->text() + "\n").toUtf8())) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, unable to set user password."));
+        goBack(tr("Sorry, unable to set user password."));
         return false;
     }
 
