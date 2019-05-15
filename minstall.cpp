@@ -1707,7 +1707,7 @@ bool MInstall::installLoader()
     if (runCmd(cmd) != 0) {
         // error
         QMessageBox::critical(this, QString::null,
-                              tr("Sorry, installing GRUB failed. This may be due to a change in the disk formatting. You can uncheck GRUB and finish installing then reboot to the LiveDVD or LiveUSB and repair the installation with the reinstall GRUB function."));
+                              tr("GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu and repair the installation."));
         runCmd("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
         if (runCmd("mountpoint -q /mnt/antiX/boot/efi") == 0) {
             runCmd("umount /mnt/antiX/boot/efi");
