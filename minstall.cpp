@@ -441,10 +441,11 @@ bool MInstall::processNextPhase()
             setServices();
             if (!setComputerName()) return false;
             setLocale();
-            if (!setUserInfo()) return false;
-            if (haveSnapshotUserAccounts) {
+            if (haveSnapshotUserAccounts) { // skip user account creation
                 QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
                 shell.run(cmd);
+            } else {
+                if (!setUserInfo()) return false;
             }
             saveConfig();
             runProc("/bin/sync"); // the sync(2) system call will block the GUI
