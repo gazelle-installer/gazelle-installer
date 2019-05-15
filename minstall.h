@@ -75,10 +75,8 @@ public:
     bool checkPassword(const QString &pass);
     bool installLoader();
     bool validateChosenPartitions();
-    bool makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot, bool &formatSwap);
     bool makeDefaultPartitions(bool &formatBoot);
     bool makeEsp(const QString &drv, int size);
-    bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot, bool formatSwap);
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
     bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString(), const bool failHard = true);
@@ -195,6 +193,7 @@ private slots:
 private:
     int phase = 0;
     bool pretend = false;
+    bool formatSwap = false;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
@@ -260,4 +259,6 @@ private:
     bool pretendToInstall(int start, int stop, int sleep);
     void prepareToInstall();
     bool saveHomeBasic();
+    bool makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot);
+    bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot);
 };
