@@ -1707,7 +1707,7 @@ bool MInstall::installLoader()
     if (runCmd(cmd) != 0) {
         // error
         QMessageBox::critical(this, QString::null,
-                              tr("GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu and repair the installation."));
+                              tr("GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
         runCmd("umount /mnt/antiX/proc; umount /mnt/antiX/sys; umount /mnt/antiX/dev");
         if (runCmd("mountpoint -q /mnt/antiX/boot/efi") == 0) {
             runCmd("umount /mnt/antiX/boot/efi");
