@@ -224,7 +224,7 @@ void MInstall::writeKeyFile()
         //add keyfile to container
         QString swapUUID;
         if (swapDevicePreserve != "/dev/none") {
-            swapUUID = getCmdOut("blkid -c /dev/null -s UUID -o value " + swapDevicePreserve);
+            swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
 
             runProc("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile",
                     password.toUtf8() + "\n");
@@ -234,14 +234,14 @@ void MInstall::writeKeyFile()
             runProc("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile",
                     password.toUtf8() + "\n");
         }
-        QString rootUUID = getCmdOut("blkid -c /dev/null -s UUID -o value " + rootDevicePreserve);
+        QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
         //write crypttab keyfile entry
         QFile file("/mnt/antiX/etc/crypttab");
         if (file.open(QIODevice::WriteOnly)) {
             QTextStream out(&file);
             out << "rootfs /dev/disk/by-uuid/" + rootUUID +" none luks \n";
             if (isHomeEncrypted) {
-                QString homeUUID =  getCmdOut("blkid -c /dev/null -s UUID -o value " + homeDevicePreserve);
+                QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
                 out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
             }
             if (swapDevicePreserve != "/dev/none") {
@@ -258,12 +258,12 @@ void MInstall::writeKeyFile()
             key.erase();
 
             //add keyfile to container
-            swapUUID = getCmdOut("blkid -c /dev/null -s UUID -o value " + swapDevicePreserve);
+            swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
 
             runProc("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete",
                     password.toUtf8() + "\n");
         }
-        QString homeUUID = getCmdOut("blkid -c /dev/null -s UUID -o value " + homeDevicePreserve);
+        QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
         //write crypttab keyfile entry
         QFile file("/mnt/antiX/etc/crypttab");
         if (file.open(QIODevice::WriteOnly)) {
@@ -416,7 +416,8 @@ bool MInstall::processNextPhase()
                 goBack(tr("Failed to format required partitions."));
                 return false;
             }
-            runProc("partprobe");
+            //run blkid -c /dev/null to freshen UUID cache
+            runCmd("blkid -c /dev/null");
             if (!installLinux()) return false;
         } else if (!pretendToInstall(1, iCopyBarB, 100)) {
             return false;
@@ -859,6 +860,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
         updateStatus(tr("Mounting the /home partition"));
         if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) return false;
     }
+
     return true;
 }
 
@@ -1456,27 +1458,40 @@ bool MInstall::installLinux()
 void MInstall::makeFstab()
 {
     if (phase < 0) return;
+
     // get config
     QString rootdev = rootDevicePreserve;
     QString homedev = homeDevicePreserve;
     QString swapdev = swapDevicePreserve;
 
+    //get UUIDs
+    QString rootdevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + rootDevicePreserve);
+    QString homedevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + homeDevicePreserve);
+    QString swapdevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + swapDevicePreserve);
+    QString bootdevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + bootdev);
+
     // if encrypting, modify devices to /dev/mapper categories
     if (isRootEncrypted){
         rootdev = "/dev/mapper/rootfs";
+        rootdevUUID = rootdev;
     }
     if (isHomeEncrypted) {
         homedev = "/dev/mapper/homefs";
+        homedevUUID = homedev;
     }
     if (isSwapEncrypted) {
         swapdev = "/dev/mapper/swapfs";
+        swapdevUUID = swapdev;
     }
     qDebug() << "Create fstab entries for:";
     qDebug() << "rootdev" << rootdev;
+    qDebug() << "rootdevUUID" << rootdevUUID;
     qDebug() << "homedev" << homedev;
+    qDebug() << "homedevUUID" << homedevUUID;
     qDebug() << "swapdev" << swapdev;
+    qDebug() << "swapdevUUID" << swapdevUUID;
     qDebug() << "bootdev" << bootdev;
-
+    qDebug() << "bootdevUUID" << bootdevUUID;
 
     QString fstype = getPartType(rootdev);
     QString dump_pass = "1 1";
@@ -1492,11 +1507,11 @@ void MInstall::makeFstab()
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream out(&file);
         out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
-        out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
+        out << rootdevUUID + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
         //add bootdev if present
         //only ext4 (for now) for max compatibility with other linuxes
         if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
-            out << bootdev + " /boot ext4 " + root_mntops + " 1 1 \n";
+            out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1 \n";
         }
         if (!homedev.isEmpty() && homedev != rootDevicePreserve) {
             fstype = getPartType(homedev);
@@ -1508,13 +1523,13 @@ void MInstall::makeFstab()
                     home_mntops += ",notail";
                     dump_pass = "0 0";
                 }
-                out << homedev + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
+                out << homedevUUID + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
             } else { // if not formatted
-                out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
+                out << homedevUUID + " /home " + fstype + " defaults,noatime 1 2\n";
             }
         }
         if (!swapdev.isEmpty() && swapdev != "/dev/none") {
-            out << swapdev +" swap swap defaults 0 0 \n";
+            out << swapdevUUID +" swap swap defaults 0 0 \n";
         }
         file.close();
     }
@@ -1529,7 +1544,7 @@ void MInstall::makeFstab()
     runCmd("mount -o bind /sys /mnt/antiX/sys");
     runCmd("mount -o bind /proc /mnt/antiX/proc");
 
-    runCmd("chroot /mnt/antiX dev2uuid_fstab");
+   // runCmd("chroot /mnt/antiX dev2uuid_fstab");
 
     qDebug() << "clear chroot env";
     runCmd("umount /mnt/antiX/proc");
@@ -1787,7 +1802,7 @@ bool MInstall::installLoader()
 
 bool MInstall::isGpt(const QString &drv)
 {
-    QString cmd = QString("blkid -c /dev/null %1 | grep -q PTTYPE=\\\"gpt\\\"").arg(drv);
+    QString cmd = QString("blkid %1 | grep -q PTTYPE=\\\"gpt\\\"").arg(drv);
     return (shell.run(cmd) == 0);
 }
 
@@ -1918,7 +1933,7 @@ bool MInstall::setUserName()
 QString MInstall::getPartType(const QString &dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    return shell.getOutput("blkid -c /dev/null " + dev + " -o value -s TYPE");
+    return shell.getOutput("blkid " + dev + " -o value -s TYPE");
 }
 
 bool MInstall::setPasswords()
@@ -3394,7 +3409,7 @@ void MInstall::buildBootLists()
     listBootPart.clear();
     for (const QString &part : part_list) {
         if (shell.run("partition-info is-linux=" + part.section(" ", 0, 0)) == 0) { // list only Linux partitions
-            if (shell.getOutput("blkid -c /dev/null /dev/" + part.section(" ", 0, 0) + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
+            if (shell.getOutput("blkid /dev/" + part.section(" ", 0, 0) + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
                 listBootPart << part;
             }
         }
