@@ -381,14 +381,13 @@ bool MInstall::processNextPhase()
         prepareToInstall();
 
         // these parameters are passed by reference and modified by make*Partitions()
-        bool formatBoot = false, formatSwap = false;
+        bool formatBoot = false;
         QByteArray encPass;
         QString rootType, homeType;
 
         if (!pretend) {
             if (entireDiskButton->isChecked()) {
                 rootType = "ext4";
-                formatSwap = true;
                 encPass = FDEpassword->text().toUtf8();
                 if (!makeDefaultPartitions(formatBoot)) {
                     // failed
@@ -397,7 +396,7 @@ bool MInstall::processNextPhase()
                 }
             } else {
                 encPass = FDEpassCust->text().toUtf8();
-                if (!makeChosenPartitions(rootType, homeType, formatBoot, formatSwap)) {
+                if (!makeChosenPartitions(rootType, homeType, formatBoot)) {
                     // failed
                     goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
                     return false;
@@ -412,7 +411,7 @@ bool MInstall::processNextPhase()
         iCopyBarB = grubEspButton->isChecked() ? 93 : 94;
 
         if (!pretend) {
-            if (!formatPartitions(encPass, rootType, homeType, formatBoot, formatSwap)) {
+            if (!formatPartitions(encPass, rootType, homeType, formatBoot)) {
                 goBack(tr("Failed to format required partitions."));
                 return false;
             }
@@ -779,7 +778,7 @@ bool MInstall::makeEsp(const QString &drv, int size)
     return true;
 }
 
-bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot, bool formatSwap)
+bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -1074,7 +1073,14 @@ bool MInstall::validateChosenPartitions()
         if (shell.run(QString("partition-info is-linux=%1").arg(swapdev)) != 0) {
             msgForeignList << swapdev << "swap";
         }
-        msgFormatList << swapdev << "swap";
+        formatSwap = checkBoxEncryptSwap->isChecked() || shell.run(QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev)) != 0;
+        if (formatSwap) {
+            msgFormatList << swapdev << "swap";
+        } else {
+            msgConfirm += " - " + tr("Configure %1 as swap space").arg(swapdev) + "\n";
+        }
+    } else {
+        formatSwap = false;
     }
 
     QString msg;
@@ -1304,13 +1310,14 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
     }
 
     homeDevicePreserve = rootDevicePreserve;
+    formatSwap = true;
     return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
 
-bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot, bool &formatSwap)
+bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -1358,7 +1365,6 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     if (swapdev != "/dev/none") {
         shell.run("pumount " + swapdev);
         shell.run(cmd.arg(swapsplit[0], swapsplit[1]));
-        formatSwap = true;
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (!(saveHome && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
@@ -1844,16 +1850,14 @@ bool MInstall::setUserName()
                 rexit = shell.run(cmd.arg(ixi));
             }
             if (rexit != 0) {
-                QMessageBox::critical(this, QString::null,
-                                      tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
+                goBack(tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
                 return false;
             }
         } else if (oldHomeAction == OldHomeDelete) {
             // delete the directory
             cmd = QString("rm -rf %1").arg(dpath);
             if (shell.run(cmd) != 0) {
-                QMessageBox::critical(this, QString::null,
-                                      tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
+                goBack(tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
                 return false;
             }
         }
@@ -1863,14 +1867,12 @@ bool MInstall::setUserName()
         // dir does not exist, must create it
         // copy skel to demo
         if (shell.run("cp -a /mnt/antiX/etc/skel /mnt/antiX/home") != 0) {
-            QMessageBox::critical(this, QString::null,
-                                  tr("Sorry, failed to create user directory."));
+            goBack(tr("Sorry, failed to create user directory."));
             return false;
         }
         cmd = QString("mv -f /mnt/antiX/home/skel %1").arg(dpath);
         if (shell.run(cmd) != 0) {
-            QMessageBox::critical(this, QString::null,
-                                  tr("Sorry, failed to name user directory."));
+            goBack(tr("Sorry, failed to name user directory."));
             return false;
         }
     } else {
@@ -1893,7 +1895,7 @@ bool MInstall::setUserName()
         shell.run("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
         cmd = QString("rsync -a /home/demo/ %1 --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority' --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
         if (shell.run(cmd) != 0) {
-            QMessageBox::critical(this, QString::null,
+            QMessageBox::warning(this, QString::null,
                                   tr("Sorry, failed to save desktop changes."));
         } else {
             cmd = QString("grep -rl \"home/demo\" " + dpath + "| xargs sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'");
@@ -1903,8 +1905,7 @@ bool MInstall::setUserName()
     // fix the ownership, demo=newuser
     cmd = QString("chown -R demo:demo %1").arg(dpath);
     if (shell.run(cmd) != 0) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, failed to set ownership of user directory."));
+        goBack(tr("Sorry, failed to set ownership of user directory."));
         return false;
     }
 
@@ -1948,13 +1949,11 @@ bool MInstall::setPasswords()
     const QString cmd = "chroot /mnt/antiX chpasswd";
 
     if (!runProc(cmd, QString("root:" + rootPasswordEdit->text() + "\n").toUtf8())) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, unable to set root password."));
+        goBack(tr("Sorry, unable to set root password."));
         return false;
     }
     if (!runProc(cmd, QString("demo:" + userPasswordEdit->text() + "\n").toUtf8())) {
-        QMessageBox::critical(this, QString::null,
-                              tr("Sorry, unable to set user password."));
+        goBack(tr("Sorry, unable to set user password."));
         return false;
     }
 
