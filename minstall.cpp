@@ -381,14 +381,13 @@ bool MInstall::processNextPhase()
         prepareToInstall();
 
         // these parameters are passed by reference and modified by make*Partitions()
-        bool formatBoot = false, formatSwap = false;
+        bool formatBoot = false;
         QByteArray encPass;
         QString rootType, homeType;
 
         if (!pretend) {
             if (entireDiskButton->isChecked()) {
                 rootType = "ext4";
-                formatSwap = true;
                 encPass = FDEpassword->text().toUtf8();
                 if (!makeDefaultPartitions(formatBoot)) {
                     // failed
@@ -397,7 +396,7 @@ bool MInstall::processNextPhase()
                 }
             } else {
                 encPass = FDEpassCust->text().toUtf8();
-                if (!makeChosenPartitions(rootType, homeType, formatBoot, formatSwap)) {
+                if (!makeChosenPartitions(rootType, homeType, formatBoot)) {
                     // failed
                     goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
                     return false;
@@ -412,7 +411,7 @@ bool MInstall::processNextPhase()
         iCopyBarB = grubEspButton->isChecked() ? 93 : 94;
 
         if (!pretend) {
-            if (!formatPartitions(encPass, rootType, homeType, formatBoot, formatSwap)) {
+            if (!formatPartitions(encPass, rootType, homeType, formatBoot)) {
                 goBack(tr("Failed to format required partitions."));
                 return false;
             }
@@ -779,7 +778,7 @@ bool MInstall::makeEsp(const QString &drv, int size)
     return true;
 }
 
-bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot, bool formatSwap)
+bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -1074,7 +1073,14 @@ bool MInstall::validateChosenPartitions()
         if (shell.run(QString("partition-info is-linux=%1").arg(swapdev)) != 0) {
             msgForeignList << swapdev << "swap";
         }
-        msgFormatList << swapdev << "swap";
+        formatSwap = checkBoxEncryptSwap->isChecked() || shell.run(QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev)) != 0;
+        if (formatSwap) {
+            msgFormatList << swapdev << "swap";
+        } else {
+            msgConfirm += " - " + tr("Configure %1 as swap space").arg(swapdev) + "\n";
+        }
+    } else {
+        formatSwap = false;
     }
 
     QString msg;
@@ -1304,13 +1310,14 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
     }
 
     homeDevicePreserve = rootDevicePreserve;
+    formatSwap = true;
     return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
 
-bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot, bool &formatSwap)
+bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -1358,7 +1365,6 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     if (swapdev != "/dev/none") {
         shell.run("pumount " + swapdev);
         shell.run(cmd.arg(swapsplit[0], swapsplit[1]));
-        formatSwap = true;
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (!(saveHome && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
