@@ -57,12 +57,12 @@ bool MInstall::runProc(const QString &cmd, const QByteArray &input)
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     proc->start(cmd);
     if (!input.isEmpty()) {
-        proc->waitForStarted();
         proc->write(input);
         proc->closeWriteChannel();
     }
     eloop.exec();
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+    qDebug() << "Exit code: " << proc->exitCode() << ", status: " << proc->exitStatus();
     return (proc->exitStatus() == QProcess::NormalExit && proc->exitCode() == 0);
 }
 
@@ -416,7 +416,8 @@ bool MInstall::processNextPhase()
                 goBack(tr("Failed to format required partitions."));
                 return false;
             }
-            csleep(1000);
+            //run blkid -c /dev/null to freshen UUID cache
+            runCmd("blkid -c /dev/null");
             if (!installLinux()) return false;
         } else if (!pretendToInstall(1, iCopyBarB, 100)) {
             return false;
@@ -440,10 +441,11 @@ bool MInstall::processNextPhase()
             setServices();
             if (!setComputerName()) return false;
             setLocale();
-            if (!setUserInfo()) return false;
-            if (haveSnapshotUserAccounts) {
+            if (haveSnapshotUserAccounts) { // skip user account creation
                 QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
                 shell.run(cmd);
+            } else {
+                if (!setUserInfo()) return false;
             }
             saveConfig();
             runProc("/bin/sync"); // the sync(2) system call will block the GUI
@@ -859,6 +861,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
         updateStatus(tr("Mounting the /home partition"));
         if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) return false;
     }
+
     return true;
 }
 
@@ -1456,27 +1459,40 @@ bool MInstall::installLinux()
 void MInstall::makeFstab()
 {
     if (phase < 0) return;
+
     // get config
     QString rootdev = rootDevicePreserve;
     QString homedev = homeDevicePreserve;
     QString swapdev = swapDevicePreserve;
 
+    //get UUIDs
+    QString rootdevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + rootDevicePreserve);
+    QString homedevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + homeDevicePreserve);
+    QString swapdevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + swapDevicePreserve);
+    QString bootdevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + bootdev);
+
     // if encrypting, modify devices to /dev/mapper categories
     if (isRootEncrypted){
         rootdev = "/dev/mapper/rootfs";
+        rootdevUUID = rootdev;
     }
     if (isHomeEncrypted) {
         homedev = "/dev/mapper/homefs";
+        homedevUUID = homedev;
     }
     if (isSwapEncrypted) {
         swapdev = "/dev/mapper/swapfs";
+        swapdevUUID = swapdev;
     }
     qDebug() << "Create fstab entries for:";
     qDebug() << "rootdev" << rootdev;
+    qDebug() << "rootdevUUID" << rootdevUUID;
     qDebug() << "homedev" << homedev;
+    qDebug() << "homedevUUID" << homedevUUID;
     qDebug() << "swapdev" << swapdev;
+    qDebug() << "swapdevUUID" << swapdevUUID;
     qDebug() << "bootdev" << bootdev;
-
+    qDebug() << "bootdevUUID" << bootdevUUID;
 
     QString fstype = getPartType(rootdev);
     QString dump_pass = "1 1";
@@ -1492,11 +1508,11 @@ void MInstall::makeFstab()
     if (file.open(QIODevice::WriteOnly)) {
         QTextStream out(&file);
         out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
-        out << rootdev + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
+        out << rootdevUUID + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
         //add bootdev if present
         //only ext4 (for now) for max compatibility with other linuxes
         if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
-            out << bootdev + " /boot ext4 " + root_mntops + " 1 1 \n";
+            out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1 \n";
         }
         if (!homedev.isEmpty() && homedev != rootDevicePreserve) {
             fstype = getPartType(homedev);
@@ -1508,13 +1524,13 @@ void MInstall::makeFstab()
                     home_mntops += ",notail";
                     dump_pass = "0 0";
                 }
-                out << homedev + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
+                out << homedevUUID + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
             } else { // if not formatted
-                out << homedev + " /home " + fstype + " defaults,noatime 1 2\n";
+                out << homedevUUID + " /home " + fstype + " defaults,noatime 1 2\n";
             }
         }
         if (!swapdev.isEmpty() && swapdev != "/dev/none") {
-            out << swapdev +" swap swap defaults 0 0 \n";
+            out << swapdevUUID +" swap swap defaults 0 0 \n";
         }
         file.close();
     }
@@ -1529,7 +1545,7 @@ void MInstall::makeFstab()
     runCmd("mount -o bind /sys /mnt/antiX/sys");
     runCmd("mount -o bind /proc /mnt/antiX/proc");
 
-    runCmd("chroot /mnt/antiX dev2uuid_fstab");
+   // runCmd("chroot /mnt/antiX dev2uuid_fstab");
 
     qDebug() << "clear chroot env";
     runCmd("umount /mnt/antiX/proc");
@@ -1931,12 +1947,12 @@ bool MInstall::setPasswords()
 
     const QString cmd = "chroot /mnt/antiX chpasswd";
 
-    if (!runProc(cmd, "root:" + rootPasswordEdit->text().toUtf8())) {
+    if (!runProc(cmd, QString("root:" + rootPasswordEdit->text() + "\n").toUtf8())) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set root password."));
         return false;
     }
-    if (!runProc(cmd, "demo:" + userPasswordEdit->text().toUtf8())) {
+    if (!runProc(cmd, QString("demo:" + userPasswordEdit->text() + "\n").toUtf8())) {
         QMessageBox::critical(this, QString::null,
                               tr("Sorry, unable to set user password."));
         return false;
@@ -2106,37 +2122,34 @@ bool MInstall::setComputerName()
         replaceStringInFile("WORKGROUP", computerGroupEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
     }
     if (sambaCheckBox->isChecked()) {
-        shell.run("mv -f /mnt/antiX/etc/rc5.d/K01smbd /mnt/antiX/etc/rc5.d/S06smbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc4.d/K01smbd /mnt/antiX/etc/rc4.d/S06smbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc3.d/K01smbd /mnt/antiX/etc/rc3.d/S06smbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc2.d/K01smbd /mnt/antiX/etc/rc2.d/S06smbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc5.d/K01samba-ad-dc /mnt/antiX/etc/rc5.d/S01samba-ad-dc >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc4.d/K01samba-ad-dc /mnt/antiX/etc/rc4.d/S01samba-ad-dc >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc3.d/K01samba-ad-dc /mnt/antiX/etc/rc3.d/S01samba-ad-dc >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc2.d/K01samba-ad-dc /mnt/antiX/etc/rc2.d/S01samba-ad-dc >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc5.d/K01nmbd /mnt/antiX/etc/rc5.d/S01nmbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc4.d/K01nmbd /mnt/antiX/etc/rc4.d/S01nmbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc3.d/K01nmbd /mnt/antiX/etc/rc3.d/S01nmbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc2.d/K01nmbd /mnt/antiX/etc/rc2.d/S01nmbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc5.d/K*smbd /mnt/antiX/etc/rc5.d/S06smbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc4.d/K*smbd /mnt/antiX/etc/rc4.d/S06smbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc3.d/K*smbd /mnt/antiX/etc/rc3.d/S06smbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc2.d/K*smbd /mnt/antiX/etc/rc2.d/S06smbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc5.d/K*samba-ad-dc /mnt/antiX/etc/rc5.d/S01samba-ad-dc >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc4.d/K*samba-ad-dc /mnt/antiX/etc/rc4.d/S01samba-ad-dc >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc3.d/K*samba-ad-dc /mnt/antiX/etc/rc3.d/S01samba-ad-dc >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc2.d/K*samba-ad-dc /mnt/antiX/etc/rc2.d/S01samba-ad-dc >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc5.d/K*nmbd /mnt/antiX/etc/rc5.d/S01nmbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc4.d/K*nmbd /mnt/antiX/etc/rc4.d/S01nmbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc3.d/K*nmbd /mnt/antiX/etc/rc3.d/S01nmbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc2.d/K*nmbd /mnt/antiX/etc/rc2.d/S01nmbd >/dev/null 2>&1");
     } else {
-        shell.run("mv -f /mnt/antiX/etc/rc5.d/S06smbd /mnt/antiX/etc/rc5.d/K01smbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc4.d/S06smbd /mnt/antiX/etc/rc4.d/K01smbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc3.d/S06smbd /mnt/antiX/etc/rc3.d/K01smbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc2.d/S06smbd /mnt/antiX/etc/rc2.d/K01smbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc5.d/S01samba-ad-dc /mnt/antiX/etc/rc5.d/K01samba-ad-dc >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc4.d/S01samba-ad-dc /mnt/antiX/etc/rc4.d/K01samba-ad-dc >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc3.d/S01samba-ad-dc /mnt/antiX/etc/rc3.d/K01samba-ad-dc >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc2.d/S01samba-ad-dc /mnt/antiX/etc/rc2.d/K01samba-ad-dc >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc5.d/S01nmbd /mnt/antiX/etc/rc5.d/K01nmbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc4.d/S01nmbd /mnt/antiX/etc/rc4.d/K01nmbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc3.d/S01nmbd /mnt/antiX/etc/rc3.d/K01nmbd >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc2.d/S01nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc5.d/S*smbd /mnt/antiX/etc/rc5.d/K01smbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc4.d/S*smbd /mnt/antiX/etc/rc4.d/K01smbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc3.d/S*smbd /mnt/antiX/etc/rc3.d/K01smbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc2.d/S*smbd /mnt/antiX/etc/rc2.d/K01smbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc5.d/S*samba-ad-dc /mnt/antiX/etc/rc5.d/K01samba-ad-dc >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc4.d/S*samba-ad-dc /mnt/antiX/etc/rc4.d/K01samba-ad-dc >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc3.d/S*samba-ad-dc /mnt/antiX/etc/rc3.d/K01samba-ad-dc >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc2.d/S*samba-ad-dc /mnt/antiX/etc/rc2.d/K01samba-ad-dc >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc5.d/S*nmbd /mnt/antiX/etc/rc5.d/K01nmbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc4.d/S*nmbd /mnt/antiX/etc/rc4.d/K01nmbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc3.d/S*nmbd /mnt/antiX/etc/rc3.d/K01nmbd >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc2.d/S*nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1");
     }
 
-    // systemd check
-    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
-
-    if (!systemdcheck.isEmpty()) {
+    if (system("readlink /mnt/antiX/sbin/init") == 0) { // systemd check
         if (!sambaCheckBox->isChecked()) {
             runCmd("chroot /mnt/antiX systemctl disable smbd");
             runCmd("chroot /mnt/antiX systemctl disable nmbd");
@@ -2228,7 +2241,7 @@ void MInstall::setServices()
     if (phase < 0) return;
 
     // systemd check
-    QString systemdcheck = getCmdOut("readlink /mnt/antiX/sbin/init)");
+    bool systemd = (system("readlink /mnt/antiX/sbin/init") == 0);
 
     QTreeWidgetItemIterator it(csView);
     while (*it) {
@@ -2236,13 +2249,13 @@ void MInstall::setServices()
             QString service = (*it)->text(0);
             qDebug() << "Service: " << service;
             if ((*it)->checkState(0) == Qt::Checked) {
-                if (systemdcheck.isEmpty()) {
+                if (!systemd) {
                     runCmd("chroot /mnt/antiX update-rc.d " + service + " enable");
                 } else {
                     runCmd("chroot /mnt/antiX systemctl enable " + service);
                 }
             } else {
-                if (systemdcheck.isEmpty()) {
+                if (!systemd) {
                     runCmd("chroot /mnt/antiX update-rc.d " + service + " disable");
                 } else {
                     runCmd("chroot /mnt/antiX systemctl disable " + service);
@@ -2254,11 +2267,11 @@ void MInstall::setServices()
     }
 
     if (!isInsideVB()) {
-        shell.run("mv -f /mnt/antiX/etc/rc5.d/S01virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc4.d/S01virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc3.d/S01virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rc2.d/S01virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-        shell.run("mv -f /mnt/antiX/etc/rcS.d/S21virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        shell.run("mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
     }
 }
 
@@ -3156,7 +3169,6 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
 
 void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 {
-    grubPbrButton->setDisabled(checked);
     if (homeCombo->currentText() == "root") { // if home on root set disable home encryption checkbox and set same encryption option
         checkBoxEncryptHome->setEnabled(false);
         checkBoxEncryptHome->setChecked(checked);
@@ -3164,18 +3176,10 @@ void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
 
     if (checked) {
         gbEncrPass->setVisible(true);
-        nextButton->setDisabled(true);
         checkBoxEncryptSwap->setChecked(true);
-        FDEpassCust->setFocus();
     } else {
         gbEncrPass->setVisible(checkBoxEncryptHome->isChecked());
-        nextButton->setDisabled(checkBoxEncryptHome->isChecked());
         checkBoxEncryptSwap->setChecked(checkBoxEncryptHome->isChecked());
-    }
-
-    if (!checkBoxEncryptSwap->isChecked()) {
-        FDEpassCust->clear();
-        FDEpassCust2->clear();
     }
 }
 
@@ -3183,24 +3187,20 @@ void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
 {
     if (checked) {
         gbEncrPass->setVisible(true);
-        nextButton->setDisabled(true);
         checkBoxEncryptSwap->setChecked(true);
-        FDEpassCust->setFocus();
     } else {
         gbEncrPass->setVisible(checkBoxEncryptRoot->isChecked());
-        nextButton->setDisabled(checkBoxEncryptRoot->isChecked());
         checkBoxEncryptSwap->setChecked(checkBoxEncryptRoot->isChecked());
-    }
-
-    if (!checkBoxEncryptSwap->isChecked()) {
-        FDEpassCust->clear();
-        FDEpassCust2->clear();
     }
 }
 
 void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
 {
+    nextButton->setDisabled(checked);
     if (checked) {
+        FDEpassCust2->clear();
+        FDEpassCust->clear();
+        FDEpassCust->setFocus();
         QMessageBox::warning(this, QString::null,
                              tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
                              tr("OK"));
@@ -3339,7 +3339,7 @@ void MInstall::on_grubCheckBox_toggled(bool checked)
             grubMbrButton->setEnabled(true);
         }
         if(listBootPart.count() > 0) {
-            grubPbrButton->setEnabled(true);
+            grubPbrButton->setDisabled(checkBoxEncryptRoot->isChecked());
         }
     } else {
         grubEspButton->setEnabled(false);
