@@ -1472,10 +1472,11 @@ void MInstall::makeFstab()
     QString swapdev = swapDevicePreserve;
 
     //get UUIDs
-    QString rootdevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + rootDevicePreserve);
-    QString homedevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + homeDevicePreserve);
-    QString swapdevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + swapDevicePreserve);
-    QString bootdevUUID = "UUID=" + getCmdOut("blkid -o value UUID -s UUID " + bootdev);
+    const QString cmdBlkID("blkid -o value UUID -s UUID ");
+    QString rootdevUUID = "UUID=" + getCmdOut(cmdBlkID + rootDevicePreserve);
+    QString homedevUUID = "UUID=" + getCmdOut(cmdBlkID + homeDevicePreserve);
+    QString swapdevUUID = "UUID=" + getCmdOut(cmdBlkID + swapDevicePreserve);
+    const QString bootdevUUID = "UUID=" + getCmdOut(cmdBlkID + bootdev);
 
     // if encrypting, modify devices to /dev/mapper categories
     if (isRootEncrypted){
@@ -1491,14 +1492,10 @@ void MInstall::makeFstab()
         swapdevUUID = swapdev;
     }
     qDebug() << "Create fstab entries for:";
-    qDebug() << "rootdev" << rootdev;
-    qDebug() << "rootdevUUID" << rootdevUUID;
-    qDebug() << "homedev" << homedev;
-    qDebug() << "homedevUUID" << homedevUUID;
-    qDebug() << "swapdev" << swapdev;
-    qDebug() << "swapdevUUID" << swapdevUUID;
-    qDebug() << "bootdev" << bootdev;
-    qDebug() << "bootdevUUID" << bootdevUUID;
+    qDebug() << "rootdev" << rootdev << rootdevUUID;
+    qDebug() << "homedev" << homedev << homedevUUID;
+    qDebug() << "swapdev" << swapdev << swapdevUUID;
+    qDebug() << "bootdev" << bootdev << bootdevUUID;
 
     QString fstype = getPartType(rootdev);
     QString dump_pass = "1 1";
@@ -1518,7 +1515,13 @@ void MInstall::makeFstab()
         //add bootdev if present
         //only ext4 (for now) for max compatibility with other linuxes
         if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
-            out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1 \n";
+            out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1\n";
+            if (grubEspButton->isChecked()) {
+                const QString espdev = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0).trimmed();
+                const QString espdevUUID = "UUID=" + getCmdOut(cmdBlkID + espdev);
+                qDebug() << "espdev" << espdev << espdevUUID;
+                out << espdevUUID + " /boot/efi vfat defaults,noauto,dmask=0002,fmask=0113 0 0\n";
+            }
         }
         if (!homedev.isEmpty() && homedev != rootDevicePreserve) {
             fstype = getPartType(homedev);
