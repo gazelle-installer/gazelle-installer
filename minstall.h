@@ -55,8 +55,6 @@ public:
     QStringList args;
 
     void checkUefi();
-    void goBack(const QString &msg);
-    void unmountGoBack(const QString &msg);
 
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
@@ -135,9 +133,9 @@ public:
     void updateDiskInfo();
     void setupkeyboardbutton();
     bool abort(bool onclose);
+    void cleanup(bool endclean = true);
 
 public slots:
-    void cleanup();
     void copyTime();
 
 private slots:
@@ -261,4 +259,5 @@ private:
     bool saveHomeBasic();
     bool makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot);
     bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot);
+    void failUI(const QString &msg);
 };
