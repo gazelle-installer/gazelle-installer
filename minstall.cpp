@@ -391,14 +391,14 @@ bool MInstall::processNextPhase()
                 encPass = FDEpassword->text().toUtf8();
                 if (!makeDefaultPartitions(formatBoot)) {
                     // failed
-                    goBack(tr("Failed to create required partitions.\nReturning to Step 1."));
+                    failUI(tr("Failed to create required partitions.\nReturning to Step 1."));
                     return false;
                 }
             } else {
                 encPass = FDEpassCust->text().toUtf8();
                 if (!makeChosenPartitions(rootType, homeType, formatBoot)) {
                     // failed
-                    goBack(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
+                    failUI(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
                     return false;
                 }
             }
@@ -412,7 +412,7 @@ bool MInstall::processNextPhase()
 
         if (!pretend) {
             if (!formatPartitions(encPass, rootType, homeType, formatBoot)) {
-                goBack(tr("Failed to format required partitions."));
+                failUI(tr("Failed to format required partitions."));
                 return false;
             }
             //run blkid -c /dev/null to freshen UUID cache
@@ -474,6 +474,10 @@ void MInstall::prepareToInstall()
         // unmount /home if it exists
         shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
         shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+        // close LUKS containers
+        runProc("cryptsetup luksClose /dev/mapper/rootfs");
+        runProc("cryptsetup luksClose /dev/mapper/swapfs");
+        runProc("cryptsetup luksClose /dev/mapper/homefs");
     }
 
     isRootFormatted = false;
@@ -984,7 +988,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
                   + " --iter-time " + spinFDEroundtime->cleanText()
                   + " luksFormat " + dev;
     if (!runProc(cmd, password + "\n")) {
-        goBack(tr("Sorry, could not create %1 LUKS partition").arg(dev));
+        failUI(tr("Sorry, could not create %1 LUKS partition").arg(dev));
         return false;
     }
     return true;
@@ -1000,7 +1004,7 @@ bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, con
     if (!fs_name.isEmpty()) cmd += " " + fs_name;
     if (!options.isEmpty()) cmd += " " + options;
     if (!runProc(cmd, password + "\n")) {
-        if (failHard) goBack(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
+        if (failHard) failUI(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
     }
     return true;
@@ -1454,7 +1458,7 @@ bool MInstall::installLinux()
         if (proc->exitStatus() == QProcess::NormalExit) {
             if(!copyLinux()) return false;
         } else {
-            unmountGoBack(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
+            failUI(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
             return false;
         }
     }
@@ -1617,7 +1621,7 @@ bool MInstall::copyLinux()
         timer->start(1000);
         runProc(cmd);
         if (proc->exitStatus() != QProcess::NormalExit) {
-            unmountGoBack(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
+            failUI(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
             return false;
         }
         timer->stop();
@@ -1853,14 +1857,14 @@ bool MInstall::setUserName()
                 rexit = shell.run(cmd.arg(ixi));
             }
             if (rexit != 0) {
-                goBack(tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
+                failUI(tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
                 return false;
             }
         } else if (oldHomeAction == OldHomeDelete) {
             // delete the directory
             cmd = QString("rm -rf %1").arg(dpath);
             if (shell.run(cmd) != 0) {
-                goBack(tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
+                failUI(tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
                 return false;
             }
         }
@@ -1870,12 +1874,12 @@ bool MInstall::setUserName()
         // dir does not exist, must create it
         // copy skel to demo
         if (shell.run("cp -a /mnt/antiX/etc/skel /mnt/antiX/home") != 0) {
-            goBack(tr("Sorry, failed to create user directory."));
+            failUI(tr("Sorry, failed to create user directory."));
             return false;
         }
         cmd = QString("mv -f /mnt/antiX/home/skel %1").arg(dpath);
         if (shell.run(cmd) != 0) {
-            goBack(tr("Sorry, failed to name user directory."));
+            failUI(tr("Sorry, failed to name user directory."));
             return false;
         }
     } else {
@@ -1908,7 +1912,7 @@ bool MInstall::setUserName()
     // fix the ownership, demo=newuser
     cmd = QString("chown -R demo:demo %1").arg(dpath);
     if (shell.run(cmd) != 0) {
-        goBack(tr("Sorry, failed to set ownership of user directory."));
+        failUI(tr("Sorry, failed to set ownership of user directory."));
         return false;
     }
 
@@ -1952,11 +1956,11 @@ bool MInstall::setPasswords()
     const QString cmd = "chroot /mnt/antiX chpasswd";
 
     if (!runProc(cmd, QString("root:" + rootPasswordEdit->text() + "\n").toUtf8())) {
-        goBack(tr("Sorry, unable to set root password."));
+        failUI(tr("Sorry, unable to set root password."));
         return false;
     }
     if (!runProc(cmd, QString("demo:" + userPasswordEdit->text() + "\n").toUtf8())) {
-        goBack(tr("Sorry, unable to set user password."));
+        failUI(tr("Sorry, unable to set user password."));
         return false;
     }
 
@@ -2277,24 +2281,7 @@ void MInstall::setServices()
     }
 }
 
-void MInstall::unmountGoBack(const QString &msg)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    shell.run("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
-    shell.run("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
-    if (isRootEncrypted) {
-        shell.run("cryptsetup luksClose rootfs");
-    }
-    if (isHomeEncrypted) {
-        shell.run("cryptsetup luksClose homefs");
-    }
-    if (isSwapEncrypted) {
-        shell.run("cryptsetup luksClose swapfs");
-    }
-    goBack(msg);
-}
-
-void MInstall::goBack(const QString &msg)
+void MInstall::failUI(const QString &msg)
 {
     if (phase >= 0) {
         this->setEnabled(false);
@@ -2500,7 +2487,10 @@ void MInstall::pageDisplayed(int next)
             backButton->setEnabled(haveSysConfig);
             nextButton->setEnabled(!haveSysConfig);
         }
-        if (!processNextPhase() && phase > -2) gotoPage(1);
+        if (!processNextPhase() && phase > -2) {
+            cleanup(false);
+            gotoPage(1);
+        }
         return; // avoid enabling both Back and Next buttons at the end
         break;
     case 5: // set bootloader
@@ -2911,21 +2901,19 @@ bool MInstall::eventFilter(QObject* obj, QEvent* event)
 }
 
 // run before closing the app, do some cleanup
-void MInstall::cleanup()
+void MInstall::cleanup(bool endclean)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (pretend) return;
 
-    shell.run("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'");
-
-
-    shell.run("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
-    shell.run("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1");
-    sync();
+    if (endclean) {
+        shell.run("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'");
+        shell.run("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1");
+        shell.run("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1");
+    }
     shell.run("umount -l /mnt/antiX/proc >/dev/null 2>&1; umount -l /mnt/antiX/sys >/dev/null 2>&1; umount -l /mnt/antiX/dev/shm >/dev/null 2>&1; umount -l /mnt/antiX/dev >/dev/null 2>&1");
     shell.run("umount -lR /mnt/antiX >/dev/null 2>&1");
 
-    sync();
     if (isRootEncrypted) {
         shell.run("cryptsetup luksClose rootfs");
     }
@@ -2935,7 +2923,6 @@ void MInstall::cleanup()
     if (isSwapEncrypted) {
         shell.run("cryptsetup luksClose swapfs");
     }
-    sync();
 }
 
 /////////////////////////////////////////////////////////////////////////
