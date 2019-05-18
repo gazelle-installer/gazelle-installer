@@ -56,11 +56,15 @@ int main(int argc, char *argv[])
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
 
     // Set the logging files
-    logFile.reset(new QFile("/var/log/minstall.log"));
+    const QString logFileName("/var/log/minstall.log");
+    logFile.reset(new QFile(logFileName));
     // Open the file logging
-    logFile.data()->open(QFile::Append | QFile::Text);
-    // Set handler
-    qInstallMessageHandler(messageHandler);
+    if (logFile.data()->open(QFile::Append | QFile::Text)) {
+        // Set handler
+        qInstallMessageHandler(messageHandler);
+    } else {
+        qDebug() << "Cannot write to installer log:" << logFileName;
+    }
 
 
     QTranslator qtTran;
