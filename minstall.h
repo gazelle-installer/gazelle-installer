@@ -64,7 +64,6 @@ public:
     QString getCmdOut(const QString &cmd);
     QStringList getCmdOuts(const QString &cmd);
     static int command(const QString &string);
-    int getPartitionNumber();
 
     bool isInsideVB();
     bool isGpt(const QString &drv);
