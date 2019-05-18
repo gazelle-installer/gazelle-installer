@@ -364,7 +364,7 @@ bool MInstall::checkPassword(const QString &pass)
 int MInstall::getPartitionNumber()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    return getCmdOut("cat /proc/partitions | grep '[h,s,v].[a-z][1-9]$' | wc -l").toInt();
+    return getCmdOut("cat /proc/partitions |  grep -E 'x?[h,s,v].[a-z][1-9][0-9]?$' | wc -l").toInt();
 }
 
 // process the next phase of installation if possible
