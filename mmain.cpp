@@ -95,7 +95,7 @@ void MMain::changeEvent(QEvent *event)
     {
         QPalette pal = mainHelp->style()->standardPalette();
         QColor col = pal.color(QPalette::Base);
-        col.setAlpha(85);
+        col.setAlpha(150);
         pal.setColor(QPalette::Base, col);
         mainHelp->setPalette(pal);
     }

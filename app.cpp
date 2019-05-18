@@ -92,19 +92,25 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (getuid() == 0) {
-        qDebug() << "Installer version:" << VERSION;
-        MMain mmain(a.arguments());
-        const QRect &geo = a.desktop()->availableGeometry(&mmain);
-        mmain.move((geo.width()-mmain.width())/2, (geo.height()-mmain.height())/2);
-        mmain.show();
-        return a.exec();
-    } else {
+    // alert the user if not running as root
+    if (getuid() != 0) {
         QApplication::beep();
-        QMessageBox::critical(0, QString::null,
-                              QApplication::tr("You must run this app as root."));
-        return 1;
+        const QString &msg = QApplication::tr("You must run this app as root.");
+        if (a.arguments().contains("--pretend") || a.arguments().contains("-p")) {
+            QMessageBox::warning(0, QString::null, msg);
+        } else {
+            QMessageBox::critical(0, QString::null, msg);
+            return 1;
+        }
     }
+
+    // main routine
+    qDebug() << "Installer version:" << VERSION;
+    MMain mmain(a.arguments());
+    const QRect &geo = a.desktop()->availableGeometry(&mmain);
+    mmain.move((geo.width()-mmain.width())/2, (geo.height()-mmain.height())/2);
+    mmain.show();
+    return a.exec();
 }
 
 // The implementation of the handler
