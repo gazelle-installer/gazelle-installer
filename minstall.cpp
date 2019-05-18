@@ -361,12 +361,6 @@ bool MInstall::checkPassword(const QString &pass)
     return true;
 }
 
-int MInstall::getPartitionNumber()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    return getCmdOut("cat /proc/partitions |  grep -E 'x?[h,s,v].[a-z][1-9][0-9]?$' | wc -l").toInt();
-}
-
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
@@ -2637,9 +2631,20 @@ void MInstall::updatePartitionWidgets()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
-    int numberPartitions = this->getPartitionNumber();
+    // see if there are any partitions in the system
+    bool foundPartitions = false;
+    QFile file("/proc/partitions");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        QRegularExpression regexp("x?[h,s,v].[a-z][1-9][0-9]*$");
+        while (!foundPartitions) {
+            QString line(file.readLine());
+            if (line.contains(regexp)) foundPartitions = true;
+            else if (line.isEmpty()) break;
+        }
+        file.close();
+    }
 
-    if (numberPartitions > 0) {
+    if (foundPartitions) {
         existing_partitionsButton->show();
         existing_partitionsButton->setChecked(true);
     } else {
