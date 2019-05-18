@@ -1520,12 +1520,12 @@ void MInstall::makeFstab()
         //only ext4 (for now) for max compatibility with other linuxes
         if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
             out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1\n";
-            if (grubEspButton->isChecked()) {
-                const QString espdev = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0).trimmed();
-                const QString espdevUUID = "UUID=" + getCmdOut(cmdBlkID + espdev);
-                qDebug() << "espdev" << espdev << espdevUUID;
-                out << espdevUUID + " /boot/efi vfat defaults,noauto,dmask=0002,fmask=0113 0 0\n";
-            }
+        }
+        if (grubEspButton->isChecked()) {
+            const QString espdev = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0).trimmed();
+            const QString espdevUUID = "UUID=" + getCmdOut(cmdBlkID + espdev);
+            qDebug() << "espdev" << espdev << espdevUUID;
+            out << espdevUUID + " /boot/efi vfat defaults,noauto,noatime,sync,dmask=0002,fmask=0113 0 0\n";
         }
         if (!homedev.isEmpty() && homedev != rootDevicePreserve) {
             fstype = getPartType(homedev);
