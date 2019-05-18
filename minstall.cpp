@@ -1519,7 +1519,7 @@ void MInstall::makeFstab()
             const QString espdev = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0).trimmed();
             const QString espdevUUID = "UUID=" + getCmdOut(cmdBlkID + espdev);
             qDebug() << "espdev" << espdev << espdevUUID;
-            out << espdevUUID + " /boot/efi vfat defaults,noauto,noatime,sync,dmask=0002,fmask=0113 0 0\n";
+            out << espdevUUID + " /boot/efi vfat defaults,noatime,dmask=0002,fmask=0113 0 0\n";
         }
         if (!homedev.isEmpty() && homedev != rootDevicePreserve) {
             fstype = getPartType(homedev);
