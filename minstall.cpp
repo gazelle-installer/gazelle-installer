@@ -513,7 +513,10 @@ void MInstall::prepareToInstall()
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         while (!file.atEnd()) {
             const QString line(file.readLine().trimmed());
-            if(!line.startsWith('#')) localeCombo->addItem(line);
+            if(!line.startsWith('#')) {
+                QLocale loc(line);
+                localeCombo->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(line));
+            }
         }
         file.close();
     }
@@ -527,11 +530,12 @@ void MInstall::prepareToInstall()
             }
         }
         file.close();
+        localeCombo->model()->sort(0);
     }
-    if (localeCombo->findText(locale) != -1) {
-        localeCombo->setCurrentIndex(localeCombo->findText(locale));
+    if (localeCombo->findData(QVariant(locale)) != -1) {
+        localeCombo->setCurrentIndex(localeCombo->findData(QVariant(locale)));
     } else {
-        localeCombo->setCurrentIndex(localeCombo->findText("en_US"));
+        localeCombo->setCurrentIndex(localeCombo->findData(QVariant("en_US")));
     }
 
     // clock 24/12 default
@@ -690,7 +694,7 @@ void MInstall::saveConfig()
     config->setValue("Network/Workgroup", computerGroupEdit->text());
     config->setValue("Network/Samba", sambaCheckBox->isChecked());
     // Localization step
-    config->setValue("Localization/Locale", localeCombo->currentText());
+    config->setValue("Localization/Locale", localeCombo->currentData().toString());
     config->setValue("Localization/LocalClock", localClockCheckBox->isChecked());
     config->setValue("Localization/Clock24h", radio24h->isChecked());
     config->setValue("Localization/Timezone", timezoneCombo->currentText());
@@ -2183,10 +2187,10 @@ void MInstall::setLocale()
     QString cmd;
 
     //locale
-    cmd = QString("chroot /mnt/antiX /usr/sbin/update-locale \"LANG=%1\"").arg(localeCombo->currentText());
+    cmd = QString("chroot /mnt/antiX /usr/sbin/update-locale \"LANG=%1\"").arg(localeCombo->currentData().toString());
     qDebug() << "Update locale";
     runCmd(cmd);
-    cmd = QString("Language=%1").arg(localeCombo->currentText());
+    cmd = QString("Language=%1").arg(localeCombo->currentData().toString());
 
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
     //replace with link
