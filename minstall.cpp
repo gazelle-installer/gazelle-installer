@@ -2639,7 +2639,7 @@ void MInstall::updatePartitionWidgets()
     bool foundPartitions = false;
     QFile file("/proc/partitions");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
-        QRegularExpression regexp("x?[h,s,v].[a-z][1-9][0-9]*$");
+        QRegularExpression regexp("((x?[h,s,v]d[a-z]*)|((mmcblk|nvme).*p))[0-9]");
         while (!foundPartitions) {
             QString line(file.readLine());
             if (line.contains(regexp)) foundPartitions = true;
