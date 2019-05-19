@@ -2564,7 +2564,6 @@ void MInstall::gotoPage(int next)
     // modify ui for standard cases
     if (next == 0) {
         // entering first page
-        nextButton->setText(tr("Next"));
         backButton->hide();
     } else {
         // default
@@ -2576,6 +2575,9 @@ void MInstall::gotoPage(int next)
         // entering the last page
         backButton->hide();
         nextButton->setText(tr("Finish"));
+    } else if (next == 3 || next == 6){
+        // Advanced Encryption Settings and Services pages
+        nextButton->setText(tr("OK"));
     } else {
         nextButton->setText(tr("Next"));
     }
