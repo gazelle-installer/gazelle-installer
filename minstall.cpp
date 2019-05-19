@@ -430,7 +430,7 @@ bool MInstall::processNextPhase()
         }
         phase = 4;
         updateStatus(tr("Installation successful"), 100);
-        csleep(1000);
+        execute("sleep 1");
         gotoPage(10);
     }
     return true;
@@ -811,7 +811,6 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
         if (!makeLinuxPartition(rootdev, rootType, badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
-        csleep(1000);
         isRootFormatted = true;
         root_mntops = "defaults,noatime";
     }
@@ -832,7 +831,6 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
             return false;
         }
         execute("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1", false);
-        csleep(1000);
         isHomeFormatted = true;
     }
     mkdir("/mnt/antiX/home", 0755);
@@ -884,7 +882,6 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         // btrfs and set up fsck
         execute("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
-        csleep(1000);
         QString size_str = getCmdOut("/sbin/sfdisk -s " + dev);
         quint64 size = size_str.toULongLong();
         size = size / 1024; // in MiB
@@ -931,7 +928,6 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         // error
         return false;
     }
-    csleep(1000);
 
     if (type.startsWith("ext")) {
         // ext4 tuning
@@ -1163,7 +1159,6 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
 
     // calculate new partition sizes
     // get the total disk size
-    csleep(1000);
     QString size_str = getCmdOut("/sbin/sfdisk -s " + drv);
     quint64 size = size_str.toULongLong();
     size = size / 1024; // in MiB
