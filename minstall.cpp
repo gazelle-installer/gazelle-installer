@@ -1550,19 +1550,6 @@ void MInstall::makeFstab()
     if (POPULATE_MEDIA_MOUNTPOINTS) {
         runCmd("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
     }
-
-    qDebug() << "change fstab entries to use UUIDs";
-    // set mounts for chroot
-    runCmd("mount -o bind /dev /mnt/antiX/dev");
-    runCmd("mount -o bind /sys /mnt/antiX/sys");
-    runCmd("mount -o bind /proc /mnt/antiX/proc");
-
-   // runCmd("chroot /mnt/antiX dev2uuid_fstab");
-
-    qDebug() << "clear chroot env";
-    runCmd("umount /mnt/antiX/proc");
-    runCmd("umount /mnt/antiX/sys");
-    runCmd("umount /mnt/antiX/dev");
 }
 
 bool MInstall::copyLinux()
