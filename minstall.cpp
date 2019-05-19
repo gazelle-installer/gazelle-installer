@@ -2571,16 +2571,20 @@ void MInstall::gotoPage(int next)
     }
 
     int c = widgetStack->count();
+    QSize isize = nextButton->iconSize();
+    isize.setWidth(isize.height());
     if (next >= c-1) {
         // entering the last page
         backButton->hide();
         nextButton->setText(tr("Finish"));
     } else if (next == 3 || next == 6){
         // Advanced Encryption Settings and Services pages
+        isize.setWidth(0);
         nextButton->setText(tr("OK"));
     } else {
         nextButton->setText(tr("Next"));
     }
+    nextButton->setIconSize(isize);
     if (next > c-1) {
         // finished
         updateCursor(Qt::WaitCursor);
