@@ -1551,9 +1551,9 @@ bool MInstall::copyLinux()
     iCopyBarA = progressBar->value();
     // setup and start the process
     QString cmd;
-    cmd = "/bin/cp -a";
+    cmd = "/bin/cp -av";
     if (args.contains("--sync") || args.contains("-s")) {
-        cmd = "rsync -a --delete";
+        cmd = "rsync -av --delete";
         if (saveHomeCheck->isChecked()) {
             cmd.append(" --filter 'protect home/*'");
         }
@@ -1572,6 +1572,7 @@ bool MInstall::copyLinux()
 
     if (!(args.contains("--nocopy") || args.contains("-n"))) {
         connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
+        connect(proc, SIGNAL(readyRead()), this, SLOT(copyTime()));
         timer->start(1000);
         execute(cmd);
         if (proc->exitStatus() != QProcess::NormalExit) {
@@ -1579,6 +1580,7 @@ bool MInstall::copyLinux()
             return false;
         }
         timer->stop();
+        disconnect(proc, SIGNAL(readyRead()), 0, 0);
         disconnect(timer, SIGNAL(timeout()), 0, 0);
     }
 
@@ -2931,6 +2933,7 @@ void MInstall::copyTime()
         updateStatus(tr("Copy progress unknown. No file system statistics."), 0);
     }
     progressBar->setValue(i + iCopyBarA);
+    proc->readAll();
 }
 
 void MInstall::on_progressBar_valueChanged(int value)
