@@ -58,8 +58,6 @@ public:
 
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
-    int runCmd(const QString &cmd);
-    bool runProc(const QString &cmd, const QByteArray &input = QByteArray());
     void csleep(int msec);
     QString getCmdOut(const QString &cmd);
     QStringList getCmdOuts(const QString &cmd);
@@ -251,6 +249,7 @@ private:
     long iFDEroundtime = -1;
 
     // private functions
+    bool execute(const QString &cmd, const bool rawexec = true, const QByteArray &input = QByteArray());
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     bool pretendToInstall(int start, int stop, int sleep);
