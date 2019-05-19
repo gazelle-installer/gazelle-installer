@@ -2141,7 +2141,8 @@ bool MInstall::setComputerName()
         shell.run("mv -f /mnt/antiX/etc/rc2.d/S*nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1");
     }
 
-    if (system("readlink /mnt/antiX/sbin/init") == 0) { // systemd check
+    char rbuf[4];
+    if (readlink("/mnt/antiX/sbin/init", rbuf, sizeof(rbuf)) >= 0) { // systemd check
         if (!sambaCheckBox->isChecked()) {
             runCmd("chroot /mnt/antiX systemctl disable smbd");
             runCmd("chroot /mnt/antiX systemctl disable nmbd");
@@ -2233,7 +2234,8 @@ void MInstall::setServices()
     if (phase < 0) return;
 
     // systemd check
-    bool systemd = (system("readlink /mnt/antiX/sbin/init") == 0);
+    char rbuf[4];
+    bool systemd = (readlink("/mnt/antiX/sbin/init", rbuf, sizeof(rbuf)) >= 0);
 
     QTreeWidgetItemIterator it(csView);
     while (*it) {
