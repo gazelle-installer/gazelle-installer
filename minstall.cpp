@@ -664,7 +664,7 @@ void MInstall::saveConfig()
     config->setValue("Encryption/Cipher", comboFDEcipher->currentText());
     config->setValue("Encryption/ChainMode", comboFDEchain->currentText());
     config->setValue("Encryption/IVgenerator", comboFDEivgen->currentText());
-    config->setValue("Encryption/IVhash", comboFDEivhash->itemData(comboFDEivhash->currentIndex()).toString());
+    config->setValue("Encryption/IVhash", comboFDEivhash->currentData().toString());
     config->setValue("Encryption/KeySize", spinFDEkeysize->cleanText());
     config->setValue("Encryption/LUKSkeyHash", comboFDEhash->currentText().toLower().remove('-'));
     config->setValue("Encryption/KernelRNG", comboFDErandom->currentText());
@@ -975,7 +975,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
     if (comboFDEchain->currentText() != "ECB") {
         strCipherSpec += "-" + comboFDEivgen->currentText();
         if (comboFDEivgen->currentText() == "ESSIV") {
-            strCipherSpec += ":" + comboFDEivhash->itemData(comboFDEivhash->currentIndex()).toString();
+            strCipherSpec += ":" + comboFDEivhash->currentData().toString();
         }
     }
     QString cmd = "cryptsetup --batch-mode"
