@@ -28,24 +28,6 @@
 #include "mmain.h"
 #include "cmd.h"
 
-bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray &input)
-{
-    if (phase < 0) return false;
-    qDebug() << cmd;
-    QEventLoop eloop;
-    connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
-    if (rawexec) proc->start(cmd);
-    else proc->start("/bin/bash", QStringList() << "-c" << cmd);
-    if (!input.isEmpty()) {
-        proc->write(input);
-        proc->closeWriteChannel();
-    }
-    eloop.exec();
-    disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
-    qDebug() << "Exit code: " << proc->exitCode() << ", status: " << proc->exitStatus();
-    return (proc->exitStatus() == QProcess::NormalExit && proc->exitCode() == 0);
-}
-
 MInstall::MInstall(QWidget *parent, QStringList args) :
     QWidget(parent)
 {
@@ -115,14 +97,36 @@ void MInstall::csleep(int msec)
     eloop.exec();
 }
 
-QString MInstall::getCmdOut(const QString &cmd)
+bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray &input)
 {
-    return shell.getOutput(cmd).section("\n", 0, 0);
+    if (phase < 0) return false;
+    qDebug() << cmd;
+    QEventLoop eloop;
+    connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
+    if (rawexec) proc->start(cmd);
+    else proc->start("/bin/bash", QStringList() << "-c" << cmd);
+    if (!input.isEmpty()) {
+        proc->write(input);
+        proc->closeWriteChannel();
+    }
+    eloop.exec();
+    disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+    qDebug() << "Exit code: " << proc->exitCode() << ", status: " << proc->exitStatus();
+    return (proc->exitStatus() == QProcess::NormalExit && proc->exitCode() == 0);
+}
+
+QString MInstall::getCmdOut(const QString &cmd, bool everything)
+{
+    execute(cmd, false);
+    QString strout(proc->readAll().trimmed());
+    if (everything) return strout;
+    return strout.section("\n", 0, 0);
 }
 
 QStringList MInstall::getCmdOuts(const QString &cmd)
 {
-    return shell.getOutput(cmd).split('\n');
+    execute(cmd, false);
+    return QString(proc->readAll().trimmed()).split('\n');
 }
 
 // Check if running inside VirtualBox
@@ -135,7 +139,7 @@ bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtex
 {
 
     QString cmd = QString("sed -i 's/%1/%2/g' %3").arg(oldtext, newtext, filepath);
-    if (execute(cmd)) {
+    if (!execute(cmd)) {
         return false;
     }
     return true;
@@ -440,7 +444,7 @@ void MInstall::prepareToInstall()
 
     if (!pretend) {
         // unmount /boot/efi if mounted by previous run
-        if (!execute("mountpoint -q /mnt/antiX/boot/efi")) {
+        if (execute("mountpoint -q /mnt/antiX/boot/efi")) {
             execute("umount /mnt/antiX/boot/efi");
         }
         // unmount /home if it exists
@@ -456,7 +460,7 @@ void MInstall::prepareToInstall()
     isHomeFormatted = false;
 
     // if it looks like an apple...
-    if (!execute("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
+    if (execute("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
         grubPbrButton->setChecked(true);
         grubMbrButton->setEnabled(false);
         localClockCheckBox->setChecked(true);
@@ -881,7 +885,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         execute("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
         csleep(1000);
-        QString size_str = shell.getOutput("/sbin/sfdisk -s " + dev);
+        QString size_str = getCmdOut("/sbin/sfdisk -s " + dev);
         quint64 size = size_str.toULongLong();
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
@@ -923,7 +927,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
             cmd = QString("mkfs.ext4 -F %1 -L \"%2\"").arg(dev).arg(label);
         }
     }
-    if (execute(cmd) != 0) {
+    if (!execute(cmd)) {
         // error
         return false;
     }
@@ -932,7 +936,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
     if (type.startsWith("ext")) {
         // ext4 tuning
         cmd = QString("/sbin/tune2fs -c0 -C0 -i1m %1").arg(dev);
-        if (execute(cmd) != 0) {
+        if (!execute(cmd)) {
             // error
         }
     }
@@ -1070,7 +1074,7 @@ bool MInstall::validateChosenPartitions()
             msgForeignList << bootdev << "/boot";
         }
         // warn if partition too big (not needed for boot, likely data or other useful partition
-        QString size_str = shell.getOutput("lsblk -nbo SIZE " + bootdev + "|head -n1").trimmed();
+        QString size_str = getCmdOut("lsblk -nbo SIZE " + bootdev + "|head -n1").trimmed();
         bool ok = true;
         quint64 size = size_str.toULongLong(&ok, 10);
         if (size > 2147483648 || !ok) {  // if > 2GiB or not converted properly
@@ -1160,7 +1164,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
     // calculate new partition sizes
     // get the total disk size
     csleep(1000);
-    QString size_str = shell.getOutput("/sbin/sfdisk -s " + drv);
+    QString size_str = getCmdOut("/sbin/sfdisk -s " + drv);
     quint64 size = size_str.toULongLong();
     size = size / 1024; // in MiB
     // pre-compensate for rounding errors in disk geometry
@@ -1774,7 +1778,7 @@ bool MInstall::installLoader()
 bool MInstall::isGpt(const QString &drv)
 {
     QString cmd = QString("blkid %1 | grep -q PTTYPE=\\\"gpt\\\"").arg(drv);
-    return (!execute(cmd, false));
+    return execute(cmd, false);
 }
 
 void MInstall::checkUefi()
@@ -1904,7 +1908,7 @@ bool MInstall::setUserName()
 QString MInstall::getPartType(const QString &dev)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    return shell.getOutput("blkid " + dev + " -o value -s TYPE");
+    return getCmdOut("blkid " + dev + " -o value -s TYPE");
 }
 
 bool MInstall::setPasswords()
@@ -2590,7 +2594,7 @@ void MInstall::firstRefresh(QDialog *main)
     mmn = main;
     if (!pretend) {
         // disable automounting in Thunar
-        auto_mount = shell.getOutput("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
+        auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
     }
 
@@ -2864,8 +2868,6 @@ bool MInstall::abort(bool onclose)
     updateCursor(Qt::WaitCursor);
     proc->terminate();
     QTimer::singleShot(5000, proc, SLOT(kill()));
-    shell.terminate();
-    QTimer::singleShot(1000, &shell, SLOT(kill()));
     // help the installer if it was stuck at the config pages
     if (onclose) {
         phase = -2;
@@ -3359,18 +3361,18 @@ void MInstall::buildBootLists()
     // check if booted UEFI and if ESP(s) available
     grubEspButton->setEnabled(false);
     if (uefi) {
-        const QStringList drives = shell.getOutput("partition-info drives --noheadings --exclude=boot | awk '{print $1}'").split("\n");
+        const QStringList drives = getCmdOuts("partition-info drives --noheadings --exclude=boot | awk '{print $1}'");
 
         // find ESP for all partitions on all drives
         listBootESP.clear();
         for (const QString &drive : drives) {
             if (isGpt("/dev/" + drive)) {
-                QString esps = shell.getOutput("lsblk -nlo name,parttype /dev/" + drive + " | egrep '(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$' | awk '{print $1}'");
+                QString esps = getCmdOut("lsblk -nlo name,parttype /dev/" + drive + " | egrep '(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$' | awk '{print $1}'", true);
                 if (!esps.isEmpty()) {
                     listBootESP << esps.split("\n");
                 }
                 // backup detection for drives that don't have UUID for ESP
-                const QStringList backup_list = shell.getOutput("fdisk -l -o DEVICE,TYPE /dev/" + drive + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3").split("\n");
+                const QStringList backup_list = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + drive + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
                 for (const QString &part : backup_list) {
                     if (!listBootESP.contains(part)) {
                         listBootESP << part;
@@ -3387,11 +3389,11 @@ void MInstall::buildBootLists()
     }
 
     // build partition list available to install GRUB (in PBR)
-    const QStringList part_list = shell.getOutput("partition-info all --noheadings --exclude=swap,boot,efi").split("\n");
+    const QStringList part_list = getCmdOuts("partition-info all --noheadings --exclude=swap,boot,efi");
     listBootPart.clear();
     for (const QString &part : part_list) {
         if (execute("partition-info is-linux=" + part.section(" ", 0, 0), false)) { // list only Linux partitions
-            if (shell.getOutput("blkid /dev/" + part.section(" ", 0, 0) + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
+            if (getCmdOut("blkid /dev/" + part.section(" ", 0, 0) + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
                 listBootPart << part;
             }
         }
