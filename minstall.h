@@ -27,7 +27,6 @@
 #include <dirent.h>
 
 #include "ui_meinstall.h"
-#include "cmd.h"
 
 class SafeCache : public QByteArray {
 public:
@@ -59,7 +58,6 @@ public:
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
     void csleep(int msec);
-    QString getCmdOut(const QString &cmd);
     QStringList getCmdOuts(const QString &cmd);
     static int command(const QString &string);
 
@@ -198,7 +196,6 @@ private:
     bool haveSysConfig = false;
 
     QWidget *nextFocus = NULL;
-    Cmd shell;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
     QStringList listHomes;
@@ -249,7 +246,11 @@ private:
     long iFDEroundtime = -1;
 
     // private functions
+
+    // helpers
     bool execute(const QString &cmd, const bool rawexec = true, const QByteArray &input = QByteArray());
+    QString getCmdOut(const QString &cmd, bool everything = false);
+
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     bool pretendToInstall(int start, int stop, int sleep);
