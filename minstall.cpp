@@ -2228,6 +2228,17 @@ void MInstall::setLocale()
     runCmd("chroot /mnt/antiX localize-repo default");
 }
 
+void MInstall::stashServices(bool save)
+{
+    QTreeWidgetItemIterator it(csView);
+    while (*it) {
+        if ((*it)->parent() != NULL) {
+            (*it)->setCheckState(save?2:0, (*it)->checkState(save?0:2));
+        }
+        ++it;
+    }
+}
+
 void MInstall::setServices()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -2345,9 +2356,8 @@ int MInstall::showPage(int curr, int next)
             haveSysConfig = true;
             next = 4; // Continue
         }
-    } else if (next == 7 && curr == 6) { // at Step_Services (forward)
-        return 8; // goes back to the screen that called Services screen
-    } else if (next == 5 && curr == 6) { // at Step_Services (backward)
+    } else if (curr == 6) { // at Step_Services
+        stashServices(next == 7);
         return 8; // goes back to the screen that called Services screen
     }
     return next;
@@ -2718,6 +2728,7 @@ void MInstall::buildServiceList()
     csView->expandAll();
     csView->resizeColumnToContents(0);
     csView->resizeColumnToContents(1);
+    stashServices(true);
 }
 
 /////////////////////////////////////////////////////////////////////////
