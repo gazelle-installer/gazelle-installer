@@ -2209,6 +2209,17 @@ void MInstall::setLocale()
     execute("chroot /mnt/antiX localize-repo default");
 }
 
+void MInstall::stashServices(bool save)
+{
+    QTreeWidgetItemIterator it(csView);
+    while (*it) {
+        if ((*it)->parent() != NULL) {
+            (*it)->setCheckState(save?2:0, (*it)->checkState(save?0:2));
+        }
+        ++it;
+    }
+}
+
 void MInstall::setServices()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -2326,9 +2337,8 @@ int MInstall::showPage(int curr, int next)
             haveSysConfig = true;
             next = 4; // Continue
         }
-    } else if (next == 7 && curr == 6) { // at Step_Services (forward)
-        return 8; // goes back to the screen that called Services screen
-    } else if (next == 5 && curr == 6) { // at Step_Services (backward)
+    } else if (curr == 6) { // at Step_Services
+        stashServices(next == 7);
         return 8; // goes back to the screen that called Services screen
     }
     return next;
@@ -2535,7 +2545,6 @@ void MInstall::gotoPage(int next)
     // modify ui for standard cases
     if (next == 0) {
         // entering first page
-        nextButton->setText(tr("Next"));
         backButton->hide();
     } else {
         // default
@@ -2543,13 +2552,20 @@ void MInstall::gotoPage(int next)
     }
 
     int c = widgetStack->count();
+    QSize isize = nextButton->iconSize();
+    isize.setWidth(isize.height());
     if (next >= c-1) {
         // entering the last page
         backButton->hide();
         nextButton->setText(tr("Finish"));
+    } else if (next == 3 || next == 6){
+        // Advanced Encryption Settings and Services pages
+        isize.setWidth(0);
+        nextButton->setText(tr("OK"));
     } else {
         nextButton->setText(tr("Next"));
     }
+    nextButton->setIconSize(isize);
     if (next > c-1) {
         // finished
         updateCursor(Qt::WaitCursor);
@@ -2699,6 +2715,7 @@ void MInstall::buildServiceList()
     csView->expandAll();
     csView->resizeColumnToContents(0);
     csView->resizeColumnToContents(1);
+    stashServices(true);
 }
 
 /////////////////////////////////////////////////////////////////////////

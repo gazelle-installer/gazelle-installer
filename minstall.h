@@ -258,4 +258,5 @@ private:
     bool makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot);
     bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot);
     void failUI(const QString &msg);
+    void stashServices(bool save);
 };
