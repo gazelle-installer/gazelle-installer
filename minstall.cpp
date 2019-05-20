@@ -528,15 +528,11 @@ void MInstall::prepareToInstall()
         }
         file.close();
     }
-    if (localeCombo->findData(QVariant(locale)) != -1) {
-        localeCombo->setCurrentIndex(localeCombo->findData(QVariant(locale)));
+    const int iloc = localeCombo->findData(QVariant(locale));
+    if (iloc != -1) {
+        localeCombo->setCurrentIndex(iloc);
     } else {
-        localeCombo->setCurrentIndex(localeCombo->findData(QVariant("en_US")));
-    }
-
-    // clock 24/12 default
-    if (locale == "en_US.UTF-8" || locale == "LANG=ar_EG.UTF-8" || locale == "LANG=el_GR.UTF-8" || locale == "LANG=sq_AL.UTF-8") {
-        radio12h->setChecked(true);
+        localeCombo->setCurrentIndex(localeCombo->findData(QVariant("en_GB.UTF-8")));
     }
 
     // Detect snapshot-backup account(s)
