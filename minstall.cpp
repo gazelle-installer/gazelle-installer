@@ -510,17 +510,13 @@ void MInstall::prepareToInstall()
 
     // locale
     localeCombo->clear();
-    file.setFileName("/usr/share/antiX/locales.template");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while (!file.atEnd()) {
-            const QString line(file.readLine().trimmed());
-            if(!line.startsWith('#')) {
-                QLocale loc(line);
-                localeCombo->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(line));
-            }
-        }
-        file.close();
+    QStringList loclist = getCmdOuts("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'");
+    for (QString &strloc : loclist) {
+        strloc.replace("utf8", "UTF-8", Qt::CaseInsensitive);
+        QLocale loc(strloc);
+        localeCombo->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
     }
+    localeCombo->model()->sort(0);
     file.setFileName("/etc/default/locale");
     QString locale;
     if (file.open(QFile::ReadOnly | QFile::Text)) {
@@ -531,16 +527,16 @@ void MInstall::prepareToInstall()
             }
         }
         file.close();
-        localeCombo->model()->sort(0);
     }
-    if (localeCombo->findData(QVariant(locale)) != -1) {
-        localeCombo->setCurrentIndex(localeCombo->findData(QVariant(locale)));
+    const int iloc = localeCombo->findData(QVariant(locale));
+    if (iloc != -1) {
+        localeCombo->setCurrentIndex(iloc);
     } else {
-        localeCombo->setCurrentIndex(localeCombo->findData(QVariant("en_US")));
+        localeCombo->setCurrentIndex(localeCombo->findData(QVariant("en_GB.UTF-8")));
     }
 
     // clock 24/12 default
-    if (locale == "en_US.UTF-8" || locale == "LANG=ar_EG.UTF-8" || locale == "LANG=el_GR.UTF-8" || locale == "LANG=sq_AL.UTF-8") {
+    if (locale == "en_US.UTF-8" || locale == "ar_EG.UTF-8" || locale == "el_GR.UTF-8" || locale == "sq_AL.UTF-8") {
         radio12h->setChecked(true);
     }
 
