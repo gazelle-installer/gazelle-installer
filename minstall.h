@@ -198,7 +198,6 @@ private:
     SafeCache key;
 
     // for file copy progress updates
-    int iCopyBarA;
     int iCopyBarB;
 
     // for the tips display
@@ -243,7 +242,7 @@ private:
     // private functions
 
     // helpers
-    bool execute(const QString &cmd, const bool rawexec = true, const QByteArray &input = QByteArray());
+    bool execute(const QString &cmd, const bool rawexec = false, const QByteArray &input = QByteArray());
     QString getCmdOut(const QString &cmd, bool everything = false);
 
     void updateStatus(const QString &msg, int val = -1);
