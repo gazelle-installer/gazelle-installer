@@ -104,10 +104,8 @@ bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray 
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (rawexec) proc->start(cmd);
     else proc->start("/bin/bash", QStringList() << "-c" << cmd);
-    if (!input.isEmpty()) {
-        proc->write(input);
-        proc->closeWriteChannel();
-    }
+    if (!input.isEmpty()) proc->write(input);
+    proc->closeWriteChannel();
     eloop.exec();
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
     qDebug() << "Exit:" << proc->exitCode() << proc->exitStatus();
@@ -116,7 +114,7 @@ bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray 
 
 QString MInstall::getCmdOut(const QString &cmd, bool everything)
 {
-    execute(cmd, false);
+    execute(cmd);
     QString strout(proc->readAll().trimmed());
     if (everything) return strout;
     return strout.section("\n", 0, 0);
@@ -124,7 +122,7 @@ QString MInstall::getCmdOut(const QString &cmd, bool everything)
 
 QStringList MInstall::getCmdOuts(const QString &cmd)
 {
-    execute(cmd, false);
+    execute(cmd);
     return QString(proc->readAll().trimmed()).split('\n');
 }
 
@@ -138,10 +136,7 @@ bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtex
 {
 
     QString cmd = QString("sed -i 's/%1/%2/g' %3").arg(oldtext, newtext, filepath);
-    if (!execute(cmd)) {
-        return false;
-    }
-    return true;
+    return execute(cmd);
 }
 
 void MInstall::updateCursor(const Qt::CursorShape shape)
@@ -282,11 +277,7 @@ bool MInstall::mountPartition(const QString dev, const QString point, const QStr
     if (phase < 0) return -1;
     mkdir(point.toUtf8(), 0755);
     QString cmd = QString("/bin/mount %1 %2 -o %3").arg(dev).arg(point).arg(mntops);
-
-    if (!execute(cmd)) {
-        return false;
-    }
-    return true;
+    return execute(cmd);
 }
 
 // checks SMART status of the selected disk, returs false if it detects errors and user chooses to abort
@@ -1050,7 +1041,7 @@ bool MInstall::validateChosenPartitions()
         if (!execute(QString("partition-info is-linux=%1").arg(swapdev), false)) {
             msgForeignList << swapdev << "swap";
         }
-        formatSwap = checkBoxEncryptSwap->isChecked() || execute(QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev), false);
+        formatSwap = checkBoxEncryptSwap->isChecked() || !execute(QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev), false);
         if (formatSwap) {
             msgFormatList << swapdev << "swap";
         } else {
@@ -1797,7 +1788,7 @@ void MInstall::checkUefi()
     if (execute("uname -m | grep -q i686", false) && execute("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
         uefi = false;
     } else {
-        uefi = execute("test -d /sys/firmware/efi");
+        uefi = execute("test -d /sys/firmware/efi", true);
     }
     qDebug() << "uefi =" << uefi;
 }
