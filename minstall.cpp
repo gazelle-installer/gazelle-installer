@@ -535,6 +535,11 @@ void MInstall::prepareToInstall()
         localeCombo->setCurrentIndex(localeCombo->findData(QVariant("en_GB.UTF-8")));
     }
 
+    // clock 24/12 default
+    if (locale == "en_US.UTF-8" || locale == "ar_EG.UTF-8" || locale == "el_GR.UTF-8" || locale == "sq_AL.UTF-8") {
+        radio12h->setChecked(true);
+    }
+
     // Detect snapshot-backup account(s)
     // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
     if (shell.run("ls /home | grep -v lost+found | grep -v demo | grep -v snapshot | grep -q [a-zA-Z0-9]") == 0 || shell.run("test -d /live/linux/home/demo") == 0) {
