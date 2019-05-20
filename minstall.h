@@ -41,7 +41,6 @@ class MInstall : public QWidget, public Ui::MeInstall {
     Q_OBJECT
 protected:
     QProcess *proc;
-    QTimer *timer;
     QDialog *mmn;
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -130,9 +129,6 @@ public:
     bool abort(bool onclose);
     void cleanup(bool endclean = true);
 
-public slots:
-    void copyTime();
-
 private slots:
     void on_abortInstallButton_clicked();
     void on_backButton_clicked();
@@ -202,7 +198,6 @@ private:
     SafeCache key;
 
     // for file copy progress updates
-    fsfilcnt_t iTargetInodes = 0;
     int iCopyBarA;
     int iCopyBarB;
 
