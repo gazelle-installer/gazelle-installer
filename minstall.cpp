@@ -74,7 +74,6 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     setupkeyboardbutton();
 
     proc = new QProcess(this);
-    timer = new QTimer(this);
 
     rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
     homeLabelEdit->setText("home" + PROJECTSHORTNAME);
@@ -1410,25 +1409,20 @@ bool MInstall::installLinux()
     QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
     if (phase < 0) return false;
 
-    // maybe root was formatted or using --sync option
-    if (isRootFormatted || args.contains("--sync") || args.contains("-s")) {
-        // yes it was
-        if(!copyLinux()) return false;
-    } else {
-        // no--it's being reused
+    if (!(isRootFormatted || args.contains("--sync") || args.contains("-s"))) {
+        // if root was not formatted and not using --sync option then re-use it
         updateStatus(tr("Mounting the / (root) partition"));
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
         // remove all folders in root except for /home
         updateStatus(tr("Deleting old system"));
         execute("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;", false);
 
-        if (proc->exitStatus() == QProcess::NormalExit) {
-            if(!copyLinux()) return false;
-        } else {
+        if (proc->exitStatus() != QProcess::NormalExit) {
             failUI(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
             return false;
         }
     }
+    if(!copyLinux()) return false;
     return true;
 }
 
@@ -1548,7 +1542,7 @@ bool MInstall::copyLinux()
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
     updateStatus(tr("Copying new system"));
-    iCopyBarA = progressBar->value();
+    int progstart = progressBar->value();
     // setup and start the process
     QString cmd;
     cmd = "/bin/cp -av";
@@ -1563,25 +1557,43 @@ bool MInstall::copyLinux()
     cmd.append(" /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr");
     cmd.append(" /live/aufs/var /live/aufs/home /mnt/antiX");
     struct statvfs svfs;
+
+    fsfilcnt_t sourceInodes = 1;
+    fsfilcnt_t targetInodes = 1;
     if (statvfs("/live/linux", &svfs) == 0) {
-        iTargetInodes = svfs.f_files - svfs.f_ffree;
+        sourceInodes = svfs.f_files - svfs.f_ffree;
         if(statvfs("/mnt/antiX", &svfs) == 0) {
-            iTargetInodes += svfs.f_files - svfs.f_ffree;
+            targetInodes = svfs.f_files - svfs.f_ffree;
         }
     }
 
     if (!(args.contains("--nocopy") || args.contains("-n"))) {
-        connect(timer, SIGNAL(timeout()), this, SLOT(copyTime()));
-        connect(proc, SIGNAL(readyRead()), this, SLOT(copyTime()));
-        timer->start(1000);
-        execute(cmd);
+        if (phase < 0) return false;
+        QEventLoop eloop;
+        connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
+        connect(proc, static_cast<void (QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
+        qDebug() << "Copy command: " << cmd;
+        proc->start(cmd);
+        const int progspace = iCopyBarB - progstart;
+        const int progdiv = (progspace != 0) ? (sourceInodes / progspace) : 0;
+        while (proc->state() != QProcess::NotRunning) {
+            eloop.exec();
+            proc->readAll();
+            if(statvfs("/mnt/antiX", &svfs) == 0 && progdiv != 0) {
+                int i = (svfs.f_files - svfs.f_ffree - targetInodes) / progdiv;
+                if (i > progspace) i = progspace;
+                progressBar->setValue(i + progstart);
+            } else {
+                updateStatus(tr("Copy progress unknown. No file system statistics."));
+            }
+        }
+        disconnect(proc, SIGNAL(readyRead()), 0, 0);
+        disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+
         if (proc->exitStatus() != QProcess::NormalExit) {
             failUI(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
             return false;
         }
-        timer->stop();
-        disconnect(proc, SIGNAL(readyRead()), 0, 0);
-        disconnect(timer, SIGNAL(timeout()), 0, 0);
     }
 
     updateStatus(tr("Fixing configuration"), 94);
@@ -2914,26 +2926,6 @@ void MInstall::cleanup(bool endclean)
     if (isSwapEncrypted) {
         execute("cryptsetup luksClose swapfs");
     }
-}
-
-/////////////////////////////////////////////////////////////////////////
-// copy process events
-
-void MInstall::copyTime()
-{
-    struct statvfs svfs;
-    const int progspace = iCopyBarB - iCopyBarA;
-    int i = 0;
-    if(iTargetInodes > 0 && statvfs("/mnt/antiX", &svfs) == 0) {
-        i = (int)((svfs.f_files - svfs.f_ffree) / (iTargetInodes / progspace));
-        if (i > progspace) {
-            i = progspace;
-        }
-    } else {
-        updateStatus(tr("Copy progress unknown. No file system statistics."), 0);
-    }
-    progressBar->setValue(i + iCopyBarA);
-    proc->readAll();
 }
 
 void MInstall::on_progressBar_valueChanged(int value)
