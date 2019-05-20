@@ -110,7 +110,7 @@ bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray 
     }
     eloop.exec();
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
-    qDebug() << "Exit code: " << proc->exitCode() << ", status: " << proc->exitStatus();
+    qDebug() << "Exit:" << proc->exitCode() << proc->exitStatus();
     return (proc->exitStatus() == QProcess::NormalExit && proc->exitCode() == 0);
 }
 
@@ -1573,7 +1573,7 @@ bool MInstall::copyLinux()
         QEventLoop eloop;
         connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
         connect(proc, static_cast<void (QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
-        qDebug() << "Copy command: " << cmd;
+        qDebug() << cmd;
         proc->start(cmd);
         const int progspace = iCopyBarB - progstart;
         const int progdiv = (progspace != 0) ? (sourceInodes / progspace) : 0;
