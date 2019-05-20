@@ -528,12 +528,12 @@ void MInstall::prepareToInstall()
         }
         file.close();
     }
-    const int iloc = localeCombo->findData(QVariant(locale));
-    if (iloc != -1) {
-        localeCombo->setCurrentIndex(iloc);
-    } else {
-        localeCombo->setCurrentIndex(localeCombo->findData(QVariant("en_GB.UTF-8")));
+    int iloc = localeCombo->findData(QVariant(locale));
+    if (iloc == -1) {
+        // set to British English to show that the system locale was probably not picked up
+        iloc = localeCombo->findData(QVariant("en_GB.UTF-8"));
     }
+    localeCombo->setCurrentIndex(iloc);
 
     // clock 24/12 default
     if (locale == "en_US.UTF-8" || locale == "ar_EG.UTF-8" || locale == "el_GR.UTF-8" || locale == "sq_AL.UTF-8") {
