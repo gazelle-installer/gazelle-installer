@@ -380,7 +380,7 @@ bool MInstall::processNextPhase()
         }
 
         // allow the user to enter other options
-        execute("/sbin/partprobe");
+        execute("/sbin/partprobe", true);
         buildBootLists();
         gotoPage(5);
         iCopyBarB = grubEspButton->isChecked() ? 93 : 94;
@@ -391,7 +391,7 @@ bool MInstall::processNextPhase()
                 return false;
             }
             //run blkid -c /dev/null to freshen UUID cache
-            execute("blkid -c /dev/null");
+            execute("blkid -c /dev/null", true);
             if (!installLinux()) return false;
         } else if (!pretendToInstall(1, iCopyBarB, 100)) {
             return false;
@@ -422,14 +422,14 @@ bool MInstall::processNextPhase()
                 if (!setUserInfo()) return false;
             }
             saveConfig();
-            execute("/bin/sync"); // the sync(2) system call will block the GUI
+            execute("/bin/sync", true); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
         } else if (!pretendToInstall(iCopyBarB + 1, 99, 1000)){
             return false;
         }
         phase = 4;
         updateStatus(tr("Installation successful"), 100);
-        execute("sleep 1");
+        execute("sleep 1", true);
         gotoPage(10);
     }
     return true;
@@ -443,16 +443,16 @@ void MInstall::prepareToInstall()
 
     if (!pretend) {
         // unmount /boot/efi if mounted by previous run
-        if (execute("mountpoint -q /mnt/antiX/boot/efi")) {
-            execute("umount /mnt/antiX/boot/efi");
+        if (execute("mountpoint -q /mnt/antiX/boot/efi", true)) {
+            execute("umount /mnt/antiX/boot/efi", true);
         }
         // unmount /home if it exists
-        execute("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1", false);
-        execute("/bin/umount -l /mnt/antiX >/dev/null 2>&1", false);
+        execute("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
+        execute("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
         // close LUKS containers
-        execute("cryptsetup luksClose /dev/mapper/rootfs");
-        execute("cryptsetup luksClose /dev/mapper/swapfs");
-        execute("cryptsetup luksClose /dev/mapper/homefs");
+        execute("cryptsetup luksClose /dev/mapper/rootfs", true);
+        execute("cryptsetup luksClose /dev/mapper/swapfs", true);
+        execute("cryptsetup luksClose /dev/mapper/homefs", true);
     }
 
     isRootFormatted = false;
@@ -526,7 +526,8 @@ void MInstall::prepareToInstall()
 
     // Detect snapshot-backup account(s)
     // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
-    if (execute("ls /home | grep -v lost+found | grep -v demo | grep -v snapshot | grep -q [a-zA-Z0-9]", false) || execute("test -d /live/linux/home/demo")) {
+    if (execute("ls /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)
+        || execute("test -d /live/linux/home/demo", true)) {
         haveSnapshotUserAccounts = true;
     }
 
@@ -684,7 +685,7 @@ void MInstall::saveConfig()
     config->setValue("User/Autologin", autologinCheckBox->isChecked());
     config->setValue("User/SaveDesktop", saveDesktopCheckBox->isChecked());
     // copy config file to installed system
-    execute("cp \"" + config->fileName() + "\" /mnt/antiX/var/log");
+    execute("cp \"" + config->fileName() + "\" /mnt/antiX/var/log", true);
 }
 
 // update partition combos
@@ -1395,11 +1396,11 @@ bool MInstall::saveHomeBasic()
     // unmount partitions
     if (homedev != rootDevicePreserve) {
         execute("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1", false);
-        if (isHomeEncrypted) execute("cryptsetup luksClose homefs");
+        if (isHomeEncrypted) execute("cryptsetup luksClose homefs", true);
     }
  ending2:
     execute("/bin/umount -l /mnt/antiX >/dev/null 2>&1", false);
-    if (isRootEncrypted) execute("cryptsetup luksClose rootfs");
+    if (isRootEncrypted) execute("cryptsetup luksClose rootfs", true);
     return ok;
 }
 
@@ -1597,7 +1598,7 @@ bool MInstall::copyLinux()
     }
 
     updateStatus(tr("Fixing configuration"), 94);
-    execute("mkdir -m 1777 /mnt/antiX/tmp");
+    mkdir("/mnt/antiX/tmp", 01777);
     makeFstab();
     writeKeyFile();
     disablehiberanteinitramfs();
@@ -1655,14 +1656,14 @@ bool MInstall::installLoader()
         if (!part_num.isEmpty()) {
             // remove the non-digit part to get the number of the root partition
             part_num.remove(QRegularExpression("\\D+\\d*\\D+"));
-            execute("parted -s " + boot + " set " + part_num + " boot on");
+            execute("parted -s " + boot + " set " + part_num + " boot on", true);
         }
     }
 
     // set mounts for chroot
-    execute("mount -o bind /dev /mnt/antiX/dev");
-    execute("mount -o bind /sys /mnt/antiX/sys");
-    execute("mount -o bind /proc /mnt/antiX/proc");
+    execute("mount -o bind /dev /mnt/antiX/dev", true);
+    execute("mount -o bind /sys /mnt/antiX/sys", true);
+    execute("mount -o bind /proc /mnt/antiX/proc", true);
 
     QString arch;
 
@@ -1774,11 +1775,11 @@ bool MInstall::installLoader()
     execute("chroot /mnt/antiX update-initramfs -u -t -k all");
     updateStatus(statup);
     qDebug() << "clear chroot env";
-    execute("umount /mnt/antiX/proc");
-    execute("umount /mnt/antiX/sys");
-    execute("umount /mnt/antiX/dev");
-    if (execute("mountpoint -q /mnt/antiX/boot/efi")) {
-        execute("umount /mnt/antiX/boot/efi");
+    execute("umount /mnt/antiX/proc", true);
+    execute("umount /mnt/antiX/sys", true);
+    execute("umount /mnt/antiX/dev", true);
+    if (execute("mountpoint -q /mnt/antiX/boot/efi", true)) {
+        execute("umount /mnt/antiX/boot/efi", true);
     }
 
     return true;
@@ -2661,8 +2662,8 @@ void MInstall::updateDiskInfo()
     diskCombo->clear();
     diskCombo->addItem(tr("Loading..."));
 
-    if (!pretend) execute("/sbin/swapoff -a"); // kludge - live boot automatically activates swap
-    execute("/sbin/partprobe");
+    if (!pretend) execute("/sbin/swapoff -a", true); // kludge - live boot automatically activates swap
+    execute("/sbin/partprobe", true);
     updatePartitionWidgets();
     //  shell.run("umount -a 2>/dev/null");
     QString exclude = " --exclude=boot";
@@ -2774,7 +2775,7 @@ void MInstall::on_qtpartedButton_clicked()
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
     execute("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager", false);
-    execute("/sbin/partprobe");
+    execute("/sbin/partprobe", true);
     updatePartitionWidgets();
     indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
@@ -2918,13 +2919,13 @@ void MInstall::cleanup(bool endclean)
     execute("umount -lR /mnt/antiX >/dev/null 2>&1", false);
 
     if (isRootEncrypted) {
-        execute("cryptsetup luksClose rootfs");
+        execute("cryptsetup luksClose rootfs", true);
     }
     if (isHomeEncrypted) {
-        execute("cryptsetup luksClose homefs");
+        execute("cryptsetup luksClose homefs", true);
     }
     if (isSwapEncrypted) {
-        execute("cryptsetup luksClose swapfs");
+        execute("cryptsetup luksClose swapfs", true);
     }
 }
 
