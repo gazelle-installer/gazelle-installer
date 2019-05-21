@@ -1658,7 +1658,7 @@ bool MInstall::installLoader()
     if (!grubEspButton->isChecked()) {
         cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot %1").arg(boot);
     } else {
-        execute("mkdir /mnt/antiX/boot/efi");
+        mkdir("/mnt/antiX/boot/efi", 0755);
         QString mount = QString("mount %1 /mnt/antiX/boot/efi").arg(boot);
         execute(mount);
         // rename arch to match grub-install target
@@ -1677,11 +1677,11 @@ bool MInstall::installLoader()
         // error
         QMessageBox::critical(this, QString::null,
                               tr("GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
-        execute("umount /mnt/antiX/proc");
-        execute("umount /mnt/antiX/sys");
-        execute("umount /mnt/antiX/dev");
-        if (execute("mountpoint -q /mnt/antiX/boot/efi")) {
-            execute("umount /mnt/antiX/boot/efi");
+        execute("umount /mnt/antiX/proc", true);
+        execute("umount /mnt/antiX/sys", true);
+        execute("umount /mnt/antiX/dev", true);
+        if (execute("mountpoint -q /mnt/antiX/boot/efi", true)) {
+            execute("umount /mnt/antiX/boot/efi", true);
         }
         return false;
     }
@@ -1742,12 +1742,11 @@ bool MInstall::installLoader()
     //copy memtest efi files if needed
 
     if (uefi) {
+        mkdir("/mnt/antiX/boot/uefi-mt", 0755);
         if (arch == "i386") {
-            execute("mkdir -p /mnt/antiX/boot/uefi-mt");
-            execute("cp /live/boot-dev/boot/uefi-mt/mtest-32.efi /mnt/antiX/boot/uefi-mt");
+            execute("cp /live/boot-dev/boot/uefi-mt/mtest-32.efi /mnt/antiX/boot/uefi-mt", true);
         } else {
-            execute("mkdir -p /mnt/antiX/boot/uefi-mt");
-            execute("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt");
+            execute("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt", true);
         }
     }
     updateStatus(statup);
