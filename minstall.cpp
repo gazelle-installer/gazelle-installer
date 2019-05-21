@@ -403,7 +403,7 @@ bool MInstall::processNextPhase()
         runProc("/sbin/partprobe");
         buildBootLists();
         gotoPage(5);
-        iCopyBarB = grubEspButton->isChecked() ? 93 : 94;
+        iCopyBarB = grubEspButton->isChecked() ? 92 : 93;
 
         if (!pretend) {
             if (!formatPartitions(encPass, rootType, homeType, formatBoot)) {
@@ -413,12 +413,12 @@ bool MInstall::processNextPhase()
             //run blkid -c /dev/null to freshen UUID cache
             runCmd("blkid -c /dev/null");
             if (!installLinux()) return false;
-        } else if (!pretendToInstall(1, iCopyBarB, 100)) {
+        } else if (!pretendToInstall(1, iCopyBarB + 1, 100)) {
             return false;
         }
         if (!haveSysConfig) {
             progressBar->setEnabled(false);
-            updateStatus(tr("Paused for required operator input"), iCopyBarB + 1);
+            updateStatus(tr("Paused for required operator input"), iCopyBarB + 2);
             QApplication::beep();
             if(widgetStack->currentIndex() == 4) {
                 on_nextButton_clicked();
@@ -431,7 +431,7 @@ bool MInstall::processNextPhase()
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
         if (!pretend) {
-            updateStatus(tr("Setting system configuration"), iCopyBarB + 1);
+            updateStatus(tr("Setting system configuration"), iCopyBarB + 2);
             setServices();
             if (!setComputerName()) return false;
             setLocale();
@@ -444,7 +444,7 @@ bool MInstall::processNextPhase()
             saveConfig();
             runProc("/bin/sync"); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
-        } else if (!pretendToInstall(iCopyBarB + 1, 99, 1000)){
+        } else if (!pretendToInstall(iCopyBarB + 2, 99, 1000)){
             return false;
         }
         phase = 4;
@@ -1610,7 +1610,7 @@ bool MInstall::copyLinux()
         disconnect(timer, SIGNAL(timeout()), 0, 0);
     }
 
-    updateStatus(tr("Fixing configuration"), 94);
+    updateStatus(tr("Fixing configuration"), iCopyBarB + 1);
     shell.run("mkdir -m 1777 /mnt/antiX/tmp");
     makeFstab();
     writeKeyFile();
