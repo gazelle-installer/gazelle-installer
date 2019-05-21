@@ -134,7 +134,6 @@ bool MInstall::isInsideVB()
 
 bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
 {
-
     QString cmd = QString("sed -i 's/%1/%2/g' %3").arg(oldtext, newtext, filepath);
     return execute(cmd);
 }
@@ -1586,6 +1585,7 @@ bool MInstall::copyLinux()
 
     updateStatus(tr("Fixing configuration"), 94);
     mkdir("/mnt/antiX/tmp", 01777);
+    chmod("/mnt/antiX/tmp", 01777);
     makeFstab();
     writeKeyFile();
     disablehiberanteinitramfs();
