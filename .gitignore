@@ -47,4 +47,4 @@ debian
 minstall
 
 # Exclude build folder
-build
+debs
