@@ -93,8 +93,6 @@ public:
     void setServices();
     void updatePartCombo(QString *prevItem, const QString &part);
     void updatePartitionWidgets();
-    void loadAdvancedFDE();
-    void saveAdvancedFDE();
     void writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
@@ -230,21 +228,20 @@ private:
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
-    int indexFDEcipher = -1;
-    int indexFDEchain = -1;
-    int indexFDEivgen = -1;
-    int indexFDEivhash = -1;
-    int iFDEkeysize = -1;
-    int indexFDEhash = -1;
-    int indexFDErandom = -1;
-    long iFDEroundtime = -1;
+    int indexFDEcipher;
+    int indexFDEchain;
+    int indexFDEivgen;
+    int indexFDEivhash;
+    int iFDEkeysize;
+    int indexFDEhash;
+    int indexFDErandom;
+    long iFDEroundtime;
 
-    // private functions
 
     // helpers
     bool execute(const QString &cmd, const bool rawexec = false, const QByteArray &input = QByteArray());
     QString getCmdOut(const QString &cmd, bool everything = false);
-
+    // private functions
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     bool pretendToInstall(int start, int stop, int sleep);
@@ -254,4 +251,5 @@ private:
     bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot);
     void failUI(const QString &msg);
     void stashServices(bool save);
+    void stashAdvancedFDE(bool save);
 };
