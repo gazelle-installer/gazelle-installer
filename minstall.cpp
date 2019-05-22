@@ -67,9 +67,11 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME).arg(PROJECTFORUM));
 
-    // advanced FDE page defaults
-
-    loadAdvancedFDE();
+    // advanced encryption settings page defaults
+    on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
+    on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
+    on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
+    stashAdvancedFDE(true);
 
     setupkeyboardbutton();
 
@@ -697,31 +699,27 @@ void MInstall::updatePartCombo(QString *prevItem, const QString &part)
     }
 }
 
-void MInstall::loadAdvancedFDE()
+void MInstall::stashAdvancedFDE(bool save)
 {
-    if (indexFDEcipher >= 0) comboFDEcipher->setCurrentIndex(indexFDEcipher);
-    on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
-    if (indexFDEchain >= 0) comboFDEchain->setCurrentIndex(indexFDEchain);
-    on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
-    if (indexFDEivgen >= 0) comboFDEivgen->setCurrentIndex(indexFDEivgen);
-    on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
-    if (indexFDEivhash >= 0) comboFDEivhash->setCurrentIndex(indexFDEivhash);
-    if (iFDEkeysize >= 0) spinFDEkeysize->setValue(iFDEkeysize);
-    if (indexFDEhash >= 0) comboFDEhash->setCurrentIndex(indexFDEhash);
-    if (indexFDErandom >= 0) comboFDErandom->setCurrentIndex(indexFDErandom);
-    if (iFDEroundtime >= 0) spinFDEroundtime->setValue(iFDEroundtime);
-}
-
-void MInstall::saveAdvancedFDE()
-{
-    indexFDEcipher = comboFDEcipher->currentIndex();
-    indexFDEchain = comboFDEchain->currentIndex();
-    indexFDEivgen = comboFDEivgen->currentIndex();
-    indexFDEivhash = comboFDEivhash->currentIndex();
-    iFDEkeysize = spinFDEkeysize->value();
-    indexFDEhash = comboFDEhash->currentIndex();
-    indexFDErandom = comboFDErandom->currentIndex();
-    iFDEroundtime = spinFDEroundtime->value();
+    if (save) {
+        indexFDEcipher = comboFDEcipher->currentIndex();
+        indexFDEchain = comboFDEchain->currentIndex();
+        indexFDEivgen = comboFDEivgen->currentIndex();
+        indexFDEivhash = comboFDEivhash->currentIndex();
+        iFDEkeysize = spinFDEkeysize->value();
+        indexFDEhash = comboFDEhash->currentIndex();
+        indexFDErandom = comboFDErandom->currentIndex();
+        iFDEroundtime = spinFDEroundtime->value();
+    } else {
+        comboFDEcipher->setCurrentIndex(indexFDEcipher);
+        comboFDEchain->setCurrentIndex(indexFDEchain);
+        comboFDEivgen->setCurrentIndex(indexFDEivgen);
+        comboFDEivhash->setCurrentIndex(indexFDEivhash);
+        spinFDEkeysize->setValue(iFDEkeysize);
+        comboFDEhash->setCurrentIndex(indexFDEhash);
+        comboFDErandom->setCurrentIndex(indexFDErandom);
+        spinFDEroundtime->setValue(iFDEroundtime);
+    }
 }
 
 // create ESP at the begining of the drive
@@ -2300,11 +2298,7 @@ int MInstall::showPage(int curr, int next)
         }
         return 4; // Go to Step_Progress
     } else if (curr == 3) { // at Step_FDE
-        if (next == 4) { // Forward
-            saveAdvancedFDE();
-        } else { // Backward
-            loadAdvancedFDE();
-        }
+        stashAdvancedFDE(next == 4);
         next = ixPageRefAdvancedFDE;
         ixPageRefAdvancedFDE = 0;
         return next;
