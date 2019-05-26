@@ -1883,6 +1883,8 @@ bool MInstall::setUserName()
     replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/shadow");
     replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/slim.conf");
     replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/lightdm/lightdm.conf");
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/home/*/.gtkrc-2.0");
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/root/.gtkrc-2.0");
     if (autologinCheckBox->isChecked()) {
         replaceStringInFile("#auto_login", "auto_login", "/mnt/antiX/etc/slim.conf");
         replaceStringInFile("#default_user ", "default_user ", "/mnt/antiX/etc/slim.conf");
