@@ -72,9 +72,7 @@ public:
     bool validateUserInfo();
     bool validateComputerName();
     bool setComputerName();
-    bool setPasswords();
     bool setUserInfo();
-    bool setUserName();
     void addItemCombo(QComboBox *cb, const QString *part);
     void buildBootLists();
     void buildServiceList();
