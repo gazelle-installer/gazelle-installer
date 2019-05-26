@@ -2583,7 +2583,7 @@ void MInstall::gotoPage(int next)
         // finished
         updateCursor(Qt::WaitCursor);
         cleanup();
-        if (checkBoxExitReboot->isChecked()) {
+        if (!pretend && checkBoxExitReboot->isChecked()) {
             execute("/usr/local/bin/persist-config --shutdown --command reboot &", false);
         }
         qApp->exit(0);
