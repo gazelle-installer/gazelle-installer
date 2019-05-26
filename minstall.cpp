@@ -30,7 +30,6 @@ MInstall::MInstall(const QStringList &args)
 {
     setupUi(this);
 
-    this->installEventFilter(this);
     this->args = args;
     pretend = (args.contains("--pretend") || args.contains("-p"));
     installBox->hide();
@@ -2741,6 +2740,10 @@ void MInstall::closeEvent(QCloseEvent *event)
     }
 }
 
+void MInstall::reject()
+{
+}
+
 /////////////////////////////////////////////////////////////////////////
 // slots
 
@@ -2902,20 +2905,6 @@ bool MInstall::abort(bool onclose)
         phase = -1;
     }
     return true;
-}
-
-bool MInstall::eventFilter(QObject* obj, QEvent* event)
-{
-    if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Escape) {
-            if (installBox->isHidden()) { // don't close on installation by mistake
-                on_closeButton_clicked();
-            }
-            return true;
-        }
-    }
-    return QObject::eventFilter(obj, event);
 }
 
 // run before closing the app, do some cleanup
