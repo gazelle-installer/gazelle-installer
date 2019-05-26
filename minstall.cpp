@@ -1938,14 +1938,10 @@ bool MInstall::setPasswords()
         return true;
     }
 
-    const QString cmd = "chroot /mnt/antiX chpasswd";
-
-    if (!execute(cmd, true, QString("root:" + rootPasswordEdit->text() + "\n").toUtf8())) {
-        failUI(tr("Sorry, unable to set root password."));
-        return false;
-    }
-    if (!execute(cmd, true, QString("demo:" + userPasswordEdit->text() + "\n").toUtf8())) {
-        failUI(tr("Sorry, unable to set user password."));
+    if (!execute("chroot /mnt/antiX chpasswd", true,
+                 QString("root:" + rootPasswordEdit->text() + "\n"
+                         "demo:" + userPasswordEdit->text()).toUtf8())) {
+        failUI(tr("Failed to set user account passwords."));
         return false;
     }
 
