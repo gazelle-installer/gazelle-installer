@@ -2742,6 +2742,7 @@ void MInstall::closeEvent(QCloseEvent *event)
 
 void MInstall::reject()
 {
+    // dummy (overrides QDialog::reject() so Escape won't close the window)
 }
 
 /////////////////////////////////////////////////////////////////////////
