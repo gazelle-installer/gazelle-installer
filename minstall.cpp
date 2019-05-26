@@ -1809,120 +1809,6 @@ void MInstall::checkUefi()
     qDebug() << "uefi =" << uefi;
 }
 
-/////////////////////////////////////////////////////////////////////////
-// create the user, can not be rerun
-
-bool MInstall::setUserName()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (phase < 0) return false;
-    if (args.contains("--nocopy") || args.contains("-n")) {
-        return true;
-    }
-    DIR *dir;
-    QString cmd;
-
-    // see if user directory already exists
-    QString dpath = QString("/mnt/antiX/home/%1").arg(userNameEdit->text());
-    if ((dir = opendir(dpath.toUtf8())) != NULL) {
-        // already exists
-        closedir(dir);
-        if (oldHomeAction == OldHomeSave) {
-            // save the old directory
-            bool ok = false;
-            cmd = QString("mv -f %1 %1.00%2").arg(dpath);
-            for (int ixi = 1; ixi < 10 && !ok; ++ixi) {
-                ok = execute(cmd.arg(ixi));
-            }
-            if (!ok) {
-                failUI(tr("Sorry, failed to save old home directory. Before proceeding,\nyou'll have to select a different username or\ndelete a previously saved copy of your home directory."));
-                return false;
-            }
-        } else if (oldHomeAction == OldHomeDelete) {
-            // delete the directory
-            cmd = QString("rm -rf %1").arg(dpath);
-            if (!execute(cmd)) {
-                failUI(tr("Sorry, failed to delete old home directory. Before proceeding, \nyou'll have to select a different username."));
-                return false;
-            }
-        }
-    }
-
-    if ((dir = opendir(dpath.toUtf8())) == NULL) {
-        // dir does not exist, must create it
-        // copy skel to demo
-        if (!execute("cp -a /mnt/antiX/etc/skel /mnt/antiX/home")) {
-            failUI(tr("Sorry, failed to create user directory."));
-            return false;
-        }
-        cmd = QString("mv -f /mnt/antiX/home/skel %1").arg(dpath);
-        if (!execute(cmd)) {
-            failUI(tr("Sorry, failed to name user directory."));
-            return false;
-        }
-    } else {
-        // dir does exist, clean it up
-        cmd = QString("cp -n /mnt/antiX/etc/skel/.bash_profile %1").arg(dpath);
-        execute(cmd);
-        cmd = QString("cp -n /mnt/antiX/etc/skel/.bashrc %1").arg(dpath);
-        execute(cmd);
-        cmd = QString("cp -n /mnt/antiX/etc/skel/.gtkrc %1").arg(dpath);
-        execute(cmd);
-        cmd = QString("cp -n /mnt/antiX/etc/skel/.gtkrc-2.0 %1").arg(dpath);
-        execute(cmd);
-        cmd = QString("cp -Rn /mnt/antiX/etc/skel/.config %1").arg(dpath);
-        execute(cmd);
-        cmd = QString("cp -Rn /mnt/antiX/etc/skel/.local %1").arg(dpath);
-        execute(cmd);
-    }
-    // saving Desktop changes
-    if (saveDesktopCheckBox->isChecked()) {
-        execute("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
-        cmd = QString("rsync -a /home/demo/ %1"
-                      " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
-                      " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
-                      " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
-                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
-                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
-        if (!execute(cmd)) {
-            QMessageBox::warning(this, QString::null,
-                                  tr("Sorry, failed to save desktop changes."));
-        } else {
-            cmd = QString("grep -rl \"home/demo\" " + dpath + "| xargs sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'");
-            execute(cmd, false);
-        }
-    }
-    // fix the ownership, demo=newuser
-    cmd = QString("chown -R demo:demo %1").arg(dpath);
-    if (!execute(cmd)) {
-        failUI(tr("Sorry, failed to set ownership of user directory."));
-        return false;
-    }
-
-    // change in files
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/group");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/gshadow");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/passwd");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/shadow");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/slim.conf");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/lightdm/lightdm.conf");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/home/*/.gtkrc-2.0");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/root/.gtkrc-2.0");
-    if (autologinCheckBox->isChecked()) {
-        replaceStringInFile("#auto_login", "auto_login", "/mnt/antiX/etc/slim.conf");
-        replaceStringInFile("#default_user ", "default_user ", "/mnt/antiX/etc/slim.conf");
-    }
-    else {
-        replaceStringInFile("auto_login", "#auto_login", "/mnt/antiX/etc/slim.conf");
-        replaceStringInFile("default_user ", "#default_user ", "/mnt/antiX/etc/slim.conf");
-        replaceStringInFile("autologin-user=", "#autologin-user=", "/mnt/antiX/etc/lightdm/lightdm.conf");
-    }
-    cmd = QString("touch /mnt/antiX/var/mail/%1").arg(userNameEdit->text());
-    execute(cmd);
-
-    return true;
-}
-
 // get the type of the partition
 QString MInstall::getPartType(const QString &dev)
 {
@@ -1930,23 +1816,8 @@ QString MInstall::getPartType(const QString &dev)
     return getCmdOut("blkid " + dev + " -o value -s TYPE");
 }
 
-bool MInstall::setPasswords()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (phase < 0) return false;
-    if (args.contains("--nocopy") || args.contains("-n")) {
-        return true;
-    }
-
-    if (!execute("chroot /mnt/antiX chpasswd", true,
-                 QString("root:" + rootPasswordEdit->text() + "\n"
-                         "demo:" + userPasswordEdit->text()).toUtf8())) {
-        failUI(tr("Failed to set user account passwords."));
-        return false;
-    }
-
-    return true;
-}
+/////////////////////////////////////////////////////////////////////////
+// user account functions
 
 bool MInstall::validateUserInfo()
 {
@@ -2046,13 +1917,123 @@ bool MInstall::validateUserInfo()
     return true;
 }
 
+// setup the user, cannot be rerun
 bool MInstall::setUserInfo()
 {
+    if (args.contains("--nocopy") || args.contains("-n")) {
+        return true;
+    }
     if (phase < 0) return false;
-    if (!setPasswords()) {
+
+    // set the user passwords first
+    if (!execute("chroot /mnt/antiX chpasswd", true,
+                 QString("root:" + rootPasswordEdit->text() + "\n"
+                         "demo:" + userPasswordEdit->text()).toUtf8())) {
+        failUI(tr("Failed to set user account passwords."));
         return false;
     }
-    return setUserName();
+
+    DIR *dir;
+    QString cmd;
+    // see if user directory already exists
+    QString dpath = QString("/mnt/antiX/home/%1").arg(userNameEdit->text());
+    if ((dir = opendir(dpath.toUtf8())) != NULL) {
+        // already exists
+        closedir(dir);
+        if (oldHomeAction == OldHomeSave) {
+            // save the old directory
+            bool ok = false;
+            cmd = QString("mv -f %1 %1.00%2").arg(dpath);
+            for (int ixi = 1; ixi < 10 && !ok; ++ixi) {
+                ok = execute(cmd.arg(ixi));
+            }
+            if (!ok) {
+                failUI(tr("Failed to save old home directory."));
+                return false;
+            }
+        } else if (oldHomeAction == OldHomeDelete) {
+            // delete the directory
+            cmd = QString("rm -rf %1").arg(dpath);
+            if (!execute(cmd)) {
+                failUI(tr("Failed to delete old home directory."));
+                return false;
+            }
+        }
+    }
+
+    if ((dir = opendir(dpath.toUtf8())) == NULL) {
+        // dir does not exist, must create it
+        // copy skel to demo
+        if (!execute("cp -a /mnt/antiX/etc/skel /mnt/antiX/home")) {
+            failUI(tr("Sorry, failed to create user directory."));
+            return false;
+        }
+        cmd = QString("mv -f /mnt/antiX/home/skel %1").arg(dpath);
+        if (!execute(cmd)) {
+            failUI(tr("Sorry, failed to name user directory."));
+            return false;
+        }
+    } else {
+        // dir does exist, clean it up
+        cmd = QString("cp -n /mnt/antiX/etc/skel/.bash_profile %1").arg(dpath);
+        execute(cmd);
+        cmd = QString("cp -n /mnt/antiX/etc/skel/.bashrc %1").arg(dpath);
+        execute(cmd);
+        cmd = QString("cp -n /mnt/antiX/etc/skel/.gtkrc %1").arg(dpath);
+        execute(cmd);
+        cmd = QString("cp -n /mnt/antiX/etc/skel/.gtkrc-2.0 %1").arg(dpath);
+        execute(cmd);
+        cmd = QString("cp -Rn /mnt/antiX/etc/skel/.config %1").arg(dpath);
+        execute(cmd);
+        cmd = QString("cp -Rn /mnt/antiX/etc/skel/.local %1").arg(dpath);
+        execute(cmd);
+    }
+    // saving Desktop changes
+    if (saveDesktopCheckBox->isChecked()) {
+        execute("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
+        cmd = QString("rsync -a /home/demo/ %1"
+                      " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
+                      " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
+                      " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
+                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
+                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
+        if (!execute(cmd)) {
+            QMessageBox::warning(this, QString::null,
+                                  tr("Sorry, failed to save desktop changes."));
+        } else {
+            cmd = QString("grep -rl \"home/demo\" " + dpath + "| xargs sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'");
+            execute(cmd, false);
+        }
+    }
+    // fix the ownership, demo=newuser
+    cmd = QString("chown -R demo:demo %1").arg(dpath);
+    if (!execute(cmd)) {
+        failUI(tr("Sorry, failed to set ownership of user directory."));
+        return false;
+    }
+
+    // change in files
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/group");
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/gshadow");
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/passwd");
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/shadow");
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/slim.conf");
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/lightdm/lightdm.conf");
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/home/*/.gtkrc-2.0");
+    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/root/.gtkrc-2.0");
+    if (autologinCheckBox->isChecked()) {
+        replaceStringInFile("#auto_login", "auto_login", "/mnt/antiX/etc/slim.conf");
+        replaceStringInFile("#default_user ", "default_user ", "/mnt/antiX/etc/slim.conf");
+    }
+    else {
+        replaceStringInFile("auto_login", "#auto_login", "/mnt/antiX/etc/slim.conf");
+        replaceStringInFile("default_user ", "#default_user ", "/mnt/antiX/etc/slim.conf");
+        replaceStringInFile("autologin-user=", "#autologin-user=", "/mnt/antiX/etc/lightdm/lightdm.conf");
+    }
+    cmd = QString("touch /mnt/antiX/var/mail/%1").arg(userNameEdit->text());
+    execute(cmd);
+
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////
