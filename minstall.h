@@ -18,8 +18,6 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QProcess>
-#include <QTimer>
-#include <QProgressDialog>
 #include <QSettings>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -37,17 +35,17 @@ public:
     void erase();
 };
 
-class MInstall : public QWidget, public Ui::MeInstall {
+class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
 protected:
     QProcess *proc;
-    QDialog *mmn;
     bool eventFilter(QObject *obj, QEvent *event);
+    void changeEvent(QEvent *event);
+    void resizeEvent(QResizeEvent *);
+    void closeEvent(QCloseEvent * event);
 
 public:
-    /** constructor */
-    MInstall(QWidget* parent=0, QStringList args = QStringList());
-    /** destructor */
+    MInstall(const QStringList &args);
     ~MInstall();
 
     QStringList args;
@@ -58,7 +56,6 @@ public:
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
     void csleep(int msec);
     QStringList getCmdOuts(const QString &cmd);
-    static int command(const QString &string);
 
     bool isInsideVB();
     bool isGpt(const QString &drv);
@@ -119,7 +116,6 @@ public:
     QString homeDevicePreserve;
 
     int showPage(int curr, int next);
-    void firstRefresh(QDialog *main);
     void gotoPage(int next);
     void pageDisplayed(int next);
     void updateDiskInfo();
@@ -136,7 +132,6 @@ private slots:
     void on_passwordCheckBox_stateChanged(int);
     void on_qtpartedButton_clicked();
     void on_viewServicesButton_clicked();
-
 
     void on_homeCombo_currentIndexChanged(const QString &arg1);
     void on_userPasswordEdit2_textChanged(const QString &arg1);
