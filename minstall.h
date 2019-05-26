@@ -39,10 +39,10 @@ class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
 protected:
     QProcess *proc;
-    bool eventFilter(QObject *obj, QEvent *event);
     void changeEvent(QEvent *event);
     void resizeEvent(QResizeEvent *);
     void closeEvent(QCloseEvent * event);
+    void reject();
 
 public:
     MInstall(const QStringList &args);
