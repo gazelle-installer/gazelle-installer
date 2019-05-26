@@ -99,6 +99,7 @@ MInstall::MInstall(const QStringList &args)
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
     }
 
+    setWindowFlags(Qt::Window); // for the close, min and max buttons
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
     qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
