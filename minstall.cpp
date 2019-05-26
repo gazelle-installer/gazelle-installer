@@ -25,19 +25,16 @@
 #include <sys/stat.h>
 
 #include "minstall.h"
-#include "mmain.h"
-#include "cmd.h"
 
-MInstall::MInstall(QWidget *parent, QStringList args) :
-    QWidget(parent)
+MInstall::MInstall(const QStringList &args)
 {
     setupUi(this);
 
     this->installEventFilter(this);
     this->args = args;
+    pretend = (args.contains("--pretend") || args.contains("-p"));
     installBox->hide();
 
-    pretend = (args.contains("--pretend") || args.contains("-p"));
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
     PROJECTNAME=settings.value("PROJECT_NAME").toString();
@@ -54,6 +51,7 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     MIN_INSTALL_SIZE=settings.value("MIN_INSTALL_SIZE").toString();
     PREFERRED_MIN_INSTALL_SIZE=settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
     REMOVE_NOSPLASH=settings.value("REMOVE_NOSPLASH", "false").toBool();
+    setWindowTitle(PROJECTNAME + " " + tr("Installer"));
 
     // save config
     config = new QSettings(PROJECTNAME, "minstall", this);
@@ -80,6 +78,34 @@ MInstall::MInstall(QWidget *parent, QStringList args) :
     rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
     homeLabelEdit->setText("home" + PROJECTSHORTNAME);
     swapLabelEdit->setText("swap" + PROJECTSHORTNAME);
+    if (!pretend) {
+        // disable automounting in Thunar
+        auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
+        execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
+    }
+
+    rootTypeCombo->setEnabled(false);
+    homeTypeCombo->setEnabled(false);
+    checkBoxEncryptRoot->setEnabled(false);
+    checkBoxEncryptHome->setEnabled(false);
+    rootLabelEdit->setEnabled(false);
+    homeLabelEdit->setEnabled(false);
+    swapLabelEdit->setEnabled(false);
+
+    FDEpassword->hide();
+    FDEpassword2->hide();
+    labelFDEpass->hide();
+    labelFDEpass2->hide();
+    buttonAdvancedFDE->hide();
+    gbEncrPass->hide();
+    existing_partitionsButton->hide();
+
+    gotoPage(0);
+
+    // setWindowFlags(Qt::Window); // for the close, min and max buttons
+    // ensure the help widgets are displayed correctly when started
+    // Qt will delete the heap-allocated event object when posted
+    qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
 }
 
 MInstall::~MInstall() {
@@ -2349,17 +2375,17 @@ void MInstall::pageDisplayed(int next)
 
     switch (next) {
     case 1: // choose disk
-        ((MMain *)mmn)->setHelpText(tr("<p><b>General Instructions</b><br/>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</p>"
-                                       "<p>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. "
-                                       "You will be prompted for confirmation before any destructive actions are performed.</p>"
-                                       "<p>Installation requires about %1 of space. %2 or more is preferred. "
-                                       "You can use the entire disk or you can put the installation on existing partitions. </p>"
-                                       "<p>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.</p>"
-                                       "<p>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</p>").arg(MIN_INSTALL_SIZE).arg(PREFERRED_MIN_INSTALL_SIZE) + tr(""
-                                       "<p>Autoinstall will place home on the root partition.</p>") + tr(""
-                                       "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
-                                       "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
-                                       "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
+        mainHelp->setText(tr("<p><b>General Instructions</b><br/>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</p>"
+                             "<p>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. "
+                             "You will be prompted for confirmation before any destructive actions are performed.</p>"
+                             "<p>Installation requires about %1 of space. %2 or more is preferred. "
+                             "You can use the entire disk or you can put the installation on existing partitions. </p>"
+                             "<p>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.</p>"
+                             "<p>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</p>").arg(MIN_INSTALL_SIZE).arg(PREFERRED_MIN_INSTALL_SIZE) + tr(""
+                             "<p>Autoinstall will place home on the root partition.</p>") + tr(""
+                             "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
+                             "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
+                             "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
         if (diskCombo->count() == 0 || phase < 0) {
             updateCursor(Qt::WaitCursor);
             updateDiskInfo();
@@ -2371,65 +2397,65 @@ void MInstall::pageDisplayed(int next)
 
     case 2:  // choose partition
         updateCursor(Qt::WaitCursor);
-        ((MMain *)mmn)->setHelpText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
-                                       "It's solely your responsibility to backup your data before proceeding.</p>"
-                                       "<p><b>Choose Partitions</b><br/>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</p>"
-                                       "<p>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</p>"
-                                       "<p><b>Upgrading</b><br/>To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.</p>"
-                                       "<p>If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. "
-                                       "As a result, the installation will take much longer than usual.</p>"
-                                       "<p><b>Preferred Filesystem Type</b><br/>For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. </p>"
-                                       "<p>Additional compression options are available for drives using btrfs. "
-                                       "Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</p>"
-                                       "<p><b>Bad Blocks</b><br/>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. "
-                                       "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME)+ tr(""
-                                       "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
-                                       "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
+        mainHelp->setText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
+                             "It's solely your responsibility to backup your data before proceeding.</p>"
+                             "<p><b>Choose Partitions</b><br/>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</p>"
+                             "<p>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</p>"
+                             "<p><b>Upgrading</b><br/>To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.</p>"
+                             "<p>If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. "
+                             "As a result, the installation will take much longer than usual.</p>"
+                             "<p><b>Preferred Filesystem Type</b><br/>For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. </p>"
+                             "<p>Additional compression options are available for drives using btrfs. "
+                             "Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</p>"
+                             "<p><b>Bad Blocks</b><br/>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. "
+                             "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME)+ tr(""
+                             "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
+                             "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
         updatePartInfo();
         updateCursor();
         break;
 
     case 3: // advanced encryption settings
-        ((MMain *)mmn)->setHelpText("<p><b>"
-                                    + tr("Advanced Encryption Settings") + "</b><br/>" + tr("This page allows fine-tuning of LUKS encrypted partitions.") + "<br/>"
-                                    + tr("In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.")
-                                    + "</p><p>"
-                                    + tr("This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.") + "<br/>"
-                                    + tr("Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.") + "<br/>"
-                                    + tr("Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.") + "<br/>"
-                                    + tr("Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.")
-                                    + "</p><p>"
-                                    + tr("You can use the <b>Benchmark</b> button (which runs <i>cryptsetup benchmark</i> in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.") + "<br/>"
-                                    + tr("Please note that <i>cryptsetup benchmark</i> does not cover all the combinations or selections possible, and generally covers the most commonly used selections.")
-                                    + "</p><p>"
-                                    + "<b>" + tr("Cipher") + "</b><br/>" + tr("A variety of ciphers are available.") + "<br/>"
-                                    + "<b>Serpent</b> " + tr("was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.") + "<br/>"
-                                    + "<b>AES</b> " + tr("(also known as <i>Rijndael</i>) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.") + "<br/>"
-                                    + "<b>Twofish</b> " + tr("is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.") + "<br/>"
-                                    + "<b>CAST6</b> " + tr("(CAST-256) was a candidate in the AES contest, however it did not become a finalist.") + "<br/>"
-                                    + "<b>Blowfish</b> " + tr("is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.")
-                                    + "</p><p>"
-                                    + "<b>" + tr("Chain mode") + "</b><br/>" + tr("If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.") + "<br />"
-                                    + "<b>XTS</b> " + tr("XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.") + "<br />"
-                                    + "<b>CBC</b> " + tr("(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.") + "<br />"
-                                    + "<b>ECB</b> " + tr("(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.")
-                                    + "</p><p>"
-                                    + "<b>" + tr("IV generator") + "</b><br/>" + tr("For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.") + "<br/>"
-                                    + tr("ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.")
-                                    + "</p><p>"
-                                    + "<b>" + tr("Key size") + "</b><br/>" + tr("Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.") + "<br/>"
-                                    + tr("The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).")
-                                    + "</p><p>"
-                                    + "<b>" + tr("LUKS key hash") + "</b><br/>" + tr("The hash used for PBKDF2 and for the AF splitter.") + " <br/>"
-                                    + tr("SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.")
-                                    + "</p><p>"
-                                    + "<b>" + tr("Kernel RNG") + "</b><br/>" + tr("Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).") + "<br/>"
-                                    + tr("Two options are available: /dev/<b>random</b> which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/<b>urandom</b> which will not block even if there is insufficient entropy (possibly weaker keys).")
-                                    + "</p><p>"
-                                    + "<b>" + tr("KDF round time</b><br/>The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.") + "<br/>"
-                                    + tr("A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).") + "<br/>"
-                                    + tr("If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.")
-                                    + "</p>");
+        mainHelp->setText("<p><b>"
+                          + tr("Advanced Encryption Settings") + "</b><br/>" + tr("This page allows fine-tuning of LUKS encrypted partitions.") + "<br/>"
+                          + tr("In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.")
+                          + "</p><p>"
+                          + tr("This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.") + "<br/>"
+                          + tr("Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.") + "<br/>"
+                          + tr("Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.") + "<br/>"
+                          + tr("Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.")
+                          + "</p><p>"
+                          + tr("You can use the <b>Benchmark</b> button (which runs <i>cryptsetup benchmark</i> in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.") + "<br/>"
+                          + tr("Please note that <i>cryptsetup benchmark</i> does not cover all the combinations or selections possible, and generally covers the most commonly used selections.")
+                          + "</p><p>"
+                          + "<b>" + tr("Cipher") + "</b><br/>" + tr("A variety of ciphers are available.") + "<br/>"
+                          + "<b>Serpent</b> " + tr("was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.") + "<br/>"
+                          + "<b>AES</b> " + tr("(also known as <i>Rijndael</i>) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.") + "<br/>"
+                          + "<b>Twofish</b> " + tr("is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.") + "<br/>"
+                          + "<b>CAST6</b> " + tr("(CAST-256) was a candidate in the AES contest, however it did not become a finalist.") + "<br/>"
+                          + "<b>Blowfish</b> " + tr("is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.")
+                          + "</p><p>"
+                          + "<b>" + tr("Chain mode") + "</b><br/>" + tr("If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.") + "<br />"
+                          + "<b>XTS</b> " + tr("XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.") + "<br />"
+                          + "<b>CBC</b> " + tr("(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.") + "<br />"
+                          + "<b>ECB</b> " + tr("(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.")
+                          + "</p><p>"
+                          + "<b>" + tr("IV generator") + "</b><br/>" + tr("For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.") + "<br/>"
+                          + tr("ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.")
+                          + "</p><p>"
+                          + "<b>" + tr("Key size") + "</b><br/>" + tr("Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.") + "<br/>"
+                          + tr("The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).")
+                          + "</p><p>"
+                          + "<b>" + tr("LUKS key hash") + "</b><br/>" + tr("The hash used for PBKDF2 and for the AF splitter.") + " <br/>"
+                          + tr("SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.")
+                          + "</p><p>"
+                          + "<b>" + tr("Kernel RNG") + "</b><br/>" + tr("Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).") + "<br/>"
+                          + tr("Two options are available: /dev/<b>random</b> which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/<b>urandom</b> which will not block even if there is insufficient entropy (possibly weaker keys).")
+                          + "</p><p>"
+                          + "<b>" + tr("KDF round time</b><br/>The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.") + "<br/>"
+                          + tr("A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).") + "<br/>"
+                          + tr("If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.")
+                          + "</p>");
         break;
 
     case 4: // installation step
@@ -2442,16 +2468,16 @@ void MInstall::pageDisplayed(int next)
             iLastProgress = progressBar->value();
             on_progressBar_valueChanged(iLastProgress);
         }
-        ((MMain *)mmn)->setHelpText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
-                                    + tr("%1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
-                                    + "</p><p>"
-                                    + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
-                                    + "</p><p>"
-                                    + "<b>" + tr("Change settings while you wait") + "</b><br/>"
-                                    + tr("While %1 is being installed, you can click on the <b>Next</b> or <b>Back</b> buttons to enter other information required for the installation.").arg(PROJECTNAME)
-                                    + "</p><p>"
-                                    + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
-                                    + "</p>");
+        mainHelp->setText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
+                          + tr("%1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
+                          + "</p><p>"
+                          + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
+                          + "</p><p>"
+                          + "<b>" + tr("Change settings while you wait") + "</b><br/>"
+                          + tr("While %1 is being installed, you can click on the <b>Next</b> or <b>Back</b> buttons to enter other information required for the installation.").arg(PROJECTNAME)
+                          + "</p><p>"
+                          + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
+                          + "</p>");
         widgetStack->setEnabled(true);
         if (phase > 0 && phase < 4) {
             backButton->setEnabled(haveSysConfig);
@@ -2464,56 +2490,56 @@ void MInstall::pageDisplayed(int next)
         return; // avoid enabling both Back and Next buttons at the end
         break;
     case 5: // set bootloader
-        ((MMain *)mmn)->setHelpText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
-                                       "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
-                                       "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
-                                       "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
+        mainHelp->setText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
+                             "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
+                             "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
+                             "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
 
         updateCursor(); // restore wait cursor set in install screen
         break;
 
     case 6: // set services
-        ((MMain *)mmn)->setHelpText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
+        mainHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         break;
 
     case 7: // set computer name
-        ((MMain *)mmn)->setHelpText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
-                                       "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
-                                       "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
-                                       "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
-                                       "with a local computer that is running MS-Windows or Mac OSX.</p>"));
+        mainHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
+                             "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
+                             "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
+                             "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
+                             "with a local computer that is running MS-Windows or Mac OSX.</p>"));
         break;
 
     case 8: // set localization, clock, services button
-        ((MMain *)mmn)->setHelpText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
-                                       "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
-                                       "<p><b>Timezone Settings</b><br/>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</p>"
-                                       "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
+        mainHelp->setText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
+                             "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
+                             "<p><b>Timezone Settings</b><br/>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</p>"
+                             "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
         break;
 
     case 9: // set username and passwords
-        ((MMain *)mmn)->setHelpText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
-                                       "You should not use the root user as your daily user account. "
-                                       "Please enter the name for a new (default) user account that you will use on a daily basis. "
-                                       "If needed, you can add other user accounts later with %1 User Manager. </p>"
-                                       "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
-                                       "Each password must be entered twice.</p>").arg(PROJECTNAME));
+        mainHelp->setText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
+                             "You should not use the root user as your daily user account. "
+                             "Please enter the name for a new (default) user account that you will use on a daily basis. "
+                             "If needed, you can add other user accounts later with %1 User Manager. </p>"
+                             "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
+                             "Each password must be entered twice.</p>").arg(PROJECTNAME));
         if (!nextFocus) nextFocus = userNameEdit;
         break;
 
     case 10: // done
         closeButton->setEnabled(false);
-        ((MMain *)mmn)->setHelpText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
-                                       "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
-                                       "The best way to learn about them is to browse through the Menu and try them. "
-                                       "Many of the apps were developed specifically for the %1 project. "
-                                       "These are shown in the main menus. "
-                                       "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME));
+        mainHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
+                             "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
+                             "The best way to learn about them is to browse through the Menu and try them. "
+                             "Many of the apps were developed specifically for the %1 project. "
+                             "These are shown in the main menus. "
+                             "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME));
         break;
 
     default:
         // case 0 or any other
-        ((MMain *)mmn)->setHelpText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n " + tr("<p><b>Support %1</b><br/>"
+        mainHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n " + tr("<p><b>Support %1</b><br/>"
                                                                                                   "%1 is supported by people like you. Some help others at the "
                                                                                                   "support forum - %2 - or translate help files into different "
                                                                                                   "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
@@ -2578,35 +2604,6 @@ void MInstall::gotoPage(int next)
         nextFocus->setFocus();
         nextFocus = NULL;
     }
-}
-
-void MInstall::firstRefresh(QDialog *main)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    mmn = main;
-    if (!pretend) {
-        // disable automounting in Thunar
-        auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
-        execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
-    }
-
-    rootTypeCombo->setEnabled(false);
-    homeTypeCombo->setEnabled(false);
-    checkBoxEncryptRoot->setEnabled(false);
-    checkBoxEncryptHome->setEnabled(false);
-    rootLabelEdit->setEnabled(false);
-    homeLabelEdit->setEnabled(false);
-    swapLabelEdit->setEnabled(false);
-
-    FDEpassword->hide();
-    FDEpassword2->hide();
-    labelFDEpass->hide();
-    labelFDEpass2->hide();
-    buttonAdvancedFDE->hide();
-    gbEncrPass->hide();
-    existing_partitionsButton->hide();
-
-    gotoPage(0);
 }
 
 void MInstall::updatePartitionWidgets()
@@ -2707,6 +2704,41 @@ void MInstall::buildServiceList()
     csView->resizeColumnToContents(0);
     csView->resizeColumnToContents(1);
     stashServices(true);
+}
+
+/////////////////////////////////////////////////////////////////////////
+// event handlers
+
+void MInstall::changeEvent(QEvent *event)
+{
+    const QEvent::Type etype = event->type();
+    if (etype == QEvent::ApplicationPaletteChange
+        || etype == QEvent::PaletteChange || etype == QEvent::StyleChange)
+    {
+        QPalette pal = mainHelp->style()->standardPalette();
+        QColor col = pal.color(QPalette::Base);
+        col.setAlpha(150);
+        pal.setColor(QPalette::Base, col);
+        mainHelp->setPalette(pal);
+        resizeEvent(NULL);
+    }
+}
+
+void MInstall::resizeEvent(QResizeEvent *)
+{
+    mainHelp->resize(tab->size());
+    helpbackdrop->resize(mainHelp->size());
+}
+
+void MInstall::closeEvent(QCloseEvent *event)
+{
+    if (abort(true)) {
+        event->accept();
+        cleanup();
+        QWidget::closeEvent(event);
+    } else {
+        event->ignore();
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -2972,7 +3004,7 @@ void MInstall::on_progressBar_valueChanged(int value)
 
 void MInstall::on_closeButton_clicked()
 {
-    ((MMain *)mmn)->close();
+    close();
 }
 
 void MInstall::setupkeyboardbutton()
@@ -2999,9 +3031,9 @@ void MInstall::setupkeyboardbutton()
 
 void MInstall::on_buttonSetKeyboard_clicked()
 {
-    mmn->hide();
+    hide();
     execute("fskbsetting", false);
-    mmn->show();
+    show();
     setupkeyboardbutton();
 }
 
