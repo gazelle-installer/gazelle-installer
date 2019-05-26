@@ -29,10 +29,10 @@
 MInstall::MInstall(const QStringList &args)
 {
     setupUi(this);
+    proc = new QProcess(this);
 
     this->args = args;
     pretend = (args.contains("--pretend") || args.contains("-p"));
-    installBox->hide();
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
@@ -56,11 +56,9 @@ MInstall::MInstall(const QStringList &args)
     config = new QSettings(PROJECTNAME, "minstall", this);
 
     // set default host name
-
     computerNameEdit->setText(DEFAULT_HOSTNAME);
 
     // set some distro-centric text
-
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME).arg(PROJECTFORUM));
 
@@ -72,16 +70,9 @@ MInstall::MInstall(const QStringList &args)
 
     setupkeyboardbutton();
 
-    proc = new QProcess(this);
-
     rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
     homeLabelEdit->setText("home" + PROJECTSHORTNAME);
     swapLabelEdit->setText("swap" + PROJECTSHORTNAME);
-    if (!pretend) {
-        // disable automounting in Thunar
-        auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
-        execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
-    }
 
     rootTypeCombo->setEnabled(false);
     homeTypeCombo->setEnabled(false);
@@ -99,9 +90,15 @@ MInstall::MInstall(const QStringList &args)
     gbEncrPass->hide();
     existing_partitionsButton->hide();
 
+    installBox->hide();
     gotoPage(0);
 
-    // setWindowFlags(Qt::Window); // for the close, min and max buttons
+    if (!pretend) {
+        // disable automounting in Thunar
+        auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
+        execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
+    }
+
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
     qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
