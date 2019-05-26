@@ -47,8 +47,6 @@ public:
     MInstall(const QStringList &args);
     ~MInstall();
 
-    QStringList args;
-
     void checkUefi();
 
     // helpers
@@ -172,7 +170,10 @@ private slots:
 private:
     QProcess *proc;
     int phase = 0;
-    bool pretend = false;
+
+    // command line options
+    bool pretend, nocopy, sync;
+
     bool formatSwap = false;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
