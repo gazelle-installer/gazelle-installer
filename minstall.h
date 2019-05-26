@@ -38,7 +38,6 @@ public:
 class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
 protected:
-    QProcess *proc;
     void changeEvent(QEvent *event);
     void resizeEvent(QResizeEvent *);
     void closeEvent(QCloseEvent * event);
@@ -173,6 +172,7 @@ private slots:
     void on_progressBar_valueChanged(int value);
 
 private:
+    QProcess *proc;
     int phase = 0;
     bool pretend = false;
     bool formatSwap = false;
