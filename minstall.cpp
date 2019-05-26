@@ -31,8 +31,9 @@ MInstall::MInstall(const QStringList &args)
     setupUi(this);
     proc = new QProcess(this);
 
-    this->args = args;
+    nocopy = (args.contains("--nocopy") || args.contains("-n"));
     pretend = (args.contains("--pretend") || args.contains("-p"));
+    sync = (args.contains("--sync") || args.contains("-s"));
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
@@ -1345,7 +1346,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         execute(cmd.arg(swapsplit[0], swapsplit[1]));
     }
     // maybe format root (if not saving /home on root) // or if using --sync option
-    if (!(saveHome && homedev == rootdev) && !(args.contains("--sync") || args.contains("-s"))) {
+    if (!(saveHome && homedev == rootdev) && !sync) {
         execute("pumount " + rootdev);
         execute(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
         rootType = rootTypeCombo->currentText().toUtf8();
@@ -1417,7 +1418,7 @@ bool MInstall::installLinux()
     QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
     if (phase < 0) return false;
 
-    if (!(isRootFormatted || args.contains("--sync") || args.contains("-s"))) {
+    if (!(isRootFormatted || sync)) {
         // if root was not formatted and not using --sync option then re-use it
         updateStatus(tr("Mounting the / (root) partition"));
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
@@ -1554,7 +1555,7 @@ bool MInstall::copyLinux()
     // setup and start the process
     QString cmd;
     cmd = "/bin/cp -av";
-    if (args.contains("--sync") || args.contains("-s")) {
+    if (sync) {
         cmd = "rsync -av --delete";
         if (saveHomeCheck->isChecked()) {
             cmd.append(" --filter 'protect home/*'");
@@ -1575,7 +1576,7 @@ bool MInstall::copyLinux()
         }
     }
 
-    if (!(args.contains("--nocopy") || args.contains("-n"))) {
+    if (!nocopy) {
         if (phase < 0) return false;
         QEventLoop eloop;
         connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
@@ -1920,9 +1921,7 @@ bool MInstall::validateUserInfo()
 // setup the user, cannot be rerun
 bool MInstall::setUserInfo()
 {
-    if (args.contains("--nocopy") || args.contains("-n")) {
-        return true;
-    }
+    if (nocopy) return true;
     if (phase < 0) return false;
 
     // set the user passwords first
