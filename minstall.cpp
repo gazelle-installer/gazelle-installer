@@ -52,7 +52,7 @@ MInstall::MInstall(const QStringList &args)
     MIN_INSTALL_SIZE=settings.value("MIN_INSTALL_SIZE").toString();
     PREFERRED_MIN_INSTALL_SIZE=settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
     REMOVE_NOSPLASH=settings.value("REMOVE_NOSPLASH", "false").toBool();
-    setWindowTitle(PROJECTNAME + " " + tr("Installer"));
+    setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
     // save config
     config = new QSettings(PROJECTNAME, "minstall", this);
@@ -2424,7 +2424,7 @@ void MInstall::pageDisplayed(int next)
             on_progressBar_valueChanged(iLastProgress);
         }
         mainHelp->setText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
-                          + tr("%1 is installing.  For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
+                          + tr("%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
                           + "</p><p>"
                           + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
                           + "</p><p>"
