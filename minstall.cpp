@@ -34,6 +34,7 @@ MInstall::MInstall(const QStringList &args)
     nocopy = (args.contains("--nocopy") || args.contains("-n"));
     pretend = (args.contains("--pretend") || args.contains("-p"));
     sync = (args.contains("--sync") || args.contains("-s"));
+    if (pretend) listHomes = args; // dummy existing homes
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
@@ -2290,7 +2291,7 @@ int MInstall::showPage(int curr, int next)
         if (!validateChosenPartitions()) {
             return curr;
         }
-        if (!saveHomeBasic()) {
+        if (!pretend && !saveHomeBasic()) {
             const QString &msg = tr("The data in /home cannot be preserved because the required information could not be obtained.") + "\n"
                     + tr("If the partition containing /home is encrypted, please ensure the correct \"Encrypt\" boxes are selected, and that the entered password is correct.") + "\n"
                     + tr("The installer cannot encrypt an existing /home directory or partition.");
@@ -2304,7 +2305,7 @@ int MInstall::showPage(int curr, int next)
         ixPageRefAdvancedFDE = 0;
         return next;
     } else if (next == 3 && curr == 4) { // at Step_Progress (backward)
-        if (haveSnapshotUserAccounts) {
+        if (!pretend && haveSnapshotUserAccounts) {
             return 8; // skip Step_User_Accounts and go to Step_Localization
         }
         return 9; // go to Step_Users
@@ -2323,7 +2324,7 @@ int MInstall::showPage(int curr, int next)
     } else if (next == 6 && curr == 7) { // at Step_Network (backward)
        return next - 1; // skip Services screen
     } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
-        if (haveSnapshotUserAccounts) {
+        if (!pretend && haveSnapshotUserAccounts) {
             haveSysConfig = true;
             next = 4; // Continue
         }
