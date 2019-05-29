@@ -1880,40 +1880,21 @@ bool MInstall::validateUserInfo()
     // see if user directory already exists
     if (listHomes.contains(userNameEdit->text())) {
         // already exists
-        int ans;
-        QString msg;
-        msg = tr("The home directory for %1 already exists.Would you like to reuse the old home directory?").arg(userNameEdit->text());
-        ans = QMessageBox::information(this, windowTitle(), msg,
-                                       QMessageBox::Yes, QMessageBox::No);
-        if (ans == QMessageBox::Yes) {
-            // use the old home
-            oldHomeAction = OldHomeUse;
-        } else {
-            // don't reuse -- maybe save the old home
-            msg = tr("Would you like to save the old home directory\nand create a new home directory?");
-            ans = QMessageBox::information(this, windowTitle(), msg,
-                                           QMessageBox::Yes, QMessageBox::No);
-            if (ans == QMessageBox::Yes) {
-                // save the old directory
-                oldHomeAction = OldHomeSave;
-            } else {
-                // don't save and don't reuse -- delete?
-                msg = tr("Would you like to delete the old home directory for %1?").arg(userNameEdit->text());
-                ans = QMessageBox::information(this, windowTitle(), msg,
-                                               QMessageBox::Yes, QMessageBox::No);
-                if (ans == QMessageBox::Yes) {
-                    // delete the directory
-                    oldHomeAction = OldHomeDelete;
-                } else {
-                    // don't save, reuse or delete -- can't proceed
-                    QMessageBox::critical(this, windowTitle(),
-                                          tr("You've chosen to not use, save or delete the old home directory.\n"
-                                             "Before proceeding, you'll have to select a different username."));
-                    nextFocus = userNameEdit;
-                    return false;
-                }
-            }
-        }
+        QMessageBox msgbox(this);
+        msgbox.setWindowTitle(windowTitle());
+        msgbox.setText(tr("The home directory for %1 already exists.").arg(userNameEdit->text()));
+        msgbox.setInformativeText(tr("What would you like to do with the old directory?"));
+        QPushButton *msgbtnUse = msgbox.addButton(tr("Reuse"), QMessageBox::ActionRole);
+        QPushButton *msgbtnSave = msgbox.addButton(tr("Save"), QMessageBox::ActionRole);
+        QPushButton *msgbtnDelete = msgbox.addButton(tr("Delete"), QMessageBox::ActionRole);
+        msgbox.setDefaultButton(msgbox.addButton(QMessageBox::Cancel));
+        msgbox.exec();
+        QAbstractButton *msgbtn = msgbox.clickedButton();
+        if (msgbtn == msgbtnDelete) oldHomeAction = OldHomeDelete; // delete the directory
+        else if (msgbtn == msgbtnSave) oldHomeAction = OldHomeSave; // save the old directory
+        else if (msgbtn == msgbtnUse) oldHomeAction = OldHomeUse; // use the old home
+        else return false; // don't save, reuse or delete -- can't proceed
+        qDebug() << oldHomeAction;
     }
     nextFocus = NULL;
     return true;
