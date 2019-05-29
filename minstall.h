@@ -18,8 +18,6 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QProcess>
-#include <QTimer>
-#include <QProgressDialog>
 #include <QSettings>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -27,7 +25,6 @@
 #include <dirent.h>
 
 #include "ui_meinstall.h"
-#include "cmd.h"
 
 class SafeCache : public QByteArray {
 public:
@@ -38,32 +35,24 @@ public:
     void erase();
 };
 
-class MInstall : public QWidget, public Ui::MeInstall {
+class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
 protected:
-    QProcess *proc;
-    QTimer *timer;
-    QDialog *mmn;
-    bool eventFilter(QObject *obj, QEvent *event);
+    void changeEvent(QEvent *event);
+    void resizeEvent(QResizeEvent *);
+    void closeEvent(QCloseEvent * event);
+    void reject();
 
 public:
-    /** constructor */
-    MInstall(QWidget* parent=0, QStringList args = QStringList());
-    /** destructor */
+    MInstall(const QStringList &args);
     ~MInstall();
-
-    QStringList args;
 
     void checkUefi();
 
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
-    int runCmd(const QString &cmd);
-    bool runProc(const QString &cmd, const QByteArray &input = QByteArray());
     void csleep(int msec);
-    QString getCmdOut(const QString &cmd);
     QStringList getCmdOuts(const QString &cmd);
-    static int command(const QString &string);
 
     bool isInsideVB();
     bool isGpt(const QString &drv);
@@ -81,9 +70,7 @@ public:
     bool validateUserInfo();
     bool validateComputerName();
     bool setComputerName();
-    bool setPasswords();
     bool setUserInfo();
-    bool setUserName();
     void addItemCombo(QComboBox *cb, const QString *part);
     void buildBootLists();
     void buildServiceList();
@@ -98,8 +85,6 @@ public:
     void setServices();
     void updatePartCombo(QString *prevItem, const QString &part);
     void updatePartitionWidgets();
-    void loadAdvancedFDE();
-    void saveAdvancedFDE();
     void writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
@@ -126,16 +111,12 @@ public:
     QString homeDevicePreserve;
 
     int showPage(int curr, int next);
-    void firstRefresh(QDialog *main);
     void gotoPage(int next);
     void pageDisplayed(int next);
     void updateDiskInfo();
     void setupkeyboardbutton();
     bool abort(bool onclose);
     void cleanup(bool endclean = true);
-
-public slots:
-    void copyTime();
 
 private slots:
     void on_abortInstallButton_clicked();
@@ -146,7 +127,6 @@ private slots:
     void on_passwordCheckBox_stateChanged(int);
     void on_qtpartedButton_clicked();
     void on_viewServicesButton_clicked();
-
 
     void on_homeCombo_currentIndexChanged(const QString &arg1);
     void on_userPasswordEdit2_textChanged(const QString &arg1);
@@ -188,8 +168,12 @@ private slots:
     void on_progressBar_valueChanged(int value);
 
 private:
+    QProcess *proc;
     int phase = 0;
-    bool pretend = false;
+
+    // command line options
+    bool pretend, nocopy, sync;
+
     bool formatSwap = false;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
@@ -200,15 +184,12 @@ private:
     bool haveSysConfig = false;
 
     QWidget *nextFocus = NULL;
-    Cmd shell;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
     QStringList listHomes;
     SafeCache key;
 
     // for file copy progress updates
-    fsfilcnt_t iTargetInodes = 0;
-    int iCopyBarA;
     int iCopyBarB;
 
     // for the tips display
@@ -241,15 +222,19 @@ private:
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
-    int indexFDEcipher = -1;
-    int indexFDEchain = -1;
-    int indexFDEivgen = -1;
-    int indexFDEivhash = -1;
-    int iFDEkeysize = -1;
-    int indexFDEhash = -1;
-    int indexFDErandom = -1;
-    long iFDEroundtime = -1;
+    int indexFDEcipher;
+    int indexFDEchain;
+    int indexFDEivgen;
+    int indexFDEivhash;
+    int iFDEkeysize;
+    int indexFDEhash;
+    int indexFDErandom;
+    long iFDEroundtime;
 
+
+    // helpers
+    bool execute(const QString &cmd, const bool rawexec = false, const QByteArray &input = QByteArray());
+    QString getCmdOut(const QString &cmd, bool everything = false);
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
@@ -260,4 +245,5 @@ private:
     bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot);
     void failUI(const QString &msg);
     void stashServices(bool save);
+    void stashAdvancedFDE(bool save);
 };
