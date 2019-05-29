@@ -30,7 +30,7 @@
 #include <QScopedPointer>
 #include <QDebug>
 
-#include "mmain.h"
+#include "minstall.h"
 #include "version.h"
 
 QScopedPointer<QFile> logFile;
@@ -110,10 +110,10 @@ int main(int argc, char *argv[])
 
     // main routine
     qDebug() << "Installer version:" << VERSION;
-    MMain mmain(a.arguments());
-    const QRect &geo = a.desktop()->availableGeometry(&mmain);
-    mmain.move((geo.width()-mmain.width())/2, (geo.height()-mmain.height())/2);
-    mmain.show();
+    MInstall minstall(a.arguments());
+    const QRect &geo = a.desktop()->availableGeometry(&minstall);
+    minstall.move((geo.width()-minstall.width())/2, (geo.height()-minstall.height())/2);
+    minstall.show();
     return a.exec();
 }
 
