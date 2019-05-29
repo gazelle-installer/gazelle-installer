@@ -44,12 +44,12 @@ int main(int argc, char *argv[])
 
     if (a.arguments().contains("--help") || a.arguments().contains("-h") ) {
         printHelp();
-        return 0;
+        return EXIT_SUCCESS;
     }
 
     if (a.arguments().contains("--version") || a.arguments().contains("-v") ) {
        qDebug() << "Installer version:" << VERSION;
-       return 0;
+       return EXIT_SUCCESS;
     }
 
 
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         QMessageBox::critical(0, QString::null,
                               QApplication::tr("The installer won't launch because it appears to be running already in the background.\n\n"
                                                "Please close it if possible, or run 'pkill minstall' in terminal."));
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // check if 32bit on 64 bit UEFI
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
                                                                            "Do you want to continue the installation?"),
                                     QApplication::tr("Yes"), QApplication::tr("No"));
         if (ans != 0) {
-            return 1;
+            return EXIT_FAILURE;
         }
     }
 
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
             QMessageBox::warning(0, QString::null, msg);
         } else {
             QMessageBox::critical(0, QString::null, msg);
-            return 1;
+            return EXIT_FAILURE;
         }
     }
 
