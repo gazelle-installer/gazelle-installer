@@ -2545,7 +2545,7 @@ void MInstall::gotoPage(int next)
         if (!pretend && checkBoxExitReboot->isChecked()) {
             execute("/usr/local/bin/persist-config --shutdown --command reboot &", false);
         }
-        qApp->exit(0);
+        qApp->exit(EXIT_SUCCESS);
         return;
     }
     // display the next page
@@ -2691,6 +2691,12 @@ void MInstall::closeEvent(QCloseEvent *event)
         event->accept();
         cleanup();
         QWidget::closeEvent(event);
+        if (widgetStack->currentWidget() != Step_End) {
+            qApp->exit(EXIT_FAILURE);
+        } else {
+            proc->waitForFinished();
+            qApp->exit(EXIT_SUCCESS);
+        }
     } else {
         event->ignore();
     }
