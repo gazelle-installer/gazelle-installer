@@ -34,6 +34,7 @@ MInstall::MInstall(const QStringList &args)
     nocopy = (args.contains("--nocopy") || args.contains("-n"));
     pretend = (args.contains("--pretend") || args.contains("-p"));
     sync = (args.contains("--sync") || args.contains("-s"));
+    if (pretend) listHomes = args; // dummy existing homes
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
@@ -1879,40 +1880,21 @@ bool MInstall::validateUserInfo()
     // see if user directory already exists
     if (listHomes.contains(userNameEdit->text())) {
         // already exists
-        int ans;
-        QString msg;
-        msg = tr("The home directory for %1 already exists. Would you like to reuse the old home directory?").arg(userNameEdit->text());
-        ans = QMessageBox::information(this, windowTitle(), msg,
-                                       QMessageBox::Yes, QMessageBox::No);
-        if (ans == QMessageBox::Yes) {
-            // use the old home
-            oldHomeAction = OldHomeUse;
-        } else {
-            // don't reuse -- maybe save the old home
-            msg = tr("Would you like to save the old home directory\nand create a new home directory?");
-            ans = QMessageBox::information(this, windowTitle(), msg,
-                                           QMessageBox::Yes, QMessageBox::No);
-            if (ans == QMessageBox::Yes) {
-                // save the old directory
-                oldHomeAction = OldHomeSave;
-            } else {
-                // don't save and don't reuse -- delete?
-                msg = tr("Would you like to delete the old home directory for %1?").arg(userNameEdit->text());
-                ans = QMessageBox::information(this, windowTitle(), msg,
-                                               QMessageBox::Yes, QMessageBox::No);
-                if (ans == QMessageBox::Yes) {
-                    // delete the directory
-                    oldHomeAction = OldHomeDelete;
-                } else {
-                    // don't save, reuse or delete -- can't proceed
-                    QMessageBox::critical(this, windowTitle(),
-                                          tr("You've chosen to not use, save or delete the old home directory.\n"
-                                             "Before proceeding, you'll have to select a different username."));
-                    nextFocus = userNameEdit;
-                    return false;
-                }
-            }
-        }
+        QMessageBox msgbox(this);
+        msgbox.setWindowTitle(windowTitle());
+        msgbox.setText(tr("The home directory for %1 already exists.").arg(userNameEdit->text()));
+        msgbox.setInformativeText(tr("What would you like to do with the old directory?"));
+        QPushButton *msgbtnUse = msgbox.addButton(tr("Reuse"), QMessageBox::ActionRole);
+        QPushButton *msgbtnSave = msgbox.addButton(tr("Save"), QMessageBox::ActionRole);
+        QPushButton *msgbtnDelete = msgbox.addButton(tr("Delete"), QMessageBox::ActionRole);
+        msgbox.setDefaultButton(msgbox.addButton(QMessageBox::Cancel));
+        msgbox.exec();
+        QAbstractButton *msgbtn = msgbox.clickedButton();
+        if (msgbtn == msgbtnDelete) oldHomeAction = OldHomeDelete; // delete the directory
+        else if (msgbtn == msgbtnSave) oldHomeAction = OldHomeSave; // save the old directory
+        else if (msgbtn == msgbtnUse) oldHomeAction = OldHomeUse; // use the old home
+        else return false; // don't save, reuse or delete -- can't proceed
+        qDebug() << oldHomeAction;
     }
     nextFocus = NULL;
     return true;
@@ -2290,7 +2272,7 @@ int MInstall::showPage(int curr, int next)
         if (!validateChosenPartitions()) {
             return curr;
         }
-        if (!saveHomeBasic()) {
+        if (!pretend && !saveHomeBasic()) {
             const QString &msg = tr("The data in /home cannot be preserved because the required information could not be obtained.") + "\n"
                     + tr("If the partition containing /home is encrypted, please ensure the correct \"Encrypt\" boxes are selected, and that the entered password is correct.") + "\n"
                     + tr("The installer cannot encrypt an existing /home directory or partition.");
@@ -2304,7 +2286,7 @@ int MInstall::showPage(int curr, int next)
         ixPageRefAdvancedFDE = 0;
         return next;
     } else if (next == 3 && curr == 4) { // at Step_Progress (backward)
-        if (haveSnapshotUserAccounts) {
+        if (!pretend && haveSnapshotUserAccounts) {
             return 8; // skip Step_User_Accounts and go to Step_Localization
         }
         return 9; // go to Step_Users
@@ -2323,7 +2305,7 @@ int MInstall::showPage(int curr, int next)
     } else if (next == 6 && curr == 7) { // at Step_Network (backward)
        return next - 1; // skip Services screen
     } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
-        if (haveSnapshotUserAccounts) {
+        if (!pretend && haveSnapshotUserAccounts) {
             haveSysConfig = true;
             next = 4; // Continue
         }
@@ -2563,7 +2545,7 @@ void MInstall::gotoPage(int next)
         if (!pretend && checkBoxExitReboot->isChecked()) {
             execute("/usr/local/bin/persist-config --shutdown --command reboot &", false);
         }
-        qApp->exit(0);
+        qApp->exit(EXIT_SUCCESS);
         return;
     }
     // display the next page
@@ -2709,6 +2691,12 @@ void MInstall::closeEvent(QCloseEvent *event)
         event->accept();
         cleanup();
         QWidget::closeEvent(event);
+        if (widgetStack->currentWidget() != Step_End) {
+            qApp->exit(EXIT_FAILURE);
+        } else {
+            proc->waitForFinished();
+            qApp->exit(EXIT_SUCCESS);
+        }
     } else {
         event->ignore();
     }
