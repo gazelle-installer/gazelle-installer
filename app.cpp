@@ -90,8 +90,8 @@ int main(int argc, char *argv[])
                                                                            " unless you select Legacy Boot or similar at restart.\n"
                                                                            "We recommend you quit now and restart in Legacy Boot\n\n"
                                                                            "Do you want to continue the installation?"),
-                                    QApplication::tr("Yes"), QApplication::tr("No"));
-        if (ans != 0) {
+                                    QMessageBox::Yes, QMessageBox::No);
+        if (ans != QMessageBox::Yes) {
             return EXIT_FAILURE;
         }
     }
