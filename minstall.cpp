@@ -464,8 +464,8 @@ void MInstall::prepareToInstall()
             execute("umount /mnt/antiX/boot/efi", true);
         }
         // unmount /home if it exists
-        execute("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1");
-        execute("/bin/umount -l /mnt/antiX >/dev/null 2>&1");
+        execute("/bin/umount -l /mnt/antiX/home");
+        execute("/bin/umount -l /mnt/antiX");
         // close LUKS containers
         execute("cryptsetup luksClose /dev/mapper/rootfs", true);
         execute("cryptsetup luksClose /dev/mapper/swapfs", true);
@@ -1155,7 +1155,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
 
     // unmount root part
     rootdev = drv + mmcnvmepartdesignator + "1";
-    QString cmd = QString("/bin/umount -l %1 >/dev/null 2>&1").arg(rootdev);
+    QString cmd = QString("/bin/umount -l %1").arg(rootdev);
     if (!execute(cmd, false)) {
         qDebug() << "could not umount: " << rootdev;
     }
@@ -1404,11 +1404,11 @@ bool MInstall::saveHomeBasic()
  ending1:
     // unmount partitions
     if (homedev != rootDevicePreserve) {
-        execute("/bin/umount -l /mnt/antiX/home >/dev/null 2>&1", false);
+        execute("/bin/umount -l /mnt/antiX/home", false);
         if (isHomeEncrypted) execute("cryptsetup luksClose homefs", true);
     }
  ending2:
-    execute("/bin/umount -l /mnt/antiX >/dev/null 2>&1", false);
+    execute("/bin/umount -l /mnt/antiX", false);
     if (isRootEncrypted) execute("cryptsetup luksClose rootfs", true);
     return ok;
 }
@@ -1614,14 +1614,12 @@ bool MInstall::copyLinux()
     disablehiberanteinitramfs();
 
     // Copy live set up to install and clean up.
-    //shell.run("/bin/rm -rf /mnt/antiX/etc/skel/Desktop");
     execute("/usr/sbin/live-to-installed /mnt/antiX", false);
     qDebug() << "Desktop menu";
     execute("chroot /mnt/antiX desktop-menu --write-out-global", false);
     execute("/bin/rm -rf /mnt/antiX/home/demo");
     execute("/bin/rm -rf /mnt/antiX/media/sd*", false);
     execute("/bin/rm -rf /mnt/antiX/media/hd*", false);
-    //shell.run("/bin/mv -f /mnt/antiX/etc/X11/xorg.conf /mnt/antiX/etc/X11/xorg.conf.live >/dev/null 2>&1");
 
     // guess localtime vs UTC
     if (getCmdOut("guess-hwclock") == "localtime") {
