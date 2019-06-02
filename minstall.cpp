@@ -1976,10 +1976,7 @@ bool MInstall::setUserInfo()
                       " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
                       " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
                       " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' %1/$").arg(dpath);
-        if (!execute(cmd)) {
-            QMessageBox::warning(this, windowTitle(),
-                                  tr("Sorry, failed to save desktop changes."));
-        }
+        execute(cmd);
     }
     // fix the ownership, demo=newuser
     cmd = QString("chown -R demo:demo %1").arg(dpath);
