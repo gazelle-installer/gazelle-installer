@@ -1970,18 +1970,15 @@ bool MInstall::setUserInfo()
     // saving Desktop changes
     if (saveDesktopCheckBox->isChecked()) {
         execute("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
-        cmd = QString("rsync -a /home/demo/ %1"
+        cmd = QString("rsync -a --info=name1 /home/demo/ %1"
                       " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
                       " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
                       " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
                       " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
-                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'").arg(dpath);
+                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' %1/$").arg(dpath);
         if (!execute(cmd)) {
             QMessageBox::warning(this, windowTitle(),
                                   tr("Sorry, failed to save desktop changes."));
-        } else {
-            cmd = QString("grep -rl \"home/demo\" " + dpath + "| xargs sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'");
-            execute(cmd, false);
         }
     }
     // fix the ownership, demo=newuser
