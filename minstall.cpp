@@ -458,19 +458,8 @@ void MInstall::prepareToInstall()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return;
 
-    if (!pretend) {
-        // unmount /boot/efi if mounted by previous run
-        if (execute("mountpoint -q /mnt/antiX/boot/efi", true)) {
-            execute("umount /mnt/antiX/boot/efi", true);
-        }
-        // unmount /home if it exists
-        execute("/bin/umount -l /mnt/antiX/home");
-        execute("/bin/umount -l /mnt/antiX");
-        // close LUKS containers
-        execute("cryptsetup luksClose /dev/mapper/rootfs", true);
-        execute("cryptsetup luksClose /dev/mapper/swapfs", true);
-        execute("cryptsetup luksClose /dev/mapper/homefs", true);
-    }
+    // cleanup previous mounts
+    cleanup(false);
 
     isRootFormatted = false;
     isHomeFormatted = false;
@@ -1373,6 +1362,7 @@ bool MInstall::saveHomeBasic()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (!(saveHomeCheck->isChecked())) return true;
+    cleanup(false); // cleanup previous mounts
     // if preserving /home, obtain some basic information
     bool ok = false;
     const QByteArray &pass = FDEpassCust->text().toUtf8();
@@ -1380,7 +1370,6 @@ bool MInstall::saveHomeBasic()
     QString homedev = homeDevicePreserve;
     // mount the root partition
     if (isRootEncrypted) {
-        execute("cryptsetup luksClose rootfs");
         if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly", false)) return false;
         rootdev = "/dev/mapper/rootfs";
     }
@@ -1388,7 +1377,6 @@ bool MInstall::saveHomeBasic()
     // mount the home partition
     if (homedev != rootDevicePreserve) {
         if (isHomeEncrypted) {
-            execute("cryptsetup luksClose homefs");
             if (!openLuksPartition(homedev, "homefs", pass, "--readonly", false)) goto ending2;
             homedev = "/dev/mapper/homefs";
         }
@@ -2873,8 +2861,10 @@ void MInstall::cleanup(bool endclean)
         execute("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
         execute("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
-    execute("umount -l /mnt/antiX/proc >/dev/null 2>&1; umount -l /mnt/antiX/sys >/dev/null 2>&1; umount -l /mnt/antiX/dev/shm >/dev/null 2>&1; umount -l /mnt/antiX/dev >/dev/null 2>&1", false);
-    execute("umount -lR /mnt/antiX >/dev/null 2>&1", false);
+    execute("umount -l /mnt/antiX/boot/efi", true);
+    execute("(umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev) >/dev/null 2>&1", false);
+    execute("umount -l /mnt/antiX/home", true);
+    execute("umount -lR /mnt/antiX", true);
 
     if (isRootEncrypted) {
         execute("cryptsetup luksClose rootfs", true);
