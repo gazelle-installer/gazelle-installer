@@ -458,19 +458,8 @@ void MInstall::prepareToInstall()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return;
 
-    if (!pretend) {
-        // unmount /boot/efi if mounted by previous run
-        if (execute("mountpoint -q /mnt/antiX/boot/efi", true)) {
-            execute("umount /mnt/antiX/boot/efi", true);
-        }
-        // unmount /home if it exists
-        execute("/bin/umount -l /mnt/antiX/home");
-        execute("/bin/umount -l /mnt/antiX");
-        // close LUKS containers
-        execute("cryptsetup luksClose /dev/mapper/rootfs", true);
-        execute("cryptsetup luksClose /dev/mapper/swapfs", true);
-        execute("cryptsetup luksClose /dev/mapper/homefs", true);
-    }
+    // cleanup previous mounts
+    cleanup(false);
 
     isRootFormatted = false;
     isHomeFormatted = false;
@@ -633,70 +622,88 @@ void MInstall::saveConfig()
 {
     if (phase < 0) return;
     // Disk step
-    config->setValue("Disk/Disk", diskCombo->currentText().section(" ", 0, 0));
-    config->setValue("Disk/Encrypted", checkBoxEncryptAuto->isChecked());
-    config->setValue("Disk/EntireDisk", entireDiskButton->isChecked());
+    config->beginGroup("Disk");
+    config->setValue("Disk", diskCombo->currentText().section(" ", 0, 0));
+    config->setValue("Encrypted", checkBoxEncryptAuto->isChecked());
+    config->setValue("EntireDisk", entireDiskButton->isChecked());
+    config->endGroup();
     // Partition step
-    config->setValue("Partition/Root", rootCombo->currentText().section(" ", 0, 0));
-    config->setValue("Partition/Home", homeCombo->currentText().section(" ", 0, 0));
-    config->setValue("Partition/Swap", swapCombo->currentText().section(" ", 0, 0));
-    config->setValue("Partition/Boot", bootCombo->currentText().section(" ", 0, 0));
+    config->beginGroup("Partition");
 
-    config->setValue("Partition/RootType", rootTypeCombo->currentText());
-    config->setValue("Partition/HomeType", homeTypeCombo->currentText());
+    config->setValue("Root", rootCombo->currentText().section(" ", 0, 0));
+    config->setValue("Home", homeCombo->currentText().section(" ", 0, 0));
+    config->setValue("Swap", swapCombo->currentText().section(" ", 0, 0));
+    config->setValue("Boot", bootCombo->currentText().section(" ", 0, 0));
 
-    config->setValue("Partition/RootEncrypt", checkBoxEncryptRoot->isChecked());
-    config->setValue("Partition/RootEncrypt", checkBoxEncryptHome->isChecked());
-    config->setValue("Partition/RootEncrypt", checkBoxEncryptSwap->isChecked());
+    config->setValue("RootType", rootTypeCombo->currentText());
+    config->setValue("HomeType", homeTypeCombo->currentText());
 
-    config->setValue("Partition/RootLabel", rootLabelEdit->text());
-    config->setValue("Partition/HomeLabel", homeLabelEdit->text());
-    config->setValue("Partition/SwapLabel", swapLabelEdit->text());
+    config->setValue("RootEncrypt", checkBoxEncryptRoot->isChecked());
+    config->setValue("RootEncrypt", checkBoxEncryptHome->isChecked());
+    config->setValue("RootEncrypt", checkBoxEncryptSwap->isChecked());
 
-    config->setValue("Partition/SaveHome", saveHomeCheck->isChecked());
-    config->setValue("Partition/BadBlocksCheck", badblocksCheck->isChecked());
+    config->setValue("RootLabel", rootLabelEdit->text());
+    config->setValue("HomeLabel", homeLabelEdit->text());
+    config->setValue("SwapLabel", swapLabelEdit->text());
+
+    config->setValue("SaveHome", saveHomeCheck->isChecked());
+    config->setValue("BadBlocksCheck", badblocksCheck->isChecked());
+
+    config->endGroup();
     // AES step
-    config->setValue("Encryption/Cipher", comboFDEcipher->currentText());
-    config->setValue("Encryption/ChainMode", comboFDEchain->currentText());
-    config->setValue("Encryption/IVgenerator", comboFDEivgen->currentText());
-    config->setValue("Encryption/IVhash", comboFDEivhash->currentData().toString());
-    config->setValue("Encryption/KeySize", spinFDEkeysize->cleanText());
-    config->setValue("Encryption/LUKSkeyHash", comboFDEhash->currentText().toLower().remove('-'));
-    config->setValue("Encryption/KernelRNG", comboFDErandom->currentText());
-    config->setValue("Encryption/KDFroundTime", spinFDEroundtime->cleanText());
+    config->beginGroup("Encryption");
+    config->setValue("Cipher", comboFDEcipher->currentText());
+    config->setValue("ChainMode", comboFDEchain->currentText());
+    config->setValue("IVgenerator", comboFDEivgen->currentText());
+    config->setValue("IVhash", comboFDEivhash->currentData().toString());
+    config->setValue("KeySize", spinFDEkeysize->cleanText());
+    config->setValue("LUKSkeyHash", comboFDEhash->currentText().toLower().remove('-'));
+    config->setValue("KernelRNG", comboFDErandom->currentText());
+    config->setValue("KDFroundTime", spinFDEroundtime->cleanText());
+    config->endGroup();
     // GRUB step
+    config->beginGroup("GRUB");
     if(grubCheckBox->isChecked()) {
         const char *cfgGrubInstall;
         if(grubMbrButton->isChecked()) cfgGrubInstall = "MBR";
         if(grubPbrButton->isChecked()) cfgGrubInstall = "PBR";
         if(grubEspButton->isChecked()) cfgGrubInstall = "ESP";
-        config->setValue("GRUB/InstallGRUB", cfgGrubInstall);
-        config->setValue("GRUB/GrubLocation", grubBootCombo->currentText().section(" ", 0, 0));
+        config->setValue("InstallGRUB", cfgGrubInstall);
+        config->setValue("GrubLocation", grubBootCombo->currentText().section(" ", 0, 0));
     } else {
-        config->setValue("GRUB/InstallGRUB", false);
+        config->setValue("InstallGRUB", false);
     }
+    config->endGroup();
     // Services step
-    QTreeWidgetItemIterator it(csView, QTreeWidgetItemIterator::Checked);
+    config->beginGroup("Services");
+    QTreeWidgetItemIterator it(csView);
     while (*it) {
         if ((*it)->parent() != NULL) {
-            config->setValue("Services/" + (*it)->text(0), true);
+            config->setValue((*it)->text(0), (*it)->checkState(0));
         }
         ++it;
     }
+    config->endGroup();
     // Network step
-    config->setValue("Network/ComputerName", computerNameEdit->text());
-    config->setValue("Network/Domain", computerDomainEdit->text());
-    config->setValue("Network/Workgroup", computerGroupEdit->text());
-    config->setValue("Network/Samba", sambaCheckBox->isChecked());
+    config->beginGroup("Network");
+    config->setValue("ComputerName", computerNameEdit->text());
+    config->setValue("Domain", computerDomainEdit->text());
+    config->setValue("Workgroup", computerGroupEdit->text());
+    config->setValue("Samba", sambaCheckBox->isChecked());
+    config->endGroup();
     // Localization step
-    config->setValue("Localization/Locale", localeCombo->currentData().toString());
-    config->setValue("Localization/LocalClock", localClockCheckBox->isChecked());
-    config->setValue("Localization/Clock24h", radio24h->isChecked());
-    config->setValue("Localization/Timezone", timezoneCombo->currentText());
+    config->beginGroup("Localization");
+    config->setValue("Locale", localeCombo->currentData().toString());
+    config->setValue("LocalClock", localClockCheckBox->isChecked());
+    config->setValue("Clock24h", radio24h->isChecked());
+    config->setValue("Timezone", timezoneCombo->currentText());
+    config->endGroup();
     // User Accounts step
-    config->setValue("User/Username", userNameEdit->text());
-    config->setValue("User/Autologin", autologinCheckBox->isChecked());
-    config->setValue("User/SaveDesktop", saveDesktopCheckBox->isChecked());
+    config->beginGroup("User");
+    config->setValue("Username", userNameEdit->text());
+    config->setValue("Autologin", autologinCheckBox->isChecked());
+    config->setValue("SaveDesktop", saveDesktopCheckBox->isChecked());
+    config->endGroup();
     // copy config file to installed system
     execute("cp \"" + config->fileName() + "\" /mnt/antiX/var/log", true);
 }
@@ -1373,6 +1380,7 @@ bool MInstall::saveHomeBasic()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (!(saveHomeCheck->isChecked())) return true;
+    cleanup(false); // cleanup previous mounts
     // if preserving /home, obtain some basic information
     bool ok = false;
     const QByteArray &pass = FDEpassCust->text().toUtf8();
@@ -1380,7 +1388,6 @@ bool MInstall::saveHomeBasic()
     QString homedev = homeDevicePreserve;
     // mount the root partition
     if (isRootEncrypted) {
-        execute("cryptsetup luksClose rootfs");
         if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly", false)) return false;
         rootdev = "/dev/mapper/rootfs";
     }
@@ -1388,7 +1395,6 @@ bool MInstall::saveHomeBasic()
     // mount the home partition
     if (homedev != rootDevicePreserve) {
         if (isHomeEncrypted) {
-            execute("cryptsetup luksClose homefs");
             if (!openLuksPartition(homedev, "homefs", pass, "--readonly", false)) goto ending2;
             homedev = "/dev/mapper/homefs";
         }
@@ -2873,8 +2879,10 @@ void MInstall::cleanup(bool endclean)
         execute("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
         execute("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
-    execute("umount -l /mnt/antiX/proc >/dev/null 2>&1; umount -l /mnt/antiX/sys >/dev/null 2>&1; umount -l /mnt/antiX/dev/shm >/dev/null 2>&1; umount -l /mnt/antiX/dev >/dev/null 2>&1", false);
-    execute("umount -lR /mnt/antiX >/dev/null 2>&1", false);
+    execute("umount -l /mnt/antiX/boot/efi", true);
+    execute("(umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev) >/dev/null 2>&1", false);
+    execute("umount -l /mnt/antiX/home", true);
+    execute("umount -lR /mnt/antiX", true);
 
     if (isRootEncrypted) {
         execute("cryptsetup luksClose rootfs", true);
