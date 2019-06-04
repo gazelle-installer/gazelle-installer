@@ -44,7 +44,7 @@ protected:
     void reject();
 
 public:
-    MInstall(const QStringList &args);
+    MInstall(const QStringList &args, const QString &cfgfile = "/etc/minstall.conf");
     ~MInstall();
 
     void checkUefi();
@@ -202,7 +202,7 @@ private:
     QHash<QString, int> removedHome;
     QHash<QString, int> removedSwap;
     QHash<QString, int> removedBoot;
-    QSettings *config;
+    QSettings *config = NULL;
     QString auto_mount;
     QString prevItemRoot; // remember previously selected item in combo box
     QString prevItemHome;
@@ -231,7 +231,8 @@ private:
     int indexFDErandom;
     long iFDEroundtime;
 
-
+    // slots
+    void startup();
     // helpers
     bool execute(const QString &cmd, const bool rawexec = false, const QByteArray &input = QByteArray());
     QString getCmdOut(const QString &cmd, bool everything = false);
