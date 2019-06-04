@@ -26,9 +26,14 @@
 
 #include "minstall.h"
 
-MInstall::MInstall(const QStringList &args)
+MInstall::MInstall(const QStringList &args, const QString &cfgfile)
 {
     setupUi(this);
+    updateCursor(Qt::WaitCursor);
+    this->setEnabled(false);
+    setWindowFlags(Qt::Window); // for the close, min and max buttons
+    installBox->hide();
+    gotoPage(0);
     proc = new QProcess(this);
 
     pretend = (args.contains("--pretend") || args.contains("-p"));
@@ -55,23 +60,38 @@ MInstall::MInstall(const QStringList &args)
     REMOVE_NOSPLASH=settings.value("REMOVE_NOSPLASH", "false").toBool();
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
-    // save config
-    config = new QSettings(PROJECTNAME, "minstall", this);
-
-    // set default host name
-    computerNameEdit->setText(DEFAULT_HOSTNAME);
+    // config file
+    if (QFile::exists(cfgfile)) {
+        config = new QSettings(cfgfile, QSettings::NativeFormat, this);
+    }
 
     // set some distro-centric text
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME).arg(PROJECTFORUM));
+
+    // ensure the help widgets are displayed correctly when started
+    // Qt will delete the heap-allocated event object when posted
+    qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
+
+    QTimer::singleShot(0, this, &MInstall::startup);
+}
+
+MInstall::~MInstall() {
+}
+
+// meant to be run after the installer becomes visible
+void MInstall::startup()
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+
+    // set default host name
+    computerNameEdit->setText(DEFAULT_HOSTNAME);
 
     // advanced encryption settings page defaults
     on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
     on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
     on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
     stashAdvancedFDE(true);
-
-    setupkeyboardbutton();
 
     rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
     homeLabelEdit->setText("home" + PROJECTSHORTNAME);
@@ -93,22 +113,15 @@ MInstall::MInstall(const QStringList &args)
     gbEncrPass->hide();
     existing_partitionsButton->hide();
 
-    installBox->hide();
-    gotoPage(0);
-
+    setupkeyboardbutton();
     if (!pretend) {
         // disable automounting in Thunar
         auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
     }
 
-    setWindowFlags(Qt::Window); // for the close, min and max buttons
-    // ensure the help widgets are displayed correctly when started
-    // Qt will delete the heap-allocated event object when posted
-    qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
-}
-
-MInstall::~MInstall() {
+    this->setEnabled(true);
+    updateCursor();
 }
 
 /////////////////////////////////////////////////////////////////////////
