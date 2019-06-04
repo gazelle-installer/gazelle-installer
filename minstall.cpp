@@ -31,8 +31,9 @@ MInstall::MInstall(const QStringList &args)
     setupUi(this);
     proc = new QProcess(this);
 
-    nocopy = (args.contains("--nocopy") || args.contains("-n"));
     pretend = (args.contains("--pretend") || args.contains("-p"));
+    automatic = (args.contains("--auto") || args.contains("-a"));
+    nocopy = (args.contains("--nocopy") || args.contains("-n"));
     sync = (args.contains("--sync") || args.contains("-s"));
     if (pretend) listHomes = args; // dummy existing homes
 
@@ -621,91 +622,90 @@ void MInstall::removeItemCombo(QComboBox *cb, const QString *part)
 void MInstall::saveConfig()
 {
     if (phase < 0) return;
+    QSettings confout("/mnt/antiX/var/log/minstall.conf", QSettings::NativeFormat);
     // Disk step
-    config->beginGroup("Disk");
-    config->setValue("Disk", diskCombo->currentText().section(" ", 0, 0));
-    config->setValue("Encrypted", checkBoxEncryptAuto->isChecked());
-    config->setValue("EntireDisk", entireDiskButton->isChecked());
-    config->endGroup();
+    confout.beginGroup("Disk");
+    confout.setValue("Disk", diskCombo->currentText().section(" ", 0, 0));
+    confout.setValue("Encrypted", checkBoxEncryptAuto->isChecked());
+    confout.setValue("EntireDisk", entireDiskButton->isChecked());
+    confout.endGroup();
     // Partition step
-    config->beginGroup("Partition");
+    confout.beginGroup("Partition");
 
-    config->setValue("Root", rootCombo->currentText().section(" ", 0, 0));
-    config->setValue("Home", homeCombo->currentText().section(" ", 0, 0));
-    config->setValue("Swap", swapCombo->currentText().section(" ", 0, 0));
-    config->setValue("Boot", bootCombo->currentText().section(" ", 0, 0));
+    confout.setValue("Root", rootCombo->currentText().section(" ", 0, 0));
+    confout.setValue("Home", homeCombo->currentText().section(" ", 0, 0));
+    confout.setValue("Swap", swapCombo->currentText().section(" ", 0, 0));
+    confout.setValue("Boot", bootCombo->currentText().section(" ", 0, 0));
 
-    config->setValue("RootType", rootTypeCombo->currentText());
-    config->setValue("HomeType", homeTypeCombo->currentText());
+    confout.setValue("RootType", rootTypeCombo->currentText());
+    confout.setValue("HomeType", homeTypeCombo->currentText());
 
-    config->setValue("RootEncrypt", checkBoxEncryptRoot->isChecked());
-    config->setValue("RootEncrypt", checkBoxEncryptHome->isChecked());
-    config->setValue("RootEncrypt", checkBoxEncryptSwap->isChecked());
+    confout.setValue("RootEncrypt", checkBoxEncryptRoot->isChecked());
+    confout.setValue("RootEncrypt", checkBoxEncryptHome->isChecked());
+    confout.setValue("RootEncrypt", checkBoxEncryptSwap->isChecked());
 
-    config->setValue("RootLabel", rootLabelEdit->text());
-    config->setValue("HomeLabel", homeLabelEdit->text());
-    config->setValue("SwapLabel", swapLabelEdit->text());
+    confout.setValue("RootLabel", rootLabelEdit->text());
+    confout.setValue("HomeLabel", homeLabelEdit->text());
+    confout.setValue("SwapLabel", swapLabelEdit->text());
 
-    config->setValue("SaveHome", saveHomeCheck->isChecked());
-    config->setValue("BadBlocksCheck", badblocksCheck->isChecked());
+    confout.setValue("SaveHome", saveHomeCheck->isChecked());
+    confout.setValue("BadBlocksCheck", badblocksCheck->isChecked());
 
-    config->endGroup();
+    confout.endGroup();
     // AES step
-    config->beginGroup("Encryption");
-    config->setValue("Cipher", comboFDEcipher->currentText());
-    config->setValue("ChainMode", comboFDEchain->currentText());
-    config->setValue("IVgenerator", comboFDEivgen->currentText());
-    config->setValue("IVhash", comboFDEivhash->currentData().toString());
-    config->setValue("KeySize", spinFDEkeysize->cleanText());
-    config->setValue("LUKSkeyHash", comboFDEhash->currentText().toLower().remove('-'));
-    config->setValue("KernelRNG", comboFDErandom->currentText());
-    config->setValue("KDFroundTime", spinFDEroundtime->cleanText());
-    config->endGroup();
+    confout.beginGroup("Encryption");
+    confout.setValue("Cipher", comboFDEcipher->currentText());
+    confout.setValue("ChainMode", comboFDEchain->currentText());
+    confout.setValue("IVgenerator", comboFDEivgen->currentText());
+    confout.setValue("IVhash", comboFDEivhash->currentData().toString());
+    confout.setValue("KeySize", spinFDEkeysize->cleanText());
+    confout.setValue("LUKSkeyHash", comboFDEhash->currentText().toLower().remove('-'));
+    confout.setValue("KernelRNG", comboFDErandom->currentText());
+    confout.setValue("KDFroundTime", spinFDEroundtime->cleanText());
+    confout.endGroup();
     // GRUB step
-    config->beginGroup("GRUB");
+    confout.beginGroup("GRUB");
     if(grubCheckBox->isChecked()) {
         const char *cfgGrubInstall;
         if(grubMbrButton->isChecked()) cfgGrubInstall = "MBR";
         if(grubPbrButton->isChecked()) cfgGrubInstall = "PBR";
         if(grubEspButton->isChecked()) cfgGrubInstall = "ESP";
-        config->setValue("InstallGRUB", cfgGrubInstall);
-        config->setValue("GrubLocation", grubBootCombo->currentText().section(" ", 0, 0));
+        confout.setValue("InstallGRUB", cfgGrubInstall);
+        confout.setValue("GrubLocation", grubBootCombo->currentText().section(" ", 0, 0));
     } else {
-        config->setValue("InstallGRUB", false);
+        confout.setValue("InstallGRUB", false);
     }
-    config->endGroup();
+    confout.endGroup();
     // Services step
-    config->beginGroup("Services");
+    confout.beginGroup("Services");
     QTreeWidgetItemIterator it(csView);
     while (*it) {
         if ((*it)->parent() != NULL) {
-            config->setValue((*it)->text(0), (*it)->checkState(0));
+            confout.setValue((*it)->text(0), (*it)->checkState(0));
         }
         ++it;
     }
-    config->endGroup();
+    confout.endGroup();
     // Network step
-    config->beginGroup("Network");
-    config->setValue("ComputerName", computerNameEdit->text());
-    config->setValue("Domain", computerDomainEdit->text());
-    config->setValue("Workgroup", computerGroupEdit->text());
-    config->setValue("Samba", sambaCheckBox->isChecked());
-    config->endGroup();
+    confout.beginGroup("Network");
+    confout.setValue("ComputerName", computerNameEdit->text());
+    confout.setValue("Domain", computerDomainEdit->text());
+    confout.setValue("Workgroup", computerGroupEdit->text());
+    confout.setValue("Samba", sambaCheckBox->isChecked());
+    confout.endGroup();
     // Localization step
-    config->beginGroup("Localization");
-    config->setValue("Locale", localeCombo->currentData().toString());
-    config->setValue("LocalClock", localClockCheckBox->isChecked());
-    config->setValue("Clock24h", radio24h->isChecked());
-    config->setValue("Timezone", timezoneCombo->currentText());
-    config->endGroup();
+    confout.beginGroup("Localization");
+    confout.setValue("Locale", localeCombo->currentData().toString());
+    confout.setValue("LocalClock", localClockCheckBox->isChecked());
+    confout.setValue("Clock24h", radio24h->isChecked());
+    confout.setValue("Timezone", timezoneCombo->currentText());
+    confout.endGroup();
     // User Accounts step
-    config->beginGroup("User");
-    config->setValue("Username", userNameEdit->text());
-    config->setValue("Autologin", autologinCheckBox->isChecked());
-    config->setValue("SaveDesktop", saveDesktopCheckBox->isChecked());
-    config->endGroup();
-    // copy config file to installed system
-    execute("cp \"" + config->fileName() + "\" /mnt/antiX/var/log", true);
+    confout.beginGroup("User");
+    confout.setValue("Username", userNameEdit->text());
+    confout.setValue("Autologin", autologinCheckBox->isChecked());
+    confout.setValue("SaveDesktop", saveDesktopCheckBox->isChecked());
+    confout.endGroup();
 }
 
 // update partition combos
@@ -2023,9 +2023,8 @@ bool MInstall::validateComputerName()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // see if name is reasonable
     nextFocus = computerNameEdit;
-    if (computerNameEdit->text().length() < 2) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Sorry, your computer name needs to be\nat least 2 characters long. You'll have to\nselect a different name before proceeding."));
+    if (computerNameEdit->text().isEmpty()) {
+        QMessageBox::critical(this, windowTitle(), tr("Please enter a computer name."));
         return false;
     } else if (computerNameEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(this, windowTitle(),
@@ -2034,9 +2033,8 @@ bool MInstall::validateComputerName()
     }
     // see if name is reasonable
     nextFocus = computerDomainEdit;
-    if (computerDomainEdit->text().length() < 2) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Sorry, your computer domain needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
+    if (computerDomainEdit->text().isEmpty()) {
+        QMessageBox::critical(this, windowTitle(), tr("Please enter a domain name."));
         return false;
     } else if (computerDomainEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(this, windowTitle(),
@@ -2046,9 +2044,8 @@ bool MInstall::validateComputerName()
 
     if (haveSamba) {
         // see if name is reasonable
-        if (computerGroupEdit->text().length() < 2) {
-            QMessageBox::critical(this, windowTitle(),
-                                  tr("Sorry, your workgroup needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
+        if (computerGroupEdit->text().isEmpty()) {
+            QMessageBox::critical(this, windowTitle(), tr("Please enter a workgroup."));
             nextFocus = computerGroupEdit;
             return false;
         }
