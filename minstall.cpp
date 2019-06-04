@@ -61,9 +61,8 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
     // config file
-    if (QFile::exists(cfgfile)) {
-        config = new QSettings(cfgfile, QSettings::NativeFormat, this);
-    }
+    config = new QSettings(QFile::exists(cfgfile) ? cfgfile : "/dev/null",
+                           QSettings::NativeFormat, this);
 
     // set some distro-centric text
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
