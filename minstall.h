@@ -172,7 +172,7 @@ private:
     int phase = 0;
 
     // command line options
-    bool pretend, nocopy, sync;
+    bool pretend, automatic, nocopy, sync;
 
     bool formatSwap = false;
     bool isHomeEncrypted = false;
