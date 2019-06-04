@@ -657,9 +657,9 @@ void MInstall::saveConfig()
     confout.setValue("Cipher", comboFDEcipher->currentText());
     confout.setValue("ChainMode", comboFDEchain->currentText());
     confout.setValue("IVgenerator", comboFDEivgen->currentText());
-    confout.setValue("IVhash", comboFDEivhash->currentData().toString());
+    confout.setValue("IVhash", comboFDEivhash->currentText());
     confout.setValue("KeySize", spinFDEkeysize->cleanText());
-    confout.setValue("LUKSkeyHash", comboFDEhash->currentText().toLower().remove('-'));
+    confout.setValue("LUKSkeyHash", comboFDEhash->currentText());
     confout.setValue("KernelRNG", comboFDErandom->currentText());
     confout.setValue("KDFroundTime", spinFDEroundtime->cleanText());
     confout.endGroup();
