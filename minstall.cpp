@@ -2023,9 +2023,8 @@ bool MInstall::validateComputerName()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // see if name is reasonable
     nextFocus = computerNameEdit;
-    if (computerNameEdit->text().length() < 2) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Sorry, your computer name needs to be\nat least 2 characters long. You'll have to\nselect a different name before proceeding."));
+    if (computerNameEdit->text().isEmpty()) {
+        QMessageBox::critical(this, windowTitle(), tr("Please enter a computer name."));
         return false;
     } else if (computerNameEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(this, windowTitle(),
@@ -2034,9 +2033,8 @@ bool MInstall::validateComputerName()
     }
     // see if name is reasonable
     nextFocus = computerDomainEdit;
-    if (computerDomainEdit->text().length() < 2) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Sorry, your computer domain needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
+    if (computerDomainEdit->text().isEmpty()) {
+        QMessageBox::critical(this, windowTitle(), tr("Please enter a domain name."));
         return false;
     } else if (computerDomainEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(this, windowTitle(),
@@ -2046,9 +2044,8 @@ bool MInstall::validateComputerName()
 
     if (haveSamba) {
         // see if name is reasonable
-        if (computerGroupEdit->text().length() < 2) {
-            QMessageBox::critical(this, windowTitle(),
-                                  tr("Sorry, your workgroup needs to be at least\n2 characters long. You'll have to select a different\nname before proceeding."));
+        if (computerGroupEdit->text().isEmpty()) {
+            QMessageBox::critical(this, windowTitle(), tr("Please enter a workgroup."));
             nextFocus = computerGroupEdit;
             return false;
         }
