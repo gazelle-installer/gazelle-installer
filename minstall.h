@@ -35,6 +35,20 @@ public:
     void erase();
 };
 
+struct BlockDeviceInfo {
+    QString name;
+    QString uuid;
+    QString model;
+    qint64 size;
+    struct {
+        bool disk : 1;
+        bool native : 1;
+        bool boot : 1;
+        bool esp : 1;
+        bool swap : 1;
+    } flags;
+};
+
 class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
 protected:
@@ -184,6 +198,7 @@ private:
     bool haveSysConfig = false;
 
     QWidget *nextFocus = NULL;
+    QList<BlockDeviceInfo> listBlkDevs;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
     QStringList listHomes;
@@ -239,6 +254,7 @@ private:
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
+    void buildBlockDevList();
     bool pretendToInstall(int start, int stop, int sleep);
     void prepareToInstall();
     bool saveHomeBasic();
