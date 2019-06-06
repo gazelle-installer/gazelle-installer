@@ -50,8 +50,8 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     PROJECTURL=settings.value("PROJECT_URL").toString();
     PROJECTFORUM=settings.value("FORUM_URL").toString();
     INSTALL_FROM_ROOT_DEVICE=settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
-    MIN_ROOT_DEVICE_SIZE=settings.value("MIN_ROOT_DRIVE_SIZE").toString();
-    MIN_BOOT_DEVICE_SIZE=settings.value("MIN_BOOT_DRIVE_SIZE", "256").toString();
+    MIN_ROOT_DEVICE_SIZE=settings.value("MIN_ROOT_DRIVE_SIZE").toLongLong() * 1048576;
+    MIN_BOOT_DEVICE_SIZE=settings.value("MIN_BOOT_DRIVE_SIZE", "256").toLongLong() * 1048576;
     DEFAULT_HOSTNAME=settings.value("DEFAULT_HOSTNAME").toString();
     ENABLE_SERVICES=settings.value("ENABLE_SERVICES").toStringList();
     POPULATE_MEDIA_MOUNTPOINTS=settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
@@ -122,6 +122,7 @@ void MInstall::startup()
 
     this->setEnabled(true);
     updateCursor();
+
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -1029,14 +1030,14 @@ bool MInstall::validateChosenPartitions()
             }
         }
     }
-    QString rootdev = "/dev/" + rootCombo->currentText().section(" -", 0, 0).trimmed();
-    QString homedev = "/dev/" + homeCombo->currentText().section(" -", 0, 0).trimmed();
-    QString swapdev = "/dev/" + swapCombo->currentText().section(" -", 0, 0).trimmed();
+    QString rootdev = "/dev/" + rootCombo->currentText().section(" ", 0, 0).trimmed();
+    QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0).trimmed();
+    QString swapdev = "/dev/" + swapCombo->currentText().section(" ", 0, 0).trimmed();
     homedev = (homedev == "/dev/root") ? rootdev : homedev;
     if (bootCombo->currentText() == "root") {
         bootdev = rootdev;
     } else {
-        bootdev = "/dev/" + bootCombo->currentText().section(" -", 0, 0).trimmed();
+        bootdev = "/dev/" + bootCombo->currentText().section(" ", 0, 0).trimmed();
     }
 
     if (rootdev == "/dev/none" || rootdev == "/dev/") {
@@ -1050,10 +1051,15 @@ bool MInstall::validateChosenPartitions()
     QString msgConfirm;
     QStringList msgFormatList;
 
-    // warn if using a non-Linux partition (potential Windows install)
-    if (!execute(QString("partition-info is-linux=%1").arg(rootdev), false)) {
-        msgForeignList << rootdev << "/ (root)";
-    }
+    // warn if using a non-Linux partition (potential install of another OS)
+    auto lambdaForeignTrap = [this,&msgForeignList](const QString &devname, const QString &desc) -> void {
+        for (const BlockDeviceInfo &bdinfo : this->listBlkDevs) {
+            if (bdinfo.flags.native && QString("/dev/" + bdinfo.name) == devname) return;
+        }
+        msgForeignList << devname << desc;
+    };
+
+    lambdaForeignTrap(rootdev, "/ (root)");
 
     // warn on formatting or deletion
     if (!(saveHomeCheck->isChecked() && homedev == rootdev)) {
@@ -1064,9 +1070,7 @@ bool MInstall::validateChosenPartitions()
 
     // format /home?
     if (homedev != rootdev) {
-        if (!execute(QString("partition-info is-linux=%1").arg(homedev), false)) {
-            msgForeignList << homedev << "/home";
-        }
+        lambdaForeignTrap(homedev, "/home");
         if (saveHomeCheck->isChecked()) {
             msgConfirm += " - " + tr("Reuse (no reformat) %1 as the /home partition").arg(homedev) + "\n";
         } else {
@@ -1076,10 +1080,11 @@ bool MInstall::validateChosenPartitions()
 
     // format swap? (if no swap is chosen do nothing)
     if (swapdev != "/dev/none") {
-        if (!execute(QString("partition-info is-linux=%1").arg(swapdev), false)) {
-            msgForeignList << swapdev << "swap";
+        lambdaForeignTrap(swapdev, "swap");
+        formatSwap = checkBoxEncryptSwap->isChecked();
+        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+            if (!bdinfo.flags.swap && QString("/dev/" + bdinfo.name) == swapdev) formatSwap = true;
         }
-        formatSwap = checkBoxEncryptSwap->isChecked() || !execute(QString("partition-info %1 | cut -d- -f3 | grep swap").arg(swapdev), false);
         if (formatSwap) {
             msgFormatList << swapdev << "swap";
         } else {
@@ -1094,10 +1099,7 @@ bool MInstall::validateChosenPartitions()
     // format /boot?
     if (bootCombo->currentText() != "root") {
         msgFormatList << bootdev << "/boot";
-        // warn if using a non-Linux partition (potential Windows install)
-        if (!execute(QString("partition-info is-linux=%1").arg(bootdev), false)) {
-            msgForeignList << bootdev << "/boot";
-        }
+        lambdaForeignTrap(bootdev, "/boot");
         // warn if partition too big (not needed for boot, likely data or other useful partition
         QString size_str = getCmdOut("lsblk -nbo SIZE " + bootdev + "|head -n1").trimmed();
         bool ok = true;
@@ -1324,63 +1326,45 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     const bool saveHome = saveHomeCheck->isChecked();
     QString cmd;
 
-    if (checkBoxEncryptRoot->isChecked()) {
-        isRootEncrypted = true;
-    }
-
-    QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0).trimmed();
-    bool gpt = isGpt(drv);
-
-    // Root
-    QString rootdev = rootDevicePreserve;
-    QStringList rootsplit = getCmdOut("partition-info split-device=" + rootdev).split(" ", QString::SkipEmptyParts);
-
-    // Swap
-    QString swapdev = swapDevicePreserve;
-    if (checkBoxEncryptSwap->isChecked() && swapdev != "/dev/none") {
-        isSwapEncrypted = true;
-    }
-    QStringList swapsplit = getCmdOut("partition-info split-device=" + swapdev).split(" ", QString::SkipEmptyParts);
-
-    // Boot
-    QStringList bootsplit = getCmdOut("partition-info split-device=" + bootdev).split(" ", QString::SkipEmptyParts);
-
-    // Home
-    QString homedev = homeDevicePreserve;
-
-    if (checkBoxEncryptHome->isChecked() && homedev != rootdev) {
-        isHomeEncrypted = true;
-    }
-    QStringList homesplit = getCmdOut("partition-info split-device=" + homedev).split(" ", QString::SkipEmptyParts);
-
     updateStatus(tr("Preparing required partitions"));
 
     // command to set the partition type
-    if (gpt) {
+    if (isGpt("/dev/" + diskCombo->currentText().section(" ", 0, 0).trimmed())) {
         cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
     } else {
         cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
     }
+
     // maybe format swap
-    if (swapdev != "/dev/none") {
-        execute("pumount " + swapdev);
+    if (swapDevicePreserve != "/dev/none") {
+        if (checkBoxEncryptSwap->isChecked()) isSwapEncrypted = true;
+        execute("pumount " + swapDevicePreserve);
+        QStringList swapsplit = splitDevice(swapDevicePreserve);
         execute(cmd.arg(swapsplit[0], swapsplit[1]));
     }
+
+    if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
     // maybe format root (if not saving /home on root) // or if using --sync option
-    if (!(saveHome && homedev == rootdev) && !sync) {
-        execute("pumount " + rootdev);
+    if (!(saveHome && homeDevicePreserve == rootDevicePreserve) && !sync) {
+        execute("pumount " + rootDevicePreserve);
+        QStringList rootsplit = splitDevice(rootDevicePreserve);
         execute(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
         rootType = rootTypeCombo->currentText().toUtf8();
     }
+
     // format and mount /boot if different than root
     if (bootCombo->currentText() != "root") {
+        QStringList bootsplit = splitDevice(bootdev);
         execute(cmd.arg(bootsplit[0]).arg(bootsplit[1]));
         formatBoot = true;
     }
+
     // prepare home if not being preserved, and on a different partition
-    if (homedev != rootdev) {
-        execute("pumount " + homedev);
+    if (homeDevicePreserve != rootDevicePreserve) {
+        if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
+        execute("pumount " + homeDevicePreserve);
         if (!saveHome) {
+            QStringList homesplit = splitDevice(homeDevicePreserve);
             execute(cmd.arg(homesplit[0]).arg(homesplit[1]));
             homeType = homeTypeCombo->currentText().toUtf8();
         }
@@ -2574,29 +2558,21 @@ void MInstall::updatePartitionWidgets()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
     // see if there are any partitions in the system
-    bool foundPartitions = false;
-    QFile file("/proc/partitions");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        QRegularExpression regexp("((x?[h,s,v]d[a-z]*)|((mmcblk|nvme).*p))[0-9]");
-        while (!foundPartitions) {
-            QString line(file.readLine());
-            if (line.contains(regexp)) foundPartitions = true;
-            else if (line.isEmpty()) break;
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (!bdinfo.flags.disk) {
+            // found at least one partition
+            existing_partitionsButton->show();
+            existing_partitionsButton->setChecked(true);
+            return;
         }
-        file.close();
     }
-
-    if (foundPartitions) {
-        existing_partitionsButton->show();
-        existing_partitionsButton->setChecked(true);
-    } else {
-        existing_partitionsButton->hide();
-        entireDiskButton->setChecked(true);
-    }
+    // reached the end = no partitions
+    existing_partitionsButton->hide();
+    entireDiskButton->setChecked(true);
 }
 
 // return block device info that is suitable for a combo box
-QString BlockDeviceInfo::comboFormat()
+QString BlockDeviceInfo::comboFormat() const
 {
     static const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
     unsigned int isuffix = 0;
@@ -2610,6 +2586,17 @@ QString BlockDeviceInfo::comboFormat()
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
     return strout + ")";
+}
+
+QStringList MInstall::splitDevice(const QString &devname) const
+{
+    static const QRegularExpression rxdev1("^(mmcblk.*|nvme.*)p([0-9]*)$");
+    static const QRegularExpression rxdev2("^([a-z]*)([0-9]*)$");
+    QRegularExpressionMatch rxmatch(rxdev1.match(devname));
+    if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
+    QStringList list(rxmatch.capturedTexts());
+    if (!list.isEmpty()) list.removeFirst();
+    return list;
 }
 
 void MInstall::buildBlockDevList()
@@ -2644,7 +2631,7 @@ void MInstall::buildBlockDevList()
         bdinfo.uuid = bdsegs.at(2);
         bdinfo.size = bdsegs.at(3).toLongLong();
         bdinfo.flags.disk = (bdsegs.at(0) == "disk");
-        bdinfo.flags.boot = (bdinfo.uuid == bootUUID);
+        bdinfo.flags.boot = (!bootUUID.isEmpty() && bdinfo.uuid == bootUUID);
         if (segsize > 4) {
             bdinfo.flags.esp = (bdsegs.at(4).count(rxESP) >= 1);
             bdinfo.flags.swap = (bdsegs.at(4).count(rxSwap) >= 1);
@@ -2668,7 +2655,7 @@ void MInstall::buildBlockDevList()
     }
 
     // debug
-    for (BlockDeviceInfo &bdi : listBlkDevs) {
+    for (const BlockDeviceInfo &bdi : listBlkDevs) {
         qDebug() << bdi.comboFormat() << ", UUID:" << bdi.uuid << ", Disk:" << bdi.flags.disk
                  << ", Boot:" << bdi.flags.boot << ", ESP:" << bdi.flags.esp
                  << ", Native:" << bdi.flags.native << ", Swap:" << bdi.flags.swap;
@@ -2685,17 +2672,16 @@ void MInstall::updateDiskInfo()
     diskCombo->addItem(tr("Loading..."));
 
     if (!pretend) execute("/sbin/swapoff -a", true); // kludge - live boot automatically activates swap
-    execute("/sbin/partprobe", true);
+    buildBlockDevList();
     updatePartitionWidgets();
-    //  shell.run("umount -a 2>/dev/null");
-    QString exclude = " --exclude=boot";
-    if (INSTALL_FROM_ROOT_DEVICE) {
-        exclude.clear();
-    }
-    listBootDrives = getCmdOuts("partition-info" + exclude + " --min-size=" + MIN_ROOT_DEVICE_SIZE + " -n drives");
     indexPartInfoDisk = -1;
     diskCombo->clear();
-    diskCombo->addItems(listBootDrives);
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (bdinfo.flags.disk && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
+                && (!bdinfo.flags.boot || INSTALL_FROM_ROOT_DEVICE)) {
+            diskCombo->addItem(bdinfo.comboFormat());
+        }
+    }
     diskCombo->setCurrentIndex(0);
     diskCombo->setEnabled(true);
 }
@@ -2843,7 +2829,7 @@ void MInstall::on_qtpartedButton_clicked()
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
     execute("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager", false);
-    execute("/sbin/partprobe", true);
+    buildBlockDevList();
     updatePartitionWidgets();
     indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
@@ -2862,52 +2848,29 @@ void MInstall::updatePartInfo()
 {
     if (indexPartInfoDisk == diskCombo->currentIndex()) return;
     indexPartInfoDisk = diskCombo->currentIndex();
-
-    if (phase < 1) {
-        const QString &sloading = tr("Loading...");
-        rootCombo->clear();
-        swapCombo->clear();
-        homeCombo->clear();
-        bootCombo->clear();
-        rootCombo->addItem(sloading);
-        swapCombo->addItem(sloading);
-        homeCombo->addItem(sloading);
-        bootCombo->addItem(sloading);
-    }
-
-    QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
-
-    // build rootCombo
-    QString exclude;
-    if (!INSTALL_FROM_ROOT_DEVICE) {
-        exclude = "boot,";
-    }
-    QStringList partitions = getCmdOuts(QString("partition-info -n --exclude=" + exclude + "swap --min-size=" + MIN_ROOT_DEVICE_SIZE + " %1").arg(drv));
     rootCombo->clear();
-    if (partitions.size() > 0) {
-        rootCombo->addItems(partitions);
-    } else {
-        rootCombo->addItem("none");
-    }
-
-    // build homeCombo for all disks
-    partitions = getCmdOuts("partition-info all -n --exclude=" + exclude + "swap --min-size=1000");
-    homeCombo->clear();
-    homeCombo->addItem("root");
-    homeCombo->addItems(partitions);
-
-    // build swapCombo for all disks
-    partitions = getCmdOuts("partition-info all -n --exclude=" + exclude);
     swapCombo->clear();
-    swapCombo->addItem("none");
-    swapCombo->addItems(partitions);
-
-    // build bootCombo for all disks, exclude ESP (EFI)
-    partitions = getCmdOuts("partition-info all -n --exclude=" + exclude + "efi --min-size=" + MIN_BOOT_DEVICE_SIZE);
+    homeCombo->clear();
     bootCombo->clear();
+    homeCombo->addItem("root");
+    swapCombo->addItem("none");
     bootCombo->addItem("root");
-    bootCombo->addItems(partitions);
 
+    QString drv = diskCombo->currentText().section(" ", 0, 0);
+
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (!bdinfo.flags.disk && (!bdinfo.flags.boot || INSTALL_FROM_ROOT_DEVICE)) {
+            const QString &cfmt = bdinfo.comboFormat();
+            if (!bdinfo.flags.swap) {
+                if (bdinfo.size >= MIN_ROOT_DEVICE_SIZE && bdinfo.name.startsWith(drv)) rootCombo->addItem(cfmt);
+                homeCombo->addItem(cfmt);
+            }
+            swapCombo->addItem(cfmt);
+            if (!bdinfo.flags.esp && bdinfo.size >= MIN_BOOT_DEVICE_SIZE) bootCombo->addItem(cfmt);
+        }
+    }
+    // if there was no suitable root, add an entry to let the user know
+    if (rootCombo->count() == 0) rootCombo->addItem("none");
     on_rootCombo_activated(rootCombo->currentText());
 }
 
@@ -3405,25 +3368,34 @@ void MInstall::on_grubEspButton_toggled()
 // build ESP list available to install GRUB
 void MInstall::buildBootLists()
 {
+    buildBlockDevList();
+
+    // build partition list available to install GRUB (in PBR)
+    listBootPart.clear();
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (bdinfo.flags.disk) listBootDrives << bdinfo.comboFormat();
+        else if (!(bdinfo.flags.swap || bdinfo.flags.boot || bdinfo.flags.esp)
+                 && bdinfo.flags.native) { // list only Linux partitions
+            if (getCmdOut("blkid /dev/" + bdinfo.name + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
+                listBootPart << bdinfo.comboFormat();
+            }
+        }
+    }
+    if (grubMbrButton->isChecked()) on_grubMbrButton_toggled(); // force a refresh
+
     // check if booted UEFI and if ESP(s) available
     grubEspButton->setEnabled(false);
+    listBootESP.clear();
     if (uefi) {
-        const QStringList drives = getCmdOuts("partition-info drives --noheadings --exclude=boot | awk '{print $1}'");
-
+        // backup detection for drives that don't have UUID for ESP
+        const QStringList backup_list = getCmdOuts("fdisk -l -o DEVICE,TYPE |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
         // find ESP for all partitions on all drives
-        listBootESP.clear();
-        for (const QString &drive : drives) {
-            if (isGpt("/dev/" + drive)) {
-                QString esps = getCmdOut("lsblk -nlo name,parttype /dev/" + drive + " | egrep '(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$' | awk '{print $1}'", true);
-                if (!esps.isEmpty()) {
-                    listBootESP << esps.split("\n");
-                }
-                // backup detection for drives that don't have UUID for ESP
-                const QStringList backup_list = getCmdOuts("fdisk -l -o DEVICE,TYPE /dev/" + drive + " |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
-                for (const QString &part : backup_list) {
-                    if (!listBootESP.contains(part)) {
-                        listBootESP << part;
-                    }
+        bool gpt = false;
+        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+            if (bdinfo.flags.disk) gpt = isGpt("/dev/" + bdinfo.name);
+            else if (gpt && !bdinfo.flags.boot) {
+                if (bdinfo.flags.esp || backup_list.contains(bdinfo.name)) {
+                    listBootESP << bdinfo.comboFormat();
                 }
             }
         }
@@ -3432,17 +3404,6 @@ void MInstall::buildBootLists()
         if (listBootESP.count() > 0) {
             grubEspButton->setEnabled(true);
             grubEspButton->click();
-        }
-    }
-
-    // build partition list available to install GRUB (in PBR)
-    const QStringList part_list = getCmdOuts("partition-info all --noheadings --exclude=swap,boot,efi");
-    listBootPart.clear();
-    for (const QString &part : part_list) {
-        if (execute("partition-info is-linux=" + part.section(" ", 0, 0), false)) { // list only Linux partitions
-            if (getCmdOut("blkid /dev/" + part.section(" ", 0, 0) + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
-                listBootPart << part;
-            }
         }
     }
 }
