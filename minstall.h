@@ -38,6 +38,8 @@ public:
 struct BlockDeviceInfo {
     QString name;
     QString uuid;
+    QString fstype;
+    QString label;
     QString model;
     qint64 size;
     struct {
@@ -47,6 +49,7 @@ struct BlockDeviceInfo {
         bool esp : 1;
         bool swap : 1;
     } flags;
+    QString comboFormat();
 };
 
 class MInstall : public QDialog, public Ui::MeInstall {
