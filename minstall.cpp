@@ -2627,8 +2627,8 @@ void MInstall::buildBlockDevList()
     static const QRegularExpression rxNativeFS("^(btrfs|ext2|ext3|ext4|jfs|nilfs2|reiser4|reiserfs|ufs|xfs)$");
 
     QString bootUUID;
-    if (QFile::exists("./initrd.out")) {
-        QSettings livecfg("./initrd.out", QSettings::NativeFormat);
+    if (QFile::exists("/live/config/initrd.out")) {
+        QSettings livecfg("/live/config/initrd.out", QSettings::NativeFormat);
         bootUUID = livecfg.value("BOOT_UUID").toString();
     }
     // populate the block device list
