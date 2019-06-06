@@ -49,7 +49,7 @@ struct BlockDeviceInfo {
         bool esp : 1;
         bool swap : 1;
     } flags;
-    QString comboFormat();
+    QString comboFormat() const;
 };
 
 class MInstall : public QDialog, public Ui::MeInstall {
@@ -107,10 +107,10 @@ public:
     bool INSTALL_FROM_ROOT_DEVICE;
     bool POPULATE_MEDIA_MOUNTPOINTS;
 
+    qlonglong MIN_BOOT_DEVICE_SIZE;
+    qlonglong MIN_ROOT_DEVICE_SIZE;
     QString DEFAULT_HOSTNAME;
-    QString MIN_BOOT_DEVICE_SIZE;
     QString MIN_INSTALL_SIZE;
-    QString MIN_ROOT_DEVICE_SIZE;
     QString PREFERRED_MIN_INSTALL_SIZE;
     QString PROJECTFORUM;
     QString PROJECTNAME;
@@ -257,6 +257,7 @@ private:
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
+    QStringList splitDevice(const QString &device) const;
     void buildBlockDevList();
     bool pretendToInstall(int start, int stop, int sleep);
     void prepareToInstall();
