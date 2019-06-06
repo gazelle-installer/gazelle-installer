@@ -118,6 +118,7 @@ void MInstall::startup()
         auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
     }
+    buildBlockDevList();
 
     this->setEnabled(true);
     updateCursor();
@@ -2591,6 +2592,58 @@ void MInstall::updatePartitionWidgets()
     } else {
         existing_partitionsButton->hide();
         entireDiskButton->setChecked(true);
+    }
+}
+
+void MInstall::buildBlockDevList()
+{
+    execute("/sbin/partprobe", true);
+
+    // expressions for matching various partition types
+    QRegularExpression rxESP("^(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$");
+    QRegularExpression rxSwap("^(0x82|0657fd6d-a4ab-43c4-84e5-0933c84b4f4f)$");
+    QRegularExpression rxNative("^(0x83|0fc63daf-8483-4772-8e79-3d69d8477de4" // Linux data
+                                "|0x82|0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" // Linux swap
+                                "|44479540-f297-41b2-9af7-d131d5f0458a" // Linux /root x86
+                                "|4f68bce3-e8cd-4db1-96e7-fbcaf984b709" // Linux /root x86-64
+                                "|933ac7e1-2eb4-4f13-b844-0e14e2aef915)$"); // Linux /home
+    QRegularExpression rxNativeFS("^(btrfs|ext2|ext3|ext4|jfs|nilfs2"
+                                  "reiser4|reiserfs|ufs|xfs)$");
+
+    // populate the block device list
+    listBlkDevs.clear();
+    QStringList blkdevs = getCmdOuts("lsblk -brno TYPE,NAME,SIZE,PARTTYPE,FSTYPE,PARTFLAGS,UUID,MODEL"
+                                     " | grep -E '^(disk|part)'");
+    for (const QString &blkdev : blkdevs) {
+        QStringList bdsegs = blkdev.split(' ');
+        BlockDeviceInfo bdinfo;
+        const int segsize = bdsegs.size();
+        if (segsize < 6) continue;
+        bdinfo.name = bdsegs.at(1);
+        bdinfo.size = bdsegs.at(2).toLongLong();
+        bdinfo.flags.disk = (bdsegs.at(0) == "disk");
+        bdinfo.flags.esp = (bdsegs.at(3).count(rxESP) >= 1);
+        bdinfo.flags.swap = (bdsegs.at(3).count(rxSwap) >= 1);
+        bdinfo.flags.native = (bdsegs.at(3).count(rxNative) >= 1
+                               || bdsegs.at(4).count(rxNativeFS) >= 1);
+        const int flags = bdsegs.at(5).toInt(NULL, 0);
+        bdinfo.flags.boot = (flags & 0x80);
+        if (segsize > 6) bdinfo.uuid = bdsegs.at(6);
+        if (segsize > 7) {
+            QString seg = bdsegs.at(7);
+            seg.replace('%', "\\x25");
+            seg.replace("\\x", "%");
+            bdinfo.model = QUrl::fromPercentEncoding(seg.toUtf8()).trimmed();
+        }
+        listBlkDevs << bdinfo;
+    }
+
+    // debug
+    for (BlockDeviceInfo &bdi : listBlkDevs) {
+        qDebug() << bdi.name << ", UUID:" << bdi.uuid << ", Size (MB):" << bdi.size / 1048576
+                 << ", Model:" << bdi.model << ", Disk:" << bdi.flags.disk
+                 << ", Native:" << bdi.flags.native << ", ESP:" << bdi.flags.esp
+                 << ", Swap:" << bdi.flags.swap << ", Boot:" << bdi.flags.boot;
     }
 }
 
