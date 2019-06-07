@@ -42,13 +42,11 @@ struct BlockDeviceInfo {
     QString label;
     QString model;
     qint64 size;
-    struct {
-        bool disk : 1;
-        bool native : 1;
-        bool boot : 1;
-        bool esp : 1;
-        bool swap : 1;
-    } flags;
+    bool isDisk : 1;
+    bool isNative : 1;
+    bool isBoot : 1;
+    bool isESP : 1;
+    bool isSwap : 1;
     QString comboFormat(bool showfs = true) const;
 };
 
