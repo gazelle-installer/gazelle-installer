@@ -1133,6 +1133,7 @@ bool MInstall::validateChosenPartitions()
             QString &s = *it;
             msg += msgPartSel.arg(s).arg((QString)*(++it));
         }
+        if (!msgConfirm.isEmpty()) msg += "\n";
     }
     if (!msgConfirm.isEmpty()) {
         msg += tr("The %1 installer will now perform the following actions:").arg(PROJECTNAME);
@@ -1326,54 +1327,49 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
     const bool saveHome = saveHomeCheck->isChecked();
-    QString cmd;
 
     updateStatus(tr("Preparing required partitions"));
 
-    // command to set the partition type
-    if (isGpt("/dev/" + diskCombo->currentText().section(" ", 0, 0).trimmed())) {
-        cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
-    } else {
-        cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
-    }
+    auto lambdaPreparePart = [this](const QString &strdev) -> void {
+        execute("pumount " + strdev);
+        execute(QStringLiteral("dd if=/dev/zero of=%1 bs=8192 count=1").arg(strdev));
 
-    const QString cmd_clean("dd if=/dev/zero of=%1 bs=8192 count=1");
+        // command to set the partition type
+        const QStringList devsplit = splitDevice(strdev);
+        QString cmd;
+        if (isGpt("/dev/" + devsplit[0])) {
+            cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
+        } else {
+            cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
+        }
+        execute(cmd.arg(devsplit[0], devsplit[1]));
+    };
 
     // maybe format swap
     if (swapDevicePreserve != "/dev/none") {
         if (checkBoxEncryptSwap->isChecked()) isSwapEncrypted = true;
-        execute("pumount " + swapDevicePreserve);
-        QStringList swapsplit = splitDevice(swapDevicePreserve);
-        execute(cmd_clean.arg(swapDevicePreserve));
-        execute(cmd.arg(swapsplit[0], swapsplit[1]));
+        lambdaPreparePart(swapDevicePreserve);
     }
 
     if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
     // maybe format root (if not saving /home on root) // or if using --sync option
     if (!(saveHome && homeDevicePreserve == rootDevicePreserve) && !sync) {
-        execute("pumount " + rootDevicePreserve);
-        QStringList rootsplit = splitDevice(rootDevicePreserve);
-        execute(cmd_clean.arg(rootDevicePreserve));
-        execute(cmd.arg(rootsplit[0], rootsplit[1]));
+        lambdaPreparePart(rootDevicePreserve);
         rootType = rootTypeCombo->currentText().toUtf8();
     }
 
     // format and mount /boot if different than root
     if (bootCombo->currentText() != "root") {
-        QStringList bootsplit = splitDevice(bootdev);
-        execute(cmd_clean.arg(bootdev));
-        execute(cmd.arg(bootsplit[0], bootsplit[1]));
+        lambdaPreparePart(bootdev);
         formatBoot = true;
     }
 
     // prepare home if not being preserved, and on a different partition
     if (homeDevicePreserve != rootDevicePreserve) {
         if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
-        execute("pumount " + homeDevicePreserve);
-        if (!saveHome) {
-            QStringList homesplit = splitDevice(homeDevicePreserve);
-            execute(cmd_clean.arg(homeDevicePreserve));
-            execute(cmd.arg(homesplit[0], homesplit[1]));
+        if (saveHome) execute("pumount " + homeDevicePreserve);
+        else {
+            lambdaPreparePart(homeDevicePreserve);
             homeType = homeTypeCombo->currentText().toUtf8();
         }
     }
