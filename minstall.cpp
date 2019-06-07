@@ -1029,17 +1029,17 @@ bool MInstall::validateChosenPartitions()
             }
         }
     }
-    QString rootdev = "/dev/" + rootCombo->currentText().section(" ", 0, 0).trimmed();
-    QString homedev = "/dev/" + homeCombo->currentText().section(" ", 0, 0).trimmed();
-    QString swapdev = "/dev/" + swapCombo->currentText().section(" ", 0, 0).trimmed();
-    homedev = (homedev == "/dev/root") ? rootdev : homedev;
+    QString rootdev = rootCombo->currentText().section(" ", 0, 0);
+    QString homedev = homeCombo->currentText().section(" ", 0, 0);
+    QString swapdev = swapCombo->currentText().section(" ", 0, 0);
+    homedev = (homedev == "root") ? rootdev : homedev;
     if (bootCombo->currentText() == "root") {
         bootdev = rootdev;
     } else {
-        bootdev = "/dev/" + bootCombo->currentText().section(" ", 0, 0).trimmed();
+        bootdev = bootCombo->currentText().section(" ", 0, 0);
     }
 
-    if (rootdev == "/dev/none" || rootdev == "/dev/") {
+    if (rootdev == "none") {
         QMessageBox::critical(this, windowTitle(),
             tr("You must choose a root partition.\nThe root partition must be at least %1.").arg(MIN_INSTALL_SIZE));
         nextFocus = rootCombo;
@@ -1052,7 +1052,7 @@ bool MInstall::validateChosenPartitions()
 
     // warn if using a non-Linux partition (potential install of another OS)
     auto lambdaForeignTrap = [this,&msgForeignList](const QString &devname, const QString &desc) -> void {
-        int bdindex = listBlkDevs.findDevice(devname);
+        const int bdindex = listBlkDevs.findDevice(devname);
         if (bdindex >= 0 && !listBlkDevs[bdindex].flags.native) {
             msgForeignList << devname << desc;
         }
@@ -1078,12 +1078,11 @@ bool MInstall::validateChosenPartitions()
     }
 
     // format swap? (if no swap is chosen do nothing)
-    if (swapdev != "/dev/none") {
+    if (swapdev != "none") {
         lambdaForeignTrap(swapdev, "swap");
         formatSwap = checkBoxEncryptSwap->isChecked();
-        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (!bdinfo.flags.swap && QString("/dev/" + bdinfo.name) == swapdev) formatSwap = true;
-        }
+        const int bdindex = listBlkDevs.findDevice(swapdev);
+        if (bdindex >= 0 && listBlkDevs[bdindex].flags.swap) formatSwap = true;
         if (formatSwap) {
             msgFormatList << swapdev << "swap";
         } else {
@@ -1100,7 +1099,7 @@ bool MInstall::validateChosenPartitions()
         msgFormatList << bootdev << "/boot";
         lambdaForeignTrap(bootdev, "/boot");
         // warn if partition too big (not needed for boot, likely data or other useful partition
-        QString size_str = getCmdOut("lsblk -nbo SIZE " + bootdev + "|head -n1").trimmed();
+        QString size_str = getCmdOut("lsblk -nbo SIZE /dev/" + bootdev + "|head -n1").trimmed();
         bool ok = true;
         quint64 size = size_str.toULongLong(&ok, 10);
         if (size > 2147483648 || !ok) {  // if > 2GiB or not converted properly
@@ -1148,9 +1147,10 @@ bool MInstall::validateChosenPartitions()
         }
     }
 
-    rootDevicePreserve = rootdev;
-    swapDevicePreserve = swapdev;
-    homeDevicePreserve = homedev;
+    bootdev = "/dev/" + bootdev;
+    rootDevicePreserve = "/dev/" + rootdev;
+    swapDevicePreserve = "/dev/" + swapdev;
+    homeDevicePreserve = "/dev/" + homedev;
     return true;
 }
 
@@ -2594,7 +2594,7 @@ int BlockDeviceList::findDevice(const QString &devname) const
     const int cnt = count();
     for (int ixi = 0; ixi < cnt; ++ixi) {
         const BlockDeviceInfo &bdinfo = at(ixi);
-        if (bdinfo.name == devname || ("/dev/" + bdinfo.name) == devname) return ixi;
+        if (bdinfo.name == devname) return ixi;
     }
     return -1;
 }
