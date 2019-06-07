@@ -118,7 +118,7 @@ void MInstall::startup()
         auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
     }
-    buildBlockDevList();
+    updatePartitionWidgets();
 
     this->setEnabled(true);
     updateCursor();
@@ -2337,17 +2337,15 @@ void MInstall::pageDisplayed(int next)
                              "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                              "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
                              "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
-        if (diskCombo->count() == 0 || phase < 0) {
+        if (phase < 0) {
             updateCursor(Qt::WaitCursor);
-            updateDiskInfo();
+            updatePartitionWidgets();
         }
         phase = 0;
-        this->setEnabled(true);
         updateCursor();
         break;
 
     case 2:  // choose partition
-        updateCursor(Qt::WaitCursor);
         mainHelp->setText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
                              "It's solely your responsibility to backup your data before proceeding.</p>"
                              "<p><b>Choose Partitions</b><br/>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</p>"
@@ -2362,8 +2360,6 @@ void MInstall::pageDisplayed(int next)
                              "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME)+ tr(""
                              "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
                              "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
-        updatePartInfo();
-        updateCursor();
         break;
 
     case 3: // advanced encryption settings
@@ -2561,18 +2557,58 @@ void MInstall::updatePartitionWidgets()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
-    // see if there are any partitions in the system
+    diskCombo->setEnabled(false);
+    diskCombo->clear();
+    diskCombo->addItem(tr("Loading..."));
+    if (!pretend) execute("/sbin/swapoff -a", true); // kludge - live boot automatically activates swap
+    buildBlockDevList();
+
+    // disk combo box
+    diskCombo->clear();
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (bdinfo.isDisk && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
+                && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
+            diskCombo->addItem(bdinfo.comboFormat());
+        }
+    }
+    diskCombo->setCurrentIndex(0);
+    diskCombo->setEnabled(true);
+
+    // whole-disk vs custom-partition radio buttons
+    existing_partitionsButton->hide();
+    entireDiskButton->setChecked(true);
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (!bdinfo.isDisk) {
             // found at least one partition
             existing_partitionsButton->show();
             existing_partitionsButton->setChecked(true);
-            return;
+            break;
         }
     }
-    // reached the end = no partitions
-    existing_partitionsButton->hide();
-    entireDiskButton->setChecked(true);
+
+    // partition combo boxes
+    rootCombo->clear();
+    swapCombo->clear();
+    homeCombo->clear();
+    bootCombo->clear();
+    homeCombo->addItem("root");
+    swapCombo->addItem("none");
+    bootCombo->addItem("root");
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (!bdinfo.isDisk && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
+            const QString &cfmt = bdinfo.comboFormat();
+            if (!bdinfo.isSwap) {
+                if (bdinfo.size >= MIN_ROOT_DEVICE_SIZE) rootCombo->addItem(cfmt);
+                homeCombo->addItem(cfmt);
+            }
+            swapCombo->addItem(cfmt);
+            if (!bdinfo.isESP && bdinfo.size >= MIN_BOOT_DEVICE_SIZE) bootCombo->addItem(cfmt);
+        }
+    }
+    // if there was no suitable root, add an entry to let the user know
+    if (rootCombo->count() == 0) rootCombo->addItem("none");
+    prevItemRoot.clear();
+    on_rootCombo_activated(rootCombo->currentText());
 }
 
 // return block device info that is suitable for a combo box
@@ -2675,30 +2711,6 @@ void MInstall::buildBlockDevList()
                  << ", Boot:" << bdi.isBoot << ", ESP:" << bdi.isESP
                  << ", Native:" << bdi.isNative << ", Swap:" << bdi.isSwap;
     }
-}
-
-// widget being shown
-void MInstall::updateDiskInfo()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-
-    diskCombo->setEnabled(false);
-    diskCombo->clear();
-    diskCombo->addItem(tr("Loading..."));
-
-    if (!pretend) execute("/sbin/swapoff -a", true); // kludge - live boot automatically activates swap
-    buildBlockDevList();
-    updatePartitionWidgets();
-    indexPartInfoDisk = -1;
-    diskCombo->clear();
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDisk && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
-                && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
-            diskCombo->addItem(bdinfo.comboFormat());
-        }
-    }
-    diskCombo->setCurrentIndex(0);
-    diskCombo->setEnabled(true);
 }
 
 void MInstall::buildServiceList()
@@ -2844,7 +2856,6 @@ void MInstall::on_qtpartedButton_clicked()
     nextButton->setEnabled(false);
     qtpartedButton->setEnabled(false);
     execute("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager", false);
-    buildBlockDevList();
     updatePartitionWidgets();
     indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
@@ -2856,39 +2867,6 @@ void MInstall::on_buttonBenchmarkFDE_clicked()
 {
     execute("x-terminal-emulator -e bash -c \"/sbin/cryptsetup benchmark"
             " && echo && read -n 1 -srp 'Press any key to close the benchmark window.'\"");
-}
-
-// disk selection changed, rebuild dropdown menus
-void MInstall::updatePartInfo()
-{
-    if (indexPartInfoDisk == diskCombo->currentIndex()) return;
-    indexPartInfoDisk = diskCombo->currentIndex();
-    rootCombo->clear();
-    swapCombo->clear();
-    homeCombo->clear();
-    bootCombo->clear();
-    homeCombo->addItem("root");
-    swapCombo->addItem("none");
-    bootCombo->addItem("root");
-
-    QString drv = diskCombo->currentText().section(" ", 0, 0);
-
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!bdinfo.isDisk && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
-            const QString &cfmt = bdinfo.comboFormat();
-            if (!bdinfo.isSwap) {
-                if (bdinfo.size >= MIN_ROOT_DEVICE_SIZE && bdinfo.name.startsWith(drv)) rootCombo->addItem(cfmt);
-                homeCombo->addItem(cfmt);
-            }
-            swapCombo->addItem(cfmt);
-            if (!bdinfo.isESP && bdinfo.size >= MIN_BOOT_DEVICE_SIZE) bootCombo->addItem(cfmt);
-        }
-    }
-    // if there was no suitable root, add an entry to let the user know
-    if (rootCombo->count() == 0) rootCombo->addItem("none");
-
-    prevItemRoot.clear();
-    on_rootCombo_activated(rootCombo->currentText());
 }
 
 // root partition changed, rebuild home, swap, boot combo boxes

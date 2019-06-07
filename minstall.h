@@ -104,7 +104,6 @@ public:
     void setLocale();
     void setServices();
     void updatePartCombo(QString *prevItem, const QString &part);
-    void updatePartitionWidgets();
     void writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
@@ -133,7 +132,6 @@ public:
     int showPage(int curr, int next);
     void gotoPage(int next);
     void pageDisplayed(int next);
-    void updateDiskInfo();
     void setupkeyboardbutton();
     bool abort(bool onclose);
     void cleanup(bool endclean = true);
@@ -173,7 +171,6 @@ private slots:
     void on_checkBoxEncryptHome_toggled(bool checked);
     void on_checkBoxEncryptSwap_toggled(bool checked);
 
-    void updatePartInfo();
     void on_rootTypeCombo_activated(QString item = "");
     void on_rootCombo_activated(const QString &arg1 = "");
     void on_homeCombo_activated(const QString &arg1);
@@ -260,6 +257,7 @@ private:
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
+    void updatePartitionWidgets();
     QStringList splitDevice(const QString &device) const;
     void buildBlockDevList();
     bool pretendToInstall(int start, int stop, int sleep);
