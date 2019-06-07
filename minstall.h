@@ -52,6 +52,11 @@ struct BlockDeviceInfo {
     QString comboFormat(bool showfs = true) const;
 };
 
+class BlockDeviceList : public QList<BlockDeviceInfo> {
+public:
+    int findDevice(const QString &devname) const;
+};
+
 class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
 protected:
@@ -201,7 +206,7 @@ private:
     bool haveSysConfig = false;
 
     QWidget *nextFocus = NULL;
-    QList<BlockDeviceInfo> listBlkDevs;
+    BlockDeviceList listBlkDevs;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
     QStringList listHomes;
