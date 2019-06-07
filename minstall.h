@@ -47,7 +47,7 @@ struct BlockDeviceInfo {
     bool isBoot : 1;
     bool isESP : 1;
     bool isSwap : 1;
-    QString comboFormat(bool showfs = true) const;
+    QString comboFormat() const;
 };
 
 class BlockDeviceList : public QList<BlockDeviceInfo> {
