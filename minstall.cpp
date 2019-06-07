@@ -1053,7 +1053,7 @@ bool MInstall::validateChosenPartitions()
     // warn if using a non-Linux partition (potential install of another OS)
     auto lambdaForeignTrap = [this,&msgForeignList](const QString &devname, const QString &desc) -> void {
         const int bdindex = listBlkDevs.findDevice(devname);
-        if (bdindex >= 0 && !listBlkDevs[bdindex].flags.native) {
+        if (bdindex >= 0 && !listBlkDevs[bdindex].isNative) {
             msgForeignList << devname << desc;
         }
     };
@@ -1082,7 +1082,7 @@ bool MInstall::validateChosenPartitions()
         lambdaForeignTrap(swapdev, "swap");
         formatSwap = checkBoxEncryptSwap->isChecked();
         const int bdindex = listBlkDevs.findDevice(swapdev);
-        if (bdindex >= 0 && listBlkDevs[bdindex].flags.swap) formatSwap = true;
+        if (bdindex >= 0 && listBlkDevs[bdindex].isSwap) formatSwap = true;
         if (formatSwap) {
             msgFormatList << swapdev << "swap";
         } else {
@@ -2558,7 +2558,7 @@ void MInstall::updatePartitionWidgets()
 
     // see if there are any partitions in the system
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!bdinfo.flags.disk) {
+        if (!bdinfo.isDisk) {
             // found at least one partition
             existing_partitionsButton->show();
             existing_partitionsButton->setChecked(true);
@@ -2641,18 +2641,18 @@ void MInstall::buildBlockDevList()
         bdinfo.name = bdsegs[1];
         bdinfo.uuid = bdsegs[2];
         bdinfo.size = bdsegs[3].toLongLong();
-        bdinfo.flags.disk = (bdsegs[0] == "disk");
-        bdinfo.flags.boot = (!bootUUID.isEmpty() && bdinfo.uuid == bootUUID);
+        bdinfo.isDisk = (bdsegs[0] == "disk");
+        bdinfo.isBoot = (!bootUUID.isEmpty() && bdinfo.uuid == bootUUID);
         if (segsize > 4) {
-            bdinfo.flags.esp = (bdsegs[4].count(rxESP) >= 1);
-            bdinfo.flags.swap = (bdsegs[4].count(rxSwap) >= 1);
-            bdinfo.flags.native = (bdsegs[4].count(rxNative) >= 1);
+            bdinfo.isESP = (bdsegs[4].count(rxESP) >= 1);
+            bdinfo.isSwap = (bdsegs[4].count(rxSwap) >= 1);
+            bdinfo.isNative = (bdsegs[4].count(rxNative) >= 1);
         } else {
-            bdinfo.flags.esp = bdinfo.flags.swap = bdinfo.flags.native = false;
+            bdinfo.isESP = bdinfo.isSwap = bdinfo.isNative = false;
         }
         if (segsize > 5) {
             bdinfo.fstype = bdsegs[5];
-            if(bdinfo.fstype.count(rxNativeFS) >= 1) bdinfo.flags.native = true;
+            if(bdinfo.fstype.count(rxNativeFS) >= 1) bdinfo.isNative = true;
         }
         if (segsize > 6) {
             const QByteArray seg(bdsegs[6].toUtf8().replace('%', "\\x25").replace("\\x", "%"));
@@ -2667,9 +2667,9 @@ void MInstall::buildBlockDevList()
 
     // debug
     for (const BlockDeviceInfo &bdi : listBlkDevs) {
-        qDebug() << bdi.comboFormat() << ", UUID:" << bdi.uuid << ", Disk:" << bdi.flags.disk
-                 << ", Boot:" << bdi.flags.boot << ", ESP:" << bdi.flags.esp
-                 << ", Native:" << bdi.flags.native << ", Swap:" << bdi.flags.swap;
+        qDebug() << bdi.comboFormat() << ", UUID:" << bdi.uuid << ", Disk:" << bdi.isDisk
+                 << ", Boot:" << bdi.isBoot << ", ESP:" << bdi.isESP
+                 << ", Native:" << bdi.isNative << ", Swap:" << bdi.isSwap;
     }
 }
 
@@ -2688,8 +2688,8 @@ void MInstall::updateDiskInfo()
     indexPartInfoDisk = -1;
     diskCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.flags.disk && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
-                && (!bdinfo.flags.boot || INSTALL_FROM_ROOT_DEVICE)) {
+        if (bdinfo.isDisk && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
+                && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
             diskCombo->addItem(bdinfo.comboFormat());
         }
     }
@@ -2870,14 +2870,14 @@ void MInstall::updatePartInfo()
     QString drv = diskCombo->currentText().section(" ", 0, 0);
 
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!bdinfo.flags.disk && (!bdinfo.flags.boot || INSTALL_FROM_ROOT_DEVICE)) {
+        if (!bdinfo.isDisk && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
             const QString &cfmt = bdinfo.comboFormat();
-            if (!bdinfo.flags.swap) {
+            if (!bdinfo.isSwap) {
                 if (bdinfo.size >= MIN_ROOT_DEVICE_SIZE && bdinfo.name.startsWith(drv)) rootCombo->addItem(cfmt);
                 homeCombo->addItem(cfmt);
             }
             swapCombo->addItem(cfmt);
-            if (!bdinfo.flags.esp && bdinfo.size >= MIN_BOOT_DEVICE_SIZE) bootCombo->addItem(cfmt);
+            if (!bdinfo.isESP && bdinfo.size >= MIN_BOOT_DEVICE_SIZE) bootCombo->addItem(cfmt);
         }
     }
     // if there was no suitable root, add an entry to let the user know
@@ -3386,9 +3386,9 @@ void MInstall::buildBootLists()
     // build partition list available to install GRUB (in PBR)
     listBootPart.clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.flags.disk) listBootDrives << bdinfo.comboFormat(false);
-        else if (!(bdinfo.flags.swap || bdinfo.flags.boot || bdinfo.flags.esp)
-                 && bdinfo.flags.native) { // list only Linux partitions
+        if (bdinfo.isDisk) listBootDrives << bdinfo.comboFormat(false);
+        else if (!(bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
+                 && bdinfo.isNative) { // list only Linux partitions
             if (getCmdOut("blkid /dev/" + bdinfo.name + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
                 listBootPart << bdinfo.comboFormat(false);
             }
@@ -3405,9 +3405,9 @@ void MInstall::buildBootLists()
         // find ESP for all partitions on all drives
         bool gpt = false;
         for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (bdinfo.flags.disk) gpt = isGpt("/dev/" + bdinfo.name);
-            else if (gpt && !bdinfo.flags.boot) {
-                if (bdinfo.flags.esp || backup_list.contains(bdinfo.name)) {
+            if (bdinfo.isDisk) gpt = isGpt("/dev/" + bdinfo.name);
+            else if (gpt && !bdinfo.isBoot) {
+                if (bdinfo.isESP || backup_list.contains(bdinfo.name)) {
                     listBootESP << bdinfo.comboFormat(false);
                 }
             }
