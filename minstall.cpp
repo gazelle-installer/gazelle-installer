@@ -1052,10 +1052,10 @@ bool MInstall::validateChosenPartitions()
 
     // warn if using a non-Linux partition (potential install of another OS)
     auto lambdaForeignTrap = [this,&msgForeignList](const QString &devname, const QString &desc) -> void {
-        for (const BlockDeviceInfo &bdinfo : this->listBlkDevs) {
-            if (bdinfo.flags.native && QString("/dev/" + bdinfo.name) == devname) return;
+        int bdindex = listBlkDevs.findDevice(devname);
+        if (bdindex >= 0 && !listBlkDevs[bdindex].flags.native) {
+            msgForeignList << devname << desc;
         }
-        msgForeignList << devname << desc;
     };
 
     lambdaForeignTrap(rootdev, "/ (root)");
@@ -2589,6 +2589,16 @@ QString BlockDeviceInfo::comboFormat(bool showfs) const
     return strout + ")";
 }
 
+int BlockDeviceList::findDevice(const QString &devname) const
+{
+    const int cnt = count();
+    for (int ixi = 0; ixi < cnt; ++ixi) {
+        const BlockDeviceInfo &bdinfo = at(ixi);
+        if (bdinfo.name == devname || ("/dev/" + bdinfo.name) == devname) return ixi;
+    }
+    return -1;
+}
+
 QStringList MInstall::splitDevice(const QString &devname) const
 {
     static const QRegularExpression rxdev1("^(?:/dev/)+(mmcblk.*|nvme.*)p([0-9]*)$");
@@ -2628,28 +2638,28 @@ void MInstall::buildBlockDevList()
         const int segsize = bdsegs.size();
         if (segsize < 3) continue;
         BlockDeviceInfo bdinfo;
-        bdinfo.name = bdsegs.at(1);
-        bdinfo.uuid = bdsegs.at(2);
-        bdinfo.size = bdsegs.at(3).toLongLong();
-        bdinfo.flags.disk = (bdsegs.at(0) == "disk");
+        bdinfo.name = bdsegs[1];
+        bdinfo.uuid = bdsegs[2];
+        bdinfo.size = bdsegs[3].toLongLong();
+        bdinfo.flags.disk = (bdsegs[0] == "disk");
         bdinfo.flags.boot = (!bootUUID.isEmpty() && bdinfo.uuid == bootUUID);
         if (segsize > 4) {
-            bdinfo.flags.esp = (bdsegs.at(4).count(rxESP) >= 1);
-            bdinfo.flags.swap = (bdsegs.at(4).count(rxSwap) >= 1);
-            bdinfo.flags.native = (bdsegs.at(4).count(rxNative) >= 1);
+            bdinfo.flags.esp = (bdsegs[4].count(rxESP) >= 1);
+            bdinfo.flags.swap = (bdsegs[4].count(rxSwap) >= 1);
+            bdinfo.flags.native = (bdsegs[4].count(rxNative) >= 1);
         } else {
             bdinfo.flags.esp = bdinfo.flags.swap = bdinfo.flags.native = false;
         }
         if (segsize > 5) {
-            bdinfo.fstype = bdsegs.at(5);
+            bdinfo.fstype = bdsegs[5];
             if(bdinfo.fstype.count(rxNativeFS) >= 1) bdinfo.flags.native = true;
         }
         if (segsize > 6) {
-            const QByteArray seg(bdsegs.at(6).toUtf8().replace('%', "\\x25").replace("\\x", "%"));
+            const QByteArray seg(bdsegs[6].toUtf8().replace('%', "\\x25").replace("\\x", "%"));
             bdinfo.label = QUrl::fromPercentEncoding(seg).trimmed();
         }
         if (segsize > 7) {
-            const QByteArray seg(bdsegs.at(7).toUtf8().replace('%', "\\x25").replace("\\x", "%"));
+            const QByteArray seg(bdsegs[7].toUtf8().replace('%', "\\x25").replace("\\x", "%"));
             bdinfo.model = QUrl::fromPercentEncoding(seg).trimmed();
         }
         listBlkDevs << bdinfo;
@@ -2709,8 +2719,8 @@ void MInstall::buildServiceList()
             }
         }
         QString category, description;
-        category = list.at(0);
-        description = list.at(1);
+        category = list[0];
+        description = list[1];
 
         if (QFile("/etc/init.d/" + service).exists()) {
             QList<QTreeWidgetItem *> found_items = csView->findItems(category, Qt::MatchExactly, 0);
