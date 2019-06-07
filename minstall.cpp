@@ -2571,7 +2571,7 @@ void MInstall::updatePartitionWidgets()
 }
 
 // return block device info that is suitable for a combo box
-QString BlockDeviceInfo::comboFormat() const
+QString BlockDeviceInfo::comboFormat(bool showfs) const
 {
     static const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
     unsigned int isuffix = 0;
@@ -2581,8 +2581,10 @@ QString BlockDeviceInfo::comboFormat() const
         scalesize /= 1024;
     }
     QString strout(name + " (" + QString::number(scalesize) + suffixes[isuffix]);
-    if (!fstype.isEmpty()) strout += " " + fstype;
-    if (!label.isEmpty()) strout += " - " + label;
+    if (showfs) {
+        if (!fstype.isEmpty()) strout += " " + fstype;
+        if (!label.isEmpty()) strout += " - " + label;
+    }
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
     return strout + ")";
 }
@@ -3374,11 +3376,11 @@ void MInstall::buildBootLists()
     // build partition list available to install GRUB (in PBR)
     listBootPart.clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.flags.disk) listBootDrives << bdinfo.comboFormat();
+        if (bdinfo.flags.disk) listBootDrives << bdinfo.comboFormat(false);
         else if (!(bdinfo.flags.swap || bdinfo.flags.boot || bdinfo.flags.esp)
                  && bdinfo.flags.native) { // list only Linux partitions
             if (getCmdOut("blkid /dev/" + bdinfo.name + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
-                listBootPart << bdinfo.comboFormat();
+                listBootPart << bdinfo.comboFormat(false);
             }
         }
     }
@@ -3396,7 +3398,7 @@ void MInstall::buildBootLists()
             if (bdinfo.flags.disk) gpt = isGpt("/dev/" + bdinfo.name);
             else if (gpt && !bdinfo.flags.boot) {
                 if (bdinfo.flags.esp || backup_list.contains(bdinfo.name)) {
-                    listBootESP << bdinfo.comboFormat();
+                    listBootESP << bdinfo.comboFormat(false);
                 }
             }
         }

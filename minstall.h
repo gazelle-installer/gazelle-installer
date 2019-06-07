@@ -49,7 +49,7 @@ struct BlockDeviceInfo {
         bool esp : 1;
         bool swap : 1;
     } flags;
-    QString comboFormat() const;
+    QString comboFormat(bool showfs = true) const;
 };
 
 class MInstall : public QDialog, public Ui::MeInstall {
