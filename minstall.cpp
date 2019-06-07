@@ -411,7 +411,7 @@ bool MInstall::processNextPhase()
         }
 
         // allow the user to enter other options
-        execute("/sbin/partprobe", true);
+        buildBlockDevList();
         buildBootLists();
         gotoPage(5);
         iCopyBarB = grubEspButton->isChecked() ? 92 : 93;
@@ -1176,8 +1176,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
 
     // unmount root part
     rootdev = drv + mmcnvmepartdesignator + "1";
-    QString cmd = QString("/bin/umount -l %1").arg(rootdev);
-    if (!execute(cmd, false)) {
+    if (!execute(QStringLiteral("/bin/umount -l %1").arg(rootdev), false)) {
         qDebug() << "could not umount: " << rootdev;
     }
 
@@ -1236,6 +1235,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
         free = 0;
     }
 
+    execute(QStringLiteral("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv));
     if (uefi) { // if booted from UEFI make ESP
         // new GPT partition table
         if (!execute("parted -s " + drv + " mklabel gpt")) {
@@ -1259,8 +1259,6 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
 
     } else {
         // new msdos partition table
-        cmd = QString("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv);
-        execute(cmd);
         if (!execute("parted -s " + drv + " mklabel msdos")) {
             qDebug() << "Could not create msdos partition table on " + drv;
             return false;
@@ -1310,6 +1308,11 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
         return false;
     }
 
+    const QString cmd_clean("dd if=/dev/zero of=%1 bs=8192 count=1");
+    execute(cmd_clean.arg(bootdev));
+    execute(cmd_clean.arg(rootdev));
+    execute(cmd_clean.arg(swapdev));
+
     homeDevicePreserve = rootDevicePreserve;
     formatSwap = true;
     return true;
@@ -1334,11 +1337,14 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
     }
 
+    const QString cmd_clean("dd if=/dev/zero of=%1 bs=8192 count=1");
+
     // maybe format swap
     if (swapDevicePreserve != "/dev/none") {
         if (checkBoxEncryptSwap->isChecked()) isSwapEncrypted = true;
         execute("pumount " + swapDevicePreserve);
         QStringList swapsplit = splitDevice(swapDevicePreserve);
+        execute(cmd_clean.arg(swapDevicePreserve));
         execute(cmd.arg(swapsplit[0], swapsplit[1]));
     }
 
@@ -1347,14 +1353,16 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     if (!(saveHome && homeDevicePreserve == rootDevicePreserve) && !sync) {
         execute("pumount " + rootDevicePreserve);
         QStringList rootsplit = splitDevice(rootDevicePreserve);
-        execute(cmd.arg(rootsplit[0]).arg(rootsplit[1]));
+        execute(cmd_clean.arg(rootDevicePreserve));
+        execute(cmd.arg(rootsplit[0], rootsplit[1]));
         rootType = rootTypeCombo->currentText().toUtf8();
     }
 
     // format and mount /boot if different than root
     if (bootCombo->currentText() != "root") {
         QStringList bootsplit = splitDevice(bootdev);
-        execute(cmd.arg(bootsplit[0]).arg(bootsplit[1]));
+        execute(cmd_clean.arg(bootdev));
+        execute(cmd.arg(bootsplit[0], bootsplit[1]));
         formatBoot = true;
     }
 
@@ -1364,7 +1372,8 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         execute("pumount " + homeDevicePreserve);
         if (!saveHome) {
             QStringList homesplit = splitDevice(homeDevicePreserve);
-            execute(cmd.arg(homesplit[0]).arg(homesplit[1]));
+            execute(cmd_clean.arg(homeDevicePreserve));
+            execute(cmd.arg(homesplit[0], homesplit[1]));
             homeType = homeTypeCombo->currentText().toUtf8();
         }
     }
@@ -2571,7 +2580,7 @@ void MInstall::updatePartitionWidgets()
 }
 
 // return block device info that is suitable for a combo box
-QString BlockDeviceInfo::comboFormat(bool showfs) const
+QString BlockDeviceInfo::comboFormat() const
 {
     static const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
     unsigned int isuffix = 0;
@@ -2581,10 +2590,8 @@ QString BlockDeviceInfo::comboFormat(bool showfs) const
         scalesize /= 1024;
     }
     QString strout(name + " (" + QString::number(scalesize) + suffixes[isuffix]);
-    if (showfs) {
-        if (!fstype.isEmpty()) strout += " " + fstype;
-        if (!label.isEmpty()) strout += " - " + label;
-    }
+    if (!fstype.isEmpty()) strout += " " + fstype;
+    if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
     return strout + ")";
 }
@@ -2613,6 +2620,7 @@ QStringList MInstall::splitDevice(const QString &devname) const
 void MInstall::buildBlockDevList()
 {
     execute("/sbin/partprobe", true);
+    execute("blkid -c /dev/null", true);
 
     // expressions for matching various partition types
     static const QRegularExpression rxESP("^(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$");
@@ -3381,16 +3389,14 @@ void MInstall::on_grubEspButton_toggled()
 // build ESP list available to install GRUB
 void MInstall::buildBootLists()
 {
-    buildBlockDevList();
-
     // build partition list available to install GRUB (in PBR)
     listBootPart.clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDisk) listBootDrives << bdinfo.comboFormat(false);
+        if (bdinfo.isDisk) listBootDrives << bdinfo.comboFormat();
         else if (!(bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
                  && bdinfo.isNative) { // list only Linux partitions
             if (getCmdOut("blkid /dev/" + bdinfo.name + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
-                listBootPart << bdinfo.comboFormat(false);
+                listBootPart << bdinfo.comboFormat();
             }
         }
     }
@@ -3408,7 +3414,7 @@ void MInstall::buildBootLists()
             if (bdinfo.isDisk) gpt = isGpt("/dev/" + bdinfo.name);
             else if (gpt && !bdinfo.isBoot) {
                 if (bdinfo.isESP || backup_list.contains(bdinfo.name)) {
-                    listBootESP << bdinfo.comboFormat(false);
+                    listBootESP << bdinfo.comboFormat();
                 }
             }
         }
