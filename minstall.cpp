@@ -122,7 +122,6 @@ void MInstall::startup()
 
     this->setEnabled(true);
     updateCursor();
-
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -2590,8 +2589,8 @@ QString BlockDeviceInfo::comboFormat() const
 
 QStringList MInstall::splitDevice(const QString &devname) const
 {
-    static const QRegularExpression rxdev1("^(mmcblk.*|nvme.*)p([0-9]*)$");
-    static const QRegularExpression rxdev2("^([a-z]*)([0-9]*)$");
+    static const QRegularExpression rxdev1("^(?:/dev/)+(mmcblk.*|nvme.*)p([0-9]*)$");
+    static const QRegularExpression rxdev2("^(?:/dev/)+([a-z]*)([0-9]*)$");
     QRegularExpressionMatch rxmatch(rxdev1.match(devname));
     if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
     QStringList list(rxmatch.capturedTexts());
@@ -2871,6 +2870,8 @@ void MInstall::updatePartInfo()
     }
     // if there was no suitable root, add an entry to let the user know
     if (rootCombo->count() == 0) rootCombo->addItem("none");
+
+    prevItemRoot.clear();
     on_rootCombo_activated(rootCombo->currentText());
 }
 
