@@ -1163,23 +1163,22 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
+    QString drv(diskCombo->currentText().section(" ", 0, 0));
+    // detach all existing partitions on the selected drive
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (!bdinfo.isDisk && bdinfo.name.startsWith(drv)) {
+            execute("swapoff /dev/" + bdinfo.name, true);
+            execute("pumount /dev/" + bdinfo.name, true);
+        }
+    }
+
     QString mmcnvmepartdesignator;
-
-    QString rootdev, swapdev;
-    QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
-
-    if (drv.contains("nvme") || drv.contains("mmcblk" )) {
+    if (drv.startsWith("nvme") || drv.startsWith("mmcblk")) {
         mmcnvmepartdesignator = "p";
     }
+    drv.insert(0, "/dev/");
 
-    // entire disk, create partitions
     updateStatus(tr("Creating required partitions"));
-
-    // unmount root part
-    rootdev = drv + mmcnvmepartdesignator + "1";
-    if (!execute(QStringLiteral("/bin/umount -l %1").arg(rootdev), false)) {
-        qDebug() << "could not umount: " << rootdev;
-    }
 
     bool ok = true;
     int free = freeSpaceEdit->text().toInt(&ok,10);
@@ -1189,8 +1188,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
 
     // calculate new partition sizes
     // get the total disk size
-    QString size_str = getCmdOut("/sbin/sfdisk -s " + drv);
-    quint64 size = size_str.toULongLong();
+    quint64 size = getCmdOut("/sbin/sfdisk -s " + drv).toULongLong();
     size = size / 1024; // in MiB
     // pre-compensate for rounding errors in disk geometry
     size = size - 32;
@@ -1235,6 +1233,9 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
     } else { // no free space
         free = 0;
     }
+
+    QString rootdev = drv + mmcnvmepartdesignator + "1";
+    QString swapdev;
 
     execute(QStringLiteral("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv));
     if (uefi) { // if booted from UEFI make ESP
@@ -1331,7 +1332,8 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     updateStatus(tr("Preparing required partitions"));
 
     auto lambdaPreparePart = [this](const QString &strdev) -> void {
-        execute("pumount " + strdev);
+        execute("swapoff " + strdev, true);
+        execute("pumount " + strdev, true);
         execute(QStringLiteral("dd if=/dev/zero of=%1 bs=8192 count=1").arg(strdev));
 
         // command to set the partition type
@@ -2560,7 +2562,6 @@ void MInstall::updatePartitionWidgets()
     diskCombo->setEnabled(false);
     diskCombo->clear();
     diskCombo->addItem(tr("Loading..."));
-    if (!pretend) execute("/sbin/swapoff -a", true); // kludge - live boot automatically activates swap
     buildBlockDevList();
 
     // disk combo box
