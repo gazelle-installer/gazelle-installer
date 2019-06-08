@@ -98,7 +98,6 @@ public:
     void makeFstab();
     bool processNextPhase();
     void removeItemCombo(QComboBox *cb, const QString *part);
-    void saveConfig();
     void setLocale();
     void setServices();
     void updatePartCombo(QString *prevItem, const QString &part);
@@ -188,6 +187,9 @@ private:
 
     // command line options
     bool pretend, automatic, nocopy, sync;
+    // configuration management
+    enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
+    int configStuck = 0;
 
     bool formatSwap = false;
     bool isHomeEncrypted = false;
@@ -262,6 +264,7 @@ private:
     bool installLinux(const int progend);
     bool copyLinux(const int progend);
     void failUI(const QString &msg);
+    int manageConfig(enum ConfigAction mode);
     void stashServices(bool save);
     void stashAdvancedFDE(bool save);
 };
