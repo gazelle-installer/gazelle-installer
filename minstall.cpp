@@ -19,7 +19,8 @@
 
 #include <QDebug>
 #include <QFileInfo>
-#include <QtConcurrent/QtConcurrent>
+#include <QTimer>
+#include <QProcess>
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
