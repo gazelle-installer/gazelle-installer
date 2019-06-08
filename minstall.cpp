@@ -329,7 +329,7 @@ bool MInstall::checkDisk()
     int ans;
     QString output;
 
-    QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
+    QString drv = "/dev/" + (entireDiskButton->isChecked() ? diskCombo : rootCombo)->currentText().section(" ", 0, 0);
     output = getCmdOut("smartctl -H " + drv + "|grep -w FAILED");
     if (output.contains("FAILED")) {
         msg = output + tr("\n\nThe disk with the partition you selected for installation is failing.\n\n") +
