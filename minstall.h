@@ -229,7 +229,7 @@ private:
     int iFDEkeysize;
     int indexFDEhash;
     int indexFDErandom;
-    long iFDEroundtime;
+    int iFDEroundtime;
 
     // slots
     void startup();
