@@ -91,16 +91,13 @@ public:
     bool validateComputerName();
     bool setComputerName();
     bool setUserInfo();
-    void addItemCombo(QComboBox *cb, const QString *part);
     void buildBootLists();
     void buildServiceList();
     void disablehiberanteinitramfs();
     void makeFstab();
     bool processNextPhase();
-    void removeItemCombo(QComboBox *cb, const QString *part);
     void setLocale();
     void setServices();
-    void updatePartCombo(QString *prevItem, const QString &part);
     void writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
@@ -143,7 +140,6 @@ private slots:
     void on_qtpartedButton_clicked();
     void on_viewServicesButton_clicked();
 
-    void on_homeCombo_currentIndexChanged(const QString &arg1);
     void on_userPasswordEdit2_textChanged(const QString &arg1);
     void on_rootPasswordEdit2_textChanged(const QString &arg1);
     void on_userPasswordEdit_textChanged();
@@ -169,10 +165,10 @@ private slots:
     void on_checkBoxEncryptSwap_toggled(bool checked);
 
     void on_rootTypeCombo_activated(QString item = "");
-    void on_rootCombo_activated(const QString &arg1 = "");
-    void on_homeCombo_activated(const QString &arg1);
-    void on_swapCombo_activated(const QString &arg1);
-    void on_bootCombo_activated(const QString &arg1);
+    void on_rootCombo_currentIndexChanged(const QString &text);
+    void on_homeCombo_currentIndexChanged(const QString &text);
+    void on_swapCombo_currentIndexChanged(const QString &text);
+    void on_bootCombo_currentIndexChanged(int);
 
     void on_grubCheckBox_toggled(bool checked);
     void on_grubMbrButton_toggled();
@@ -188,9 +184,11 @@ private:
     // command line options
     bool pretend, automatic, nocopy, sync;
     // configuration management
+    QSettings *config = NULL;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
     int configStuck = 0;
 
+    QString auto_mount;
     bool formatSwap = false;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
@@ -211,18 +209,6 @@ private:
     int ixTip = 0;
     int ixTipStart = -1;
     int iLastProgress = -1;
-
-    // for partition combo updates
-    QHash<QString, int> removedRoot; // remember items removed from combo box: item, index
-    QHash<QString, int> removedHome;
-    QHash<QString, int> removedSwap;
-    QHash<QString, int> removedBoot;
-    QSettings *config = NULL;
-    QString auto_mount;
-    QString prevItemRoot; // remember previously selected item in combo box
-    QString prevItemHome;
-    QString prevItemSwap;
-    QString prevItemBoot;
 
     // info needed for Phase 2 of the process
     QStringList listBootDrives;
@@ -254,6 +240,7 @@ private:
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
+    void updatePartitionCombos(QComboBox *changed);
     QStringList splitDevice(const QString &device) const;
     void buildBlockDevList();
     bool pretendToInstall(int start, int stop, int sleep);
