@@ -61,8 +61,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
     // config file
-    config = new QSettings(QFile::exists(cfgfile) ? cfgfile : "/dev/null",
-                           QSettings::NativeFormat, this);
+    if (QFile::exists(cfgfile)) config = new QSettings(cfgfile, QSettings::NativeFormat, this);
 
     // set some distro-centric text
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
@@ -119,6 +118,7 @@ void MInstall::startup()
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
     }
     updatePartitionWidgets();
+    manageConfig(ConfigLoadA);
 
     this->setEnabled(true);
     updateCursor();
@@ -414,6 +414,7 @@ bool MInstall::processNextPhase()
         // allow the user to enter other options
         buildBlockDevList();
         buildBootLists();
+        manageConfig(ConfigLoadB);
         gotoPage(5);
 
         if (!pretend) {
@@ -452,7 +453,7 @@ bool MInstall::processNextPhase()
             } else {
                 if (!setUserInfo()) return false;
             }
-            saveConfig();
+            manageConfig(ConfigSave);
             execute("/bin/sync", true); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
         } else if (!pretendToInstall(progPhase23, 99, 1000)){
@@ -631,94 +632,193 @@ void MInstall::removeItemCombo(QComboBox *cb, const QString *part)
     }
 }
 
-// save configuration
-void MInstall::saveConfig()
+int MInstall::manageConfig(enum ConfigAction mode)
 {
-    if (phase < 0) return;
-    QSettings confout("/mnt/antiX/var/log/minstall.conf", QSettings::NativeFormat);
-    // Disk step
-    confout.beginGroup("Disk");
-    confout.setValue("Disk", diskCombo->currentText().section(" ", 0, 0));
-    confout.setValue("Encrypted", checkBoxEncryptAuto->isChecked());
-    confout.setValue("EntireDisk", entireDiskButton->isChecked());
-    confout.endGroup();
-    // Partition step
-    confout.beginGroup("Partition");
-
-    confout.setValue("Root", rootCombo->currentText().section(" ", 0, 0));
-    confout.setValue("Home", homeCombo->currentText().section(" ", 0, 0));
-    confout.setValue("Swap", swapCombo->currentText().section(" ", 0, 0));
-    confout.setValue("Boot", bootCombo->currentText().section(" ", 0, 0));
-
-    confout.setValue("RootType", rootTypeCombo->currentText());
-    confout.setValue("HomeType", homeTypeCombo->currentText());
-
-    confout.setValue("RootEncrypt", checkBoxEncryptRoot->isChecked());
-    confout.setValue("RootEncrypt", checkBoxEncryptHome->isChecked());
-    confout.setValue("RootEncrypt", checkBoxEncryptSwap->isChecked());
-
-    confout.setValue("RootLabel", rootLabelEdit->text());
-    confout.setValue("HomeLabel", homeLabelEdit->text());
-    confout.setValue("SwapLabel", swapLabelEdit->text());
-
-    confout.setValue("SaveHome", saveHomeCheck->isChecked());
-    confout.setValue("BadBlocksCheck", badblocksCheck->isChecked());
-
-    confout.endGroup();
-    // AES step
-    confout.beginGroup("Encryption");
-    confout.setValue("Cipher", comboFDEcipher->currentText());
-    confout.setValue("ChainMode", comboFDEchain->currentText());
-    confout.setValue("IVgenerator", comboFDEivgen->currentText());
-    confout.setValue("IVhash", comboFDEivhash->currentText());
-    confout.setValue("KeySize", spinFDEkeysize->cleanText());
-    confout.setValue("LUKSkeyHash", comboFDEhash->currentText());
-    confout.setValue("KernelRNG", comboFDErandom->currentText());
-    confout.setValue("KDFroundTime", spinFDEroundtime->cleanText());
-    confout.endGroup();
-    // GRUB step
-    confout.beginGroup("GRUB");
-    if(grubCheckBox->isChecked()) {
-        const char *cfgGrubInstall;
-        if(grubMbrButton->isChecked()) cfgGrubInstall = "MBR";
-        if(grubPbrButton->isChecked()) cfgGrubInstall = "PBR";
-        if(grubEspButton->isChecked()) cfgGrubInstall = "ESP";
-        confout.setValue("InstallGRUB", cfgGrubInstall);
-        confout.setValue("GrubLocation", grubBootCombo->currentText().section(" ", 0, 0));
-    } else {
-        confout.setValue("InstallGRUB", false);
+    configStuck = 0;
+    if (mode == ConfigSave) {
+        if (config) delete config;
+        config = new QSettings("/mnt/antiX/var/log/minstall.conf", QSettings::NativeFormat);
     }
-    confout.endGroup();
-    // Services step
-    confout.beginGroup("Services");
-    QTreeWidgetItemIterator it(csView);
-    while (*it) {
-        if ((*it)->parent() != NULL) {
-            confout.setValue((*it)->text(0), (*it)->checkState(0));
+    if (!config) return 0;
+
+    auto lambdaSetComboBox = [this, mode](const QString &key, QComboBox *combobox, const bool useData = false) -> void {
+        if (mode == ConfigSave) {
+            if (useData) config->setValue(key, combobox->currentData());
+            else config->setValue(key, combobox->currentText().section(" ", 0, 0));
+        } else {
+            int icombo;
+            if (useData) {
+                icombo = combobox->findData(config->value(key, combobox->currentData()));
+            } else {
+                const QString &val = config->value(key, combobox->currentText()).toString();
+                icombo = combobox->findText(val, Qt::MatchStartsWith);
+            }
+
+            if (icombo >= 0) combobox->setCurrentIndex(icombo);
+            else if (!configStuck) configStuck = -1;
         }
-        ++it;
+    };
+    auto lambdaSetCheckBox = [this, mode](const QString &key, QCheckBox *checkbox) -> void {
+        const QVariant state(checkbox->isChecked());
+        if (mode == ConfigSave) config->setValue(key, state);
+        else checkbox->setChecked(config->value(key, state).toBool());
+    };
+    auto lambdaSetLineEdit = [this, mode](const QString &key, QLineEdit *lineedit) -> void {
+        const QString &text = lineedit->text();
+        if (mode == ConfigSave) config->setValue(key, text);
+        else lineedit->setText(config->value(key, text).toString());
+    };
+    auto lambdaSetSpinBox = [this, mode](const QString &key, QSpinBox *spinbox) -> void {
+        const QVariant spinval(spinbox->value());
+        if (mode == ConfigSave) config->setValue(key, spinval);
+        else {
+            const int val = config->value(key, spinval).toInt();
+            spinbox->setValue(val);
+            if (val != spinbox->value() && !configStuck) configStuck = -1;
+        }
+    };
+    auto lambdaSetRadioBoolean = [this, mode](const QString &key, QRadioButton *radio, QRadioButton *radioFalse) -> void {
+        const QVariant radioval(radio->isChecked());
+        if (mode == ConfigSave) config->setValue(key, radioval);
+        else {
+            const bool val = config->value(key, radioval).toBool();
+            if (val) {
+                if (radio->isEnabled()) radio->setChecked(true);
+                else configStuck = -1;
+            } else {
+                if (radioFalse->isEnabled()) radioFalse->setChecked(true);
+                else configStuck = -1;
+            }
+        }
+    };
+
+    if (mode == ConfigSave || mode == ConfigLoadA) {
+        // Disk setup
+        config->beginGroup("Disk");
+        lambdaSetComboBox("Disk", diskCombo);
+        lambdaSetCheckBox("Encrypted", checkBoxEncryptAuto);
+        lambdaSetRadioBoolean("EntireDisk", entireDiskButton, existing_partitionsButton);
+        config->endGroup();
+        if (configStuck < 0) configStuck = 1;
+
+        if (existing_partitionsButton->isChecked()) {
+            // Partition step
+            config->beginGroup("Partition");
+
+            lambdaSetComboBox("Root", rootCombo);
+            lambdaSetComboBox("Home", homeCombo);
+            lambdaSetComboBox("Swap", swapCombo);
+            lambdaSetComboBox("Boot", bootCombo);
+
+            lambdaSetComboBox("RootType", rootTypeCombo);
+            lambdaSetComboBox("HomeType", homeTypeCombo);
+
+            lambdaSetCheckBox( "RootEncrypt", checkBoxEncryptRoot);
+            lambdaSetCheckBox("HomeEncrypt", checkBoxEncryptHome);
+            lambdaSetCheckBox("SwapEncrypt", checkBoxEncryptSwap);
+
+            lambdaSetLineEdit("RootLabel", rootLabelEdit);
+            lambdaSetLineEdit("HomeLabel", homeLabelEdit);
+            lambdaSetLineEdit("SwapLabel", swapLabelEdit);
+
+            lambdaSetCheckBox("SaveHome", saveHomeCheck);
+            lambdaSetCheckBox("BadBlocksCheck", badblocksCheck);
+
+            config->endGroup();
+            if (configStuck < 0) configStuck = 2;
+        }
+
+        // AES step
+        config->beginGroup("Encryption");
+        lambdaSetComboBox("Cipher", comboFDEcipher);
+        lambdaSetComboBox("ChainMode", comboFDEchain);
+        lambdaSetComboBox("IVgenerator", comboFDEivgen);
+        lambdaSetComboBox("IVhash", comboFDEivhash);
+        lambdaSetSpinBox("KeySize", spinFDEkeysize);
+        lambdaSetComboBox("LUKSkeyHash", comboFDEhash);
+        lambdaSetComboBox("KernelRNG", comboFDErandom);
+        lambdaSetSpinBox("KDFroundTime", spinFDEroundtime);
+        config->endGroup();
+        if (configStuck < 0) configStuck = 3;
     }
-    confout.endGroup();
-    // Network step
-    confout.beginGroup("Network");
-    confout.setValue("ComputerName", computerNameEdit->text());
-    confout.setValue("Domain", computerDomainEdit->text());
-    confout.setValue("Workgroup", computerGroupEdit->text());
-    confout.setValue("Samba", sambaCheckBox->isChecked());
-    confout.endGroup();
-    // Localization step
-    confout.beginGroup("Localization");
-    confout.setValue("Locale", localeCombo->currentData().toString());
-    confout.setValue("LocalClock", localClockCheckBox->isChecked());
-    confout.setValue("Clock24h", radio24h->isChecked());
-    confout.setValue("Timezone", timezoneCombo->currentText());
-    confout.endGroup();
-    // User Accounts step
-    confout.beginGroup("User");
-    confout.setValue("Username", userNameEdit->text());
-    confout.setValue("Autologin", autologinCheckBox->isChecked());
-    confout.setValue("SaveDesktop", saveDesktopCheckBox->isChecked());
-    confout.endGroup();
+
+    // GRUB step
+    if (mode == ConfigSave || mode == ConfigLoadB) {
+        config->beginGroup("GRUB");
+        const char *install = NULL;
+        if(grubCheckBox->isChecked()) {
+            if(grubMbrButton->isChecked()) install = "MBR";
+            if(grubPbrButton->isChecked()) install = "PBR";
+            if(grubEspButton->isChecked()) install = "ESP";
+        }
+        if (mode == ConfigSave) {
+            if (!install) config->setValue("Install", false);
+            else config->setValue("Install", install);
+        } else {
+            const QString &val = config->value("Install", QVariant(install)).toString();
+            if (val.compare("MBR", Qt::CaseInsensitive)) {
+                if (grubMbrButton->isEnabled()) grubMbrButton->setChecked(true);
+                else configStuck = -1;
+            } else if (val.compare("PBR", Qt::CaseInsensitive)) {
+                if (grubPbrButton->isEnabled()) grubPbrButton->setChecked(true);
+                else configStuck = -1;
+            } else if (val.compare("ESP", Qt::CaseInsensitive)) {
+                if (grubEspButton->isEnabled()) grubEspButton->setChecked(true);
+                else configStuck = -1;
+            } else configStuck = -1;
+        }
+        lambdaSetComboBox("Location", grubBootCombo);
+        config->endGroup();
+        if (configStuck < 0) configStuck = 5;
+    }
+
+    if (mode == ConfigSave || mode == ConfigLoadA) {
+        // Services step
+        config->beginGroup("Services");
+        QTreeWidgetItemIterator it(csView);
+        while (*it) {
+            if ((*it)->parent() != NULL) {
+                const QString &itext = (*it)->text(0);
+                const QVariant checkval((*it)->checkState(0) == Qt::Checked);
+                if (mode == ConfigSave) config->setValue(itext, checkval);
+                else {
+                    const bool val = config->value(itext, checkval).toBool();
+                    (*it)->setCheckState(0, val ? Qt::Checked : Qt::Unchecked);
+                }
+            }
+            ++it;
+        }
+        config->endGroup();
+        if (configStuck < 0) configStuck = 6;
+
+        // Network step
+        config->beginGroup("Network");
+        lambdaSetLineEdit("ComputerName", computerNameEdit);
+        lambdaSetLineEdit("Domain", computerDomainEdit);
+        lambdaSetLineEdit("Workgroup", computerGroupEdit);
+        lambdaSetCheckBox("Samba", sambaCheckBox);
+        config->endGroup();
+        if (configStuck < 0) configStuck = 7;
+
+        // Localization step
+        config->beginGroup("Localization");
+        lambdaSetComboBox("Locale", localeCombo, true);
+        lambdaSetCheckBox("LocalClock", localClockCheckBox);
+        lambdaSetRadioBoolean("Clock24h", radio24h, radio12h);
+        lambdaSetComboBox("Timezone", timezoneCombo);
+        config->endGroup();
+        if (configStuck < 0) configStuck = 8;
+
+        // User Accounts step
+        config->beginGroup("User");
+        lambdaSetLineEdit("Username", userNameEdit);
+        lambdaSetCheckBox("Autologin", autologinCheckBox);
+        lambdaSetCheckBox("SaveDesktop", saveDesktopCheckBox);
+        config->endGroup();
+        if (configStuck < 0) configStuck = 9;
+    }
+
+    return configStuck;
 }
 
 // update partition combos
