@@ -376,6 +376,7 @@ bool MInstall::checkPassword(const QString &pass)
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
+    static const int progPhase23 = 94; // start of Phase 2/3 progress bar space
     // Phase < 0 = install has been aborted (Phase -2 on close)
     if (phase < 0) return false;
     // Phase 0 = install not started yet, Phase 1 = install in progress
@@ -414,7 +415,6 @@ bool MInstall::processNextPhase()
         buildBlockDevList();
         buildBootLists();
         gotoPage(5);
-        iCopyBarB = grubEspButton->isChecked() ? 92 : 93;
 
         if (!pretend) {
             if (!formatPartitions(encPass, rootType, homeType, formatBoot)) {
@@ -423,13 +423,13 @@ bool MInstall::processNextPhase()
             }
             //run blkid -c /dev/null to freshen UUID cache
             execute("blkid -c /dev/null", true);
-            if (!installLinux()) return false;
-        } else if (!pretendToInstall(1, iCopyBarB + 1, 100)) {
+            if (!installLinux(progPhase23 - 1)) return false;
+        } else if (!pretendToInstall(1, progPhase23 - 1, 100)) {
             return false;
         }
         if (!haveSysConfig) {
             progressBar->setEnabled(false);
-            updateStatus(tr("Paused for required operator input"), iCopyBarB + 2);
+            updateStatus(tr("Paused for required operator input"), progPhase23);
             QApplication::beep();
             if(widgetStack->currentIndex() == 4) {
                 on_nextButton_clicked();
@@ -442,7 +442,7 @@ bool MInstall::processNextPhase()
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
         if (!pretend) {
-            updateStatus(tr("Setting system configuration"), iCopyBarB + 2);
+            updateStatus(tr("Setting system configuration"), progPhase23);
             setServices();
             if (!setComputerName()) return false;
             setLocale();
@@ -455,7 +455,7 @@ bool MInstall::processNextPhase()
             saveConfig();
             execute("/bin/sync", true); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
-        } else if (!pretendToInstall(iCopyBarB + 2, 99, 1000)){
+        } else if (!pretendToInstall(progPhase23, 99, 1000)){
             return false;
         }
         phase = 4;
@@ -1422,7 +1422,7 @@ bool MInstall::saveHomeBasic()
     return ok;
 }
 
-bool MInstall::installLinux()
+bool MInstall::installLinux(const int progend)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
@@ -1441,7 +1441,48 @@ bool MInstall::installLinux()
             return false;
         }
     }
-    if(!copyLinux()) return false;
+
+    // make empty dirs for opt, dev, proc, sys, run,
+    // home already done
+    updateStatus(tr("Creating system directories"));
+    mkdir("/mnt/antiX/opt", 0755);
+    mkdir("/mnt/antiX/dev", 0755);
+    mkdir("/mnt/antiX/proc", 0755);
+    mkdir("/mnt/antiX/sys", 0755);
+    mkdir("/mnt/antiX/run", 0755);
+
+    //if separate /boot in use, mount that to /mnt/antiX/boot
+    if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
+        mkdir("/mnt/antiX/boot", 0755);
+        execute("fsck.ext4 -y " + bootdev); // needed to run fsck because sfdisk --part-type can mess up the partition
+        if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
+            qDebug() << "Could not mount /boot on " + bootdev;
+            return false;
+        }
+    }
+
+    if(!copyLinux(progend - 1)) return false;
+
+    updateStatus(tr("Fixing configuration"), progend);
+    mkdir("/mnt/antiX/tmp", 01777);
+    chmod("/mnt/antiX/tmp", 01777);
+    makeFstab();
+    writeKeyFile();
+    disablehiberanteinitramfs();
+
+    // Copy live set up to install and clean up.
+    execute("/usr/sbin/live-to-installed /mnt/antiX", false);
+    qDebug() << "Desktop menu";
+    execute("chroot /mnt/antiX desktop-menu --write-out-global", false);
+    execute("/bin/rm -rf /mnt/antiX/home/demo");
+    execute("/bin/rm -rf /mnt/antiX/media/sd*", false);
+    execute("/bin/rm -rf /mnt/antiX/media/hd*", false);
+
+    // guess localtime vs UTC
+    if (getCmdOut("guess-hwclock") == "localtime") {
+        localClockCheckBox->setChecked(true);
+    }
+
     return true;
 }
 
@@ -1533,29 +1574,10 @@ void MInstall::makeFstab()
     }
 }
 
-bool MInstall::copyLinux()
+bool MInstall::copyLinux(const int progend)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    // make empty dirs for opt, dev, proc, sys, run,
-    // home already done
-
-    updateStatus(tr("Creating system directories"));
-    mkdir("/mnt/antiX/opt", 0755);
-    mkdir("/mnt/antiX/dev", 0755);
-    mkdir("/mnt/antiX/proc", 0755);
-    mkdir("/mnt/antiX/sys", 0755);
-    mkdir("/mnt/antiX/run", 0755);
-
-    //if separate /boot in use, mount that to /mnt/antiX/boot
-    if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
-        mkdir("/mnt/antiX/boot", 0755);
-        execute("fsck.ext4 -y " + bootdev); // needed to run fsck because sfdisk --part-type can mess up the partition
-        if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
-            qDebug() << "Could not mount /boot on " + bootdev;
-            return false;
-        }
-    }
 
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
@@ -1593,7 +1615,7 @@ bool MInstall::copyLinux()
         connect(proc, static_cast<void (QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
         qDebug() << cmd;
         proc->start(cmd);
-        const int progspace = iCopyBarB - progstart;
+        const int progspace = progend - progstart;
         const int progdiv = (progspace != 0) ? (sourceInodes / progspace) : 0;
         while (proc->state() != QProcess::NotRunning) {
             eloop.exec();
@@ -1613,26 +1635,6 @@ bool MInstall::copyLinux()
             failUI(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
             return false;
         }
-    }
-
-    updateStatus(tr("Fixing configuration"), iCopyBarB + 1);
-    mkdir("/mnt/antiX/tmp", 01777);
-    chmod("/mnt/antiX/tmp", 01777);
-    makeFstab();
-    writeKeyFile();
-    disablehiberanteinitramfs();
-
-    // Copy live set up to install and clean up.
-    execute("/usr/sbin/live-to-installed /mnt/antiX", false);
-    qDebug() << "Desktop menu";
-    execute("chroot /mnt/antiX desktop-menu --write-out-global", false);
-    execute("/bin/rm -rf /mnt/antiX/home/demo");
-    execute("/bin/rm -rf /mnt/antiX/media/sd*", false);
-    execute("/bin/rm -rf /mnt/antiX/media/hd*", false);
-
-    // guess localtime vs UTC
-    if (getCmdOut("guess-hwclock") == "localtime") {
-        localClockCheckBox->setChecked(true);
     }
 
     return true;
@@ -1717,8 +1719,8 @@ bool MInstall::installLoader()
     }
 
     // update NVRAM boot entries (only if installing on ESP)
+    updateStatus(statup);
     if (grubEspButton->isChecked()) {
-        updateStatus(statup);
         cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
         if (!execute(cmd)) {
             QMessageBox::warning(this, windowTitle(), tr("NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu."));
@@ -2858,7 +2860,6 @@ void MInstall::on_qtpartedButton_clicked()
     qtpartedButton->setEnabled(false);
     execute("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager", false);
     updatePartitionWidgets();
-    indexPartInfoDisk = -1; // invalidate existing partition info
     qtpartedButton->setEnabled(true);
     nextButton->setEnabled(true);
     updateCursor();

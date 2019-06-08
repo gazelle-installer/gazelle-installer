@@ -94,9 +94,7 @@ public:
     void addItemCombo(QComboBox *cb, const QString *part);
     void buildBootLists();
     void buildServiceList();
-    bool copyLinux();
     void disablehiberanteinitramfs();
-    bool installLinux();
     void makeFstab();
     bool processNextPhase();
     void removeItemCombo(QComboBox *cb, const QString *part);
@@ -207,9 +205,6 @@ private:
     QStringList listHomes;
     SafeCache key;
 
-    // for file copy progress updates
-    int iCopyBarB;
-
     // for the tips display
     int ixTip = 0;
     int ixTipStart = -1;
@@ -226,7 +221,6 @@ private:
     QString prevItemHome;
     QString prevItemSwap;
     QString prevItemBoot;
-    int indexPartInfoDisk = -1;
 
     // info needed for Phase 2 of the process
     QStringList listBootDrives;
@@ -265,6 +259,8 @@ private:
     bool saveHomeBasic();
     bool makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot);
     bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot);
+    bool installLinux(const int progend);
+    bool copyLinux(const int progend);
     void failUI(const QString &msg);
     void stashServices(bool save);
     void stashAdvancedFDE(bool save);
