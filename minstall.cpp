@@ -648,7 +648,8 @@ int MInstall::manageConfig(enum ConfigAction mode)
         } else {
             int icombo;
             if (useData) {
-                icombo = combobox->findData(config->value(key, combobox->currentData()));
+                icombo = combobox->findData(config->value(key, combobox->currentData()),
+                                            Qt::MatchExactly);
             } else {
                 const QString &val = config->value(key, combobox->currentText()).toString();
                 icombo = combobox->findText(val, Qt::MatchStartsWith);
@@ -1643,7 +1644,7 @@ void MInstall::makeFstab()
             out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1\n";
         }
         if (grubEspButton->isChecked()) {
-            const QString espdev = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0).trimmed();
+            const QString espdev = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0);
             const QString espdevUUID = "UUID=" + getCmdOut(cmdBlkID + espdev);
             qDebug() << "espdev" << espdev << espdevUUID;
             out << espdevUUID + " /boot/efi vfat defaults,noatime,dmask=0002,fmask=0113 0 0\n";
@@ -1765,7 +1766,7 @@ bool MInstall::installLoader()
     }
 
     //add switch to change root partition info
-    QString boot = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0).trimmed();
+    QString boot = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0);
 
     if (grubMbrButton->isChecked() && !isGpt(boot)) {
         QString part_num;
