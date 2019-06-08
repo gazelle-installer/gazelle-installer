@@ -90,7 +90,6 @@ void MInstall::startup()
     on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
     on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
     on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
-    stashAdvancedFDE(true);
 
     rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
     homeLabelEdit->setText("home" + PROJECTSHORTNAME);
@@ -113,14 +112,15 @@ void MInstall::startup()
     existing_partitionsButton->hide();
 
     setupkeyboardbutton();
+    updatePartitionWidgets();
+    manageConfig(ConfigLoadA);
+    stashAdvancedFDE(true);
+
     if (!pretend) {
         // disable automounting in Thunar
         auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
     }
-    updatePartitionWidgets();
-    manageConfig(ConfigLoadA);
-
     this->setEnabled(true);
     updateCursor();
 }
@@ -676,8 +676,8 @@ int MInstall::manageConfig(enum ConfigAction mode)
         if (configStuck < 0) configStuck = 3;
     }
 
-    // GRUB step
     if (mode == ConfigSave || mode == ConfigLoadB) {
+        // GRUB step
         config->beginGroup("GRUB");
         const char *install = NULL;
         if(grubCheckBox->isChecked()) {
@@ -704,9 +704,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
         lambdaSetComboBox("Location", grubBootCombo);
         config->endGroup();
         if (configStuck < 0) configStuck = 5;
-    }
 
-    if (mode == ConfigSave || mode == ConfigLoadA) {
         // Services step
         config->beginGroup("Services");
         QTreeWidgetItemIterator it(csView);
