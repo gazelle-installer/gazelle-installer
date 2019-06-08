@@ -564,74 +564,6 @@ void MInstall::prepareToInstall()
     buildServiceList();
 }
 
-void MInstall::addItemCombo(QComboBox *cb, const QString *part)
-{
-    // determine which hash to update and exit if called on same combo
-    QHash<QString, int> *removedHash;
-    if (cb == homeCombo) {
-        if (part == prevItemHome) { // return if called to add item on the same combo
-            return;
-        }
-        removedHash = &removedHome;
-    } else if (cb == swapCombo) {
-        if (part == prevItemSwap) { // return if called to add item on the same combo
-            return;
-        }
-        removedHash = &removedSwap;
-    } else if (cb == bootCombo) {
-        if (part == prevItemBoot) { // return if called to add item on the same combo
-            return;
-        }
-        removedHash = &removedBoot;
-    } else { // root
-        if (part == prevItemRoot) { // return if called to add item on the same combo
-            return;
-        }
-        removedHash = &removedRoot;
-    }
-    // remove item from combo and update hash
-    if (removedHash->contains(*part)) {
-        cb->insertItem(removedHash->value(*part), *part);  //index, item
-        removedHash->remove(*part); // clear removed hash
-    }
-}
-
-void MInstall::removeItemCombo(QComboBox *cb, const QString *part)
-{
-    // determine which hash to update and exit if called on same combo
-    QHash<QString, int> *removedHash;
-    if (cb == homeCombo) {
-        if (part == prevItemHome) { // return if called to add item on the same combo
-            return;
-        }
-        removedHash = &removedHome;
-    } else if (cb == swapCombo) {
-        if (part == prevItemSwap) { // return if called to add item on the same combo
-            return;
-        }
-        removedHash = &removedSwap;
-    } else if (cb == bootCombo) {
-        if (part == prevItemBoot) { // return if called to add item on the same combo
-            return;
-        }
-        removedHash = &removedBoot;
-    } else { // root
-        if (part == prevItemRoot) { // return if called to add item on the same combo
-            return;
-        }
-        removedHash = &removedRoot;
-    }
-
-    // find and remove item
-    int index = cb->findText(part->section(" ", 0, 0), Qt::MatchStartsWith);
-    if (index != -1) {
-        cb->removeItem(index);
-        removedHash->insert(*part, index);
-    } else {
-        return;
-    }
-}
-
 int MInstall::manageConfig(enum ConfigAction mode)
 {
     configStuck = 0;
@@ -820,29 +752,6 @@ int MInstall::manageConfig(enum ConfigAction mode)
     }
 
     return configStuck;
-}
-
-// update partition combos
-void MInstall::updatePartCombo(QString *prevItem, const QString &part)
-{
-    // check if prev item selected is different or the same
-    if (*prevItem == part) { // same: do nothing
-        return;
-    } else {
-        addItemCombo(rootCombo, prevItem);
-        addItemCombo(homeCombo, prevItem);
-        addItemCombo(swapCombo, prevItem);
-        addItemCombo(bootCombo, prevItem);
-        if (part.isEmpty() || part == "root" || part == "none") {
-            prevItem->clear();
-        } else { // remove items from combos
-            *prevItem = part; // update selection
-            removeItemCombo(rootCombo, prevItem);
-            removeItemCombo(homeCombo, prevItem);
-            removeItemCombo(swapCombo, prevItem);
-            removeItemCombo(bootCombo, prevItem);
-        }
-    }
 }
 
 void MInstall::stashAdvancedFDE(bool save)
@@ -2691,28 +2600,71 @@ void MInstall::updatePartitionWidgets()
     }
 
     // partition combo boxes
-    rootCombo->clear();
-    swapCombo->clear();
-    homeCombo->clear();
-    bootCombo->clear();
-    homeCombo->addItem("root");
-    swapCombo->addItem("none");
-    bootCombo->addItem("root");
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!bdinfo.isDisk && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
-            const QString &cfmt = bdinfo.comboFormat();
-            if (!bdinfo.isSwap) {
-                if (bdinfo.size >= MIN_ROOT_DEVICE_SIZE) rootCombo->addItem(cfmt);
-                homeCombo->addItem(cfmt);
+    updatePartitionCombos(NULL);
+    on_rootCombo_currentIndexChanged(rootCombo->currentText());
+}
+
+void MInstall::updatePartitionCombos(QComboBox *changed)
+{
+    QString curItem;
+    auto lambdaComboEnter = [this, &curItem](QComboBox *combo) -> void {
+        combo->blockSignals(true);
+        curItem = combo->currentText();
+        combo->clear();
+    };
+    auto lambdaComboLeave = [this, &curItem](QComboBox *combo) -> void {
+        const int icur = combo->findText(curItem);
+        if (icur >= 0) combo->setCurrentIndex(icur);
+        combo->blockSignals(false);
+    };
+    auto lambdaTestBD = [this](const BlockDeviceInfo &bdinfo) -> bool {
+        return !bdinfo.isDisk && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
+                && !(rootCombo->currentText().startsWith(bdinfo.name))
+                && !(swapCombo->currentText().startsWith(bdinfo.name))
+                && !(homeCombo->currentText().startsWith(bdinfo.name))
+                && !(bootCombo->currentText().startsWith(bdinfo.name));
+    };
+    if (rootCombo != changed) {
+        lambdaComboEnter(rootCombo);
+        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+            if (lambdaTestBD(bdinfo) && !bdinfo.isSwap
+                && (bdinfo.size >= MIN_ROOT_DEVICE_SIZE)) {
+                rootCombo->addItem(bdinfo.comboFormat());
             }
-            swapCombo->addItem(cfmt);
-            if (!bdinfo.isESP && bdinfo.size >= MIN_BOOT_DEVICE_SIZE) bootCombo->addItem(cfmt);
         }
+        if (rootCombo->count() == 0) rootCombo->addItem("none");
+        lambdaComboLeave(rootCombo);
     }
-    // if there was no suitable root, add an entry to let the user know
-    if (rootCombo->count() == 0) rootCombo->addItem("none");
-    prevItemRoot.clear();
-    on_rootCombo_activated(rootCombo->currentText());
+    if (swapCombo != changed) {
+        lambdaComboEnter(swapCombo);
+        swapCombo->addItem("none");
+        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+            if (lambdaTestBD(bdinfo)) swapCombo->addItem(bdinfo.comboFormat());
+        }
+        lambdaComboLeave(swapCombo);
+    }
+    if (homeCombo != changed) {
+        lambdaComboEnter(homeCombo);
+        homeCombo->addItem("root");
+        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+            if (lambdaTestBD(bdinfo) && !bdinfo.isSwap) {
+                homeCombo->addItem(bdinfo.comboFormat());
+            }
+        }
+        lambdaComboLeave(homeCombo);
+    }
+    if (bootCombo != changed) {
+        lambdaComboEnter(bootCombo);
+        bootCombo->addItem("root");
+        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+            if (lambdaTestBD(bdinfo) && !bdinfo.isESP
+                    && bdinfo.size >= MIN_BOOT_DEVICE_SIZE) {
+                bootCombo->addItem(bdinfo.comboFormat());
+            }
+        }
+        lambdaComboLeave(bootCombo);
+    }
+
 }
 
 // return block device info that is suitable for a combo box
@@ -2973,12 +2925,12 @@ void MInstall::on_buttonBenchmarkFDE_clicked()
 }
 
 // root partition changed, rebuild home, swap, boot combo boxes
-void MInstall::on_rootCombo_activated(const QString &arg1)
+void MInstall::on_rootCombo_currentIndexChanged(const QString &text)
 {
-    updatePartCombo(&prevItemRoot, arg1);
-    rootLabelEdit->setEnabled(!arg1.isEmpty());
-    rootTypeCombo->setEnabled(!arg1.isEmpty());
-    checkBoxEncryptRoot->setEnabled(!arg1.isEmpty());
+    updatePartitionCombos(rootCombo);
+    rootLabelEdit->setEnabled(!text.isEmpty());
+    rootTypeCombo->setEnabled(!text.isEmpty());
+    checkBoxEncryptRoot->setEnabled(!text.isEmpty());
 }
 
 void MInstall::on_rootTypeCombo_activated(QString)
@@ -3138,20 +3090,6 @@ void MInstall::on_buttonSetKeyboard_clicked()
     execute("fskbsetting", false);
     show();
     setupkeyboardbutton();
-}
-
-void MInstall::on_homeCombo_currentIndexChanged(const QString &arg1)
-{
-    if (!homeCombo->isEnabled() || arg1.isEmpty()) {
-        return;
-    }
-    homeLabelEdit->setEnabled(arg1 != "root");
-    homeTypeCombo->setEnabled(arg1 != "root");
-    checkBoxEncryptHome->setEnabled(arg1 != "root");
-    checkBoxEncryptHome->setChecked(checkBoxEncryptRoot->isChecked() && arg1 == "root");
-    if (arg1 == "root") {
-        homeTypeCombo->setCurrentIndex(rootTypeCombo->currentIndex());
-    }
 }
 
 void MInstall::on_userPasswordEdit2_textChanged(const QString &arg1)
@@ -3404,20 +3342,28 @@ void MInstall::on_spinFDEkeysize_valueChanged(int i)
     }
 }
 
-void MInstall::on_homeCombo_activated(const QString &arg1)
+void MInstall::on_homeCombo_currentIndexChanged(const QString &text)
 {
-    updatePartCombo(&prevItemHome, arg1);
+    updatePartitionCombos(homeCombo);
+    if (!homeCombo->isEnabled() || text.isEmpty()) return;
+    homeLabelEdit->setEnabled(text != "root");
+    homeTypeCombo->setEnabled(text != "root");
+    checkBoxEncryptHome->setEnabled(text != "root");
+    checkBoxEncryptHome->setChecked(checkBoxEncryptRoot->isChecked() && text == "root");
+    if (text == "root") {
+        homeTypeCombo->setCurrentIndex(rootTypeCombo->currentIndex());
+    }
 }
 
-void MInstall::on_swapCombo_activated(const QString &arg1)
+void MInstall::on_swapCombo_currentIndexChanged(const QString &text)
 {
-    updatePartCombo(&prevItemSwap, arg1);
-    swapLabelEdit->setEnabled(swapCombo->currentText() != "none");
+    updatePartitionCombos(swapCombo);
+    swapLabelEdit->setEnabled(text != "none");
 }
 
-void MInstall::on_bootCombo_activated(const QString &arg1)
+void MInstall::on_bootCombo_currentIndexChanged(int)
 {
-    updatePartCombo(&prevItemBoot, arg1);
+    updatePartitionCombos(bootCombo);
 }
 
 void MInstall::on_grubCheckBox_toggled(bool checked)
