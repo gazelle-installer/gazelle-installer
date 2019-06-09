@@ -633,6 +633,17 @@ int MInstall::manageConfig(enum ConfigAction mode)
         const char *diskChoices[] = {"WholeDisk", "Custom"};
         QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
         lambdaSetRadios("PartitionMode", 2, diskChoices, diskRadios);
+        if (mode == ConfigLoadA) {
+            // Password (load-only)
+            const QString &epass = config->value("Pass").toString();
+            if (entireDiskButton->isChecked()) {
+                FDEpassword->setText(epass);
+                FDEpassword2->setText(epass);
+            } else {
+                FDEpassCust->setText(epass);
+                FDEpassCust2->setText(epass);
+            }
+        }
         config->endGroup();
         if (configStuck < 0) configStuck = 1;
 
@@ -747,6 +758,13 @@ int MInstall::manageConfig(enum ConfigAction mode)
             else if (!val.compare("Use", Qt::CaseInsensitive)) oldHomeAction = OldHomeUse;
             else if (!val.compare("Delete", Qt::CaseInsensitive)) oldHomeAction = OldHomeDelete;
             else configStuck = -1;
+            // Passwords (load-only)
+            const QString &upass = config->value("UserPass").toString();
+            userPasswordEdit->setText(upass);
+            userPasswordEdit2->setText(upass);
+            const QString &rpass = config->value("RootPass").toString();
+            rootPasswordEdit->setText(rpass);
+            rootPasswordEdit2->setText(rpass);
         }
         config->endGroup();
         if (configStuck < 0) configStuck = 9;
