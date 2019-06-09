@@ -2352,10 +2352,10 @@ void MInstall::pageDisplayed(int next)
                              "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
         if (phase < 0) {
             updateCursor(Qt::WaitCursor);
+            phase = 0;
             updatePartitionWidgets();
+            updateCursor();
         }
-        phase = 0;
-        updateCursor();
         break;
 
     case 2:  // choose partition
@@ -2959,6 +2959,7 @@ bool MInstall::abort(bool onclose)
     } else {
         phase = -1;
     }
+    if (!onclose) this->setEnabled(true);
     return true;
 }
 
