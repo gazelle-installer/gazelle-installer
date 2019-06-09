@@ -48,7 +48,7 @@ struct BlockDeviceInfo {
     bool isESP : 1;
     bool isNative : 1;
     bool isSwap : 1;
-    QString comboFormat() const;
+    void addToCombo(QComboBox *combo) const;
 };
 
 class BlockDeviceList : public QList<BlockDeviceInfo> {
