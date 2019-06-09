@@ -575,11 +575,12 @@ int MInstall::manageConfig(enum ConfigAction mode)
     if (!config) return 0;
 
     auto lambdaSetComboBox = [this, mode](const QString &key, QComboBox *combo, const bool useData) -> void {
-        const QVariant &val = useData ? combo->currentData() : QVariant(combo->currentText());
-        if (mode == ConfigSave) config->setValue(key, val);
+        const QVariant &comboval = useData ? combo->currentData() : QVariant(combo->currentText());
+        if (mode == ConfigSave) config->setValue(key, comboval);
         else {
-            const int icombo = useData ? combo->findData(config->value(key, val), Qt::MatchExactly)
-                             : combo->findText(config->value(key, val).toString(), Qt::MatchExactly);
+            const QVariant &val = config->value(key, comboval);
+            const int icombo = useData ? combo->findData(val, Qt::UserRole, Qt::MatchFixedString)
+                             : combo->findText(val.toString(), Qt::MatchFixedString);
             if (icombo >= 0) combo->setCurrentIndex(icombo);
             else if (!configStuck) configStuck = -1;
         }
@@ -615,8 +616,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
         else {
             const QString &val = config->value(key, choice).toString();
             for (int ixi = 0; ixi < nchoices; ++ixi) {
-                if (val.compare(QString(choices[ixi]), Qt::CaseInsensitive)
-                        && radios[ixi]->isVisible() && radios[ixi]->isEnabled()) {
+                if (!val.compare(QString(choices[ixi]), Qt::CaseInsensitive)) {
                     radios[ixi]->setChecked(true);
                     return;
                 }
@@ -743,9 +743,9 @@ int MInstall::manageConfig(enum ConfigAction mode)
             config->setValue("OldHomeAction", action);
         } else {
             const QString &val = config->value("OldHomeAction", "Nothing").toString();
-            if (val.compare("Nothing", Qt::CaseInsensitive)) oldHomeAction = OldHomeNothing;
-            else if (val.compare("Use", Qt::CaseInsensitive)) oldHomeAction = OldHomeUse;
-            else if (val.compare("Delete", Qt::CaseInsensitive)) oldHomeAction = OldHomeDelete;
+            if (!val.compare("Nothing", Qt::CaseInsensitive)) oldHomeAction = OldHomeNothing;
+            else if (!val.compare("Use", Qt::CaseInsensitive)) oldHomeAction = OldHomeUse;
+            else if (!val.compare("Delete", Qt::CaseInsensitive)) oldHomeAction = OldHomeDelete;
             else configStuck = -1;
         }
         config->endGroup();
