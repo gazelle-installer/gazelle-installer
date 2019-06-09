@@ -746,6 +746,22 @@ int MInstall::manageConfig(enum ConfigAction mode)
         lambdaSetLineEdit("Username", userNameEdit);
         lambdaSetCheckBox("Autologin", autologinCheckBox);
         lambdaSetCheckBox("SaveDesktop", saveDesktopCheckBox);
+        if (mode == ConfigSave) {
+            const char *action = NULL;
+            switch (oldHomeAction) {
+                case OldHomeNothing: install = "Nothing"; break;
+                case OldHomeUse: install = "Use"; break;
+                case OldHomeSave: install = "Save"; break;
+                case OldHomeDelete: install = "Delete"; break;
+            }
+            config->setValue("OldHomeAction", action);
+        } else {
+            const QString &val = config->value("OldHomeAction", "Nothing").toString();
+            if (val.compare("Nothing", Qt::CaseInsensitive)) oldHomeAction = OldHomeNothing;
+            else if (val.compare("Use", Qt::CaseInsensitive)) oldHomeAction = OldHomeUse;
+            else if (val.compare("Delete", Qt::CaseInsensitive)) oldHomeAction = OldHomeDelete;
+            else configStuck = -1;
+        }
         config->endGroup();
         if (configStuck < 0) configStuck = 9;
     }
@@ -1896,8 +1912,7 @@ bool MInstall::validateUserInfo()
 
     // Check for pre-existing /home directory
     // see if user directory already exists
-    if (listHomes.contains(userNameEdit->text())) {
-        // already exists
+    if (oldHomeAction == OldHomeNothing && listHomes.contains(userNameEdit->text())) {
         QMessageBox msgbox(this);
         msgbox.setWindowTitle(windowTitle());
         msgbox.setText(tr("The home directory for %1 already exists.").arg(userNameEdit->text()));
@@ -1912,7 +1927,6 @@ bool MInstall::validateUserInfo()
         else if (msgbtn == msgbtnSave) oldHomeAction = OldHomeSave; // save the old directory
         else if (msgbtn == msgbtnUse) oldHomeAction = OldHomeUse; // use the old home
         else return false; // don't save, reuse or delete -- can't proceed
-        qDebug() << oldHomeAction;
     }
     nextFocus = NULL;
     return true;
