@@ -2605,65 +2605,43 @@ void MInstall::updatePartitionWidgets()
 
 void MInstall::updatePartitionCombos(QComboBox *changed)
 {
-    QString curItem;
-    auto lambdaComboEnter = [this, &curItem](QComboBox *combo) -> void {
-        combo->blockSignals(true);
-        curItem = combo->currentText();
-        combo->clear();
-    };
-    auto lambdaComboLeave = [this, &curItem](QComboBox *combo) -> void {
-        const int icur = combo->findText(curItem);
-        if (icur >= 0) combo->setCurrentIndex(icur);
-        combo->blockSignals(false);
-    };
-    auto lambdaTestBD = [this](const BlockDeviceInfo &bdinfo) -> bool {
-        return !bdinfo.isDisk && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
-                && !(rootCombo->currentText().startsWith(bdinfo.name))
-                && !(swapCombo->currentText().startsWith(bdinfo.name))
-                && !(homeCombo->currentText().startsWith(bdinfo.name))
-                && !(bootCombo->currentText().startsWith(bdinfo.name));
-    };
-    if (rootCombo != changed) {
-        lambdaComboEnter(rootCombo);
-        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (lambdaTestBD(bdinfo) && !bdinfo.isSwap
-                && (bdinfo.size >= MIN_ROOT_DEVICE_SIZE)) {
-                rootCombo->addItem(bdinfo.comboFormat());
-            }
-        }
-        if (rootCombo->count() == 0) rootCombo->addItem("none");
-        lambdaComboLeave(rootCombo);
-    }
-    if (swapCombo != changed) {
-        lambdaComboEnter(swapCombo);
-        swapCombo->addItem("none");
-        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (lambdaTestBD(bdinfo)) swapCombo->addItem(bdinfo.comboFormat());
-        }
-        lambdaComboLeave(swapCombo);
-    }
-    if (homeCombo != changed) {
-        lambdaComboEnter(homeCombo);
-        homeCombo->addItem("root");
-        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (lambdaTestBD(bdinfo) && !bdinfo.isSwap) {
-                homeCombo->addItem(bdinfo.comboFormat());
-            }
-        }
-        lambdaComboLeave(homeCombo);
-    }
-    if (bootCombo != changed) {
-        lambdaComboEnter(bootCombo);
-        bootCombo->addItem("root");
-        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (lambdaTestBD(bdinfo) && !bdinfo.isESP
-                    && bdinfo.size >= MIN_BOOT_DEVICE_SIZE) {
-                bootCombo->addItem(bdinfo.comboFormat());
-            }
-        }
-        lambdaComboLeave(bootCombo);
-    }
+    // rebuild the other combo boxes and leave the changed one alone
+    for (QComboBox *combo : {rootCombo, swapCombo, homeCombo, bootCombo}) {
+        if (combo != changed) {
+            // block events for now and save the combo box state
+            combo->blockSignals(true);
+            QString curItem = combo->currentText();
+            combo->clear();
+            if (combo == homeCombo || combo == bootCombo) combo->addItem("root");
+            else if (combo == swapCombo) combo->addItem("none");
 
+            // add each eligible partition that is not already selected elsewhere
+            for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+                if (!bdinfo.isDisk && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
+                        && !(rootCombo->currentText().startsWith(bdinfo.name))
+                        && !(swapCombo->currentText().startsWith(bdinfo.name))
+                        && !(homeCombo->currentText().startsWith(bdinfo.name))
+                        && !(bootCombo->currentText().startsWith(bdinfo.name))) {
+                    bool add = true;
+                    if (combo == rootCombo) {
+                        add = (!bdinfo.isSwap && bdinfo.size >= MIN_ROOT_DEVICE_SIZE);
+                    } else if (combo == homeCombo) {
+                        add = (!bdinfo.isSwap);
+                    } else if (combo == bootCombo) {
+                        add = (!bdinfo.isESP && bdinfo.size >= MIN_BOOT_DEVICE_SIZE);
+                    }
+                    if (add) combo->addItem(bdinfo.comboFormat());
+                }
+            }
+
+            // restore the combo box state (if possible) and allow events again
+            const int icur = combo->findText(curItem);
+            if (icur >= 0) combo->setCurrentIndex(icur);
+            combo->blockSignals(false);
+        }
+    }
+    // if no valid root is found, the user should know
+    if (rootCombo->count() == 0) rootCombo->addItem("none");
 }
 
 // return block device info that is suitable for a combo box
