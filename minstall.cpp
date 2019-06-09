@@ -1179,7 +1179,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (!bdinfo.isDisk && bdinfo.name.startsWith(drv)) {
             execute("swapoff /dev/" + bdinfo.name, true);
-            execute("pumount /dev/" + bdinfo.name, true);
+            execute("umount /dev/" + bdinfo.name, true);
         }
     }
 
@@ -1344,7 +1344,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
 
     auto lambdaPreparePart = [this](const QString &strdev) -> void {
         execute("swapoff " + strdev, true);
-        execute("pumount " + strdev, true);
+        execute("umount " + strdev, true);
         execute(QStringLiteral("dd if=/dev/zero of=%1 bs=8192 count=1").arg(strdev));
 
         // command to set the partition type
@@ -1380,7 +1380,7 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
     // prepare home if not being preserved, and on a different partition
     if (homeDevicePreserve != rootDevicePreserve) {
         if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
-        if (saveHome) execute("pumount " + homeDevicePreserve);
+        if (saveHome) execute("umount " + homeDevicePreserve);
         else {
             lambdaPreparePart(homeDevicePreserve);
             homeType = homeTypeCombo->currentText().toUtf8();
