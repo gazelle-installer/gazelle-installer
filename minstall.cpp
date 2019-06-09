@@ -2716,19 +2716,28 @@ void MInstall::buildBlockDevList()
         QSettings livecfg("/live/config/initrd.out", QSettings::NativeFormat);
         bootUUID = livecfg.value("BOOT_UUID").toString();
     }
+
+    // backup detection for drives that don't have UUID for ESP
+    const QStringList backup_list = getCmdOuts("fdisk -l -o DEVICE,TYPE |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
+
     // populate the block device list
     listBlkDevs.clear();
+    bool gpt = false; // propagates to all partitions within the drive
     const QStringList &blkdevs = getCmdOuts("lsblk -brno TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL"
                                             " | grep -E '^(disk|part)'");
     for (const QString &blkdev : blkdevs) {
         const QStringList &bdsegs = blkdev.split(' ');
         const int segsize = bdsegs.size();
         if (segsize < 3) continue;
+
         BlockDeviceInfo bdinfo;
+        bdinfo.isDisk = (bdsegs[0] == "disk");
+        if (bdinfo.isDisk) gpt = isGpt("/dev/" + bdinfo.name);
+        bdinfo.isGPT = gpt;
+
         bdinfo.name = bdsegs[1];
         bdinfo.uuid = bdsegs[2];
         bdinfo.size = bdsegs[3].toLongLong();
-        bdinfo.isDisk = (bdsegs[0] == "disk");
         bdinfo.isBoot = (!bootUUID.isEmpty() && bdinfo.uuid == bootUUID);
         if (segsize > 4) {
             bdinfo.isESP = (bdsegs[4].count(rxESP) >= 1);
@@ -2736,6 +2745,10 @@ void MInstall::buildBlockDevList()
             bdinfo.isNative = (bdsegs[4].count(rxNative) >= 1);
         } else {
             bdinfo.isESP = bdinfo.isSwap = bdinfo.isNative = false;
+        }
+        if (!bdinfo.isDisk && !bdinfo.isESP) {
+            // check the backup ESP detection list
+            bdinfo.isESP = backup_list.contains(bdinfo.name);
         }
         if (segsize > 5) {
             bdinfo.fstype = bdsegs[5];
@@ -3359,21 +3372,9 @@ void MInstall::on_bootCombo_currentIndexChanged(int)
 
 void MInstall::on_grubCheckBox_toggled(bool checked)
 {
-    if(checked) {
-        if(listBootESP.count() > 0) {
-            grubEspButton->setEnabled(true);
-        }
-        if(listBootDrives.count() > 0) {
-            grubMbrButton->setEnabled(true);
-        }
-        if(listBootPart.count() > 0) {
-            grubPbrButton->setDisabled(checkBoxEncryptRoot->isChecked());
-        }
-    } else {
-        grubEspButton->setEnabled(false);
-        grubMbrButton->setEnabled(false);
-        grubPbrButton->setEnabled(false);
-    }
+    grubEspButton->setEnabled(checked && canESP);
+    grubMbrButton->setEnabled(checked && canMBR);
+    grubPbrButton->setEnabled(checked && canPBR);
     grubInsLabel->setEnabled(checked);
     grubBootLabel->setEnabled(checked);
     grubBootCombo->setEnabled(checked);
@@ -3382,62 +3383,55 @@ void MInstall::on_grubCheckBox_toggled(bool checked)
 void MInstall::on_grubMbrButton_toggled()
 {
     grubBootCombo->clear();
-    grubBootCombo->addItems(listBootDrives);
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (bdinfo.isDisk) grubBootCombo->addItem(bdinfo.comboFormat());
+    }
     grubBootLabel->setText(tr("System boot disk:"));
 }
 
 void MInstall::on_grubPbrButton_toggled()
 {
     grubBootCombo->clear();
-    grubBootCombo->addItems(listBootPart);
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (!(bdinfo.isDisk || bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
+                 && bdinfo.isNative && bdinfo.fstype != "crypto_LUKS") {
+            // list only Linux partitions excluding crypto_LUKS partitions
+            grubBootCombo->addItem(bdinfo.comboFormat());
+        }
+    }
     grubBootLabel->setText(tr("Partition to use:"));
 }
 
 void MInstall::on_grubEspButton_toggled()
 {
     grubBootCombo->clear();
-    grubBootCombo->addItems(listBootESP);
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if (bdinfo.isESP) grubBootCombo->addItem(bdinfo.comboFormat());
+    }
     grubBootLabel->setText(tr("Partition to use:"));
 }
 
 // build ESP list available to install GRUB
 void MInstall::buildBootLists()
 {
-    // build partition list available to install GRUB (in PBR)
-    listBootPart.clear();
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDisk) listBootDrives << bdinfo.comboFormat();
-        else if (!(bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
-                 && bdinfo.isNative) { // list only Linux partitions
-            if (getCmdOut("blkid /dev/" + bdinfo.name + " -s TYPE -o value") != "crypto_LUKS") { // exclude crypto_LUKS partitions
-                listBootPart << bdinfo.comboFormat();
-            }
-        }
-    }
-    if (grubMbrButton->isChecked()) on_grubMbrButton_toggled(); // force a refresh
+    // refresh lists and enable or disable options according to device presence
+    on_grubMbrButton_toggled();
+    canMBR = (grubBootCombo->count() > 0);
+    on_grubPbrButton_toggled();
+    canPBR = (grubBootCombo->count() > 0);
 
-    // check if booted UEFI and if ESP(s) available
-    grubEspButton->setEnabled(false);
-    listBootESP.clear();
+    canESP = false;
     if (uefi) {
-        // backup detection for drives that don't have UUID for ESP
-        const QStringList backup_list = getCmdOuts("fdisk -l -o DEVICE,TYPE |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
-        // find ESP for all partitions on all drives
-        bool gpt = false;
-        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (bdinfo.isDisk) gpt = isGpt("/dev/" + bdinfo.name);
-            else if (gpt && !bdinfo.isBoot) {
-                if (bdinfo.isESP || backup_list.contains(bdinfo.name)) {
-                    listBootESP << bdinfo.comboFormat();
-                }
-            }
-        }
-
-        // if GPT, and ESP exists
-        if (listBootESP.count() > 0) {
-            grubEspButton->setEnabled(true);
+        on_grubEspButton_toggled();
+        if (grubBootCombo->count() > 0) {
+            canESP = true;
             grubEspButton->click();
         }
+    }
+    // default to MBR if no ESP exists
+    if (!canESP) {
+        on_grubMbrButton_toggled();
+        grubMbrButton->click();
     }
 }
 
