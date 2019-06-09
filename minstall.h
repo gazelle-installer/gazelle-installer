@@ -217,8 +217,8 @@ private:
     bool haveSamba = false;
     bool haveSnapshotUserAccounts = false;
     enum OldHomeAction {
-        OldHomeUse, OldHomeSave, OldHomeDelete
-    } oldHomeAction;
+        OldHomeNothing, OldHomeUse, OldHomeSave, OldHomeDelete
+    } oldHomeAction = OldHomeNothing;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
