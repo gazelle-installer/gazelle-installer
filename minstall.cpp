@@ -330,7 +330,7 @@ bool MInstall::checkDisk()
     int ans;
     QString output;
 
-    QString drv = "/dev/" + (entireDiskButton->isChecked() ? diskCombo : rootCombo)->currentText().section(" ", 0, 0);
+    QString drv = "/dev/" + (entireDiskButton->isChecked() ? diskCombo : rootCombo)->currentData().toString();
     output = getCmdOut("smartctl -H " + drv + "|grep -w FAILED");
     if (output.contains("FAILED")) {
         msg = output + tr("\n\nThe disk with the partition you selected for installation is failing.\n\n") +
@@ -574,21 +574,13 @@ int MInstall::manageConfig(enum ConfigAction mode)
     }
     if (!config) return 0;
 
-    auto lambdaSetComboBox = [this, mode](const QString &key, QComboBox *combobox, const bool useData = false) -> void {
-        if (mode == ConfigSave) {
-            if (useData) config->setValue(key, combobox->currentData());
-            else config->setValue(key, combobox->currentText().section(" ", 0, 0));
-        } else {
-            int icombo;
-            if (useData) {
-                icombo = combobox->findData(config->value(key, combobox->currentData()),
-                                            Qt::MatchExactly);
-            } else {
-                const QString &val = config->value(key, combobox->currentText()).toString();
-                icombo = combobox->findText(val, Qt::MatchStartsWith);
-            }
-
-            if (icombo >= 0) combobox->setCurrentIndex(icombo);
+    auto lambdaSetComboBox = [this, mode](const QString &key, QComboBox *combo, const bool useData) -> void {
+        const QVariant &val = useData ? combo->currentData() : QVariant(combo->currentText());
+        if (mode == ConfigSave) config->setValue(key, val);
+        else {
+            const int icombo = useData ? combo->findData(config->value(key, val), Qt::MatchExactly)
+                             : combo->findText(config->value(key, val).toString(), Qt::MatchExactly);
+            if (icombo >= 0) combo->setCurrentIndex(icombo);
             else if (!configStuck) configStuck = -1;
         }
     };
@@ -629,7 +621,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
     if (mode == ConfigSave || mode == ConfigLoadA) {
         // Disk setup
         config->beginGroup("Disk");
-        lambdaSetComboBox("Disk", diskCombo);
+        lambdaSetComboBox("Disk", diskCombo, true);
         lambdaSetCheckBox("Encrypted", checkBoxEncryptAuto);
         lambdaSetRadioBoolean("EntireDisk", entireDiskButton, existing_partitionsButton);
         config->endGroup();
@@ -639,15 +631,15 @@ int MInstall::manageConfig(enum ConfigAction mode)
             // Partition step
             config->beginGroup("Partition");
 
-            lambdaSetComboBox("Root", rootCombo);
-            lambdaSetComboBox("Home", homeCombo);
-            lambdaSetComboBox("Swap", swapCombo);
-            lambdaSetComboBox("Boot", bootCombo);
+            lambdaSetComboBox("Root", rootCombo, true);
+            lambdaSetComboBox("Home", homeCombo, true);
+            lambdaSetComboBox("Swap", swapCombo, true);
+            lambdaSetComboBox("Boot", bootCombo, true);
 
-            lambdaSetComboBox("RootType", rootTypeCombo);
-            lambdaSetComboBox("HomeType", homeTypeCombo);
+            lambdaSetComboBox("RootType", rootTypeCombo, false);
+            lambdaSetComboBox("HomeType", homeTypeCombo, false);
 
-            lambdaSetCheckBox( "RootEncrypt", checkBoxEncryptRoot);
+            lambdaSetCheckBox("RootEncrypt", checkBoxEncryptRoot);
             lambdaSetCheckBox("HomeEncrypt", checkBoxEncryptHome);
             lambdaSetCheckBox("SwapEncrypt", checkBoxEncryptSwap);
 
@@ -664,13 +656,13 @@ int MInstall::manageConfig(enum ConfigAction mode)
 
         // AES step
         config->beginGroup("Encryption");
-        lambdaSetComboBox("Cipher", comboFDEcipher);
-        lambdaSetComboBox("ChainMode", comboFDEchain);
-        lambdaSetComboBox("IVgenerator", comboFDEivgen);
-        lambdaSetComboBox("IVhash", comboFDEivhash);
+        lambdaSetComboBox("Cipher", comboFDEcipher, false);
+        lambdaSetComboBox("ChainMode", comboFDEchain, false);
+        lambdaSetComboBox("IVgenerator", comboFDEivgen, false);
+        lambdaSetComboBox("IVhash", comboFDEivhash, false);
         lambdaSetSpinBox("KeySize", spinFDEkeysize);
-        lambdaSetComboBox("LUKSkeyHash", comboFDEhash);
-        lambdaSetComboBox("KernelRNG", comboFDErandom);
+        lambdaSetComboBox("LUKSkeyHash", comboFDEhash, false);
+        lambdaSetComboBox("KernelRNG", comboFDErandom, false);
         lambdaSetSpinBox("KDFroundTime", spinFDEroundtime);
         config->endGroup();
         if (configStuck < 0) configStuck = 3;
@@ -701,7 +693,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
                 else configStuck = -1;
             } else configStuck = -1;
         }
-        lambdaSetComboBox("Location", grubBootCombo);
+        lambdaSetComboBox("Location", grubBootCombo, true);
         config->endGroup();
         if (configStuck < 0) configStuck = 5;
 
@@ -737,7 +729,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
         lambdaSetComboBox("Locale", localeCombo, true);
         lambdaSetCheckBox("LocalClock", localClockCheckBox);
         lambdaSetRadioBoolean("Clock24h", radio24h, radio12h);
-        lambdaSetComboBox("Timezone", timezoneCombo);
+        lambdaSetComboBox("Timezone", timezoneCombo, false);
         config->endGroup();
         if (configStuck < 0) configStuck = 8;
 
@@ -1054,14 +1046,14 @@ bool MInstall::validateChosenPartitions()
             }
         }
     }
-    QString rootdev = rootCombo->currentText().section(" ", 0, 0);
-    QString homedev = homeCombo->currentText().section(" ", 0, 0);
-    QString swapdev = swapCombo->currentText().section(" ", 0, 0);
+    QString rootdev(rootCombo->currentData().toString());
+    QString homedev(homeCombo->currentData().toString());
+    QString swapdev(swapCombo->currentData().toString());
     homedev = (homedev == "root") ? rootdev : homedev;
     if (bootCombo->currentText() == "root") {
         bootdev = rootdev;
     } else {
-        bootdev = bootCombo->currentText().section(" ", 0, 0);
+        bootdev = bootCombo->currentData().toString();
     }
 
     if (rootdev == "none") {
@@ -1188,7 +1180,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    QString drv(diskCombo->currentText().section(" ", 0, 0));
+    QString drv(diskCombo->currentData().toString());
     // detach all existing partitions on the selected drive
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (!bdinfo.isDisk && bdinfo.name.startsWith(drv)) {
@@ -1568,7 +1560,7 @@ void MInstall::makeFstab()
             out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1\n";
         }
         if (grubEspButton->isChecked()) {
-            const QString espdev = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0);
+            const QString espdev = "/dev/" + grubBootCombo->currentData().toString();
             const QString espdevUUID = "UUID=" + getCmdOut(cmdBlkID + espdev);
             qDebug() << "espdev" << espdev << espdevUUID;
             out << espdevUUID + " /boot/efi vfat defaults,noatime,dmask=0002,fmask=0113 0 0\n";
@@ -1690,7 +1682,7 @@ bool MInstall::installLoader()
     }
 
     //add switch to change root partition info
-    QString boot = "/dev/" + grubBootCombo->currentText().section(" ", 0, 0);
+    QString boot = "/dev/" + grubBootCombo->currentData().toString();
 
     if (grubMbrButton->isChecked() && !isGpt(boot)) {
         QString part_num;
@@ -2282,7 +2274,7 @@ int MInstall::showPage(int curr, int next)
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
                 return curr;
             }
-            QString drv = "/dev/" + diskCombo->currentText().section(" ", 0, 0);
+            QString drv = "/dev/" + diskCombo->currentData().toString();
             QString msg = tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME);
             int ans = QMessageBox::warning(this, windowTitle(), msg,
                                            QMessageBox::Yes, QMessageBox::No);
@@ -2594,7 +2586,7 @@ void MInstall::updatePartitionWidgets()
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (bdinfo.isDisk && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
                 && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
-            diskCombo->addItem(bdinfo.comboFormat());
+            bdinfo.addToCombo(diskCombo);
         }
     }
     diskCombo->setCurrentIndex(0);
@@ -2626,7 +2618,7 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
             combo->blockSignals(true);
             QString curItem = combo->currentText();
             combo->clear();
-            if (combo == homeCombo || combo == bootCombo) combo->addItem("root");
+            if (combo == homeCombo || combo == bootCombo) combo->addItem("root", "root");
             else if (combo == swapCombo) combo->addItem("none");
 
             // add each eligible partition that is not already selected elsewhere
@@ -2644,7 +2636,7 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
                     } else if (combo == bootCombo) {
                         add = (!bdinfo.isESP && bdinfo.size >= MIN_BOOT_DEVICE_SIZE);
                     }
-                    if (add) combo->addItem(bdinfo.comboFormat());
+                    if (add) bdinfo.addToCombo(combo);
                 }
             }
 
@@ -2659,7 +2651,7 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
 }
 
 // return block device info that is suitable for a combo box
-QString BlockDeviceInfo::comboFormat() const
+void BlockDeviceInfo::addToCombo(QComboBox *combo) const
 {
     static const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
     unsigned int isuffix = 0;
@@ -2672,7 +2664,7 @@ QString BlockDeviceInfo::comboFormat() const
     if (!fstype.isEmpty()) strout += " " + fstype;
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
-    return strout + ")";
+    combo->addItem(strout + ")", name);
 }
 
 int BlockDeviceList::findDevice(const QString &devname) const
@@ -2766,10 +2758,11 @@ void MInstall::buildBlockDevList()
     }
 
     // debug
+    qDebug() << "Name UUID Size Model FS | isDisk isGPT isBoot isESP isNative isSwap";
     for (const BlockDeviceInfo &bdi : listBlkDevs) {
-        qDebug() << bdi.comboFormat() << ", UUID:" << bdi.uuid << ", Disk:" << bdi.isDisk
-                 << ", Boot:" << bdi.isBoot << ", ESP:" << bdi.isESP
-                 << ", Native:" << bdi.isNative << ", Swap:" << bdi.isSwap;
+        qDebug() << bdi.name << bdi.uuid << bdi.size << bdi.model << bdi.fstype << "|"
+                 << bdi.isDisk << bdi.isGPT << bdi.isBoot << bdi.isESP
+                 << bdi.isNative << bdi.isSwap;
     }
 }
 
@@ -3384,7 +3377,7 @@ void MInstall::on_grubMbrButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDisk) grubBootCombo->addItem(bdinfo.comboFormat());
+        if (bdinfo.isDisk) bdinfo.addToCombo(grubBootCombo);
     }
     grubBootLabel->setText(tr("System boot disk:"));
 }
@@ -3396,7 +3389,7 @@ void MInstall::on_grubPbrButton_toggled()
         if (!(bdinfo.isDisk || bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
                  && bdinfo.isNative && bdinfo.fstype != "crypto_LUKS") {
             // list only Linux partitions excluding crypto_LUKS partitions
-            grubBootCombo->addItem(bdinfo.comboFormat());
+            bdinfo.addToCombo(grubBootCombo);
         }
     }
     grubBootLabel->setText(tr("Partition to use:"));
@@ -3406,7 +3399,7 @@ void MInstall::on_grubEspButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isESP) grubBootCombo->addItem(bdinfo.comboFormat());
+        if (bdinfo.isESP) bdinfo.addToCombo(grubBootCombo);
     }
     grubBootLabel->setText(tr("Partition to use:"));
 }
