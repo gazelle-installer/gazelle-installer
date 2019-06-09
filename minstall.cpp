@@ -3404,19 +3404,17 @@ void MInstall::buildBootLists()
     // refresh lists and enable or disable options according to device presence
     on_grubMbrButton_toggled();
     canMBR = (grubBootCombo->count() > 0);
+    grubMbrButton->setEnabled(canMBR);
     on_grubPbrButton_toggled();
     canPBR = (grubBootCombo->count() > 0);
+    grubPbrButton->setEnabled(canPBR);
+    on_grubEspButton_toggled();
+    canESP = (uefi && grubBootCombo->count() > 0);
+    grubEspButton->setEnabled(canESP);
 
-    canESP = false;
-    if (uefi) {
-        on_grubEspButton_toggled();
-        if (grubBootCombo->count() > 0) {
-            canESP = true;
-            grubEspButton->click();
-        }
-    }
-    // default to MBR if no ESP exists
-    if (!canESP) {
+    if (canESP) grubEspButton->click();
+    else {
+        // load MBR list as a default if no ESP exists
         on_grubMbrButton_toggled();
         grubMbrButton->click();
     }
