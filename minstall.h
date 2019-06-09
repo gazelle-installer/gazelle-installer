@@ -43,9 +43,10 @@ struct BlockDeviceInfo {
     QString model;
     qint64 size;
     bool isDisk : 1;
-    bool isNative : 1;
+    bool isGPT : 1;
     bool isBoot : 1;
     bool isESP : 1;
+    bool isNative : 1;
     bool isSwap : 1;
     QString comboFormat() const;
 };
@@ -211,9 +212,7 @@ private:
     int iLastProgress = -1;
 
     // info needed for Phase 2 of the process
-    QStringList listBootDrives;
-    QStringList listBootESP;
-    QStringList listBootPart;
+    bool canMBR, canPBR, canESP;
     bool haveSamba = false;
     bool haveSnapshotUserAccounts = false;
     enum OldHomeAction {
