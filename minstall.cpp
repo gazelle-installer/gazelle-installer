@@ -603,18 +603,25 @@ int MInstall::manageConfig(enum ConfigAction mode)
             if (val != spinbox->value() && !configStuck) configStuck = -1;
         }
     };
-    auto lambdaSetRadioBoolean = [this, mode](const QString &key, QRadioButton *radio, QRadioButton *radioFalse) -> void {
-        const QVariant radioval(radio->isChecked());
-        if (mode == ConfigSave) config->setValue(key, radioval);
+    auto lambdaSetRadios = [this, mode](const QString &key, const int nchoices,
+            const char *choices[], QRadioButton *radios[]) -> void {
+        // obtain the current choice
+        int ixradio = -1;
+        for (int ixi = 0; ixradio < 0 && ixi < nchoices; ++ixi) {
+            if (radios[ixi]->isChecked()) ixradio = ixi;
+        }
+        const QVariant choice(ixradio >= 0 ? choices[ixradio] : "");
+        if (mode == ConfigSave) config->setValue(key, choice);
         else {
-            const bool val = config->value(key, radioval).toBool();
-            if (val) {
-                if (radio->isEnabled()) radio->setChecked(true);
-                else configStuck = -1;
-            } else {
-                if (radioFalse->isEnabled()) radioFalse->setChecked(true);
-                else configStuck = -1;
+            const QString &val = config->value(key, choice).toString();
+            for (int ixi = 0; ixi < nchoices; ++ixi) {
+                if (val.compare(QString(choices[ixi]), Qt::CaseInsensitive)
+                        && radios[ixi]->isVisible() && radios[ixi]->isEnabled()) {
+                    radios[ixi]->setChecked(true);
+                    return;
+                }
             }
+            if (!configStuck) configStuck = -1;
         }
     };
 
@@ -623,7 +630,9 @@ int MInstall::manageConfig(enum ConfigAction mode)
         config->beginGroup("Disk");
         lambdaSetComboBox("Disk", diskCombo, true);
         lambdaSetCheckBox("Encrypted", checkBoxEncryptAuto);
-        lambdaSetRadioBoolean("EntireDisk", entireDiskButton, existing_partitionsButton);
+        const char *diskChoices[] = {"WholeDisk", "Custom"};
+        QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
+        lambdaSetRadios("PartitionMode", 2, diskChoices, diskRadios);
         config->endGroup();
         if (configStuck < 0) configStuck = 1;
 
@@ -671,27 +680,10 @@ int MInstall::manageConfig(enum ConfigAction mode)
     if (mode == ConfigSave || mode == ConfigLoadB) {
         // GRUB step
         config->beginGroup("GRUB");
-        const char *install = NULL;
         if(grubCheckBox->isChecked()) {
-            if(grubMbrButton->isChecked()) install = "MBR";
-            if(grubPbrButton->isChecked()) install = "PBR";
-            if(grubEspButton->isChecked()) install = "ESP";
-        }
-        if (mode == ConfigSave) {
-            if (!install) config->setValue("Install", false);
-            else config->setValue("Install", install);
-        } else {
-            const QString &val = config->value("Install", QVariant(install)).toString();
-            if (val.compare("MBR", Qt::CaseInsensitive)) {
-                if (grubMbrButton->isEnabled()) grubMbrButton->setChecked(true);
-                else configStuck = -1;
-            } else if (val.compare("PBR", Qt::CaseInsensitive)) {
-                if (grubPbrButton->isEnabled()) grubPbrButton->setChecked(true);
-                else configStuck = -1;
-            } else if (val.compare("ESP", Qt::CaseInsensitive)) {
-                if (grubEspButton->isEnabled()) grubEspButton->setChecked(true);
-                else configStuck = -1;
-            } else configStuck = -1;
+            const char *grubChoices[] = {"MBR", "PBR", "ESP"};
+            QRadioButton *grubRadios[] = {grubMbrButton, grubPbrButton, grubEspButton};
+            lambdaSetRadios("Install", 3, grubChoices, grubRadios);
         }
         lambdaSetComboBox("Location", grubBootCombo, true);
         config->endGroup();
@@ -728,7 +720,9 @@ int MInstall::manageConfig(enum ConfigAction mode)
         config->beginGroup("Localization");
         lambdaSetComboBox("Locale", localeCombo, true);
         lambdaSetCheckBox("LocalClock", localClockCheckBox);
-        lambdaSetRadioBoolean("Clock24h", radio24h, radio12h);
+        const char *clockChoices[] = {"24", "12"};
+        QRadioButton *clockRadios[] = {radio24h, radio12h};
+        lambdaSetRadios("ClockHours", 2, clockChoices, clockRadios);
         lambdaSetComboBox("Timezone", timezoneCombo, false);
         config->endGroup();
         if (configStuck < 0) configStuck = 8;
@@ -741,10 +735,10 @@ int MInstall::manageConfig(enum ConfigAction mode)
         if (mode == ConfigSave) {
             const char *action = NULL;
             switch (oldHomeAction) {
-                case OldHomeNothing: install = "Nothing"; break;
-                case OldHomeUse: install = "Use"; break;
-                case OldHomeSave: install = "Save"; break;
-                case OldHomeDelete: install = "Delete"; break;
+                case OldHomeNothing: action = "Nothing"; break;
+                case OldHomeUse: action = "Use"; break;
+                case OldHomeSave: action = "Save"; break;
+                case OldHomeDelete: action = "Delete"; break;
             }
             config->setValue("OldHomeAction", action);
         } else {
