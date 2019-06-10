@@ -397,13 +397,10 @@ bool MInstall::processNextPhase()
         manageConfig(ConfigLoadB);
         gotoPage(5);
 
-        // these parameters are passed by reference and modified by make*Partitions()
-        QByteArray encPass;
-
+        // the core of the installation
         if (!pretend) {
-            encPass = (entireDiskButton->isChecked() ? FDEpassword : FDEpassCust)->text().toUtf8();
             bool ok = makePartitions();
-            if (ok) ok = formatPartitions(encPass);
+            if (ok) ok = formatPartitions();
             if (!ok) {
                 failUI(tr("Failed to format required partitions."));
                 return false;
@@ -770,16 +767,17 @@ void MInstall::stashAdvancedFDE(bool save)
     }
 }
 
-bool MInstall::formatPartitions(const QByteArray &encPass)
+bool MInstall::formatPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-
     QString rootdev = rootDevice;
     QString swapdev = swapDevice;
     QString homedev = homeDevice;
 
     // set up LUKS containers
+    const QByteArray &encPass = (entireDiskButton->isChecked()
+                                 ? FDEpassword : FDEpassCust)->text().toUtf8();
     const QString &statup = tr("Setting up LUKS encrypted containers");
     if (isSwapEncrypted) {
         if (swapFormatSize) {
@@ -1356,6 +1354,7 @@ bool MInstall::makePartitions()
     if (!lambdaPreparePart(rootDevice, rootFormatSize, "primary ext4 ")) return false;
     if (!lambdaPreparePart(homeDevice, homeFormatSize, "primary")) return false;
     if (!lambdaPreparePart(swapDevice, swapFormatSize, "primary")) return false;
+    execute("partprobe", true);
     return true;
 }
 
