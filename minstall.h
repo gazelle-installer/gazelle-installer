@@ -82,8 +82,6 @@ public:
     bool checkPassword(const QString &pass);
     bool installLoader();
     bool validateChosenPartitions();
-    bool makeDefaultPartitions();
-    bool makeEsp(const QString &drv, int size);
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
     bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString(), const bool failHard = true);
@@ -123,6 +121,7 @@ public:
     QString swapDevicePreserve;
     QString rootDevicePreserve;
     QString homeDevicePreserve;
+    QString espDevice;
 
     int showPage(int curr, int next);
     void gotoPage(int next);
@@ -254,7 +253,7 @@ private:
     void prepareToInstall();
     bool saveHomeBasic();
     bool calculateFuturePartitions();
-    bool makeChosenPartitions();
+    bool makePartitions();
     bool formatPartitions(const QByteArray &encPass);
     bool installLinux(const int progend);
     bool copyLinux(const int progend);
