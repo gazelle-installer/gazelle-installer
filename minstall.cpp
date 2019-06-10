@@ -387,40 +387,39 @@ bool MInstall::processNextPhase()
         updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
         if (!checkDisk()) return false;
         phase = 1; // installation.
+
+        // preparation
+        calculateFuturePartitions();
         prepareToInstall();
 
+        // allow the user to enter other options
+        buildBootLists();
+        manageConfig(ConfigLoadB);
+        gotoPage(5);
+
         // these parameters are passed by reference and modified by make*Partitions()
-        bool formatBoot = false;
         QByteArray encPass;
-        QString rootType, homeType;
 
         if (!pretend) {
             if (entireDiskButton->isChecked()) {
-                rootType = "ext4";
+                rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
                 encPass = FDEpassword->text().toUtf8();
-                if (!makeDefaultPartitions(formatBoot)) {
-                    // failed
+                if (!makeDefaultPartitions()) {
                     failUI(tr("Failed to create required partitions.\nReturning to Step 1."));
                     return false;
                 }
             } else {
                 encPass = FDEpassCust->text().toUtf8();
-                if (!makeChosenPartitions(rootType, homeType, formatBoot)) {
-                    // failed
+                if (!makeChosenPartitions()) {
                     failUI(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
                     return false;
                 }
             }
-        }
 
-        // allow the user to enter other options
-        buildBlockDevList();
-        buildBootLists();
-        manageConfig(ConfigLoadB);
-        gotoPage(5);
+            // rebuild the block list so we have the real thing
+            buildBlockDevList();
 
-        if (!pretend) {
-            if (!formatPartitions(encPass, rootType, homeType, formatBoot)) {
+            if (!formatPartitions(encPass)) {
                 failUI(tr("Failed to format required partitions."));
                 return false;
             }
@@ -807,7 +806,7 @@ bool MInstall::makeEsp(const QString &drv, int size)
     return true;
 }
 
-bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot)
+bool MInstall::formatPartitions(const QByteArray &encPass)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -819,7 +818,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
     // set up LUKS containers
     const QString &statup = tr("Setting up LUKS encrypted containers");
     if (isSwapEncrypted) {
-        if (formatSwap) {
+        if (swap_size) {
             updateStatus(statup);
             if (!makeLuksPartition(swapdev, encPass)) return false;
         }
@@ -828,7 +827,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
         swapdev = "/dev/mapper/swapfs";
     }
     if (isRootEncrypted) {
-        if (!rootType.isEmpty()) {
+        if (root_size) {
             updateStatus(statup);
             if (!makeLuksPartition(rootdev, encPass)) return false;
         }
@@ -837,7 +836,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
         rootdev = "/dev/mapper/rootfs";
     }
     if (isHomeEncrypted) {
-        if (!homeType.isEmpty()) {
+        if (home_size) {
             updateStatus(statup);
             if (!makeLuksPartition(homedev, encPass)) return false;
         }
@@ -847,16 +846,17 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
     }
 
     //if no swap is chosen do nothing
-    if (formatSwap) {
+    if (swap_size) {
         updateStatus(tr("Formatting swap partition"));
         const QString cmd("/sbin/mkswap %1 -L %2");
         if (!execute(cmd.arg(swapdev, swapLabelEdit->text()))) return false;
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
-    if (!rootType.isEmpty()) {
+    if (swap_size) {
         updateStatus(tr("Formatting the / (root) partition"));
-        if (!makeLinuxPartition(rootdev, rootType, badblocksCheck->isChecked(), rootLabelEdit->text())) {
+        if (!makeLinuxPartition(rootdev, rootTypeCombo->currentText(),
+                                badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
         isRootFormatted = true;
@@ -865,20 +865,21 @@ bool MInstall::formatPartitions(const QByteArray &encPass, const QString &rootTy
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) return false;
 
     // format and mount /boot if different than root
-    if (formatBoot) {
+    if (boot_size) {
         updateStatus(tr("Formatting boot partition"));
-        if (!makeLinuxPartition(bootdev, "ext4", false, "boot")) {
+        if (!makeLinuxPartition(bootDevicePreserve, "ext4", false, "boot")) {
             return false;
         }
     }
 
     // maybe format home
-    if (!homeType.isEmpty()) {
+    if (home_size) {
         updateStatus(tr("Formatting the /home partition"));
-        if (!makeLinuxPartition(homedev, homeType, badblocksCheck->isChecked(), homeLabelEdit->text())) {
+        if (!makeLinuxPartition(homedev, homeTypeCombo->currentText(),
+                                badblocksCheck->isChecked(), homeLabelEdit->text())) {
             return false;
         }
-        execute("/bin/rm -r /mnt/antiX/home >/dev/null 2>&1", false);
+        execute("/bin/rm -r /mnt/antiX/home", true);
         isHomeFormatted = true;
     }
     mkdir("/mnt/antiX/home", 0755);
@@ -1051,12 +1052,9 @@ bool MInstall::validateChosenPartitions()
     QString rootdev(rootCombo->currentData().toString());
     QString homedev(homeCombo->currentData().toString());
     QString swapdev(swapCombo->currentData().toString());
-    homedev = (homedev == "root") ? rootdev : homedev;
-    if (bootCombo->currentText() == "root") {
-        bootdev = rootdev;
-    } else {
-        bootdev = bootCombo->currentData().toString();
-    }
+    QString bootdev(bootCombo->currentData().toString());
+    if (homedev == "root") homedev = rootdev;
+    if (bootdev == "root") bootdev = rootdev;
 
     if (rootdev == "none") {
         QMessageBox::critical(this, windowTitle(),
@@ -1167,94 +1165,178 @@ bool MInstall::validateChosenPartitions()
         }
     }
 
-    bootdev = "/dev/" + bootdev;
+    bootDevicePreserve = "/dev/" + bootdev;
     rootDevicePreserve = "/dev/" + rootdev;
     swapDevicePreserve = "/dev/" + swapdev;
     homeDevicePreserve = "/dev/" + homedev;
     return true;
 }
 
+bool MInstall::calculateFuturePartitions()
+{
+    root_size = home_size = swap_size = boot_size = esp_size = 0;
+    if (entireDiskButton->isChecked()) {
+        QString drv(diskCombo->currentData().toString());
+        int bdindex = listBlkDevs.findDevice(drv);
+        if (bdindex < 0) return false;
+        QString mmcnvmepartdesignator;
+        if (drv.startsWith("nvme") || drv.startsWith("mmcblk")) {
+            mmcnvmepartdesignator = "p";
+        }
+
+        // remove partitions from the list that belong to this drive
+        const int ixRemoveBD = bdindex + 1;
+        while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs[ixRemoveBD].isDisk) {
+            listBlkDevs.removeAt(ixRemoveBD);
+        }
+
+        bool ok = true;
+        int free = freeSpaceEdit->text().toInt(&ok,10);
+        if (!ok) free = 0;
+
+        // calculate new partition sizes
+        // get the total disk size
+        root_size = listBlkDevs[bdindex].size / 1048576; // in MB
+        root_size -= 32; // pre-compensate for rounding errors in disk geometry
+
+        // allocate space for ESP
+        if (uefi) { // if booted from UEFI
+            esp_size = 256;
+            root_size -= esp_size;
+        }
+
+        // allocate space for /boot if encrypting
+        if (checkBoxEncryptAuto->isChecked()){ // set root and swap status encrypted
+            isRootEncrypted = true;
+            isSwapEncrypted = true;
+            boot_size = 512;
+            root_size -= boot_size;
+        }
+
+        // 2048 swap should be ample
+        swap_size = 2048;
+        if (root_size < 2048) swap_size = 128;
+        else if (root_size < 3096) swap_size = 256;
+        else if (root_size < 4096) swap_size = 512;
+        else if (root_size < 12288) swap_size = 1024;
+        root_size -= swap_size;
+
+        if (free > 0 && root_size > 8192) {
+            // allow free_size
+            // remaining is capped until free is satisfied
+            if (free > root_size - 8192) {
+                free = root_size - 8192;
+            }
+            root_size -= free;
+        } else { // no free space
+            free = 0;
+        }
+
+        // code for adding future partitions to the list
+        int ixAddBD = bdindex;
+        int ixpart = 1;
+        auto lambdaAddFutureBD = [this, bdindex, &ixpart, &ixAddBD, &drv, &mmcnvmepartdesignator]
+                (qint64 size, const QString &fs) -> BlockDeviceInfo &  {
+            BlockDeviceInfo bdinfo;
+            bdinfo.name = drv + mmcnvmepartdesignator + QString::number(ixpart);
+            bdinfo.fstype = fs;
+            bdinfo.size = size * 1048576; // back into bytes
+            bdinfo.isFuture = bdinfo.isNative = true;
+            bdinfo.isGPT = listBlkDevs[bdindex].isGPT;
+            ++ixAddBD;
+            listBlkDevs.insert(ixAddBD, bdinfo);
+            ++ixpart;
+            return listBlkDevs[ixAddBD];
+        };
+        // add future partitions to the block device list and store new names
+        if (uefi) {
+            BlockDeviceInfo &bdinfo = lambdaAddFutureBD(esp_size, "vfat");
+            bdinfo.isNative = false;
+            bdinfo.isESP = true;
+        }
+        if (!isRootEncrypted) bootDevicePreserve.clear();
+        else bootDevicePreserve = "/dev/" + lambdaAddFutureBD(boot_size, "ext4").name;
+        rootDevicePreserve = "/dev/" + lambdaAddFutureBD(root_size,
+                              isRootEncrypted ? "crypto_LUKS" : "ext4").name;
+        BlockDeviceInfo &bdinfo = lambdaAddFutureBD(swap_size, "swap");
+        bdinfo.isSwap = true;
+        swapDevicePreserve = "/dev/" + bdinfo.name;
+        homeDevicePreserve = rootDevicePreserve;
+        rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
+    } else {
+        auto lambdaSetFutureBD = [this](QComboBox *combo, const QString &label,
+                const QString &fs, const bool isEncrypted) -> int {
+            int index = listBlkDevs.findDevice(combo->currentData().toString());
+            if (index >= 0) {
+                BlockDeviceInfo &bdinfo = listBlkDevs[index];
+                bdinfo.fstype = isEncrypted ? QStringLiteral("crypt_LUKS") : fs;
+                bdinfo.label = label;
+                bdinfo.isFuture = bdinfo.isNative = true;
+            }
+            return index;
+        };
+        const bool saveHome = saveHomeCheck->isChecked();
+        // maybe format swap
+        if (swapCombo->currentData().isValid()) {
+            if (checkBoxEncryptSwap->isChecked()) isSwapEncrypted = true;
+            const int bdindex = lambdaSetFutureBD(swapCombo, swapLabelEdit->text(),
+                                                  "swap", isSwapEncrypted);
+            if (bdindex < 0) return false;
+            listBlkDevs[bdindex].isSwap = true;
+            swap_size = -1;
+        }
+
+        if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
+        // maybe format root (if not saving /home on root) // or if using --sync option
+        if (!(saveHome && homeDevicePreserve == rootDevicePreserve) && !sync) {
+            root_size = -1;
+            lambdaSetFutureBD(rootCombo, rootLabelEdit->text(),
+                              rootTypeCombo->currentData().toString(), isRootEncrypted);
+        }
+
+        // format and mount /boot if different than root
+        if (bootCombo->currentText() != "root") {
+            lambdaSetFutureBD(bootCombo, "boot", "ext4", false);
+            boot_size = -1;
+        }
+
+        // prepare home if not being preserved, and on a different partition
+        if (homeDevicePreserve != rootDevicePreserve) {
+            if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
+            if (!saveHome) {
+                home_size = -1;
+                lambdaSetFutureBD(homeCombo, homeLabelEdit->text(),
+                                  homeTypeCombo->currentText(), isHomeEncrypted);
+            }
+        }
+    }
+    qDebug() << " ---- PARTITION FORMAT SCHEDULE ----";
+    qDebug() << rootDevicePreserve << root_size;
+    qDebug() << homeDevicePreserve << home_size;
+    qDebug() << swapDevicePreserve << swap_size;
+    qDebug() << bootDevicePreserve << boot_size;
+    return true;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // in this case use all of the drive
 
-bool MInstall::makeDefaultPartitions(bool &formatBoot)
+bool MInstall::makeDefaultPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
     QString drv(diskCombo->currentData().toString());
     // detach all existing partitions on the selected drive
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+    for (const BlockDeviceInfo &bdinfo : listBlkDevsBackup) {
         if (!bdinfo.isDisk && bdinfo.name.startsWith(drv)) {
             execute("swapoff /dev/" + bdinfo.name, true);
             execute("umount /dev/" + bdinfo.name, true);
         }
     }
-
-    QString mmcnvmepartdesignator;
-    if (drv.startsWith("nvme") || drv.startsWith("mmcblk")) {
-        mmcnvmepartdesignator = "p";
-    }
     drv.insert(0, "/dev/");
 
     updateStatus(tr("Creating required partitions"));
-
-    bool ok = true;
-    int free = freeSpaceEdit->text().toInt(&ok,10);
-    if (!ok) {
-        free = 0;
-    }
-
-    // calculate new partition sizes
-    // get the total disk size
-    quint64 size = getCmdOut("/sbin/sfdisk -s " + drv).toULongLong();
-    size = size / 1024; // in MiB
-    // pre-compensate for rounding errors in disk geometry
-    size = size - 32;
-    int remaining = size;
-
-    // allocate space for ESP
-    int esp_size = 0;
-    if (uefi) { // if booted from UEFI
-        esp_size = 256;
-        remaining -= esp_size;
-    }
-
-    // allocate space for /boot if encrypting
-    int boot_size = 0;
-    if (checkBoxEncryptAuto->isChecked()){ // set root and swap status encrypted
-        isRootEncrypted = true;
-        isSwapEncrypted = true;
-        boot_size = 512;
-        remaining -= boot_size;
-    }
-
-    // 2048 swap should be ample
-    int swap = 2048;
-    if (remaining < 2048) {
-        swap = 128;
-    } else if (remaining < 3096) {
-        swap = 256;
-    } else if (remaining < 4096) {
-        swap = 512;
-    } else if (remaining < 12288) {
-        swap = 1024;
-    }
-    remaining -= swap;
-
-    if (free > 0 && remaining > 8192) {
-        // allow free_size
-        // remaining is capped until free is satisfied
-        if (free > remaining - 8192) {
-            free = remaining - 8192;
-        }
-        remaining -= free;
-    } else { // no free space
-        free = 0;
-    }
-
-    QString rootdev = drv + mmcnvmepartdesignator + "1";
-    QString swapdev;
 
     execute(QStringLiteral("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv));
     if (uefi) { // if booted from UEFI make ESP
@@ -1262,16 +1344,6 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
         if (!execute("parted -s " + drv + " mklabel gpt")) {
             qDebug() << "Could not create gpt partition table on " + drv;
             return false;
-        }
-        // switch for encrypted parts and /boot
-        if (isRootEncrypted) {
-            bootdev = drv + mmcnvmepartdesignator + "2";
-            rootdev = drv + mmcnvmepartdesignator + "3";
-            swapdev = drv + mmcnvmepartdesignator + "4";
-        } else {
-            rootdev = drv + mmcnvmepartdesignator + "2";
-            swapdev = drv + mmcnvmepartdesignator + "3";
-            updateStatus(tr("Formatting EFI System Partition (ESP)"));
         }
 
         if (!makeEsp(drv, esp_size)) {
@@ -1284,18 +1356,7 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
             qDebug() << "Could not create msdos partition table on " + drv;
             return false;
         }
-        // switch for encrypted parts and /boot
-        if (isRootEncrypted) {
-            bootdev = drv + mmcnvmepartdesignator + "1";
-            rootdev = drv + mmcnvmepartdesignator + "2";
-            swapdev = drv + mmcnvmepartdesignator + "3";
-        } else {
-            rootdev = drv + mmcnvmepartdesignator + "1";
-            swapdev = drv + mmcnvmepartdesignator + "2";
-        }
     }
-    rootDevicePreserve = rootdev;
-    swapDevicePreserve = swapdev;
 
     // create root partition
     QString start;
@@ -1313,40 +1374,31 @@ bool MInstall::makeDefaultPartitions(bool &formatBoot)
             return false;
         }
         start = QString::number(end_boot) + "MiB ";
-        formatBoot = true;
     }
 
     // if encrypting, boot_size=512, or 0 if not  .  start is set to end_boot if encrypting
-    int end_root = esp_size + boot_size + remaining;
+    int end_root = esp_size + boot_size + root_size;
     if (!execute("parted -s --align optimal " + drv + " mkpart primary ext4 " + start + QString::number(end_root) + "MiB")) {
         qDebug() << "Could not create root partition";
         return false;
     }
 
     // create swap partition
-    if (!execute("parted -s --align optimal " + drv + " mkpart primary " + QString::number(end_root) + "MiB " + QString::number(end_root + swap) + "MiB")) {
+    if (!execute("parted -s --align optimal " + drv + " mkpart primary " + QString::number(end_root) + "MiB " + QString::number(end_root + swap_size) + "MiB")) {
         qDebug() << "Could not create swap partition";
         return false;
     }
 
-    const QString cmd_clean("dd if=/dev/zero of=%1 bs=8192 count=1");
-    execute(cmd_clean.arg(bootdev));
-    execute(cmd_clean.arg(rootdev));
-    execute(cmd_clean.arg(swapdev));
-
-    homeDevicePreserve = rootDevicePreserve;
-    formatSwap = true;
     return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
 
-bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot)
+bool MInstall::makeChosenPartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    const bool saveHome = saveHomeCheck->isChecked();
 
     updateStatus(tr("Preparing required partitions"));
 
@@ -1366,34 +1418,13 @@ bool MInstall::makeChosenPartitions(QString &rootType, QString &homeType, bool &
         execute(cmd.arg(devsplit[0], devsplit[1]));
     };
 
-    // maybe format swap
-    if (swapDevicePreserve != "/dev/none") {
-        if (checkBoxEncryptSwap->isChecked()) isSwapEncrypted = true;
-        lambdaPreparePart(swapDevicePreserve);
-    }
-
-    if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
-    // maybe format root (if not saving /home on root) // or if using --sync option
-    if (!(saveHome && homeDevicePreserve == rootDevicePreserve) && !sync) {
-        lambdaPreparePart(rootDevicePreserve);
-        rootType = rootTypeCombo->currentText().toUtf8();
-    }
-
-    // format and mount /boot if different than root
-    if (bootCombo->currentText() != "root") {
-        lambdaPreparePart(bootdev);
-        formatBoot = true;
-    }
+    if (swap_size) lambdaPreparePart(swapDevicePreserve);
+    if (root_size) lambdaPreparePart(rootDevicePreserve);
+    if (boot_size) lambdaPreparePart(bootDevicePreserve);
 
     // prepare home if not being preserved, and on a different partition
-    if (homeDevicePreserve != rootDevicePreserve) {
-        if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
-        if (saveHome) execute("umount " + homeDevicePreserve);
-        else {
-            lambdaPreparePart(homeDevicePreserve);
-            homeType = homeTypeCombo->currentText().toUtf8();
-        }
-    }
+    if (saveHomeCheck->isChecked()) execute("umount " + homeDevicePreserve);
+    else if (home_size) lambdaPreparePart(homeDevicePreserve);
 
     return true;
 }
@@ -1471,11 +1502,11 @@ bool MInstall::installLinux(const int progend)
     mkdir("/mnt/antiX/run", 0755);
 
     //if separate /boot in use, mount that to /mnt/antiX/boot
-    if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
+    if (!bootDevicePreserve.isEmpty() && bootDevicePreserve != rootDevicePreserve) {
         mkdir("/mnt/antiX/boot", 0755);
-        execute("fsck.ext4 -y " + bootdev); // needed to run fsck because sfdisk --part-type can mess up the partition
-        if (!mountPartition(bootdev, "/mnt/antiX/boot", root_mntops)) {
-            qDebug() << "Could not mount /boot on " + bootdev;
+        execute("fsck.ext4 -y " + bootDevicePreserve); // needed to run fsck because sfdisk --part-type can mess up the partition
+        if (!mountPartition(bootDevicePreserve, "/mnt/antiX/boot", root_mntops)) {
+            qDebug() << "Could not mount /boot on " + bootDevicePreserve;
             return false;
         }
     }
@@ -1520,7 +1551,7 @@ void MInstall::makeFstab()
     QString rootdevUUID = "UUID=" + getCmdOut(cmdBlkID + rootDevicePreserve);
     QString homedevUUID = "UUID=" + getCmdOut(cmdBlkID + homeDevicePreserve);
     QString swapdevUUID = "UUID=" + getCmdOut(cmdBlkID + swapDevicePreserve);
-    const QString bootdevUUID = "UUID=" + getCmdOut(cmdBlkID + bootdev);
+    const QString bootdevUUID = "UUID=" + getCmdOut(cmdBlkID + bootDevicePreserve);
 
     // if encrypting, modify devices to /dev/mapper categories
     if (isRootEncrypted){
@@ -1539,7 +1570,7 @@ void MInstall::makeFstab()
     qDebug() << "rootdev" << rootdev << rootdevUUID;
     qDebug() << "homedev" << homedev << homedevUUID;
     qDebug() << "swapdev" << swapdev << swapdevUUID;
-    qDebug() << "bootdev" << bootdev << bootdevUUID;
+    qDebug() << "bootdev" << bootDevicePreserve << bootdevUUID;
 
     QString fstype = getPartType(rootdev);
     QString dump_pass = "1 1";
@@ -1558,7 +1589,7 @@ void MInstall::makeFstab()
         out << rootdevUUID + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
         //add bootdev if present
         //only ext4 (for now) for max compatibility with other linuxes
-        if (!bootdev.isEmpty() && bootdev != rootDevicePreserve) {
+        if (!bootDevicePreserve.isEmpty() && bootDevicePreserve != rootDevicePreserve) {
             out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1\n";
         }
         if (grubEspButton->isChecked()) {
@@ -1688,7 +1719,7 @@ bool MInstall::installLoader()
 
     if (grubMbrButton->isChecked() && !isGpt(boot)) {
         QString part_num;
-        if (bootdev.startsWith(boot)) part_num = bootdev;
+        if (bootDevicePreserve.startsWith(boot)) part_num = bootDevicePreserve;
         else if (rootDevicePreserve.startsWith(boot)) part_num = rootDevicePreserve;
         else if (homeDevicePreserve.startsWith(boot)) part_num = homeDevicePreserve;
         if (!part_num.isEmpty()) {
@@ -2666,7 +2697,9 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo) const
     if (!fstype.isEmpty()) strout += " " + fstype;
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
-    combo->addItem(strout + ")", name);
+    QIcon icon;
+    if (isFuture) icon = QIcon::fromTheme("appointment-soon");
+    combo->addItem(icon, strout + ")", name);
 }
 
 int BlockDeviceList::findDevice(const QString &devname) const
@@ -2725,6 +2758,7 @@ void MInstall::buildBlockDevList()
         if (segsize < 3) continue;
 
         BlockDeviceInfo bdinfo;
+        bdinfo.isFuture = false;
         bdinfo.isDisk = (bdsegs[0] == "disk");
         if (bdinfo.isDisk) gpt = isGpt("/dev/" + bdinfo.name);
         bdinfo.isGPT = gpt;
@@ -2758,6 +2792,8 @@ void MInstall::buildBlockDevList()
         }
         listBlkDevs << bdinfo;
     }
+    // also refresh the backup block device list
+    listBlkDevsBackup = listBlkDevs;
 
     // debug
     qDebug() << "Name UUID Size Model FS | isDisk isGPT isBoot isESP isNative isSwap";
