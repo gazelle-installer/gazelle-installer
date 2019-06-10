@@ -401,20 +401,10 @@ bool MInstall::processNextPhase()
         QByteArray encPass;
 
         if (!pretend) {
+            encPass = (entireDiskButton->isChecked() ? FDEpassword : FDEpassCust)->text().toUtf8();
             bool ok = makePartitions();
-            if (entireDiskButton->isChecked()) {
-                encPass = FDEpassword->text().toUtf8();
-                if (!ok) failUI(tr("Failed to create required partitions.\nReturning to Step 1."));
-            } else {
-                encPass = FDEpassCust->text().toUtf8();
-                if (!ok) failUI(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
-            }
-            if (!ok) return false;
-
-            // rebuild the block list so we have the real thing
-            buildBlockDevList();
-
-            if (!formatPartitions(encPass)) {
+            if (ok) ok = formatPartitions(encPass);
+            if (!ok) {
                 failUI(tr("Failed to format required partitions."));
                 return false;
             }
@@ -841,9 +831,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass)
     // format and mount /boot if different than root
     if (bootFormatSize) {
         updateStatus(tr("Formatting boot partition"));
-        if (!makeLinuxPartition(bootDevice, "ext4", false, "boot")) {
-            return false;
-        }
+        if (!makeLinuxPartition(bootDevice, "ext4", false, "boot")) return false;
     }
 
     // format ESP if necessary
@@ -1314,16 +1302,38 @@ bool MInstall::makePartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    const bool useWholeDrive = entireDiskButton->isChecked();
+
+    qint64 start = 1; // start with 1 MB to aid alignment
 
     auto lambdaDetachPart = [this](const QString &strdev) -> void {
         execute("swapoff " + strdev, true);
         execute("umount " + strdev, true);
     };
+    auto lambdaPreparePart = [this, &start, lambdaDetachPart]
+            (const QString &strdev, qint64 size, const QString &type) -> bool {
+        const QStringList devsplit = splitDevice(strdev);
+        bool rc = true;
+        // size=0 = nothing, size>0 = creation, size<0 = allocation.
+        if (size > 0) {
+            const qint64 end = start + size;
+            rc = execute("parted -s --align optimal /dev/" + devsplit[0] + " mkpart " + type
+                         + QString::number(start) + "MiB " + QString::number(end) + "MiB");
+            start += end;
+        } else if (size < 0){
+            lambdaDetachPart(strdev);
+            // command to set the partition type
+            QString cmd;
+            if (isGpt("/dev/" + devsplit[0])) {
+                cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
+            } else {
+                cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
+            }
+            rc = execute(cmd.arg(devsplit[0], devsplit[1]));
+        }
+        return rc;
+    };
 
-    if (useWholeDrive) {
-        updateStatus(tr("Creating required partitions"));
-
+    if (entireDiskButton->isChecked()) {
         QString drv(diskCombo->currentData().toString());
         // detach all existing partitions on the selected drive
         for (const BlockDeviceInfo &bdinfo : listBlkDevsBackup) {
@@ -1331,51 +1341,21 @@ bool MInstall::makePartitions()
                 lambdaDetachPart("/dev/" + bdinfo.name);
             }
         }
-        drv.insert(0, "/dev/");
-
-        qint64 start = 1; //use 1 MB to aid alignment
-        auto lambdaCreatePart = [this, &start, &drv](qint64 size, const QString &type) -> bool {
-            bool rc = true;
-            if (size > 0) {
-                const qint64 end = start + size;
-                rc = execute("parted -s --align optimal " + drv + " mkpart " + type
-                             + QString::number(start) + "MiB " + QString::number(end) + "MiB");
-                start += end;
-            }
-            return rc;
-        };
-
-        execute(QStringLiteral("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv));
-        if (!execute("parted -s " + drv + " mklabel " + (uefi ? "gpt" : "msdos"))) return false;
-        if (!lambdaCreatePart(espFormatSize, "ESP")) return false;
-        if (!lambdaCreatePart(bootFormatSize, "primary")) return false;
-        if (!lambdaCreatePart(rootFormatSize, "primary ext4 ")) return false;
-        if (!lambdaCreatePart(swapFormatSize, "primary")) return false;
+        updateStatus(tr("Creating required partitions"));
+        execute(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
+        if (!execute("parted -s /dev/" + drv + " mklabel " + (uefi ? "gpt" : "msdos"))) return false;
     } else {
         updateStatus(tr("Preparing required partitions"));
-
-        auto lambdaPreparePart = [this, lambdaDetachPart]
-                (const QString &strdev) -> void {
-            lambdaDetachPart(strdev);
-            // command to set the partition type
-            const QStringList devsplit = splitDevice(strdev);
-            QString cmd;
-            if (isGpt("/dev/" + devsplit[0])) {
-                cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
-            } else {
-                cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
-            }
-            execute(cmd.arg(devsplit[0], devsplit[1]));
-        };
-
-        if (swapFormatSize) lambdaPreparePart(swapDevice);
-        if (rootFormatSize) lambdaPreparePart(rootDevice);
-        if (bootFormatSize) lambdaPreparePart(bootDevice);
         // prepare home if not being preserved, and on a different partition
-        if (saveHomeCheck->isChecked()) execute("umount " + homeDevice);
-        else if (homeFormatSize) lambdaPreparePart(homeDevice);
+        if (saveHomeCheck->isChecked()) lambdaDetachPart(homeDevice);
     }
 
+    // any new partitions they will appear in this order on the disk
+    if (!lambdaPreparePart(espDevice, espFormatSize, "ESP")) return false;
+    if (!lambdaPreparePart(bootDevice, bootFormatSize, "primary")) return false;
+    if (!lambdaPreparePart(rootDevice, rootFormatSize, "primary ext4 ")) return false;
+    if (!lambdaPreparePart(homeDevice, homeFormatSize, "primary")) return false;
+    if (!lambdaPreparePart(swapDevice, swapFormatSize, "primary")) return false;
     return true;
 }
 
