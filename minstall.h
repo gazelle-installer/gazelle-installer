@@ -37,8 +37,7 @@ public:
 
 struct BlockDeviceInfo {
     QString name;
-    QString uuid;
-    QString fstype;
+    QString fs;
     QString label;
     QString model;
     qint64 size;

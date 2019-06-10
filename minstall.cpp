@@ -1239,7 +1239,7 @@ bool MInstall::calculateFuturePartitions()
                 (qint64 size, const QString &fs) -> BlockDeviceInfo &  {
             BlockDeviceInfo bdinfo;
             bdinfo.name = drv + mmcnvmepartdesignator + QString::number(ixpart);
-            bdinfo.fstype = fs;
+            bdinfo.fs = fs;
             bdinfo.size = size * 1048576; // back into bytes
             bdinfo.isFuture = bdinfo.isNative = true;
             bdinfo.isGPT = listBlkDevs[bdindex].isGPT;
@@ -1269,7 +1269,7 @@ bool MInstall::calculateFuturePartitions()
             int index = listBlkDevs.findDevice(combo->currentData().toString());
             if (index >= 0) {
                 BlockDeviceInfo &bdinfo = listBlkDevs[index];
-                bdinfo.fstype = isEncrypted ? QStringLiteral("crypt_LUKS") : fs;
+                bdinfo.fs = isEncrypted ? QStringLiteral("crypt_LUKS") : fs;
                 bdinfo.label = label;
                 bdinfo.isFuture = bdinfo.isNative = true;
             }
@@ -2694,7 +2694,7 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo) const
         scalesize /= 1024;
     }
     QString strout(name + " (" + QString::number(scalesize) + suffixes[isuffix]);
-    if (!fstype.isEmpty()) strout += " " + fstype;
+    if (!fs.isEmpty()) strout += " " + fs;
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
     QIcon icon;
@@ -2764,9 +2764,10 @@ void MInstall::buildBlockDevList()
         bdinfo.isGPT = gpt;
 
         bdinfo.name = bdsegs[1];
-        bdinfo.uuid = bdsegs[2];
+        const QString &uuid = bdsegs[2];
+
         bdinfo.size = bdsegs[3].toLongLong();
-        bdinfo.isBoot = (!bootUUID.isEmpty() && bdinfo.uuid == bootUUID);
+        bdinfo.isBoot = (!bootUUID.isEmpty() && uuid == bootUUID);
         if (segsize > 4) {
             bdinfo.isESP = (bdsegs[4].count(rxESP) >= 1);
             bdinfo.isSwap = (bdsegs[4].count(rxSwap) >= 1);
@@ -2779,8 +2780,8 @@ void MInstall::buildBlockDevList()
             bdinfo.isESP = backup_list.contains(bdinfo.name);
         }
         if (segsize > 5) {
-            bdinfo.fstype = bdsegs[5];
-            if(bdinfo.fstype.count(rxNativeFS) >= 1) bdinfo.isNative = true;
+            bdinfo.fs = bdsegs[5];
+            if(bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
         }
         if (segsize > 6) {
             const QByteArray seg(bdsegs[6].toUtf8().replace('%', "\\x25").replace("\\x", "%"));
@@ -2796,9 +2797,9 @@ void MInstall::buildBlockDevList()
     listBlkDevsBackup = listBlkDevs;
 
     // debug
-    qDebug() << "Name UUID Size Model FS | isDisk isGPT isBoot isESP isNative isSwap";
+    qDebug() << "Name Size Model FS | isDisk isGPT isBoot isESP isNative isSwap";
     for (const BlockDeviceInfo &bdi : listBlkDevs) {
-        qDebug() << bdi.name << bdi.uuid << bdi.size << bdi.model << bdi.fstype << "|"
+        qDebug() << bdi.name << bdi.size << bdi.model << bdi.fs << "|"
                  << bdi.isDisk << bdi.isGPT << bdi.isBoot << bdi.isESP
                  << bdi.isNative << bdi.isSwap;
     }
@@ -3426,7 +3427,7 @@ void MInstall::on_grubPbrButton_toggled()
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (!(bdinfo.isDisk || bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
-                 && bdinfo.isNative && bdinfo.fstype != "crypto_LUKS") {
+                 && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
             // list only Linux partitions excluding crypto_LUKS partitions
             bdinfo.addToCombo(grubBootCombo);
         }
