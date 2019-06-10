@@ -254,7 +254,7 @@ private:
     bool saveHomeBasic();
     bool calculateFuturePartitions();
     bool makePartitions();
-    bool formatPartitions(const QByteArray &encPass);
+    bool formatPartitions();
     bool installLinux(const int progend);
     bool copyLinux(const int progend);
     void failUI(const QString &msg);
