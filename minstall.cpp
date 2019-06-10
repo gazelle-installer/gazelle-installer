@@ -243,53 +243,53 @@ void MInstall::writeKeyFile()
 
         //add keyfile to container
         QString swapUUID;
-        if (swapDevicePreserve != "/dev/none") {
-            swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+        if (swapDevice != "/dev/none") {
+            swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevice);
 
-            execute("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/root/keyfile",
+            execute("cryptsetup luksAddKey " + swapDevice + " /mnt/antiX/root/keyfile",
                     true, password.toUtf8() + "\n");
         }
 
         if (isHomeEncrypted && newkey) { // if encrypting separate /home
-            execute("cryptsetup luksAddKey " + homeDevicePreserve + " /mnt/antiX/root/keyfile",
+            execute("cryptsetup luksAddKey " + homeDevice + " /mnt/antiX/root/keyfile",
                     true, password.toUtf8() + "\n");
         }
-        QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevicePreserve);
+        QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevice);
         //write crypttab keyfile entry
         QFile file("/mnt/antiX/etc/crypttab");
         if (file.open(QIODevice::WriteOnly)) {
             QTextStream out(&file);
             out << "rootfs /dev/disk/by-uuid/" + rootUUID +" none luks \n";
             if (isHomeEncrypted) {
-                QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
+                QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homeDevice);
                 out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
             }
-            if (swapDevicePreserve != "/dev/none") {
+            if (swapDevice != "/dev/none") {
                 out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks,nofail \n";
             }
         }
         file.close();
     } else if (isHomeEncrypted) { // if encrypting /home without encrypting root
         QString swapUUID;
-        if (swapDevicePreserve != "/dev/none") {
+        if (swapDevice != "/dev/none") {
             //create keyfile
             key.load(rngfile.toUtf8(), keylength);
             key.save("/mnt/antiX/home/.keyfileDONOTdelete", 0400);
             key.erase();
 
             //add keyfile to container
-            swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevicePreserve);
+            swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevice);
 
-            execute("cryptsetup luksAddKey " + swapDevicePreserve + " /mnt/antiX/home/.keyfileDONOTdelete",
+            execute("cryptsetup luksAddKey " + swapDevice + " /mnt/antiX/home/.keyfileDONOTdelete",
                     true, password.toUtf8() + "\n");
         }
-        QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevicePreserve);
+        QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevice);
         //write crypttab keyfile entry
         QFile file("/mnt/antiX/etc/crypttab");
         if (file.open(QIODevice::WriteOnly)) {
             QTextStream out(&file);
             out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
-            if (swapDevicePreserve != "/dev/none") {
+            if (swapDevice != "/dev/none") {
                 out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
                 execute("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks", false);
             }
@@ -786,14 +786,14 @@ bool MInstall::formatPartitions(const QByteArray &encPass)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    QString rootdev = rootDevicePreserve;
-    QString swapdev = swapDevicePreserve;
-    QString homedev = homeDevicePreserve;
+    QString rootdev = rootDevice;
+    QString swapdev = swapDevice;
+    QString homedev = homeDevice;
 
     // set up LUKS containers
     const QString &statup = tr("Setting up LUKS encrypted containers");
     if (isSwapEncrypted) {
-        if (swap_size) {
+        if (swapFormatSize) {
             updateStatus(statup);
             if (!makeLuksPartition(swapdev, encPass)) return false;
         }
@@ -802,7 +802,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass)
         swapdev = "/dev/mapper/swapfs";
     }
     if (isRootEncrypted) {
-        if (root_size) {
+        if (rootFormatSize) {
             updateStatus(statup);
             if (!makeLuksPartition(rootdev, encPass)) return false;
         }
@@ -811,7 +811,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass)
         rootdev = "/dev/mapper/rootfs";
     }
     if (isHomeEncrypted) {
-        if (home_size) {
+        if (homeFormatSize) {
             updateStatus(statup);
             if (!makeLuksPartition(homedev, encPass)) return false;
         }
@@ -821,14 +821,14 @@ bool MInstall::formatPartitions(const QByteArray &encPass)
     }
 
     //if no swap is chosen do nothing
-    if (swap_size) {
+    if (swapFormatSize) {
         updateStatus(tr("Formatting swap partition"));
         const QString cmd("/sbin/mkswap %1 -L %2");
         if (!execute(cmd.arg(swapdev, swapLabelEdit->text()))) return false;
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
-    if (swap_size) {
+    if (swapFormatSize) {
         updateStatus(tr("Formatting the / (root) partition"));
         if (!makeLinuxPartition(rootdev, rootTypeCombo->currentText(),
                                 badblocksCheck->isChecked(), rootLabelEdit->text())) {
@@ -840,21 +840,21 @@ bool MInstall::formatPartitions(const QByteArray &encPass)
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) return false;
 
     // format and mount /boot if different than root
-    if (boot_size) {
+    if (bootFormatSize) {
         updateStatus(tr("Formatting boot partition"));
-        if (!makeLinuxPartition(bootDevicePreserve, "ext4", false, "boot")) {
+        if (!makeLinuxPartition(bootDevice, "ext4", false, "boot")) {
             return false;
         }
     }
 
     // format ESP if necessary
-    if (esp_size) {
+    if (espFormatSize) {
         updateStatus(tr("Formatting EFI System Partition"));
         if (!execute("mkfs.msdos -F 32 " + espDevice)) return false;
         execute("parted -s " + splitDevice(espDevice)[0] + " set 1 esp on"); // sets boot flag and esp flag
     }
     // maybe format home
-    if (home_size) {
+    if (homeFormatSize) {
         updateStatus(tr("Formatting the /home partition"));
         if (!makeLinuxPartition(homedev, homeTypeCombo->currentText(),
                                 badblocksCheck->isChecked(), homeLabelEdit->text())) {
@@ -864,7 +864,7 @@ bool MInstall::formatPartitions(const QByteArray &encPass)
         isHomeFormatted = true;
     }
     mkdir("/mnt/antiX/home", 0755);
-    if (homedev != rootDevicePreserve) {
+    if (homedev != rootDevice) {
         // not on root
         updateStatus(tr("Mounting the /home partition"));
         if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) return false;
@@ -877,7 +877,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    QString homedev = homeDevicePreserve;
+    QString homedev = homeDevice;
     if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
         home_mntops = "defaults,noatime";
     } else {
@@ -1146,16 +1146,16 @@ bool MInstall::validateChosenPartitions()
         }
     }
 
-    bootDevicePreserve = "/dev/" + bootdev;
-    rootDevicePreserve = "/dev/" + rootdev;
-    swapDevicePreserve = "/dev/" + swapdev;
-    homeDevicePreserve = "/dev/" + homedev;
+    bootDevice = "/dev/" + bootdev;
+    rootDevice = "/dev/" + rootdev;
+    swapDevice = "/dev/" + swapdev;
+    homeDevice = "/dev/" + homedev;
     return true;
 }
 
 bool MInstall::calculateFuturePartitions()
 {
-    root_size = home_size = swap_size = boot_size = esp_size = 0;
+    rootFormatSize = homeFormatSize = swapFormatSize = bootFormatSize = espFormatSize = 0;
     if (entireDiskButton->isChecked()) {
         QString drv(diskCombo->currentData().toString());
         int bdindex = listBlkDevs.findDevice(drv);
@@ -1177,38 +1177,38 @@ bool MInstall::calculateFuturePartitions()
 
         // calculate new partition sizes
         // get the total disk size
-        root_size = listBlkDevs[bdindex].size / 1048576; // in MB
-        root_size -= 32; // pre-compensate for rounding errors in disk geometry
+        rootFormatSize = listBlkDevs[bdindex].size / 1048576; // in MB
+        rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
 
         // allocate space for ESP
         if (uefi) { // if booted from UEFI
-            esp_size = 256;
-            root_size -= esp_size;
+            espFormatSize = 256;
+            rootFormatSize -= espFormatSize;
         }
 
         // allocate space for /boot if encrypting
         if (checkBoxEncryptAuto->isChecked()){ // set root and swap status encrypted
             isRootEncrypted = true;
             isSwapEncrypted = true;
-            boot_size = 512;
-            root_size -= boot_size;
+            bootFormatSize = 512;
+            rootFormatSize -= bootFormatSize;
         }
 
         // 2048 swap should be ample
-        swap_size = 2048;
-        if (root_size < 2048) swap_size = 128;
-        else if (root_size < 3096) swap_size = 256;
-        else if (root_size < 4096) swap_size = 512;
-        else if (root_size < 12288) swap_size = 1024;
-        root_size -= swap_size;
+        swapFormatSize = 2048;
+        if (rootFormatSize < 2048) swapFormatSize = 128;
+        else if (rootFormatSize < 3096) swapFormatSize = 256;
+        else if (rootFormatSize < 4096) swapFormatSize = 512;
+        else if (rootFormatSize < 12288) swapFormatSize = 1024;
+        rootFormatSize -= swapFormatSize;
 
-        if (free > 0 && root_size > 8192) {
+        if (free > 0 && rootFormatSize > 8192) {
             // allow free_size
             // remaining is capped until free is satisfied
-            if (free > root_size - 8192) {
-                free = root_size - 8192;
+            if (free > rootFormatSize - 8192) {
+                free = rootFormatSize - 8192;
             }
-            root_size -= free;
+            rootFormatSize -= free;
         } else { // no free space
             free = 0;
         }
@@ -1231,19 +1231,19 @@ bool MInstall::calculateFuturePartitions()
         };
         // add future partitions to the block device list and store new names
         if (uefi) {
-            BlockDeviceInfo &bdinfo = lambdaAddFutureBD(esp_size, "vfat");
+            BlockDeviceInfo &bdinfo = lambdaAddFutureBD(espFormatSize, "vfat");
             espDevice = bdinfo.name;
             bdinfo.isNative = false;
             bdinfo.isESP = true;
         }
-        if (!isRootEncrypted) bootDevicePreserve.clear();
-        else bootDevicePreserve = "/dev/" + lambdaAddFutureBD(boot_size, "ext4").name;
-        rootDevicePreserve = "/dev/" + lambdaAddFutureBD(root_size,
+        if (!isRootEncrypted) bootDevice.clear();
+        else bootDevice = "/dev/" + lambdaAddFutureBD(bootFormatSize, "ext4").name;
+        rootDevice = "/dev/" + lambdaAddFutureBD(rootFormatSize,
                               isRootEncrypted ? "crypto_LUKS" : "ext4").name;
-        BlockDeviceInfo &bdinfo = lambdaAddFutureBD(swap_size, "swap");
+        BlockDeviceInfo &bdinfo = lambdaAddFutureBD(swapFormatSize, "swap");
         bdinfo.isSwap = true;
-        swapDevicePreserve = "/dev/" + bdinfo.name;
-        homeDevicePreserve = rootDevicePreserve;
+        swapDevice = "/dev/" + bdinfo.name;
+        homeDevice = rootDevice;
         rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
     } else {
         auto lambdaSetFutureBD = [this](QComboBox *combo, const QString &label,
@@ -1265,13 +1265,13 @@ bool MInstall::calculateFuturePartitions()
                                                   "swap", isSwapEncrypted);
             if (bdindex < 0) return false;
             listBlkDevs[bdindex].isSwap = true;
-            swap_size = -1;
+            swapFormatSize = -1;
         }
 
         if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
         // maybe format root (if not saving /home on root) // or if using --sync option
-        if (!(saveHome && homeDevicePreserve == rootDevicePreserve) && !sync) {
-            root_size = -1;
+        if (!(saveHome && homeDevice == rootDevice) && !sync) {
+            rootFormatSize = -1;
             lambdaSetFutureBD(rootCombo, rootLabelEdit->text(),
                               rootTypeCombo->currentData().toString(), isRootEncrypted);
         }
@@ -1279,24 +1279,24 @@ bool MInstall::calculateFuturePartitions()
         // format and mount /boot if different than root
         if (bootCombo->currentText() != "root") {
             lambdaSetFutureBD(bootCombo, "boot", "ext4", false);
-            boot_size = -1;
+            bootFormatSize = -1;
         }
 
         // prepare home if not being preserved, and on a different partition
-        if (homeDevicePreserve != rootDevicePreserve) {
+        if (homeDevice != rootDevice) {
             if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
             if (!saveHome) {
-                home_size = -1;
+                homeFormatSize = -1;
                 lambdaSetFutureBD(homeCombo, homeLabelEdit->text(),
                                   homeTypeCombo->currentText(), isHomeEncrypted);
             }
         }
     }
     qDebug() << " ---- PARTITION FORMAT SCHEDULE ----";
-    qDebug() << rootDevicePreserve << root_size;
-    qDebug() << homeDevicePreserve << home_size;
-    qDebug() << swapDevicePreserve << swap_size;
-    qDebug() << bootDevicePreserve << boot_size;
+    qDebug() << rootDevice << rootFormatSize;
+    qDebug() << homeDevice << homeFormatSize;
+    qDebug() << swapDevice << swapFormatSize;
+    qDebug() << bootDevice << bootFormatSize;
     return true;
 }
 
@@ -1315,6 +1315,8 @@ bool MInstall::makePartitions()
     };
 
     if (useWholeDrive) {
+        updateStatus(tr("Creating required partitions"));
+
         QString drv(diskCombo->currentData().toString());
         // detach all existing partitions on the selected drive
         for (const BlockDeviceInfo &bdinfo : listBlkDevsBackup) {
@@ -1324,13 +1326,7 @@ bool MInstall::makePartitions()
         }
         drv.insert(0, "/dev/");
 
-        updateStatus(tr("Creating required partitions"));
-
-        execute(QStringLiteral("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv));
-        if (!execute("parted -s " + drv + " mklabel " + (uefi ? "gpt" : "msdos"))) return false;
-
         qint64 start = 1; //use 1 MB to aid alignment
-
         auto lambdaCreatePart = [this, &start, &drv](qint64 size, const QString &type) -> bool {
             bool rc = true;
             if (size > 0) {
@@ -1342,12 +1338,15 @@ bool MInstall::makePartitions()
             return rc;
         };
 
-        if (!lambdaCreatePart(esp_size, "ESP")) return false;
-        if (!lambdaCreatePart(boot_size, "primary")) return false;
-        if (!lambdaCreatePart(root_size, "primary ext4 ")) return false;
-        if (!lambdaCreatePart(swap_size, "primary")) return false;
-
+        execute(QStringLiteral("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv));
+        if (!execute("parted -s " + drv + " mklabel " + (uefi ? "gpt" : "msdos"))) return false;
+        if (!lambdaCreatePart(espFormatSize, "ESP")) return false;
+        if (!lambdaCreatePart(bootFormatSize, "primary")) return false;
+        if (!lambdaCreatePart(rootFormatSize, "primary ext4 ")) return false;
+        if (!lambdaCreatePart(swapFormatSize, "primary")) return false;
     } else {
+        updateStatus(tr("Preparing required partitions"));
+
         auto lambdaPreparePart = [this, lambdaDetachPart]
                 (const QString &strdev) -> void {
             lambdaDetachPart(strdev);
@@ -1362,15 +1361,12 @@ bool MInstall::makePartitions()
             execute(cmd.arg(devsplit[0], devsplit[1]));
         };
 
-        updateStatus(tr("Preparing required partitions"));
-
-        if (swap_size) lambdaPreparePart(swapDevicePreserve);
-        if (root_size) lambdaPreparePart(rootDevicePreserve);
-        if (boot_size) lambdaPreparePart(bootDevicePreserve);
-
+        if (swapFormatSize) lambdaPreparePart(swapDevice);
+        if (rootFormatSize) lambdaPreparePart(rootDevice);
+        if (bootFormatSize) lambdaPreparePart(bootDevice);
         // prepare home if not being preserved, and on a different partition
-        if (saveHomeCheck->isChecked()) execute("umount " + homeDevicePreserve);
-        else if (home_size) lambdaPreparePart(homeDevicePreserve);
+        if (saveHomeCheck->isChecked()) execute("umount " + homeDevice);
+        else if (homeFormatSize) lambdaPreparePart(homeDevice);
     }
 
     return true;
@@ -1384,8 +1380,8 @@ bool MInstall::saveHomeBasic()
     // if preserving /home, obtain some basic information
     bool ok = false;
     const QByteArray &pass = FDEpassCust->text().toUtf8();
-    QString rootdev = rootDevicePreserve;
-    QString homedev = homeDevicePreserve;
+    QString rootdev = rootDevice;
+    QString homedev = homeDevice;
     // mount the root partition
     if (isRootEncrypted) {
         if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly", false)) return false;
@@ -1393,7 +1389,7 @@ bool MInstall::saveHomeBasic()
     }
     if (!mountPartition(rootdev, "/mnt/antiX", "ro")) goto ending2;
     // mount the home partition
-    if (homedev != rootDevicePreserve) {
+    if (homedev != rootDevice) {
         if (isHomeEncrypted) {
             if (!openLuksPartition(homedev, "homefs", pass, "--readonly", false)) goto ending2;
             homedev = "/dev/mapper/homefs";
@@ -1409,7 +1405,7 @@ bool MInstall::saveHomeBasic()
     ok = true;
  ending1:
     // unmount partitions
-    if (homedev != rootDevicePreserve) {
+    if (homedev != rootDevice) {
         execute("/bin/umount -l /mnt/antiX/home", false);
         if (isHomeEncrypted) execute("cryptsetup luksClose homefs", true);
     }
@@ -1422,7 +1418,7 @@ bool MInstall::saveHomeBasic()
 bool MInstall::installLinux(const int progend)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevicePreserve);
+    QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevice);
     if (phase < 0) return false;
 
     if (!(isRootFormatted || sync)) {
@@ -1449,11 +1445,11 @@ bool MInstall::installLinux(const int progend)
     mkdir("/mnt/antiX/run", 0755);
 
     //if separate /boot in use, mount that to /mnt/antiX/boot
-    if (!bootDevicePreserve.isEmpty() && bootDevicePreserve != rootDevicePreserve) {
+    if (!bootDevice.isEmpty() && bootDevice != rootDevice) {
         mkdir("/mnt/antiX/boot", 0755);
-        execute("fsck.ext4 -y " + bootDevicePreserve); // needed to run fsck because sfdisk --part-type can mess up the partition
-        if (!mountPartition(bootDevicePreserve, "/mnt/antiX/boot", root_mntops)) {
-            qDebug() << "Could not mount /boot on " + bootDevicePreserve;
+        execute("fsck.ext4 -y " + bootDevice); // needed to run fsck because sfdisk --part-type can mess up the partition
+        if (!mountPartition(bootDevice, "/mnt/antiX/boot", root_mntops)) {
+            qDebug() << "Could not mount /boot on " + bootDevice;
             return false;
         }
     }
@@ -1489,16 +1485,16 @@ void MInstall::makeFstab()
     if (phase < 0) return;
 
     // get config
-    QString rootdev = rootDevicePreserve;
-    QString homedev = homeDevicePreserve;
-    QString swapdev = swapDevicePreserve;
+    QString rootdev = rootDevice;
+    QString homedev = homeDevice;
+    QString swapdev = swapDevice;
 
     //get UUIDs
     const QString cmdBlkID("blkid -o value UUID -s UUID ");
-    QString rootdevUUID = "UUID=" + getCmdOut(cmdBlkID + rootDevicePreserve);
-    QString homedevUUID = "UUID=" + getCmdOut(cmdBlkID + homeDevicePreserve);
-    QString swapdevUUID = "UUID=" + getCmdOut(cmdBlkID + swapDevicePreserve);
-    const QString bootdevUUID = "UUID=" + getCmdOut(cmdBlkID + bootDevicePreserve);
+    QString rootdevUUID = "UUID=" + getCmdOut(cmdBlkID + rootDevice);
+    QString homedevUUID = "UUID=" + getCmdOut(cmdBlkID + homeDevice);
+    QString swapdevUUID = "UUID=" + getCmdOut(cmdBlkID + swapDevice);
+    const QString bootdevUUID = "UUID=" + getCmdOut(cmdBlkID + bootDevice);
 
     // if encrypting, modify devices to /dev/mapper categories
     if (isRootEncrypted){
@@ -1517,7 +1513,7 @@ void MInstall::makeFstab()
     qDebug() << "rootdev" << rootdev << rootdevUUID;
     qDebug() << "homedev" << homedev << homedevUUID;
     qDebug() << "swapdev" << swapdev << swapdevUUID;
-    qDebug() << "bootdev" << bootDevicePreserve << bootdevUUID;
+    qDebug() << "bootdev" << bootDevice << bootdevUUID;
 
     QString fstype = getPartType(rootdev);
     QString dump_pass = "1 1";
@@ -1536,7 +1532,7 @@ void MInstall::makeFstab()
         out << rootdevUUID + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
         //add bootdev if present
         //only ext4 (for now) for max compatibility with other linuxes
-        if (!bootDevicePreserve.isEmpty() && bootDevicePreserve != rootDevicePreserve) {
+        if (!bootDevice.isEmpty() && bootDevice != rootDevice) {
             out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1\n";
         }
         if (grubEspButton->isChecked()) {
@@ -1545,7 +1541,7 @@ void MInstall::makeFstab()
             qDebug() << "espdev" << espdev << espdevUUID;
             out << espdevUUID + " /boot/efi vfat defaults,noatime,dmask=0002,fmask=0113 0 0\n";
         }
-        if (!homedev.isEmpty() && homedev != rootDevicePreserve) {
+        if (!homedev.isEmpty() && homedev != rootDevice) {
             fstype = getPartType(homedev);
             if (isHomeFormatted) {
                 dump_pass = "1 2";
@@ -1666,9 +1662,9 @@ bool MInstall::installLoader()
 
     if (grubMbrButton->isChecked() && !isGpt(boot)) {
         QString part_num;
-        if (bootDevicePreserve.startsWith(boot)) part_num = bootDevicePreserve;
-        else if (rootDevicePreserve.startsWith(boot)) part_num = rootDevicePreserve;
-        else if (homeDevicePreserve.startsWith(boot)) part_num = homeDevicePreserve;
+        if (bootDevice.startsWith(boot)) part_num = bootDevice;
+        else if (rootDevice.startsWith(boot)) part_num = rootDevice;
+        else if (homeDevice.startsWith(boot)) part_num = homeDevice;
         if (!part_num.isEmpty()) {
             // remove the non-digit part to get the number of the root partition
             part_num.remove(QRegularExpression("\\D+\\d*\\D+"));

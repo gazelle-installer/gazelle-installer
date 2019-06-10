@@ -117,10 +117,10 @@ public:
     bool REMOVE_NOSPLASH;
 
     // global for now until boot combo box is sorted out
-    QString bootDevicePreserve;
-    QString swapDevicePreserve;
-    QString rootDevicePreserve;
-    QString homeDevicePreserve;
+    QString bootDevice;
+    QString swapDevice;
+    QString rootDevice;
+    QString homeDevice;
     QString espDevice;
 
     int showPage(int curr, int next);
@@ -200,11 +200,11 @@ private:
 
     // if these variables are non-zero then the installer formats the partition
     // if they are negative the installer formats an existing partition
-    qint64 root_size = 0;
-    qint64 home_size = 0;
-    qint64 swap_size = 0;
-    qint64 boot_size = 0;
-    qint64 esp_size = 0;
+    qint64 rootFormatSize = 0;
+    qint64 homeFormatSize = 0;
+    qint64 swapFormatSize = 0;
+    qint64 bootFormatSize = 0;
+    qint64 espFormatSize = 0;
 
     QWidget *nextFocus = NULL;
     BlockDeviceList listBlkDevs, listBlkDevsBackup;
