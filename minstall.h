@@ -42,6 +42,7 @@ struct BlockDeviceInfo {
     QString label;
     QString model;
     qint64 size;
+    bool isFuture : 1;
     bool isDisk : 1;
     bool isGPT : 1;
     bool isBoot : 1;
@@ -82,7 +83,7 @@ public:
     bool checkPassword(const QString &pass);
     bool installLoader();
     bool validateChosenPartitions();
-    bool makeDefaultPartitions(bool &formatBoot);
+    bool makeDefaultPartitions();
     bool makeEsp(const QString &drv, int size);
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
@@ -119,7 +120,7 @@ public:
     bool REMOVE_NOSPLASH;
 
     // global for now until boot combo box is sorted out
-    QString bootdev;
+    QString bootDevicePreserve;
     QString swapDevicePreserve;
     QString rootDevicePreserve;
     QString homeDevicePreserve;
@@ -199,8 +200,16 @@ private:
     bool uefi = false;
     bool haveSysConfig = false;
 
+    // if these variables are non-zero then the installer formats the partition
+    // if they are negative the installer formats an existing partition
+    qint64 root_size = 0;
+    qint64 home_size = 0;
+    qint64 swap_size = 0;
+    qint64 boot_size = 0;
+    qint64 esp_size = 0;
+
     QWidget *nextFocus = NULL;
-    BlockDeviceList listBlkDevs;
+    BlockDeviceList listBlkDevs, listBlkDevsBackup;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
     QStringList listHomes;
@@ -245,8 +254,9 @@ private:
     bool pretendToInstall(int start, int stop, int sleep);
     void prepareToInstall();
     bool saveHomeBasic();
-    bool makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot);
-    bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot);
+    bool calculateFuturePartitions();
+    bool makeChosenPartitions();
+    bool formatPartitions(const QByteArray &encPass);
     bool installLinux(const int progend);
     bool copyLinux(const int progend);
     void failUI(const QString &msg);
