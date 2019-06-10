@@ -25,6 +25,7 @@
 #include <sys/statvfs.h>
 #include <sys/stat.h>
 
+#include "version.h"
 #include "minstall.h"
 
 MInstall::MInstall(const QStringList &args, const QString &cfgfile)
@@ -571,6 +572,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
     if (mode == ConfigSave) {
         if (config) delete config;
         config = new QSettings("/mnt/antiX/var/log/minstall.conf", QSettings::NativeFormat);
+        config->setValue("Version", VERSION);
     }
     if (!config) return 0;
 
@@ -604,37 +606,70 @@ int MInstall::manageConfig(enum ConfigAction mode)
             if (val != spinbox->value() && !configStuck) configStuck = -1;
         }
     };
-    auto lambdaSetRadios = [this, mode](const QString &key, const int nchoices,
+    auto lambdaSetEnum = [this, mode](const QString &key, const int nchoices,
+            const char *choices[], const int curval) -> int {
+        QVariant choice(curval >= 0 ? choices[curval] : "");
+        if (mode == ConfigSave) config->setValue(key, choice);
+        else {
+            const QString &val = config->value(key, choice).toString();
+            for (int ixi = 0; ixi < nchoices; ++ixi) {
+                if (!val.compare(QString(choices[ixi]), Qt::CaseInsensitive)) return ixi;
+            }
+            if (!configStuck) configStuck = -1;
+        }
+        return curval;
+    };
+    auto lambdaSetRadios = [lambdaSetEnum](const QString &key, const int nchoices,
             const char *choices[], QRadioButton *radios[]) -> void {
         // obtain the current choice
         int ixradio = -1;
         for (int ixi = 0; ixradio < 0 && ixi < nchoices; ++ixi) {
             if (radios[ixi]->isChecked()) ixradio = ixi;
         }
-        const QVariant choice(ixradio >= 0 ? choices[ixradio] : "");
-        if (mode == ConfigSave) config->setValue(key, choice);
-        else {
-            const QString &val = config->value(key, choice).toString();
-            for (int ixi = 0; ixi < nchoices; ++ixi) {
-                if (!val.compare(QString(choices[ixi]), Qt::CaseInsensitive)) {
-                    radios[ixi]->setChecked(true);
-                    return;
-                }
-            }
-            if (!configStuck) configStuck = -1;
-        }
+        // select the corresponding radio button
+        ixradio = lambdaSetEnum(key, nchoices, choices, ixradio);
+        if (ixradio >= 0) radios[ixradio]->setChecked(true);
     };
 
     if (mode == ConfigSave || mode == ConfigLoadA) {
-        // Disk setup
-        config->beginGroup("Disk");
-        lambdaSetComboBox("Disk", diskCombo, true);
-        lambdaSetCheckBox("Encrypted", checkBoxEncryptAuto);
-        const char *diskChoices[] = {"WholeDisk", "Custom"};
+        config->beginGroup("Setup");
+        const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
-        lambdaSetRadios("PartitionMode", 2, diskChoices, diskRadios);
-        if (mode == ConfigLoadA) {
-            // Password (load-only)
+        lambdaSetRadios("Destination", 2, diskChoices, diskRadios);
+        config->endGroup();
+        if (configStuck < 0) configStuck = 1;
+
+        if (entireDiskButton->isChecked()) {
+            // Disk drive setup
+            config->beginGroup("Drive");
+            lambdaSetComboBox("Device", diskCombo, true);
+            lambdaSetCheckBox("Encrypted", checkBoxEncryptAuto);
+            config->endGroup();
+            if (configStuck < 0) configStuck = 1;
+        } else {
+            // Partition step
+            config->beginGroup("Partitions");
+            lambdaSetComboBox("Root", rootCombo, true);
+            lambdaSetComboBox("Home", homeCombo, true);
+            lambdaSetComboBox("Swap", swapCombo, true);
+            lambdaSetComboBox("Boot", bootCombo, true);
+            lambdaSetComboBox("RootType", rootTypeCombo, false);
+            lambdaSetComboBox("HomeType", homeTypeCombo, false);
+            lambdaSetCheckBox("RootEncrypt", checkBoxEncryptRoot);
+            lambdaSetCheckBox("HomeEncrypt", checkBoxEncryptHome);
+            lambdaSetCheckBox("SwapEncrypt", checkBoxEncryptSwap);
+            lambdaSetLineEdit("RootLabel", rootLabelEdit);
+            lambdaSetLineEdit("HomeLabel", homeLabelEdit);
+            lambdaSetLineEdit("SwapLabel", swapLabelEdit);
+            lambdaSetCheckBox("SaveHome", saveHomeCheck);
+            lambdaSetCheckBox("BadBlocksCheck", badblocksCheck);
+            config->endGroup();
+            if (configStuck < 0) configStuck = 2;
+        }
+
+        // AES step
+        config->beginGroup("Encryption");
+        if (mode != ConfigSave) {
             const QString &epass = config->value("Pass").toString();
             if (entireDiskButton->isChecked()) {
                 FDEpassword->setText(epass);
@@ -644,38 +679,6 @@ int MInstall::manageConfig(enum ConfigAction mode)
                 FDEpassCust2->setText(epass);
             }
         }
-        config->endGroup();
-        if (configStuck < 0) configStuck = 1;
-
-        if (existing_partitionsButton->isChecked()) {
-            // Partition step
-            config->beginGroup("Partition");
-
-            lambdaSetComboBox("Root", rootCombo, true);
-            lambdaSetComboBox("Home", homeCombo, true);
-            lambdaSetComboBox("Swap", swapCombo, true);
-            lambdaSetComboBox("Boot", bootCombo, true);
-
-            lambdaSetComboBox("RootType", rootTypeCombo, false);
-            lambdaSetComboBox("HomeType", homeTypeCombo, false);
-
-            lambdaSetCheckBox("RootEncrypt", checkBoxEncryptRoot);
-            lambdaSetCheckBox("HomeEncrypt", checkBoxEncryptHome);
-            lambdaSetCheckBox("SwapEncrypt", checkBoxEncryptSwap);
-
-            lambdaSetLineEdit("RootLabel", rootLabelEdit);
-            lambdaSetLineEdit("HomeLabel", homeLabelEdit);
-            lambdaSetLineEdit("SwapLabel", swapLabelEdit);
-
-            lambdaSetCheckBox("SaveHome", saveHomeCheck);
-            lambdaSetCheckBox("BadBlocksCheck", badblocksCheck);
-
-            config->endGroup();
-            if (configStuck < 0) configStuck = 2;
-        }
-
-        // AES step
-        config->beginGroup("Encryption");
         lambdaSetComboBox("Cipher", comboFDEcipher, false);
         lambdaSetComboBox("ChainMode", comboFDEchain, false);
         lambdaSetComboBox("IVgenerator", comboFDEivgen, false);
@@ -743,22 +746,9 @@ int MInstall::manageConfig(enum ConfigAction mode)
         lambdaSetLineEdit("Username", userNameEdit);
         lambdaSetCheckBox("Autologin", autologinCheckBox);
         lambdaSetCheckBox("SaveDesktop", saveDesktopCheckBox);
-        if (mode == ConfigSave) {
-            const char *action = NULL;
-            switch (oldHomeAction) {
-                case OldHomeNothing: action = "Nothing"; break;
-                case OldHomeUse: action = "Use"; break;
-                case OldHomeSave: action = "Save"; break;
-                case OldHomeDelete: action = "Delete"; break;
-            }
-            config->setValue("OldHomeAction", action);
-        } else {
-            const QString &val = config->value("OldHomeAction", "Nothing").toString();
-            if (!val.compare("Nothing", Qt::CaseInsensitive)) oldHomeAction = OldHomeNothing;
-            else if (!val.compare("Use", Qt::CaseInsensitive)) oldHomeAction = OldHomeUse;
-            else if (!val.compare("Delete", Qt::CaseInsensitive)) oldHomeAction = OldHomeDelete;
-            else configStuck = -1;
-            // Passwords (load-only)
+        const char *oldHomeActionChoices[] = {"Nothing", "Use", "Save", "Delete"};
+        oldHomeAction = static_cast<OldHomeAction>(lambdaSetEnum("OldHomeAction", 4, oldHomeActionChoices, oldHomeAction));
+        if (mode != ConfigSave) {
             const QString &upass = config->value("UserPass").toString();
             userPasswordEdit->setText(upass);
             userPasswordEdit2->setText(upass);
