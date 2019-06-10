@@ -401,20 +401,16 @@ bool MInstall::processNextPhase()
         QByteArray encPass;
 
         if (!pretend) {
+            bool ok = makePartitions();
             if (entireDiskButton->isChecked()) {
                 rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
                 encPass = FDEpassword->text().toUtf8();
-                if (!makeDefaultPartitions()) {
-                    failUI(tr("Failed to create required partitions.\nReturning to Step 1."));
-                    return false;
-                }
+                if (!ok) failUI(tr("Failed to create required partitions.\nReturning to Step 1."));
             } else {
                 encPass = FDEpassCust->text().toUtf8();
-                if (!makeChosenPartitions()) {
-                    failUI(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
-                    return false;
-                }
+                if (!ok) failUI(tr("Failed to prepare chosen partitions.\nReturning to Step 1."));
             }
+            if (!ok) return false;
 
             // rebuild the block list so we have the real thing
             buildBlockDevList();
@@ -785,27 +781,6 @@ void MInstall::stashAdvancedFDE(bool save)
     }
 }
 
-// create ESP at the begining of the drive
-bool MInstall::makeEsp(const QString &drv, int size)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (phase < 0) return false;
-    QString mmcnvmepartdesignator;
-    if (drv.contains("nvme") || drv.contains("mmcblk" )) {
-        mmcnvmepartdesignator = "p";
-    }
-    if (!execute("parted -s --align optimal " + drv + " mkpart ESP 1MiB " + QString::number(size) + "MiB")) {
-        qDebug() << "Could not create ESP";
-        return false;
-    }
-    if (!execute("mkfs.msdos -F 32 " + drv + mmcnvmepartdesignator + "1")) {
-        qDebug() << "Could not format ESP";
-        return false;
-    }
-    execute("parted -s " + drv + " set 1 esp on"); // sets boot flag and esp flag
-    return true;
-}
-
 bool MInstall::formatPartitions(const QByteArray &encPass)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
@@ -872,6 +847,12 @@ bool MInstall::formatPartitions(const QByteArray &encPass)
         }
     }
 
+    // format ESP if necessary
+    if (esp_size) {
+        updateStatus(tr("Formatting EFI System Partition"));
+        if (!execute("mkfs.msdos -F 32 " + espDevice)) return false;
+        execute("parted -s " + splitDevice(espDevice)[0] + " set 1 esp on"); // sets boot flag and esp flag
+    }
     // maybe format home
     if (home_size) {
         updateStatus(tr("Formatting the /home partition"));
@@ -1251,6 +1232,7 @@ bool MInstall::calculateFuturePartitions()
         // add future partitions to the block device list and store new names
         if (uefi) {
             BlockDeviceInfo &bdinfo = lambdaAddFutureBD(esp_size, "vfat");
+            espDevice = bdinfo.name;
             bdinfo.isNative = false;
             bdinfo.isESP = true;
         }
@@ -1319,112 +1301,77 @@ bool MInstall::calculateFuturePartitions()
 }
 
 ///////////////////////////////////////////////////////////////////////////
-// in this case use all of the drive
-
-bool MInstall::makeDefaultPartitions()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (phase < 0) return false;
-
-    QString drv(diskCombo->currentData().toString());
-    // detach all existing partitions on the selected drive
-    for (const BlockDeviceInfo &bdinfo : listBlkDevsBackup) {
-        if (!bdinfo.isDisk && bdinfo.name.startsWith(drv)) {
-            execute("swapoff /dev/" + bdinfo.name, true);
-            execute("umount /dev/" + bdinfo.name, true);
-        }
-    }
-    drv.insert(0, "/dev/");
-
-    updateStatus(tr("Creating required partitions"));
-
-    execute(QStringLiteral("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv));
-    if (uefi) { // if booted from UEFI make ESP
-        // new GPT partition table
-        if (!execute("parted -s " + drv + " mklabel gpt")) {
-            qDebug() << "Could not create gpt partition table on " + drv;
-            return false;
-        }
-
-        if (!makeEsp(drv, esp_size)) {
-            return false;
-        }
-
-    } else {
-        // new msdos partition table
-        if (!execute("parted -s " + drv + " mklabel msdos")) {
-            qDebug() << "Could not create msdos partition table on " + drv;
-            return false;
-        }
-    }
-
-    // create root partition
-    QString start;
-    if (esp_size == 0) {
-        start = "1MiB "; //use 1 MiB to aid alignment
-    } else {
-        start = QString::number(esp_size) + "MiB ";
-    }
-
-    // create boot partition if necessary
-    if (isRootEncrypted){
-        int end_boot = esp_size + boot_size;
-        if (!execute("parted -s --align optimal " + drv + " mkpart primary " + start + QString::number(end_boot) + "MiB")) {
-            qDebug() << "Could not create boot partition";
-            return false;
-        }
-        start = QString::number(end_boot) + "MiB ";
-    }
-
-    // if encrypting, boot_size=512, or 0 if not  .  start is set to end_boot if encrypting
-    int end_root = esp_size + boot_size + root_size;
-    if (!execute("parted -s --align optimal " + drv + " mkpart primary ext4 " + start + QString::number(end_root) + "MiB")) {
-        qDebug() << "Could not create root partition";
-        return false;
-    }
-
-    // create swap partition
-    if (!execute("parted -s --align optimal " + drv + " mkpart primary " + QString::number(end_root) + "MiB " + QString::number(end_root + swap_size) + "MiB")) {
-        qDebug() << "Could not create swap partition";
-        return false;
-    }
-
-    return true;
-}
-
-///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
 
-bool MInstall::makeChosenPartitions()
+bool MInstall::makePartitions()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
+    const bool useWholeDrive = entireDiskButton->isChecked();
 
-    updateStatus(tr("Preparing required partitions"));
-
-    auto lambdaPreparePart = [this](const QString &strdev) -> void {
+    auto lambdaDetachPart = [this](const QString &strdev) -> void {
         execute("swapoff " + strdev, true);
         execute("umount " + strdev, true);
-        execute(QStringLiteral("dd if=/dev/zero of=%1 bs=8192 count=1").arg(strdev));
-
-        // command to set the partition type
-        const QStringList devsplit = splitDevice(strdev);
-        QString cmd;
-        if (isGpt("/dev/" + devsplit[0])) {
-            cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
-        } else {
-            cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
-        }
-        execute(cmd.arg(devsplit[0], devsplit[1]));
     };
 
-    if (swap_size) lambdaPreparePart(swapDevicePreserve);
-    if (root_size) lambdaPreparePart(rootDevicePreserve);
-    if (boot_size) lambdaPreparePart(bootDevicePreserve);
+    if (useWholeDrive) {
+        QString drv(diskCombo->currentData().toString());
+        // detach all existing partitions on the selected drive
+        for (const BlockDeviceInfo &bdinfo : listBlkDevsBackup) {
+            if (!bdinfo.isDisk && bdinfo.name.startsWith(drv)) {
+                lambdaDetachPart("/dev/" + bdinfo.name);
+            }
+        }
+        drv.insert(0, "/dev/");
 
-    // prepare home if not being preserved, and on a different partition
-    if (saveHomeCheck->isChecked()) execute("umount " + homeDevicePreserve);
-    else if (home_size) lambdaPreparePart(homeDevicePreserve);
+        updateStatus(tr("Creating required partitions"));
+
+        execute(QStringLiteral("/bin/dd if=/dev/zero of=%1 bs=512 count=100").arg(drv));
+        if (!execute("parted -s " + drv + " mklabel " + (uefi ? "gpt" : "msdos"))) return false;
+
+        qint64 start = 1; //use 1 MB to aid alignment
+
+        auto lambdaCreatePart = [this, &start, &drv](qint64 size, const QString &type) -> bool {
+            bool rc = true;
+            if (size > 0) {
+                const qint64 end = start + size;
+                rc = execute("parted -s --align optimal " + drv + " mkpart " + type
+                             + QString::number(start) + "MiB " + QString::number(end) + "MiB");
+                start += end;
+            }
+            return rc;
+        };
+
+        if (!lambdaCreatePart(esp_size, "ESP")) return false;
+        if (!lambdaCreatePart(boot_size, "primary")) return false;
+        if (!lambdaCreatePart(root_size, "primary ext4 ")) return false;
+        if (!lambdaCreatePart(swap_size, "primary")) return false;
+
+    } else {
+        auto lambdaPreparePart = [this, lambdaDetachPart]
+                (const QString &strdev) -> void {
+            lambdaDetachPart(strdev);
+            // command to set the partition type
+            const QStringList devsplit = splitDevice(strdev);
+            QString cmd;
+            if (isGpt("/dev/" + devsplit[0])) {
+                cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
+            } else {
+                cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
+            }
+            execute(cmd.arg(devsplit[0], devsplit[1]));
+        };
+
+        updateStatus(tr("Preparing required partitions"));
+
+        if (swap_size) lambdaPreparePart(swapDevicePreserve);
+        if (root_size) lambdaPreparePart(rootDevicePreserve);
+        if (boot_size) lambdaPreparePart(bootDevicePreserve);
+
+        // prepare home if not being preserved, and on a different partition
+        if (saveHomeCheck->isChecked()) execute("umount " + homeDevicePreserve);
+        else if (home_size) lambdaPreparePart(homeDevicePreserve);
+    }
 
     return true;
 }
