@@ -243,7 +243,7 @@ void MInstall::writeKeyFile()
 
         //add keyfile to container
         QString swapUUID;
-        if (swapDevice != "/dev/none") {
+        if (!swapDevice.isEmpty()) {
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevice);
 
             execute("cryptsetup luksAddKey " + swapDevice + " /mnt/antiX/root/keyfile",
@@ -264,14 +264,14 @@ void MInstall::writeKeyFile()
                 QString homeUUID =  getCmdOut("blkid -s UUID -o value " + homeDevice);
                 out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
             }
-            if (swapDevice != "/dev/none") {
+            if (!swapDevice.isEmpty()) {
                 out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks,nofail \n";
             }
         }
         file.close();
     } else if (isHomeEncrypted) { // if encrypting /home without encrypting root
         QString swapUUID;
-        if (swapDevice != "/dev/none") {
+        if (!swapDevice.isEmpty()) {
             //create keyfile
             key.load(rngfile.toUtf8(), keylength);
             key.save("/mnt/antiX/home/.keyfileDONOTdelete", 0400);
@@ -289,7 +289,7 @@ void MInstall::writeKeyFile()
         if (file.open(QIODevice::WriteOnly)) {
             QTextStream out(&file);
             out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
-            if (swapDevice != "/dev/none") {
+            if (!swapDevice.isEmpty()) {
                 out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
                 execute("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks", false);
             }
@@ -346,7 +346,7 @@ bool MInstall::checkDisk()
     }
     else {
         output = getCmdOut("smartctl -A " + drv + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
-        if (output != "") {
+        if (output.isEmpty()) {
             msg = tr("Smartmon tool output:\n\n") + output + "\n\n" +
                     tr("The disk with the partition you selected for installation passes the S.M.A.R.T. monitor test (smartctl)\n") +
                     tr("but the tests indicate it will have a higher than average failure rate in the upcoming year.\n") +
@@ -403,7 +403,6 @@ bool MInstall::processNextPhase()
         if (!pretend) {
             bool ok = makePartitions();
             if (entireDiskButton->isChecked()) {
-                rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
                 encPass = FDEpassword->text().toUtf8();
                 if (!ok) failUI(tr("Failed to create required partitions.\nReturning to Step 1."));
             } else {
@@ -1037,7 +1036,7 @@ bool MInstall::validateChosenPartitions()
     if (homedev == "root") homedev = rootdev;
     if (bootdev == "root") bootdev = rootdev;
 
-    if (rootdev == "none") {
+    if (rootdev.isEmpty()) {
         QMessageBox::critical(this, windowTitle(),
             tr("You must choose a root partition.\nThe root partition must be at least %1.").arg(MIN_INSTALL_SIZE));
         nextFocus = rootCombo;
@@ -1076,7 +1075,7 @@ bool MInstall::validateChosenPartitions()
     }
 
     // format swap? (if no swap is chosen do nothing)
-    if (swapdev != "none") {
+    if (!swapdev.isEmpty()) {
         lambdaForeignTrap(swapdev, "swap");
         formatSwap = checkBoxEncryptSwap->isChecked();
         const int bdindex = listBlkDevs.findDevice(swapdev);
@@ -1146,10 +1145,10 @@ bool MInstall::validateChosenPartitions()
         }
     }
 
-    bootDevice = "/dev/" + bootdev;
     rootDevice = "/dev/" + rootdev;
-    swapDevice = "/dev/" + swapdev;
-    homeDevice = "/dev/" + homedev;
+    if (!bootdev.isEmpty()) bootDevice = "/dev/" + bootdev;
+    if (!swapdev.isEmpty()) swapDevice = "/dev/" + swapdev;
+    if (!homedev.isEmpty()) homeDevice = "/dev/" + homedev;
     return true;
 }
 
@@ -1258,14 +1257,22 @@ bool MInstall::calculateFuturePartitions()
             return index;
         };
         const bool saveHome = saveHomeCheck->isChecked();
-        // maybe format swap
+
+        // format swap if encrypting or not already swap
         if (swapCombo->currentData().isValid()) {
-            if (checkBoxEncryptSwap->isChecked()) isSwapEncrypted = true;
-            const int bdindex = lambdaSetFutureBD(swapCombo, swapLabelEdit->text(),
-                                                  "swap", isSwapEncrypted);
-            if (bdindex < 0) return false;
-            listBlkDevs[bdindex].isSwap = true;
-            swapFormatSize = -1;
+            if (checkBoxEncryptSwap->isChecked()) {
+                isSwapEncrypted = true;
+                swapFormatSize = -1;
+            } else {
+                int index = listBlkDevs.findDevice(swapCombo->currentData().toString());
+                if (index >= 0 && !listBlkDevs[index].isSwap) swapFormatSize = -1;
+            }
+            if (swapFormatSize) {
+                const int bdindex = lambdaSetFutureBD(swapCombo, swapLabelEdit->text(),
+                                                      "swap", isSwapEncrypted);
+                if (bdindex < 0) return false;
+                listBlkDevs[bdindex].isSwap = true;
+            }
         }
 
         if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
@@ -1556,7 +1563,7 @@ void MInstall::makeFstab()
                 out << homedevUUID + " /home " + fstype + " defaults,noatime 1 2\n";
             }
         }
-        if (!swapdev.isEmpty() && swapdev != "/dev/none") {
+        if (!swapdev.isEmpty()) {
             out << swapdevUUID +" swap swap defaults 0 0 \n";
         }
         file.close();
