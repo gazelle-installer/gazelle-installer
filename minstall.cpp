@@ -85,7 +85,15 @@ void MInstall::startup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
-    checkUefi();
+
+    // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
+    if (execute("uname -m | grep -q i686", false) && execute("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
+        uefi = false;
+    } else {
+        uefi = execute("test -d /sys/firmware/efi", true);
+    }
+    qDebug() << "uefi =" << uefi;
+
     if (!pretend) {
         // disable automounting in Thunar
         auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
@@ -484,9 +492,6 @@ bool MInstall::processNextPhase()
             progressBar->setEnabled(false);
             updateStatus(tr("Paused for required operator input"), progPhase23);
             QApplication::beep();
-            if(widgetStack->currentWidget() == Step_Progress) {
-                on_nextButton_clicked();
-            }
         }
         phase = 2;
     }
@@ -1732,17 +1737,6 @@ bool MInstall::isGpt(const QString &drv)
 {
     QString cmd = QString("blkid %1 | grep -q PTTYPE=\\\"gpt\\\"").arg(drv);
     return execute(cmd, false);
-}
-
-void MInstall::checkUefi()
-{
-    // return false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
-    if (execute("uname -m | grep -q i686", false) && execute("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
-        uefi = false;
-    } else {
-        uefi = execute("test -d /sys/firmware/efi", true);
-    }
-    qDebug() << "uefi =" << uefi;
 }
 
 // get the type of the partition
