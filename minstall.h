@@ -82,7 +82,6 @@ public:
     bool checkDisk();
     bool checkPassword(const QString &pass);
     bool installLoader();
-    bool validateChosenPartitions();
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
     bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString(), const bool failHard = true);
@@ -250,8 +249,8 @@ private:
     void buildBlockDevList();
     bool pretendToInstall(int start, int stop, int sleep);
     bool saveHomeBasic();
+    bool validateChosenPartitions();
     bool calculateDefaultPartitions();
-    bool calculateChosenPartitions();
     bool makePartitions();
     bool formatPartitions();
     bool installLinux(const int progend);
