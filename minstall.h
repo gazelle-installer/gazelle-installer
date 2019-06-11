@@ -242,7 +242,7 @@ private:
     // slots
     void startup();
     // helpers
-    bool execute(const QString &cmd, const bool rawexec = false, const QByteArray &input = QByteArray());
+    bool execute(const QString &cmd, const bool rawexec = false, const QByteArray *input = NULL, bool needRead = false);
     QString getCmdOut(const QString &cmd, bool everything = false);
     // private functions
     void updateStatus(const QString &msg, int val = -1);
