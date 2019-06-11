@@ -85,6 +85,7 @@ void MInstall::startup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
+    checkUefi();
     if (!pretend) {
         // disable automounting in Thunar
         auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
@@ -466,7 +467,6 @@ bool MInstall::processNextPhase()
         cleanup(false); // cleanup previous mounts
         isRootFormatted = false;
         isHomeFormatted = false;
-        checkUefi();
 
         // the core of the installation
         if (!pretend) {
