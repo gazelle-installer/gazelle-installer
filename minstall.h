@@ -208,7 +208,7 @@ private:
     qint64 espFormatSize = 0;
 
     QWidget *nextFocus = NULL;
-    BlockDeviceList listBlkDevs, listBlkDevsBackup;
+    BlockDeviceList listBlkDevs;
     QStringList listToUnmount;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
