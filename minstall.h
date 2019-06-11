@@ -35,6 +35,28 @@ public:
     void erase();
 };
 
+struct BlockDeviceInfo {
+    QString name;
+    QString fs;
+    QString label;
+    QString model;
+    qint64 size;
+    bool isFuture = false;
+    bool isNasty = false;
+    bool isDisk = false;
+    bool isGPT = false;
+    bool isBoot = false;
+    bool isESP = false;
+    bool isNative = false;
+    bool isSwap = false;
+    void addToCombo(QComboBox *combo, bool warnNasty = false) const;
+};
+
+class BlockDeviceList : public QList<BlockDeviceInfo> {
+public:
+    int findDevice(const QString &devname) const;
+};
+
 class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
 protected:
@@ -44,7 +66,7 @@ protected:
     void reject();
 
 public:
-    MInstall(const QStringList &args);
+    MInstall(const QStringList &args, const QString &cfgfile = "/etc/minstall.conf");
     ~MInstall();
 
     void checkUefi();
@@ -60,9 +82,6 @@ public:
     bool checkDisk();
     bool checkPassword(const QString &pass);
     bool installLoader();
-    bool validateChosenPartitions();
-    bool makeDefaultPartitions(bool &formatBoot);
-    bool makeEsp(const QString &drv, int size);
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
     bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString(), const bool failHard = true);
@@ -71,29 +90,22 @@ public:
     bool validateComputerName();
     bool setComputerName();
     bool setUserInfo();
-    void addItemCombo(QComboBox *cb, const QString *part);
     void buildBootLists();
     void buildServiceList();
-    bool copyLinux();
     void disablehiberanteinitramfs();
-    bool installLinux();
     void makeFstab();
     bool processNextPhase();
-    void removeItemCombo(QComboBox *cb, const QString *part);
-    void saveConfig();
     void setLocale();
     void setServices();
-    void updatePartCombo(QString *prevItem, const QString &part);
-    void updatePartitionWidgets();
     void writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
     bool POPULATE_MEDIA_MOUNTPOINTS;
 
+    qlonglong MIN_BOOT_DEVICE_SIZE;
+    qlonglong MIN_ROOT_DEVICE_SIZE;
     QString DEFAULT_HOSTNAME;
-    QString MIN_BOOT_DEVICE_SIZE;
     QString MIN_INSTALL_SIZE;
-    QString MIN_ROOT_DEVICE_SIZE;
     QString PREFERRED_MIN_INSTALL_SIZE;
     QString PROJECTFORUM;
     QString PROJECTNAME;
@@ -105,15 +117,15 @@ public:
     bool REMOVE_NOSPLASH;
 
     // global for now until boot combo box is sorted out
-    QString bootdev;
-    QString swapDevicePreserve;
-    QString rootDevicePreserve;
-    QString homeDevicePreserve;
+    QString bootDevice;
+    QString swapDevice;
+    QString rootDevice;
+    QString homeDevice;
+    QString espDevice;
 
     int showPage(int curr, int next);
     void gotoPage(int next);
     void pageDisplayed(int next);
-    void updateDiskInfo();
     void setupkeyboardbutton();
     bool abort(bool onclose);
     void cleanup(bool endclean = true);
@@ -128,7 +140,6 @@ private slots:
     void on_qtpartedButton_clicked();
     void on_viewServicesButton_clicked();
 
-    void on_homeCombo_currentIndexChanged(const QString &arg1);
     void on_userPasswordEdit2_textChanged(const QString &arg1);
     void on_rootPasswordEdit2_textChanged(const QString &arg1);
     void on_userPasswordEdit_textChanged();
@@ -153,12 +164,11 @@ private slots:
     void on_checkBoxEncryptHome_toggled(bool checked);
     void on_checkBoxEncryptSwap_toggled(bool checked);
 
-    void updatePartInfo();
     void on_rootTypeCombo_activated(QString item = "");
-    void on_rootCombo_activated(const QString &arg1 = "");
-    void on_homeCombo_activated(const QString &arg1);
-    void on_swapCombo_activated(const QString &arg1);
-    void on_bootCombo_activated(const QString &arg1);
+    void on_rootCombo_currentIndexChanged(const QString &text);
+    void on_homeCombo_currentIndexChanged(const QString &text);
+    void on_swapCombo_currentIndexChanged(const QString &text);
+    void on_bootCombo_currentIndexChanged(int);
 
     void on_grubCheckBox_toggled(bool checked);
     void on_grubMbrButton_toggled();
@@ -172,53 +182,46 @@ private:
     int phase = 0;
 
     // command line options
-    bool pretend, automatic, nocopy, sync;
+    bool brave, pretend, automatic, nocopy, sync;
+    // configuration management
+    QSettings *config = NULL;
+    enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
+    int configStuck = 0;
 
-    bool formatSwap = false;
+    QString auto_mount;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
-    bool isRootFormatted = false;
-    bool isHomeFormatted = false;
     bool uefi = false;
-    bool haveSysConfig = false;
+
+    // if these variables are non-zero then the installer formats the partition
+    // if they are negative the installer formats an existing partition
+    qint64 rootFormatSize = 0;
+    qint64 homeFormatSize = 0;
+    qint64 swapFormatSize = 0;
+    qint64 bootFormatSize = 0;
+    qint64 espFormatSize = 0;
 
     QWidget *nextFocus = NULL;
+    BlockDeviceList listBlkDevs;
+    QStringList listToUnmount;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
     QStringList listHomes;
     SafeCache key;
-
-    // for file copy progress updates
-    int iCopyBarB;
 
     // for the tips display
     int ixTip = 0;
     int ixTipStart = -1;
     int iLastProgress = -1;
 
-    // for partition combo updates
-    QHash<QString, int> removedRoot; // remember items removed from combo box: item, index
-    QHash<QString, int> removedHome;
-    QHash<QString, int> removedSwap;
-    QHash<QString, int> removedBoot;
-    QSettings *config;
-    QString auto_mount;
-    QString prevItemRoot; // remember previously selected item in combo box
-    QString prevItemHome;
-    QString prevItemSwap;
-    QString prevItemBoot;
-    int indexPartInfoDisk = -1;
-
     // info needed for Phase 2 of the process
-    QStringList listBootDrives;
-    QStringList listBootESP;
-    QStringList listBootPart;
+    bool canMBR, canPBR, canESP;
     bool haveSamba = false;
     bool haveSnapshotUserAccounts = false;
     enum OldHomeAction {
-        OldHomeUse, OldHomeSave, OldHomeDelete
-    } oldHomeAction;
+        OldHomeNothing, OldHomeUse, OldHomeSave, OldHomeDelete
+    } oldHomeAction = OldHomeNothing;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
@@ -229,21 +232,30 @@ private:
     int iFDEkeysize;
     int indexFDEhash;
     int indexFDErandom;
-    long iFDEroundtime;
+    int iFDEroundtime;
 
-
+    // slots
+    void startup();
     // helpers
-    bool execute(const QString &cmd, const bool rawexec = false, const QByteArray &input = QByteArray());
+    bool execute(const QString &cmd, const bool rawexec = false, const QByteArray *input = NULL, bool needRead = false);
     QString getCmdOut(const QString &cmd, bool everything = false);
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
+    void updatePartitionWidgets();
+    void updatePartitionCombos(QComboBox *changed);
+    QStringList splitDevice(const QString &device) const;
+    void buildBlockDevList();
     bool pretendToInstall(int start, int stop, int sleep);
-    void prepareToInstall();
     bool saveHomeBasic();
-    bool makeChosenPartitions(QString &rootType, QString &homeType, bool &formatBoot);
-    bool formatPartitions(const QByteArray &encPass, const QString &rootType, const QString &homeType, bool formatBoot);
+    bool validateChosenPartitions();
+    bool calculateDefaultPartitions();
+    bool makePartitions();
+    bool formatPartitions();
+    bool installLinux(const int progend);
+    bool copyLinux(const int progend);
     void failUI(const QString &msg);
+    int manageConfig(enum ConfigAction mode);
     void stashServices(bool save);
     void stashAdvancedFDE(bool save);
 };
