@@ -1192,7 +1192,7 @@ bool MInstall::calculateDefaultPartitions()
     // add future partitions to the block device list and store new names
     if (uefi) {
         BlockDeviceInfo &bdinfo = lambdaAddFutureBD(espFormatSize, "vfat");
-        espDevice = bdinfo.name;
+        espDevice = "/dev/" + bdinfo.name;
         bdinfo.isNative = false;
         bdinfo.isESP = true;
     }
