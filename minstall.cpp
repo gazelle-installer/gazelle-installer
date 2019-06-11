@@ -812,7 +812,7 @@ bool MInstall::formatPartitions()
     if (espFormatSize) {
         updateStatus(tr("Formatting EFI System Partition"));
         if (!execute("mkfs.msdos -F 32 " + espDevice)) return false;
-        execute("parted -s " + splitDevice(espDevice)[0] + " set 1 esp on"); // sets boot flag and esp flag
+        execute("parted -s " + splitDevice(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
     }
     // maybe format home
     if (homeFormatSize) {
@@ -1267,18 +1267,18 @@ bool MInstall::makePartitions()
         // size=0 = nothing, size>0 = creation, size<0 = allocation.
         if (size > 0) {
             const qint64 end = start + size;
-            rc = execute("parted -s --align optimal /dev/" + devsplit[0] + " mkpart " + type
+            rc = execute("parted -s --align optimal /dev/" + devsplit.at(0) + " mkpart " + type
                          + " " + QString::number(start) + "MiB " + QString::number(end) + "MiB");
             start = end;
         } else if (size < 0){
             // command to set the partition type
             QString cmd;
-            if (isGpt("/dev/" + devsplit[0])) {
+            if (isGpt("/dev/" + devsplit.at(0))) {
                 cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
             } else {
                 cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
             }
-            rc = execute(cmd.arg(devsplit[0], devsplit[1]));
+            rc = execute(cmd.arg(devsplit.at(0), devsplit.at(1)));
         }
         return rc;
     };
@@ -2624,7 +2624,7 @@ void MInstall::buildBlockDevList()
 
         BlockDeviceInfo bdinfo;
         bdinfo.isFuture = false;
-        bdinfo.isDisk = (bdsegs[0] == "disk");
+        bdinfo.isDisk = (bdsegs.at(0) == "disk");
         if (bdinfo.isDisk) {
             driveIndex = listBlkDevs.count();
             gpt = isGpt("/dev/" + bdinfo.name);
@@ -2637,13 +2637,13 @@ void MInstall::buildBlockDevList()
         }
         bdinfo.isGPT = gpt;
 
-        bdinfo.name = bdsegs[1];
-        const QString &uuid = bdsegs[2];
+        bdinfo.name = bdsegs.at(1);
+        const QString &uuid = bdsegs.at(2);
 
-        bdinfo.size = bdsegs[3].toLongLong();
+        bdinfo.size = bdsegs.at(3).toLongLong();
         bdinfo.isBoot = (!bootUUID.isEmpty() && uuid == bootUUID);
         if (segsize > 4) {
-            const QString &seg4 = bdsegs[4];
+            const QString &seg4 = bdsegs.at(4);
             bdinfo.isESP = (seg4.count(rxESP) >= 1);
             bdinfo.isSwap = (seg4.count(rxSwap) >= 1);
             bdinfo.isNative = (seg4.count(rxNative) >= 1);
@@ -2657,15 +2657,15 @@ void MInstall::buildBlockDevList()
             bdinfo.isESP = backup_list.contains(bdinfo.name);
         }
         if (segsize > 5) {
-            bdinfo.fs = bdsegs[5];
+            bdinfo.fs = bdsegs.at(5);
             if(bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
         }
         if (segsize > 6) {
-            const QByteArray seg(bdsegs[6].toUtf8().replace('%', "\\x25").replace("\\x", "%"));
+            const QByteArray seg(bdsegs.at(6).toUtf8().replace('%', "\\x25").replace("\\x", "%"));
             bdinfo.label = QUrl::fromPercentEncoding(seg).trimmed();
         }
         if (segsize > 7) {
-            const QByteArray seg(bdsegs[7].toUtf8().replace('%', "\\x25").replace("\\x", "%"));
+            const QByteArray seg(bdsegs.at(7).toUtf8().replace('%', "\\x25").replace("\\x", "%"));
             bdinfo.model = QUrl::fromPercentEncoding(seg).trimmed();
         }
         listBlkDevs << bdinfo;
@@ -2704,8 +2704,8 @@ void MInstall::buildServiceList()
             }
         }
         QString category, description;
-        category = list[0];
-        description = list[1];
+        category = list.at(0);
+        description = list.at(1);
 
         if (QFile("/etc/init.d/" + service).exists()) {
             QList<QTreeWidgetItem *> found_items = csView->findItems(category, Qt::MatchExactly, 0);
