@@ -42,13 +42,14 @@ struct BlockDeviceInfo {
     QString model;
     qint64 size;
     bool isFuture = false;
+    bool isNasty = false;
     bool isDisk = false;
     bool isGPT = false;
     bool isBoot = false;
     bool isESP = false;
     bool isNative = false;
     bool isSwap = false;
-    void addToCombo(QComboBox *combo) const;
+    void addToCombo(QComboBox *combo, bool warnNasty = false) const;
 };
 
 class BlockDeviceList : public QList<BlockDeviceInfo> {
@@ -182,7 +183,7 @@ private:
     int phase = 0;
 
     // command line options
-    bool pretend, automatic, nocopy, sync;
+    bool brave, pretend, automatic, nocopy, sync;
     // configuration management
     QSettings *config = NULL;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };

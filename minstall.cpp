@@ -38,6 +38,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     gotoPage(0);
     proc = new QProcess(this);
 
+    brave = (args.contains("--brave"));
     pretend = (args.contains("--pretend") || args.contains("-p"));
     automatic = (args.contains("--auto") || args.contains("-a"));
     nocopy = (args.contains("--nocopy") || args.contains("-n"));
@@ -457,14 +458,6 @@ void MInstall::prepareToInstall()
     isRootFormatted = false;
     isHomeFormatted = false;
 
-    // if it looks like an apple...
-    if (execute("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
-        grubPbrButton->setChecked(true);
-        grubMbrButton->setEnabled(false);
-        localClockCheckBox->setChecked(true);
-    } else if (grubMbrButton->isEnabled()){
-        grubMbrButton->setChecked(true);
-    }
     checkUefi();
 
     // timezone
@@ -1237,6 +1230,7 @@ bool MInstall::calculateChosenPartitions()
             BlockDeviceInfo &bdinfo = listBlkDevs[index];
             bdinfo.fs = isEncrypted ? QStringLiteral("crypt_LUKS") : fs;
             bdinfo.label = label;
+            bdinfo.isNasty = false; // future partitions are safe
             bdinfo.isFuture = bdinfo.isNative = true;
         }
         return index;
@@ -2619,7 +2613,7 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
 }
 
 // return block device info that is suitable for a combo box
-void BlockDeviceInfo::addToCombo(QComboBox *combo) const
+void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
 {
     static const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
     unsigned int isuffix = 0;
@@ -2632,9 +2626,10 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo) const
     if (!fs.isEmpty()) strout += " " + fs;
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
-    QIcon icon;
-    if (isFuture) icon = QIcon::fromTheme("appointment-soon-symbolic");
-    combo->addItem(icon, strout + ")", name);
+    QString stricon;
+    if (isFuture) stricon = "appointment-soon-symbolic";
+    else if (isNasty && warnNasty) stricon = "dialog-warning-symbolic";
+    combo->addItem(QIcon::fromTheme(stricon), strout + ")", name);
 }
 
 int BlockDeviceList::findDevice(const QString &devname) const
@@ -2671,6 +2666,8 @@ void MInstall::buildBlockDevList()
                                              "|44479540-f297-41b2-9af7-d131d5f0458a" // Linux /root x86
                                              "|4f68bce3-e8cd-4db1-96e7-fbcaf984b709" // Linux /root x86-64
                                              "|933ac7e1-2eb4-4f13-b844-0e14e2aef915)$"); // Linux /home
+    static const QRegularExpression rxWinLDM("^(0x42|5808c8aa-7e8f-42e0-85d2-e1e90434cfb3"
+                                             "|e3c9e316-0b5c-4db8-817d-f92df00215ae)$"); // Windows LDM
     static const QRegularExpression rxNativeFS("^(btrfs|ext2|ext3|ext4|jfs|nilfs2|reiser4|reiserfs|ufs|xfs)$");
 
     QString bootUUID;
@@ -2685,6 +2682,7 @@ void MInstall::buildBlockDevList()
     // populate the block device list
     listBlkDevs.clear();
     bool gpt = false; // propagates to all partitions within the drive
+    int driveIndex = 0; // for propagating the nasty flag to the drive
     const QStringList &blkdevs = getCmdOuts("lsblk -brno TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL"
                                             " | grep -E '^(disk|part)'");
     for (const QString &blkdev : blkdevs) {
@@ -2695,7 +2693,16 @@ void MInstall::buildBlockDevList()
         BlockDeviceInfo bdinfo;
         bdinfo.isFuture = false;
         bdinfo.isDisk = (bdsegs[0] == "disk");
-        if (bdinfo.isDisk) gpt = isGpt("/dev/" + bdinfo.name);
+        if (bdinfo.isDisk) {
+            driveIndex = listBlkDevs.count();
+            gpt = isGpt("/dev/" + bdinfo.name);
+        } else {
+            // if it looks like an apple...
+            if (execute("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
+                bdinfo.isNasty = true;
+                localClockCheckBox->setChecked(true);
+            }
+        }
         bdinfo.isGPT = gpt;
 
         bdinfo.name = bdsegs[1];
@@ -2704,12 +2711,15 @@ void MInstall::buildBlockDevList()
         bdinfo.size = bdsegs[3].toLongLong();
         bdinfo.isBoot = (!bootUUID.isEmpty() && uuid == bootUUID);
         if (segsize > 4) {
-            bdinfo.isESP = (bdsegs[4].count(rxESP) >= 1);
-            bdinfo.isSwap = (bdsegs[4].count(rxSwap) >= 1);
-            bdinfo.isNative = (bdsegs[4].count(rxNative) >= 1);
+            const QString &seg4 = bdsegs[4];
+            bdinfo.isESP = (seg4.count(rxESP) >= 1);
+            bdinfo.isSwap = (seg4.count(rxSwap) >= 1);
+            bdinfo.isNative = (seg4.count(rxNative) >= 1);
+            if (!bdinfo.isNasty) bdinfo.isNasty = (seg4.count(rxWinLDM) >= 1);
         } else {
             bdinfo.isESP = bdinfo.isSwap = bdinfo.isNative = false;
         }
+
         if (!bdinfo.isDisk && !bdinfo.isESP) {
             // check the backup ESP detection list
             bdinfo.isESP = backup_list.contains(bdinfo.name);
@@ -2727,6 +2737,8 @@ void MInstall::buildBlockDevList()
             bdinfo.model = QUrl::fromPercentEncoding(seg).trimmed();
         }
         listBlkDevs << bdinfo;
+        // propagate the nasty flag up to the drive
+        if (bdinfo.isNasty) listBlkDevs[driveIndex].isNasty = true;
     }
     // also refresh the backup block device list
     listBlkDevsBackup = listBlkDevs;
@@ -3352,7 +3364,9 @@ void MInstall::on_grubMbrButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDisk) bdinfo.addToCombo(grubBootCombo);
+        if (bdinfo.isDisk) {
+            if (!bdinfo.isNasty || brave) bdinfo.addToCombo(grubBootCombo, true);
+        }
     }
     grubBootLabel->setText(tr("System boot disk:"));
 }
@@ -3364,7 +3378,7 @@ void MInstall::on_grubPbrButton_toggled()
         if (!(bdinfo.isDisk || bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
                  && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
             // list only Linux partitions excluding crypto_LUKS partitions
-            bdinfo.addToCombo(grubBootCombo);
+            if (!bdinfo.isNasty || brave) bdinfo.addToCombo(grubBootCombo, true);
         }
     }
     grubBootLabel->setText(tr("Partition to use:"));
