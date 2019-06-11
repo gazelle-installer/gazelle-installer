@@ -812,7 +812,7 @@ bool MInstall::formatPartitions()
     if (espFormatSize) {
         updateStatus(tr("Formatting EFI System Partition"));
         if (!execute("mkfs.msdos -F 32 " + espDevice)) return false;
-        execute("parted -s " + splitDevice(espDevice)[0] + " set 1 esp on"); // sets boot flag and esp flag
+        execute("parted -s " + splitDevice(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
     }
     // maybe format home
     if (homeFormatSize) {
@@ -1011,7 +1011,7 @@ bool MInstall::validateChosenPartitions()
     // warn if using a non-Linux partition (potential install of another OS)
     auto lambdaForeignTrap = [this,&msgForeignList](const QString &devname, const QString &desc) -> void {
         const int bdindex = listBlkDevs.findDevice(devname);
-        if (bdindex >= 0 && !listBlkDevs[bdindex].isNative) {
+        if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
             msgForeignList << devname << desc;
         }
     };
@@ -1050,7 +1050,7 @@ bool MInstall::validateChosenPartitions()
         if (isSwapEncrypted) swapFormatSize = -1;
         else {
             const int bdindex = listBlkDevs.findDevice(swapdev);
-            if (bdindex >= 0 && !listBlkDevs[bdindex].isSwap) swapFormatSize = -1;
+            if (bdindex >= 0 && !listBlkDevs.at(bdindex).isSwap) swapFormatSize = -1;
         }
         if (swapFormatSize) {
             msgFormatList << swapdev << "swap";
@@ -1069,7 +1069,7 @@ bool MInstall::validateChosenPartitions()
         lambdaForeignTrap(bootdev, "/boot");
         // warn if partition too big (not needed for boot, likely data or other useful partition
         const int bdindex = listBlkDevs.findDevice(bootdev);
-        if (bdindex < 0 || listBlkDevs[bdindex].size > 2147483648) {
+        if (bdindex < 0 || listBlkDevs.at(bdindex).size > 2147483648) {
             // if > 2GB or not in block device list for some reason
             msg = tr("The partition you selected for /boot is larger than expected.") + "\n\n";
         }
@@ -1159,8 +1159,8 @@ bool MInstall::calculateDefaultPartitions()
 
     // remove partitions from the list that belong to this drive
     const int ixRemoveBD = bdindex + 1;
-    while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs[ixRemoveBD].isDisk) {
-        listToUnmount << listBlkDevs[ixRemoveBD].name;
+    while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs.at(ixRemoveBD).isDisk) {
+        listToUnmount << listBlkDevs.at(ixRemoveBD).name;
         listBlkDevs.removeAt(ixRemoveBD);
     }
 
@@ -1170,7 +1170,7 @@ bool MInstall::calculateDefaultPartitions()
 
     // calculate new partition sizes
     // get the total disk size
-    rootFormatSize = listBlkDevs[bdindex].size / 1048576; // in MB
+    rootFormatSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
     rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
 
     // allocate space for ESP if booted from UEFI
@@ -1218,7 +1218,7 @@ bool MInstall::calculateDefaultPartitions()
         bdinfo.fs = fs;
         bdinfo.size = size * 1048576; // back into bytes
         bdinfo.isFuture = bdinfo.isNative = true;
-        bdinfo.isGPT = listBlkDevs[bdindex].isGPT;
+        bdinfo.isGPT = listBlkDevs.at(bdindex).isGPT;
         ++ixAddBD;
         listBlkDevs.insert(ixAddBD, bdinfo);
         ++ixpart;
@@ -1267,18 +1267,18 @@ bool MInstall::makePartitions()
         // size=0 = nothing, size>0 = creation, size<0 = allocation.
         if (size > 0) {
             const qint64 end = start + size;
-            rc = execute("parted -s --align optimal /dev/" + devsplit[0] + " mkpart " + type
+            rc = execute("parted -s --align optimal /dev/" + devsplit.at(0) + " mkpart " + type
                          + " " + QString::number(start) + "MiB " + QString::number(end) + "MiB");
             start = end;
         } else if (size < 0){
             // command to set the partition type
             QString cmd;
-            if (isGpt("/dev/" + devsplit[0])) {
+            if (isGpt("/dev/" + devsplit.at(0))) {
                 cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
             } else {
                 cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
             }
-            rc = execute(cmd.arg(devsplit[0], devsplit[1]));
+            rc = execute(cmd.arg(devsplit.at(0), devsplit.at(1)));
         }
         return rc;
     };
@@ -2219,7 +2219,7 @@ int MInstall::showPage(int curr, int next)
         if (!pretend && haveSnapshotUserAccounts) {
             return 7; // skip Step_User_Accounts and go to Step_Localization
         }
-    } else if (curr == 6) { // at Step_Services
+    } else if (curr == 5) { // at Step_Services
         stashServices(next == 7);
         return 7; // goes back to the screen that called Services screen
     }
@@ -2624,7 +2624,7 @@ void MInstall::buildBlockDevList()
 
         BlockDeviceInfo bdinfo;
         bdinfo.isFuture = false;
-        bdinfo.isDisk = (bdsegs[0] == "disk");
+        bdinfo.isDisk = (bdsegs.at(0) == "disk");
         if (bdinfo.isDisk) {
             driveIndex = listBlkDevs.count();
             gpt = isGpt("/dev/" + bdinfo.name);
@@ -2637,13 +2637,13 @@ void MInstall::buildBlockDevList()
         }
         bdinfo.isGPT = gpt;
 
-        bdinfo.name = bdsegs[1];
-        const QString &uuid = bdsegs[2];
+        bdinfo.name = bdsegs.at(1);
+        const QString &uuid = bdsegs.at(2);
 
-        bdinfo.size = bdsegs[3].toLongLong();
+        bdinfo.size = bdsegs.at(3).toLongLong();
         bdinfo.isBoot = (!bootUUID.isEmpty() && uuid == bootUUID);
         if (segsize > 4) {
-            const QString &seg4 = bdsegs[4];
+            const QString &seg4 = bdsegs.at(4);
             bdinfo.isESP = (seg4.count(rxESP) >= 1);
             bdinfo.isSwap = (seg4.count(rxSwap) >= 1);
             bdinfo.isNative = (seg4.count(rxNative) >= 1);
@@ -2657,15 +2657,15 @@ void MInstall::buildBlockDevList()
             bdinfo.isESP = backup_list.contains(bdinfo.name);
         }
         if (segsize > 5) {
-            bdinfo.fs = bdsegs[5];
+            bdinfo.fs = bdsegs.at(5);
             if(bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
         }
         if (segsize > 6) {
-            const QByteArray seg(bdsegs[6].toUtf8().replace('%', "\\x25").replace("\\x", "%"));
+            const QByteArray seg(bdsegs.at(6).toUtf8().replace('%', "\\x25").replace("\\x", "%"));
             bdinfo.label = QUrl::fromPercentEncoding(seg).trimmed();
         }
         if (segsize > 7) {
-            const QByteArray seg(bdsegs[7].toUtf8().replace('%', "\\x25").replace("\\x", "%"));
+            const QByteArray seg(bdsegs.at(7).toUtf8().replace('%', "\\x25").replace("\\x", "%"));
             bdinfo.model = QUrl::fromPercentEncoding(seg).trimmed();
         }
         listBlkDevs << bdinfo;
@@ -2704,8 +2704,8 @@ void MInstall::buildServiceList()
             }
         }
         QString category, description;
-        category = list[0];
-        description = list[1];
+        category = list.at(0);
+        description = list.at(1);
 
         if (QFile("/etc/init.d/" + service).exists()) {
             QList<QTreeWidgetItem *> found_items = csView->findItems(category, Qt::MatchExactly, 0);
