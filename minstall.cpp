@@ -242,7 +242,7 @@ bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray 
 
 QString MInstall::getCmdOut(const QString &cmd, bool everything)
 {
-    execute(cmd, false, NULL, true);
+    execute(cmd, false, nullptr, true);
     QString strout(proc->readAll().trimmed());
     if (everything) return strout;
     return strout.section("\n", 0, 0);
@@ -250,7 +250,7 @@ QString MInstall::getCmdOut(const QString &cmd, bool everything)
 
 QStringList MInstall::getCmdOuts(const QString &cmd)
 {
-    execute(cmd, false, NULL, true);
+    execute(cmd, false, nullptr, true);
     return QString(proc->readAll().trimmed()).split('\n');
 }
 
@@ -271,7 +271,7 @@ void MInstall::updateCursor(const Qt::CursorShape shape)
     if (shape != Qt::ArrowCursor) {
         qApp->setOverrideCursor(QCursor(shape));
     } else {
-        while (qApp->overrideCursor() != NULL) {
+        while (qApp->overrideCursor() != nullptr) {
             qApp->restoreOverrideCursor();
         }
     }
@@ -665,7 +665,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
         config->beginGroup("Services");
         QTreeWidgetItemIterator it(csView);
         while (*it) {
-            if ((*it)->parent() != NULL) {
+            if ((*it)->parent() != nullptr) {
                 const QString &itext = (*it)->text(0);
                 const QVariant checkval((*it)->checkState(0) == Qt::Checked);
                 if (mode == ConfigSave) config->setValue(itext, checkval);
@@ -1822,7 +1822,7 @@ bool MInstall::validateUserInfo()
         else if (msgbtn == msgbtnUse) oldHomeAction = OldHomeUse; // use the old home
         else return false; // don't save, reuse or delete -- can't proceed
     }
-    nextFocus = NULL;
+    nextFocus = nullptr;
     return true;
 }
 
@@ -1844,7 +1844,7 @@ bool MInstall::setUserInfo()
     QString cmd;
     // see if user directory already exists
     QString dpath = QString("/mnt/antiX/home/%1").arg(userNameEdit->text());
-    if ((dir = opendir(dpath.toUtf8())) != NULL) {
+    if ((dir = opendir(dpath.toUtf8())) != nullptr) {
         // already exists
         closedir(dir);
         if (oldHomeAction == OldHomeSave) {
@@ -1868,7 +1868,7 @@ bool MInstall::setUserInfo()
         }
     }
 
-    if ((dir = opendir(dpath.toUtf8())) == NULL) {
+    if ((dir = opendir(dpath.toUtf8())) == nullptr) {
         // dir does not exist, must create it
         // copy skel to demo
         if (!execute("cp -a /mnt/antiX/etc/skel /mnt/antiX/home")) {
@@ -1975,7 +1975,7 @@ bool MInstall::validateComputerName()
         computerGroupEdit->clear();
     }
 
-    nextFocus = NULL;
+    nextFocus = nullptr;
     return true;
 }
 
@@ -2106,7 +2106,7 @@ void MInstall::stashServices(bool save)
 {
     QTreeWidgetItemIterator it(csView);
     while (*it) {
-        if ((*it)->parent() != NULL) {
+        if ((*it)->parent() != nullptr) {
             (*it)->setCheckState(save?2:0, (*it)->checkState(save?0:2));
         }
         ++it;
@@ -2124,7 +2124,7 @@ void MInstall::setServices()
 
     QTreeWidgetItemIterator it(csView);
     while (*it) {
-        if ((*it)->parent() != NULL) {
+        if ((*it)->parent() != nullptr) {
             QString service = (*it)->text(0);
             qDebug() << "Service: " << service;
             if ((*it)->checkState(0) == Qt::Checked) {
@@ -2462,7 +2462,7 @@ void MInstall::gotoPage(int next)
     widgetStack->setEnabled(true);
     if (nextFocus) {
         nextFocus->setFocus();
-        nextFocus = NULL;
+        nextFocus = nullptr;
     }
 }
 
@@ -2499,7 +2499,7 @@ void MInstall::updatePartitionWidgets()
     }
 
     // partition combo boxes
-    updatePartitionCombos(NULL);
+    updatePartitionCombos(nullptr);
     on_rootCombo_currentIndexChanged(rootCombo->currentText());
 }
 
@@ -2744,7 +2744,7 @@ void MInstall::changeEvent(QEvent *event)
         col.setAlpha(150);
         pal.setColor(QPalette::Base, col);
         mainHelp->setPalette(pal);
-        resizeEvent(NULL);
+        resizeEvent(nullptr);
     }
 }
 
@@ -2979,11 +2979,11 @@ void MInstall::setupkeyboardbutton()
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         while (!file.atEnd()) {
             QString line(file.readLine().trimmed());
-            QLabel *plabel = NULL;
+            QLabel *plabel = nullptr;
             if (line.startsWith("XKBMODEL")) plabel = labelModel;
             else if (line.startsWith("XKBLAYOUT")) plabel = labelLayout;
             else if (line.startsWith("XKBVARIANT")) plabel = labelVariant;
-            if (plabel != NULL) {
+            if (plabel != nullptr) {
                 line = line.section('=', 1);
                 line.replace(",", " ");
                 line.remove(QChar('"'));
@@ -3357,7 +3357,7 @@ SafeCache::~SafeCache()
     erase();
 }
 
-// to completely free the key use parameters NULL, 0
+// to completely free the key use parameters nullptr, 0
 bool SafeCache::load(const char *filename, int length)
 {
     bool ok = false;
