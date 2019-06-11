@@ -1011,7 +1011,7 @@ bool MInstall::validateChosenPartitions()
     // warn if using a non-Linux partition (potential install of another OS)
     auto lambdaForeignTrap = [this,&msgForeignList](const QString &devname, const QString &desc) -> void {
         const int bdindex = listBlkDevs.findDevice(devname);
-        if (bdindex >= 0 && !listBlkDevs[bdindex].isNative) {
+        if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
             msgForeignList << devname << desc;
         }
     };
@@ -1050,7 +1050,7 @@ bool MInstall::validateChosenPartitions()
         if (isSwapEncrypted) swapFormatSize = -1;
         else {
             const int bdindex = listBlkDevs.findDevice(swapdev);
-            if (bdindex >= 0 && !listBlkDevs[bdindex].isSwap) swapFormatSize = -1;
+            if (bdindex >= 0 && !listBlkDevs.at(bdindex).isSwap) swapFormatSize = -1;
         }
         if (swapFormatSize) {
             msgFormatList << swapdev << "swap";
@@ -1069,7 +1069,7 @@ bool MInstall::validateChosenPartitions()
         lambdaForeignTrap(bootdev, "/boot");
         // warn if partition too big (not needed for boot, likely data or other useful partition
         const int bdindex = listBlkDevs.findDevice(bootdev);
-        if (bdindex < 0 || listBlkDevs[bdindex].size > 2147483648) {
+        if (bdindex < 0 || listBlkDevs.at(bdindex).size > 2147483648) {
             // if > 2GB or not in block device list for some reason
             msg = tr("The partition you selected for /boot is larger than expected.") + "\n\n";
         }
@@ -1159,8 +1159,8 @@ bool MInstall::calculateDefaultPartitions()
 
     // remove partitions from the list that belong to this drive
     const int ixRemoveBD = bdindex + 1;
-    while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs[ixRemoveBD].isDisk) {
-        listToUnmount << listBlkDevs[ixRemoveBD].name;
+    while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs.at(ixRemoveBD).isDisk) {
+        listToUnmount << listBlkDevs.at(ixRemoveBD).name;
         listBlkDevs.removeAt(ixRemoveBD);
     }
 
@@ -1170,7 +1170,7 @@ bool MInstall::calculateDefaultPartitions()
 
     // calculate new partition sizes
     // get the total disk size
-    rootFormatSize = listBlkDevs[bdindex].size / 1048576; // in MB
+    rootFormatSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
     rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
 
     // allocate space for ESP if booted from UEFI
@@ -1218,7 +1218,7 @@ bool MInstall::calculateDefaultPartitions()
         bdinfo.fs = fs;
         bdinfo.size = size * 1048576; // back into bytes
         bdinfo.isFuture = bdinfo.isNative = true;
-        bdinfo.isGPT = listBlkDevs[bdindex].isGPT;
+        bdinfo.isGPT = listBlkDevs.at(bdindex).isGPT;
         ++ixAddBD;
         listBlkDevs.insert(ixAddBD, bdinfo);
         ++ixpart;
