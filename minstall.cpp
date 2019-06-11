@@ -1296,7 +1296,7 @@ bool MInstall::makePartitions()
             const qint64 end = start + size;
             rc = execute("parted -s --align optimal /dev/" + devsplit[0] + " mkpart " + type
                          + " " + QString::number(start) + "MiB " + QString::number(end) + "MiB");
-            start += end;
+            start = end;
         } else if (size < 0){
             // command to set the partition type
             QString cmd;
