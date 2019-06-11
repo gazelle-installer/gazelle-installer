@@ -340,13 +340,11 @@ bool MInstall::checkDisk()
                 tr("Do you want to abort the installation?");
         ans = QMessageBox::critical(this, windowTitle(), msg,
                                     QMessageBox::Yes, QMessageBox::No);
-        if (ans == QMessageBox::Yes) {
-            return false;
-        }
+        if (ans == QMessageBox::Yes) return false;
     }
     else {
         output = getCmdOut("smartctl -A " + drv + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
-        if (output.isEmpty()) {
+        if (!output.isEmpty()) {
             msg = tr("Smartmon tool output:\n\n") + output + "\n\n" +
                     tr("The disk with the partition you selected for installation passes the S.M.A.R.T. monitor test (smartctl)\n") +
                     tr("but the tests indicate it will have a higher than average failure rate in the upcoming year.\n") +
@@ -354,9 +352,7 @@ bool MInstall::checkDisk()
                     tr("Do you want to continue?");
             ans = QMessageBox::warning(this, windowTitle(), msg,
                                        QMessageBox::Yes, QMessageBox::No);
-            if (ans != QMessageBox::Yes) {
-                return false;
-            }
+            if (ans != QMessageBox::Yes) return false;
         }
     }
     return true;
