@@ -252,7 +252,8 @@ private:
     bool pretendToInstall(int start, int stop, int sleep);
     void prepareToInstall();
     bool saveHomeBasic();
-    bool calculateFuturePartitions();
+    bool calculateDefaultPartitions();
+    bool calculateChosenPartitions();
     bool makePartitions();
     bool formatPartitions();
     bool installLinux(const int progend);
