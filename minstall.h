@@ -69,8 +69,6 @@ public:
     MInstall(const QStringList &args, const QString &cfgfile = "/etc/minstall.conf");
     ~MInstall();
 
-    void checkUefi();
-
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
     void csleep(int msec);
