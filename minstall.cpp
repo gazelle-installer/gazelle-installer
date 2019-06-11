@@ -85,6 +85,12 @@ void MInstall::startup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
+    if (!pretend) {
+        // disable automounting in Thunar
+        auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
+        execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
+    }
+
     // set default host name
     computerNameEdit->setText(DEFAULT_HOSTNAME);
 
@@ -114,15 +120,80 @@ void MInstall::startup()
     existing_partitionsButton->hide();
 
     setupkeyboardbutton();
+
+    // timezone
+    timezoneCombo->clear();
+    QFile file("/usr/share/zoneinfo/zone.tab");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        while(!file.atEnd()) {
+            const QString line(file.readLine().trimmed());
+            if(!line.startsWith('#')) {
+                timezoneCombo->addItem(line.section("\t", 2, 2));
+            }
+        }
+        file.close();
+    }
+    timezoneCombo->model()->sort(0);
+    file.setFileName("/etc/timezone");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        const QString line(file.readLine().trimmed());
+        timezoneCombo->setCurrentIndex(timezoneCombo->findText(line));
+        file.close();
+    }
+
+    // locale
+    localeCombo->clear();
+    QStringList loclist = getCmdOuts("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'");
+    for (QString &strloc : loclist) {
+        strloc.replace("utf8", "UTF-8", Qt::CaseInsensitive);
+        QLocale loc(strloc);
+        localeCombo->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
+    }
+    localeCombo->model()->sort(0);
+    file.setFileName("/etc/default/locale");
+    QString locale;
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        while (!file.atEnd()) {
+            const QString line(file.readLine());
+            if(line.startsWith("LANG")) {
+                locale = line.section('=', 1).trimmed();
+            }
+        }
+        file.close();
+    }
+    int iloc = localeCombo->findData(QVariant(locale));
+    if (iloc == -1) {
+        // set to British English to show that the system locale was probably not picked up
+        iloc = localeCombo->findData(QVariant("en_GB.UTF-8"));
+    }
+    localeCombo->setCurrentIndex(iloc);
+
+    // Detect snapshot-backup account(s)
+    // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
+    if (execute("ls /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)
+        || execute("test -d /live/linux/home/demo", true)) {
+        haveSnapshotUserAccounts = true;
+    }
+
+    //check for samba
+    QFileInfo info("/etc/init.d/smbd");
+    if (!info.exists()) {
+        computerGroupLabel->setEnabled(false);
+        computerGroupEdit->setEnabled(false);
+        computerGroupEdit->setText("");
+        sambaCheckBox->setChecked(false);
+        sambaCheckBox->setEnabled(false);
+    }
+
+    // check for the Samba server
+    QString val = getCmdOut("dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'");
+    haveSamba = (val.compare("installed") == 0);
+
+    buildServiceList();
     updatePartitionWidgets();
     manageConfig(ConfigLoadA);
     stashAdvancedFDE(true);
-
-    if (!pretend) {
-        // disable automounting in Thunar
-        auto_mount = getCmdOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
-        execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
-    }
+    stashServices(true);
     this->setEnabled(true);
     updateCursor();
 }
@@ -381,17 +452,20 @@ bool MInstall::processNextPhase()
     // Phase 0 = install not started yet, Phase 1 = install in progress
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps
     if (phase == 0) { // no install started yet
-        updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
-        if (!checkDisk()) return false;
-        phase = 1; // installation.
-
-        // preparation
-        prepareToInstall();
-
         // allow the user to enter other options
         buildBootLists();
         manageConfig(ConfigLoadB);
         gotoPage(5);
+
+        updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
+        if (!checkDisk()) return false;
+        phase = 1; // installation.
+
+        // gather required information and prepare installation
+        cleanup(false); // cleanup previous mounts
+        isRootFormatted = false;
+        isHomeFormatted = false;
+        checkUefi();
 
         // the core of the installation
         if (!pretend) {
@@ -444,95 +518,6 @@ bool MInstall::processNextPhase()
         gotoPage(10);
     }
     return true;
-}
-
-// gather required information and prepare installation
-void MInstall::prepareToInstall()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (phase < 0) return;
-
-    // cleanup previous mounts
-    cleanup(false);
-
-    isRootFormatted = false;
-    isHomeFormatted = false;
-
-    checkUefi();
-
-    // timezone
-    timezoneCombo->clear();
-    QFile file("/usr/share/zoneinfo/zone.tab");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while(!file.atEnd()) {
-            const QString line(file.readLine().trimmed());
-            if(!line.startsWith('#')) {
-                timezoneCombo->addItem(line.section("\t", 2, 2));
-            }
-        }
-        file.close();
-    }
-    timezoneCombo->model()->sort(0);
-    file.setFileName("/etc/timezone");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        const QString line(file.readLine().trimmed());
-        timezoneCombo->setCurrentIndex(timezoneCombo->findText(line));
-        file.close();
-    }
-
-    // locale
-    localeCombo->clear();
-    QStringList loclist = getCmdOuts("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'");
-    for (QString &strloc : loclist) {
-        strloc.replace("utf8", "UTF-8", Qt::CaseInsensitive);
-        QLocale loc(strloc);
-        localeCombo->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
-    }
-    localeCombo->model()->sort(0);
-    file.setFileName("/etc/default/locale");
-    QString locale;
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while (!file.atEnd()) {
-            const QString line(file.readLine());
-            if(line.startsWith("LANG")) {
-                locale = line.section('=', 1).trimmed();
-            }
-        }
-        file.close();
-    }
-    int iloc = localeCombo->findData(QVariant(locale));
-    if (iloc == -1) {
-        // set to British English to show that the system locale was probably not picked up
-        iloc = localeCombo->findData(QVariant("en_GB.UTF-8"));
-    }
-    localeCombo->setCurrentIndex(iloc);
-
-    // clock 24/12 default
-    if (locale == "en_US.UTF-8" || locale == "ar_EG.UTF-8" || locale == "el_GR.UTF-8" || locale == "sq_AL.UTF-8") {
-        radio12h->setChecked(true);
-    }
-
-    // Detect snapshot-backup account(s)
-    // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
-    if (execute("ls /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)
-        || execute("test -d /live/linux/home/demo", true)) {
-        haveSnapshotUserAccounts = true;
-    }
-
-    //check for samba
-    QFileInfo info("/etc/init.d/smbd");
-    if (!info.exists()) {
-        computerGroupLabel->setEnabled(false);
-        computerGroupEdit->setEnabled(false);
-        computerGroupEdit->setText("");
-        sambaCheckBox->setChecked(false);
-        sambaCheckBox->setEnabled(false);
-    }
-    // check for the Samba server
-    QString val = getCmdOut("dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'");
-    haveSamba = (val.compare("installed") == 0);
-
-    buildServiceList();
 }
 
 int MInstall::manageConfig(enum ConfigAction mode)
@@ -2798,7 +2783,6 @@ void MInstall::buildServiceList()
     csView->expandAll();
     csView->resizeColumnToContents(0);
     csView->resizeColumnToContents(1);
-    stashServices(true);
 }
 
 /////////////////////////////////////////////////////////////////////////
