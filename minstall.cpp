@@ -389,7 +389,6 @@ bool MInstall::processNextPhase()
         phase = 1; // installation.
 
         // preparation
-        calculateFuturePartitions();
         prepareToInstall();
 
         // allow the user to enter other options
@@ -1138,158 +1137,161 @@ bool MInstall::validateChosenPartitions()
     return true;
 }
 
-bool MInstall::calculateFuturePartitions()
+bool MInstall::calculateDefaultPartitions()
 {
-    rootFormatSize = homeFormatSize = swapFormatSize = bootFormatSize = espFormatSize = 0;
-    if (entireDiskButton->isChecked()) {
-        QString drv(diskCombo->currentData().toString());
-        int bdindex = listBlkDevs.findDevice(drv);
-        if (bdindex < 0) return false;
-        QString mmcnvmepartdesignator;
-        if (drv.startsWith("nvme") || drv.startsWith("mmcblk")) {
-            mmcnvmepartdesignator = "p";
+    QString drv(diskCombo->currentData().toString());
+    int bdindex = listBlkDevs.findDevice(drv);
+    if (bdindex < 0) return false;
+    QString mmcnvmepartdesignator;
+    if (drv.startsWith("nvme") || drv.startsWith("mmcblk")) {
+        mmcnvmepartdesignator = "p";
+    }
+
+    // remove partitions from the list that belong to this drive
+    const int ixRemoveBD = bdindex + 1;
+    while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs[ixRemoveBD].isDisk) {
+        listBlkDevs.removeAt(ixRemoveBD);
+    }
+
+    bool ok = true;
+    int free = freeSpaceEdit->text().toInt(&ok,10);
+    if (!ok) free = 0;
+
+    // calculate new partition sizes
+    // get the total disk size
+    rootFormatSize = listBlkDevs[bdindex].size / 1048576; // in MB
+    rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
+
+    // allocate space for ESP if booted from UEFI
+    espFormatSize = uefi ? 256 : 0;
+    rootFormatSize -= espFormatSize;
+
+    // allocate space for /boot if encrypting
+    bootFormatSize = 0;
+    if (checkBoxEncryptAuto->isChecked()){ // set root and swap status encrypted
+        isRootEncrypted = true;
+        isSwapEncrypted = true;
+        bootFormatSize = 512;
+        rootFormatSize -= bootFormatSize;
+    }
+
+    // no default separate /home just yet
+    homeFormatSize = 0;
+
+    // 2048 swap should be ample
+    swapFormatSize = 2048;
+    if (rootFormatSize < 2048) swapFormatSize = 128;
+    else if (rootFormatSize < 3096) swapFormatSize = 256;
+    else if (rootFormatSize < 4096) swapFormatSize = 512;
+    else if (rootFormatSize < 12288) swapFormatSize = 1024;
+    rootFormatSize -= swapFormatSize;
+
+    if (free > 0 && rootFormatSize > 8192) {
+        // allow free_size
+        // remaining is capped until free is satisfied
+        if (free > rootFormatSize - 8192) {
+            free = rootFormatSize - 8192;
         }
+        rootFormatSize -= free;
+    } else { // no free space
+        free = 0;
+    }
 
-        // remove partitions from the list that belong to this drive
-        const int ixRemoveBD = bdindex + 1;
-        while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs[ixRemoveBD].isDisk) {
-            listBlkDevs.removeAt(ixRemoveBD);
-        }
+    // code for adding future partitions to the list
+    int ixAddBD = bdindex;
+    int ixpart = 1;
+    auto lambdaAddFutureBD = [this, bdindex, &ixpart, &ixAddBD, &drv, &mmcnvmepartdesignator]
+            (qint64 size, const QString &fs) -> BlockDeviceInfo &  {
+        BlockDeviceInfo bdinfo;
+        bdinfo.name = drv + mmcnvmepartdesignator + QString::number(ixpart);
+        bdinfo.fs = fs;
+        bdinfo.size = size * 1048576; // back into bytes
+        bdinfo.isFuture = bdinfo.isNative = true;
+        bdinfo.isGPT = listBlkDevs[bdindex].isGPT;
+        ++ixAddBD;
+        listBlkDevs.insert(ixAddBD, bdinfo);
+        ++ixpart;
+        return listBlkDevs[ixAddBD];
+    };
+    // add future partitions to the block device list and store new names
+    if (uefi) {
+        BlockDeviceInfo &bdinfo = lambdaAddFutureBD(espFormatSize, "vfat");
+        espDevice = bdinfo.name;
+        bdinfo.isNative = false;
+        bdinfo.isESP = true;
+    }
+    if (!isRootEncrypted) bootDevice.clear();
+    else bootDevice = "/dev/" + lambdaAddFutureBD(bootFormatSize, "ext4").name;
+    rootDevice = "/dev/" + lambdaAddFutureBD(rootFormatSize,
+                          isRootEncrypted ? "crypto_LUKS" : "ext4").name;
+    BlockDeviceInfo &bdinfo = lambdaAddFutureBD(swapFormatSize, "swap");
+    bdinfo.isSwap = true;
+    swapDevice = "/dev/" + bdinfo.name;
+    homeDevice = rootDevice;
+    rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
+    return true;
+}
 
-        bool ok = true;
-        int free = freeSpaceEdit->text().toInt(&ok,10);
-        if (!ok) free = 0;
-
-        // calculate new partition sizes
-        // get the total disk size
-        rootFormatSize = listBlkDevs[bdindex].size / 1048576; // in MB
-        rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
-
-        // allocate space for ESP
-        if (uefi) { // if booted from UEFI
-            espFormatSize = 256;
-            rootFormatSize -= espFormatSize;
-        }
-
-        // allocate space for /boot if encrypting
-        if (checkBoxEncryptAuto->isChecked()){ // set root and swap status encrypted
-            isRootEncrypted = true;
-            isSwapEncrypted = true;
-            bootFormatSize = 512;
-            rootFormatSize -= bootFormatSize;
-        }
-
-        // 2048 swap should be ample
-        swapFormatSize = 2048;
-        if (rootFormatSize < 2048) swapFormatSize = 128;
-        else if (rootFormatSize < 3096) swapFormatSize = 256;
-        else if (rootFormatSize < 4096) swapFormatSize = 512;
-        else if (rootFormatSize < 12288) swapFormatSize = 1024;
-        rootFormatSize -= swapFormatSize;
-
-        if (free > 0 && rootFormatSize > 8192) {
-            // allow free_size
-            // remaining is capped until free is satisfied
-            if (free > rootFormatSize - 8192) {
-                free = rootFormatSize - 8192;
-            }
-            rootFormatSize -= free;
-        } else { // no free space
-            free = 0;
-        }
-
-        // code for adding future partitions to the list
-        int ixAddBD = bdindex;
-        int ixpart = 1;
-        auto lambdaAddFutureBD = [this, bdindex, &ixpart, &ixAddBD, &drv, &mmcnvmepartdesignator]
-                (qint64 size, const QString &fs) -> BlockDeviceInfo &  {
-            BlockDeviceInfo bdinfo;
-            bdinfo.name = drv + mmcnvmepartdesignator + QString::number(ixpart);
-            bdinfo.fs = fs;
-            bdinfo.size = size * 1048576; // back into bytes
+bool MInstall::calculateChosenPartitions()
+{
+    auto lambdaSetFutureBD = [this](QComboBox *combo, const QString &label,
+            const QString &fs, const bool isEncrypted) -> int {
+        int index = listBlkDevs.findDevice(combo->currentData().toString());
+        if (index >= 0) {
+            BlockDeviceInfo &bdinfo = listBlkDevs[index];
+            bdinfo.fs = isEncrypted ? QStringLiteral("crypt_LUKS") : fs;
+            bdinfo.label = label;
             bdinfo.isFuture = bdinfo.isNative = true;
-            bdinfo.isGPT = listBlkDevs[bdindex].isGPT;
-            ++ixAddBD;
-            listBlkDevs.insert(ixAddBD, bdinfo);
-            ++ixpart;
-            return listBlkDevs[ixAddBD];
-        };
-        // add future partitions to the block device list and store new names
-        if (uefi) {
-            BlockDeviceInfo &bdinfo = lambdaAddFutureBD(espFormatSize, "vfat");
-            espDevice = bdinfo.name;
-            bdinfo.isNative = false;
-            bdinfo.isESP = true;
         }
-        if (!isRootEncrypted) bootDevice.clear();
-        else bootDevice = "/dev/" + lambdaAddFutureBD(bootFormatSize, "ext4").name;
-        rootDevice = "/dev/" + lambdaAddFutureBD(rootFormatSize,
-                              isRootEncrypted ? "crypto_LUKS" : "ext4").name;
-        BlockDeviceInfo &bdinfo = lambdaAddFutureBD(swapFormatSize, "swap");
-        bdinfo.isSwap = true;
-        swapDevice = "/dev/" + bdinfo.name;
-        homeDevice = rootDevice;
-        rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
-    } else {
-        auto lambdaSetFutureBD = [this](QComboBox *combo, const QString &label,
-                const QString &fs, const bool isEncrypted) -> int {
-            int index = listBlkDevs.findDevice(combo->currentData().toString());
-            if (index >= 0) {
-                BlockDeviceInfo &bdinfo = listBlkDevs[index];
-                bdinfo.fs = isEncrypted ? QStringLiteral("crypt_LUKS") : fs;
-                bdinfo.label = label;
-                bdinfo.isFuture = bdinfo.isNative = true;
-            }
-            return index;
-        };
-        const bool saveHome = saveHomeCheck->isChecked();
+        return index;
+    };
+    const bool saveHome = saveHomeCheck->isChecked();
 
-        // format swap if encrypting or not already swap
-        if (swapCombo->currentData().isValid()) {
-            if (checkBoxEncryptSwap->isChecked()) {
-                isSwapEncrypted = true;
-                swapFormatSize = -1;
-            } else {
-                int index = listBlkDevs.findDevice(swapCombo->currentData().toString());
-                if (index >= 0 && !listBlkDevs[index].isSwap) swapFormatSize = -1;
-            }
-            if (swapFormatSize) {
-                const int bdindex = lambdaSetFutureBD(swapCombo, swapLabelEdit->text(),
-                                                      "swap", isSwapEncrypted);
-                if (bdindex < 0) return false;
-                listBlkDevs[bdindex].isSwap = true;
-            }
+    // format swap if encrypting or not already swap
+    swapFormatSize = 0;
+    if (swapCombo->currentData().isValid()) {
+        if (checkBoxEncryptSwap->isChecked()) {
+            isSwapEncrypted = true;
+            swapFormatSize = -1;
+        } else {
+            int index = listBlkDevs.findDevice(swapCombo->currentData().toString());
+            if (index >= 0 && !listBlkDevs[index].isSwap) swapFormatSize = -1;
         }
-
-        if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
-        // maybe format root (if not saving /home on root) // or if using --sync option
-        if (!(saveHome && homeDevice == rootDevice) && !sync) {
-            rootFormatSize = -1;
-            lambdaSetFutureBD(rootCombo, rootLabelEdit->text(),
-                              rootTypeCombo->currentData().toString(), isRootEncrypted);
-        }
-
-        // format and mount /boot if different than root
-        if (bootCombo->currentText() != "root") {
-            lambdaSetFutureBD(bootCombo, "boot", "ext4", false);
-            bootFormatSize = -1;
-        }
-
-        // prepare home if not being preserved, and on a different partition
-        if (homeDevice != rootDevice) {
-            if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
-            if (!saveHome) {
-                homeFormatSize = -1;
-                lambdaSetFutureBD(homeCombo, homeLabelEdit->text(),
-                                  homeTypeCombo->currentText(), isHomeEncrypted);
-            }
+        if (swapFormatSize) {
+            const int bdindex = lambdaSetFutureBD(swapCombo, swapLabelEdit->text(),
+                                                  "swap", isSwapEncrypted);
+            if (bdindex < 0) return false;
+            listBlkDevs[bdindex].isSwap = true;
         }
     }
-    qDebug() << " ---- PARTITION FORMAT SCHEDULE ----";
-    qDebug() << rootDevice << rootFormatSize;
-    qDebug() << homeDevice << homeFormatSize;
-    qDebug() << swapDevice << swapFormatSize;
-    qDebug() << bootDevice << bootFormatSize;
+
+    if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
+    // maybe format root (if not saving /home on root) // or if using --sync option
+    rootFormatSize = 0;
+    if (!(saveHome && homeDevice == rootDevice) && !sync) {
+        rootFormatSize = -1;
+        lambdaSetFutureBD(rootCombo, rootLabelEdit->text(),
+                          rootTypeCombo->currentData().toString(), isRootEncrypted);
+    }
+
+    // format and mount /boot if different than root
+    bootFormatSize = espFormatSize = 0; // no new ESP partition this time
+    if (bootCombo->currentText() != "root") {
+        lambdaSetFutureBD(bootCombo, "boot", "ext4", false);
+        bootFormatSize = -1;
+    }
+
+    // prepare home if not being preserved, and on a different partition
+    homeFormatSize = 0;
+    if (homeDevice != rootDevice) {
+        if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
+        if (!saveHome) {
+            homeFormatSize = -1;
+            lambdaSetFutureBD(homeCombo, homeLabelEdit->text(),
+                              homeTypeCombo->currentText(), isHomeEncrypted);
+        }
+    }
+
     return true;
 }
 
@@ -1315,7 +1317,7 @@ bool MInstall::makePartitions()
         if (size > 0) {
             const qint64 end = start + size;
             rc = execute("parted -s --align optimal /dev/" + devsplit[0] + " mkpart " + type
-                         + QString::number(start) + "MiB " + QString::number(end) + "MiB");
+                         + " " + QString::number(start) + "MiB " + QString::number(end) + "MiB");
             start += end;
         } else if (size < 0){
             lambdaDetachPart(strdev);
@@ -1330,6 +1332,12 @@ bool MInstall::makePartitions()
         }
         return rc;
     };
+
+    qDebug() << " ---- PARTITION FORMAT SCHEDULE ----";
+    qDebug() << rootDevice << rootFormatSize;
+    qDebug() << homeDevice << homeFormatSize;
+    qDebug() << swapDevice << swapFormatSize;
+    qDebug() << bootDevice << bootFormatSize;
 
     if (entireDiskButton->isChecked()) {
         QString drv(diskCombo->currentData().toString());
@@ -1351,7 +1359,7 @@ bool MInstall::makePartitions()
     // any new partitions they will appear in this order on the disk
     if (!lambdaPreparePart(espDevice, espFormatSize, "ESP")) return false;
     if (!lambdaPreparePart(bootDevice, bootFormatSize, "primary")) return false;
-    if (!lambdaPreparePart(rootDevice, rootFormatSize, "primary ext4 ")) return false;
+    if (!lambdaPreparePart(rootDevice, rootFormatSize, "primary ext4")) return false;
     if (!lambdaPreparePart(homeDevice, homeFormatSize, "primary")) return false;
     if (!lambdaPreparePart(swapDevice, swapFormatSize, "primary")) return false;
     execute("partprobe", true);
@@ -2243,6 +2251,7 @@ int MInstall::showPage(int curr, int next)
             if (ans != QMessageBox::Yes) { // don't format - stop install
                 return curr;
             }
+            calculateDefaultPartitions();
             return 4; // Go to Step_Progress
         }
     } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
@@ -2256,6 +2265,7 @@ int MInstall::showPage(int curr, int next)
             QMessageBox::critical(this, windowTitle(), msg);
             return curr;
         }
+        calculateChosenPartitions();
         return 4; // Go to Step_Progress
     } else if (curr == 3) { // at Step_FDE
         stashAdvancedFDE(next == 4);
