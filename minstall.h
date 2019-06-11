@@ -193,7 +193,6 @@ private:
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
     bool uefi = false;
-    bool haveSysConfig = false;
 
     // if these variables are non-zero then the installer formats the partition
     // if they are negative the installer formats an existing partition
