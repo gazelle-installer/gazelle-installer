@@ -1120,6 +1120,7 @@ bool MInstall::calculateDefaultPartitions()
     // remove partitions from the list that belong to this drive
     const int ixRemoveBD = bdindex + 1;
     while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs[ixRemoveBD].isDisk) {
+        listToUnmount << listBlkDevs[ixRemoveBD].name;
         listBlkDevs.removeAt(ixRemoveBD);
     }
 
@@ -1213,6 +1214,8 @@ bool MInstall::calculateChosenPartitions()
             bdinfo.label = label;
             bdinfo.isNasty = false; // future partitions are safe
             bdinfo.isFuture = bdinfo.isNative = true;
+            // add the current partition with this name to the unmount list
+            listToUnmount << bdinfo.name;
         }
         return index;
     };
@@ -1256,7 +1259,8 @@ bool MInstall::calculateChosenPartitions()
     homeFormatSize = 0;
     if (homeDevice != rootDevice) {
         if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
-        if (!saveHome) {
+        if (saveHome) listToUnmount << homeCombo->currentData().toString();
+        else {
             homeFormatSize = -1;
             lambdaSetFutureBD(homeCombo, homeLabelEdit->text(),
                               homeTypeCombo->currentText(), isHomeEncrypted);
@@ -1274,13 +1278,16 @@ bool MInstall::makePartitions()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
 
-    qint64 start = 1; // start with 1 MB to aid alignment
-
-    auto lambdaDetachPart = [this](const QString &strdev) -> void {
+    // detach all existing partitions on the selected drive
+    for (const QString &strdev : listToUnmount) {
         execute("swapoff " + strdev, true);
         execute("umount " + strdev, true);
-    };
-    auto lambdaPreparePart = [this, &start, lambdaDetachPart]
+    }
+    listToUnmount.clear();
+
+    qint64 start = 1; // start with 1 MB to aid alignment
+
+    auto lambdaPreparePart = [this, &start]
             (const QString &strdev, qint64 size, const QString &type) -> bool {
         const QStringList devsplit = splitDevice(strdev);
         bool rc = true;
@@ -1291,7 +1298,6 @@ bool MInstall::makePartitions()
                          + " " + QString::number(start) + "MiB " + QString::number(end) + "MiB");
             start += end;
         } else if (size < 0){
-            lambdaDetachPart(strdev);
             // command to set the partition type
             QString cmd;
             if (isGpt("/dev/" + devsplit[0])) {
@@ -1311,20 +1317,12 @@ bool MInstall::makePartitions()
     qDebug() << bootDevice << bootFormatSize;
 
     if (entireDiskButton->isChecked()) {
-        QString drv(diskCombo->currentData().toString());
-        // detach all existing partitions on the selected drive
-        for (const BlockDeviceInfo &bdinfo : listBlkDevsBackup) {
-            if (!bdinfo.isDisk && bdinfo.name.startsWith(drv)) {
-                lambdaDetachPart("/dev/" + bdinfo.name);
-            }
-        }
+        const QString &drv = diskCombo->currentData().toString();
         updateStatus(tr("Creating required partitions"));
         execute(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
         if (!execute("parted -s /dev/" + drv + " mklabel " + (uefi ? "gpt" : "msdos"))) return false;
     } else {
         updateStatus(tr("Preparing required partitions"));
-        // prepare home if not being preserved, and on a different partition
-        if (saveHomeCheck->isChecked()) lambdaDetachPart(homeDevice);
     }
 
     // any new partitions they will appear in this order on the disk
@@ -2299,6 +2297,7 @@ void MInstall::pageDisplayed(int next)
             updateCursor(Qt::WaitCursor);
             phase = 0;
             updatePartitionWidgets();
+            listToUnmount.clear();
             updateCursor();
         }
         break;
@@ -2721,8 +2720,6 @@ void MInstall::buildBlockDevList()
         // propagate the nasty flag up to the drive
         if (bdinfo.isNasty) listBlkDevs[driveIndex].isNasty = true;
     }
-    // also refresh the backup block device list
-    listBlkDevsBackup = listBlkDevs;
 
     // debug
     qDebug() << "Name Size Model FS | isDisk isGPT isBoot isESP isNative isSwap";

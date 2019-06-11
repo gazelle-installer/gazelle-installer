@@ -209,6 +209,7 @@ private:
 
     QWidget *nextFocus = NULL;
     BlockDeviceList listBlkDevs, listBlkDevsBackup;
+    QStringList listToUnmount;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
     QStringList listHomes;
