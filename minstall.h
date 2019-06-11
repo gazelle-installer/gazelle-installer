@@ -251,7 +251,6 @@ private:
     QStringList splitDevice(const QString &device) const;
     void buildBlockDevList();
     bool pretendToInstall(int start, int stop, int sleep);
-    void prepareToInstall();
     bool saveHomeBasic();
     bool calculateDefaultPartitions();
     bool calculateChosenPartitions();
