@@ -211,7 +211,7 @@ void MInstall::csleep(int msec)
     eloop.exec();
 }
 
-bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray &input)
+bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray *input, bool needRead)
 {
     if (phase < 0) return false;
     qDebug() << cmd;
@@ -219,7 +219,11 @@ bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray 
     connect(proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (rawexec) proc->start(cmd);
     else proc->start("/bin/bash", QStringList() << "-c" << cmd);
-    if (!input.isEmpty()) proc->write(input);
+    if (!needRead) {
+        proc->closeReadChannel(QProcess::StandardOutput);
+        proc->closeReadChannel(QProcess::StandardError);
+    }
+    if (input && !(input->isEmpty())) proc->write(*input);
     proc->closeWriteChannel();
     eloop.exec();
     disconnect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
@@ -229,7 +233,7 @@ bool MInstall::execute(const QString &cmd, const bool rawexec, const QByteArray 
 
 QString MInstall::getCmdOut(const QString &cmd, bool everything)
 {
-    execute(cmd);
+    execute(cmd, false, NULL, true);
     QString strout(proc->readAll().trimmed());
     if (everything) return strout;
     return strout.section("\n", 0, 0);
@@ -237,7 +241,7 @@ QString MInstall::getCmdOut(const QString &cmd, bool everything)
 
 QStringList MInstall::getCmdOuts(const QString &cmd)
 {
-    execute(cmd);
+    execute(cmd, false, NULL, true);
     return QString(proc->readAll().trimmed()).split('\n');
 }
 
@@ -305,7 +309,8 @@ void MInstall::writeKeyFile()
 
     QString rngfile = "/dev/" + comboFDErandom->currentText();
     const unsigned int keylength = 4096;
-    QString password = (checkBoxEncryptAuto->isChecked()) ? FDEpassword->text() : FDEpassCust->text();
+    const QLineEdit *passedit = checkBoxEncryptAuto->isChecked() ? FDEpassword : FDEpassCust;
+    const QByteArray password(passedit->text().toUtf8());
     if (isRootEncrypted) { // if encrypting root
         bool newkey = (key.length() == 0);
 
@@ -319,12 +324,12 @@ void MInstall::writeKeyFile()
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevice);
 
             execute("cryptsetup luksAddKey " + swapDevice + " /mnt/antiX/root/keyfile",
-                    true, password.toUtf8() + "\n");
+                    true, &password);
         }
 
         if (isHomeEncrypted && newkey) { // if encrypting separate /home
             execute("cryptsetup luksAddKey " + homeDevice + " /mnt/antiX/root/keyfile",
-                    true, password.toUtf8() + "\n");
+                    true, &password);
         }
         QString rootUUID = getCmdOut("blkid -s UUID -o value " + rootDevice);
         //write crypttab keyfile entry
@@ -353,7 +358,7 @@ void MInstall::writeKeyFile()
             swapUUID = getCmdOut("blkid -s UUID -o value " + swapDevice);
 
             execute("cryptsetup luksAddKey " + swapDevice + " /mnt/antiX/home/.keyfileDONOTdelete",
-                    true, password.toUtf8() + "\n");
+                    true, &password);
         }
         QString homeUUID = getCmdOut("blkid -s UUID -o value " + homeDevice);
         //write crypttab keyfile entry
@@ -944,7 +949,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
                   + " --use-" + comboFDErandom->currentText()
                   + " --iter-time " + spinFDEroundtime->cleanText()
                   + " luksFormat " + dev;
-    if (!execute(cmd, true, password + "\n")) {
+    if (!execute(cmd, true, &password)) {
         failUI(tr("Sorry, could not create %1 LUKS partition").arg(dev));
         return false;
     }
@@ -960,7 +965,7 @@ bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, con
     QString cmd = "cryptsetup luksOpen " + dev;
     if (!fs_name.isEmpty()) cmd += " " + fs_name;
     if (!options.isEmpty()) cmd += " " + options;
-    if (!execute(cmd, true, password + "\n")) {
+    if (!execute(cmd, true, &password)) {
         if (failHard) failUI(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
         return false;
     }
@@ -1311,10 +1316,11 @@ bool MInstall::makePartitions()
     };
 
     qDebug() << " ---- PARTITION FORMAT SCHEDULE ----";
-    qDebug() << rootDevice << rootFormatSize;
-    qDebug() << homeDevice << homeFormatSize;
-    qDebug() << swapDevice << swapFormatSize;
-    qDebug() << bootDevice << bootFormatSize;
+    qDebug() << "Root:" << rootDevice << rootFormatSize;
+    qDebug() << "Home:" << homeDevice << homeFormatSize;
+    qDebug() << "Swap:" << swapDevice << swapFormatSize;
+    qDebug() << "Boot:" << bootDevice << bootFormatSize;
+    qDebug() << "ESP:" << espDevice << espFormatSize;
 
     if (entireDiskButton->isChecked()) {
         const QString &drv = diskCombo->currentData().toString();
@@ -1870,9 +1876,9 @@ bool MInstall::setUserInfo()
     if (phase < 0) return false;
 
     // set the user passwords first
-    if (!execute("chroot /mnt/antiX chpasswd", true,
-                 QString("root:" + rootPasswordEdit->text() + "\n"
-                         "demo:" + userPasswordEdit->text()).toUtf8())) {
+    const QByteArray &userinfo = QString("root:" + rootPasswordEdit->text() + "\n"
+                                 "demo:" + userPasswordEdit->text()).toUtf8();
+    if (!execute("chroot /mnt/antiX chpasswd", true, &userinfo)) {
         failUI(tr("Failed to set user account passwords."));
         return false;
     }
