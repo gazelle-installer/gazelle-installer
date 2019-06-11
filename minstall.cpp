@@ -2264,14 +2264,14 @@ int MInstall::showPage(int curr, int next)
             return 9; // skip Step_User_Accounts and go to Step_Progress
         }
     } else if (next == 10 && curr == 9) { // at Step_Progress (forward)
-        return 4; // Return to Step_Boot instead of the end
+        if (phase < 4) return 4; // Return to Step_Boot instead of the end
     } else if (next == 8 && curr == 9) { // at Step_Progress (backward)
         if (!pretend && haveSnapshotUserAccounts) {
             return 7; // skip Step_User_Accounts and go to Step_Localization
         }
     } else if (curr == 6) { // at Step_Services
         stashServices(next == 7);
-        return 8; // goes back to the screen that called Services screen
+        return 7; // goes back to the screen that called Services screen
     }
     return next;
 }
