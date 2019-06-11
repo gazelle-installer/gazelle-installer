@@ -463,8 +463,8 @@ bool MInstall::processNextPhase()
         if (!checkDisk()) return false;
         phase = 1; // installation.
 
-        // gather required information and prepare installation
-        cleanup(false); // cleanup previous mounts
+        // cleanup previous mounts
+        cleanup(false);
 
         // the core of the installation
         if (!pretend) {
@@ -1013,32 +1013,41 @@ bool MInstall::validateChosenPartitions()
 
     lambdaForeignTrap(rootdev, "/ (root)");
 
-    // warn on formatting or deletion
-    if (!(saveHomeCheck->isChecked() && homedev == rootdev)) {
+    // maybe format root (if not saving /home on root) // or if using --sync option
+    rootFormatSize = 0;
+    if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
+    if (!(saveHomeCheck->isChecked() && homedev == rootdev) && !sync) {
+        rootFormatSize = -1;
         msgFormatList << rootdev << "/ (root)";
     } else {
         msgConfirm += " - " + tr("Delete the data on %1 except for /home").arg(rootdev) + "\n";
     }
 
     // format /home?
+    homeFormatSize = 0;
     if (homedev != rootdev) {
+        if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
         lambdaForeignTrap(homedev, "/home");
         if (saveHomeCheck->isChecked()) {
+            listToUnmount << homedev;
             msgConfirm += " - " + tr("Reuse (no reformat) %1 as the /home partition").arg(homedev) + "\n";
         } else {
+            homeFormatSize = -1;
             msgFormatList << homedev << "/home";
         }
     }
 
-    // format swap? (if no swap is chosen do nothing)
+    // format swap if encrypting or not already swap (if no swap is chosen do nothing)
+    swapFormatSize = 0;
     if (!swapdev.isEmpty()) {
         lambdaForeignTrap(swapdev, "swap");
-        bool formatSwap = checkBoxEncryptSwap->isChecked();
-        if (!formatSwap) {
+        isSwapEncrypted = checkBoxEncryptSwap->isChecked();
+        if (isSwapEncrypted) swapFormatSize = -1;
+        else {
             const int bdindex = listBlkDevs.findDevice(swapdev);
-            if (bdindex >= 0 && !listBlkDevs[bdindex].isSwap) formatSwap = true;
+            if (bdindex >= 0 && !listBlkDevs[bdindex].isSwap) swapFormatSize = -1;
         }
-        if (formatSwap) {
+        if (swapFormatSize) {
             msgFormatList << swapdev << "swap";
         } else {
             msgConfirm += " - " + tr("Configure %1 as swap space").arg(swapdev) + "\n";
@@ -1048,14 +1057,15 @@ bool MInstall::validateChosenPartitions()
     QString msg;
 
     // format /boot?
+    bootFormatSize = espFormatSize = 0; // no new ESP partition this time
     if (bootCombo->currentText() != "root") {
+        bootFormatSize = -1;
         msgFormatList << bootdev << "/boot";
         lambdaForeignTrap(bootdev, "/boot");
         // warn if partition too big (not needed for boot, likely data or other useful partition
-        QString size_str = getCmdOut("lsblk -nbo SIZE /dev/" + bootdev + "|head -n1").trimmed();
-        bool ok = true;
-        quint64 size = size_str.toULongLong(&ok, 10);
-        if (size > 2147483648 || !ok) {  // if > 2GiB or not converted properly
+        const int bdindex = listBlkDevs.findDevice(bootdev);
+        if (bdindex < 0 || listBlkDevs[bdindex].size > 2147483648) {
+            // if > 2GB or not in block device list for some reason
             msg = tr("The partition you selected for /boot is larger than expected.") + "\n\n";
         }
     }
@@ -1105,6 +1115,30 @@ bool MInstall::validateChosenPartitions()
     if (!bootdev.isEmpty()) bootDevice = "/dev/" + bootdev;
     if (!swapdev.isEmpty()) swapDevice = "/dev/" + swapdev;
     if (!homedev.isEmpty()) homeDevice = "/dev/" + homedev;
+
+    // calculate the future partitions here
+    auto lambdaCalcBD = [this](const qint64 size, QComboBox *combo, const QString &label,
+            const QString &fs, const bool isEncrypted) -> int {
+        int index = size ? listBlkDevs.findDevice(combo->currentData().toString()) : -1;
+        if (index >= 0) {
+            BlockDeviceInfo &bdinfo = listBlkDevs[index];
+            bdinfo.fs = isEncrypted ? QStringLiteral("crypt_LUKS") : fs;
+            bdinfo.label = label;
+            bdinfo.isNasty = false; // future partitions are safe
+            bdinfo.isFuture = bdinfo.isNative = true;
+            // add the current partition with this name to the unmount list
+            listToUnmount << bdinfo.name;
+        }
+        return index;
+    };
+    const int ixswap = lambdaCalcBD(swapFormatSize, swapCombo, swapLabelEdit->text(),
+                                    "swap", isSwapEncrypted);
+    if (ixswap >= 0) listBlkDevs[ixswap].isSwap = true;
+    lambdaCalcBD(rootFormatSize, rootCombo, rootLabelEdit->text(),
+                 rootTypeCombo->currentData().toString(), isRootEncrypted);
+    lambdaCalcBD(bootFormatSize, bootCombo, "boot", "ext4", false);
+    lambdaCalcBD(homeFormatSize, homeCombo, homeLabelEdit->text(),
+                 homeTypeCombo->currentText(), isHomeEncrypted);
     return true;
 }
 
@@ -1204,73 +1238,6 @@ bool MInstall::calculateDefaultPartitions()
     return true;
 }
 
-bool MInstall::calculateChosenPartitions()
-{
-    auto lambdaSetFutureBD = [this](QComboBox *combo, const QString &label,
-            const QString &fs, const bool isEncrypted) -> int {
-        int index = listBlkDevs.findDevice(combo->currentData().toString());
-        if (index >= 0) {
-            BlockDeviceInfo &bdinfo = listBlkDevs[index];
-            bdinfo.fs = isEncrypted ? QStringLiteral("crypt_LUKS") : fs;
-            bdinfo.label = label;
-            bdinfo.isNasty = false; // future partitions are safe
-            bdinfo.isFuture = bdinfo.isNative = true;
-            // add the current partition with this name to the unmount list
-            listToUnmount << bdinfo.name;
-        }
-        return index;
-    };
-    const bool saveHome = saveHomeCheck->isChecked();
-
-    // format swap if encrypting or not already swap
-    swapFormatSize = 0;
-    if (swapCombo->currentData().isValid()) {
-        if (checkBoxEncryptSwap->isChecked()) {
-            isSwapEncrypted = true;
-            swapFormatSize = -1;
-        } else {
-            int index = listBlkDevs.findDevice(swapCombo->currentData().toString());
-            if (index >= 0 && !listBlkDevs[index].isSwap) swapFormatSize = -1;
-        }
-        if (swapFormatSize) {
-            const int bdindex = lambdaSetFutureBD(swapCombo, swapLabelEdit->text(),
-                                                  "swap", isSwapEncrypted);
-            if (bdindex < 0) return false;
-            listBlkDevs[bdindex].isSwap = true;
-        }
-    }
-
-    if (checkBoxEncryptRoot->isChecked()) isRootEncrypted = true;
-    // maybe format root (if not saving /home on root) // or if using --sync option
-    rootFormatSize = 0;
-    if (!(saveHome && homeDevice == rootDevice) && !sync) {
-        rootFormatSize = -1;
-        lambdaSetFutureBD(rootCombo, rootLabelEdit->text(),
-                          rootTypeCombo->currentData().toString(), isRootEncrypted);
-    }
-
-    // format and mount /boot if different than root
-    bootFormatSize = espFormatSize = 0; // no new ESP partition this time
-    if (bootCombo->currentText() != "root") {
-        lambdaSetFutureBD(bootCombo, "boot", "ext4", false);
-        bootFormatSize = -1;
-    }
-
-    // prepare home if not being preserved, and on a different partition
-    homeFormatSize = 0;
-    if (homeDevice != rootDevice) {
-        if (checkBoxEncryptHome->isChecked()) isHomeEncrypted = true;
-        if (saveHome) listToUnmount << homeCombo->currentData().toString();
-        else {
-            homeFormatSize = -1;
-            lambdaSetFutureBD(homeCombo, homeLabelEdit->text(),
-                              homeTypeCombo->currentText(), isHomeEncrypted);
-        }
-    }
-
-    return true;
-}
-
 ///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
 
@@ -1281,8 +1248,8 @@ bool MInstall::makePartitions()
 
     // detach all existing partitions on the selected drive
     for (const QString &strdev : listToUnmount) {
-        execute("swapoff " + strdev, true);
-        execute("umount " + strdev, true);
+        execute("swapoff /dev/" + strdev, true);
+        execute("umount /dev/" + strdev, true);
     }
     listToUnmount.clear();
 
@@ -1372,11 +1339,11 @@ bool MInstall::saveHomeBasic()
     // unmount partitions
     if (homedev != rootDevice) {
         execute("/bin/umount -l /mnt/antiX/home", false);
-        if (isHomeEncrypted) execute("cryptsetup luksClose homefs", true);
+        if (isHomeEncrypted) execute("cryptsetup close homefs", true);
     }
  ending2:
     execute("/bin/umount -l /mnt/antiX", false);
-    if (isRootEncrypted) execute("cryptsetup luksClose rootfs", true);
+    if (isRootEncrypted) execute("cryptsetup close rootfs", true);
     return ok;
 }
 
@@ -2236,7 +2203,6 @@ int MInstall::showPage(int curr, int next)
             QMessageBox::critical(this, windowTitle(), msg);
             return curr;
         }
-        calculateChosenPartitions();
         return 4; // Go to Step_Boot
     } else if (curr == 3) { // at Step_FDE
         stashAdvancedFDE(next == 4);
@@ -2946,19 +2912,16 @@ void MInstall::cleanup(bool endclean)
         execute("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
     execute("umount -l /mnt/antiX/boot/efi", true);
-    execute("(umount -l /mnt/antiX/proc; umount -l /mnt/antiX/sys; umount -l /mnt/antiX/dev/shm; umount -l /mnt/antiX/dev) >/dev/null 2>&1", false);
+    execute("umount -l /mnt/antiX/proc", true);
+    execute("umount -l /mnt/antiX/sys", true);
+    execute("umount -l /mnt/antiX/dev/shm", true);
+    execute("umount -l /mnt/antiX/dev", true);
     execute("umount -l /mnt/antiX/home", true);
     execute("umount -lR /mnt/antiX", true);
 
-    if (isRootEncrypted) {
-        execute("cryptsetup luksClose rootfs", true);
-    }
-    if (isHomeEncrypted) {
-        execute("cryptsetup luksClose homefs", true);
-    }
-    if (isSwapEncrypted) {
-        execute("cryptsetup luksClose swapfs", true);
-    }
+    if (isRootEncrypted) execute("cryptsetup close rootfs", true);
+    if (isHomeEncrypted) execute("cryptsetup close homefs", true);
+    if (isSwapEncrypted) execute("cryptsetup close swapfs", true);
 }
 
 void MInstall::on_progressBar_valueChanged(int value)
