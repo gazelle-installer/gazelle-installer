@@ -182,7 +182,7 @@ private:
     // command line options
     bool brave, pretend, automatic, nocopy, sync;
     // configuration management
-    QSettings *config = NULL;
+    QSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
     int configStuck = 0;
 
@@ -200,7 +200,7 @@ private:
     qint64 bootFormatSize = 0;
     qint64 espFormatSize = 0;
 
-    QWidget *nextFocus = NULL;
+    QWidget *nextFocus = nullptr;
     BlockDeviceList listBlkDevs;
     QStringList listToUnmount;
     QString home_mntops = "defaults";
@@ -235,7 +235,7 @@ private:
     // slots
     void startup();
     // helpers
-    bool execute(const QString &cmd, const bool rawexec = false, const QByteArray *input = NULL, bool needRead = false);
+    bool execute(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
     QString getCmdOut(const QString &cmd, bool everything = false);
     // private functions
     void updateStatus(const QString &msg, int val = -1);
