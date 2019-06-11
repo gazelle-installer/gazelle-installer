@@ -480,7 +480,7 @@ bool MInstall::processNextPhase()
         } else if (!pretendToInstall(1, progPhase23 - 1, 100)) {
             return false;
         }
-        if (!haveSysConfig) {
+        if (widgetStack->currentWidget() != Step_Progress) {
             progressBar->setEnabled(false);
             updateStatus(tr("Paused for required operator input"), progPhase23);
             QApplication::beep();
@@ -490,7 +490,7 @@ bool MInstall::processNextPhase()
         }
         phase = 2;
     }
-    if (phase == 2 && haveSysConfig) {
+    if (phase == 2 && widgetStack->currentWidget() == Step_Progress) {
         phase = 3;
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
@@ -2211,22 +2211,16 @@ int MInstall::showPage(int curr, int next)
         return next;
     } else if (next == 5 && curr == 4) { // at Step_Boot (forward)
         return next + 1; // skip Services screen
-    } else if (next == 3 && curr == 4) { // at Step_Boot (backward)
-        return 9; // cannot go back so go to Step_Progress
     } else if (next == 9 && curr == 8) { // at Step_User_Accounts (forward)
         if (!validateUserInfo()) return curr;
-        haveSysConfig = true;
     } else if (next == 7 && curr == 6) { // at Step_Network (forward)
         if (!validateComputerName()) return curr;
     } else if (next == 5 && curr == 6) { // at Step_Network (backward)
        return next - 1; // skip Services screen
     } else if (next == 8 && curr == 7) { // at Step_Localization (forward)
         if (!pretend && haveSnapshotUserAccounts) {
-            haveSysConfig = true;
             return 9; // skip Step_User_Accounts and go to Step_Progress
         }
-    } else if (next == 10 && curr == 9) { // at Step_Progress (forward)
-        if (phase < 4) return 4; // Return to Step_Boot instead of the end
     } else if (next == 8 && curr == 9) { // at Step_Progress (backward)
         if (!pretend && haveSnapshotUserAccounts) {
             return 7; // skip Step_User_Accounts and go to Step_Localization
@@ -2243,10 +2237,7 @@ void MInstall::pageDisplayed(int next)
     // progress bar shown only for install and configuration pages.
     installBox->setVisible(next >= 4 && next <= 9);
 
-    if(next >= 4 && next <= 8) {
-        haveSysConfig = false; // (re)editing configuration
-        ixTipStart = ixTip;
-    }
+    if(next >= 4 && next <= 8) ixTipStart = ixTip;
 
     switch (next) {
     case 1: // choose disk
@@ -2336,16 +2327,17 @@ void MInstall::pageDisplayed(int next)
                              "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
                              "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
 
+        backButton->setEnabled(false);
+        nextButton->setEnabled(true);
         if (phase <= 0) {
             buildBootLists();
             manageConfig(ConfigLoadB);
-            backButton->setEnabled(true);
-            nextButton->setEnabled(true);
             if (!processNextPhase() && phase > -2) {
                 cleanup(false);
                 gotoPage(1);
             }
         }
+        return; // avoid the end that enables both Back and Next buttons
         break;
 
     case 5: // set services
@@ -2392,10 +2384,8 @@ void MInstall::pageDisplayed(int next)
                           + "</p><p>"
                           + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
                           + "</p>");
-        if (phase > 0 && phase < 4) {
-            backButton->setEnabled(haveSysConfig);
-            nextButton->setEnabled(!haveSysConfig);
-        }
+        backButton->setEnabled(true);
+        nextButton->setEnabled(false);
         if (!processNextPhase() && phase > -2) {
             cleanup(false);
             gotoPage(1);
@@ -2890,7 +2880,7 @@ bool MInstall::abort(bool onclose)
     // help the installer if it was stuck at the config pages
     if (onclose) {
         phase = -2;
-    } else if (phase == 2 && !haveSysConfig) {
+    } else if (phase == 2 && widgetStack->currentWidget() != Step_Progress) {
         phase = -1;
         gotoPage(1);
     } else {
