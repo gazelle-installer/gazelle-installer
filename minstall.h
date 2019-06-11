@@ -190,12 +190,9 @@ private:
     int configStuck = 0;
 
     QString auto_mount;
-    bool formatSwap = false;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
-    bool isRootFormatted = false;
-    bool isHomeFormatted = false;
     bool uefi = false;
     bool haveSysConfig = false;
 

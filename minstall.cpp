@@ -465,8 +465,6 @@ bool MInstall::processNextPhase()
 
         // gather required information and prepare installation
         cleanup(false); // cleanup previous mounts
-        isRootFormatted = false;
-        isHomeFormatted = false;
 
         // the core of the installation
         if (!pretend) {
@@ -789,13 +787,12 @@ bool MInstall::formatPartitions()
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
-    if (swapFormatSize) {
+    if (rootFormatSize) {
         updateStatus(tr("Formatting the / (root) partition"));
         if (!makeLinuxPartition(rootdev, rootTypeCombo->currentText(),
                                 badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
-        isRootFormatted = true;
         root_mntops = "defaults,noatime";
     }
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) return false;
@@ -820,7 +817,6 @@ bool MInstall::formatPartitions()
             return false;
         }
         execute("/bin/rm -r /mnt/antiX/home", true);
-        isHomeFormatted = true;
     }
     mkdir("/mnt/antiX/home", 0755);
     if (homedev != rootDevice) {
@@ -1037,16 +1033,16 @@ bool MInstall::validateChosenPartitions()
     // format swap? (if no swap is chosen do nothing)
     if (!swapdev.isEmpty()) {
         lambdaForeignTrap(swapdev, "swap");
-        formatSwap = checkBoxEncryptSwap->isChecked();
-        const int bdindex = listBlkDevs.findDevice(swapdev);
-        if (bdindex >= 0 && listBlkDevs[bdindex].isSwap) formatSwap = true;
+        bool formatSwap = checkBoxEncryptSwap->isChecked();
+        if (!formatSwap) {
+            const int bdindex = listBlkDevs.findDevice(swapdev);
+            if (bdindex >= 0 && !listBlkDevs[bdindex].isSwap) formatSwap = true;
+        }
         if (formatSwap) {
             msgFormatList << swapdev << "swap";
         } else {
             msgConfirm += " - " + tr("Configure %1 as swap space").arg(swapdev) + "\n";
         }
-    } else {
-        formatSwap = false;
     }
 
     QString msg;
@@ -1390,7 +1386,7 @@ bool MInstall::installLinux(const int progend)
     QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevice);
     if (phase < 0) return false;
 
-    if (!(isRootFormatted || sync)) {
+    if (!(rootFormatSize || sync)) {
         // if root was not formatted and not using --sync option then re-use it
         updateStatus(tr("Mounting the / (root) partition"));
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
@@ -1512,7 +1508,7 @@ void MInstall::makeFstab()
         }
         if (!homedev.isEmpty() && homedev != rootDevice) {
             fstype = getPartType(homedev);
-            if (isHomeFormatted) {
+            if (homeFormatSize) {
                 dump_pass = "1 2";
                 if (fstype.startsWith("btrfs")) {
                     dump_pass = "1 2";
