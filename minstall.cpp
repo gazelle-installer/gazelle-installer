@@ -2219,7 +2219,7 @@ int MInstall::showPage(int curr, int next)
         if (!pretend && haveSnapshotUserAccounts) {
             return 7; // skip Step_User_Accounts and go to Step_Localization
         }
-    } else if (curr == 6) { // at Step_Services
+    } else if (curr == 5) { // at Step_Services
         stashServices(next == 7);
         return 7; // goes back to the screen that called Services screen
     }
