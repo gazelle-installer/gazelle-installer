@@ -41,13 +41,13 @@ struct BlockDeviceInfo {
     QString label;
     QString model;
     qint64 size;
-    bool isFuture : 1;
-    bool isDisk : 1;
-    bool isGPT : 1;
-    bool isBoot : 1;
-    bool isESP : 1;
-    bool isNative : 1;
-    bool isSwap : 1;
+    bool isFuture = false;
+    bool isDisk = false;
+    bool isGPT = false;
+    bool isBoot = false;
+    bool isESP = false;
+    bool isNative = false;
+    bool isSwap = false;
     void addToCombo(QComboBox *combo) const;
 };
 
