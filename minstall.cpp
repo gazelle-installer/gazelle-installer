@@ -2633,7 +2633,7 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo) const
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
     QIcon icon;
-    if (isFuture) icon = QIcon::fromTheme("appointment-soon");
+    if (isFuture) icon = QIcon::fromTheme("appointment-soon-symbolic");
     combo->addItem(icon, strout + ")", name);
 }
 
