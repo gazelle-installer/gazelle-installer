@@ -446,17 +446,13 @@ bool MInstall::checkPassword(const QString &pass)
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
+    widgetStack->setEnabled(true);
     static const int progPhase23 = 94; // start of Phase 2/3 progress bar space
     // Phase < 0 = install has been aborted (Phase -2 on close)
     if (phase < 0) return false;
     // Phase 0 = install not started yet, Phase 1 = install in progress
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps
     if (phase == 0) { // no install started yet
-        // allow the user to enter other options
-        buildBootLists();
-        manageConfig(ConfigLoadB);
-        gotoPage(5);
-
         updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
         if (!checkDisk()) return false;
         phase = 1; // installation.
@@ -485,7 +481,7 @@ bool MInstall::processNextPhase()
             progressBar->setEnabled(false);
             updateStatus(tr("Paused for required operator input"), progPhase23);
             QApplication::beep();
-            if(widgetStack->currentIndex() == 4) {
+            if(widgetStack->currentWidget() == Step_Progress) {
                 on_nextButton_clicked();
             }
         }
@@ -2223,11 +2219,11 @@ int MInstall::showPage(int curr, int next)
             QString msg = tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME);
             int ans = QMessageBox::warning(this, windowTitle(), msg,
                                            QMessageBox::Yes, QMessageBox::No);
-            if (ans != QMessageBox::Yes) { // don't format - stop install
-                return curr;
+            if (ans != QMessageBox::Yes) {
+                return curr; // don't format - stop install
             }
             calculateDefaultPartitions();
-            return 4; // Go to Step_Progress
+            return 4; // Go to Step_Boot
         }
     } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
         if (!validateChosenPartitions()) {
@@ -2241,35 +2237,33 @@ int MInstall::showPage(int curr, int next)
             return curr;
         }
         calculateChosenPartitions();
-        return 4; // Go to Step_Progress
+        return 4; // Go to Step_Boot
     } else if (curr == 3) { // at Step_FDE
         stashAdvancedFDE(next == 4);
         next = ixPageRefAdvancedFDE;
         ixPageRefAdvancedFDE = 0;
         return next;
-    } else if (next == 3 && curr == 4) { // at Step_Progress (backward)
-        if (!pretend && haveSnapshotUserAccounts) {
-            return 8; // skip Step_User_Accounts and go to Step_Localization
-        }
-        return 9; // go to Step_Users
-    } else if (next == 6 && curr == 5) { // at Step_Boot screen (forward)
+    } else if (next == 5 && curr == 4) { // at Step_Boot (forward)
         return next + 1; // skip Services screen
-    } else if (next == 10 && curr == 9) { // at Step_User_Accounts (forward)
-        if (!validateUserInfo()) {
-            return curr;
-        }
+    } else if (next == 3 && curr == 4) { // at Step_Boot (backward)
+        return 9; // cannot go back so go to Step_Progress
+    } else if (next == 9 && curr == 8) { // at Step_User_Accounts (forward)
+        if (!validateUserInfo()) return curr;
         haveSysConfig = true;
-        next = 4;
-    } else if (next == 8 && curr == 7) { // at Step_Network (forward)
-        if (!validateComputerName()) {
-            return curr;
-        }
-    } else if (next == 6 && curr == 7) { // at Step_Network (backward)
+    } else if (next == 7 && curr == 6) { // at Step_Network (forward)
+        if (!validateComputerName()) return curr;
+    } else if (next == 5 && curr == 6) { // at Step_Network (backward)
        return next - 1; // skip Services screen
-    } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
+    } else if (next == 8 && curr == 7) { // at Step_Localization (forward)
         if (!pretend && haveSnapshotUserAccounts) {
             haveSysConfig = true;
-            next = 4; // Continue
+            return 9; // skip Step_User_Accounts and go to Step_Progress
+        }
+    } else if (next == 10 && curr == 9) { // at Step_Progress (forward)
+        return 4; // Return to Step_Boot instead of the end
+    } else if (next == 8 && curr == 9) { // at Step_Progress (backward)
+        if (!pretend && haveSnapshotUserAccounts) {
+            return 7; // skip Step_User_Accounts and go to Step_Localization
         }
     } else if (curr == 6) { // at Step_Services
         stashServices(next == 7);
@@ -2280,12 +2274,10 @@ int MInstall::showPage(int curr, int next)
 
 void MInstall::pageDisplayed(int next)
 {
-    QString val;
-
     // progress bar shown only for install and configuration pages.
     installBox->setVisible(next >= 4 && next <= 9);
 
-    if(next >= 5 && next <= 9) {
+    if(next >= 4 && next <= 8) {
         haveSysConfig = false; // (re)editing configuration
         ixTipStart = ixTip;
     }
@@ -2371,13 +2363,55 @@ void MInstall::pageDisplayed(int next)
                           + "</p>");
         break;
 
-    case 4: // installation step
-        if (phase == 0) {
-            updateCursor(Qt::BusyCursor); // restored after entering boot config screen
-            tipsEdit->setText("<p><b>" + tr("Additional information required") + "</b><br/>"
-                              + tr("The %1 installer is about to request more information from you. Please wait.").arg(PROJECTNAME)
-                              + "</p>");
-        } else if(ixTipStart >= 0) {
+    case 4: // set bootloader (start of installation)
+        mainHelp->setText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
+                             "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
+                             "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
+                             "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
+
+        if (phase <= 0) {
+            buildBootLists();
+            manageConfig(ConfigLoadB);
+            backButton->setEnabled(true);
+            nextButton->setEnabled(true);
+            if (!processNextPhase() && phase > -2) {
+                cleanup(false);
+                gotoPage(1);
+            }
+        }
+        break;
+
+    case 5: // set services
+        mainHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
+        break;
+
+    case 6: // set computer name
+        mainHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
+                             "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
+                             "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
+                             "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
+                             "with a local computer that is running MS-Windows or Mac OSX.</p>"));
+        break;
+
+    case 7: // set localization, clock, services button
+        mainHelp->setText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
+                             "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
+                             "<p><b>Timezone Settings</b><br/>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</p>"
+                             "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
+        break;
+
+    case 8: // set username and passwords
+        mainHelp->setText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
+                             "You should not use the root user as your daily user account. "
+                             "Please enter the name for a new (default) user account that you will use on a daily basis. "
+                             "If needed, you can add other user accounts later with %1 User Manager. </p>"
+                             "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
+                             "Each password must be entered twice.</p>").arg(PROJECTNAME));
+        if (!nextFocus) nextFocus = userNameEdit;
+        break;
+
+    case 9: // installation step
+        if(ixTipStart >= 0) {
             iLastProgress = progressBar->value();
             on_progressBar_valueChanged(iLastProgress);
         }
@@ -2391,7 +2425,6 @@ void MInstall::pageDisplayed(int next)
                           + "</p><p>"
                           + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
                           + "</p>");
-        widgetStack->setEnabled(true);
         if (phase > 0 && phase < 4) {
             backButton->setEnabled(haveSysConfig);
             nextButton->setEnabled(!haveSysConfig);
@@ -2401,43 +2434,6 @@ void MInstall::pageDisplayed(int next)
             gotoPage(1);
         }
         return; // avoid enabling both Back and Next buttons at the end
-        break;
-    case 5: // set bootloader
-        mainHelp->setText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
-                             "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
-                             "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
-                             "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
-
-        updateCursor(); // restore wait cursor set in install screen
-        break;
-
-    case 6: // set services
-        mainHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
-        break;
-
-    case 7: // set computer name
-        mainHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
-                             "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
-                             "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
-                             "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
-                             "with a local computer that is running MS-Windows or Mac OSX.</p>"));
-        break;
-
-    case 8: // set localization, clock, services button
-        mainHelp->setText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
-                             "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
-                             "<p><b>Timezone Settings</b><br/>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</p>"
-                             "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
-        break;
-
-    case 9: // set username and passwords
-        mainHelp->setText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
-                             "You should not use the root user as your daily user account. "
-                             "Please enter the name for a new (default) user account that you will use on a daily basis. "
-                             "If needed, you can add other user accounts later with %1 User Manager. </p>"
-                             "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
-                             "Each password must be entered twice.</p>").arg(PROJECTNAME));
-        if (!nextFocus) nextFocus = userNameEdit;
         break;
 
     case 10: // done
@@ -2488,7 +2484,7 @@ void MInstall::gotoPage(int next)
         // entering the last page
         backButton->hide();
         nextButton->setText(tr("Finish"));
-    } else if (next == 3 || next == 6){
+    } else if (next == 3 || next == 5){
         // Advanced Encryption Settings and Services pages
         isize.setWidth(0);
         nextButton->setText(tr("OK"));
@@ -2870,7 +2866,7 @@ void MInstall::on_abortInstallButton_clicked()
 // clicking advanced button to go to Services page
 void MInstall::on_viewServicesButton_clicked()
 {
-    gotoPage(6);
+    gotoPage(5);
 }
 
 void MInstall::on_qtpartedButton_clicked()
@@ -2968,7 +2964,7 @@ void MInstall::cleanup(bool endclean)
 
 void MInstall::on_progressBar_valueChanged(int value)
 {
-    if (ixTipStart < 0 || widgetStack->currentIndex() != 4) {
+    if (ixTipStart < 0 || widgetStack->currentWidget() != Step_Progress) {
         return; // no point displaying a new hint if it will be invisible
     }
 
@@ -3391,11 +3387,14 @@ void MInstall::buildBootLists()
     canESP = (uefi && grubBootCombo->count() > 0);
     grubEspButton->setEnabled(canESP);
 
-    if (canESP) grubEspButton->click();
-    else {
-        // load MBR list as a default if no ESP exists
+    // load one as the default in preferential order: ESP, MBR, PBR
+    if (canESP) grubEspButton->setChecked(true);
+    else if (canMBR) {
         on_grubMbrButton_toggled();
-        grubMbrButton->click();
+        grubMbrButton->setChecked(true);
+    } else if (canPBR) {
+        on_grubPbrButton_toggled();
+        grubPbrButton->setChecked(true);
     }
 }
 
