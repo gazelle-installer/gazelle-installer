@@ -110,7 +110,6 @@ public:
     QString PROJECTSHORTNAME;
     QString PROJECTURL;
     QString PROJECTVERSION;
-    QString getPartType(const QString &dev);
     QStringList ENABLE_SERVICES;
     bool REMOVE_NOSPLASH;
 

@@ -1452,7 +1452,7 @@ void MInstall::makeFstab()
     qDebug() << "swapdev" << swapdev << swapdevUUID;
     qDebug() << "bootdev" << bootDevice << bootdevUUID;
 
-    QString fstype = getPartType(rootdev);
+    QString fstype = getCmdOut("blkid " + rootdev + " -o value -s TYPE");
     QString dump_pass = "1 1";
 
     if (fstype.startsWith("btrfs")) {
@@ -1479,7 +1479,7 @@ void MInstall::makeFstab()
             out << espdevUUID + " /boot/efi vfat defaults,noatime,dmask=0002,fmask=0113 0 0\n";
         }
         if (!homedev.isEmpty() && homedev != rootDevice) {
-            fstype = getPartType(homedev);
+            fstype = getCmdOut("blkid " + homedev + " -o value -s TYPE");
             if (homeFormatSize) {
                 dump_pass = "1 2";
                 if (fstype.startsWith("btrfs")) {
@@ -1739,13 +1739,6 @@ bool MInstall::isGpt(const QString &drv)
     return execute(cmd, false);
 }
 
-// get the type of the partition
-QString MInstall::getPartType(const QString &dev)
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    return getCmdOut("blkid " + dev + " -o value -s TYPE");
-}
-
 /////////////////////////////////////////////////////////////////////////
 // user account functions
 
@@ -1942,7 +1935,6 @@ bool MInstall::setUserInfo()
 
 bool MInstall::validateComputerName()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // see if name is reasonable
     nextFocus = computerNameEdit;
     if (computerNameEdit->text().isEmpty()) {
