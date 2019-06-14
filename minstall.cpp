@@ -530,7 +530,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
     if (mode == ConfigSave) {
         if (config) delete config;
         config = new QSettings("/mnt/antiX/var/log/minstall.conf", QSettings::NativeFormat);
-        config->setValue("Version", VERSION);
+        config->setValue("Setup/Version", VERSION);
     }
     if (!config) return 0;
 
