@@ -530,7 +530,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
     if (mode == ConfigSave) {
         if (config) delete config;
         config = new QSettings("/mnt/antiX/var/log/minstall.conf", QSettings::NativeFormat);
-        config->setValue("Version", VERSION);
+        config->setValue("Setup/Version", VERSION);
     }
     if (!config) return 0;
 
@@ -2191,7 +2191,7 @@ int MInstall::showPage(int curr, int next)
         }
         return 4; // Go to Step_Boot
     } else if (curr == 3) { // at Step_FDE
-        stashAdvancedFDE(next == 4);
+        stashAdvancedFDE(next >= 4);
         next = ixPageRefAdvancedFDE;
         ixPageRefAdvancedFDE = 0;
         return next;
@@ -2212,7 +2212,7 @@ int MInstall::showPage(int curr, int next)
             return 7; // skip Step_User_Accounts and go to Step_Localization
         }
     } else if (curr == 5) { // at Step_Services
-        stashServices(next == 7);
+        stashServices(next >= 6);
         return 7; // goes back to the screen that called Services screen
     }
     return next;
