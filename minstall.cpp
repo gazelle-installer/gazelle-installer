@@ -286,11 +286,11 @@ void MInstall::updateStatus(const QString &msg, int val)
     qApp->processEvents();
 }
 
-bool MInstall::pretendToInstall(int start, int stop, int sleep)
+bool MInstall::pretendToInstall(int start, int stop)
 {
     for (int ixi = start; ixi <= stop; ++ixi) {
         updateStatus(tr("Pretending to install %1").arg(PROJECTNAME), ixi);
-        csleep(sleep);
+        csleep(100);
         if (phase < 0) {
             csleep(1000);
             return false;
@@ -485,7 +485,7 @@ bool MInstall::processNextPhase()
             //run blkid -c /dev/null to freshen UUID cache
             execute("blkid -c /dev/null", true);
             if (!installLinux(progPhase23 - 1)) return false;
-        } else if (!pretendToInstall(1, progPhase23 - 1, 100)) {
+        } else if (!pretendToInstall(1, progPhase23 - 1)) {
             return false;
         }
         if (widgetStack->currentWidget() != Step_Progress) {
@@ -513,7 +513,7 @@ bool MInstall::processNextPhase()
             manageConfig(ConfigSave);
             execute("/bin/sync", true); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
-        } else if (!pretendToInstall(progPhase23, 99, 1000)){
+        } else if (!pretendToInstall(progPhase23, 99)){
             return false;
         }
         phase = 4;
