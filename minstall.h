@@ -243,7 +243,7 @@ private:
     void updatePartitionCombos(QComboBox *changed);
     QStringList splitDevice(const QString &device) const;
     void buildBlockDevList();
-    bool pretendToInstall(int start, int stop, int sleep);
+    bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
     bool validateChosenPartitions();
     bool calculateDefaultPartitions();
