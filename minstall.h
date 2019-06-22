@@ -78,7 +78,6 @@ public:
     bool isGpt(const QString &drv);
 
     bool checkDisk();
-    bool checkPassword(const QString &pass);
     bool installLoader();
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
@@ -235,6 +234,7 @@ private:
     // helpers
     bool execute(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
     QString getCmdOut(const QString &cmd, bool everything = false);
+    bool checkPassword(QLineEdit *passEdit);
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
