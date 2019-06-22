@@ -206,6 +206,9 @@ void MInstall::startup()
     stashServices(true);
     this->setEnabled(true);
     updateCursor();
+
+    // automatic installation
+    if (automatic) nextButton->click();
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -1070,44 +1073,46 @@ bool MInstall::validateChosenPartitions()
         }
     }
 
-    static const QString msgPartSel = " - " + tr("%1 for the %2 partition") + "\n";
-    // message to advise of issues found.
-    if (msgForeignList.count() > 0) {
-        msg += tr("The following partitions you selected are not Linux partitions:") + "\n\n";
-        for (QStringList::Iterator it = msgForeignList.begin(); it != msgForeignList.end(); ++it) {
-            QString &s = *it;
-            msg += msgPartSel.arg(s).arg((QString)*(++it));
+    if (!automatic) {
+        const QString msgPartSel = " - " + tr("%1 for the %2 partition") + "\n";
+        // message to advise of issues found.
+        if (msgForeignList.count() > 0) {
+            msg += tr("The following partitions you selected are not Linux partitions:") + "\n\n";
+            for (QStringList::Iterator it = msgForeignList.begin(); it != msgForeignList.end(); ++it) {
+                QString &s = *it;
+                msg += msgPartSel.arg(s).arg((QString)*(++it));
+            }
+            msg += "\n";
         }
-        msg += "\n";
-    }
-    if (!msg.isEmpty()) {
-        msg += tr("Are you sure you want to reformat these partitions?");
-        ans = QMessageBox::warning(this, windowTitle(), msg,
-                                   QMessageBox::Yes, QMessageBox::No);
-        if (ans != QMessageBox::Yes) {
-            return false;
+        if (!msg.isEmpty()) {
+            msg += tr("Are you sure you want to reformat these partitions?");
+            ans = QMessageBox::warning(this, windowTitle(), msg,
+                                       QMessageBox::Yes, QMessageBox::No);
+            if (ans != QMessageBox::Yes) {
+                return false;
+            }
         }
-    }
-    // final message before the installer starts.
-    msg.clear();
-    if (msgFormatList.count() > 0) {
-        msg += tr("The %1 installer will now format and destroy the data on the following partitions:").arg(PROJECTNAME) + "\n\n";
-        for (QStringList::Iterator it = msgFormatList.begin(); it != msgFormatList.end(); ++it) {
-            QString &s = *it;
-            msg += msgPartSel.arg(s).arg((QString)*(++it));
+        // final message before the installer starts.
+        msg.clear();
+        if (msgFormatList.count() > 0) {
+            msg += tr("The %1 installer will now format and destroy the data on the following partitions:").arg(PROJECTNAME) + "\n\n";
+            for (QStringList::Iterator it = msgFormatList.begin(); it != msgFormatList.end(); ++it) {
+                QString &s = *it;
+                msg += msgPartSel.arg(s).arg((QString)*(++it));
+            }
+            if (!msgConfirm.isEmpty()) msg += "\n";
         }
-        if (!msgConfirm.isEmpty()) msg += "\n";
-    }
-    if (!msgConfirm.isEmpty()) {
-        msg += tr("The %1 installer will now perform the following actions:").arg(PROJECTNAME);
-        msg += "\n\n" + msgConfirm;
-    }
-    if(!msg.isEmpty()) {
-        msg += "\n" + tr("These actions cannot be undone. Do you want to continue?");
-        ans = QMessageBox::warning(this, windowTitle(), msg,
-                                   QMessageBox::Yes, QMessageBox::No);
-        if (ans != QMessageBox::Yes) {
-            return false;
+        if (!msgConfirm.isEmpty()) {
+            msg += tr("The %1 installer will now perform the following actions:").arg(PROJECTNAME);
+            msg += "\n\n" + msgConfirm;
+        }
+        if(!msg.isEmpty()) {
+            msg += "\n" + tr("These actions cannot be undone. Do you want to continue?");
+            ans = QMessageBox::warning(this, windowTitle(), msg,
+                                       QMessageBox::Yes, QMessageBox::No);
+            if (ans != QMessageBox::Yes) {
+                return false;
+            }
         }
     }
 
@@ -2313,6 +2318,7 @@ void MInstall::pageDisplayed(int next)
         if (phase <= 0) {
             buildBootLists();
             manageConfig(ConfigLoadB);
+            if (automatic) nextButton->click(); // because this doesn't happen until after processNextPhase()
             if (!processNextPhase() && phase > -2) {
                 cleanup(false);
                 gotoPage(1);
@@ -2450,6 +2456,16 @@ void MInstall::gotoPage(int next)
     if (nextFocus) {
         nextFocus->setFocus();
         nextFocus = nullptr;
+    }
+
+    // automatic installation
+    if (automatic && next > curr) {
+        if (!configStuck) nextButton->click();
+        else {
+            // TODO: finalise failure method and use tr() here
+            QMessageBox::critical(this, windowTitle(), "Configuration file error ("
+                                  + QString::number(configStuck) + ")");
+        }
     }
 }
 
@@ -3128,9 +3144,11 @@ void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
         FDEpassCust2->clear();
         FDEpassCust->clear();
         FDEpassCust->setFocus();
-        QMessageBox::warning(this, windowTitle(),
-                             tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
-                             QMessageBox::Ok);
+        if (!automatic) {
+            QMessageBox::warning(this, windowTitle(),
+                                 tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
+                                 QMessageBox::Ok);
+        }
     }
 }
 
