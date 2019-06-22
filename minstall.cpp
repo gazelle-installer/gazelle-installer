@@ -64,7 +64,8 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
     // config file
-    if (QFile::exists(cfgfile)) config = new QSettings(cfgfile, QSettings::NativeFormat, this);
+    if (QFile::exists(cfgfile)) execute(QString("cp %1 %1.bak").arg(cfgfile), true);
+    config = new QSettings(cfgfile, QSettings::NativeFormat, this);
 
     // set some distro-centric text
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
@@ -527,11 +528,6 @@ bool MInstall::processNextPhase()
 int MInstall::manageConfig(enum ConfigAction mode)
 {
     configStuck = 0;
-    if (mode == ConfigSave) {
-        if (config) delete config;
-        config = new QSettings("/mnt/antiX/var/log/minstall.conf", QSettings::NativeFormat);
-        config->setValue("Setup/Version", VERSION);
-    }
     if (!config) return 0;
 
     auto lambdaSetComboBox = [this, mode](const QString &key, QComboBox *combo, const bool useData) -> void {
@@ -590,11 +586,10 @@ int MInstall::manageConfig(enum ConfigAction mode)
     };
 
     if (mode == ConfigSave || mode == ConfigLoadA) {
-        config->beginGroup("Setup");
+        if (mode == ConfigSave) config->setValue("Version", VERSION);
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
-        lambdaSetRadios("Destination", 2, diskChoices, diskRadios);
-        config->endGroup();
+        lambdaSetRadios("InstallTo", 2, diskChoices, diskRadios);
         if (configStuck < 0) configStuck = 1;
 
         if (entireDiskButton->isChecked()) {
@@ -2885,6 +2880,7 @@ void MInstall::cleanup(bool endclean)
     if (endclean) {
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'", false);
         execute("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
+        execute("cp /etc/minstall.conf /mnt/antiX/etc >/dev/null 2>&1", false);
         execute("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
     execute("umount -l /mnt/antiX/boot/efi", true);
