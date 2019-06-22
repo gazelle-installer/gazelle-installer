@@ -64,7 +64,8 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
     // config file
-    if (QFile::exists(cfgfile)) config = new QSettings(cfgfile, QSettings::NativeFormat, this);
+    if (QFile::exists(cfgfile)) execute(QString("cp %1 %1.bak").arg(cfgfile), true);
+    config = new QSettings(cfgfile, QSettings::NativeFormat, this);
 
     // set some distro-centric text
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
@@ -205,6 +206,9 @@ void MInstall::startup()
     stashServices(true);
     this->setEnabled(true);
     updateCursor();
+
+    // automatic installation
+    if (automatic) nextButton->click();
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -286,15 +290,12 @@ void MInstall::updateStatus(const QString &msg, int val)
     qApp->processEvents();
 }
 
-bool MInstall::pretendToInstall(int start, int stop, int sleep)
+bool MInstall::pretendToInstall(int start, int stop)
 {
     for (int ixi = start; ixi <= stop; ++ixi) {
         updateStatus(tr("Pretending to install %1").arg(PROJECTNAME), ixi);
-        csleep(sleep);
-        if (phase < 0) {
-            csleep(1000);
-            return false;
-        }
+        csleep(phase == 1 ? 100 : 1000);
+        if (phase < 0) return false;
     }
     return true;
 }
@@ -445,13 +446,14 @@ bool MInstall::checkDisk()
 }
 
 // check password length (maybe complexity)
-bool MInstall::checkPassword(const QString &pass)
+bool MInstall::checkPassword(QLineEdit *passEdit)
 {
-    if (pass.length() < 8) {
+    if (passEdit->text().isEmpty()) {
         QMessageBox::critical(this, windowTitle(),
                               tr("The password needs to be at least\n"
                                  "%1 characters long. Please select\n"
-                                 "a longer password before proceeding.").arg("8"));
+                                 "a longer password before proceeding.").arg("1"));
+        nextFocus = passEdit;
         return false;
     }
     return true;
@@ -485,7 +487,7 @@ bool MInstall::processNextPhase()
             //run blkid -c /dev/null to freshen UUID cache
             execute("blkid -c /dev/null", true);
             if (!installLinux(progPhase23 - 1)) return false;
-        } else if (!pretendToInstall(1, progPhase23 - 1, 100)) {
+        } else if (!pretendToInstall(1, progPhase23 - 1)) {
             return false;
         }
         if (widgetStack->currentWidget() != Step_Progress) {
@@ -513,7 +515,7 @@ bool MInstall::processNextPhase()
             manageConfig(ConfigSave);
             execute("/bin/sync", true); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
-        } else if (!pretendToInstall(progPhase23, 99, 1000)){
+        } else if (!pretendToInstall(progPhase23, 99)){
             return false;
         }
         phase = 4;
@@ -524,17 +526,20 @@ bool MInstall::processNextPhase()
     return true;
 }
 
-int MInstall::manageConfig(enum ConfigAction mode)
+void MInstall::manageConfig(enum ConfigAction mode)
 {
-    configStuck = 0;
-    if (mode == ConfigSave) {
-        if (config) delete config;
-        config = new QSettings("/mnt/antiX/var/log/minstall.conf", QSettings::NativeFormat);
-        config->setValue("Setup/Version", VERSION);
-    }
-    if (!config) return 0;
+    QWidget *step = Step_Terms;
+    bool stuck = false;
+    if (!config) return;
 
-    auto lambdaSetComboBox = [this, mode](const QString &key, QComboBox *combo, const bool useData) -> void {
+    auto lambdaMarkBadWidget = [this, &step, &stuck](QWidget *widget) -> void {
+        widget->setStyleSheet("QWidget { background: maroon; color: white; border: 2px inset red; }\n"
+                              "QPushButton:!pressed { border-style: outset; }\n"
+                              "QRadioButton { border-style: dotted; }");
+        step->setProperty("STUCK", true);
+        stuck = true;
+    };
+    auto lambdaSetComboBox = [this, mode, lambdaMarkBadWidget](const QString &key, QComboBox *combo, const bool useData) -> void {
         const QVariant &comboval = useData ? combo->currentData() : QVariant(combo->currentText());
         if (mode == ConfigSave) config->setValue(key, comboval);
         else {
@@ -542,7 +547,7 @@ int MInstall::manageConfig(enum ConfigAction mode)
             const int icombo = useData ? combo->findData(val, Qt::UserRole, Qt::MatchFixedString)
                              : combo->findText(val.toString(), Qt::MatchFixedString);
             if (icombo >= 0) combo->setCurrentIndex(icombo);
-            else if (!configStuck) configStuck = -1;
+            else lambdaMarkBadWidget(combo);
         }
     };
     auto lambdaSetCheckBox = [this, mode](const QString &key, QCheckBox *checkbox) -> void {
@@ -555,13 +560,13 @@ int MInstall::manageConfig(enum ConfigAction mode)
         if (mode == ConfigSave) config->setValue(key, text);
         else lineedit->setText(config->value(key, text).toString());
     };
-    auto lambdaSetSpinBox = [this, mode](const QString &key, QSpinBox *spinbox) -> void {
+    auto lambdaSetSpinBox = [this, mode, lambdaMarkBadWidget](const QString &key, QSpinBox *spinbox) -> void {
         const QVariant spinval(spinbox->value());
         if (mode == ConfigSave) config->setValue(key, spinval);
         else {
             const int val = config->value(key, spinval).toInt();
             spinbox->setValue(val);
-            if (val != spinbox->value() && !configStuck) configStuck = -1;
+            if (val != spinbox->value()) lambdaMarkBadWidget(spinbox);
         }
     };
     auto lambdaSetEnum = [this, mode](const QString &key, const int nchoices,
@@ -573,11 +578,11 @@ int MInstall::manageConfig(enum ConfigAction mode)
             for (int ixi = 0; ixi < nchoices; ++ixi) {
                 if (!val.compare(QString(choices[ixi]), Qt::CaseInsensitive)) return ixi;
             }
-            if (!configStuck) configStuck = -1;
+            return -1;
         }
         return curval;
     };
-    auto lambdaSetRadios = [lambdaSetEnum](const QString &key, const int nchoices,
+    auto lambdaSetRadios = [lambdaSetEnum, lambdaMarkBadWidget](const QString &key, const int nchoices,
             const char *choices[], QRadioButton *radios[]) -> void {
         // obtain the current choice
         int ixradio = -1;
@@ -587,26 +592,30 @@ int MInstall::manageConfig(enum ConfigAction mode)
         // select the corresponding radio button
         ixradio = lambdaSetEnum(key, nchoices, choices, ixradio);
         if (ixradio >= 0) radios[ixradio]->setChecked(true);
+        else {
+            for (int ixi = 0; ixi < nchoices; ++ixi) lambdaMarkBadWidget(radios[ixi]);
+        }
     };
 
+    if (mode == ConfigSave) {
+        config->clear();
+        config->setValue("Version", VERSION);
+        config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
+    }
     if (mode == ConfigSave || mode == ConfigLoadA) {
-        config->beginGroup("Setup");
+        config->beginGroup("Storage");
+        step = Step_Disk;
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
-        lambdaSetRadios("Destination", 2, diskChoices, diskRadios);
-        config->endGroup();
-        if (configStuck < 0) configStuck = 1;
+        lambdaSetRadios("Target", 2, diskChoices, diskRadios);
 
         if (entireDiskButton->isChecked()) {
             // Disk drive setup
-            config->beginGroup("Drive");
-            lambdaSetComboBox("Device", diskCombo, true);
-            lambdaSetCheckBox("Encrypted", checkBoxEncryptAuto);
-            config->endGroup();
-            if (configStuck < 0) configStuck = 1;
+            lambdaSetComboBox("Drive", diskCombo, true);
+            lambdaSetCheckBox("DriveEncrypt", checkBoxEncryptAuto);
         } else {
             // Partition step
-            config->beginGroup("Partitions");
+            step = Step_Partitions;
             lambdaSetComboBox("Root", rootCombo, true);
             lambdaSetComboBox("Home", homeCombo, true);
             lambdaSetComboBox("Swap", swapCombo, true);
@@ -621,12 +630,12 @@ int MInstall::manageConfig(enum ConfigAction mode)
             lambdaSetLineEdit("SwapLabel", swapLabelEdit);
             lambdaSetCheckBox("SaveHome", saveHomeCheck);
             lambdaSetCheckBox("BadBlocksCheck", badblocksCheck);
-            config->endGroup();
-            if (configStuck < 0) configStuck = 2;
         }
+        config->endGroup();
 
         // AES step
         config->beginGroup("Encryption");
+        step = Step_FDE;
         if (mode != ConfigSave) {
             const QString &epass = config->value("Pass").toString();
             if (entireDiskButton->isChecked()) {
@@ -646,12 +655,17 @@ int MInstall::manageConfig(enum ConfigAction mode)
         lambdaSetComboBox("KernelRNG", comboFDErandom, false);
         lambdaSetSpinBox("KDFroundTime", spinFDEroundtime);
         config->endGroup();
-        if (configStuck < 0) configStuck = 3;
+        if (step->property("STUCK").toBool()) {
+            step = entireDiskButton->isChecked() ? Step_Disk : Step_Partitions;
+            lambdaMarkBadWidget(buttonAdvancedFDE);
+            lambdaMarkBadWidget(buttonAdvancedFDECust);
+        }
     }
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
         // GRUB step
         config->beginGroup("GRUB");
+        step = Step_Boot;
         if(grubCheckBox->isChecked()) {
             const char *grubChoices[] = {"MBR", "PBR", "ESP"};
             QRadioButton *grubRadios[] = {grubMbrButton, grubPbrButton, grubEspButton};
@@ -659,10 +673,10 @@ int MInstall::manageConfig(enum ConfigAction mode)
         }
         lambdaSetComboBox("Location", grubBootCombo, true);
         config->endGroup();
-        if (configStuck < 0) configStuck = 5;
 
         // Services step
         config->beginGroup("Services");
+        step = Step_Services;
         QTreeWidgetItemIterator it(csView);
         while (*it) {
             if ((*it)->parent() != nullptr) {
@@ -677,19 +691,19 @@ int MInstall::manageConfig(enum ConfigAction mode)
             ++it;
         }
         config->endGroup();
-        if (configStuck < 0) configStuck = 6;
 
         // Network step
         config->beginGroup("Network");
+        step = Step_Network;
         lambdaSetLineEdit("ComputerName", computerNameEdit);
         lambdaSetLineEdit("Domain", computerDomainEdit);
         lambdaSetLineEdit("Workgroup", computerGroupEdit);
         lambdaSetCheckBox("Samba", sambaCheckBox);
         config->endGroup();
-        if (configStuck < 0) configStuck = 7;
 
         // Localization step
         config->beginGroup("Localization");
+        step = Step_Localization;
         lambdaSetComboBox("Locale", localeCombo, true);
         lambdaSetCheckBox("LocalClock", localClockCheckBox);
         const char *clockChoices[] = {"24", "12"};
@@ -697,15 +711,17 @@ int MInstall::manageConfig(enum ConfigAction mode)
         lambdaSetRadios("ClockHours", 2, clockChoices, clockRadios);
         lambdaSetComboBox("Timezone", timezoneCombo, false);
         config->endGroup();
-        if (configStuck < 0) configStuck = 8;
 
         // User Accounts step
         config->beginGroup("User");
+        step = Step_User_Accounts;
         lambdaSetLineEdit("Username", userNameEdit);
         lambdaSetCheckBox("Autologin", autologinCheckBox);
         lambdaSetCheckBox("SaveDesktop", saveDesktopCheckBox);
         const char *oldHomeActionChoices[] = {"Nothing", "Use", "Save", "Delete"};
-        oldHomeAction = static_cast<OldHomeAction>(lambdaSetEnum("OldHomeAction", 4, oldHomeActionChoices, oldHomeAction));
+        int ohaVal = lambdaSetEnum("OldHomeAction", 4, oldHomeActionChoices, oldHomeAction);
+        if (ohaVal >= 0) oldHomeAction = static_cast<OldHomeAction>(ohaVal);
+        else step->setProperty("STUCK", true);
         if (mode != ConfigSave) {
             const QString &upass = config->value("UserPass").toString();
             userPasswordEdit->setText(upass);
@@ -715,10 +731,13 @@ int MInstall::manageConfig(enum ConfigAction mode)
             rootPasswordEdit2->setText(rpass);
         }
         config->endGroup();
-        if (configStuck < 0) configStuck = 9;
     }
 
-    return configStuck;
+    if (stuck) {
+        // TODO: finalise failure method and use tr() here
+        QMessageBox::critical(this, windowTitle(),
+            "Invalid settings in loaded configuration file");
+    }
 }
 
 void MInstall::stashAdvancedFDE(bool save)
@@ -980,9 +999,7 @@ bool MInstall::validateChosenPartitions()
 
     int ans;
     if (checkBoxEncryptSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
-        if (!checkPassword(FDEpassCust->text())) {
-            return false;
-        }
+        if (!checkPassword(FDEpassCust)) return false;
         if (bootCombo->currentText() == "root") {
             if (checkBoxEncryptRoot->isChecked()) {
                 QMessageBox::critical(this, windowTitle(), tr("You must choose a separate boot partition when encrypting root."));
@@ -1075,44 +1092,46 @@ bool MInstall::validateChosenPartitions()
         }
     }
 
-    static const QString msgPartSel = " - " + tr("%1 for the %2 partition") + "\n";
-    // message to advise of issues found.
-    if (msgForeignList.count() > 0) {
-        msg += tr("The following partitions you selected are not Linux partitions:") + "\n\n";
-        for (QStringList::Iterator it = msgForeignList.begin(); it != msgForeignList.end(); ++it) {
-            QString &s = *it;
-            msg += msgPartSel.arg(s).arg((QString)*(++it));
+    if (!automatic) {
+        const QString msgPartSel = " - " + tr("%1 for the %2 partition") + "\n";
+        // message to advise of issues found.
+        if (msgForeignList.count() > 0) {
+            msg += tr("The following partitions you selected are not Linux partitions:") + "\n\n";
+            for (QStringList::Iterator it = msgForeignList.begin(); it != msgForeignList.end(); ++it) {
+                QString &s = *it;
+                msg += msgPartSel.arg(s).arg((QString)*(++it));
+            }
+            msg += "\n";
         }
-        msg += "\n";
-    }
-    if (!msg.isEmpty()) {
-        msg += tr("Are you sure you want to reformat these partitions?");
-        ans = QMessageBox::warning(this, windowTitle(), msg,
-                                   QMessageBox::Yes, QMessageBox::No);
-        if (ans != QMessageBox::Yes) {
-            return false;
+        if (!msg.isEmpty()) {
+            msg += tr("Are you sure you want to reformat these partitions?");
+            ans = QMessageBox::warning(this, windowTitle(), msg,
+                                       QMessageBox::Yes, QMessageBox::No);
+            if (ans != QMessageBox::Yes) {
+                return false;
+            }
         }
-    }
-    // final message before the installer starts.
-    msg.clear();
-    if (msgFormatList.count() > 0) {
-        msg += tr("The %1 installer will now format and destroy the data on the following partitions:").arg(PROJECTNAME) + "\n\n";
-        for (QStringList::Iterator it = msgFormatList.begin(); it != msgFormatList.end(); ++it) {
-            QString &s = *it;
-            msg += msgPartSel.arg(s).arg((QString)*(++it));
+        // final message before the installer starts.
+        msg.clear();
+        if (msgFormatList.count() > 0) {
+            msg += tr("The %1 installer will now format and destroy the data on the following partitions:").arg(PROJECTNAME) + "\n\n";
+            for (QStringList::Iterator it = msgFormatList.begin(); it != msgFormatList.end(); ++it) {
+                QString &s = *it;
+                msg += msgPartSel.arg(s).arg((QString)*(++it));
+            }
+            if (!msgConfirm.isEmpty()) msg += "\n";
         }
-        if (!msgConfirm.isEmpty()) msg += "\n";
-    }
-    if (!msgConfirm.isEmpty()) {
-        msg += tr("The %1 installer will now perform the following actions:").arg(PROJECTNAME);
-        msg += "\n\n" + msgConfirm;
-    }
-    if(!msg.isEmpty()) {
-        msg += "\n" + tr("These actions cannot be undone. Do you want to continue?");
-        ans = QMessageBox::warning(this, windowTitle(), msg,
-                                   QMessageBox::Yes, QMessageBox::No);
-        if (ans != QMessageBox::Yes) {
-            return false;
+        if (!msgConfirm.isEmpty()) {
+            msg += tr("The %1 installer will now perform the following actions:").arg(PROJECTNAME);
+            msg += "\n\n" + msgConfirm;
+        }
+        if(!msg.isEmpty()) {
+            msg += "\n" + tr("These actions cannot be undone. Do you want to continue?");
+            ans = QMessageBox::warning(this, windowTitle(), msg,
+                                       QMessageBox::Yes, QMessageBox::No);
+            if (ans != QMessageBox::Yes) {
+                return false;
+            }
         }
     }
 
@@ -2165,15 +2184,17 @@ int MInstall::showPage(int curr, int next)
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
-            if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
+            if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
                 return curr;
             }
-            QString drv = "/dev/" + diskCombo->currentData().toString();
-            QString msg = tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME);
-            int ans = QMessageBox::warning(this, windowTitle(), msg,
-                                           QMessageBox::Yes, QMessageBox::No);
-            if (ans != QMessageBox::Yes) {
-                return curr; // don't format - stop install
+            if (!automatic) {
+                const QString msg = tr("OK to format and use the entire disk (%1) for %2?");
+                int ans = QMessageBox::warning(this, windowTitle(),
+                                               msg.arg(diskCombo->currentData().toString(), PROJECTNAME),
+                                               QMessageBox::Yes, QMessageBox::No);
+                if (ans != QMessageBox::Yes) {
+                    return curr; // don't format - stop install
+                }
             }
             calculateDefaultPartitions();
             return 4; // Go to Step_Boot
@@ -2318,10 +2339,6 @@ void MInstall::pageDisplayed(int next)
         if (phase <= 0) {
             buildBootLists();
             manageConfig(ConfigLoadB);
-            if (!processNextPhase() && phase > -2) {
-                cleanup(false);
-                gotoPage(1);
-            }
         }
         return; // avoid the end that enables both Back and Next buttons
         break;
@@ -2372,10 +2389,6 @@ void MInstall::pageDisplayed(int next)
                           + "</p>");
         backButton->setEnabled(true);
         nextButton->setEnabled(false);
-        if (!processNextPhase() && phase > -2) {
-            cleanup(false);
-            gotoPage(1);
-        }
         return; // avoid enabling both Back and Next buttons at the end
         break;
 
@@ -2455,6 +2468,21 @@ void MInstall::gotoPage(int next)
     if (nextFocus) {
         nextFocus->setFocus();
         nextFocus = nullptr;
+    }
+
+    // automatic installation
+    if (automatic) {
+        if (!(widgetStack->currentWidget()->property("STUCK").toBool())
+            && next > curr) nextButton->click();
+        else automatic = false; // failed validation
+    }
+
+    // process next installation phase
+    if (next == 4 || next == 9) {
+        if (!processNextPhase() && phase > -2) {
+            cleanup(false);
+            gotoPage(1);
+        }
     }
 }
 
@@ -2885,6 +2913,7 @@ void MInstall::cleanup(bool endclean)
     if (endclean) {
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'", false);
         execute("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
+        execute("cp /etc/minstall.conf /mnt/antiX/etc >/dev/null 2>&1", false);
         execute("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
     execute("umount -l /mnt/antiX/boot/efi", true);
@@ -3132,9 +3161,11 @@ void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
         FDEpassCust2->clear();
         FDEpassCust->clear();
         FDEpassCust->setFocus();
-        QMessageBox::warning(this, windowTitle(),
-                             tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
-                             QMessageBox::Ok);
+        if (!automatic && checkBoxEncryptSwap->isVisible()) {
+            QMessageBox::warning(this, windowTitle(),
+                tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
+                QMessageBox::Ok);
+        }
     }
 }
 
