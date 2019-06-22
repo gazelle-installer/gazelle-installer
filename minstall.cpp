@@ -2185,12 +2185,14 @@ int MInstall::showPage(int curr, int next)
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
                 return curr;
             }
-            QString drv = "/dev/" + diskCombo->currentData().toString();
-            QString msg = tr("OK to format and use the entire disk (%1) for %2?").arg(drv).arg(PROJECTNAME);
-            int ans = QMessageBox::warning(this, windowTitle(), msg,
-                                           QMessageBox::Yes, QMessageBox::No);
-            if (ans != QMessageBox::Yes) {
-                return curr; // don't format - stop install
+            if (!automatic) {
+                const QString msg = tr("OK to format and use the entire disk (%1) for %2?");
+                int ans = QMessageBox::warning(this, windowTitle(),
+                                               msg.arg(diskCombo->currentData().toString(), PROJECTNAME),
+                                               QMessageBox::Yes, QMessageBox::No);
+                if (ans != QMessageBox::Yes) {
+                    return curr; // don't format - stop install
+                }
             }
             calculateDefaultPartitions();
             return 4; // Go to Step_Boot
