@@ -78,7 +78,6 @@ public:
     bool isGpt(const QString &drv);
 
     bool checkDisk();
-    bool checkPassword(const QString &pass);
     bool installLoader();
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
@@ -183,7 +182,6 @@ private:
     // configuration management
     QSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
-    int configStuck = 0;
 
     QString auto_mount;
     bool isHomeEncrypted = false;
@@ -236,6 +234,7 @@ private:
     // helpers
     bool execute(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
     QString getCmdOut(const QString &cmd, bool everything = false);
+    bool checkPassword(QLineEdit *passEdit);
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
@@ -243,7 +242,7 @@ private:
     void updatePartitionCombos(QComboBox *changed);
     QStringList splitDevice(const QString &device) const;
     void buildBlockDevList();
-    bool pretendToInstall(int start, int stop, int sleep);
+    bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
     bool validateChosenPartitions();
     bool calculateDefaultPartitions();
@@ -252,7 +251,7 @@ private:
     bool installLinux(const int progend);
     bool copyLinux(const int progend);
     void failUI(const QString &msg);
-    int manageConfig(enum ConfigAction mode);
+    void manageConfig(enum ConfigAction mode);
     void stashServices(bool save);
     void stashAdvancedFDE(bool save);
 };
