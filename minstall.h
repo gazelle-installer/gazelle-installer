@@ -252,7 +252,7 @@ private:
     bool installLinux(const int progend);
     bool copyLinux(const int progend);
     void failUI(const QString &msg);
-    int manageConfig(enum ConfigAction mode);
+    void manageConfig(enum ConfigAction mode);
     void stashServices(bool save);
     void stashAdvancedFDE(bool save);
 };
