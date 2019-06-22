@@ -597,8 +597,12 @@ void MInstall::manageConfig(enum ConfigAction mode)
         }
     };
 
+    if (mode == ConfigSave) {
+        config->clear();
+        config->setValue("Version", VERSION);
+    }
     if (mode == ConfigSave || mode == ConfigLoadA) {
-        if (mode == ConfigSave) config->setValue("Version", VERSION);
+        step = Step_Disk;
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
         lambdaSetRadios("InstallTo", 2, diskChoices, diskRadios);
@@ -606,7 +610,6 @@ void MInstall::manageConfig(enum ConfigAction mode)
         if (entireDiskButton->isChecked()) {
             // Disk drive setup
             config->beginGroup("Drive");
-            step = Step_Disk;
             lambdaSetComboBox("Device", diskCombo, true);
             lambdaSetCheckBox("Encrypted", checkBoxEncryptAuto);
             config->endGroup();
