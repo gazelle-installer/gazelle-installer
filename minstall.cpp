@@ -713,6 +713,11 @@ int MInstall::manageConfig(enum ConfigAction mode)
         if (configStuck < 0) configStuck = 9;
     }
 
+    if (configStuck) {
+        // TODO: finalise failure method and use tr() here
+        QMessageBox::critical(this, windowTitle(),
+            "Configuration file error (" + QString::number(configStuck) + ")");
+    }
     return configStuck;
 }
 
@@ -2400,6 +2405,13 @@ void MInstall::gotoPage(int next)
     int curr = widgetStack->currentIndex();
     next = showPage(curr, next);
 
+    // manage configuration load failures for --auto
+    if (automatic && configStuck && next >= configStuck) {
+        if (configStuck == 3) ixPageRefAdvancedFDE = curr;
+        next = configStuck;
+        automatic = false;
+    }
+
     // modify ui for standard cases
     if (next == 0) {
         // entering first page
@@ -2448,14 +2460,7 @@ void MInstall::gotoPage(int next)
 
     if (next > curr) {
         // automatic installation
-        if (automatic) {
-            if (!configStuck) nextButton->click();
-            else {
-                // TODO: finalise failure method and use tr() here
-                QMessageBox::critical(this, windowTitle(),
-                    "Configuration file error (" + QString::number(configStuck) + ")");
-            }
-        }
+        if (automatic) nextButton->click();
 
         // process next installation phase
         if (next == 4 || next == 9) {
