@@ -446,13 +446,14 @@ bool MInstall::checkDisk()
 }
 
 // check password length (maybe complexity)
-bool MInstall::checkPassword(const QString &pass)
+bool MInstall::checkPassword(QLineEdit *passEdit)
 {
-    if (pass.length() < 8) {
+    if (passEdit->text().isEmpty()) {
         QMessageBox::critical(this, windowTitle(),
                               tr("The password needs to be at least\n"
                                  "%1 characters long. Please select\n"
-                                 "a longer password before proceeding.").arg("8"));
+                                 "a longer password before proceeding.").arg("1"));
+        nextFocus = passEdit;
         return false;
     }
     return true;
@@ -996,9 +997,7 @@ bool MInstall::validateChosenPartitions()
 
     int ans;
     if (checkBoxEncryptSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
-        if (!checkPassword(FDEpassCust->text())) {
-            return false;
-        }
+        if (!checkPassword(FDEpassCust)) return false;
         if (bootCombo->currentText() == "root") {
             if (checkBoxEncryptRoot->isChecked()) {
                 QMessageBox::critical(this, windowTitle(), tr("You must choose a separate boot partition when encrypting root."));
@@ -2183,7 +2182,7 @@ int MInstall::showPage(int curr, int next)
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
-            if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword->text())) {
+            if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
                 return curr;
             }
             QString drv = "/dev/" + diskCombo->currentData().toString();
