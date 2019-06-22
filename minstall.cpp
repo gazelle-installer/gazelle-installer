@@ -527,10 +527,18 @@ bool MInstall::processNextPhase()
 
 void MInstall::manageConfig(enum ConfigAction mode)
 {
-    configStuck = 0;
+    QWidget *step = Step_Terms;
+    bool stuck = false;
     if (!config) return;
 
-    auto lambdaSetComboBox = [this, mode](const QString &key, QComboBox *combo, const bool useData) -> void {
+    auto lambdaMarkBadWidget = [this, &step, &stuck](QWidget *widget) -> void {
+        widget->setStyleSheet("QWidget { background: maroon; color: white; border: 2px inset red; }\n"
+                              "QPushButton:!pressed { border-style: outset; }\n"
+                              "QRadioButton { border-style: dotted; }");
+        step->setProperty("STUCK", true);
+        stuck = true;
+    };
+    auto lambdaSetComboBox = [this, mode, lambdaMarkBadWidget](const QString &key, QComboBox *combo, const bool useData) -> void {
         const QVariant &comboval = useData ? combo->currentData() : QVariant(combo->currentText());
         if (mode == ConfigSave) config->setValue(key, comboval);
         else {
@@ -538,7 +546,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
             const int icombo = useData ? combo->findData(val, Qt::UserRole, Qt::MatchFixedString)
                              : combo->findText(val.toString(), Qt::MatchFixedString);
             if (icombo >= 0) combo->setCurrentIndex(icombo);
-            else if (!configStuck) configStuck = -1;
+            else lambdaMarkBadWidget(combo);
         }
     };
     auto lambdaSetCheckBox = [this, mode](const QString &key, QCheckBox *checkbox) -> void {
@@ -551,13 +559,13 @@ void MInstall::manageConfig(enum ConfigAction mode)
         if (mode == ConfigSave) config->setValue(key, text);
         else lineedit->setText(config->value(key, text).toString());
     };
-    auto lambdaSetSpinBox = [this, mode](const QString &key, QSpinBox *spinbox) -> void {
+    auto lambdaSetSpinBox = [this, mode, lambdaMarkBadWidget](const QString &key, QSpinBox *spinbox) -> void {
         const QVariant spinval(spinbox->value());
         if (mode == ConfigSave) config->setValue(key, spinval);
         else {
             const int val = config->value(key, spinval).toInt();
             spinbox->setValue(val);
-            if (val != spinbox->value() && !configStuck) configStuck = -1;
+            if (val != spinbox->value()) lambdaMarkBadWidget(spinbox);
         }
     };
     auto lambdaSetEnum = [this, mode](const QString &key, const int nchoices,
@@ -569,11 +577,11 @@ void MInstall::manageConfig(enum ConfigAction mode)
             for (int ixi = 0; ixi < nchoices; ++ixi) {
                 if (!val.compare(QString(choices[ixi]), Qt::CaseInsensitive)) return ixi;
             }
-            if (!configStuck) configStuck = -1;
+            return -1;
         }
         return curval;
     };
-    auto lambdaSetRadios = [lambdaSetEnum](const QString &key, const int nchoices,
+    auto lambdaSetRadios = [lambdaSetEnum, lambdaMarkBadWidget](const QString &key, const int nchoices,
             const char *choices[], QRadioButton *radios[]) -> void {
         // obtain the current choice
         int ixradio = -1;
@@ -583,6 +591,9 @@ void MInstall::manageConfig(enum ConfigAction mode)
         // select the corresponding radio button
         ixradio = lambdaSetEnum(key, nchoices, choices, ixradio);
         if (ixradio >= 0) radios[ixradio]->setChecked(true);
+        else {
+            for (int ixi = 0; ixi < nchoices; ++ixi) lambdaMarkBadWidget(radios[ixi]);
+        }
     };
 
     if (mode == ConfigSave || mode == ConfigLoadA) {
@@ -590,18 +601,18 @@ void MInstall::manageConfig(enum ConfigAction mode)
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
         lambdaSetRadios("InstallTo", 2, diskChoices, diskRadios);
-        if (configStuck < 0) configStuck = 1;
 
         if (entireDiskButton->isChecked()) {
             // Disk drive setup
             config->beginGroup("Drive");
+            step = Step_Disk;
             lambdaSetComboBox("Device", diskCombo, true);
             lambdaSetCheckBox("Encrypted", checkBoxEncryptAuto);
             config->endGroup();
-            if (configStuck < 0) configStuck = 1;
         } else {
             // Partition step
             config->beginGroup("Partitions");
+            step = Step_Partitions;
             lambdaSetComboBox("Root", rootCombo, true);
             lambdaSetComboBox("Home", homeCombo, true);
             lambdaSetComboBox("Swap", swapCombo, true);
@@ -617,11 +628,11 @@ void MInstall::manageConfig(enum ConfigAction mode)
             lambdaSetCheckBox("SaveHome", saveHomeCheck);
             lambdaSetCheckBox("BadBlocksCheck", badblocksCheck);
             config->endGroup();
-            if (configStuck < 0) configStuck = 2;
         }
 
         // AES step
         config->beginGroup("Encryption");
+        step = Step_FDE;
         if (mode != ConfigSave) {
             const QString &epass = config->value("Pass").toString();
             if (entireDiskButton->isChecked()) {
@@ -641,12 +652,17 @@ void MInstall::manageConfig(enum ConfigAction mode)
         lambdaSetComboBox("KernelRNG", comboFDErandom, false);
         lambdaSetSpinBox("KDFroundTime", spinFDEroundtime);
         config->endGroup();
-        if (configStuck < 0) configStuck = 3;
+        if (step->property("STUCK").toBool()) {
+            step = entireDiskButton->isChecked() ? Step_Disk : Step_Partitions;
+            lambdaMarkBadWidget(buttonAdvancedFDE);
+            lambdaMarkBadWidget(buttonAdvancedFDECust);
+        }
     }
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
         // GRUB step
         config->beginGroup("GRUB");
+        step = Step_Boot;
         if(grubCheckBox->isChecked()) {
             const char *grubChoices[] = {"MBR", "PBR", "ESP"};
             QRadioButton *grubRadios[] = {grubMbrButton, grubPbrButton, grubEspButton};
@@ -654,10 +670,10 @@ void MInstall::manageConfig(enum ConfigAction mode)
         }
         lambdaSetComboBox("Location", grubBootCombo, true);
         config->endGroup();
-        if (configStuck < 0) configStuck = 5;
 
         // Services step
         config->beginGroup("Services");
+        step = Step_Services;
         QTreeWidgetItemIterator it(csView);
         while (*it) {
             if ((*it)->parent() != nullptr) {
@@ -672,19 +688,19 @@ void MInstall::manageConfig(enum ConfigAction mode)
             ++it;
         }
         config->endGroup();
-        if (configStuck < 0) configStuck = 6;
 
         // Network step
         config->beginGroup("Network");
+        step = Step_Network;
         lambdaSetLineEdit("ComputerName", computerNameEdit);
         lambdaSetLineEdit("Domain", computerDomainEdit);
         lambdaSetLineEdit("Workgroup", computerGroupEdit);
         lambdaSetCheckBox("Samba", sambaCheckBox);
         config->endGroup();
-        if (configStuck < 0) configStuck = 7;
 
         // Localization step
         config->beginGroup("Localization");
+        step = Step_Localization;
         lambdaSetComboBox("Locale", localeCombo, true);
         lambdaSetCheckBox("LocalClock", localClockCheckBox);
         const char *clockChoices[] = {"24", "12"};
@@ -692,15 +708,17 @@ void MInstall::manageConfig(enum ConfigAction mode)
         lambdaSetRadios("ClockHours", 2, clockChoices, clockRadios);
         lambdaSetComboBox("Timezone", timezoneCombo, false);
         config->endGroup();
-        if (configStuck < 0) configStuck = 8;
 
         // User Accounts step
         config->beginGroup("User");
+        step = Step_User_Accounts;
         lambdaSetLineEdit("Username", userNameEdit);
         lambdaSetCheckBox("Autologin", autologinCheckBox);
         lambdaSetCheckBox("SaveDesktop", saveDesktopCheckBox);
         const char *oldHomeActionChoices[] = {"Nothing", "Use", "Save", "Delete"};
-        oldHomeAction = static_cast<OldHomeAction>(lambdaSetEnum("OldHomeAction", 4, oldHomeActionChoices, oldHomeAction));
+        int ohaVal = lambdaSetEnum("OldHomeAction", 4, oldHomeActionChoices, oldHomeAction);
+        if (ohaVal >= 0) oldHomeAction = static_cast<OldHomeAction>(ohaVal);
+        else step->setProperty("STUCK", true);
         if (mode != ConfigSave) {
             const QString &upass = config->value("UserPass").toString();
             userPasswordEdit->setText(upass);
@@ -710,13 +728,12 @@ void MInstall::manageConfig(enum ConfigAction mode)
             rootPasswordEdit2->setText(rpass);
         }
         config->endGroup();
-        if (configStuck < 0) configStuck = 9;
     }
 
-    if (configStuck) {
+    if (stuck) {
         // TODO: finalise failure method and use tr() here
         QMessageBox::critical(this, windowTitle(),
-            "Configuration file error (" + QString::number(configStuck) + ")");
+            "Invalid settings in loaded configuration file");
     }
 }
 
@@ -2404,13 +2421,6 @@ void MInstall::gotoPage(int next)
     int curr = widgetStack->currentIndex();
     next = showPage(curr, next);
 
-    // if --auto and configured badly, land on the offending page
-    if (automatic && configStuck && next >= configStuck) {
-        if (configStuck == 3) ixPageRefAdvancedFDE = curr;
-        next = configStuck;
-        automatic = false;
-    }
-
     // modify ui for standard cases
     if (next == 0) {
         // entering first page
@@ -2459,7 +2469,8 @@ void MInstall::gotoPage(int next)
 
     // automatic installation
     if (automatic) {
-        if (next > curr) nextButton->click();
+        if (!(widgetStack->currentWidget()->property("STUCK").toBool())
+            && next > curr) nextButton->click();
         else automatic = false; // failed validation
     }
 
