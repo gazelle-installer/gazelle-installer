@@ -600,22 +600,21 @@ void MInstall::manageConfig(enum ConfigAction mode)
     if (mode == ConfigSave) {
         config->clear();
         config->setValue("Version", VERSION);
+        config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
     if (mode == ConfigSave || mode == ConfigLoadA) {
+        config->beginGroup("Storage");
         step = Step_Disk;
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
-        lambdaSetRadios("InstallTo", 2, diskChoices, diskRadios);
+        lambdaSetRadios("Target", 2, diskChoices, diskRadios);
 
         if (entireDiskButton->isChecked()) {
             // Disk drive setup
-            config->beginGroup("Drive");
-            lambdaSetComboBox("Device", diskCombo, true);
-            lambdaSetCheckBox("Encrypted", checkBoxEncryptAuto);
-            config->endGroup();
+            lambdaSetComboBox("Drive", diskCombo, true);
+            lambdaSetCheckBox("DriveEncrypt", checkBoxEncryptAuto);
         } else {
             // Partition step
-            config->beginGroup("Partitions");
             step = Step_Partitions;
             lambdaSetComboBox("Root", rootCombo, true);
             lambdaSetComboBox("Home", homeCombo, true);
@@ -631,8 +630,8 @@ void MInstall::manageConfig(enum ConfigAction mode)
             lambdaSetLineEdit("SwapLabel", swapLabelEdit);
             lambdaSetCheckBox("SaveHome", saveHomeCheck);
             lambdaSetCheckBox("BadBlocksCheck", badblocksCheck);
-            config->endGroup();
         }
+        config->endGroup();
 
         // AES step
         config->beginGroup("Encryption");
