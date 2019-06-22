@@ -525,10 +525,10 @@ bool MInstall::processNextPhase()
     return true;
 }
 
-int MInstall::manageConfig(enum ConfigAction mode)
+void MInstall::manageConfig(enum ConfigAction mode)
 {
     configStuck = 0;
-    if (!config) return 0;
+    if (!config) return;
 
     auto lambdaSetComboBox = [this, mode](const QString &key, QComboBox *combo, const bool useData) -> void {
         const QVariant &comboval = useData ? combo->currentData() : QVariant(combo->currentText());
@@ -718,7 +718,6 @@ int MInstall::manageConfig(enum ConfigAction mode)
         QMessageBox::critical(this, windowTitle(),
             "Configuration file error (" + QString::number(configStuck) + ")");
     }
-    return configStuck;
 }
 
 void MInstall::stashAdvancedFDE(bool save)
@@ -2405,7 +2404,7 @@ void MInstall::gotoPage(int next)
     int curr = widgetStack->currentIndex();
     next = showPage(curr, next);
 
-    // manage configuration load failures for --auto
+    // if --auto and configured badly, land on the offending page
     if (automatic && configStuck && next >= configStuck) {
         if (configStuck == 3) ixPageRefAdvancedFDE = curr;
         next = configStuck;
@@ -2458,16 +2457,17 @@ void MInstall::gotoPage(int next)
         nextFocus = nullptr;
     }
 
-    if (next > curr) {
-        // automatic installation
-        if (automatic) nextButton->click();
+    // automatic installation
+    if (automatic) {
+        if (next > curr) nextButton->click();
+        else automatic = false; // failed validation
+    }
 
-        // process next installation phase
-        if (next == 4 || next == 9) {
-            if (!processNextPhase() && phase > -2) {
-                cleanup(false);
-                gotoPage(1);
-            }
+    // process next installation phase
+    if (next == 4 || next == 9) {
+        if (!processNextPhase() && phase > -2) {
+            cleanup(false);
+            gotoPage(1);
         }
     }
 }
