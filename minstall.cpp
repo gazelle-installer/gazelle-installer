@@ -294,11 +294,8 @@ bool MInstall::pretendToInstall(int start, int stop)
 {
     for (int ixi = start; ixi <= stop; ++ixi) {
         updateStatus(tr("Pretending to install %1").arg(PROJECTNAME), ixi);
-        csleep(100);
-        if (phase < 0) {
-            csleep(1000);
-            return false;
-        }
+        csleep(phase == 1 ? 100 : 1000);
+        if (phase < 0) return false;
     }
     return true;
 }
@@ -2318,11 +2315,6 @@ void MInstall::pageDisplayed(int next)
         if (phase <= 0) {
             buildBootLists();
             manageConfig(ConfigLoadB);
-            if (automatic) nextButton->click(); // because this doesn't happen until after processNextPhase()
-            if (!processNextPhase() && phase > -2) {
-                cleanup(false);
-                gotoPage(1);
-            }
         }
         return; // avoid the end that enables both Back and Next buttons
         break;
@@ -2373,10 +2365,6 @@ void MInstall::pageDisplayed(int next)
                           + "</p>");
         backButton->setEnabled(true);
         nextButton->setEnabled(false);
-        if (!processNextPhase() && phase > -2) {
-            cleanup(false);
-            gotoPage(1);
-        }
         return; // avoid enabling both Back and Next buttons at the end
         break;
 
@@ -2458,13 +2446,23 @@ void MInstall::gotoPage(int next)
         nextFocus = nullptr;
     }
 
-    // automatic installation
-    if (automatic && next > curr) {
-        if (!configStuck) nextButton->click();
-        else {
-            // TODO: finalise failure method and use tr() here
-            QMessageBox::critical(this, windowTitle(), "Configuration file error ("
-                                  + QString::number(configStuck) + ")");
+    if (next > curr) {
+        // automatic installation
+        if (automatic) {
+            if (!configStuck) nextButton->click();
+            else {
+                // TODO: finalise failure method and use tr() here
+                QMessageBox::critical(this, windowTitle(),
+                    "Configuration file error (" + QString::number(configStuck) + ")");
+            }
+        }
+
+        // process next installation phase
+        if (next == 4 || next == 9) {
+            if (!processNextPhase() && phase > -2) {
+                cleanup(false);
+                gotoPage(1);
+            }
         }
     }
 }
@@ -3144,10 +3142,10 @@ void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
         FDEpassCust2->clear();
         FDEpassCust->clear();
         FDEpassCust->setFocus();
-        if (!automatic) {
+        if (!automatic && checkBoxEncryptSwap->isVisible()) {
             QMessageBox::warning(this, windowTitle(),
-                                 tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
-                                 QMessageBox::Ok);
+                tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
+                QMessageBox::Ok);
         }
     }
 }
