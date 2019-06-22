@@ -183,7 +183,6 @@ private:
     // configuration management
     QSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
-    int configStuck = 0;
 
     QString auto_mount;
     bool isHomeEncrypted = false;
