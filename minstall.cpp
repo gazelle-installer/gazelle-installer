@@ -763,7 +763,7 @@ bool MInstall::formatPartitions()
     if (espFormatSize) {
         updateStatus(tr("Formatting EFI System Partition"));
         if (!execute("mkfs.msdos -F 32 " + espDevice)) return false;
-        execute("parted -s " + splitDevice(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
+        execute("parted -s " + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
     }
     // maybe format home
     if (homeFormatSize) {
@@ -1213,7 +1213,7 @@ bool MInstall::makePartitions()
 
     auto lambdaPreparePart = [this, &start]
             (const QString &strdev, qint64 size, const QString &type) -> bool {
-        const QStringList devsplit = splitDevice(strdev);
+        const QStringList devsplit = BlockDeviceInfo::split(strdev);
         bool rc = true;
         // size=0 = nothing, size>0 = creation, size<0 = allocation.
         if (size > 0) {
@@ -2494,47 +2494,6 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
     }
     // if no valid root is found, the user should know
     if (rootCombo->count() == 0) rootCombo->addItem("none");
-}
-
-// return block device info that is suitable for a combo box
-void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
-{
-    static const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
-    unsigned int isuffix = 0;
-    qlonglong scalesize = size;
-    while (scalesize >= 1024 && isuffix < sizeof(suffixes)) {
-        ++isuffix;
-        scalesize /= 1024;
-    }
-    QString strout(name + " (" + QString::number(scalesize) + suffixes[isuffix]);
-    if (!fs.isEmpty()) strout += " " + fs;
-    if (!label.isEmpty()) strout += " - " + label;
-    if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
-    QString stricon;
-    if (isFuture) stricon = "appointment-soon-symbolic";
-    else if (isNasty && warnNasty) stricon = "dialog-warning-symbolic";
-    combo->addItem(QIcon::fromTheme(stricon), strout + ")", name);
-}
-
-int BlockDeviceList::findDevice(const QString &devname) const
-{
-    const int cnt = count();
-    for (int ixi = 0; ixi < cnt; ++ixi) {
-        const BlockDeviceInfo &bdinfo = at(ixi);
-        if (bdinfo.name == devname) return ixi;
-    }
-    return -1;
-}
-
-QStringList MInstall::splitDevice(const QString &devname) const
-{
-    static const QRegularExpression rxdev1("^(?:/dev/)+(mmcblk.*|nvme.*)p([0-9]*)$");
-    static const QRegularExpression rxdev2("^(?:/dev/)+([a-z]*)([0-9]*)$");
-    QRegularExpressionMatch rxmatch(rxdev1.match(devname));
-    if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
-    QStringList list(rxmatch.capturedTexts());
-    if (!list.isEmpty()) list.removeFirst();
-    return list;
 }
 
 void MInstall::buildBlockDevList()
