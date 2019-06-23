@@ -25,38 +25,10 @@
 #include <dirent.h>
 
 #include "msettings.h"
+#include "blockdev.h"
+#include "safecache.h"
+
 #include "ui_meinstall.h"
-
-class SafeCache : public QByteArray {
-public:
-    SafeCache();
-    ~SafeCache();
-    bool load(const char *filename, int length);
-    bool save(const char *filename, mode_t mode = 0400);
-    void erase();
-};
-
-struct BlockDeviceInfo {
-    QString name;
-    QString fs;
-    QString label;
-    QString model;
-    qint64 size;
-    bool isFuture = false;
-    bool isNasty = false;
-    bool isDisk = false;
-    bool isGPT = false;
-    bool isBoot = false;
-    bool isESP = false;
-    bool isNative = false;
-    bool isSwap = false;
-    void addToCombo(QComboBox *combo, bool warnNasty = false) const;
-};
-
-class BlockDeviceList : public QList<BlockDeviceInfo> {
-public:
-    int findDevice(const QString &devname) const;
-};
 
 class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
@@ -241,7 +213,6 @@ private:
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
     void updatePartitionCombos(QComboBox *changed);
-    QStringList splitDevice(const QString &device) const;
     void buildBlockDevList();
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
