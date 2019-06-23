@@ -19,6 +19,7 @@
 #define BLOCKDEV_H
 
 #include <QComboBox>
+#include "mprocess.h"
 
 struct BlockDeviceInfo
 {
@@ -42,6 +43,7 @@ struct BlockDeviceInfo
 class BlockDeviceList : public QList<BlockDeviceInfo>
 {
 public:
+    void build(MProcess &proc);
     int findDevice(const QString &devname) const;
 };
 
