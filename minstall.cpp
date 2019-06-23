@@ -1177,7 +1177,7 @@ bool MInstall::makePartitions()
     // detach all existing partitions on the selected drive
     for (const QString &strdev : listToUnmount) {
         proc.exec("swapoff /dev/" + strdev, true);
-        proc.exec("umount /dev/" + strdev, true);
+        proc.exec("/bin/umount /dev/" + strdev, true);
     }
     listToUnmount.clear();
 
@@ -1510,7 +1510,7 @@ bool MInstall::installLoader()
 
     // the old initrd is not valid for this hardware
     if (!val.isEmpty()) {
-        proc.exec("rm -f /mnt/antiX/boot/" + val);
+        proc.exec("/bin/rm -f /mnt/antiX/boot/" + val);
     }
 
     if (!grubCheckBox->isChecked()) {
@@ -1536,9 +1536,9 @@ bool MInstall::installLoader()
     }
 
     // set mounts for chroot
-    proc.exec("mount -o bind /dev /mnt/antiX/dev", true);
-    proc.exec("mount -o bind /sys /mnt/antiX/sys", true);
-    proc.exec("mount -o bind /proc /mnt/antiX/proc", true);
+    proc.exec("/bin/mount -o bind /dev /mnt/antiX/dev", true);
+    proc.exec("/bin/mount -o bind /sys /mnt/antiX/sys", true);
+    proc.exec("/bin/mount -o bind /proc /mnt/antiX/proc", true);
 
     QString arch;
 
@@ -1547,7 +1547,7 @@ bool MInstall::installLoader()
         cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot %1").arg(boot);
     } else {
         mkdir("/mnt/antiX/boot/efi", 0755);
-        QString mount = QString("mount %1 /mnt/antiX/boot/efi").arg(boot);
+        QString mount = QString("/bin/mount %1 /mnt/antiX/boot/efi").arg(boot);
         proc.exec(mount);
         // rename arch to match grub-install target
         arch = proc.execOut("cat /sys/firmware/efi/fw_platform_size");
@@ -1565,11 +1565,11 @@ bool MInstall::installLoader()
         // error
         QMessageBox::critical(this, windowTitle(),
                               tr("GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
-        proc.exec("umount /mnt/antiX/proc", true);
-        proc.exec("umount /mnt/antiX/sys", true);
-        proc.exec("umount /mnt/antiX/dev", true);
+        proc.exec("/bin/umount /mnt/antiX/proc", true);
+        proc.exec("/bin/umount /mnt/antiX/sys", true);
+        proc.exec("/bin/umount /mnt/antiX/dev", true);
         if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
-            proc.exec("umount /mnt/antiX/boot/efi", true);
+            proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
         }
         return false;
     }
@@ -1632,9 +1632,9 @@ bool MInstall::installLoader()
     if (uefi) {
         mkdir("/mnt/antiX/boot/uefi-mt", 0755);
         if (arch == "i386") {
-            proc.exec("cp /live/boot-dev/boot/uefi-mt/mtest-32.efi /mnt/antiX/boot/uefi-mt", true);
+            proc.exec("/bin/cp /live/boot-dev/boot/uefi-mt/mtest-32.efi /mnt/antiX/boot/uefi-mt", true);
         } else {
-            proc.exec("cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt", true);
+            proc.exec("/bin/cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt", true);
         }
     }
     updateStatus(statup);
@@ -1649,11 +1649,11 @@ bool MInstall::installLoader()
     proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
     updateStatus(statup);
     qDebug() << "clear chroot env";
-    proc.exec("umount /mnt/antiX/proc", true);
-    proc.exec("umount /mnt/antiX/sys", true);
-    proc.exec("umount /mnt/antiX/dev", true);
+    proc.exec("/bin/umount /mnt/antiX/proc", true);
+    proc.exec("/bin/umount /mnt/antiX/sys", true);
+    proc.exec("/bin/umount /mnt/antiX/dev", true);
     if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
-        proc.exec("umount /mnt/antiX/boot/efi", true);
+        proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
     }
 
     return true;
@@ -1763,7 +1763,7 @@ bool MInstall::setUserInfo()
         if (oldHomeAction == OldHomeSave) {
             // save the old directory
             bool ok = false;
-            cmd = QString("mv -f %1 %1.00%2").arg(dpath);
+            cmd = QString("/bin/mv -f %1 %1.00%2").arg(dpath);
             for (int ixi = 1; ixi < 10 && !ok; ++ixi) {
                 ok = proc.exec(cmd.arg(ixi));
             }
@@ -1773,7 +1773,7 @@ bool MInstall::setUserInfo()
             }
         } else if (oldHomeAction == OldHomeDelete) {
             // delete the directory
-            cmd = QString("rm -rf %1").arg(dpath);
+            cmd = QString("/bin/rm -rf %1").arg(dpath);
             if (!proc.exec(cmd)) {
                 failUI(tr("Failed to delete old home directory."));
                 return false;
@@ -1784,28 +1784,28 @@ bool MInstall::setUserInfo()
     if ((dir = opendir(dpath.toUtf8())) == nullptr) {
         // dir does not exist, must create it
         // copy skel to demo
-        if (!proc.exec("cp -a /mnt/antiX/etc/skel /mnt/antiX/home")) {
+        if (!proc.exec("/bin/cp -a /mnt/antiX/etc/skel /mnt/antiX/home")) {
             failUI(tr("Sorry, failed to create user directory."));
             return false;
         }
-        cmd = QString("mv -f /mnt/antiX/home/skel %1").arg(dpath);
+        cmd = QString("/bin/mv -f /mnt/antiX/home/skel %1").arg(dpath);
         if (!proc.exec(cmd)) {
             failUI(tr("Sorry, failed to name user directory."));
             return false;
         }
     } else {
         // dir does exist, clean it up
-        cmd = QString("cp -n /mnt/antiX/etc/skel/.bash_profile %1").arg(dpath);
+        cmd = QString("/bin/cp -n /mnt/antiX/etc/skel/.bash_profile %1").arg(dpath);
         proc.exec(cmd);
-        cmd = QString("cp -n /mnt/antiX/etc/skel/.bashrc %1").arg(dpath);
+        cmd = QString("/bin/cp -n /mnt/antiX/etc/skel/.bashrc %1").arg(dpath);
         proc.exec(cmd);
-        cmd = QString("cp -n /mnt/antiX/etc/skel/.gtkrc %1").arg(dpath);
+        cmd = QString("/bin/cp -n /mnt/antiX/etc/skel/.gtkrc %1").arg(dpath);
         proc.exec(cmd);
-        cmd = QString("cp -n /mnt/antiX/etc/skel/.gtkrc-2.0 %1").arg(dpath);
+        cmd = QString("/bin/cp -n /mnt/antiX/etc/skel/.gtkrc-2.0 %1").arg(dpath);
         proc.exec(cmd);
-        cmd = QString("cp -Rn /mnt/antiX/etc/skel/.config %1").arg(dpath);
+        cmd = QString("/bin/cp -Rn /mnt/antiX/etc/skel/.config %1").arg(dpath);
         proc.exec(cmd);
-        cmd = QString("cp -Rn /mnt/antiX/etc/skel/.local %1").arg(dpath);
+        cmd = QString("/bin/cp -Rn /mnt/antiX/etc/skel/.local %1").arg(dpath);
         proc.exec(cmd);
     }
     // saving Desktop changes
@@ -1900,31 +1900,31 @@ bool MInstall::setComputerName()
         replaceStringInFile("WORKGROUP", computerGroupEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
     }
     if (sambaCheckBox->isChecked()) {
-        proc.exec("mv -f /mnt/antiX/etc/rc5.d/K*smbd /mnt/antiX/etc/rc5.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc4.d/K*smbd /mnt/antiX/etc/rc4.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc3.d/K*smbd /mnt/antiX/etc/rc3.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc2.d/K*smbd /mnt/antiX/etc/rc2.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc5.d/K*samba-ad-dc /mnt/antiX/etc/rc5.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc4.d/K*samba-ad-dc /mnt/antiX/etc/rc4.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc3.d/K*samba-ad-dc /mnt/antiX/etc/rc3.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc2.d/K*samba-ad-dc /mnt/antiX/etc/rc2.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc5.d/K*nmbd /mnt/antiX/etc/rc5.d/S01nmbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc4.d/K*nmbd /mnt/antiX/etc/rc4.d/S01nmbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc3.d/K*nmbd /mnt/antiX/etc/rc3.d/S01nmbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc2.d/K*nmbd /mnt/antiX/etc/rc2.d/S01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/K*smbd /mnt/antiX/etc/rc5.d/S06smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/K*smbd /mnt/antiX/etc/rc4.d/S06smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/K*smbd /mnt/antiX/etc/rc3.d/S06smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/K*smbd /mnt/antiX/etc/rc2.d/S06smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/K*samba-ad-dc /mnt/antiX/etc/rc5.d/S01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/K*samba-ad-dc /mnt/antiX/etc/rc4.d/S01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/K*samba-ad-dc /mnt/antiX/etc/rc3.d/S01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/K*samba-ad-dc /mnt/antiX/etc/rc2.d/S01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/K*nmbd /mnt/antiX/etc/rc5.d/S01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/K*nmbd /mnt/antiX/etc/rc4.d/S01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/K*nmbd /mnt/antiX/etc/rc3.d/S01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/K*nmbd /mnt/antiX/etc/rc2.d/S01nmbd >/dev/null 2>&1", false);
     } else {
-        proc.exec("mv -f /mnt/antiX/etc/rc5.d/S*smbd /mnt/antiX/etc/rc5.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc4.d/S*smbd /mnt/antiX/etc/rc4.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc3.d/S*smbd /mnt/antiX/etc/rc3.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc2.d/S*smbd /mnt/antiX/etc/rc2.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc5.d/S*samba-ad-dc /mnt/antiX/etc/rc5.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc4.d/S*samba-ad-dc /mnt/antiX/etc/rc4.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc3.d/S*samba-ad-dc /mnt/antiX/etc/rc3.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc2.d/S*samba-ad-dc /mnt/antiX/etc/rc2.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc5.d/S*nmbd /mnt/antiX/etc/rc5.d/K01nmbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc4.d/S*nmbd /mnt/antiX/etc/rc4.d/K01nmbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc3.d/S*nmbd /mnt/antiX/etc/rc3.d/K01nmbd >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc2.d/S*nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*smbd /mnt/antiX/etc/rc5.d/K01smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*smbd /mnt/antiX/etc/rc4.d/K01smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*smbd /mnt/antiX/etc/rc3.d/K01smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*smbd /mnt/antiX/etc/rc2.d/K01smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*samba-ad-dc /mnt/antiX/etc/rc5.d/K01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*samba-ad-dc /mnt/antiX/etc/rc4.d/K01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*samba-ad-dc /mnt/antiX/etc/rc3.d/K01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*samba-ad-dc /mnt/antiX/etc/rc2.d/K01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*nmbd /mnt/antiX/etc/rc5.d/K01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*nmbd /mnt/antiX/etc/rc4.d/K01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*nmbd /mnt/antiX/etc/rc3.d/K01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1", false);
     }
 
     char rbuf[4];
@@ -1969,9 +1969,9 @@ void MInstall::setLocale()
 
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
     //replace with link
-    cmd = QString("ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(timezoneCombo->currentText());
+    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(timezoneCombo->currentText());
     proc.exec(cmd, false);
-    cmd = QString("ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(timezoneCombo->currentText());
+    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(timezoneCombo->currentText());
     proc.exec(cmd, false);
     // /etc/timezone is text file with the timezone written in it. Write the user-selected timezone in it now.
     cmd = QString("echo %1 > /mnt/antiX/etc/timezone").arg(timezoneCombo->currentText());
@@ -1980,7 +1980,7 @@ void MInstall::setLocale()
     proc.exec(cmd, false);
 
     // timezone
-    proc.exec("cp -f /etc/default/rcS /mnt/antiX/etc/default");
+    proc.exec("/bin/cp -f /etc/default/rcS /mnt/antiX/etc/default");
     // Set clock to use LOCAL
     if (localClockCheckBox->isChecked()) {
         proc.exec("echo '0.0 0 0.0\n0\nLOCAL' > /etc/adjtime", false);
@@ -1988,7 +1988,7 @@ void MInstall::setLocale()
         proc.exec("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime", false);
     }
     proc.exec("hwclock --hctosys");
-    proc.exec("cp -f /etc/adjtime /mnt/antiX/etc/");
+    proc.exec("/bin/cp -f /etc/adjtime /mnt/antiX/etc/");
 
     // Set clock format
     if (radio12h->isChecked()) {
@@ -2058,11 +2058,11 @@ void MInstall::setServices()
     }
 
     if (!isInsideVB()) {
-        proc.exec("mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-        proc.exec("mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1", false);
     }
 }
 
@@ -2681,16 +2681,16 @@ void MInstall::cleanup(bool endclean)
     if (endclean) {
         proc.exec("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'", false);
         config->dumpDebug();
-        proc.exec("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
-        proc.exec("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
+        proc.exec("/bin/cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
+        proc.exec("/bin/rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
-    proc.exec("umount -l /mnt/antiX/boot/efi", true);
-    proc.exec("umount -l /mnt/antiX/proc", true);
-    proc.exec("umount -l /mnt/antiX/sys", true);
-    proc.exec("umount -l /mnt/antiX/dev/shm", true);
-    proc.exec("umount -l /mnt/antiX/dev", true);
-    proc.exec("umount -l /mnt/antiX/home", true);
-    proc.exec("umount -lR /mnt/antiX", true);
+    proc.exec("/bin/umount -l /mnt/antiX/boot/efi", true);
+    proc.exec("/bin/umount -l /mnt/antiX/proc", true);
+    proc.exec("/bin/umount -l /mnt/antiX/sys", true);
+    proc.exec("/bin/umount -l /mnt/antiX/dev/shm", true);
+    proc.exec("/bin/umount -l /mnt/antiX/dev", true);
+    proc.exec("/bin/umount -l /mnt/antiX/home", true);
+    proc.exec("/bin/umount -lR /mnt/antiX", true);
 
     if (isRootEncrypted) proc.exec("cryptsetup close rootfs", true);
     if (isHomeEncrypted) proc.exec("cryptsetup close homefs", true);
