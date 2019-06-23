@@ -151,7 +151,7 @@ void printHelp()
     qDebug() << "Here are some CLI options you can use, please read the description carefully and be aware that these are experimental options\n";
     qDebug() << "Usage: minstall [<options>]\n";
     qDebug() << "Options:";
-    qDebug() << "  -a --auto      Installs automatically using the configuration file from /etc/minstall.conf\n"
+    qDebug() << "  --auto         Installs automatically using the configuration file from /etc/minstall.conf\n"
                 "                 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically";
     qDebug() << "  -n --nocopy    Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files";
     qDebug() << "  -p --pretend   Test mode for GUI, you can advance to different screens without actially installing";
