@@ -153,6 +153,7 @@ void printHelp()
     qDebug() << "Options:";
     qDebug() << "  --auto         Installs automatically using the configuration file from /etc/minstall.conf\n"
                 "                 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically";
+    qDebug() << "  --brave        Overrules sanity check on partition, it can break things, use it only if you don't care about data on drive";
     qDebug() << "  -n --nocopy    Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files";
     qDebug() << "  -p --pretend   Test mode for GUI, you can advance to different screens without actially installing";
     qDebug() << "  -s --sync      Installing with rsync instead of cp on custom partitioning\n"
