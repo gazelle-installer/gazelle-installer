@@ -64,8 +64,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
     // config file
-    if (QFile::exists(cfgfile)) execute(QString("cp %1 %1.bak").arg(cfgfile), true);
-    config = new QSettings(cfgfile, QSettings::NativeFormat, this);
+    config = new MSettings(cfgfile, this);
 
     // set some distro-centric text
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
@@ -528,114 +527,52 @@ bool MInstall::processNextPhase()
 
 void MInstall::manageConfig(enum ConfigAction mode)
 {
-    QWidget *step = Step_Terms;
-    bool stuck = false;
+    if (mode == ConfigSave) {
+        delete config;
+        config = new MSettings("/mnt/antiX/etc/minstall.conf", this);
+    }
     if (!config) return;
-
-    auto lambdaMarkBadWidget = [this, &step, &stuck](QWidget *widget) -> void {
-        widget->setStyleSheet("QWidget { background: maroon; color: white; border: 2px inset red; }\n"
-                              "QPushButton:!pressed { border-style: outset; }\n"
-                              "QRadioButton { border-style: dotted; }");
-        step->setProperty("STUCK", true);
-        stuck = true;
-    };
-    auto lambdaSetComboBox = [this, mode, lambdaMarkBadWidget](const QString &key, QComboBox *combo, const bool useData) -> void {
-        const QVariant &comboval = useData ? combo->currentData() : QVariant(combo->currentText());
-        if (mode == ConfigSave) config->setValue(key, comboval);
-        else {
-            const QVariant &val = config->value(key, comboval);
-            const int icombo = useData ? combo->findData(val, Qt::UserRole, Qt::MatchFixedString)
-                             : combo->findText(val.toString(), Qt::MatchFixedString);
-            if (icombo >= 0) combo->setCurrentIndex(icombo);
-            else lambdaMarkBadWidget(combo);
-        }
-    };
-    auto lambdaSetCheckBox = [this, mode](const QString &key, QCheckBox *checkbox) -> void {
-        const QVariant state(checkbox->isChecked());
-        if (mode == ConfigSave) config->setValue(key, state);
-        else checkbox->setChecked(config->value(key, state).toBool());
-    };
-    auto lambdaSetLineEdit = [this, mode](const QString &key, QLineEdit *lineedit) -> void {
-        const QString &text = lineedit->text();
-        if (mode == ConfigSave) config->setValue(key, text);
-        else lineedit->setText(config->value(key, text).toString());
-    };
-    auto lambdaSetSpinBox = [this, mode, lambdaMarkBadWidget](const QString &key, QSpinBox *spinbox) -> void {
-        const QVariant spinval(spinbox->value());
-        if (mode == ConfigSave) config->setValue(key, spinval);
-        else {
-            const int val = config->value(key, spinval).toInt();
-            spinbox->setValue(val);
-            if (val != spinbox->value()) lambdaMarkBadWidget(spinbox);
-        }
-    };
-    auto lambdaSetEnum = [this, mode](const QString &key, const int nchoices,
-            const char *choices[], const int curval) -> int {
-        QVariant choice(curval >= 0 ? choices[curval] : "");
-        if (mode == ConfigSave) config->setValue(key, choice);
-        else {
-            const QString &val = config->value(key, choice).toString();
-            for (int ixi = 0; ixi < nchoices; ++ixi) {
-                if (!val.compare(QString(choices[ixi]), Qt::CaseInsensitive)) return ixi;
-            }
-            return -1;
-        }
-        return curval;
-    };
-    auto lambdaSetRadios = [lambdaSetEnum, lambdaMarkBadWidget](const QString &key, const int nchoices,
-            const char *choices[], QRadioButton *radios[]) -> void {
-        // obtain the current choice
-        int ixradio = -1;
-        for (int ixi = 0; ixradio < 0 && ixi < nchoices; ++ixi) {
-            if (radios[ixi]->isChecked()) ixradio = ixi;
-        }
-        // select the corresponding radio button
-        ixradio = lambdaSetEnum(key, nchoices, choices, ixradio);
-        if (ixradio >= 0) radios[ixradio]->setChecked(true);
-        else {
-            for (int ixi = 0; ixi < nchoices; ++ixi) lambdaMarkBadWidget(radios[ixi]);
-        }
-    };
+    config->bad = false;
 
     if (mode == ConfigSave) {
+        config->setSave(true);
         config->clear();
         config->setValue("Version", VERSION);
         config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
     if (mode == ConfigSave || mode == ConfigLoadA) {
-        config->beginGroup("Storage");
-        step = Step_Disk;
+        config->startGroup("Storage", Step_Disk);
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
-        lambdaSetRadios("Target", 2, diskChoices, diskRadios);
+        config->manageRadios("Target", 2, diskChoices, diskRadios);
+        const bool targetDrive = entireDiskButton->isChecked();
 
-        if (entireDiskButton->isChecked()) {
+        if (targetDrive) {
             // Disk drive setup
-            lambdaSetComboBox("Drive", diskCombo, true);
-            lambdaSetCheckBox("DriveEncrypt", checkBoxEncryptAuto);
+            config->manageComboBox("Drive", diskCombo, true);
+            config->manageCheckBox("DriveEncrypt", checkBoxEncryptAuto);
         } else {
             // Partition step
-            step = Step_Partitions;
-            lambdaSetComboBox("Root", rootCombo, true);
-            lambdaSetComboBox("Home", homeCombo, true);
-            lambdaSetComboBox("Swap", swapCombo, true);
-            lambdaSetComboBox("Boot", bootCombo, true);
-            lambdaSetComboBox("RootType", rootTypeCombo, false);
-            lambdaSetComboBox("HomeType", homeTypeCombo, false);
-            lambdaSetCheckBox("RootEncrypt", checkBoxEncryptRoot);
-            lambdaSetCheckBox("HomeEncrypt", checkBoxEncryptHome);
-            lambdaSetCheckBox("SwapEncrypt", checkBoxEncryptSwap);
-            lambdaSetLineEdit("RootLabel", rootLabelEdit);
-            lambdaSetLineEdit("HomeLabel", homeLabelEdit);
-            lambdaSetLineEdit("SwapLabel", swapLabelEdit);
-            lambdaSetCheckBox("SaveHome", saveHomeCheck);
-            lambdaSetCheckBox("BadBlocksCheck", badblocksCheck);
+            config->setGroupWidget(Step_Partitions);
+            config->manageComboBox("Root", rootCombo, true);
+            config->manageComboBox("Home", homeCombo, true);
+            config->manageComboBox("Swap", swapCombo, true);
+            config->manageComboBox("Boot", bootCombo, true);
+            config->manageComboBox("RootType", rootTypeCombo, false);
+            config->manageComboBox("HomeType", homeTypeCombo, false);
+            config->manageCheckBox("RootEncrypt", checkBoxEncryptRoot);
+            config->manageCheckBox("HomeEncrypt", checkBoxEncryptHome);
+            config->manageCheckBox("SwapEncrypt", checkBoxEncryptSwap);
+            config->manageLineEdit("RootLabel", rootLabelEdit);
+            config->manageLineEdit("HomeLabel", homeLabelEdit);
+            config->manageLineEdit("SwapLabel", swapLabelEdit);
+            config->manageCheckBox("SaveHome", saveHomeCheck);
+            config->manageCheckBox("BadBlocksCheck", badblocksCheck);
         }
         config->endGroup();
 
         // AES step
-        config->beginGroup("Encryption");
-        step = Step_FDE;
+        config->startGroup("Encryption", Step_FDE);
         if (mode != ConfigSave) {
             const QString &epass = config->value("Pass").toString();
             if (entireDiskButton->isChecked()) {
@@ -646,37 +583,35 @@ void MInstall::manageConfig(enum ConfigAction mode)
                 FDEpassCust2->setText(epass);
             }
         }
-        lambdaSetComboBox("Cipher", comboFDEcipher, false);
-        lambdaSetComboBox("ChainMode", comboFDEchain, false);
-        lambdaSetComboBox("IVgenerator", comboFDEivgen, false);
-        lambdaSetComboBox("IVhash", comboFDEivhash, false);
-        lambdaSetSpinBox("KeySize", spinFDEkeysize);
-        lambdaSetComboBox("LUKSkeyHash", comboFDEhash, false);
-        lambdaSetComboBox("KernelRNG", comboFDErandom, false);
-        lambdaSetSpinBox("KDFroundTime", spinFDEroundtime);
+        config->manageComboBox("Cipher", comboFDEcipher, false);
+        config->manageComboBox("ChainMode", comboFDEchain, false);
+        config->manageComboBox("IVgenerator", comboFDEivgen, false);
+        config->manageComboBox("IVhash", comboFDEivhash, false);
+        config->manageSpinBox("KeySize", spinFDEkeysize);
+        config->manageComboBox("LUKSkeyHash", comboFDEhash, false);
+        config->manageComboBox("KernelRNG", comboFDErandom, false);
+        config->manageSpinBox("KDFroundTime", spinFDEroundtime);
         config->endGroup();
-        if (step->property("STUCK").toBool()) {
-            step = entireDiskButton->isChecked() ? Step_Disk : Step_Partitions;
-            lambdaMarkBadWidget(buttonAdvancedFDE);
-            lambdaMarkBadWidget(buttonAdvancedFDECust);
+        if (config->isBadWidget(Step_FDE)) {
+            config->setGroupWidget(targetDrive ? Step_Disk : Step_Partitions);
+            config->markBadWidget(buttonAdvancedFDE);
+            config->markBadWidget(buttonAdvancedFDECust);
         }
     }
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
         // GRUB step
-        config->beginGroup("GRUB");
-        step = Step_Boot;
+        config->startGroup("GRUB", Step_Boot);
         if(grubCheckBox->isChecked()) {
             const char *grubChoices[] = {"MBR", "PBR", "ESP"};
             QRadioButton *grubRadios[] = {grubMbrButton, grubPbrButton, grubEspButton};
-            lambdaSetRadios("Install", 3, grubChoices, grubRadios);
+            config->manageRadios("Install", 3, grubChoices, grubRadios);
         }
-        lambdaSetComboBox("Location", grubBootCombo, true);
+        config->manageComboBox("Location", grubBootCombo, true);
         config->endGroup();
 
         // Services step
-        config->beginGroup("Services");
-        step = Step_Services;
+        config->startGroup("Services", Step_Services);
         QTreeWidgetItemIterator it(csView);
         while (*it) {
             if ((*it)->parent() != nullptr) {
@@ -693,35 +628,32 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->endGroup();
 
         // Network step
-        config->beginGroup("Network");
-        step = Step_Network;
-        lambdaSetLineEdit("ComputerName", computerNameEdit);
-        lambdaSetLineEdit("Domain", computerDomainEdit);
-        lambdaSetLineEdit("Workgroup", computerGroupEdit);
-        lambdaSetCheckBox("Samba", sambaCheckBox);
+        config->startGroup("Network", Step_Network);
+        config->manageLineEdit("ComputerName", computerNameEdit);
+        config->manageLineEdit("Domain", computerDomainEdit);
+        config->manageLineEdit("Workgroup", computerGroupEdit);
+        config->manageCheckBox("Samba", sambaCheckBox);
         config->endGroup();
 
         // Localization step
-        config->beginGroup("Localization");
-        step = Step_Localization;
-        lambdaSetComboBox("Locale", localeCombo, true);
-        lambdaSetCheckBox("LocalClock", localClockCheckBox);
+        config->startGroup("Localization", Step_Localization);
+        config->manageComboBox("Locale", localeCombo, true);
+        config->manageCheckBox("LocalClock", localClockCheckBox);
         const char *clockChoices[] = {"24", "12"};
         QRadioButton *clockRadios[] = {radio24h, radio12h};
-        lambdaSetRadios("ClockHours", 2, clockChoices, clockRadios);
-        lambdaSetComboBox("Timezone", timezoneCombo, false);
+        config->manageRadios("ClockHours", 2, clockChoices, clockRadios);
+        config->manageComboBox("Timezone", timezoneCombo, false);
         config->endGroup();
 
         // User Accounts step
-        config->beginGroup("User");
-        step = Step_User_Accounts;
-        lambdaSetLineEdit("Username", userNameEdit);
-        lambdaSetCheckBox("Autologin", autologinCheckBox);
-        lambdaSetCheckBox("SaveDesktop", saveDesktopCheckBox);
+        config->startGroup("User", Step_User_Accounts);
+        config->manageLineEdit("Username", userNameEdit);
+        config->manageCheckBox("Autologin", autologinCheckBox);
+        config->manageCheckBox("SaveDesktop", saveDesktopCheckBox);
         const char *oldHomeActionChoices[] = {"Nothing", "Use", "Save", "Delete"};
-        int ohaVal = lambdaSetEnum("OldHomeAction", 4, oldHomeActionChoices, oldHomeAction);
+        int ohaVal = config->manageEnum("OldHomeAction", 4, oldHomeActionChoices, oldHomeAction);
         if (ohaVal >= 0) oldHomeAction = static_cast<OldHomeAction>(ohaVal);
-        else step->setProperty("STUCK", true);
+        else config->markBadWidget(nullptr);
         if (mode != ConfigSave) {
             const QString &upass = config->value("UserPass").toString();
             userPasswordEdit->setText(upass);
@@ -733,7 +665,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->endGroup();
     }
 
-    if (stuck) {
+    if (config->bad) {
         // TODO: finalise failure method and use tr() here
         QMessageBox::critical(this, windowTitle(),
             "Invalid settings in loaded configuration file");
@@ -2472,7 +2404,7 @@ void MInstall::gotoPage(int next)
 
     // automatic installation
     if (automatic) {
-        if (!(widgetStack->currentWidget()->property("STUCK").toBool())
+        if (!MSettings::isBadWidget(widgetStack->currentWidget())
             && next > curr) nextButton->click();
         else automatic = false; // failed validation
     }
@@ -2912,8 +2844,8 @@ void MInstall::cleanup(bool endclean)
 
     if (endclean) {
         execute("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'", false);
+        config->dumpDebug();
         execute("cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
-        execute("cp /etc/minstall.conf /mnt/antiX/etc >/dev/null 2>&1", false);
         execute("rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
     execute("umount -l /mnt/antiX/boot/efi", true);
