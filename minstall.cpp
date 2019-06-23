@@ -40,7 +40,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
 
     brave = (args.contains("--brave"));
     pretend = (args.contains("--pretend") || args.contains("-p"));
-    automatic = (args.contains("--auto") || args.contains("-a"));
+    automatic = (args.contains("--auto"));
     nocopy = (args.contains("--nocopy") || args.contains("-n"));
     sync = (args.contains("--sync") || args.contains("-s"));
     if (pretend) listHomes = args; // dummy existing homes
