@@ -50,11 +50,13 @@ HEADERS += minstall.h \
     version.h \
     msettings.h \
     blockdev.h \
-    safecache.h
+    safecache.h \
+    mprocess.h
 SOURCES += app.cpp minstall.cpp \
     msettings.cpp \
     blockdev.cpp \
-    safecache.cpp
+    safecache.cpp \
+    mprocess.cpp
 LIBS +=
 CONFIG += release warn_on thread qt c++11
 
