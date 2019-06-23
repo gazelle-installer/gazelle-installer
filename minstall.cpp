@@ -185,7 +185,7 @@ void MInstall::startup()
 
     // Detect snapshot-backup account(s)
     // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
-    if (proc.exec("ls /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)
+    if (proc.exec("/bin/ls -1 /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)
         || proc.exec("test -d /live/linux/home/demo", true)) {
         haveSnapshotUserAccounts = true;
     }
