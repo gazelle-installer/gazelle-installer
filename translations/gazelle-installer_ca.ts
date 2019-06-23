@@ -26,7 +26,7 @@ Gaudiu usant %1</translation>
 %1 té el suport de persones com vosaltres. Alguns donen ajuda al fòrum de suport - %2, tradueixen fitxers d&apos;ajuda a diferents idiomes, fan suggeriments, escriuen documentació, o ajuden a provar el programari nou.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="292"/>
+        <location filename="../minstall.cpp" line="295"/>
         <source>Pretending to install %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -107,7 +107,7 @@ a longer password before proceeding.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="470"/>
+        <location filename="../minstall.cpp" line="471"/>
         <source>Preparing to install %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -124,192 +124,192 @@ Returning to Step 1.</source>
 Retornant al primer pas.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="482"/>
+        <location filename="../minstall.cpp" line="483"/>
         <source>Failed to format required partitions.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="493"/>
+        <location filename="../minstall.cpp" line="494"/>
         <source>Paused for required operator input</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="503"/>
+        <location filename="../minstall.cpp" line="504"/>
         <source>Setting system configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="520"/>
+        <location filename="../minstall.cpp" line="521"/>
         <source>Installation successful</source>
         <translation>Instal·lació acabada amb èxit </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="758"/>
+        <location filename="../minstall.cpp" line="709"/>
         <source>Setting up LUKS encrypted containers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="789"/>
+        <location filename="../minstall.cpp" line="740"/>
         <source>Formatting swap partition</source>
         <translation>Formatant la partició d&apos;intercanvi </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="796"/>
+        <location filename="../minstall.cpp" line="747"/>
         <source>Formatting the / (root) partition</source>
         <translation>Formatant la partició / (arrel) </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="807"/>
+        <location filename="../minstall.cpp" line="758"/>
         <source>Formatting boot partition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="813"/>
+        <location filename="../minstall.cpp" line="764"/>
         <source>Formatting EFI System Partition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="819"/>
+        <location filename="../minstall.cpp" line="770"/>
         <source>Formatting the /home partition</source>
         <translation>Formatant la partició /home </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="829"/>
+        <location filename="../minstall.cpp" line="780"/>
         <source>Mounting the /home partition</source>
         <translation>Muntant la partició /home </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="954"/>
+        <location filename="../minstall.cpp" line="905"/>
         <source>Sorry, could not create %1 LUKS partition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="970"/>
+        <location filename="../minstall.cpp" line="921"/>
         <source>Sorry, could not open %1 LUKS container</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="988"/>
+        <location filename="../minstall.cpp" line="937"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1002"/>
+        <location filename="../minstall.cpp" line="951"/>
         <source>You must choose a root partition.
 The root partition must be at least %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1028"/>
+        <location filename="../minstall.cpp" line="977"/>
         <source>Delete the data on %1 except for /home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1038"/>
+        <location filename="../minstall.cpp" line="987"/>
         <source>Reuse (no reformat) %1 as the /home partition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1058"/>
+        <location filename="../minstall.cpp" line="1007"/>
         <source>Configure %1 as swap space</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1074"/>
+        <location filename="../minstall.cpp" line="1023"/>
         <source>The partition you selected for /boot is larger than expected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1078"/>
+        <location filename="../minstall.cpp" line="1028"/>
         <source>%1 for the %2 partition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1081"/>
+        <location filename="../minstall.cpp" line="1031"/>
         <source>The following partitions you selected are not Linux partitions:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1089"/>
+        <location filename="../minstall.cpp" line="1039"/>
         <source>Are you sure you want to reformat these partitions?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1099"/>
+        <location filename="../minstall.cpp" line="1049"/>
         <source>The %1 installer will now format and destroy the data on the following partitions:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1107"/>
+        <location filename="../minstall.cpp" line="1057"/>
         <source>The %1 installer will now perform the following actions:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1111"/>
+        <location filename="../minstall.cpp" line="1061"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1295"/>
+        <location filename="../minstall.cpp" line="1246"/>
         <source>Creating required partitions</source>
         <translation>Creant les particions necessàries </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1299"/>
+        <location filename="../minstall.cpp" line="1250"/>
         <source>Preparing required partitions</source>
         <translation>Preparant les particions adients </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1363"/>
+        <location filename="../minstall.cpp" line="1314"/>
         <source>Mounting the / (root) partition</source>
         <translation>Muntant la partició / (arrel) </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1366"/>
+        <location filename="../minstall.cpp" line="1317"/>
         <source>Deleting old system</source>
         <translation>Esborrant el sistema antic </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1370"/>
+        <location filename="../minstall.cpp" line="1321"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
         <translation>Ha fallat en esborrar l&apos;antic %1 a la destinació.
 Retornant al primer pas.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1377"/>
+        <location filename="../minstall.cpp" line="1328"/>
         <source>Creating system directories</source>
         <translation>Creant els directoris de sistema </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1515"/>
+        <location filename="../minstall.cpp" line="1466"/>
         <source>Copying new system</source>
         <translation>Copiant el nou sistema </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1565"/>
+        <location filename="../minstall.cpp" line="1516"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Ha fallat en escriure %1 a la destinació.
 Retornant al primer pas.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1396"/>
+        <location filename="../minstall.cpp" line="1347"/>
         <source>Fixing configuration</source>
         <translation>Arranjant la configuració</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1582"/>
+        <location filename="../minstall.cpp" line="1533"/>
         <source>Installing GRUB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1641"/>
+        <location filename="../minstall.cpp" line="1592"/>
         <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1656"/>
+        <location filename="../minstall.cpp" line="1607"/>
         <source>NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -328,12 +328,12 @@ you&apos;ll have to select a different username.</source>
 Abans de continuar, cal que trieu un nom d&apos;usuari diferent.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1868"/>
+        <location filename="../minstall.cpp" line="1819"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Ho sento, ha fallat la creació del directori d&apos;usuari. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1873"/>
+        <location filename="../minstall.cpp" line="1824"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Ho sento, ha fallat en nomenar el directori d&apos;usuari.</translation>
     </message>
@@ -342,7 +342,7 @@ Abans de continuar, cal que trieu un nom d&apos;usuari diferent.</translation>
         <translation type="vanished">Ho sento, no s&apos;han pogut desar els canvis a l&apos;escriptori.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1905"/>
+        <location filename="../minstall.cpp" line="1856"/>
         <source>Sorry, failed to set ownership of user directory.</source>
         <translation>Ho sento, ha fallat en establir la propietat del directori d&apos;usuari.</translation>
     </message>
@@ -355,40 +355,40 @@ Abans de continuar, cal que trieu un nom d&apos;usuari diferent.</translation>
         <translation type="vanished">Ho sento, no puc establir la contrasenya d&apos;usuari.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1751"/>
+        <location filename="../minstall.cpp" line="1702"/>
         <source>Please enter a user name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1755"/>
+        <location filename="../minstall.cpp" line="1706"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1766"/>
+        <location filename="../minstall.cpp" line="1717"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1775"/>
+        <location filename="../minstall.cpp" line="1726"/>
         <source>Please enter the user password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1781"/>
+        <location filename="../minstall.cpp" line="1732"/>
         <source>Please enter the root password.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1787"/>
+        <location filename="../minstall.cpp" line="1738"/>
         <source>The user password entries do not match.
 Please try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1794"/>
+        <location filename="../minstall.cpp" line="1745"/>
         <source>The root password entries do not match.
 Please try again.</source>
         <translation type="unfinished"></translation>
@@ -414,346 +414,346 @@ Before proceeding, you&apos;ll have to select a different username.</source>
 Abans de continuar, cal que trieu un nom d&apos;usuari diferent. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1945"/>
+        <location filename="../minstall.cpp" line="1896"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1955"/>
+        <location filename="../minstall.cpp" line="1906"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2172"/>
+        <location filename="../minstall.cpp" line="2123"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
         <translation>D&apos;acord en formatar i usar el disc sencer (%1) per %2?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2186"/>
+        <location filename="../minstall.cpp" line="2139"/>
         <source>The data in /home cannot be preserved because the required information could not be obtained.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2187"/>
+        <location filename="../minstall.cpp" line="2140"/>
         <source>If the partition containing /home is encrypted, please ensure the correct &quot;Encrypt&quot; boxes are selected, and that the entered password is correct.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2188"/>
+        <location filename="../minstall.cpp" line="2141"/>
         <source>The installer cannot encrypt an existing /home directory or partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2230"/>
+        <location filename="../minstall.cpp" line="2183"/>
         <source>&lt;p&gt;&lt;b&gt;General Instructions&lt;/b&gt;&lt;br/&gt;BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.&lt;/p&gt;&lt;p&gt;On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.&lt;/p&gt;&lt;p&gt;Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions. &lt;/p&gt;&lt;p&gt;If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.&lt;/p&gt;&lt;p&gt;The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Instruccions generals&lt;/b&gt;&lt;br/&gt;ABANS DE CONTINUAR, TANQUEU TOTES LES ALTRES APLICACIONS.&lt;/p&gt;&lt;p&gt;A cada pàgina, si us plau llegiu les instruccions, feu la vostra elecció, i llavors cliqueu a Següent quan esteu a punt per continuar.  Se us demanarà confirmació abans abans de fer qualsevol acció destructiva.&lt;/p&gt;&lt;p&gt;La instal·lació necessita al voltant de %1 d&apos;espai. Preferible tenir-ne %2 o més. Es pot usar el disc sencer o instal·lar en les particions existents. &lt;/p&gt;&lt;p&gt;Si esteu usant Mac OS o Windows (de Vista endavant), podeu haver d&apos;usar les eines d&apos;aquests sistemes per ajustar les particions i el gestor d&apos;arrencada abans d&apos;instal·lar.&lt;/p&gt;&lt;p&gt;Els sistemes de fitxers Linux ext2, ext3, ext4, jfs, xfs, btrfs i reiserfs tenen suport; es recomana ext4 &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2236"/>
+        <location filename="../minstall.cpp" line="2189"/>
         <source>&lt;p&gt;Autoinstall will place home on the root partition.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2237"/>
-        <location filename="../minstall.cpp" line="2262"/>
+        <location filename="../minstall.cpp" line="2190"/>
+        <location filename="../minstall.cpp" line="2215"/>
         <source>&lt;p&gt;&lt;b&gt;Encryption&lt;/b&gt;&lt;br/&gt;Encryption is possible via LUKS.  A password is required (8 characters minimum length)&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2238"/>
-        <location filename="../minstall.cpp" line="2263"/>
+        <location filename="../minstall.cpp" line="2191"/>
+        <location filename="../minstall.cpp" line="2216"/>
         <source>&lt;p&gt;A separate unencrypted boot partition is required. For additional settings including cipher selection, use the &lt;b&gt;Edit advanced encryption settings&lt;/b&gt; button.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2239"/>
+        <location filename="../minstall.cpp" line="2192"/>
         <source>&lt;p&gt;When encryption is used with autoinstall, the separate boot partition will be automatically created&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2251"/>
+        <location filename="../minstall.cpp" line="2204"/>
         <source>&lt;p&gt;&lt;b&gt;Limitations&lt;/b&gt;&lt;br/&gt;Remember, this software is provided AS-IS with no warranty what-so-ever. It&apos;s solely your responsibility to backup your data before proceeding.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Choose Partitions&lt;/b&gt;&lt;br/&gt;%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.&lt;/p&gt;&lt;p&gt;If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Upgrading&lt;/b&gt;&lt;br/&gt;To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.&lt;/p&gt;&lt;p&gt;If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Preferred Filesystem Type&lt;/b&gt;&lt;br/&gt;For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. &lt;/p&gt;&lt;p&gt;Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Bad Blocks&lt;/b&gt;&lt;br/&gt;If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Limitacions&lt;/b&gt;&lt;br/&gt;Recordeu que aquest programari se subministra TAL QUAL, sense garantia de cap mena. És la vostra responsabilitat fer còpia de seguretat de les dades abans de procedir.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Selecció de Particions&lt;/b&gt;&lt;br/&gt;%1 necessita una partició arrel. La partició d&apos;intercanvi (swap) és opcional però molt recomanable. Si voleu usar la funció de suspensió al disc de %1, cal una partició més gran que la mida de la vostra memòria física.&lt;/p&gt;&lt;p&gt;Si trieu una partició /home separada, us resultarà més fàcil d&apos;actualitzar en el futur, però això no és possible si esteu actualitzant des d&apos;una instal·lació que no tingui una partició d&apos;usuari (home) separada.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Actualització&lt;/b&gt;&lt;br/&gt;Per actualitzar una instal·lació Linux existent, seleccioneu la mateixa partició d&apos;abans i trieu l&apos;opció de preservar les dades a /home.&lt;/p&gt;&lt;p&gt;Si preserveu l&apos;arbre de directoris /home a la partició arrel, l&apos;instal·lador no reformatarà la partició arrel. En conseqüència, la instal·lació trigarà molt més de l&apos;habitual. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Sistema de fitxers preferit&lt;/b&gt;&lt;br/&gt;Per %1, podeu triar de formatar les particions com a ext2, ext3, ext4, jfs, xfs, btrfs o reiser. &lt;/p&gt;&lt;p&gt;Hi ha opcions de compressió addicionals usant btrfs. Lzo és ràpid, però la compressió és menor. Zlib és més lent, amb millor compressió.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Blocs dolents&lt;/b&gt;&lt;br/&gt;Si trieu els tipus de format ext2, ext3 o ext4, teniu l&apos;opció de comprovar i corregir els blocs dolents del disc. La comprovació de blocs dolents necessita molt temps, o sigui que potser voleu saltar aquesta etapa,llevat que sospiteu que el vostre disc té blocs defectuosos.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2269"/>
+        <location filename="../minstall.cpp" line="2222"/>
         <source>Advanced Encryption Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2269"/>
+        <location filename="../minstall.cpp" line="2222"/>
         <source>This page allows fine-tuning of LUKS encrypted partitions.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2270"/>
+        <location filename="../minstall.cpp" line="2223"/>
         <source>In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2272"/>
+        <location filename="../minstall.cpp" line="2225"/>
         <source>This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2273"/>
+        <location filename="../minstall.cpp" line="2226"/>
         <source>Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2274"/>
+        <location filename="../minstall.cpp" line="2227"/>
         <source>Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2275"/>
+        <location filename="../minstall.cpp" line="2228"/>
         <source>Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2277"/>
+        <location filename="../minstall.cpp" line="2230"/>
         <source>You can use the &lt;b&gt;Benchmark&lt;/b&gt; button (which runs &lt;i&gt;cryptsetup benchmark&lt;/i&gt; in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2278"/>
+        <location filename="../minstall.cpp" line="2231"/>
         <source>Please note that &lt;i&gt;cryptsetup benchmark&lt;/i&gt; does not cover all the combinations or selections possible, and generally covers the most commonly used selections.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2280"/>
+        <location filename="../minstall.cpp" line="2233"/>
         <source>Cipher</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2280"/>
+        <location filename="../minstall.cpp" line="2233"/>
         <source>A variety of ciphers are available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2281"/>
+        <location filename="../minstall.cpp" line="2234"/>
         <source>was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2282"/>
+        <location filename="../minstall.cpp" line="2235"/>
         <source>(also known as &lt;i&gt;Rijndael&lt;/i&gt;) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2283"/>
+        <location filename="../minstall.cpp" line="2236"/>
         <source>is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2284"/>
+        <location filename="../minstall.cpp" line="2237"/>
         <source>(CAST-256) was a candidate in the AES contest, however it did not become a finalist.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2285"/>
+        <location filename="../minstall.cpp" line="2238"/>
         <source>is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2287"/>
+        <location filename="../minstall.cpp" line="2240"/>
         <source>Chain mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2287"/>
+        <location filename="../minstall.cpp" line="2240"/>
         <source>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2288"/>
+        <location filename="../minstall.cpp" line="2241"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2289"/>
+        <location filename="../minstall.cpp" line="2242"/>
         <source>(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2290"/>
+        <location filename="../minstall.cpp" line="2243"/>
         <source>(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2292"/>
+        <location filename="../minstall.cpp" line="2245"/>
         <source>IV generator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2292"/>
+        <location filename="../minstall.cpp" line="2245"/>
         <source>For XTS and CBC, this selects how the &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector is generated. &lt;b&gt;ESSIV&lt;/b&gt; requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2293"/>
+        <location filename="../minstall.cpp" line="2246"/>
         <source>ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2295"/>
+        <location filename="../minstall.cpp" line="2248"/>
         <source>Key size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2295"/>
+        <location filename="../minstall.cpp" line="2248"/>
         <source>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2296"/>
+        <location filename="../minstall.cpp" line="2249"/>
         <source>The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2298"/>
+        <location filename="../minstall.cpp" line="2251"/>
         <source>LUKS key hash</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2298"/>
+        <location filename="../minstall.cpp" line="2251"/>
         <source>The hash used for PBKDF2 and for the AF splitter.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2299"/>
+        <location filename="../minstall.cpp" line="2252"/>
         <source>SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2301"/>
+        <location filename="../minstall.cpp" line="2254"/>
         <source>Kernel RNG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2301"/>
+        <location filename="../minstall.cpp" line="2254"/>
         <source>Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2302"/>
+        <location filename="../minstall.cpp" line="2255"/>
         <source>Two options are available: /dev/&lt;b&gt;random&lt;/b&gt; which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/&lt;b&gt;urandom&lt;/b&gt; which will not block even if there is insufficient entropy (possibly weaker keys).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2304"/>
+        <location filename="../minstall.cpp" line="2257"/>
         <source>KDF round time&lt;/b&gt;&lt;br/&gt;The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2305"/>
+        <location filename="../minstall.cpp" line="2258"/>
         <source>A value of 0 selects the compiled-in default (run &lt;i&gt;cryptsetup --help&lt;/i&gt; for details).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2306"/>
+        <location filename="../minstall.cpp" line="2259"/>
         <source>If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2363"/>
+        <location filename="../minstall.cpp" line="2312"/>
         <source>Installation in Progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2366"/>
+        <location filename="../minstall.cpp" line="2315"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2368"/>
+        <location filename="../minstall.cpp" line="2317"/>
         <source>Change settings while you wait</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2369"/>
+        <location filename="../minstall.cpp" line="2318"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2371"/>
+        <location filename="../minstall.cpp" line="2320"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2311"/>
+        <location filename="../minstall.cpp" line="2264"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2330"/>
+        <location filename="../minstall.cpp" line="2279"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Serveis Comuns a activar&lt;/b&gt;&lt;br/&gt;seleccioneu els serveis comuns que podeu necessitar en la vostra configuració de sistema i aquests serveis s&apos;engegaran automàticament en arrencar %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2334"/>
+        <location filename="../minstall.cpp" line="2283"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Identitat de l&apos;ordinador&lt;/b&gt;&lt;br/&gt;El nom de l&apos;ordinador és un nom únic que identifica el vostre ordinador quan forma part d&apos;una xarxa. El domini de l&apos;ordinador és improbable que sigui obligatori llevat que el vostre proveïdor d&apos;Internet (ISP) o bé la xarxa local ho necessitin.&lt;/p&gt;&lt;p&gt;Els noms d&apos;equip i de domini poden contenir només caràcters alfanumèrics, punts, i guionets. No poden contenir espais en blanc, començar o acabar amb guionets.&lt;/p&gt;&lt;p&gt;Cal activar el servidor SaMBa si voleu compartir els vostres directoris o impressores amb un ordinador local que usi MS-Windows o Mac OSX.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2342"/>
+        <location filename="../minstall.cpp" line="2291"/>
         <source>&lt;p&gt;&lt;b&gt;Localization Defaults&lt;/b&gt;&lt;br/&gt;Set the default keyboard and locale. These will apply unless they are overridden later by the user.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configure Clock&lt;/b&gt;&lt;br/&gt;If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for &apos;System clock uses LOCAL.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Timezone Settings&lt;/b&gt;&lt;br/&gt;The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Service Settings&lt;/b&gt;&lt;br/&gt;Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! </source>
         <translation>&lt;p&gt;&lt;b&gt;Localització per omissió&lt;/b&gt;&lt;br/&gt;Definiu el teclat per omissió i el &lt;i&gt;locale&lt;/i&gt;.  Aquests s&apos;aplicaran tot seguit, però es poden canviar més endavant per l&apos;usuari.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configuració del Rellotge&lt;/b&gt;&lt;br/&gt;Si teniu un ordinador Apple o un sistema Unix pur, per omissió el rellotge del sistema s&apos;estableix en hora GMT &lt;i&gt;Greenwich Mean Time&lt;/i&gt; o UT &lt;i&gt;Universal Time&lt;/i&gt;.  Per canviar-lo, marqueu la casella de &apos;Rellotge de Sistema en LOCAL&apos;.&lt;/p&gt;El sistema arrenca amb la zona horària GMT/UTC per omissió. Per canviar la zona horària, un cop heu arrencat amb la nova instal·lació, feu clic amb el botó dret del ratolí sobre el rellotge del plafó i trieu Propietats.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Configuració de Serveis&lt;/b&gt;&lt;br/&gt;Normalment no cal canviar la configuració per omissió. Els usuaris amb ordinadors de poca capacitat a vegades poden desactivar alguns serveis innecessaris, per tal de minimitzar l&apos;ús de la RAM. Assegureu-vos, però, de saber el que esteu fent! </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2349"/>
+        <location filename="../minstall.cpp" line="2298"/>
         <source>&lt;p&gt;&lt;b&gt;Default User Login&lt;/b&gt;&lt;br/&gt;The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwords&lt;/b&gt;&lt;br/&gt;Enter a new password for your default user account and for the root account. Each password must be entered twice.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Entrada d&apos;usuari per omissió&lt;/b&gt;&lt;br/&gt;L&apos;usuari principal (root) és semblant a l&apos;usuari administrador en altres Sistemes Operatius. No hauríeu d&apos;usar l&apos;usuari principal com a usuari habitual. Si us plau, entreu el nom per a un compte d&apos;usuari nou que s&apos;utilitzarà diàriament. Si cal, podeu crear altres comptes d&apos;usuari més endavant amb %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Contrasenyes&lt;/b&gt;&lt;br/&gt;Entreu una nova contrasenya per al vostre usuari per omissió i per a l&apos;usuari pricipal (root). Cada contrasenya s&apos;ha d&apos;entrar dos cops.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2384"/>
+        <location filename="../minstall.cpp" line="2329"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Enhorabona!&lt;/b&gt;&lt;br/&gt;Heu acomplert la instal·lació de %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Trobar Aplicacions&lt;/b&gt;&lt;br/&gt;Ja hi ha centenars d&apos;aplicacions instal·lades a %1 . La millor manera de familiaritzar-s&apos;hi és fullejar el Menú i provar-les. Moltes de les aplicacions s&apos;han desenvolupat especialment per al projecte %1. Aquestes es mostren als menús principals.&lt;p&gt;Però a més,  %1 inclou moltes aplicacions estàndard de Linux que s&apos;executen des de la línia d&apos;ordres i, per tant, no surten al Menú.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2394"/>
+        <location filename="../minstall.cpp" line="2339"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
         <translation>Gaudiu usant %1&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2394"/>
-        <location filename="../minstall.cpp" line="2935"/>
+        <location filename="../minstall.cpp" line="2339"/>
+        <location filename="../minstall.cpp" line="2896"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Suport de %1&lt;/b&gt;&lt;br/&gt;%1 té el suport de persones com vosaltres. Uns n&apos;ajuden altres al fòrum d&apos;ajuda (%2), tradueixen fitxers d&apos;ajuda a diversos idiomes, fan suggeriments, escriuen documentació o proven el programari nou.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2435"/>
+        <location filename="../minstall.cpp" line="2380"/>
         <source>Next</source>
         <translation>Següent</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2429"/>
+        <location filename="../minstall.cpp" line="2374"/>
         <source>Finish</source>
         <translation>Acaba</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2467"/>
+        <location filename="../minstall.cpp" line="2427"/>
         <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2855"/>
+        <location filename="../minstall.cpp" line="2815"/>
         <source>Confirmation</source>
         <translation>Confirmació</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2856"/>
+        <location filename="../minstall.cpp" line="2816"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>No s&apos;ha acabat la instal·lació i configuració.
 De debò voleu aturar-la ara?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1558"/>
+        <location filename="../minstall.cpp" line="1509"/>
         <source>Copy progress unknown. No file system statistics.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -763,108 +763,108 @@ De debò voleu aturar-la ara?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1805"/>
+        <location filename="../minstall.cpp" line="1756"/>
         <source>The home directory for %1 already exists.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1806"/>
+        <location filename="../minstall.cpp" line="1757"/>
         <source>What would you like to do with the old directory?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1807"/>
+        <location filename="../minstall.cpp" line="1758"/>
         <source>Reuse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1808"/>
+        <location filename="../minstall.cpp" line="1759"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1809"/>
+        <location filename="../minstall.cpp" line="1760"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1832"/>
+        <location filename="../minstall.cpp" line="1783"/>
         <source>Failed to set user account passwords.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1851"/>
+        <location filename="../minstall.cpp" line="1802"/>
         <source>Failed to save old home directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1858"/>
+        <location filename="../minstall.cpp" line="1809"/>
         <source>Failed to delete old home directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1941"/>
+        <location filename="../minstall.cpp" line="1892"/>
         <source>Please enter a computer name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1951"/>
+        <location filename="../minstall.cpp" line="1902"/>
         <source>Please enter a domain name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1962"/>
+        <location filename="../minstall.cpp" line="1913"/>
         <source>Please enter a workgroup.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2364"/>
+        <location filename="../minstall.cpp" line="2313"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2921"/>
+        <location filename="../minstall.cpp" line="2882"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Obtenir Ajuda&lt;/b&gt;&lt;br/&gt;La informació bàsica quant a %1 està a %2.&lt;/p&gt;&lt;p&gt;Trobareu voluntaris per ajudar-vos al fòrum de %3 , %4&lt;/p&gt;&lt;p&gt;Si demaneu ajuda, si us plau recordeu-vos de descriure en detall l&apos;ordinador i el vostre problema. Normalment frases com &apos;No funciona&apos; no ajuden gens. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2929"/>
+        <location filename="../minstall.cpp" line="2890"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Reparar la instal·lació&lt;/b&gt;&lt;br/&gt;Si %1 deixa de funcionar des del disc dur, a vegades es pot arreglar arrencant des del DVD Autònom o Live USB i executant alguna de les utilitats incorporades a %1 o bé usant una de les eines clàssiques de Linux per reparar el sistema.&lt;/p&gt;&lt;p&gt;Fins i tot podeu usar el vostre DVD Autònom o Live USB de %1 per recuperar dades dels sistemes MS-Windows!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2942"/>
+        <location filename="../minstall.cpp" line="2903"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ajustatges del mesclador de so&lt;/b&gt;&lt;br/&gt; %1 prova de configurar el mesclador de so per vosaltres, però a vegades us serà necessari pujar el volum o desenmudir canals al mesclador per escoltar so.&lt;/p&gt; &lt;p&gt;Trobareu la drecera del mesclador al menú. Cliqueu-hi per obrir el mesclador. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2950"/>
+        <location filename="../minstall.cpp" line="2911"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Mantingueu la vostra còpia de %1 al dia&lt;/b&gt;&lt;br/&gt;Per més informació i actualitzacions podeu visitar &lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2955"/>
+        <location filename="../minstall.cpp" line="2916"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Agraïments&lt;/b&gt;&lt;br/&gt;Gràcies a tothom que ha triat donar suport a  %1 amb el seu temps, diners, suggeriments, treball, lloances, idees, promoció i/o ànims.&lt;/p&gt;&lt;p&gt;Sense vosaltres no hi hauria %1.&lt;/p&gt;&lt;p&gt;L&apos;Equip de Desenvolupament de %2.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3136"/>
+        <location filename="../minstall.cpp" line="3098"/>
         <source>This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2433"/>
+        <location filename="../minstall.cpp" line="2378"/>
         <source>OK</source>
         <translation>D&apos;acord</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3289"/>
+        <location filename="../minstall.cpp" line="3252"/>
         <source>System boot disk:</source>
         <translation>Disc d&apos;arrencada: </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3302"/>
-        <location filename="../minstall.cpp" line="3311"/>
+        <location filename="../minstall.cpp" line="3265"/>
+        <location filename="../minstall.cpp" line="3274"/>
         <source>Partition to use:</source>
         <translation type="unfinished"></translation>
     </message>
