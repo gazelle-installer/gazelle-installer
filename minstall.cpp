@@ -177,6 +177,12 @@ void MInstall::startup()
     }
     localeCombo->setCurrentIndex(iloc);
 
+    // if it looks like an apple...
+    if (proc.exec("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
+        mactest = true;
+        localClockCheckBox->setChecked(true);
+    }
+
     // Detect snapshot-backup account(s)
     // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
     if (proc.exec("ls /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)
@@ -1190,7 +1196,8 @@ bool MInstall::makePartitions()
         } else if (size < 0){
             // command to set the partition type
             QString cmd;
-            if (isGpt("/dev/" + devsplit.at(0))) {
+            const int ixdev = listBlkDevs.findDevice(devsplit.at(0));
+            if (ixdev >= 0 && listBlkDevs.at(ixdev).isGPT) {
                 cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
             } else {
                 cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
@@ -1512,9 +1519,11 @@ bool MInstall::installLoader()
     }
 
     //add switch to change root partition info
-    QString boot = "/dev/" + grubBootCombo->currentData().toString();
+    QString boot = grubBootCombo->currentData().toString();
+    const int ixboot = listBlkDevs.findDevice(boot);
+    boot.insert(0, "/dev/");
 
-    if (grubMbrButton->isChecked() && !isGpt(boot)) {
+    if (grubMbrButton->isChecked() && ixboot >= 0 && listBlkDevs.at(ixboot).isGPT) {
         QString part_num;
         if (bootDevice.startsWith(boot)) part_num = bootDevice;
         else if (rootDevice.startsWith(boot)) part_num = rootDevice;
@@ -1648,12 +1657,6 @@ bool MInstall::installLoader()
     }
 
     return true;
-}
-
-bool MInstall::isGpt(const QString &drv)
-{
-    QString cmd = QString("blkid %1 | grep -q PTTYPE=\\\"gpt\\\"").arg(drv);
-    return proc.exec(cmd, false);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -2393,6 +2396,11 @@ void MInstall::updatePartitionWidgets()
     diskCombo->clear();
     diskCombo->addItem(tr("Loading..."));
     buildBlockDevList();
+    if (mactest) {
+        for (BlockDeviceInfo &bdinfo : listBlkDevs) {
+            if (bdinfo.name.startsWith("sda")) bdinfo.isNasty = true;
+        }
+    }
 
     // disk combo box
     diskCombo->clear();
@@ -2505,13 +2513,8 @@ void MInstall::buildBlockDevList()
         bdinfo.isDisk = (bdsegs.at(0) == "disk");
         if (bdinfo.isDisk) {
             driveIndex = listBlkDevs.count();
-            gpt = isGpt("/dev/" + bdinfo.name);
-        } else {
-            // if it looks like an apple...
-            if (proc.exec("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
-                bdinfo.isNasty = true;
-                localClockCheckBox->setChecked(true);
-            }
+            const QString cmd("blkid /dev/%1 | grep -q PTTYPE=\\\"gpt\\\"");
+            gpt = proc.exec(cmd.arg(bdinfo.name), false);
         }
         bdinfo.isGPT = gpt;
 
