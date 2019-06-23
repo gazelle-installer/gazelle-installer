@@ -211,7 +211,6 @@ private:
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
     void updatePartitionCombos(QComboBox *changed);
-    void buildBlockDevList();
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
     bool validateChosenPartitions();
