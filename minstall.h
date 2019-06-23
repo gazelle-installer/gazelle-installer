@@ -26,17 +26,9 @@
 
 #include "msettings.h"
 #include "blockdev.h"
+#include "safecache.h"
 
 #include "ui_meinstall.h"
-
-class SafeCache : public QByteArray {
-public:
-    SafeCache();
-    ~SafeCache();
-    bool load(const char *filename, int length);
-    bool save(const char *filename, mode_t mode = 0400);
-    void erase();
-};
 
 class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
