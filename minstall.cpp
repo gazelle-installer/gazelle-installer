@@ -1259,7 +1259,7 @@ bool MInstall::saveHomeBasic()
     }
 
     // store a listing of /home to compare with the user name given later
-    listHomes = proc.execOutLines("ls -1 /mnt/antiX/home/");
+    listHomes = proc.execOutLines("/bin/ls -1 /mnt/antiX/home/");
     // recycle the old key for /home if possible
     key.load("/mnt/antiX/root/keyfile", -1);
 
@@ -1506,7 +1506,7 @@ bool MInstall::installLoader()
     const QString &statup = tr("Installing GRUB");
     updateStatus(statup);
     QString cmd;
-    QString val = proc.execOut("ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
+    QString val = proc.execOut("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
     // the old initrd is not valid for this hardware
     if (!val.isEmpty()) {
