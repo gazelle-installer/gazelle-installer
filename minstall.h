@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <dirent.h>
 
+#include "mprocess.h"
 #include "msettings.h"
 #include "blockdev.h"
 #include "safecache.h"
@@ -45,10 +46,8 @@ public:
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
     void csleep(int msec);
-    QStringList getCmdOuts(const QString &cmd);
 
     bool isInsideVB();
-    bool isGpt(const QString &drv);
 
     bool checkDisk();
     bool installLoader();
@@ -147,7 +146,7 @@ private slots:
     void on_progressBar_valueChanged(int value);
 
 private:
-    QProcess *proc;
+    MProcess proc;
     int phase = 0;
 
     // command line options
@@ -161,6 +160,7 @@ private:
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
     bool uefi = false;
+    bool mactest = false;
 
     // if these variables are non-zero then the installer formats the partition
     // if they are negative the installer formats an existing partition
@@ -205,15 +205,12 @@ private:
     // slots
     void startup();
     // helpers
-    bool execute(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
-    QString getCmdOut(const QString &cmd, bool everything = false);
     bool checkPassword(QLineEdit *passEdit);
     // private functions
     void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
     void updatePartitionCombos(QComboBox *changed);
-    void buildBlockDevList();
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
     bool validateChosenPartitions();
