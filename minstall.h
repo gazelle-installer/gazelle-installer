@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <dirent.h>
 
+#include "msettings.h"
 #include "ui_meinstall.h"
 
 class SafeCache : public QByteArray {
@@ -180,7 +181,7 @@ private:
     // command line options
     bool brave, pretend, automatic, nocopy, sync;
     // configuration management
-    QSettings *config = nullptr;
+    MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
 
     QString auto_mount;

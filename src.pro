@@ -47,8 +47,10 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_zh_TW.ts
 FORMS += meinstall.ui
 HEADERS += minstall.h \
-    version.h
-SOURCES += app.cpp minstall.cpp
+    version.h \
+    msettings.h
+SOURCES += app.cpp minstall.cpp \
+    msettings.cpp
 LIBS +=
 CONFIG += release warn_on thread qt c++11
 
