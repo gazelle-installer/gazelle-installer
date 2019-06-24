@@ -106,8 +106,18 @@ void BlockDeviceList::build(MProcess &proc)
         bdinfo.isGPT = gpt;
 
         const QString &uuid = bdsegs.at(2);
+        if (!bootUUID.isEmpty() && uuid == bootUUID) {
+            bdinfo.isBoot = true;
+            // propagate the boot flag across the entire drive
+            operator[](driveIndex).isBoot = true;
+            for (int ixi = driveIndex + 1; ixi < count(); ++ixi) {
+                BlockDeviceInfo &bdi = operator[](ixi);
+                if (bdi.isDisk) break;
+                bdi.isBoot = true;
+            }
+        }
+
         bdinfo.size = bdsegs.at(3).toLongLong();
-        bdinfo.isBoot = (!bootUUID.isEmpty() && uuid == bootUUID);
         if (segsize > 4) {
             const QString &seg4 = bdsegs.at(4);
             bdinfo.isESP = (seg4.count(rxESP) >= 1);
