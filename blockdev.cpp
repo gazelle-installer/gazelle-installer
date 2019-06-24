@@ -96,6 +96,8 @@ void BlockDeviceList::build(MProcess &proc)
         BlockDeviceInfo bdinfo;
         bdinfo.isFuture = false;
         bdinfo.isDisk = (bdsegs.at(0) == "disk");
+        bdinfo.name = bdsegs.at(1);
+
         if (bdinfo.isDisk) {
             driveIndex = count();
             const QString cmd("blkid /dev/%1 | grep -q PTTYPE=\\\"gpt\\\"");
@@ -103,9 +105,7 @@ void BlockDeviceList::build(MProcess &proc)
         }
         bdinfo.isGPT = gpt;
 
-        bdinfo.name = bdsegs.at(1);
         const QString &uuid = bdsegs.at(2);
-
         bdinfo.size = bdsegs.at(3).toLongLong();
         bdinfo.isBoot = (!bootUUID.isEmpty() && uuid == bootUUID);
         if (segsize > 4) {
