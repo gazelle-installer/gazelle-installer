@@ -3046,7 +3046,7 @@ void MInstall::on_spinFDEkeysize_valueChanged(int i)
 void MInstall::on_homeCombo_currentIndexChanged(const QString &text)
 {
     updatePartitionCombos(homeCombo);
-    if (!homeCombo->isEnabled() || text.isEmpty()) return;
+    if (text.isEmpty()) return;
     homeLabelEdit->setEnabled(text != "root");
     homeTypeCombo->setEnabled(text != "root");
     checkBoxEncryptHome->setEnabled(text != "root");
