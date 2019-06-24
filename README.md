@@ -17,7 +17,7 @@ in the installer.conf file of gazelle-installer-data.
 
 Services to show in the Services tab are also configurable through services.list, and Descriptions support localizations.
 
-For now the services tab supports sysVinit enable/disable actions. 
+Services tab supports sysVinit enable/disable actions and systemd systemctl enable/disable actions, depending on init system in use.
 
 See gazelle-installer-data services.list and installer.conf for instructions on configuration options.
 
