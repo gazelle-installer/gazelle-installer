@@ -380,36 +380,61 @@ bool MInstall::mountPartition(const QString dev, const QString point, const QStr
     return proc.exec(cmd);
 }
 
-// checks SMART status of the selected disk, returs false if it detects errors and user chooses to abort
-bool MInstall::checkDisk()
+// checks SMART status of the selected drives, returns false if it detects errors and user chooses to abort
+bool MInstall::checkTargetDrivesOK()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
-    QString msg;
-    int ans;
-    QString output;
 
-    QString drv = "/dev/" + (entireDiskButton->isChecked() ? diskCombo : rootCombo)->currentData().toString();
-    output = proc.execOut("smartctl -H " + drv + "|grep -w FAILED");
-    if (output.contains("FAILED")) {
-        msg = output + tr("\n\nThe disk with the partition you selected for installation is failing.\n\n") +
-                tr("You are strongly advised to abort.\n") +
-                tr("If unsure, please exit the Installer and run GSmartControl for more information.\n\n") +
-                tr("Do you want to abort the installation?");
-        ans = QMessageBox::critical(this, windowTitle(), msg,
-                                    QMessageBox::Yes, QMessageBox::No);
-        if (ans == QMessageBox::Yes) return false;
+    QString smartFail, smartWarn;
+    auto lambdaSMART = [this, &smartFail, &smartWarn](const QString &drv, const QString &purpose) -> void {
+        if (!proc.exec("smartctl -H /dev/" + drv, true)) {
+            smartFail += " - " + drv + " (" + purpose + ")\n";
+        } else {
+            const QString &output = proc.execOut("smartctl -A /dev/" + drv + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
+            if (!output.isEmpty()) {
+                smartWarn += " ---- " + drv + " (" + purpose + ") ---\n" + output + "\n\n";
+            }
+        }
+    };
+
+    if (entireDiskButton->isChecked()) {
+        lambdaSMART(diskCombo->currentData().toString(), tr("target drive"));
+    } else {
+        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+            if (bdinfo.isDisk) {
+                QStringList purposes;
+                if (bdinfo.name == rootCombo->currentData().toString()) purposes << "root";
+                if (bdinfo.name == homeCombo->currentData().toString()) purposes << "/home";
+                if (bdinfo.name == swapCombo->currentData().toString()) purposes << "swap";
+                if (bdinfo.name == bootCombo->currentData().toString()) purposes << "boot";
+                if (!purposes.isEmpty()) lambdaSMART(bdinfo.name, purposes.join(", "));
+            }
+        }
     }
-    else {
-        output = proc.execOut("smartctl -A " + drv + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
-        if (!output.isEmpty()) {
-            msg = tr("Smartmon tool output:\n\n") + output + "\n\n" +
-                    tr("The disk with the partition you selected for installation passes the S.M.A.R.T. monitor test (smartctl)\n") +
-                    tr("but the tests indicate it will have a higher than average failure rate in the upcoming year.\n") +
-                    tr("If unsure, please exit the Installer and run GSmartControl for more information.\n\n") +
-                    tr("Do you want to continue?");
+
+    QString msg;
+    if (!smartFail.isEmpty()) {
+        msg = tr("The disks with the partitions you selected for installation are failing:")
+              + "\n\n" + smartFail + "\n";
+    }
+    if (!smartWarn.isEmpty()) {
+        msg += tr("Smartmon tool output:") + "\n\n" + smartWarn
+               + tr("The disks with the partitions you selected for installation pass the SMART monitor test (smartctl),"
+                    " but the tests indicate it will have a higher than average failure rate in the near future.");
+    }
+    if (!msg.isEmpty()) {
+        int ans;
+        msg += tr("If unsure, please exit the Installer and run GSmartControl for more information.") + "\n\n";
+        if (!smartFail.isEmpty()) {
+            msg += tr("Do you want to abort the installation?");
+            ans = QMessageBox::critical(this, windowTitle(), msg,
+                      QMessageBox::Yes|QMessageBox::Default|QMessageBox::Escape, QMessageBox::No);
+            if (ans == QMessageBox::Yes) return false;
+        } else {
+            msg += tr("Do you want to continue?");
             ans = QMessageBox::warning(this, windowTitle(), msg,
-                                       QMessageBox::Yes, QMessageBox::No);
+                      QMessageBox::Yes|QMessageBox::Default, QMessageBox::No|QMessageBox::Escape);
             if (ans != QMessageBox::Yes) return false;
         }
     }
@@ -441,7 +466,7 @@ bool MInstall::processNextPhase()
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps
     if (phase == 0) { // no install started yet
         updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
-        if (!checkDisk()) return false;
+        if (!checkTargetDrivesOK()) return false;
         phase = 1; // installation.
 
         // cleanup previous mounts
