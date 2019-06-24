@@ -49,7 +49,7 @@ public:
 
     bool isInsideVB();
 
-    bool checkDisk();
+    bool checkTargetDrivesOK();
     bool installLoader();
     bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
