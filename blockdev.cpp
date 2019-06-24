@@ -95,10 +95,10 @@ void BlockDeviceList::build(MProcess &proc)
 
         BlockDeviceInfo bdinfo;
         bdinfo.isFuture = false;
-        bdinfo.isDisk = (bdsegs.at(0) == "disk");
+        bdinfo.isDrive = (bdsegs.at(0) == "disk");
         bdinfo.name = bdsegs.at(1);
 
-        if (bdinfo.isDisk) {
+        if (bdinfo.isDrive) {
             driveIndex = count();
             const QString cmd("blkid /dev/%1 | grep -q PTTYPE=\\\"gpt\\\"");
             gpt = proc.exec(cmd.arg(bdinfo.name), false);
@@ -112,7 +112,7 @@ void BlockDeviceList::build(MProcess &proc)
             operator[](driveIndex).isBoot = true;
             for (int ixi = driveIndex + 1; ixi < count(); ++ixi) {
                 BlockDeviceInfo &bdi = operator[](ixi);
-                if (bdi.isDisk) break;
+                if (bdi.isDrive) break;
                 bdi.isBoot = true;
             }
         }
@@ -128,7 +128,7 @@ void BlockDeviceList::build(MProcess &proc)
             bdinfo.isESP = bdinfo.isSwap = bdinfo.isNative = false;
         }
 
-        if (!bdinfo.isDisk && !bdinfo.isESP) {
+        if (!bdinfo.isDrive && !bdinfo.isESP) {
             // check the backup ESP detection list
             bdinfo.isESP = backup_list.contains(bdinfo.name);
         }
@@ -153,7 +153,7 @@ void BlockDeviceList::build(MProcess &proc)
     qDebug() << "Name Size Model FS | isDisk isGPT isBoot isESP isNative isSwap";
     for (const BlockDeviceInfo &bdi : *this) {
         qDebug() << bdi.name << bdi.size << bdi.model << bdi.fs << "|"
-                 << bdi.isDisk << bdi.isGPT << bdi.isBoot << bdi.isESP
+                 << bdi.isDrive << bdi.isGPT << bdi.isBoot << bdi.isESP
                  << bdi.isNative << bdi.isSwap;
     }
 }
