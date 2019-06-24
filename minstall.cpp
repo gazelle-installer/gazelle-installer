@@ -401,13 +401,16 @@ bool MInstall::checkTargetDrivesOK()
     if (entireDiskButton->isChecked()) {
         lambdaSMART(diskCombo->currentData().toString(), tr("target drive"));
     } else {
+        // this loop prevents the same drive being checked multiple times
         for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (bdinfo.isDisk) {
+            if (bdinfo.isDrive) {
+                // list everything this drive is used for
                 QStringList purposes;
                 if (bdinfo.name == rootCombo->currentData().toString()) purposes << "root";
                 if (bdinfo.name == homeCombo->currentData().toString()) purposes << "/home";
                 if (bdinfo.name == swapCombo->currentData().toString()) purposes << "swap";
                 if (bdinfo.name == bootCombo->currentData().toString()) purposes << "boot";
+                // if selected run the SMART tests
                 if (!purposes.isEmpty()) lambdaSMART(bdinfo.name, purposes.join(", "));
             }
         }
@@ -1107,7 +1110,7 @@ bool MInstall::calculateDefaultPartitions()
 
     // remove partitions from the list that belong to this drive
     const int ixRemoveBD = bdindex + 1;
-    while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs.at(ixRemoveBD).isDisk) {
+    while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs.at(ixRemoveBD).isDrive) {
         listToUnmount << listBlkDevs.at(ixRemoveBD).name;
         listBlkDevs.removeAt(ixRemoveBD);
     }
@@ -2430,7 +2433,7 @@ void MInstall::updatePartitionWidgets()
     // disk combo box
     diskCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDisk && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
+        if (bdinfo.isDrive && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
                 && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
             bdinfo.addToCombo(diskCombo);
         }
@@ -2442,7 +2445,7 @@ void MInstall::updatePartitionWidgets()
     existing_partitionsButton->hide();
     entireDiskButton->setChecked(true);
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!bdinfo.isDisk) {
+        if (!bdinfo.isDrive) {
             // found at least one partition
             existing_partitionsButton->show();
             existing_partitionsButton->setChecked(true);
@@ -2469,7 +2472,7 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
 
             // add each eligible partition that is not already selected elsewhere
             for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-                if (!bdinfo.isDisk && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
+                if (!bdinfo.isDrive && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
                         && !(rootCombo->currentText().startsWith(bdinfo.name))
                         && !(swapCombo->currentText().startsWith(bdinfo.name))
                         && !(homeCombo->currentText().startsWith(bdinfo.name))
@@ -3106,7 +3109,7 @@ void MInstall::on_grubMbrButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDisk) {
+        if (bdinfo.isDrive) {
             if (!bdinfo.isNasty || brave) bdinfo.addToCombo(grubBootCombo, true);
         }
     }
@@ -3117,7 +3120,7 @@ void MInstall::on_grubPbrButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!(bdinfo.isDisk || bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
+        if (!(bdinfo.isDrive || bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
                  && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
             // list only Linux partitions excluding crypto_LUKS partitions
             if (!bdinfo.isNasty || brave) bdinfo.addToCombo(grubBootCombo, true);
