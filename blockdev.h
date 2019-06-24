@@ -30,7 +30,7 @@ struct BlockDeviceInfo
     qint64 size;
     bool isFuture = false;
     bool isNasty = false;
-    bool isDisk = false;
+    bool isDrive = false;
     bool isGPT = false;
     bool isBoot = false;
     bool isESP = false;
