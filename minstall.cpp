@@ -512,6 +512,7 @@ bool MInstall::processNextPhase()
                 if (!setUserInfo()) return false;
             }
             manageConfig(ConfigSave);
+            config->dumpDebug();
             proc.exec("/bin/sync", true); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
         } else if (!pretendToInstall(progPhase23, 99)){
@@ -2708,7 +2709,6 @@ void MInstall::cleanup(bool endclean)
 
     if (endclean) {
         proc.exec("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'", false);
-        config->dumpDebug();
         proc.exec("/bin/cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
         proc.exec("/bin/rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
