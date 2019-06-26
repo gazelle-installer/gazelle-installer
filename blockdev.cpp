@@ -25,8 +25,8 @@
 // static function to split a device name into its drive and partition
 QStringList BlockDeviceInfo::split(const QString &devname)
 {
-    static const QRegularExpression rxdev1("^(?:/dev/)+(mmcblk.*|nvme.*)p([0-9]*)$");
-    static const QRegularExpression rxdev2("^(?:/dev/)+([a-z]*)([0-9]*)$");
+    const QRegularExpression rxdev1("^(?:/dev/)+(mmcblk.*|nvme.*)p([0-9]*)$");
+    const QRegularExpression rxdev2("^(?:/dev/)+([a-z]*)([0-9]*)$");
     QRegularExpressionMatch rxmatch(rxdev1.match(devname));
     if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
     QStringList list(rxmatch.capturedTexts());
@@ -37,7 +37,7 @@ QStringList BlockDeviceInfo::split(const QString &devname)
 // return block device info that is suitable for a combo box
 void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
 {
-    static const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
+    const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
     unsigned int isuffix = 0;
     qlonglong scalesize = size;
     while (scalesize >= 1024 && isuffix < sizeof(suffixes)) {
@@ -62,16 +62,16 @@ void BlockDeviceList::build(MProcess &proc)
     proc.exec("blkid -c /dev/null", true);
 
     // expressions for matching various partition types
-    static const QRegularExpression rxESP("^(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$");
-    static const QRegularExpression rxSwap("^(0x82|0657fd6d-a4ab-43c4-84e5-0933c84b4f4f)$");
-    static const QRegularExpression rxNative("^(0x83|0fc63daf-8483-4772-8e79-3d69d8477de4" // Linux data
-                                             "|0x82|0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" // Linux swap
-                                             "|44479540-f297-41b2-9af7-d131d5f0458a" // Linux /root x86
-                                             "|4f68bce3-e8cd-4db1-96e7-fbcaf984b709" // Linux /root x86-64
-                                             "|933ac7e1-2eb4-4f13-b844-0e14e2aef915)$"); // Linux /home
-    static const QRegularExpression rxWinLDM("^(0x42|5808c8aa-7e8f-42e0-85d2-e1e90434cfb3"
-                                             "|e3c9e316-0b5c-4db8-817d-f92df00215ae)$"); // Windows LDM
-    static const QRegularExpression rxNativeFS("^(btrfs|ext2|ext3|ext4|jfs|nilfs2|reiser4|reiserfs|ufs|xfs)$");
+    const QRegularExpression rxESP("^(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$");
+    const QRegularExpression rxSwap("^(0x82|0657fd6d-a4ab-43c4-84e5-0933c84b4f4f)$");
+    const QRegularExpression rxNative("^(0x83|0fc63daf-8483-4772-8e79-3d69d8477de4" // Linux data
+                                      "|0x82|0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" // Linux swap
+                                      "|44479540-f297-41b2-9af7-d131d5f0458a" // Linux /root x86
+                                      "|4f68bce3-e8cd-4db1-96e7-fbcaf984b709" // Linux /root x86-64
+                                      "|933ac7e1-2eb4-4f13-b844-0e14e2aef915)$"); // Linux /home
+    const QRegularExpression rxWinLDM("^(0x42|5808c8aa-7e8f-42e0-85d2-e1e90434cfb3"
+                                      "|e3c9e316-0b5c-4db8-817d-f92df00215ae)$"); // Windows LDM
+    const QRegularExpression rxNativeFS("^(btrfs|ext2|ext3|ext4|jfs|nilfs2|reiser4|reiserfs|ufs|xfs)$");
 
     QString bootUUID;
     if (QFile::exists("/live/config/initrd.out")) {

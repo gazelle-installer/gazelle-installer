@@ -462,7 +462,7 @@ bool MInstall::checkPassword(QLineEdit *passEdit)
 bool MInstall::processNextPhase()
 {
     widgetStack->setEnabled(true);
-    static const int progPhase23 = 94; // start of Phase 2/3 progress bar space
+    const int progPhase23 = 94; // start of Phase 2/3 progress bar space
     // Phase < 0 = install has been aborted (Phase -2 on close)
     if (phase < 0) return false;
     // Phase 0 = install not started yet, Phase 1 = install in progress
