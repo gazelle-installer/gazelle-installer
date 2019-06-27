@@ -532,7 +532,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
 {
     if (mode == ConfigSave) {
         delete config;
-        config = new MSettings("/mnt/antiX/etc/minstall.conf", this);
+        config = new MSettings("/.minstalled", this);
     }
     if (!config) return;
     config->bad = false;
@@ -668,10 +668,15 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->endGroup();
     }
 
+    if (mode == ConfigSave) {
+        config->sync();
+        proc.exec("/bin/cp /.minstalled /mnt/antiX/.minstall >/dev/null 2>&1", false);
+    }
+
     if (config->bad) {
-        // TODO: finalise failure method and use tr() here
         QMessageBox::critical(this, windowTitle(),
-            "Invalid settings in loaded configuration file");
+            tr("Invalid settings found in configuration file (%1)."
+               " Please review marked fields as you encounter them.").arg(config->fileName()));
     }
 }
 
