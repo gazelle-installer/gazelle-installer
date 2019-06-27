@@ -109,9 +109,21 @@ int main(int argc, char *argv[])
         }
     }
 
+    // config file
+    QString cfgfile("/.minstall");
+    int cfgindex = a.arguments().lastIndexOf("--config");
+    if (cfgindex >= 0 && cfgindex < (a.arguments().count() - 1)) {
+        const QString clicfgfile(a.arguments().at(cfgindex + 1));
+        if (QFile::exists(clicfgfile)) cfgfile = clicfgfile;
+        else {
+            QMessageBox::warning(0, QString::null,
+                QApplication::tr("Configuration file (%1) not found.").arg(clicfgfile));
+        }
+    }
+
     // main routine
     qDebug() << "Installer version:" << VERSION;
-    MInstall minstall(a.arguments());
+    MInstall minstall(a.arguments(), cfgfile);
     const QRect &geo = a.desktop()->availableGeometry(&minstall);
     minstall.move((geo.width()-minstall.width())/2, (geo.height()-minstall.height())/2);
     minstall.show();
@@ -152,8 +164,11 @@ void printHelp()
     printf("Here are some CLI options you can use. Please read the description carefully and be aware that these are experimental options.\n"
            "\n"
            "Usage: minstall [<options>]\n"
+           "       minstall [<options>] --config <config-file>\n"
            "\n"
            "Options:\n"
+           "  --config       Load a configuration file as specified by <config-file>.\n"
+           "                 By default (without this option) /.minstall is used.\n"
            "  --auto         Installs automatically using the configuration file (more information below).\n"
            "                 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.\n"
            "  --brave        Overrules sanity checks on partitions and drives, causing them to be displayed.\n"
@@ -165,9 +180,10 @@ void printHelp()
            "  -v --version   Show version information.\n"
            "\n"
            "Configuration File:\n"
-           "  If /etc/minstall.conf is present, the installer will load whatever configuration is stored inside.\n"
+           "  If /.minstall is present, the installer will load whatever configuration is stored inside.\n"
+           "  The use of -c or --config makes the installer load <config-file> instead.\n"
            "  This configuration can be used with --auto for an unattended installation.\n"
-           "  The installer automatically generates this file and saves two copies (/etc/install.conf and /mnt/antiX/var/log/minstall.conf).\n"
+           "  The installer creates (or overwrites) /.minstalled and saves a copy to /mnt/antiX/.minstall for future use.\n"
+           "  The installer will not write any passwords or ignored settings to the new configuration file.\n"
            "  Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.\n");
 }
-
