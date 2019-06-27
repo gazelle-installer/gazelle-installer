@@ -1560,7 +1560,7 @@ bool MInstall::installLoader()
         if (!part_num.isEmpty()) {
             // remove the non-digit part to get the number of the root partition
             part_num.remove(QRegularExpression("\\D+\\d*\\D+"));
-            proc.exec("parted -s " + boot + " set " + part_num + " boot on", true);
+            proc.exec("parted -s " + boot + " set " + part_num + " legacy_boot on", true);
         }
     }
 
