@@ -2114,6 +2114,19 @@ int MInstall::showPage(int curr, int next)
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
+            // HACK: Only support >=2TB if using UEFI or with custom partitions.
+            if (!uefi) {
+                const int bdindex = listBlkDevs.findDevice(diskCombo->currentData().toString());
+                if (bdindex >= 0 && listBlkDevs.at(bdindex).size >= (2048LL*1073741824LL)) {
+                    // No tr() here since this is likely to be temporary.
+                    QMessageBox::critical(this, windowTitle(),
+                        "The selected drive has a capacity of at least 2TB and must be formatted using GPT.\n"
+                        "The " + PROJECTNAME + " installer does not support this configuration on your system.\n"
+                        "Please select a different drive, or use a custom partition setup at your own risk.");
+                    return curr;
+                }
+            }
+
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
                 return curr;
             }
