@@ -15,6 +15,7 @@
 //   limitations under the License.
 //
 
+#include <cstdio>
 #include <unistd.h>
 
 #include <QApplication>
@@ -148,16 +149,25 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 // print CLI help info
 void printHelp()
 {
-    qDebug() << "Here are some CLI options you can use, please read the description carefully and be aware that these are experimental options\n";
-    qDebug() << "Usage: minstall [<options>]\n";
-    qDebug() << "Options:";
-    qDebug() << "  --auto         Installs automatically using the configuration file from /etc/minstall.conf\n"
-                "                 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically";
-    qDebug() << "  --brave        Overrules sanity check on partition, it can break things, use it only if you don't care about data on drive";
-    qDebug() << "  -n --nocopy    Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files";
-    qDebug() << "  -p --pretend   Test mode for GUI, you can advance to different screens without actially installing";
-    qDebug() << "  -s --sync      Installing with rsync instead of cp on custom partitioning\n"
-                "                 -- doesn't format /root and it doesn't work with encryption";
-    qDebug() << "  -v --version   Show version information";
+    printf("Here are some CLI options you can use. Please read the description carefully and be aware that these are experimental options.\n"
+           "\n"
+           "Usage: minstall [<options>]\n"
+           "\n"
+           "Options:\n"
+           "  --auto         Installs automatically using the configuration file (more information below).\n"
+           "                 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.\n"
+           "  --brave        Overrules sanity checks on partitions and drives, causing them to be displayed.\n"
+           "                 -- WARNING: this can break things, use it only if you don't care about data on drive.\n"
+           "  -n --nocopy    Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.\n"
+           "  -p --pretend   Test mode for GUI, you can advance to different screens without actially installing.\n"
+           "  -s --sync      Installing with rsync instead of cp on custom partitioning.\n"
+           "                 -- doesn't format /root and it doesn't work with encryption.\n"
+           "  -v --version   Show version information.\n"
+           "\n"
+           "Configuration File:\n"
+           "  If /etc/minstall.conf is present, the installer will load whatever configuration is stored inside.\n"
+           "  This configuration can be used with --auto for an unattended installation.\n"
+           "  The installer automatically generates this file and saves two copies (/etc/install.conf and /mnt/antiX/var/log/minstall.conf).\n"
+           "  Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.\n");
 }
 
