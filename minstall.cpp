@@ -2117,7 +2117,7 @@ int MInstall::showPage(int curr, int next)
             // HACK: Only support >=2TB if using UEFI or with custom partitions.
             if (!uefi) {
                 const int bdindex = listBlkDevs.findDevice(diskCombo->currentData().toString());
-                if (bdindex && listBlkDevs.at(bdindex).size >= (2048LL*1048576LL)) {
+                if (bdindex && listBlkDevs.at(bdindex).size >= (2048LL*1073741824LL)) {
                     // No tr() here since this is likely to be temporary.
                     QMessageBox::critical(this, windowTitle(),
                         "The selected drive has a capacity of at least 2TB and is not supported as the root installation drive."
