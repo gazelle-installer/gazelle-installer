@@ -389,8 +389,8 @@ bool MInstall::checkTargetDrivesOK()
     QString smartFail, smartWarn;
     auto lambdaSMART = [this, &smartFail, &smartWarn](const QString &drv, const QString &purpose) -> void {
         proc.exec("smartctl -H /dev/" + drv, true);
-        if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & (8|16)) {
-            // see smartctl(8) manual: EXIT STATUS (bits 3 and 4)
+        if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & 8) {
+            // see smartctl(8) manual: EXIT STATUS (Bit 3)
             smartFail += " - " + drv + " (" + purpose + ")\n";
         } else {
             const QString &output = proc.execOut("smartctl -A /dev/" + drv + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
