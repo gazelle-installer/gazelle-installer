@@ -2114,6 +2114,18 @@ int MInstall::showPage(int curr, int next)
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
+            // HACK: Only support >=2TB if using UEFI or with custom partitions.
+            if (!uefi) {
+                const int bdindex = listBlkDevs.findDevice(diskCombo->currentData().toString());
+                if (bdindex && listBlkDevs.at(bdindex).size >= (2048LL*1048576LL)) {
+                    // No tr() here since this is likely to be temporary.
+                    QMessageBox::critical(this, windowTitle(),
+                        "The selected drive has a capacity of at least 2TB and is not supported as the root installation drive."
+                        "Please select a different drive or use a custom partition setup.");
+                    return curr;
+                }
+            }
+
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
                 return curr;
             }
