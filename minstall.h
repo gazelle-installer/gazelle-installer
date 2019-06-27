@@ -84,13 +84,6 @@ public:
     QStringList ENABLE_SERVICES;
     bool REMOVE_NOSPLASH;
 
-    // global for now until boot combo box is sorted out
-    QString bootDevice;
-    QString swapDevice;
-    QString rootDevice;
-    QString homeDevice;
-    QString espDevice;
-
     int showPage(int curr, int next);
     void gotoPage(int next);
     void pageDisplayed(int next);
@@ -169,6 +162,13 @@ private:
     qint64 swapFormatSize = 0;
     qint64 bootFormatSize = 0;
     qint64 espFormatSize = 0;
+
+    QString bootDevice;
+    QString swapDevice;
+    QString rootDevice;
+    QString homeDevice;
+    QString espDevice;
+    QString biosGrubDevice;
 
     QWidget *nextFocus = nullptr;
     BlockDeviceList listBlkDevs;
