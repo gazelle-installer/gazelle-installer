@@ -40,7 +40,7 @@ protected:
     void reject();
 
 public:
-    MInstall(const QStringList &args, const QString &cfgfile = "/etc/minstall.conf");
+    MInstall(const QStringList &args, const QString &cfgfile);
     ~MInstall();
 
     // helpers
