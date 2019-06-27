@@ -388,7 +388,9 @@ bool MInstall::checkTargetDrivesOK()
 
     QString smartFail, smartWarn;
     auto lambdaSMART = [this, &smartFail, &smartWarn](const QString &drv, const QString &purpose) -> void {
-        if (!proc.exec("smartctl -H /dev/" + drv, true)) {
+        proc.exec("smartctl -H /dev/" + drv, true);
+        if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & (8|16)) {
+            // see smartctl(8) manual: EXIT STATUS (bits 3 and 4)
             smartFail += " - " + drv + " (" + purpose + ")\n";
         } else {
             const QString &output = proc.execOut("smartctl -A /dev/" + drv + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
@@ -1122,7 +1124,8 @@ bool MInstall::calculateDefaultPartitions()
 
     // calculate new partition sizes
     // get the total disk size
-    rootFormatSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
+    const qint64 driveSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
+    rootFormatSize = driveSize;
     rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
 
     // allocate space for ESP if booted from UEFI
@@ -1176,12 +1179,22 @@ bool MInstall::calculateDefaultPartitions()
         ++ixpart;
         return listBlkDevs[ixAddBD];
     };
+    // see if GPT needs to be used (either UEFI or >=2TB drive)
+    BlockDeviceInfo &bddrive = listBlkDevs[bdindex];
+    bddrive.isGPT = (uefi || driveSize >= 2097152);
+
     // add future partitions to the block device list and store new names
     if (uefi) {
+        // create an ESP if installing on a system with EFI
         BlockDeviceInfo &bdinfo = lambdaAddFutureBD(espFormatSize, "vfat");
         espDevice = "/dev/" + bdinfo.name;
         bdinfo.isNative = false;
         bdinfo.isESP = true;
+    } else if (bddrive.isGPT){
+        // create a bios_grub partition if using GPT on a non-EFI system
+        BlockDeviceInfo &bdinfo = lambdaAddFutureBD(1, QString());
+        biosGrubDevice = "/dev/" + bdinfo.name;
+        bdinfo.isNative = false;
     }
     if (!isRootEncrypted) bootDevice.clear();
     else bootDevice = "/dev/" + lambdaAddFutureBD(bootFormatSize, "ext4").name;
@@ -1242,17 +1255,22 @@ bool MInstall::makePartitions()
     qDebug() << "Swap:" << swapDevice << swapFormatSize;
     qDebug() << "Boot:" << bootDevice << bootFormatSize;
     qDebug() << "ESP:" << espDevice << espFormatSize;
+    qDebug() << "BIOS-GRUB:" << biosGrubDevice;
 
     if (entireDiskButton->isChecked()) {
         const QString &drv = diskCombo->currentData().toString();
         updateStatus(tr("Creating required partitions"));
         proc.exec(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
-        if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (uefi ? "gpt" : "msdos"))) return false;
+        const bool useGPT = listBlkDevs.at(listBlkDevs.findDevice(drv)).isGPT;
+        if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
     } else {
         updateStatus(tr("Preparing required partitions"));
     }
 
     // any new partitions they will appear in this order on the disk
+    if (!biosGrubDevice.isEmpty()) {
+        if (!lambdaPreparePart(biosGrubDevice, 1, "primary")) return false;
+    }
     if (!lambdaPreparePart(espDevice, espFormatSize, "ESP")) return false;
     if (!lambdaPreparePart(bootDevice, bootFormatSize, "primary")) return false;
     if (!lambdaPreparePart(rootDevice, rootFormatSize, "primary ext4")) return false;
@@ -1561,6 +1579,10 @@ bool MInstall::installLoader()
             // remove the non-digit part to get the number of the root partition
             part_num.remove(QRegularExpression("\\D+\\d*\\D+"));
             proc.exec("parted -s " + boot + " set " + part_num + " legacy_boot on", true);
+        }
+        if (!biosGrubDevice.isEmpty()) {
+            QStringList devsplit(BlockDeviceInfo::split(biosGrubDevice));
+            proc.exec("parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1) + " bios_grub on", true);
         }
     }
 
@@ -2114,24 +2136,19 @@ int MInstall::showPage(int curr, int next)
 
     if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
-            // HACK: Only support >=2TB if using UEFI or with custom partitions.
-            if (!uefi) {
-                const int bdindex = listBlkDevs.findDevice(diskCombo->currentData().toString());
-                if (bdindex >= 0 && listBlkDevs.at(bdindex).size >= (2048LL*1073741824LL)) {
-                    // No tr() here since this is likely to be temporary.
-                    QMessageBox::critical(this, windowTitle(),
-                        "The selected drive has a capacity of at least 2TB and must be formatted using GPT.\n"
-                        "The " + PROJECTNAME + " installer does not support this configuration on your system.\n"
-                        "Please select a different drive, or use a custom partition setup at your own risk.");
-                    return curr;
-                }
-            }
-
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
                 return curr;
             }
             if (!automatic) {
-                const QString msg = tr("OK to format and use the entire disk (%1) for %2?");
+                QString msg = tr("OK to format and use the entire disk (%1) for %2?");
+                if (!uefi) {
+                    const int bdindex = listBlkDevs.findDevice(diskCombo->currentData().toString());
+                    if (bdindex >= 0 && listBlkDevs.at(bdindex).size >= (2048LL*1073741824LL)) {
+                        msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
+                                           " On some systems, a GPT-formatted disk will not boot.");
+                        return curr;
+                    }
+                }
                 int ans = QMessageBox::warning(this, windowTitle(),
                                                msg.arg(diskCombo->currentData().toString(), PROJECTNAME),
                                                QMessageBox::Yes, QMessageBox::No);
