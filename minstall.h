@@ -143,7 +143,7 @@ private:
     int phase = 0;
 
     // command line options
-    bool brave, pretend, automatic, nocopy, sync;
+    bool brave, pretend, automatic, nocopy, sync, gptoverride;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
