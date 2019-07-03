@@ -38,11 +38,12 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     installBox->hide();
     gotoPage(0);
 
-    brave = (args.contains("--brave"));
+    brave = args.contains("--brave");
     pretend = (args.contains("--pretend") || args.contains("-p"));
-    automatic = (args.contains("--auto"));
+    automatic = args.contains("--auto");
     nocopy = (args.contains("--nocopy") || args.contains("-n"));
     sync = (args.contains("--sync") || args.contains("-s"));
+    gptoverride = args.contains("--gpt-override");
     if (pretend) listHomes = args; // dummy existing homes
 
     // setup system variables
@@ -1186,7 +1187,7 @@ bool MInstall::calculateDefaultPartitions()
     };
     // see if GPT needs to be used (either UEFI or >=2TB drive)
     BlockDeviceInfo &bddrive = listBlkDevs[bdindex];
-    bddrive.isGPT = (uefi || driveSize >= 2097152);
+    bddrive.isGPT = (uefi || driveSize >= 2097152 || gptoverride);
 
     // add future partitions to the block device list and store new names
     if (uefi) {
