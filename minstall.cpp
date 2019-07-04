@@ -2052,6 +2052,9 @@ void MInstall::setLocale()
         //mx systems
         proc.exec("sed -i '/data0=/c\\data0=%l:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
         proc.exec("sed -i '/data0=/c\\data0=%l:%M' /mnt/antiX/etc/skel/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
+        proc.exec("sed -i '/time_format=/c\\time_format=%l:%M' /home/demo/.config/xfce4/panel/datetime-1.rc", false);
+        proc.exec("sed -i '/time_format=/c\\time_format=%l:%M' /mnt/antiX/etc/skel/.config/xfce4/panel/datetime-1.rc", false);
+
         //antix systems
         proc.exec("sed -i 's/%H:%M/%l:%M/g' /mnt/antiX/etc/skel/.icewm/preferences", false);
         proc.exec("sed -i 's/%k:%M/%l:%M/g' /mnt/antiX/etc/skel/.fluxbox/init", false);
@@ -2060,6 +2063,8 @@ void MInstall::setLocale()
         //mx systems
         proc.exec("sed -i '/data0=/c\\data0=%H:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
         proc.exec("sed -i '/data0=/c\\data0=%H:%M' /mnt/antiX/etc/skel/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
+        proc.exec("sed -i '/time_format=/c\\time_format=%H:%M' /home/demo/.config/xfce4/panel/datetime-1.rc", false);
+        proc.exec("sed -i '/time_format=/c\\time_format=%H:%M' /mnt/antiX/etc/skel/.config/xfce4/panel/datetime-1.rc", false);
         //antix systems
         proc.exec("sed -i 's/%H:%M/%H:%M/g' /mnt/antiX/etc/skel/.icewm/preferences", false);
         proc.exec("sed -i 's/%k:%M/%k:%M/g' /mnt/antiX/etc/skel/.fluxbox/init", false);
