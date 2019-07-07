@@ -104,18 +104,7 @@ void BlockDeviceList::build(MProcess &proc)
             gpt = proc.exec(cmd.arg(bdinfo.name), false);
         }
         bdinfo.isGPT = gpt;
-
-        const QString &uuid = bdsegs.at(2);
-        if (!bootUUID.isEmpty() && uuid == bootUUID) {
-            bdinfo.isBoot = true;
-            // propagate the boot flag across the entire drive
-            operator[](driveIndex).isBoot = true;
-            for (int ixi = driveIndex + 1; ixi < count(); ++ixi) {
-                BlockDeviceInfo &bdi = operator[](ixi);
-                if (bdi.isDrive) break;
-                bdi.isBoot = true;
-            }
-        }
+        bdinfo.isBoot = (!bootUUID.isEmpty() && bdsegs.at(2) == bootUUID);
 
         bdinfo.size = bdsegs.at(3).toLongLong();
         if (segsize > 4) {
@@ -145,8 +134,15 @@ void BlockDeviceList::build(MProcess &proc)
             bdinfo.model = QUrl::fromPercentEncoding(seg).trimmed();
         }
         append(bdinfo);
-        // propagate the nasty flag up to the drive
+        // propagate the boot and nasty flags up to the drive
+        if (bdinfo.isBoot) operator[](driveIndex).isBoot = true;
         if (bdinfo.isNasty) operator[](driveIndex).isNasty = true;
+    }
+    // propagate the boot flag across the entire drive
+    bool driveBoot = false;
+    for (BlockDeviceInfo &bdinfo : *this) {
+        if (bdinfo.isDrive) driveBoot = bdinfo.isBoot;
+        bdinfo.isBoot = driveBoot;
     }
 
     // debug
