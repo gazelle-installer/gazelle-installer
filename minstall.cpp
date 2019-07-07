@@ -3150,7 +3150,7 @@ void MInstall::on_grubMbrButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDrive) {
+        if (bdinfo.isDrive && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
             if (!bdinfo.isNasty || brave) bdinfo.addToCombo(grubBootCombo, true);
         }
     }
@@ -3161,8 +3161,9 @@ void MInstall::on_grubPbrButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!(bdinfo.isDrive || bdinfo.isSwap || bdinfo.isBoot || bdinfo.isESP)
-                 && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
+        if (!(bdinfo.isDrive || bdinfo.isSwap || bdinfo.isESP)
+            && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
+            && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
             // list only Linux partitions excluding crypto_LUKS partitions
             if (!bdinfo.isNasty || brave) bdinfo.addToCombo(grubBootCombo, true);
         }
@@ -3174,7 +3175,7 @@ void MInstall::on_grubEspButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isESP) bdinfo.addToCombo(grubBootCombo);
+        if (bdinfo.isESP && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) bdinfo.addToCombo(grubBootCombo);
     }
     grubBootLabel->setText(tr("Partition to use:"));
 }
