@@ -614,9 +614,8 @@ Le chiffrement est possible via LUKS. Un mot de passe est requis (longueur minim
         <translation>Si tous les blocs étaient chiffrés avec la même clé, un motif pourrait émerger permettant de prédire le texte en clair.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2287"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
-        <translation>Tweaked codebook basé sur XEX avec &quot;ciphertext Stealing&quot;) est un mode d&apos;opération moderne, qui a remplacé CBC et EBC. C&apos;est le mode d&apos;opération par défaut (et celui recommandé). Utiliser ESSIV à la place de Plain64 entraînera une baisse de performance, avec des gains de sécurité négligeable.</translation>
+        <translation type="vanished">Tweaked codebook basé sur XEX avec &quot;ciphertext Stealing&quot;) est un mode d&apos;opération moderne, qui a remplacé CBC et EBC. C&apos;est le mode d&apos;opération par défaut (et celui recommandé). Utiliser ESSIV à la place de Plain64 entraînera une baisse de performance, avec des gains de sécurité négligeable.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2288"/>
@@ -896,6 +895,11 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../minstall.cpp" line="1945"/>
         <source>Please enter a workgroup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2287"/>
+        <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
