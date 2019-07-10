@@ -602,9 +602,8 @@ diferente antes de continuar.</translation>
         <translation>Si todos los bloques fueron cifrados con la misma clave, puede surgir un patrón y puede predecir el texto sin formato.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2287"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
-        <translation>El libro de códigos Tweaked con robo de texto cifrado basado en XEX) es un modo de cadena moderno, que reemplaza a CBC y EBC. Es el modo de cadena predeterminado (y recomendado). El uso de ESSIV sobre Plain64 incurrirá en una penalización de rendimiento, con una insignificante ganancia de seguridad conocida.</translation>
+        <translation type="vanished">El libro de códigos Tweaked con robo de texto cifrado basado en XEX) es un modo de cadena moderno, que reemplaza a CBC y EBC. Es el modo de cadena predeterminado (y recomendado). El uso de ESSIV sobre Plain64 incurrirá en una penalización de rendimiento, con una insignificante ganancia de seguridad conocida.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2288"/>
@@ -884,6 +883,11 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../minstall.cpp" line="1945"/>
         <source>Please enter a workgroup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2287"/>
+        <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
