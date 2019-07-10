@@ -1576,7 +1576,7 @@ bool MInstall::installLoader()
     const int ixboot = listBlkDevs.findDevice(boot);
     boot.insert(0, "/dev/");
 
-    if (grubMbrButton->isChecked() && ixboot >= 0 && listBlkDevs.at(ixboot).isGPT) {
+    if (grubMbrButton->isChecked() && ixboot >= 0) {
         QString part_num;
         if (bootDevice.startsWith(boot)) part_num = bootDevice;
         else if (rootDevice.startsWith(boot)) part_num = rootDevice;
@@ -1584,12 +1584,18 @@ bool MInstall::installLoader()
         if (!part_num.isEmpty()) {
             // remove the non-digit part to get the number of the root partition
             part_num.remove(QRegularExpression("\\D+\\d*\\D+"));
-            proc.exec("parted -s " + boot + " set " + part_num + " legacy_boot on", true);
         }
-        if (!biosGrubDevice.isEmpty()) {
-            QStringList devsplit(BlockDeviceInfo::split(biosGrubDevice));
-            proc.exec("parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1) + " bios_grub on", true);
+        const char *bootflag = nullptr;
+        if (listBlkDevs.at(ixboot).isGPT) {
+            if (!part_num.isEmpty()) bootflag = " legacy_boot on";
+            if (!biosGrubDevice.isEmpty()) {
+                QStringList devsplit(BlockDeviceInfo::split(biosGrubDevice));
+                proc.exec("parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1) + " bios_grub on", true);
+            }
+        } else if (entireDiskButton->isChecked()) {
+            if (!part_num.isEmpty()) bootflag = " boot on";
         }
+        if (bootflag) proc.exec("parted -s " + boot + " set " + part_num + bootflag, true);
     }
 
     // set mounts for chroot
