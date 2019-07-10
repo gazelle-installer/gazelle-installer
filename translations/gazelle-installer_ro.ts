@@ -614,9 +614,8 @@ cel puțin 2 caractere. Alegeți alt nume
         <translation>Dacă blocurile au fost toate criptate utilizând aceeași cheie, poate apărea un model și poate prezice textul necriptat.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2287"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
-        <translation>Cartelă de coduri Tweaked cu caractere XEX cu text criptat Stealing) este un mod de lanț modern, care înlocuiește CBC și EBC. Acesta este modul implicit (și recomandat) pentru lanț. Utilizarea ESSIV peste Plain64 va suporta o perdere de performanță, cu un câștig de securitate neglijabil cunoscut.</translation>
+        <translation type="vanished">Cartelă de coduri Tweaked cu caractere XEX cu text criptat Stealing) este un mod de lanț modern, care înlocuiește CBC și EBC. Acesta este modul implicit (și recomandat) pentru lanț. Utilizarea ESSIV peste Plain64 va suporta o perdere de performanță, cu un câștig de securitate neglijabil cunoscut.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2288"/>
@@ -896,6 +895,11 @@ Sigur doriți sa opriți acum?</translation>
     <message>
         <location filename="../minstall.cpp" line="1945"/>
         <source>Please enter a workgroup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2287"/>
+        <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

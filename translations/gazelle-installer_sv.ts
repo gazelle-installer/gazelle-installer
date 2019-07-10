@@ -614,9 +614,8 @@ namn innan du fortsätter.</translation>
         <translation>Om alla block krypterades med samma nyckel, kan ett mönster uppstå och avslöja klartexten.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2287"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
-        <translation>XEX-based Tweaked codebook with ciphertext Stealing) är ett modernt chaining mode, som ersätter CBC och EBC.. Det är standard (och rekommenderat) chain mode. Användande av ESSIV i stället för Plain64 kommer att orsaka en prestandaförlust, med försumbar känd säkerhetsvinst.</translation>
+        <translation type="vanished">XEX-based Tweaked codebook with ciphertext Stealing) är ett modernt chaining mode, som ersätter CBC och EBC.. Det är standard (och rekommenderat) chain mode. Användande av ESSIV i stället för Plain64 kommer att orsaka en prestandaförlust, med försumbar känd säkerhetsvinst.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2288"/>
@@ -896,6 +895,11 @@ Vill du verkligen sluta nu?</translation>
     <message>
         <location filename="../minstall.cpp" line="1945"/>
         <source>Please enter a workgroup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2287"/>
+        <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

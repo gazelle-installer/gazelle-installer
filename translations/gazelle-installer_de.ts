@@ -613,9 +613,8 @@ Sie ein längeren Namen, bevor Sie weitermachen.</translation>
         <translation>Wenn alle Blöcke mit dem gleichen Schlüssel verschlüsselt wurden, kann ein Muster entstehen, das den Klartext vorhersagen kann.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2287"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
-        <translation>XEX-based tweaked-codebook mode with ciphertext stealing) ist ein moderner Chain-Modus, der CBC und EBC ablöst. Es ist der Standard (und empfohlene) Chain-Modus. Die Verwendung von ESSIV über Plain64 führt zu einer Leistungseinbuße, mit einem vernachlässigbaren bekannten Sicherheitsgewinn.</translation>
+        <translation type="vanished">XEX-based tweaked-codebook mode with ciphertext stealing) ist ein moderner Chain-Modus, der CBC und EBC ablöst. Es ist der Standard (und empfohlene) Chain-Modus. Die Verwendung von ESSIV über Plain64 führt zu einer Leistungseinbuße, mit einem vernachlässigbaren bekannten Sicherheitsgewinn.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2288"/>
@@ -896,6 +895,11 @@ Möchten Sie jetzt wirklich den Vorgang beenden?</translation>
     <message>
         <location filename="../minstall.cpp" line="1945"/>
         <source>Please enter a workgroup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2287"/>
+        <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

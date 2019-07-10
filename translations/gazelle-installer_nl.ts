@@ -612,9 +612,8 @@ naam voordat u verder gaat.</translation>
         <translation>Als alle blokken versleuteld waren met dezelfde sleutel kan een patroon tevoorschijn komen en standaard tekst voorspeld worden.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2287"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligble known security gain.</source>
-        <translation>XEX-gebaseerd Tweaked codebook met ciphertekst Stealing) is een moderne chaining mode, die CBC en EBC vervangt. Het is de standaard (en aangeraden) chaining mode. Het gebruik van ESSIV over Plain64 zal een prestatiestraf tot gevolg hebben, met bekende verwaarloosbare beveiligingsbevordering.</translation>
+        <translation type="vanished">XEX-gebaseerd Tweaked codebook met ciphertekst Stealing) is een moderne chaining mode, die CBC en EBC vervangt. Het is de standaard (en aangeraden) chaining mode. Het gebruik van ESSIV over Plain64 zal een prestatiestraf tot gevolg hebben, met bekende verwaarloosbare beveiligingsbevordering.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="2288"/>
@@ -894,6 +893,11 @@ Wilt u werkelijk stoppen?</translation>
     <message>
         <location filename="../minstall.cpp" line="1945"/>
         <source>Please enter a workgroup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="2287"/>
+        <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
