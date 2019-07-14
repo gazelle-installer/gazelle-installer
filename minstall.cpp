@@ -62,14 +62,37 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     MIN_INSTALL_SIZE=settings.value("MIN_INSTALL_SIZE").toString();
     PREFERRED_MIN_INSTALL_SIZE=settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
     REMOVE_NOSPLASH=settings.value("REMOVE_NOSPLASH", "false").toBool();
+    PROJECT_TWITTER=settings.value("PROJECT_TWITTER", "").toString();
+    PROJECT_FACEBOOK=settings.value("PROJECT_FACEBOOK", "").toString();
+    PROJECT_OTHER_SOCIAL=settings.value("PROJECT_OTHER_SOCIAL", "").toString();
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
     // config file
     config = new MSettings(cfgfile, this);
 
+    QString forum_reminder_block;
+    QString social_reminder_block;
+    QString twitter_reminder_block;
+    QString facebook_reminder_block;
+
+    if ( PROJECTFORUM != "") {
+        forum_reminder_block = "\n\n " + PROJECTFORUM;
+    }
+    if ( PROJECT_OTHER_SOCIAL != "") {
+        social_reminder_block = "\n\n " + PROJECT_OTHER_SOCIAL;
+    }
+
+    if ( PROJECT_TWITTER!= "") {
+        twitter_reminder_block = "\n\n " + PROJECT_TWITTER;
+    }
+
+    if ( PROJECT_FACEBOOK != "") {
+        facebook_reminder_block = "\n\n " + PROJECT_FACEBOOK;
+    }
     // set some distro-centric text
     copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
-    remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME).arg(PROJECTFORUM));
+    remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME).arg(PROJECTFORUM) + " "
+                        "" + forum_reminder_block + social_reminder_block + twitter_reminder_block + facebook_reminder_block);
 
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
@@ -2808,6 +2831,7 @@ void MInstall::on_progressBar_valueChanged(int value)
                              "%1 is supported by people like you. Some help others at the "
                              "support forum - %2 - or translate help files into different "
                              "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
+
         break;
 
     case 3:
