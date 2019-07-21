@@ -532,8 +532,8 @@ bool MInstall::processNextPhase()
             return false;
         }
         phase = 4;
-        updateStatus(tr("Installation successful"), 100);
-        proc.exec("sleep 1", true);
+        updateStatus(tr("Cleaning up"), 100);
+        cleanup();
         gotoPage(10);
     }
     return true;
@@ -2439,7 +2439,6 @@ void MInstall::gotoPage(int next)
     if (next > c-1) {
         // finished
         updateCursor(Qt::WaitCursor);
-        cleanup();
         if (!pretend && checkBoxExitReboot->isChecked()) {
             proc.exec("/usr/local/bin/persist-config --shutdown --command reboot &", false);
         }
