@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Type=Application
-Exec=sudo -E minstall
+Exec=su-to-root -X -c minstall
 Icon=/usr/share/gazelle-installer-data/logo.png
 Name=Installer
 Name[am]=መግጠሚያ
