@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# MX Linux mx-installer pkexec wrapper to retain QT environment
+# Usage:
+#        mx-installer
+# based on mx-pkexec wrapper
+
+if test "$EUID" != 0; then
+    # normal user
+    QTENV="/tmp/mx-installer-qtenv.$EUID.$PPID.$$.$RANDOM$RANDOM"
+    env | grep -E '^QT_|^LANG='  | sed -e 's/^/export /' 2>/dev/null  > "$QTENV"
+    chmod +r "$QTENV"
+    pkexec /usr/bin/mx-installer "--qtenv" "$QTENV" "${@}"
+    if [ -f "$QTENV" ] ; then
+        rm  $QTENV
+    fi
+fi
+if test "$EUID" == 0; then
+    # root user
+    # set XDG_RUNTIME_DIR - do nothing if already set
+    if [ x"$XDG_RUNTIME_DIR" = "x" ]; then
+        XDG_RUNTIME_DIR=/run/user/0
+        export XDG_RUNTIME_DIR
+        [ -d $XDG_RUNTIME_DIR ] || mkdir -p $XDG_RUNTIME_DIR
+        chmod 700 $XDG_RUNTIME_DIR
+        chown 0:0 $XDG_RUNTIME_DIR
+        fi
+    if  [ "x$1" = "x--qtenv" ]; then
+        QTENV="$2"
+        shift
+        shift
+        if [ -r "$QTENV" -a  "$QTENV" != "${QTENV#/tmp/mx-installer-qtenv.}" ] ; then
+            . $QTENV
+            rm  $QTENV
+        fi
+        PATH="/usr/local/bin:$PATH"
+    fi
+    RUN="/sbin/minstall"
+    echo Starting  "$RUN"
+    command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
+    exec "$RUN"
+fi
+exit
+
