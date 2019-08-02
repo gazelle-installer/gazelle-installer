@@ -47,20 +47,20 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
-    PROJECTNAME=settings.value("PROJECT_NAME").toString();
-    PROJECTSHORTNAME=settings.value("PROJECT_SHORTNAME").toString();
-    PROJECTVERSION=settings.value("VERSION").toString();
-    PROJECTURL=settings.value("PROJECT_URL").toString();
-    PROJECTFORUM=settings.value("FORUM_URL").toString();
-    INSTALL_FROM_ROOT_DEVICE=settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
-    MIN_ROOT_DEVICE_SIZE=settings.value("MIN_ROOT_DRIVE_SIZE").toLongLong() * 1048576;
-    MIN_BOOT_DEVICE_SIZE=settings.value("MIN_BOOT_DRIVE_SIZE", "256").toLongLong() * 1048576;
-    DEFAULT_HOSTNAME=settings.value("DEFAULT_HOSTNAME").toString();
-    ENABLE_SERVICES=settings.value("ENABLE_SERVICES").toStringList();
-    POPULATE_MEDIA_MOUNTPOINTS=settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
-    MIN_INSTALL_SIZE=settings.value("MIN_INSTALL_SIZE").toString();
-    PREFERRED_MIN_INSTALL_SIZE=settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
-    REMOVE_NOSPLASH=settings.value("REMOVE_NOSPLASH", "false").toBool();
+    PROJECTNAME = settings.value("PROJECT_NAME").toString();
+    PROJECTSHORTNAME = settings.value("PROJECT_SHORTNAME").toString();
+    PROJECTVERSION = settings.value("VERSION").toString();
+    PROJECTURL = settings.value("PROJECT_URL").toString();
+    PROJECTFORUM = settings.value("FORUM_URL").toString();
+    INSTALL_FROM_ROOT_DEVICE = settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
+    MIN_ROOT_DEVICE_SIZE = settings.value("MIN_ROOT_DRIVE_SIZE").toLongLong() * 1048576;
+    MIN_BOOT_DEVICE_SIZE = settings.value("MIN_BOOT_DRIVE_SIZE", "256").toLongLong() * 1048576;
+    DEFAULT_HOSTNAME = settings.value("DEFAULT_HOSTNAME").toString();
+    ENABLE_SERVICES = settings.value("ENABLE_SERVICES").toStringList();
+    POPULATE_MEDIA_MOUNTPOINTS = settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
+    MIN_INSTALL_SIZE = settings.value("MIN_INSTALL_SIZE").toString();
+    PREFERRED_MIN_INSTALL_SIZE = settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
+    REMOVE_NOSPLASH = settings.value("REMOVE_NOSPLASH", "false").toBool();
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
     gotoPage(0);
 
