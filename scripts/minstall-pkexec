@@ -10,7 +10,7 @@ if test "$EUID" != 0; then
     QTENV="/tmp/mx-installer-qtenv.$EUID.$PPID.$$.$RANDOM$RANDOM"
     env | grep -E '^QT_|^LANG='  | sed -e 's/^/export /' 2>/dev/null  > "$QTENV"
     chmod +r "$QTENV"
-    pkexec /usr/bin/mx-installer "--qtenv" "$QTENV" "${@}"
+    pkexec /usr/bin/minstall-pkexec "--qtenv" "$QTENV" "${@}"
     if [ -f "$QTENV" ] ; then
         rm  $QTENV
     fi
