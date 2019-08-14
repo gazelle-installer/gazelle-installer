@@ -149,6 +149,7 @@ private:
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
 
     QString auto_mount;
+    QString auto_mount_antix;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
