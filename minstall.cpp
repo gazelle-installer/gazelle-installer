@@ -111,6 +111,22 @@ void MInstall::startup()
         proc.exec("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
     }
 
+    //disable automounting in antiX
+    if (!pretend) {
+        // disable automounting in automount-antix
+        QString test = proc.execOut("ps -aux |grep -v grep | grep devmon");
+        if ( ! test.isEmpty() ) {
+            proc.exec("command -v pkill >/dev/null && pkill devmon", false);
+            auto_mount_antix = "su $(logname) -c /usr/local/lib/desktop-session/desktop-session-restart &";
+        }
+    //disable spacefm desktop during install
+        test = proc.execOut("grep space /home/$(logname)/.desktop-session/desktop-code.*");
+        if ( ! test.isEmpty()) {
+            proc.exec("command -v pkill >/dev/null && pkill spacefm",false);
+            auto_mount_antix = "su $(logname) -c /usr/local/lib/desktop-session/desktop-session-restart &";
+        }
+    }
+
     // set default host name
     computerNameEdit->setText(DEFAULT_HOSTNAME);
 
@@ -2765,6 +2781,9 @@ void MInstall::cleanup(bool endclean)
 
     if (endclean) {
         proc.exec("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'", false);
+        if ( ! auto_mount_antix.isEmpty()) {
+            proc.exec(auto_mount_antix.toUtf8(),false);
+        }
         proc.exec("/bin/cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
         proc.exec("/bin/rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }

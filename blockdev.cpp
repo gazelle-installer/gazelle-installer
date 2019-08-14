@@ -86,7 +86,7 @@ void BlockDeviceList::build(MProcess &proc)
     clear();
     bool gpt = false; // propagates to all partitions within the drive
     int driveIndex = 0; // for propagating the nasty flag to the drive
-    const QStringList &blkdevs = proc.execOutLines("lsblk -brno TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL"
+    const QStringList &blkdevs = proc.execOutLines("lsblk -brno TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL |sed 's/├─//' |sed 's/└─//' "
                                             " | grep -E '^(disk|part)'");
     for (const QString &blkdev : blkdevs) {
         const QStringList &bdsegs = blkdev.split(' ');
