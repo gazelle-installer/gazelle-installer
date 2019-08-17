@@ -2513,6 +2513,25 @@ void MInstall::updatePartitionWidgets()
     // partition combo boxes
     updatePartitionCombos(nullptr);
     on_rootCombo_currentIndexChanged(rootCombo->currentText());
+
+    // partition tree
+    QTreeWidgetItem *curdrv = nullptr;
+    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        QTreeWidgetItem *curdev;
+        if (bdinfo.isDrive) {
+            curdrv = curdev = new QTreeWidgetItem(treePartitions);
+        } else {
+            curdev = new QTreeWidgetItem(curdrv);
+            curdev->setCheckState(2, Qt::Unchecked);
+            curdev->setCheckState(3, Qt::Unchecked);
+        }
+        curdev->setText(0, bdinfo.name);
+        curdev->setText(1, bdinfo.formattedDataSize());
+    }
+    treePartitions->expandAll();
+    for (int ixi = treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
+        treePartitions->resizeColumnToContents(ixi);
+    }
 }
 
 void MInstall::updatePartitionCombos(QComboBox *changed)

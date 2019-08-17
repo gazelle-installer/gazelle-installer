@@ -34,8 +34,8 @@ QStringList BlockDeviceInfo::split(const QString &devname)
     return list;
 }
 
-// return block device info that is suitable for a combo box
-void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
+// in Qt 5.10 and later there is QLocale::formattedDataSize()
+QString BlockDeviceInfo::formattedDataSize() const
 {
     const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
     unsigned int isuffix = 0;
@@ -44,7 +44,13 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
         ++isuffix;
         scalesize /= 1024;
     }
-    QString strout(name + " (" + QString::number(scalesize) + suffixes[isuffix]);
+    return QString::number(scalesize) + suffixes[isuffix];
+}
+
+// return block device info that is suitable for a combo box
+void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
+{
+    QString strout(name + " (" + formattedDataSize());
     if (!fs.isEmpty()) strout += " " + fs;
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;

@@ -775,6 +775,119 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="Step_Partitions1">
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="1">
+           <widget class="QToolButton" name="toolButton">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset theme="add">
+              <normaloff>.</normaloff>.</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QToolButton" name="toolButton_2">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset theme="remove">
+              <normaloff>.</normaloff>.</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QToolButton" name="toolButton_3">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset theme="undo">
+              <normaloff>.</normaloff>.</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QToolButton" name="toolButton_4">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset theme="revert">
+              <normaloff>.</normaloff>.</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" rowspan="6">
+           <widget class="QTreeWidget" name="treePartitions">
+            <column>
+             <property name="text">
+              <string>Device</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Size</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Check</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Encrypt</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Mount Point</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QToolButton" name="toolButton_5">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset theme="gparted"/>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QFrame" name="frame">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Sunken</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QToolButton" name="toolButton_6">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset theme="dialog-apply"/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="Step_Partitions">
          <layout class="QGridLayout" name="_5">
           <property name="leftMargin">
@@ -816,19 +929,6 @@
              <property name="spacing">
               <number>6</number>
              </property>
-             <item row="0" column="0" colspan="2">
-              <widget class="QCheckBox" name="saveHomeCheck">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Preserve data in /home (if upgrading)</string>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="0" colspan="2">
               <widget class="QCheckBox" name="badblocksCheck">
                <property name="sizePolicy">
@@ -848,6 +948,19 @@
                </property>
                <property name="checked">
                 <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" colspan="2">
+              <widget class="QCheckBox" name="saveHomeCheck">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Preserve data in /home (if upgrading)</string>
                </property>
               </widget>
              </item>
