@@ -854,7 +854,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
             // do no badblocks
             cmd = QString("mkfs.ext2 -F %1 -L \"%2\"").arg(dev).arg(label);
         }
-    } else if (type == "btrfs") {
+    } else if (type.startsWith("btrfs")) {
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
