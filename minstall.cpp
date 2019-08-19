@@ -584,20 +584,26 @@ void MInstall::manageConfig(enum ConfigAction mode)
         } else {
             // Partition step
             config->setGroupWidget(Step_Partitions);
-            config->manageComboBox("Root", rootCombo, true);
-            config->manageComboBox("Home", homeCombo, true);
-            config->manageComboBox("Swap", swapCombo, true);
-            config->manageComboBox("Boot", bootCombo, true);
-            config->manageComboBox("RootType", rootTypeCombo, false);
-            config->manageComboBox("HomeType", homeTypeCombo, false);
-            config->manageCheckBox("RootEncrypt", checkBoxEncryptRoot);
-            config->manageCheckBox("HomeEncrypt", checkBoxEncryptHome);
-            config->manageCheckBox("SwapEncrypt", checkBoxEncryptSwap);
-            config->manageLineEdit("RootLabel", rootLabelEdit);
-            config->manageLineEdit("HomeLabel", homeLabelEdit);
-            config->manageLineEdit("SwapLabel", swapLabelEdit);
             config->manageCheckBox("SaveHome", saveHomeCheck);
             config->manageCheckBox("BadBlocksCheck", badblocksCheck);
+            // Swap space
+            config->manageComboBox("Swap/Device", swapCombo, true);
+            config->manageCheckBox("Swap/Encrypt", checkBoxEncryptSwap);
+            config->manageLineEdit("Swap/Label", swapLabelEdit);
+            // Tree starting with root (/)
+            config->beginGroup("Tree");
+            config->manageComboBox("Device", rootCombo, true);
+            config->manageCheckBox("Encrypt", checkBoxEncryptRoot);
+            config->manageComboBox("Type", rootTypeCombo, false);
+            config->manageLineEdit("Label", rootLabelEdit);
+            // Boot (/boot)
+            config->manageComboBox("boot/Device", bootCombo, true);
+            // Home (/home)
+            config->manageComboBox("home/Device", homeCombo, true);
+            config->manageComboBox("home/Type", homeTypeCombo, false);
+            config->manageCheckBox("home/Encrypt", checkBoxEncryptHome);
+            config->manageLineEdit("home/Label", homeLabelEdit);
+            config->endGroup();
         }
         config->endGroup();
 
