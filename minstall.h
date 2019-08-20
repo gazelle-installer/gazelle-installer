@@ -176,6 +176,7 @@ private:
     QStringList listToUnmount;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
+    QString boot_mntops = "defaults";
     QStringList listHomes;
     SafeCache key;
 
