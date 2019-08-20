@@ -790,7 +790,6 @@ bool MInstall::formatPartitions()
                                 badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
-        root_mntops = "defaults,noatime";
     }
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) return false;
 
@@ -830,6 +829,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
     QString homedev = homeDevice;
+    boot_mntops = "defaults,noatime";
     if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
         home_mntops = "defaults,noatime";
     } else {
@@ -1394,7 +1394,7 @@ bool MInstall::installLinux(const int progend)
     if (!bootDevice.isEmpty() && bootDevice != rootDevice) {
         mkdir("/mnt/antiX/boot", 0755);
         proc.exec("fsck.ext4 -y " + bootDevice); // needed to run fsck because sfdisk --part-type can mess up the partition
-        if (!mountPartition(bootDevice, "/mnt/antiX/boot", root_mntops)) {
+        if (!mountPartition(bootDevice, "/mnt/antiX/boot", boot_mntops)) {
             qDebug() << "Could not mount /boot on " + bootDevice;
             return false;
         }
@@ -1479,7 +1479,7 @@ void MInstall::makeFstab()
         //add bootdev if present
         //only ext4 (for now) for max compatibility with other linuxes
         if (!bootDevice.isEmpty() && bootDevice != rootDevice) {
-            out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1\n";
+            out << bootdevUUID + " /boot ext4 " + boot_mntops + " 1 1\n";
         }
         if (grubEspButton->isChecked()) {
             const QString espdev = "/dev/" + grubBootCombo->currentData().toString();
