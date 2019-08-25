@@ -23,6 +23,7 @@
 
 class MProcess : public QProcess
 {
+    int execount = 0;
     bool halting = false;
     bool debugUnusedOutput = true;
 public:
