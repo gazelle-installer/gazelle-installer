@@ -34,14 +34,22 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     connect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (rawexec) start(cmd);
     else start("/bin/bash", QStringList() << "-c" << cmd);
-    if (!needRead) {
-        closeReadChannel(QProcess::StandardOutput);
+    if (!debugUnusedOutput) {
+        if (!needRead) closeReadChannel(QProcess::StandardOutput);
         closeReadChannel(QProcess::StandardError);
     }
     if (input && !(input->isEmpty())) write(*input);
     closeWriteChannel();
     eloop.exec();
     disconnect(this, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+    if (debugUnusedOutput) {
+        if (!needRead) {
+            const QByteArray &StdOut = readAllStandardOutput();
+            if (!StdOut.isEmpty()) qDebug() << "stdout:" << StdOut;
+        }
+        const QByteArray &StdErr = readAllStandardError();
+        if (!StdErr.isEmpty()) qDebug() << "stderr:" << StdErr;
+    }
     qDebug() << "Exit:" << exitCode() << exitStatus();
     return (exitStatus() == QProcess::NormalExit && exitCode() == 0);
 }
