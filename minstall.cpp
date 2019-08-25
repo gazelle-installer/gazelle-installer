@@ -2896,7 +2896,7 @@ void MInstall::setupkeyboardbutton()
 void MInstall::on_buttonSetKeyboard_clicked()
 {
     hide();
-    proc.exec("fskbsetting", false);
+    proc.exec("env GTK_THEME=\"Adwaita\" fskbsetting", false);
     show();
     setupkeyboardbutton();
 }
