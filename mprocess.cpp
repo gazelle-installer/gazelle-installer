@@ -29,27 +29,36 @@ MProcess::MProcess(QObject *parent)
 bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *input, bool needRead)
 {
     if (halting) return false;
-    qDebug() << cmd;
+    ++execount;
+    qDebug().nospace() << "Exec #" << execount << ": " << cmd;
     QEventLoop eloop;
     connect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (rawexec) start(cmd);
     else start("/bin/bash", QStringList() << "-c" << cmd);
-    if (!needRead) {
-        closeReadChannel(QProcess::StandardOutput);
+    if (!debugUnusedOutput) {
+        if (!needRead) closeReadChannel(QProcess::StandardOutput);
         closeReadChannel(QProcess::StandardError);
     }
     if (input && !(input->isEmpty())) write(*input);
     closeWriteChannel();
     eloop.exec();
     disconnect(this, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
-    qDebug() << "Exit:" << exitCode() << exitStatus();
+    if (debugUnusedOutput) {
+        if (!needRead) {
+            const QByteArray &StdOut = readAllStandardOutput();
+            if (!StdOut.isEmpty()) qDebug().nospace() << "SOut #" << execount << ": " << StdOut;
+        }
+        const QByteArray &StdErr = readAllStandardError();
+        if (!StdErr.isEmpty()) qDebug().nospace() << "SErr #" << execount << ": " << StdErr;
+    }
+    qDebug().nospace() << "Exit #" << execount << ": " << exitCode() << " " << exitStatus();
     return (exitStatus() == QProcess::NormalExit && exitCode() == 0);
 }
 
 QString MProcess::execOut(const QString &cmd, bool everything)
 {
     exec(cmd, false, nullptr, true);
-    QString strout(readAll().trimmed());
+    QString strout(readAllStandardOutput().trimmed());
     if (everything) return strout;
     return strout.section("\n", 0, 0);
 }
@@ -57,7 +66,7 @@ QString MProcess::execOut(const QString &cmd, bool everything)
 QStringList MProcess::execOutLines(const QString &cmd)
 {
     exec(cmd, false, nullptr, true);
-    return QString(readAll().trimmed()).split('\n');
+    return QString(readAllStandardOutput().trimmed()).split('\n');
 }
 
 void MProcess::halt()

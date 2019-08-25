@@ -1558,7 +1558,7 @@ bool MInstall::copyLinux(const int progend)
         const int progdiv = (progspace != 0) ? (sourceInodes / progspace) : 0;
         while (proc.state() != QProcess::NotRunning) {
             eloop.exec();
-            proc.readAll();
+            proc.readAllStandardOutput();
             if(statvfs("/mnt/antiX", &svfs) == 0 && progdiv != 0) {
                 int i = (svfs.f_files - svfs.f_ffree - targetInodes) / progdiv;
                 if (i > progspace) i = progspace;
