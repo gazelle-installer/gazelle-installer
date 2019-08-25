@@ -23,7 +23,9 @@
 
 class MProcess : public QProcess
 {
+    int execount = 0;
     bool halting = false;
+    bool debugUnusedOutput = true;
 public:
     MProcess(QObject *parent = Q_NULLPTR);
     bool exec(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
