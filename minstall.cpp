@@ -53,8 +53,6 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     PROJECTURL = settings.value("PROJECT_URL").toString();
     PROJECTFORUM = settings.value("FORUM_URL").toString();
     INSTALL_FROM_ROOT_DEVICE = settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
-    MIN_ROOT_DEVICE_SIZE = settings.value("MIN_ROOT_DRIVE_SIZE").toLongLong() * 1048576;
-    MIN_BOOT_DEVICE_SIZE = settings.value("MIN_BOOT_DRIVE_SIZE", "256").toLongLong() * 1048576;
     DEFAULT_HOSTNAME = settings.value("DEFAULT_HOSTNAME").toString();
     ENABLE_SERVICES = settings.value("ENABLE_SERVICES").toStringList();
     POPULATE_MEDIA_MOUNTPOINTS = settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
@@ -96,6 +94,18 @@ void MInstall::startup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
+    // calculate required disk space
+    bootSpace = proc.execOut("du -sb /live/linux/boot").section('\t', 0, 0).toLongLong();
+    rootSpace = proc.execOut("du -sb /live/linux --exclude=/live/linux/boot").section('\t', 0, 0).toLongLong();
+    if (!(bootSpace && rootSpace)) {
+        QMessageBox::warning(this, windowTitle(),
+             tr("Cannot access source medium.\nActivating pretend installation."));
+        pretend = true;
+    }
+    const qlonglong spaceBlock = 134217728; // 128MB
+    bootSpace += 2*spaceBlock - (bootSpace % spaceBlock);
+    rootSpace += 2*spaceBlock - (rootSpace % spaceBlock);
+    qDebug() << "Minimum space:" << bootSpace << "(boot)," << rootSpace << "(root)";
 
     // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
     if (proc.exec("uname -m | grep -q i686", false) && proc.exec("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
@@ -2512,7 +2522,7 @@ void MInstall::updatePartitionWidgets()
     // disk combo box
     diskCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDrive && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
+        if (bdinfo.isDrive && bdinfo.size >= rootSpace
                 && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
             bdinfo.addToCombo(diskCombo);
         }
@@ -2558,11 +2568,11 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
                         && !(bootCombo->currentText().startsWith(bdinfo.name))) {
                     bool add = true;
                     if (combo == rootCombo) {
-                        add = (!bdinfo.isSwap && bdinfo.size >= MIN_ROOT_DEVICE_SIZE);
+                        add = (!bdinfo.isSwap && bdinfo.size >= rootSpace);
                     } else if (combo == homeCombo) {
                         add = (!bdinfo.isSwap);
                     } else if (combo == bootCombo) {
-                        add = (!bdinfo.isESP && bdinfo.size >= MIN_BOOT_DEVICE_SIZE);
+                        add = (!bdinfo.isESP && bdinfo.size >= bootSpace);
                     }
                     if (add) bdinfo.addToCombo(combo);
                 }
