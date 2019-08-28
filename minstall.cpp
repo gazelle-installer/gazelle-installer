@@ -95,17 +95,17 @@ void MInstall::startup()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
     // calculate required disk space
-    bootSpace = proc.execOut("du -sb /live/linux/boot").section('\t', 0, 0).toLongLong();
-    rootSpace = proc.execOut("du -sb /live/linux --exclude=/live/linux/boot").section('\t', 0, 0).toLongLong();
-    if (!(bootSpace && rootSpace)) {
+    bootSpaceNeeded = proc.execOut("du -sb /live/linux/boot").section('\t', 0, 0).toLongLong();
+    rootSpaceNeeded = proc.execOut("du -sb /live/linux --exclude=/live/linux/boot").section('\t', 0, 0).toLongLong();
+    if (!(bootSpaceNeeded && rootSpaceNeeded)) {
         QMessageBox::warning(this, windowTitle(),
              tr("Cannot access source medium.\nActivating pretend installation."));
         pretend = true;
     }
     const long long spaceBlock = 134217728; // 128MB
-    bootSpace += 2*spaceBlock - (bootSpace % spaceBlock);
-    rootSpace += 2*spaceBlock - (rootSpace % spaceBlock);
-    qDebug() << "Minimum space:" << bootSpace << "(boot)," << rootSpace << "(root)";
+    bootSpaceNeeded += 2*spaceBlock - (bootSpaceNeeded % spaceBlock);
+    rootSpaceNeeded += 2*spaceBlock - (rootSpaceNeeded % spaceBlock);
+    qDebug() << "Minimum space:" << bootSpaceNeeded << "(boot)," << rootSpaceNeeded << "(root)";
 
     // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
     if (proc.exec("uname -m | grep -q i686", false) && proc.exec("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
@@ -2522,7 +2522,7 @@ void MInstall::updatePartitionWidgets()
     // disk combo box
     diskCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDrive && bdinfo.size >= rootSpace
+        if (bdinfo.isDrive && bdinfo.size >= rootSpaceNeeded
                 && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
             bdinfo.addToCombo(diskCombo);
         }
@@ -2568,11 +2568,11 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
                         && !(bootCombo->currentText().startsWith(bdinfo.name))) {
                     bool add = true;
                     if (combo == rootCombo) {
-                        add = (!bdinfo.isSwap && bdinfo.size >= rootSpace);
+                        add = (!bdinfo.isSwap && bdinfo.size >= rootSpaceNeeded);
                     } else if (combo == homeCombo) {
                         add = (!bdinfo.isSwap);
                     } else if (combo == bootCombo) {
-                        add = (!bdinfo.isESP && bdinfo.size >= bootSpace);
+                        add = (!bdinfo.isESP && bdinfo.size >= bootSpaceNeeded);
                     }
                     if (add) bdinfo.addToCombo(combo);
                 }

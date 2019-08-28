@@ -148,8 +148,8 @@ private:
 
     QString auto_mount;
     QString auto_mount_antix;
-    long long rootSpace = 0;
-    long long bootSpace = 0;
+    long long rootSpaceNeeded = 0;
+    long long bootSpaceNeeded = 0;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
