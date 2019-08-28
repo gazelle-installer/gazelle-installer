@@ -71,8 +71,6 @@ public:
     bool INSTALL_FROM_ROOT_DEVICE;
     bool POPULATE_MEDIA_MOUNTPOINTS;
 
-    qlonglong MIN_BOOT_DEVICE_SIZE;
-    qlonglong MIN_ROOT_DEVICE_SIZE;
     QString DEFAULT_HOSTNAME;
     QString MIN_INSTALL_SIZE;
     QString PREFERRED_MIN_INSTALL_SIZE;
@@ -150,6 +148,8 @@ private:
 
     QString auto_mount;
     QString auto_mount_antix;
+    qlonglong rootSpace = 0;
+    qlonglong bootSpace = 0;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
