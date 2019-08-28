@@ -95,8 +95,13 @@ void MInstall::startup()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
     // calculate required disk space
-    bootSpaceNeeded = proc.execOut("du -sb /live/linux/boot").section('\t', 0, 0).toLongLong();
-    rootSpaceNeeded = proc.execOut("du -sb /live/linux --exclude=/live/linux/boot").section('\t', 0, 0).toLongLong();
+    bootSource = "/live/aufs/boot";
+    rootSources = "/live/aufs/bin /live/aufs/dev"
+                  " /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt"
+                  " /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr"
+                  " /live/aufs/var /live/aufs/home";
+    bootSpaceNeeded = proc.execOut("du -sb " + bootSource).section('\t', 0, 0).toLongLong();
+    rootSpaceNeeded = proc.execOut("du -cb " + rootSources + " | tail -n 1").section('\t', 0, 0).toLongLong();
     if (!(bootSpaceNeeded && rootSpaceNeeded)) {
         QMessageBox::warning(this, windowTitle(),
              tr("Cannot access source medium.\nActivating pretend installation."));
@@ -104,7 +109,7 @@ void MInstall::startup()
     }
     const long long spaceBlock = 134217728; // 128MB
     bootSpaceNeeded += 2*spaceBlock - (bootSpaceNeeded % spaceBlock);
-    rootSpaceNeeded += 2*spaceBlock - (rootSpaceNeeded % spaceBlock);
+    rootSpaceNeeded += 4*spaceBlock - (rootSpaceNeeded % spaceBlock);
     qDebug() << "Minimum space:" << bootSpaceNeeded << "(boot)," << rootSpaceNeeded << "(root)";
 
     // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
@@ -1542,10 +1547,7 @@ bool MInstall::copyLinux(const int progend)
             cmd.append(" --filter 'protect home/*'");
         }
     }
-    cmd.append(" /live/aufs/bin /live/aufs/boot /live/aufs/dev");
-    cmd.append(" /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt");
-    cmd.append(" /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr");
-    cmd.append(" /live/aufs/var /live/aufs/home /mnt/antiX");
+    cmd.append(" " + bootSource + " " + rootSources + " /mnt/antiX");
     struct statvfs svfs;
 
     fsfilcnt_t sourceInodes = 1;
