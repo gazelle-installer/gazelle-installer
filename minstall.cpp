@@ -102,7 +102,7 @@ void MInstall::startup()
              tr("Cannot access source medium.\nActivating pretend installation."));
         pretend = true;
     }
-    const qlonglong spaceBlock = 134217728; // 128MB
+    const long long spaceBlock = 134217728; // 128MB
     bootSpace += 2*spaceBlock - (bootSpace % spaceBlock);
     rootSpace += 2*spaceBlock - (rootSpace % spaceBlock);
     qDebug() << "Minimum space:" << bootSpace << "(boot)," << rootSpace << "(root)";
@@ -875,7 +875,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
         QString size_str = proc.execOut("/sbin/sfdisk -s " + dev);
-        quint64 size = size_str.toULongLong();
+        long long size = size_str.toLongLong();
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
         if (size < 6000) {
@@ -1124,7 +1124,7 @@ bool MInstall::validateChosenPartitions()
     if (!homedev.isEmpty()) homeDevice = "/dev/" + homedev;
 
     // calculate the future partitions here
-    auto lambdaCalcBD = [this](const qint64 size, QComboBox *combo, const QString &label,
+    auto lambdaCalcBD = [this](const long long size, QComboBox *combo, const QString &label,
             const QString &fs, const bool isEncrypted) -> int {
         int index = size ? listBlkDevs.findDevice(combo->currentData().toString()) : -1;
         if (index >= 0) {
@@ -1172,7 +1172,7 @@ bool MInstall::calculateDefaultPartitions()
 
     // calculate new partition sizes
     // get the total disk size
-    const qint64 driveSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
+    const long long driveSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
     rootFormatSize = driveSize;
     rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
 
@@ -1215,7 +1215,7 @@ bool MInstall::calculateDefaultPartitions()
     int ixAddBD = bdindex;
     int ixpart = 1;
     auto lambdaAddFutureBD = [this, bdindex, &ixpart, &ixAddBD, &drv, &mmcnvmepartdesignator]
-            (qint64 size, const QString &fs) -> BlockDeviceInfo &  {
+            (long long size, const QString &fs) -> BlockDeviceInfo &  {
         BlockDeviceInfo bdinfo;
         bdinfo.name = drv + mmcnvmepartdesignator + QString::number(ixpart);
         bdinfo.fs = fs;
@@ -1271,15 +1271,15 @@ bool MInstall::makePartitions()
     }
     listToUnmount.clear();
 
-    qint64 start = 1; // start with 1 MB to aid alignment
+    long long start = 1; // start with 1 MB to aid alignment
 
     auto lambdaPreparePart = [this, &start]
-            (const QString &strdev, qint64 size, const QString &type) -> bool {
+            (const QString &strdev, long long size, const QString &type) -> bool {
         const QStringList devsplit = BlockDeviceInfo::split(strdev);
         bool rc = true;
         // size=0 = nothing, size>0 = creation, size<0 = allocation.
         if (size > 0) {
-            const qint64 end = start + size;
+            const long long end = start + size;
             rc = proc.exec("parted -s --align optimal /dev/" + devsplit.at(0) + " mkpart " + type
                          + " " + QString::number(start) + "MiB " + QString::number(end) + "MiB");
             start = end;
