@@ -148,8 +148,8 @@ private:
 
     QString auto_mount;
     QString auto_mount_antix;
-    qlonglong rootSpace = 0;
-    qlonglong bootSpace = 0;
+    long long rootSpace = 0;
+    long long bootSpace = 0;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
@@ -158,11 +158,11 @@ private:
 
     // if these variables are non-zero then the installer formats the partition
     // if they are negative the installer formats an existing partition
-    qint64 rootFormatSize = 0;
-    qint64 homeFormatSize = 0;
-    qint64 swapFormatSize = 0;
-    qint64 bootFormatSize = 0;
-    qint64 espFormatSize = 0;
+    long long rootFormatSize = 0;
+    long long homeFormatSize = 0;
+    long long swapFormatSize = 0;
+    long long bootFormatSize = 0;
+    long long espFormatSize = 0;
 
     QString bootDevice;
     QString swapDevice;
