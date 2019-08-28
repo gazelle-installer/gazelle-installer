@@ -39,7 +39,7 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
 {
     const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
     unsigned int isuffix = 0;
-    qlonglong scalesize = size;
+    long long scalesize = size;
     while (scalesize >= 1024 && isuffix < sizeof(suffixes)) {
         ++isuffix;
         scalesize /= 1024;

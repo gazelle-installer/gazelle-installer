@@ -71,8 +71,6 @@ public:
     bool INSTALL_FROM_ROOT_DEVICE;
     bool POPULATE_MEDIA_MOUNTPOINTS;
 
-    qlonglong MIN_BOOT_DEVICE_SIZE;
-    qlonglong MIN_ROOT_DEVICE_SIZE;
     QString DEFAULT_HOSTNAME;
     QString MIN_INSTALL_SIZE;
     QString PREFERRED_MIN_INSTALL_SIZE;
@@ -150,6 +148,8 @@ private:
 
     QString auto_mount;
     QString auto_mount_antix;
+    long long rootSpaceNeeded = 0;
+    long long bootSpaceNeeded = 0;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
@@ -158,11 +158,11 @@ private:
 
     // if these variables are non-zero then the installer formats the partition
     // if they are negative the installer formats an existing partition
-    qint64 rootFormatSize = 0;
-    qint64 homeFormatSize = 0;
-    qint64 swapFormatSize = 0;
-    qint64 bootFormatSize = 0;
-    qint64 espFormatSize = 0;
+    long long rootFormatSize = 0;
+    long long homeFormatSize = 0;
+    long long swapFormatSize = 0;
+    long long bootFormatSize = 0;
+    long long espFormatSize = 0;
 
     QString bootDevice;
     QString swapDevice;
