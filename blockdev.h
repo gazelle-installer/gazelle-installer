@@ -27,7 +27,7 @@ struct BlockDeviceInfo
     QString fs;
     QString label;
     QString model;
-    qint64 size;
+    long long size;
     bool isFuture = false;
     bool isNasty = false;
     bool isDrive = false;

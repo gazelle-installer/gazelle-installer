@@ -53,8 +53,6 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     PROJECTURL = settings.value("PROJECT_URL").toString();
     PROJECTFORUM = settings.value("FORUM_URL").toString();
     INSTALL_FROM_ROOT_DEVICE = settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
-    MIN_ROOT_DEVICE_SIZE = settings.value("MIN_ROOT_DRIVE_SIZE").toLongLong() * 1048576;
-    MIN_BOOT_DEVICE_SIZE = settings.value("MIN_BOOT_DRIVE_SIZE", "256").toLongLong() * 1048576;
     DEFAULT_HOSTNAME = settings.value("DEFAULT_HOSTNAME").toString();
     ENABLE_SERVICES = settings.value("ENABLE_SERVICES").toStringList();
     POPULATE_MEDIA_MOUNTPOINTS = settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
@@ -96,6 +94,18 @@ void MInstall::startup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
+    // calculate required disk space
+    bootSpaceNeeded = proc.execOut("du -sb /live/linux/boot").section('\t', 0, 0).toLongLong();
+    rootSpaceNeeded = proc.execOut("du -sb /live/linux --exclude=/live/linux/boot").section('\t', 0, 0).toLongLong();
+    if (!(bootSpaceNeeded && rootSpaceNeeded)) {
+        QMessageBox::warning(this, windowTitle(),
+             tr("Cannot access source medium.\nActivating pretend installation."));
+        pretend = true;
+    }
+    const long long spaceBlock = 134217728; // 128MB
+    bootSpaceNeeded += 2*spaceBlock - (bootSpaceNeeded % spaceBlock);
+    rootSpaceNeeded += 2*spaceBlock - (rootSpaceNeeded % spaceBlock);
+    qDebug() << "Minimum space:" << bootSpaceNeeded << "(boot)," << rootSpaceNeeded << "(root)";
 
     // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
     if (proc.exec("uname -m | grep -q i686", false) && proc.exec("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
@@ -865,7 +875,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
         QString size_str = proc.execOut("/sbin/sfdisk -s " + dev);
-        quint64 size = size_str.toULongLong();
+        long long size = size_str.toLongLong();
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
         if (size < 6000) {
@@ -1114,7 +1124,7 @@ bool MInstall::validateChosenPartitions()
     if (!homedev.isEmpty()) homeDevice = "/dev/" + homedev;
 
     // calculate the future partitions here
-    auto lambdaCalcBD = [this](const qint64 size, QComboBox *combo, const QString &label,
+    auto lambdaCalcBD = [this](const long long size, QComboBox *combo, const QString &label,
             const QString &fs, const bool isEncrypted) -> int {
         int index = size ? listBlkDevs.findDevice(combo->currentData().toString()) : -1;
         if (index >= 0) {
@@ -1162,7 +1172,7 @@ bool MInstall::calculateDefaultPartitions()
 
     // calculate new partition sizes
     // get the total disk size
-    const qint64 driveSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
+    const long long driveSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
     rootFormatSize = driveSize;
     rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
 
@@ -1205,7 +1215,7 @@ bool MInstall::calculateDefaultPartitions()
     int ixAddBD = bdindex;
     int ixpart = 1;
     auto lambdaAddFutureBD = [this, bdindex, &ixpart, &ixAddBD, &drv, &mmcnvmepartdesignator]
-            (qint64 size, const QString &fs) -> BlockDeviceInfo &  {
+            (long long size, const QString &fs) -> BlockDeviceInfo &  {
         BlockDeviceInfo bdinfo;
         bdinfo.name = drv + mmcnvmepartdesignator + QString::number(ixpart);
         bdinfo.fs = fs;
@@ -1261,15 +1271,15 @@ bool MInstall::makePartitions()
     }
     listToUnmount.clear();
 
-    qint64 start = 1; // start with 1 MB to aid alignment
+    long long start = 1; // start with 1 MB to aid alignment
 
     auto lambdaPreparePart = [this, &start]
-            (const QString &strdev, qint64 size, const QString &type) -> bool {
+            (const QString &strdev, long long size, const QString &type) -> bool {
         const QStringList devsplit = BlockDeviceInfo::split(strdev);
         bool rc = true;
         // size=0 = nothing, size>0 = creation, size<0 = allocation.
         if (size > 0) {
-            const qint64 end = start + size;
+            const long long end = start + size;
             rc = proc.exec("parted -s --align optimal /dev/" + devsplit.at(0) + " mkpart " + type
                          + " " + QString::number(start) + "MiB " + QString::number(end) + "MiB");
             start = end;
@@ -2512,7 +2522,7 @@ void MInstall::updatePartitionWidgets()
     // disk combo box
     diskCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDrive && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
+        if (bdinfo.isDrive && bdinfo.size >= rootSpaceNeeded
                 && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
             bdinfo.addToCombo(diskCombo);
         }
@@ -2558,11 +2568,11 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
                         && !(bootCombo->currentText().startsWith(bdinfo.name))) {
                     bool add = true;
                     if (combo == rootCombo) {
-                        add = (!bdinfo.isSwap && bdinfo.size >= MIN_ROOT_DEVICE_SIZE);
+                        add = (!bdinfo.isSwap && bdinfo.size >= rootSpaceNeeded);
                     } else if (combo == homeCombo) {
                         add = (!bdinfo.isSwap);
                     } else if (combo == bootCombo) {
-                        add = (!bdinfo.isESP && bdinfo.size >= MIN_BOOT_DEVICE_SIZE);
+                        add = (!bdinfo.isESP && bdinfo.size >= bootSpaceNeeded);
                     }
                     if (add) bdinfo.addToCombo(combo);
                 }
