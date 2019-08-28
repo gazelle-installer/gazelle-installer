@@ -148,13 +148,17 @@ private:
 
     QString auto_mount;
     QString auto_mount_antix;
-    long long rootSpaceNeeded = 0;
-    long long bootSpaceNeeded = 0;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
     bool uefi = false;
     bool mactest = false;
+
+    // source medium
+    QString rootSources;
+    QString bootSource;
+    long long rootSpaceNeeded = 0;
+    long long bootSpaceNeeded = 0;
 
     // if these variables are non-zero then the installer formats the partition
     // if they are negative the installer formats an existing partition
