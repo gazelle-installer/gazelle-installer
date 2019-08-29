@@ -146,8 +146,6 @@ private:
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
 
-    QString auto_mount;
-    QString auto_mount_antix;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
@@ -159,6 +157,9 @@ private:
     QString bootSource;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
+
+    // auto-mount setup
+    QString listMaskedMounts;
 
     // if these variables are non-zero then the installer formats the partition
     // if they are negative the installer formats an existing partition
@@ -217,6 +218,7 @@ private:
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
     void updatePartitionCombos(QComboBox *changed);
+    void setupAutoMount(bool enabled);
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
     bool validateChosenPartitions();
