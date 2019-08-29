@@ -21,6 +21,7 @@
 #include <QFileInfo>
 #include <QTimer>
 #include <QProcess>
+#include <QProcessEnvironment>
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
@@ -120,27 +121,7 @@ void MInstall::startup()
     }
     qDebug() << "uefi =" << uefi;
 
-    if (!pretend) {
-        // disable automounting in Thunar
-        auto_mount = proc.execOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
-        proc.exec("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
-    }
-
-    //disable automounting in antiX
-    if (!pretend) {
-        // disable automounting in automount-antix
-        QString test = proc.execOut("ps -aux |grep -v grep | grep devmon");
-        if ( ! test.isEmpty() ) {
-            proc.exec("command -v pkill >/dev/null && pkill devmon", false);
-            auto_mount_antix = "su $(logname) -c /usr/local/lib/desktop-session/desktop-session-restart &";
-        }
-    //disable spacefm desktop during install
-        test = proc.execOut("grep space /home/$(logname)/.desktop-session/desktop-code.*");
-        if ( ! test.isEmpty()) {
-            proc.exec("command -v pkill >/dev/null && pkill spacefm",false);
-            auto_mount_antix = "su $(logname) -c /usr/local/lib/desktop-session/desktop-session-restart &";
-        }
-    }
+    if (!pretend) setupAutoMount(false);
 
     // set default host name
     computerNameEdit->setText(DEFAULT_HOSTNAME);
@@ -256,6 +237,75 @@ void MInstall::startup()
 
     // automatic installation
     if (automatic) nextButton->click();
+}
+
+// turn auto-mount off and on
+void MInstall::setupAutoMount(bool enabled)
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+
+    QFileInfo finfo;
+    // check if the systemctl program is present
+    bool have_sysctl = false;
+    const QStringList &envpath = QProcessEnvironment::systemEnvironment().value("PATH").split(':');
+    for(const QString &path : envpath) {
+        finfo.setFile(path + "/systemctl");
+        if (finfo.isExecutable()) {
+            have_sysctl = true;
+            break;
+        }
+    }
+    // check if udisksd is running.
+    bool udisksd_running = false;
+    if (proc.exec("ps -e | grep 'udisksd'")) udisksd_running = true;
+    // create a list of rules files that are being temporarily overridden
+    QStringList udev_temp_mdadm_rules;
+    finfo.setFile("/run/udev");
+    if (finfo.isDir()) {
+        udev_temp_mdadm_rules = proc.execOutLines("egrep -l '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d");
+        for (QString &rule : udev_temp_mdadm_rules) {
+            rule.replace("/lib/udev", "/run/udev");
+        }
+    }
+
+    // auto-mount setup
+    if (!enabled) {
+        // disable auto-mount
+        if (have_sysctl) {
+            // Use systemctl to prevent automount by masking currently unmasked mount points
+            listMaskedMounts = proc.execOutLines("systemctl list-units --full --all -t mount --no-legend 2>/dev/null | grep -v masked | cut -f1 -d' '"
+                " | egrep -v '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'").join(' ');
+            if (!listMaskedMounts.isEmpty()) {
+                proc.exec("systemctl --runtime mask --quiet -- " + listMaskedMounts);
+            }
+        }
+        // create temporary blank overrides for all udev rules which
+        // automatically start Linux Software RAID array members
+        proc.exec("mkdir -p /run/udev/rules.d");
+        for (const QString &rule : udev_temp_mdadm_rules) {
+            proc.exec("touch " + rule);
+        }
+        if (udisksd_running) {
+            proc.exec("echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/90-udisks-inhibit.rules");
+            proc.exec("udevadm control --reload");
+            proc.exec("udevadm trigger --subsystem-match=block");
+        }
+    } else {
+        // enable auto-mount
+        if (udisksd_running) {
+            proc.exec("rm -f /run/udev/rules.d/90-udisks-inhibit.rules");
+            proc.exec("udevadm control --reload");
+            proc.exec("udevadm trigger --subsystem-match=block");
+        }
+        // clear the rules that were temporarily overridden
+        for (const QString &rule : udev_temp_mdadm_rules) {
+            proc.exec("rm -f " + rule);
+        }
+        // Use systemctl to restore that status of any mount points changed above
+        if (have_sysctl && !listMaskedMounts.isEmpty()) {
+            proc.exec("systemctl --runtime unmask --quiet -- $MOUNTLIST");
+        }
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -2797,11 +2847,9 @@ void MInstall::cleanup(bool endclean)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (pretend) return;
 
+    proc.unhalt();
     if (endclean) {
-        proc.exec("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'", false);
-        if ( ! auto_mount_antix.isEmpty()) {
-            proc.exec(auto_mount_antix.toUtf8(),false);
-        }
+        setupAutoMount(true);
         proc.exec("/bin/cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
         proc.exec("/bin/rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
