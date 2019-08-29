@@ -80,12 +80,12 @@ void MProcess::unhalt()
 {
     QEventLoop eloop;
     connect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
-    if (state() == QProcess::Starting || state() == QProcess::Running) {
+    if (state() != QProcess::NotRunning) {
         closeReadChannel(QProcess::StandardOutput);
         closeReadChannel(QProcess::StandardError);
         closeWriteChannel();
         eloop.exec();
     }
-    disconnect(this, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+    disconnect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), 0, 0);
     halting = false;
 }
