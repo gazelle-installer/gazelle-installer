@@ -916,6 +916,11 @@
                </item>
                <item>
                 <property name="text">
+                 <string>f2fs</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>jfs</string>
                 </property>
                </item>
@@ -1111,6 +1116,11 @@
                <item>
                 <property name="text">
                  <string>ext2</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>f2fs</string>
                 </property>
                </item>
                <item>
