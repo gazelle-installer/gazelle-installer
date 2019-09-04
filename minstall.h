@@ -134,6 +134,8 @@ private slots:
     void on_grubPbrButton_toggled();
     void on_grubEspButton_toggled();
 
+    void on_cmbTimeArea_currentIndexChanged(int index);
+
     void on_progressBar_valueChanged(int value);
 
 private:
@@ -209,6 +211,9 @@ private:
     int indexFDErandom;
     int iFDEroundtime;
 
+    // cached time zone list
+    QStringList listTimeZones;
+
     // slots
     void startup();
     // helpers
@@ -231,4 +236,5 @@ private:
     void manageConfig(enum ConfigAction mode);
     void stashServices(bool save);
     void stashAdvancedFDE(bool save);
+    int selectTimeZone(const QString &zone);
 };

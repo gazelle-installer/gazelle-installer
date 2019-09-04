@@ -63,9 +63,9 @@ QString MProcess::execOut(const QString &cmd, bool everything)
     return strout.section("\n", 0, 0);
 }
 
-QStringList MProcess::execOutLines(const QString &cmd)
+QStringList MProcess::execOutLines(const QString &cmd, const bool rawexec)
 {
-    exec(cmd, false, nullptr, true);
+    exec(cmd, rawexec, nullptr, true);
     return QString(readAllStandardOutput().trimmed()).split('\n');
 }
 
