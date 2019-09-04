@@ -164,7 +164,6 @@ void MInstall::startup()
         }
     }
     cmbTimeArea->model()->sort(0);
-    selectTimeZone(QString(QTimeZone::systemTimeZoneId()));
 
     // locale
     localeCombo->clear();
@@ -739,7 +738,8 @@ void MInstall::manageConfig(enum ConfigAction mode)
         if (mode == ConfigSave) {
             config->setValue("Timezone", cmbTimeZone->currentData().toString());
         } else {
-            const int rc = selectTimeZone(config->value("Timezone").toString());
+            QVariant def(QString(QTimeZone::systemTimeZoneId()));
+            const int rc = selectTimeZone(config->value("Timezone", def).toString());
             if (rc == 1) config->markBadWidget(cmbTimeArea);
             else if (rc == 2) config->markBadWidget(cmbTimeZone);
         }
