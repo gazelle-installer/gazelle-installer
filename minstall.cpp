@@ -22,6 +22,7 @@
 #include <QTimer>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include <QTimeZone>
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
@@ -153,25 +154,17 @@ void MInstall::startup()
 
     setupkeyboardbutton();
 
-    // timezone
-    timezoneCombo->clear();
-    QFile file("/usr/share/zoneinfo/zone.tab");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while(!file.atEnd()) {
-            const QString line(file.readLine().trimmed());
-            if(!line.startsWith('#')) {
-                timezoneCombo->addItem(line.section("\t", 2, 2));
-            }
+    // timezone lists
+    listTimeZones = proc.execOutLines("find -L /usr/share/zoneinfo/posix -mindepth 2 -type f -printf %P\\n", true);
+    cmbTimeArea->clear();
+    for (const QString &zone : listTimeZones) {
+        const QString &area = zone.section('/', 0, 0);
+        if (cmbTimeArea->findData(QVariant(area)) < 0) {
+            cmbTimeArea->addItem(area, area);
         }
-        file.close();
     }
-    timezoneCombo->model()->sort(0);
-    file.setFileName("/etc/timezone");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        const QString line(file.readLine().trimmed());
-        timezoneCombo->setCurrentIndex(timezoneCombo->findText(line));
-        file.close();
-    }
+    cmbTimeArea->model()->sort(0);
+    selectTimeZone(QString(QTimeZone::systemTimeZoneId()));
 
     // locale
     localeCombo->clear();
@@ -182,7 +175,7 @@ void MInstall::startup()
         localeCombo->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
     }
     localeCombo->model()->sort(0);
-    file.setFileName("/etc/default/locale");
+    QFile file("/etc/default/locale");
     QString locale;
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         while (!file.atEnd()) {
@@ -743,7 +736,14 @@ void MInstall::manageConfig(enum ConfigAction mode)
         const char *clockChoices[] = {"24", "12"};
         QRadioButton *clockRadios[] = {radio24h, radio12h};
         config->manageRadios("ClockHours", 2, clockChoices, clockRadios);
-        config->manageComboBox("Timezone", timezoneCombo, false);
+        if (mode == ConfigSave) {
+            config->setValue("Timezone", cmbTimeZone->currentData().toString());
+        } else {
+            const int rc = selectTimeZone(config->value("Timezone").toString());
+            if (rc == 1) config->markBadWidget(cmbTimeArea);
+            else if (rc == 2) config->markBadWidget(cmbTimeZone);
+        }
+        config->manageComboBox("Timezone", cmbTimeZone, true);
         config->endGroup();
 
         // User Accounts step
@@ -2126,14 +2126,14 @@ void MInstall::setLocale()
 
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
     //replace with link
-    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(timezoneCombo->currentText());
+    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(cmbTimeZone->currentData().toString());
     proc.exec(cmd, false);
-    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(timezoneCombo->currentText());
+    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(cmbTimeZone->currentData().toString());
     proc.exec(cmd, false);
     // /etc/timezone is text file with the timezone written in it. Write the user-selected timezone in it now.
-    cmd = QString("echo %1 > /mnt/antiX/etc/timezone").arg(timezoneCombo->currentText());
+    cmd = QString("echo %1 > /mnt/antiX/etc/timezone").arg(cmbTimeZone->currentData().toString());
     proc.exec(cmd, false);
-    cmd = QString("echo %1 > /etc/timezone").arg(timezoneCombo->currentText());
+    cmd = QString("echo %1 > /etc/timezone").arg(cmbTimeZone->currentData().toString());
     proc.exec(cmd, false);
 
     // timezone
@@ -3304,4 +3304,29 @@ void MInstall::buildBootLists()
         on_grubPbrButton_toggled();
         grubPbrButton->setChecked(true);
     }
+}
+
+// return 0 = success, 1 = bad area, 2 = bad zone
+int MInstall::selectTimeZone(const QString &zone)
+{
+    int index = cmbTimeArea->findData(QVariant(zone.section('/', 0, 0)));
+    if (index < 0) return 1;
+    cmbTimeArea->setCurrentIndex(index);
+    qApp->processEvents();
+    index = cmbTimeZone->findData(QVariant(zone));
+    if (index < 0) return 2;
+    cmbTimeZone->setCurrentIndex(index);
+    return 0;
+}
+void MInstall::on_cmbTimeArea_currentIndexChanged(int index)
+{
+    if (index < 0 || index >= cmbTimeArea->count()) return;
+    const QString &area = cmbTimeArea->itemData(index).toString();
+    cmbTimeZone->clear();
+    for (const QString &zone : listTimeZones) {
+        if (zone.startsWith(area)) {
+            cmbTimeZone->addItem(QString(zone).section('/', 1), QVariant(zone));
+        }
+    }
+    cmbTimeZone->model()->sort(0);
 }

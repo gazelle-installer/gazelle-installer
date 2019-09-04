@@ -30,7 +30,7 @@ public:
     MProcess(QObject *parent = Q_NULLPTR);
     bool exec(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
     QString execOut(const QString &cmd, bool everything = false);
-    QStringList execOutLines(const QString &cmd);
+    QStringList execOutLines(const QString &cmd, const bool rawexec = false);
     void halt();
     void unhalt();
 };
