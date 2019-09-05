@@ -193,6 +193,9 @@ void MInstall::startup()
     }
     localeCombo->setCurrentIndex(iloc);
 
+    // init system
+    containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
+
     // if it looks like an apple...
     if (proc.exec("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
         mactest = true;
@@ -2088,16 +2091,13 @@ bool MInstall::setComputerName()
         proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1", false);
     }
 
-    char rbuf[4];
-    if (readlink("/mnt/antiX/sbin/init", rbuf, sizeof(rbuf)) >= 0) { // systemd check
-        if (!sambaCheckBox->isChecked()) {
-            proc.exec("chroot /mnt/antiX systemctl disable smbd");
-            proc.exec("chroot /mnt/antiX systemctl disable nmbd");
-            proc.exec("chroot /mnt/antiX systemctl disable samba-ad-dc");
-            proc.exec("chroot /mnt/antiX systemctl mask smbd");
-            proc.exec("chroot /mnt/antiX systemctl mask nmbd");
-            proc.exec("chroot /mnt/antiX systemctl mask samba-ad-dc");
-        }
+    if (containsSystemD && !sambaCheckBox->isChecked()) {
+        proc.exec("chroot /mnt/antiX systemctl disable smbd");
+        proc.exec("chroot /mnt/antiX systemctl disable nmbd");
+        proc.exec("chroot /mnt/antiX systemctl disable samba-ad-dc");
+        proc.exec("chroot /mnt/antiX systemctl mask smbd");
+        proc.exec("chroot /mnt/antiX systemctl mask nmbd");
+        proc.exec("chroot /mnt/antiX systemctl mask samba-ad-dc");
     }
 
     //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
@@ -2196,25 +2196,19 @@ void MInstall::setServices()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return;
 
-    // systemd check
-    char rbuf[4];
-    bool systemd = (readlink("/mnt/antiX/sbin/init", rbuf, sizeof(rbuf)) >= 0);
-
     QTreeWidgetItemIterator it(csView);
     while (*it) {
         if ((*it)->parent() != nullptr) {
             QString service = (*it)->text(0);
             qDebug() << "Service: " << service;
             if ((*it)->checkState(0) == Qt::Checked) {
-                if (!systemd) {
-                    proc.exec("chroot /mnt/antiX update-rc.d " + service + " enable");
-                } else {
+                proc.exec("chroot /mnt/antiX update-rc.d " + service + " enable");
+                if (containsSystemD) {
                     proc.exec("chroot /mnt/antiX systemctl enable " + service);
                 }
             } else {
-                if (!systemd) {
-                    proc.exec("chroot /mnt/antiX update-rc.d " + service + " disable");
-                } else {
+                proc.exec("chroot /mnt/antiX update-rc.d " + service + " disable");
+                if (containsSystemD) {
                     proc.exec("chroot /mnt/antiX systemctl disable " + service);
                     proc.exec("chroot /mnt/antiX systemctl mask " + service);
                 }

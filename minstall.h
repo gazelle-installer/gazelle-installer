@@ -153,6 +153,7 @@ private:
     bool isSwapEncrypted = false;
     bool uefi = false;
     bool mactest = false;
+    bool containsSystemD = false;
 
     // source medium
     QString rootSources;
