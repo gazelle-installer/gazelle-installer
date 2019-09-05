@@ -1709,12 +1709,12 @@
               <widget class="QComboBox" name="comboFDErandom">
                <item>
                 <property name="text">
-                 <string>random</string>
+                 <string>urandom</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>urandom</string>
+                 <string>random</string>
                 </property>
                </item>
               </widget>
