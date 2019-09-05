@@ -162,6 +162,7 @@ private:
 
     // auto-mount setup
     QString listMaskedMounts;
+    bool autoMountEnabled = true;
 
     // if these variables are non-zero then the installer formats the partition
     // if they are negative the installer formats an existing partition

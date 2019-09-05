@@ -122,6 +122,7 @@ void MInstall::startup()
     }
     qDebug() << "uefi =" << uefi;
 
+    autoMountEnabled = true; // disable auto mount by force
     if (!pretend) setupAutoMount(false);
 
     // set default host name
@@ -236,6 +237,7 @@ void MInstall::setupAutoMount(bool enabled)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
+    if (autoMountEnabled == enabled) return;
     QFileInfo finfo;
     // check if the systemctl program is present
     bool have_sysctl = false;
@@ -298,6 +300,7 @@ void MInstall::setupAutoMount(bool enabled)
             proc.exec("systemctl --runtime unmask --quiet -- $MOUNTLIST");
         }
     }
+    autoMountEnabled = enabled;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -1465,6 +1468,7 @@ bool MInstall::installLinux(const int progend)
         }
     }
 
+    setupAutoMount(true);
     if(!copyLinux(progend - 1)) return false;
 
     updateStatus(tr("Fixing configuration"), progend);
