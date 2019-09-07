@@ -161,7 +161,10 @@ void MInstall::startup()
     for (const QString &zone : listTimeZones) {
         const QString &area = zone.section('/', 0, 0);
         if (cmbTimeArea->findData(QVariant(area)) < 0) {
-            cmbTimeArea->addItem(area, area);
+            QString text(area);
+            if (area == "Indian" || area == "Pacific"
+                || area == "Atlantic" || area == "Arctic") text.append(" Ocean");
+            cmbTimeArea->addItem(text, area);
         }
     }
     cmbTimeArea->model()->sort(0);
@@ -3323,7 +3326,9 @@ void MInstall::on_cmbTimeArea_currentIndexChanged(int index)
     cmbTimeZone->clear();
     for (const QString &zone : listTimeZones) {
         if (zone.startsWith(area)) {
-            cmbTimeZone->addItem(QString(zone).section('/', 1), QVariant(zone));
+            QString text(QString(zone).section('/', 1));
+            text.replace('_', ' ');
+            cmbTimeZone->addItem(text, QVariant(zone));
         }
     }
     cmbTimeZone->model()->sort(0);
