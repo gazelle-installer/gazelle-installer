@@ -286,14 +286,14 @@ void MInstall::setupAutoMount(bool enabled)
             proc.exec("touch " + rule);
         }
         if (udisksd_running) {
-            proc.exec("echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/90-udisks-inhibit.rules");
+            proc.exec("echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/91-mx-udisks-inhibit.rules");
             proc.exec("udevadm control --reload");
             proc.exec("udevadm trigger --subsystem-match=block");
         }
     } else {
         // enable auto-mount
         if (udisksd_running) {
-            proc.exec("rm -f /run/udev/rules.d/90-udisks-inhibit.rules");
+            proc.exec("rm -f /run/udev/rules.d/91-mx-udisks-inhibit.rules");
             proc.exec("udevadm control --reload");
         }
         // clear the rules that were temporarily overridden
