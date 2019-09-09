@@ -19,7 +19,7 @@
 #include "msettings.h"
 
 MSettings::MSettings(const QString &fileName, QObject *parent)
-    : QSettings(fileName, QSettings::NativeFormat, parent)
+    : QSettings(fileName, QSettings::IniFormat, parent)
 {
 }
 

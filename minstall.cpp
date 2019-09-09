@@ -624,7 +624,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
 {
     if (mode == ConfigSave) {
         delete config;
-        config = new MSettings("/.minstalled", this);
+        config = new MSettings("/mnt/antiX/etc/minstall.conf", this);
     }
     if (!config) return;
     config->bad = false;
@@ -776,7 +776,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
 
     if (mode == ConfigSave) {
         config->sync();
-        proc.exec("/bin/cp /.minstalled /mnt/antiX/.minstall >/dev/null 2>&1", false);
+        QFile::copy(config->fileName(), "/etc/minstalled.conf");
     }
 
     if (config->bad) {
