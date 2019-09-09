@@ -82,12 +82,28 @@ void BlockDeviceList::build(MProcess &proc)
     // backup detection for drives that don't have UUID for ESP
     const QStringList backup_list = proc.execOutLines("fdisk -l -o DEVICE,TYPE |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
 
+    // collect and sort lsblk info (sorting required for drives with >15 partitions)
+    const QStringList &bdraw = proc.execOutLines("lsblk -brno TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL");
+    QStringList blkdevs, bdrives, bparts;
+    for (const QString &blkdev : bdraw) {
+        const QString &bdtype = blkdev.section(' ', 0, 0);
+        if (bdtype == "disk") bdrives << blkdev;
+        else if (bdtype == "part") bparts << blkdev;
+    }
+    for (const QString &bdrive : bdrives) {
+        blkdevs << bdrive;
+        for (QString &bpart : bparts) {
+            if (bpart.section(' ', 1, 1).startsWith(bdrive.section(' ', 1, 1))) {
+                blkdevs.append(bpart);
+                bpart.clear();
+            }
+        }
+    }
+
     // populate the block device list
     clear();
     bool gpt = false; // propagates to all partitions within the drive
     int driveIndex = 0; // for propagating the nasty flag to the drive
-    const QStringList &blkdevs = proc.execOutLines("lsblk -btno TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL |sed 's/├─//' |sed 's/└─//' |sed 's/ \\{2,\\}/ /g'"
-                                            " | grep -E '^(disk|part)'");
     for (const QString &blkdev : blkdevs) {
         const QStringList &bdsegs = blkdev.split(' ');
         const int segsize = bdsegs.size();
