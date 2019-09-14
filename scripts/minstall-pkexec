@@ -11,8 +11,9 @@ if test "$EUID" != 0; then
     # normal user
     ##disable Xfce automount features
 
-	INITIALAUTOMOUNT=$(xfconf-query --channel thunar-volman --property /automount-drives/enabled)
+	INITIALAUTOMOUNT=$(command -v xfconf-query && xfconf-query --channel thunar-volman --property /automount-drives/enabled)
 	echo "INITIALAUTOMOUNT =" "$INITIALAUTOMOUNT"
+	echo "$INITIALAUTOMOUNT" >> /tmp/minstall-auto
 	command -v xfconf-query && xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false
 	###end Xfce automount feature
     
@@ -24,7 +25,10 @@ if test "$EUID" != 0; then
         rm  $QTENV
     fi
     ##renable Xfce automount feature, if it was enabled in the first place
-
+	if [ -e "/tmp/minstall-auto" ]; then
+		rm /tmp/minstall-auto
+	fi
+	
 	if [ "$INITIALAUTOMOUNT" = "true" ]; then
 		command -v xfconf-query && xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true
 	fi
