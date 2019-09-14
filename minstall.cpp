@@ -295,6 +295,7 @@ void MInstall::setupAutoMount(bool enabled)
         if (udisksd_running) {
             proc.exec("rm -f /run/udev/rules.d/91-mx-udisks-inhibit.rules");
             proc.exec("udevadm control --reload");
+            proc.exec("partprobe");
         }
         // clear the rules that were temporarily overridden
         for (const QString &rule : udev_temp_mdadm_rules) {
