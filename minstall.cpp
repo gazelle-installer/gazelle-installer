@@ -196,6 +196,10 @@ void MInstall::startup()
     }
     localeCombo->setCurrentIndex(iloc);
 
+    // set clock to 12h in some locales to prevent riots
+    QRegularExpression regex("^(en_US|en_CA|ar_EG|el_GR|sq_AL)(\\.UTF-8)?$");
+    if (locale.contains(regex)) radio12h->setChecked(true);
+
     // init system
     containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
 

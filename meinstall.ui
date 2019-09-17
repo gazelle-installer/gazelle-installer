@@ -2274,9 +2274,6 @@
                <property name="text">
                 <string notr="true">1:57</string>
                </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
               </widget>
              </item>
              <item row="3" column="3">
@@ -2310,6 +2307,9 @@
               <widget class="QRadioButton" name="radio24h">
                <property name="text">
                 <string notr="true">13:57</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
