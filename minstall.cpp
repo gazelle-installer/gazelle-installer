@@ -169,7 +169,7 @@ void MInstall::startup()
     }
     cmbTimeArea->model()->sort(0);
 
-    // locale
+    // locale list
     localeCombo->clear();
     QStringList loclist = proc.execOutLines("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'");
     for (QString &strloc : loclist) {
@@ -178,27 +178,12 @@ void MInstall::startup()
         localeCombo->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
     }
     localeCombo->model()->sort(0);
-    QFile file("/etc/default/locale");
-    QString locale;
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while (!file.atEnd()) {
-            const QString line(file.readLine());
-            if(line.startsWith("LANG")) {
-                locale = line.section('=', 1).trimmed();
-            }
-        }
-        file.close();
-    }
-    int iloc = localeCombo->findData(QVariant(locale));
-    if (iloc == -1) {
-        // set to British English to show that the system locale was probably not picked up
-        iloc = localeCombo->findData(QVariant("en_GB.UTF-8"));
-    }
-    localeCombo->setCurrentIndex(iloc);
-
-    // set clock to 12h in some locales to prevent riots
-    QRegularExpression regex("^(en_US|en_CA|ar_EG|el_GR|sq_AL)(\\.UTF-8)?$");
-    if (locale.contains(regex)) radio12h->setChecked(true);
+    // default locale selection
+    const QLocale &syslocale = QLocale::system();
+    const QVariant locvar(syslocale.name() + ".UTF-8");
+    localeCombo->setCurrentIndex(localeCombo->findData(locvar));
+    // riot control
+    if (syslocale.timeFormat().startsWith('h')) radio12h->setChecked(true);
 
     // init system
     containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
