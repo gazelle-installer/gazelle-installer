@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="is" version="2.1">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="mr" version="2.1">
 <context>
     <name>MInstall</name>
     <message>
@@ -98,7 +98,7 @@ a longer password before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="606"/>
         <source>Cleaning up</source>
-        <translation>Hreinsa til</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="774"/>
@@ -717,7 +717,7 @@ name before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="2508"/>
         <source>OK</source>
-        <translation>Í lagi</translation>
+        <translation> ठीक आहे</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2510"/>
@@ -787,7 +787,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="60"/>
         <source>Help</source>
-        <translation>Hjálp</translation>
+        <translation>मदत</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="156"/>
@@ -828,7 +828,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="262"/>
         <source>Close</source>
-        <translation>Hætta</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="310"/>
@@ -1024,7 +1024,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="1000"/>
         <source>Label</source>
-        <translation>Merki</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1019"/>
@@ -1045,7 +1045,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="1172"/>
         <source>Type</source>
-        <translation>Tegund</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="1188"/>
@@ -1345,7 +1345,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="2486"/>
         <source>View</source>
-        <translation>Skoða</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="2547"/>
