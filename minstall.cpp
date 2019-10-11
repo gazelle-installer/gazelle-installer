@@ -284,7 +284,7 @@ void MInstall::setupAutoMount(bool enabled)
         if (udisksd_running) {
             proc.exec("rm -f /run/udev/rules.d/91-mx-udisks-inhibit.rules");
             proc.exec("udevadm control --reload");
-            proc.exec("partprobe");
+            proc.exec("partprobe -s");
         }
         // clear the rules that were temporarily overridden
         for (const QString &rule : udev_temp_mdadm_rules) {
@@ -1349,7 +1349,7 @@ bool MInstall::makePartitions()
     if (!lambdaPreparePart(rootDevice, rootFormatSize, "primary ext4")) return false;
     if (!lambdaPreparePart(homeDevice, homeFormatSize, "primary")) return false;
     if (!lambdaPreparePart(swapDevice, swapFormatSize, "primary")) return false;
-    proc.exec("partprobe", true);
+    proc.exec("partprobe -s", true);
     return true;
 }
 
