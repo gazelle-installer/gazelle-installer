@@ -842,8 +842,12 @@ bool MInstall::formatPartitions()
     //if no swap is chosen do nothing
     if (swapFormatSize) {
         updateStatus(tr("Formatting swap partition"));
-        const QString cmd("/sbin/mkswap %1 -L %2");
-        if (!proc.exec(cmd.arg(swapdev, swapLabelEdit->text()))) return false;
+        const QString cmd("/sbin/mkswap %1 %2");
+        QString mkswaplabel = swapLabelEdit->text();
+        if (! mkswaplabel.isEmpty() ) {
+            mkswaplabel.prepend("-L ");
+        }
+        if (!proc.exec(cmd.arg(swapdev, mkswaplabel))) return false;
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
@@ -899,29 +903,39 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         root_mntops = "defaults,noatime";
     }
 
+    QString formatlabel=label;
+    if (! formatlabel.isEmpty()) {
+        if (type == "reiserfs") {
+            formatlabel.prepend("-l \"");
+        } else {
+            formatlabel.prepend("-L \"");
+        }
+        formatlabel.append("\"");
+    }
+
     QString cmd;
     if (type == "reiserfs") {
-        cmd = QString("mkfs.reiserfs -q %1 -l \"%2\"").arg(dev).arg(label);
+        cmd = QString("mkfs.reiserfs -q %1 %2").arg(dev).arg(formatlabel);
     } else if (type == "reiser4") {
         // reiser4
-        cmd = QString("mkfs.reiser4 -f -y %1 -L \"%2\"").arg(dev).arg(label);
+        cmd = QString("mkfs.reiser4 -f -y %1 %2").arg(dev).arg(formatlabel);
     } else if (type == "ext3") {
         // ext3
         if (bad) {
             // do with badblocks
-            cmd = QString("mkfs.ext3 -c %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.ext3 -c %1 %2").arg(dev).arg(formatlabel);
         } else {
             // do no badblocks
-            cmd = QString("mkfs.ext3 -F %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.ext3 -F %1 %2").arg(dev).arg(formatlabel);
         }
     } else if (type == "ext2") {
         // ext2
         if (bad) {
             // do with badblocks
-            cmd = QString("mkfs.ext2 -c %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.ext2 -c %1 %2").arg(dev).arg(formatlabel);
         } else {
             // do no badblocks
-            cmd = QString("mkfs.ext2 -F %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.ext2 -F %1 %2").arg(dev).arg(formatlabel);
         }
     } else if (type.startsWith("btrfs")) {
         // btrfs and set up fsck
@@ -932,9 +946,9 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
         if (size < 6000) {
-            cmd = QString("mkfs.btrfs -f -M -O skinny-metadata %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.btrfs -f -M -O skinny-metadata %1 %2").arg(dev).arg(formatlabel);
         } else {
-            cmd = QString("mkfs.btrfs -f %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.btrfs -f %1 %2").arg(dev).arg(formatlabel);
         }
         // if compression has been selected by user, set flag
         if (type == "btrfs-zlib") {
@@ -951,22 +965,22 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
             }
         }
     } else if (type == "xfs") {
-        cmd = QString("mkfs.xfs -f %1 -L \"%2\"").arg(dev).arg(label);
+        cmd = QString("mkfs.xfs -f %1 %2").arg(dev).arg(formatlabel);
     } else if (type == "jfs") {
         if (bad) {
             // do with badblocks
-            cmd = QString("mkfs.jfs -q -c %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.jfs -q -c %1 %2").arg(dev).arg(formatlabel);
         } else {
             // do no badblocks
-            cmd = QString("mkfs.jfs -q %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.jfs -q %1 %2").arg(dev).arg(formatlabel);
         }
     } else { // must be ext4
         if (bad) {
             // do with badblocks
-            cmd = QString("mkfs.ext4 -c %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.ext4 -c %1 %2").arg(dev).arg(formatlabel);
         } else {
             // do no badblocks
-            cmd = QString("mkfs.ext4 -F %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = QString("mkfs.ext4 -F %1 %2").arg(dev).arg(formatlabel);
         }
     }
     if (!proc.exec(cmd)) {
