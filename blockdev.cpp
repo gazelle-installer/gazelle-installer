@@ -58,7 +58,7 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
 
 void BlockDeviceList::build(MProcess &proc)
 {
-    proc.exec("/sbin/partprobe", true);
+    proc.exec("partprobe -s", true);
     proc.exec("blkid -c /dev/null", true);
 
     // expressions for matching various partition types
