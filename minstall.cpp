@@ -842,12 +842,10 @@ bool MInstall::formatPartitions()
     //if no swap is chosen do nothing
     if (swapFormatSize) {
         updateStatus(tr("Formatting swap partition"));
-        const QString cmd("/sbin/mkswap %1 %2");
-        QString mkswaplabel = swapLabelEdit->text();
-        if (! mkswaplabel.isEmpty() ) {
-            mkswaplabel.prepend("-L ");
-        }
-        if (!proc.exec(cmd.arg(swapdev, mkswaplabel))) return false;
+        QString cmd("/sbin/mkswap " + swapdev);
+        const QString &mkswaplabel = swapLabelEdit->text();
+        if (!mkswaplabel.isEmpty()) cmd.append(" -L \"" + mkswaplabel + "\"");
+        if (!proc.exec(cmd, true)) return false;
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
@@ -891,7 +889,7 @@ bool MInstall::formatPartitions()
     return true;
 }
 
-bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label)
+bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
@@ -903,40 +901,11 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         root_mntops = "defaults,noatime";
     }
 
-    QString formatlabel=label;
-    if (! formatlabel.isEmpty()) {
-        if (type == "reiserfs") {
-            formatlabel.prepend("-l \"");
-        } else {
-            formatlabel.prepend("-L \"");
-        }
-        formatlabel.append("\"");
-    }
-
     QString cmd;
     if (type == "reiserfs") {
-        cmd = QString("mkfs.reiserfs -q %1 %2").arg(dev).arg(formatlabel);
+        cmd = "mkfs.reiserfs -q";
     } else if (type == "reiser4") {
-        // reiser4
-        cmd = QString("mkfs.reiser4 -f -y %1 %2").arg(dev).arg(formatlabel);
-    } else if (type == "ext3") {
-        // ext3
-        if (bad) {
-            // do with badblocks
-            cmd = QString("mkfs.ext3 -c %1 %2").arg(dev).arg(formatlabel);
-        } else {
-            // do no badblocks
-            cmd = QString("mkfs.ext3 -F %1 %2").arg(dev).arg(formatlabel);
-        }
-    } else if (type == "ext2") {
-        // ext2
-        if (bad) {
-            // do with badblocks
-            cmd = QString("mkfs.ext2 -c %1 %2").arg(dev).arg(formatlabel);
-        } else {
-            // do no badblocks
-            cmd = QString("mkfs.ext2 -F %1 %2").arg(dev).arg(formatlabel);
-        }
+        cmd = "mkfs.reiser4 -f -y";
     } else if (type.startsWith("btrfs")) {
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
@@ -946,9 +915,9 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
         if (size < 6000) {
-            cmd = QString("mkfs.btrfs -f -M -O skinny-metadata %1 %2").arg(dev).arg(formatlabel);
+            cmd = "mkfs.btrfs -f -M -O skinny-metadata";
         } else {
-            cmd = QString("mkfs.btrfs -f %1 %2").arg(dev).arg(formatlabel);
+            cmd = "mkfs.btrfs -f";
         }
         // if compression has been selected by user, set flag
         if (type == "btrfs-zlib") {
@@ -965,35 +934,24 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
             }
         }
     } else if (type == "xfs") {
-        cmd = QString("mkfs.xfs -f %1 %2").arg(dev).arg(formatlabel);
-    } else if (type == "jfs") {
-        if (bad) {
-            // do with badblocks
-            cmd = QString("mkfs.jfs -q -c %1 %2").arg(dev).arg(formatlabel);
-        } else {
-            // do no badblocks
-            cmd = QString("mkfs.jfs -q %1 %2").arg(dev).arg(formatlabel);
-        }
-    } else { // must be ext4
-        if (bad) {
-            // do with badblocks
-            cmd = QString("mkfs.ext4 -c %1 %2").arg(dev).arg(formatlabel);
-        } else {
-            // do no badblocks
-            cmd = QString("mkfs.ext4 -F %1 %2").arg(dev).arg(formatlabel);
-        }
+        cmd = "mkfs.xfs -f";
+    } else { // jfs, ext2, ext3, ext4
+        cmd = "mkfs." + type;
+        if (type == "jfs") cmd.append(" -q");
+        if (chkBadBlocks) cmd.append(" -c");
     }
-    if (!proc.exec(cmd)) {
-        // error
-        return false;
+
+    cmd.append(" " + dev);
+    if (!label.isEmpty()) {
+        if (type == "reiserfs") cmd.append(" -l \"");
+        else cmd.append(" -L \"");
+        cmd.append(label + "\"");
     }
+    if (!proc.exec(cmd)) return false;
 
     if (type.startsWith("ext")) {
         // ext4 tuning
-        cmd = QString("/sbin/tune2fs -c0 -C0 -i1m %1").arg(dev);
-        if (!proc.exec(cmd)) {
-            // error
-        }
+        proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
     }
     return true;
 }
