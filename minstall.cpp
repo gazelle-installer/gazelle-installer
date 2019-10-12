@@ -179,11 +179,9 @@ void MInstall::startup()
     }
     localeCombo->model()->sort(0);
     // default locale selection
-    const QLocale &syslocale = QLocale::system();
-    const QVariant locvar(syslocale.name() + ".UTF-8");
-    localeCombo->setCurrentIndex(localeCombo->findData(locvar));
-    // riot control
-    if (syslocale.timeFormat().startsWith('h')) radio12h->setChecked(true);
+    int ixLocale = localeCombo->findData(QVariant(QLocale::system().name() + ".UTF-8"));
+    if (localeCombo->currentIndex() != ixLocale) localeCombo->setCurrentIndex(ixLocale);
+    else on_localeCombo_currentIndexChanged(ixLocale);
 
     // init system
     containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
@@ -3266,6 +3264,14 @@ void MInstall::buildBootLists()
         on_grubPbrButton_toggled();
         grubPbrButton->setChecked(true);
     }
+}
+
+void MInstall::on_localeCombo_currentIndexChanged(int index)
+{
+    // riot control
+    QLocale locale(localeCombo->itemData(index).toString());
+    if (locale.timeFormat().startsWith('h')) radio12h->setChecked(true);
+    else radio24h->setChecked(true);
 }
 
 // return 0 = success, 1 = bad area, 2 = bad zone
