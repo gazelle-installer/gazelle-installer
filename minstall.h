@@ -134,6 +134,7 @@ private slots:
     void on_grubPbrButton_toggled();
     void on_grubEspButton_toggled();
 
+    void on_localeCombo_currentIndexChanged(int index);
     void on_cmbTimeArea_currentIndexChanged(int index);
 
     void on_progressBar_valueChanged(int value);
