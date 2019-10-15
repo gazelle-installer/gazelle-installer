@@ -939,6 +939,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         cmd = "mkfs." + type;
         if (type == "jfs") cmd.append(" -q");
         if (chkBadBlocks) cmd.append(" -c");
+        else if (type.startsWith("ext")) cmd.append(" -F");
     }
 
     cmd.append(" " + dev);
