@@ -3064,7 +3064,6 @@ void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
 
 void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
 {
-    nextButton->setDisabled(checked);
     if (checked) {
         FDEpassCust2->clear();
         FDEpassCust->clear();
