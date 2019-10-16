@@ -283,7 +283,7 @@ void MInstall::setupAutoMount(bool enabled)
             proc.exec("rm -f /run/udev/rules.d/91-mx-udisks-inhibit.rules");
             proc.exec("udevadm control --reload");
             proc.exec("partprobe -s");
-            proc.exec("sleep 1");
+            csleep(1000);
         }
         // clear the rules that were temporarily overridden
         for (const QString &rule : udev_temp_mdadm_rules) {
@@ -868,7 +868,7 @@ bool MInstall::formatPartitions()
         updateStatus(tr("Formatting EFI System Partition"));
         if (!proc.exec("mkfs.msdos -F 32 " + espDevice)) return false;
         proc.exec("parted -s " + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
-        proc.exec("sleep 1");
+        csleep(1000);
     }
     // maybe format home
     if (homeFormatSize) {
@@ -954,7 +954,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         // ext4 tuning
         proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
     }
-    proc.exec("sleep 1");
+    csleep(1000);
     return true;
 }
 
@@ -983,7 +983,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
         failUI(tr("Sorry, could not create %1 LUKS partition").arg(dev));
         return false;
     }
-    proc.exec("sleep 1");
+    csleep(1000);
     return true;
 }
 
@@ -1322,7 +1322,7 @@ bool MInstall::makePartitions()
             }
             rc = proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1)));
         }
-        proc.exec("sleep 1");
+        csleep(1000);
         return rc;
     };
 
@@ -1343,7 +1343,7 @@ bool MInstall::makePartitions()
     } else {
         updateStatus(tr("Preparing required partitions"));
     }
-    proc.exec("sleep 1");
+    csleep(1000);
 
     // any new partitions they will appear in this order on the disk
     if (!biosGrubDevice.isEmpty()) {
@@ -1355,7 +1355,7 @@ bool MInstall::makePartitions()
     if (!lambdaPreparePart(homeDevice, homeFormatSize, "primary")) return false;
     if (!lambdaPreparePart(swapDevice, swapFormatSize, "primary")) return false;
     proc.exec("partprobe -s", true);
-    proc.exec("sleep 1");
+    csleep(1000);
     return true;
 }
 
@@ -1669,7 +1669,7 @@ bool MInstall::installLoader()
         if (bootflag) proc.exec("parted -s " + boot + " set " + part_num + bootflag, true);
     }
 
-    proc.exec("sleep 1");
+    csleep(1000);
 
     // set mounts for chroot
     proc.exec("/bin/mount -o bind /dev /mnt/antiX/dev", true);
