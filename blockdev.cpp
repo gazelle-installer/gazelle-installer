@@ -37,21 +37,14 @@ QStringList BlockDeviceInfo::split(const QString &devname)
 // return block device info that is suitable for a combo box
 void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
 {
-    const char *suffixes[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB"};
-    unsigned int isuffix = 0;
-    long long scalesize = size;
-    while (scalesize >= 1024 && isuffix < sizeof(suffixes)) {
-        ++isuffix;
-        scalesize /= 1024;
-    }
-    QString strout(name + " (" + QString::number(scalesize) + suffixes[isuffix]);
+    QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
     if (!fs.isEmpty()) strout += " " + fs;
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
     QString stricon;
     if (isFuture) stricon = "appointment-soon-symbolic";
     else if (isNasty && warnNasty) stricon = "dialog-warning-symbolic";
-    combo->addItem(QIcon::fromTheme(stricon), strout + ")", name);
+    combo->addItem(QIcon::fromTheme(stricon), name + " (" + strout + ")", name);
 }
 
 //////////////////////////////////////////////////////////////////////////////
