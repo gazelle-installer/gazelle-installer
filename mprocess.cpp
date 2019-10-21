@@ -42,7 +42,7 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     if (input && !(input->isEmpty())) write(*input);
     closeWriteChannel();
     eloop.exec();
-    disconnect(this, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+    disconnect(this, SIGNAL(finished(int, QProcess::ExitStatus)), nullptr, nullptr);
     if (debugUnusedOutput) {
         if (!needRead) {
             const QByteArray &StdOut = readAllStandardOutput();
@@ -69,6 +69,20 @@ QStringList MProcess::execOutLines(const QString &cmd, const bool rawexec)
     return QString(readAllStandardOutput().trimmed()).split('\n', QString::SkipEmptyParts);
 }
 
+void MProcess::sleep(const int msec, const bool silent)
+{
+    if(!silent) {
+        ++sleepcount;
+        qDebug().nospace() << "Sleep #" << sleepcount << ": " << msec << "ms";
+    }
+    QTimer cstimer(this);
+    QEventLoop eloop(this);
+    connect(&cstimer, &QTimer::timeout, &eloop, &QEventLoop::quit);
+    cstimer.start(msec);
+    int rc = eloop.exec();
+    if(!silent) qDebug().nospace() << "Sleep #" << sleepcount << ": exit " << rc;
+}
+
 void MProcess::halt()
 {
     halting = true;
@@ -86,6 +100,6 @@ void MProcess::unhalt()
         closeWriteChannel();
         eloop.exec();
     }
-    disconnect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), 0, 0);
+    disconnect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), nullptr, nullptr);
     halting = false;
 }
