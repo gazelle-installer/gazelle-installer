@@ -2669,7 +2669,7 @@ void MInstall::changeEvent(QEvent *event)
     {
         QPalette pal = mainHelp->style()->standardPalette();
         QColor col = pal.color(QPalette::Base);
-        col.setAlpha(150);
+        col.setAlpha(200);
         pal.setColor(QPalette::Base, col);
         mainHelp->setPalette(pal);
         resizeEvent(nullptr);
