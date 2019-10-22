@@ -2279,17 +2279,20 @@ void MInstall::pageDisplayed(int next)
 
     switch (next) {
     case 1: // choose disk
-        mainHelp->setText(tr("<p><b>General Instructions</b><br/>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</p>"
-                             "<p>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. "
-                             "You will be prompted for confirmation before any destructive actions are performed.</p>"
-                             "<p>Installation requires about %1 of space. %2 or more is preferred. "
-                             "You can use the entire disk or you can put the installation on existing partitions. </p>"
-                             "<p>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.</p>"
-                             "<p>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</p>").arg(MIN_INSTALL_SIZE).arg(PREFERRED_MIN_INSTALL_SIZE) + tr(""
-                             "<p>Autoinstall will place home on the root partition.</p>") + tr(""
-                             "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
-                             "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
-                             "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
+        mainHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
+                          + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
+                          "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
+                                     " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
+                          "<p>" + tr("Installation requires about %1 of space. %2 or more is preferred."
+                                     " You can use the entire disk or you can put the installation on existing partitions.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
+                          "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
+                          "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
+                          "<p>" + tr("Autoinstall will place home on the root partition.") + "</p>"
+                          "<p><b>" + tr("Encryption") + "</b><br/>"
+                          + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
+                          "<p>" + tr("A separate unencrypted boot partition is required."
+                                     " For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
+                          "<p>" + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>");
         if (phase < 0) {
             updateCursor(Qt::WaitCursor);
             phase = 0;
@@ -2301,20 +2304,27 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 2:  // choose partition
-        mainHelp->setText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
-                             "It's solely your responsibility to backup your data before proceeding.</p>"
-                             "<p><b>Choose Partitions</b><br/>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</p>"
-                             "<p>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</p>"
-                             "<p><b>Upgrading</b><br/>To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.</p>"
-                             "<p>If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. "
-                             "As a result, the installation will take much longer than usual.</p>"
-                             "<p><b>Preferred Filesystem Type</b><br/>For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. </p>"
-                             "<p>Additional compression options are available for drives using btrfs. "
-                             "Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</p>"
-                             "<p><b>Bad Blocks</b><br/>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. "
-                             "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME)+ tr(""
-                             "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
-                             "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
+        mainHelp->setText("<p><b>" + tr("Limitations") + "</b><br/>"
+                          + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
+                               " It is solely your responsibility to backup your data before proceeding.") + "</p>"
+                          "<p><b>" + tr("Choose Partitions") + "</b><br/>"
+                          + tr("%1 requires a root partition. The swap partition is optional but highly recommended."
+                               " If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.").arg(PROJECTNAME) + "</p>"
+                          "<p>" + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.") + "</p>"
+                          "<p><b>" + tr("Upgrading") + "</b><br/>"
+                          + tr("To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.") + "</p>"
+                          "<p>" + tr("If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition."
+                                     " As a result, the installation will take much longer than usual.") + "</p>"
+                          "<p><b>" + tr("Preferred Filesystem Type") + "</b><br/>"
+                          + tr("For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.").arg(PROJECTNAME) + "</p>"
+                          "<p>" + tr("Additional compression options are available for drives using btrfs."
+                                     " Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.") + "</p>"
+                          "<p><b>" + tr("Bad Blocks") + "</b><br/>"
+                          + tr("If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive."
+                               " The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"
+                          "<p><b>" + tr("Encryption") + "</b><br/>"
+                          + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
+                          "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>");
         break;
 
     case 3: // advanced encryption settings
