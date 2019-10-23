@@ -2829,6 +2829,69 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="Step_Old_Home">
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QGroupBox" name="gbOldHome">
+            <property name="title">
+             <string>Existing Home Directory</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <widget class="QLabel" name="labelOldHome"/>
+             </item>
+             <item>
+              <widget class="QLabel" name="labelOldHome2">
+               <property name="text">
+                <string>What would you like to do with the old directory?</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radioOldHomeUse">
+               <property name="text">
+                <string>Re-use it for this installation</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radioOldHomeSave">
+               <property name="text">
+                <string>Rename it and create a new directory</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="radioOldHomeDelete">
+               <property name="text">
+                <string>Delete it and create a new directory</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="Step_Progress">
          <layout class="QGridLayout" name="_16">
           <property name="leftMargin">
