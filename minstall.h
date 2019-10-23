@@ -136,7 +136,12 @@ private slots:
     void on_localeCombo_currentIndexChanged(int index);
     void on_cmbTimeArea_currentIndexChanged(int index);
 
+    void on_radioOldHomeUse_toggled(bool);
+    void on_radioOldHomeSave_toggled(bool);
+    void on_radioOldHomeDelete_toggled(bool);
+
     void on_progressBar_valueChanged(int value);
+
 
 private:
     MProcess proc;
@@ -198,9 +203,7 @@ private:
     bool canMBR, canPBR, canESP;
     bool haveSamba = false;
     bool haveSnapshotUserAccounts = false;
-    enum OldHomeAction {
-        OldHomeNothing, OldHomeUse, OldHomeSave, OldHomeDelete
-    } oldHomeAction = OldHomeNothing;
+    bool haveOldHome = false;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;

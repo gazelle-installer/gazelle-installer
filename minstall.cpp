@@ -594,7 +594,7 @@ bool MInstall::processNextPhase()
         phase = 4;
         updateStatus(tr("Cleaning up"), 100);
         cleanup();
-        gotoPage(10);
+        gotoPage(11);
     }
     return true;
 }
@@ -738,10 +738,9 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->manageLineEdit("Username", userNameEdit);
         config->manageCheckBox("Autologin", autologinCheckBox);
         config->manageCheckBox("SaveDesktop", saveDesktopCheckBox);
-        const char *oldHomeActionChoices[] = {"Nothing", "Use", "Save", "Delete"};
-        int ohaVal = config->manageEnum("OldHomeAction", 4, oldHomeActionChoices, oldHomeAction);
-        if (ohaVal >= 0) oldHomeAction = static_cast<OldHomeAction>(ohaVal);
-        else config->markBadWidget(nullptr);
+        const char *oldHomeActions[] = {"Use", "Save", "Delete"};
+        QRadioButton *oldHomeRadios[] = {radioOldHomeUse, radioOldHomeSave, radioOldHomeDelete};
+        config->manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
         if (mode != ConfigSave) {
             const QString &upass = config->value("UserPass").toString();
             userPasswordEdit->setText(upass);
@@ -1845,21 +1844,10 @@ bool MInstall::validateUserInfo()
 
     // Check for pre-existing /home directory
     // see if user directory already exists
-    if (oldHomeAction == OldHomeNothing && listHomes.contains(userNameEdit->text())) {
-        QMessageBox msgbox(this);
-        msgbox.setWindowTitle(windowTitle());
-        msgbox.setText(tr("The home directory for %1 already exists.").arg(userNameEdit->text()));
-        msgbox.setInformativeText(tr("What would you like to do with the old directory?"));
-        QPushButton *msgbtnUse = msgbox.addButton(tr("Reuse"), QMessageBox::ActionRole);
-        QPushButton *msgbtnSave = msgbox.addButton(tr("Save"), QMessageBox::ActionRole);
-        QPushButton *msgbtnDelete = msgbox.addButton(tr("Delete"), QMessageBox::ActionRole);
-        msgbox.setDefaultButton(msgbox.addButton(QMessageBox::Cancel));
-        msgbox.exec();
-        QAbstractButton *msgbtn = msgbox.clickedButton();
-        if (msgbtn == msgbtnDelete) oldHomeAction = OldHomeDelete; // delete the directory
-        else if (msgbtn == msgbtnSave) oldHomeAction = OldHomeSave; // save the old directory
-        else if (msgbtn == msgbtnUse) oldHomeAction = OldHomeUse; // use the old home
-        else return false; // don't save, reuse or delete -- can't proceed
+    haveOldHome = listHomes.contains(userNameEdit->text());
+    if (haveOldHome) {
+        const QString &str = tr("The home directory for %1 already exists.");
+        labelOldHome->setText(str.arg(userNameEdit->text()));
     }
     nextFocus = nullptr;
     return true;
@@ -1886,7 +1874,7 @@ bool MInstall::setUserInfo()
     if ((dir = opendir(dpath.toUtf8())) != nullptr) {
         // already exists
         closedir(dir);
-        if (oldHomeAction == OldHomeSave) {
+        if (radioOldHomeSave->isChecked()) {
             // save the old directory
             bool ok = false;
             cmd = QString("/bin/mv -f %1 %1.00%2").arg(dpath);
@@ -1897,7 +1885,7 @@ bool MInstall::setUserInfo()
                 failUI(tr("Failed to save old home directory."));
                 return false;
             }
-        } else if (oldHomeAction == OldHomeDelete) {
+        } else if (radioOldHomeDelete->isChecked()) {
             // delete the directory
             cmd = QString("/bin/rm -rf %1").arg(dpath);
             if (!proc.exec(cmd)) {
@@ -2251,6 +2239,7 @@ int MInstall::showPage(int curr, int next)
         return next + 1; // skip Services screen
     } else if (next == 9 && curr == 8) { // at Step_User_Accounts (forward)
         if (!validateUserInfo()) return curr;
+        if (!haveOldHome) return 10; /// skip Step_Old_Home
     } else if (next == 7 && curr == 6) { // at Step_Network (forward)
         if (!validateComputerName()) return curr;
     } else if (next == 5 && curr == 6) { // at Step_Network (backward)
@@ -2259,9 +2248,17 @@ int MInstall::showPage(int curr, int next)
         if (!pretend && haveSnapshotUserAccounts) {
             return 9; // skip Step_User_Accounts and go to Step_Progress
         }
-    } else if (next == 8 && curr == 9) { // at Step_Progress (backward)
+    } else if (next == 8 && curr == 9) { // at Step_Old_Home (backward)
         if (!pretend && haveSnapshotUserAccounts) {
             return 7; // skip Step_User_Accounts and go to Step_Localization
+        }
+    } else if (next == 9 && curr == 10) { // at Step_Progress (backward)
+        if (!haveOldHome) {
+            // skip Step_Old_Home
+            if (!pretend && haveSnapshotUserAccounts) {
+                return 7; // go to Step_Localization
+            }
+            return 8; // go to Step_User_Accounts
         }
     } else if (curr == 5) { // at Step_Services
         stashServices(next >= 6);
@@ -2273,9 +2270,9 @@ int MInstall::showPage(int curr, int next)
 void MInstall::pageDisplayed(int next)
 {
     // progress bar shown only for install and configuration pages.
-    installBox->setVisible(next >= 4 && next <= 9);
+    installBox->setVisible(next >= 4 && next <= 10);
 
-    if(next >= 4 && next <= 8) ixTipStart = ixTip;
+    if(next >= 4 && next <= 9) ixTipStart = ixTip;
 
     switch (next) {
     case 1: // choose disk
@@ -2414,7 +2411,32 @@ void MInstall::pageDisplayed(int next)
         if (!nextFocus) nextFocus = userNameEdit;
         break;
 
-    case 9: // installation step
+    case 9: // deal with an old home directory
+        mainHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
+                          + tr("A home directory already exists for the user name you have chosen."
+                               " This screen allows you to choose what happens to this directory.") + "</p>"
+                          "<p><b>" + tr("Re-use it for this installation") + "</b><br/>"
+                          + tr("The old home directory will be used for this user account."
+                               " This is a good choice when upgrading, and your files and settings will be readily available.") + "</p>"
+                          "<p><b>" + tr("Rename it and create a new directory") + "</b><br/>"
+                          + tr("A new home directory will be created for the user, but the old home directory will be renamed."
+                               " Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.") + "</p>"
+                          "<p>" + tr("The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.") + "</p>"
+                          "<p><b>" + tr("Delete it and create a new directory") + +"</b><br/>"
+                          + tr("The old home directory will be deleted, and a new one will be created from scratch.") + "<br/>"
+                          "<b>" + tr("Warning") + "</b>: "
+                          + tr("All files and settings will be deleted permanently if this option is selected."
+                               " Your chances of recovering them are low.") + "</p>");
+        // disable the Next button if none of the old home options are selected
+        on_radioOldHomeUse_toggled(false);
+        // if the Next button is disabled, avoid enabling both Back and Next at the end
+        if(nextButton->isEnabled() == false) {
+            backButton->setEnabled(true);
+            return;
+        }
+        break;
+
+    case 10: // installation step
         if(ixTipStart >= 0) {
             iLastProgress = progressBar->value();
             on_progressBar_valueChanged(iLastProgress);
@@ -2434,7 +2456,7 @@ void MInstall::pageDisplayed(int next)
         return; // avoid enabling both Back and Next buttons at the end
         break;
 
-    case 10: // done
+    case 11: // done
         closeButton->setEnabled(false);
         mainHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                              "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -2519,7 +2541,7 @@ void MInstall::gotoPage(int next)
     }
 
     // process next installation phase
-    if (next == 4 || next == 9) {
+    if (next == 4 || next == 10) {
         if (!processNextPhase() && phase > -2) {
             cleanup(false);
             gotoPage(1);
@@ -3308,4 +3330,19 @@ void MInstall::on_cmbTimeArea_currentIndexChanged(int index)
         }
     }
     cmbTimeZone->model()->sort(0);
+}
+
+void MInstall::on_radioOldHomeUse_toggled(bool)
+{
+    nextButton->setEnabled(radioOldHomeUse->isChecked()
+                           || radioOldHomeSave->isChecked()
+                           || radioOldHomeDelete->isChecked());
+}
+void MInstall::on_radioOldHomeSave_toggled(bool)
+{
+    on_radioOldHomeUse_toggled(false);
+}
+void MInstall::on_radioOldHomeDelete_toggled(bool)
+{
+    on_radioOldHomeUse_toggled(false);
 }

@@ -124,8 +124,9 @@ int MSettings::manageEnum(const QString &key, const int nchoices,
         const char *choices[], const int curval)
 {
     QVariant choice(curval >= 0 ? choices[curval] : "");
-    if (saving) setValue(key, choice);
-    else {
+    if (saving) {
+        if (curval >= 0) setValue(key, choice);
+    } else {
         const QString &val = value(key, choice).toString();
         for (int ixi = 0; ixi < nchoices; ++ixi) {
             if (!val.compare(QString(choices[ixi]), Qt::CaseInsensitive)) {
@@ -148,7 +149,7 @@ void MSettings::manageRadios(const QString &key, const int nchoices,
     // select the corresponding radio button
     ixradio = manageEnum(key, nchoices, choices, ixradio);
     if (ixradio >= 0) radios[ixradio]->setChecked(true);
-    else {
+    else if (contains(key)) {
         for (int ixi = 0; ixi < nchoices; ++ixi) {
             markBadWidget(radios[ixi]);
         }
