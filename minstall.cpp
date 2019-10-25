@@ -922,8 +922,8 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
                 root_mntops = "defaults,noatime,compress-force=lzo";
             }
         }
-    } else if (type == "xfs") {
-        cmd = "mkfs.xfs -f";
+    } else if (type == "xfs" || type == "f2fs") {
+        cmd = "mkfs." + type + " -f";
     } else { // jfs, ext2, ext3, ext4
         cmd = "mkfs." + type;
         if (type == "jfs") cmd.append(" -q");
@@ -933,7 +933,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
 
     cmd.append(" " + dev);
     if (!label.isEmpty()) {
-        if (type == "reiserfs") cmd.append(" -l \"");
+        if (type == "reiserfs" || type == "f2fs") cmd.append(" -l \"");
         else cmd.append(" -L \"");
         cmd.append(label + "\"");
     }
