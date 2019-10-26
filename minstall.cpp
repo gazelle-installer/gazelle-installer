@@ -1629,6 +1629,13 @@ bool MInstall::installLoader()
 
     if (!grubCheckBox->isChecked()) {
         // skip it
+        //if useing f2fs, then add modules to /etc/initramfs-tools/modules
+		qDebug() << "Update initramfs";
+		if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
+			proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
+			proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
+		}
+		proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
         return true;
     }
 
