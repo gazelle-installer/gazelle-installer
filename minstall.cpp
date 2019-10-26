@@ -594,7 +594,7 @@ bool MInstall::processNextPhase()
         phase = 4;
         updateStatus(tr("Cleaning up"), 100);
         cleanup();
-        gotoPage(11);
+        gotoPage(widgetStack->indexOf(Step_End));
     }
     return true;
 }
@@ -1595,8 +1595,8 @@ bool MInstall::copyLinux(const int progend)
                 updateStatus(tr("Copy progress unknown. No file system statistics."));
             }
         }
-        disconnect(&proc, SIGNAL(readyRead()), 0, 0);
-        disconnect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+        disconnect(&proc, SIGNAL(readyRead()), nullptr, nullptr);
+        disconnect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), nullptr, nullptr);
 
         if (proc.exitStatus() != QProcess::NormalExit) {
             failUI(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
@@ -2269,10 +2269,11 @@ int MInstall::showPage(int curr, int next)
 
 void MInstall::pageDisplayed(int next)
 {
+    const int ixProgress = widgetStack->indexOf(Step_Progress);
     // progress bar shown only for install and configuration pages.
-    installBox->setVisible(next >= 4 && next <= 10);
-
-    if(next >= 4 && next <= 9) ixTipStart = ixTip;
+    installBox->setVisible(next >= widgetStack->indexOf(Step_Boot) && next <= ixProgress);
+    // save the last tip and stop it updating when the progress page is hidden.
+    if(next != ixProgress) ixTipStart = ixTip;
 
     switch (next) {
     case 1: // choose disk
@@ -2541,7 +2542,7 @@ void MInstall::gotoPage(int next)
     }
 
     // process next installation phase
-    if (next == 4 || next == 10) {
+    if (next == widgetStack->indexOf(Step_Boot) || next == widgetStack->indexOf(Step_Progress)) {
         if (!processNextPhase() && phase > -2) {
             cleanup(false);
             gotoPage(1);
