@@ -1772,6 +1772,11 @@ bool MInstall::installLoader()
     updateStatus(statup);
 
     qDebug() << "Update initramfs";
+    //if useing f2fs, then add modules to /etc/initramfs-tools/modules
+    if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
+        proc.exec("grep -q f2fs /etc/initramfs-tools/modules || echo f2fs >> /etc/initramfs-tools/modules", true);
+        proc.exec("grep -q crypto-crc32 /etc/initramfs-tools/modules || echo crypto-crc32 >> /etc/initramfs-tools/modules", true);
+    }
     proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
     updateStatus(statup);
     qDebug() << "clear chroot env";
