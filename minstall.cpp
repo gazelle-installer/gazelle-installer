@@ -2648,8 +2648,6 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
 void MInstall::buildServiceList()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    QLocale locale;
-    QString lang = locale.bcp47Name().toUpper();
 
     //setup csView
     csView->header()->setMinimumSectionSize(150);
@@ -2658,7 +2656,8 @@ void MInstall::buildServiceList()
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
 
     for (const QString &service : qAsConst(ENABLE_SERVICES)) {
-        QString lang_str = (lang == "EN")? "" : "_" + lang;
+        const QString &lang = QLocale::system().bcp47Name().toLower();
+        QString lang_str = (lang == "en")? "" : "_" + lang;
         QStringList list = services_desc.value(service + lang_str).toStringList();
         if (list.size() != 2) {
             list = services_desc.value(service).toStringList(); // Use English definition
