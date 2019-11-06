@@ -1671,6 +1671,7 @@ bool MInstall::installLoader()
     proc.exec("/bin/mount -o bind /dev /mnt/antiX/dev", true);
     proc.exec("/bin/mount -o bind /sys /mnt/antiX/sys", true);
     proc.exec("/bin/mount -o bind /proc /mnt/antiX/proc", true);
+    proc.exec("/bin/mount -o bind /run /mnt/antiX/run", true);
 
     QString arch;
 
@@ -1700,6 +1701,7 @@ bool MInstall::installLoader()
         proc.exec("/bin/umount /mnt/antiX/proc", true);
         proc.exec("/bin/umount /mnt/antiX/sys", true);
         proc.exec("/bin/umount /mnt/antiX/dev", true);
+        proc.exec("/bin/umount /mnt/antiX/run", true);
         if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
             proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
         }
@@ -1789,6 +1791,7 @@ bool MInstall::installLoader()
     proc.exec("/bin/umount /mnt/antiX/proc", true);
     proc.exec("/bin/umount /mnt/antiX/sys", true);
     proc.exec("/bin/umount /mnt/antiX/dev", true);
+    proc.exec("/bin/umount /mnt/antiX/run", true);
     if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
         proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
     }
