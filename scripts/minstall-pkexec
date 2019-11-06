@@ -63,7 +63,7 @@ if test "$EUID" == 0; then
     RUN="/sbin/minstall"
     echo Starting  "$RUN"
     command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
-    exec "$RUN"
+    exec "$RUN" "${@}"
 fi
 
 exit
