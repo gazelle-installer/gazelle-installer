@@ -108,16 +108,21 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
     }
-
-    // config file
-    QString cfgfile("/etc/minstall.conf");
-    int cfgindex = a.arguments().lastIndexOf("--config");
-    if (cfgindex >= 0 && cfgindex < (a.arguments().count() - 1)) {
-        const QString clicfgfile(a.arguments().at(cfgindex + 1));
-        if (QFile::exists(clicfgfile)) cfgfile = clicfgfile;
-        else {
+    QString cfgfile;
+    //use config file if --config is specified
+    if (a.arguments().contains("--config")) {
+        // config file
+        cfgfile = "/etc/minstall.conf";
+        int cfgindex = a.arguments().lastIndexOf("--config");
+        if (cfgindex >= 0 && cfgindex < (a.arguments().count() - 1)) {
+            const QString clicfgfile(a.arguments().at(cfgindex + 1));
+            cfgfile = clicfgfile;
+        }
+        //give error message and exit if no config file found
+        if (! QFile::exists(cfgfile)) {
             QMessageBox::warning(0, QString::null,
-                QApplication::tr("Configuration file (%1) not found.").arg(clicfgfile));
+                                 QApplication::tr("Configuration file (%1) not found.").arg(cfgfile));
+            return EXIT_FAILURE;
         }
     }
 
@@ -168,7 +173,7 @@ void printHelp()
            "\n"
            "Options:\n"
            "  --config       Load a configuration file as specified by <config-file>.\n"
-           "                 By default (without this option) /etc/minstall.conf is used.\n"
+           "                 By default /etc/minstall.conf is used.\n"
            "  --auto         Installs automatically using the configuration file (more information below).\n"
            "                 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.\n"
            "  --brave        Overrules sanity checks on partitions and drives, causing them to be displayed.\n"
