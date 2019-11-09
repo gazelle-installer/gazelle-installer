@@ -56,7 +56,7 @@ void BlockDeviceList::build(MProcess &proc)
 
     // expressions for matching various partition types
     const QRegularExpression rxESP("^(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$");
-    const QRegularExpression rxSwap("^(0x82|0657fd6d-a4ab-43c4-84e5-0933c84b4f4f)$");
+    const QRegularExpression rxSwap("^(swap)$");
     const QRegularExpression rxNative("^(0x83|0fc63daf-8483-4772-8e79-3d69d8477de4" // Linux data
                                       "|0x82|0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" // Linux swap
                                       "|44479540-f297-41b2-9af7-d131d5f0458a" // Linux /root x86
@@ -119,7 +119,7 @@ void BlockDeviceList::build(MProcess &proc)
         if (segsize > 4) {
             const QString &seg4 = bdsegs.at(4);
             bdinfo.isESP = (seg4.count(rxESP) >= 1);
-            bdinfo.isSwap = (seg4.count(rxSwap) >= 1);
+           // bdinfo.isSwap = (seg4.count(rxSwap) >= 1);
             bdinfo.isNative = (seg4.count(rxNative) >= 1);
             if (!bdinfo.isNasty) bdinfo.isNasty = (seg4.count(rxWinLDM) >= 1);
         } else {
@@ -131,6 +131,8 @@ void BlockDeviceList::build(MProcess &proc)
             bdinfo.isESP = backup_list.contains(bdinfo.name);
         }
         if (segsize > 5) {
+            const QString &seg5 = bdsegs.at(5);
+            bdinfo.isSwap = (seg5.count(rxSwap) >= 1);
             bdinfo.fs = bdsegs.at(5);
             if(bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
         }
