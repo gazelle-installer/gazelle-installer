@@ -1340,7 +1340,8 @@ bool MInstall::makePartitions()
     if (entireDiskButton->isChecked()) {
         const QString &drv = diskCombo->currentData().toString();
         updateStatus(tr("Creating required partitions"));
-        proc.exec(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
+        //proc.exec(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
+        clearpartitiontables(drv);
         const bool useGPT = listBlkDevs.at(listBlkDevs.findDevice(drv)).isGPT;
         if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
     } else {
@@ -3374,4 +3375,31 @@ void MInstall::on_radioOldHomeSave_toggled(bool)
 void MInstall::on_radioOldHomeDelete_toggled(bool)
 {
     on_radioOldHomeUse_toggled(false);
+}
+
+void MInstall::clearpartitiontables(const QString &dev)
+{
+    int bytes = proc.execOut("parted --script /dev/" + dev + " unit B print 2>/dev/null | sed -rn \"s/^Disk.*: ([0-9]+)B$/\1/ip\"").toInt();
+    int block_size = 512;
+    int pt_size = 17 * block_size;
+    int pt_count = pt_size / block_size;
+    int sneaky_bytes = 32 * 1024;
+    int sneaky_offset = sneaky_bytes / block_size;
+    int total_blocks = bytes / block_size;
+
+    //clear primary partition table
+    proc.exec("dd if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count));
+
+    // Clear out sneaky iso-hybrid partition table
+    proc.exec("dd if=/dev/zero of=/dev/" + dev +" bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=64");
+
+    // clear secondary partition table
+
+    if ( ! QString::number(bytes).isEmpty()) {
+        int offset = total_blocks - pt_count;
+        proc.exec("dd conv=notrunc if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=" + QString::number(offset));
+    }
+
+
+
 }
