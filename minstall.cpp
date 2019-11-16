@@ -3379,13 +3379,17 @@ void MInstall::on_radioOldHomeDelete_toggled(bool)
 
 void MInstall::clearpartitiontables(const QString &dev)
 {
-    int bytes = proc.execOut("parted --script /dev/" + dev + " unit B print 2>/dev/null | sed -rn \"s/^Disk.*: ([0-9]+)B$/\1/ip\"").toInt();
+    QString bytes = proc.execOut("parted --script /dev/" + dev + " unit B print 2>/dev/null | sed -rn 's/^Disk.*: ([0-9]+)B$/\\1/ip\'");
+    qDebug() << "bytes is " << bytes;
+    int bytes_int = bytes.toLongLong();
     int block_size = 512;
     int pt_size = 17 * block_size;
     int pt_count = pt_size / block_size;
     int sneaky_bytes = 32 * 1024;
     int sneaky_offset = sneaky_bytes / block_size;
-    int total_blocks = bytes / block_size;
+    int total_blocks = bytes.toLongLong() / block_size;
+    qDebug() << "bytes int is" << bytes.toLongLong();
+    qDebug() << "total blocks is " << total_blocks;
 
     //clear primary partition table
     proc.exec("dd if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count));
@@ -3395,7 +3399,7 @@ void MInstall::clearpartitiontables(const QString &dev)
 
     // clear secondary partition table
 
-    if ( ! QString::number(bytes).isEmpty()) {
+    if ( ! bytes.isEmpty()) {
         int offset = total_blocks - pt_count;
         proc.exec("dd conv=notrunc if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=" + QString::number(offset));
     }
