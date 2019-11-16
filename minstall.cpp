@@ -64,6 +64,20 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
     gotoPage(0);
 
+    //disable encryption in gui if cryptsetup not present
+    QFileInfo cryptsetup("/sbin/cryptsetup");
+    QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
+    if ( !cryptsetup.exists() && !cryptsetup.isExecutable() && !crypsetupinitramfs.exists()) {
+        checkBoxEncryptAuto->hide();
+        checkBoxEncryptHome->hide();
+        checkBoxEncryptRoot->hide();
+        checkBoxEncryptSwap->hide();
+        buttonAdvancedFDE->hide();
+        buttonAdvancedFDECust->hide();
+        label_8->hide();
+    }
+
+
     // config file
     config = new MSettings(cfgfile, this);
 
