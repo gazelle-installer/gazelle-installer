@@ -3379,16 +3379,13 @@ void MInstall::on_radioOldHomeDelete_toggled(bool)
 
 void MInstall::clearpartitiontables(const QString &dev)
 {
+    //setup block size and offsets info
     QString bytes = proc.execOut("parted --script /dev/" + dev + " unit B print 2>/dev/null | sed -rn 's/^Disk.*: ([0-9]+)B$/\\1/ip\'");
     qDebug() << "bytes is " << bytes;
-    int bytes_int = bytes.toLongLong();
     int block_size = 512;
     int pt_size = 17 * 1024;
     int pt_count = pt_size / block_size;
-    int sneaky_bytes = 32 * 1024;
-    int sneaky_offset = sneaky_bytes / block_size;
     int total_blocks = bytes.toLongLong() / block_size;
-    qDebug() << "bytes int is" << bytes.toLongLong();
     qDebug() << "total blocks is " << total_blocks;
 
     //clear primary partition table
