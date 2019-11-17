@@ -3383,7 +3383,7 @@ void MInstall::clearpartitiontables(const QString &dev)
     qDebug() << "bytes is " << bytes;
     int bytes_int = bytes.toLongLong();
     int block_size = 512;
-    int pt_size = 17 * block_size;
+    int pt_size = 17 * 1024;
     int pt_count = pt_size / block_size;
     int sneaky_bytes = 32 * 1024;
     int sneaky_offset = sneaky_bytes / block_size;
