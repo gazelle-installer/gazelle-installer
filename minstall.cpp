@@ -64,6 +64,20 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
     gotoPage(0);
 
+    //disable encryption in gui if cryptsetup not present
+    QFileInfo cryptsetup("/sbin/cryptsetup");
+    QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
+    if ( !cryptsetup.exists() && !cryptsetup.isExecutable() && !crypsetupinitramfs.exists()) {
+        checkBoxEncryptAuto->hide();
+        checkBoxEncryptHome->hide();
+        checkBoxEncryptRoot->hide();
+        checkBoxEncryptSwap->hide();
+        buttonAdvancedFDE->hide();
+        buttonAdvancedFDECust->hide();
+        label_8->hide();
+    }
+
+
     // config file
     config = new MSettings(cfgfile, this);
 
@@ -1326,7 +1340,8 @@ bool MInstall::makePartitions()
     if (entireDiskButton->isChecked()) {
         const QString &drv = diskCombo->currentData().toString();
         updateStatus(tr("Creating required partitions"));
-        proc.exec(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
+        //proc.exec(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
+        clearpartitiontables(drv);
         const bool useGPT = listBlkDevs.at(listBlkDevs.findDevice(drv)).isGPT;
         if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
     } else {
@@ -3360,4 +3375,32 @@ void MInstall::on_radioOldHomeSave_toggled(bool)
 void MInstall::on_radioOldHomeDelete_toggled(bool)
 {
     on_radioOldHomeUse_toggled(false);
+}
+
+void MInstall::clearpartitiontables(const QString &dev)
+{
+    //setup block size and offsets info
+    QString bytes = proc.execOut("parted --script /dev/" + dev + " unit B print 2>/dev/null | sed -rn 's/^Disk.*: ([0-9]+)B$/\\1/ip\'");
+    qDebug() << "bytes is " << bytes;
+    int block_size = 512;
+    int pt_size = 17 * 1024;
+    int pt_count = pt_size / block_size;
+    int total_blocks = bytes.toLongLong() / block_size;
+    qDebug() << "total blocks is " << total_blocks;
+
+    //clear primary partition table
+    proc.exec("dd if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count));
+
+    // Clear out sneaky iso-hybrid partition table
+    proc.exec("dd if=/dev/zero of=/dev/" + dev +" bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=64");
+
+    // clear secondary partition table
+
+    if ( ! bytes.isEmpty()) {
+        int offset = total_blocks - pt_count;
+        proc.exec("dd conv=notrunc if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=" + QString::number(offset));
+    }
+
+
+
 }
