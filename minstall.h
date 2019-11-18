@@ -242,4 +242,5 @@ private:
     void stashServices(bool save);
     void stashAdvancedFDE(bool save);
     int selectTimeZone(const QString &zone);
+    void clearpartitiontables(const QString &dev);
 };
