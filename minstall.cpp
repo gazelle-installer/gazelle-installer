@@ -91,7 +91,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     settings.endGroup();
 
     // set some distro-centric text
-    copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
+    copyrightBrowser->setPlainText(tr("Gathering Information, please stand by."));
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
                         + "\n" + link_block);
 
@@ -232,6 +232,10 @@ void MInstall::startup()
     manageConfig(ConfigLoadA);
     stashAdvancedFDE(true);
     stashServices(true);
+
+    // set some distro-centric text
+    copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
+
     this->setEnabled(true);
     updateCursor();
 
@@ -1385,11 +1389,11 @@ bool MInstall::saveHomeBasic()
             if (!openLuksPartition(homedev, "homefs", pass, "--readonly", false)) goto ending2;
             homedev = "/dev/mapper/homefs";
         }
-        if (!mountPartition(homedev, "/mnt/antiX/home", "ro")) goto ending1;
+        if (!mountPartition(homedev, "/mnt/home-tmp", "ro")) goto ending1;
     }
 
     // store a listing of /home to compare with the user name given later
-    listHomes = proc.execOutLines("/bin/ls -1 /mnt/antiX/home/");
+    listHomes = proc.execOutLines("/bin/ls -1 /mnt/home-tmp/");
     // recycle the old key for /home if possible
     key.load("/mnt/antiX/root/keyfile", -1);
 
@@ -1397,8 +1401,9 @@ bool MInstall::saveHomeBasic()
  ending1:
     // unmount partitions
     if (homedev != rootDevice) {
-        proc.exec("/bin/umount -l /mnt/antiX/home", false);
+        proc.exec("/bin/umount -l /mnt/home-tmp", false);
         if (isHomeEncrypted) proc.exec("cryptsetup close homefs", true);
+        proc.exec("rmdir /mnt/home-tmp");
     }
  ending2:
     proc.exec("/bin/umount -l /mnt/antiX", false);
@@ -2633,6 +2638,7 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
             combo->clear();
             if (combo == homeCombo || combo == bootCombo) combo->addItem("root", "root");
             else if (combo == swapCombo) combo->addItem("none");
+            else if (combo == rootCombo) combo->addItem(tr("Select target root partition"));
 
             // add each eligible partition that is not already selected elsewhere
             for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
