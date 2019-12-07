@@ -1389,11 +1389,11 @@ bool MInstall::saveHomeBasic()
             if (!openLuksPartition(homedev, "homefs", pass, "--readonly", false)) goto ending2;
             homedev = "/dev/mapper/homefs";
         }
-        if (!mountPartition(homedev, "/mnt/antiX/home", "ro")) goto ending1;
+        if (!mountPartition(homedev, "/mnt/home-tmp", "ro")) goto ending1;
     }
 
     // store a listing of /home to compare with the user name given later
-    listHomes = proc.execOutLines("/bin/ls -1 /mnt/antiX/home/");
+    listHomes = proc.execOutLines("/bin/ls -1 /mnt/home-tmp/");
     // recycle the old key for /home if possible
     key.load("/mnt/antiX/root/keyfile", -1);
 
@@ -1401,7 +1401,7 @@ bool MInstall::saveHomeBasic()
  ending1:
     // unmount partitions
     if (homedev != rootDevice) {
-        proc.exec("/bin/umount -l /mnt/antiX/home", false);
+        proc.exec("/bin/umount -l /mnt/home-tmp", false);
         if (isHomeEncrypted) proc.exec("cryptsetup close homefs", true);
     }
  ending2:
