@@ -2638,7 +2638,7 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
             combo->clear();
             if (combo == homeCombo || combo == bootCombo) combo->addItem("root", "root");
             else if (combo == swapCombo) combo->addItem("none");
-            else if (combo == rootCombo) combo->addItem("Select target root partition");
+            else if (combo == rootCombo) combo->addItem(tr("Select target root partition"));
 
             // add each eligible partition that is not already selected elsewhere
             for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
