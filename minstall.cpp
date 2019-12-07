@@ -1403,6 +1403,7 @@ bool MInstall::saveHomeBasic()
     if (homedev != rootDevice) {
         proc.exec("/bin/umount -l /mnt/home-tmp", false);
         if (isHomeEncrypted) proc.exec("cryptsetup close homefs", true);
+        proc.exec("rmdir /mnt/home-tmp");
     }
  ending2:
     proc.exec("/bin/umount -l /mnt/antiX", false);
