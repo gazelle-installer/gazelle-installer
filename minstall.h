@@ -80,6 +80,7 @@ public:
     QString PROJECTVERSION;
     QStringList ENABLE_SERVICES;
     bool REMOVE_NOSPLASH;
+    long long MIN_ROOT_DRIVE_SIZE;
 
     int showPage(int curr, int next);
     void gotoPage(int next);
