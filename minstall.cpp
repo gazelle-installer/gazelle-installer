@@ -112,20 +112,49 @@ void MInstall::startup()
 
     // calculate required disk space
     bootSource = "/live/aufs/boot";
-    rootSources = "/live/aufs/bin /live/aufs/dev"
-                  " /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt"
-                  " /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr"
-                  " /live/aufs/var /live/aufs/home";
     bootSpaceNeeded = proc.execOut("du -sb " + bootSource).section('\t', 0, 0).toLongLong();
-    rootSpaceNeeded = proc.execOut("du -cb " + rootSources + " | tail -n 1").section('\t', 0, 0).toLongLong();
-    if (!(bootSpaceNeeded && rootSpaceNeeded)) {
+
+    //rootspaceneeded is the size of the linuxfs file * a compression factor + contents of the rootfs.  conservative but fast
+    //factors are same as used in live-remaster
+
+    //get compression factor by reading the linuxfs squasfs file, if available
+    QString linuxfs_compression_type = proc.execOut("dd if=/live/boot-dev/antiX/linuxfs bs=1 skip=20 count=2 status=none 2>/dev/null| od -An -tdI");
+    long long compression_factor;
+    //gzip, xz, or lz4
+    if ( linuxfs_compression_type == "1") {
+        compression_factor = 37; // gzip
+    } else if (linuxfs_compression_type == "2") {
+        compression_factor = 52; //lzo, not used by antiX
+    } else if (linuxfs_compression_type == "3") {
+        compression_factor = 52;  //lzma, not used by antiX
+    } else if (linuxfs_compression_type == "4") {
+        compression_factor = 31; //xz
+    } else if (linuxfs_compression_type == "5") {
+        compression_factor = 52; // lz4
+    } else {
+        compression_factor = 30; //anythng else or linuxfs not reachable (toram), should be pretty conservative
+    }
+
+    qDebug() << "linuxfs compression type is " << linuxfs_compression_type << "compression factor is " << compression_factor;
+
+    long long rootfs_file_size = 0;
+    long long linuxfs_file_size = proc.execOut("df /live/linux --output=used --total |tail -n1").toLongLong() * 1024 * 100 / compression_factor;
+    rootfs_file_size = proc.execOut("df /live/persist-root --output=used --total |tail -n1").toLongLong() * 1024;
+
+    qDebug() << "linuxfs file size is " << linuxfs_file_size << " rootfs file size is " << rootfs_file_size;
+
+    //add rootfs file size to the calculated linuxfs file size.  probaby conservative, as rootfs will likely have some overlap with linuxfs
+    long long safety_factor = 128 * 1024 * 1024; // 128 MB safety factor
+    rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
+
+    if (!(bootSpaceNeeded)) {
         QMessageBox::warning(this, windowTitle(),
              tr("Cannot access source medium.\nActivating pretend installation."));
         pretend = true;
     }
     const long long spaceBlock = 134217728; // 128MB
     bootSpaceNeeded += 2*spaceBlock - (bootSpaceNeeded % spaceBlock);
-    rootSpaceNeeded += 4*spaceBlock - (rootSpaceNeeded % spaceBlock);
+
     qDebug() << "Minimum space:" << bootSpaceNeeded << "(boot)," << rootSpaceNeeded << "(root)";
 
     // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
