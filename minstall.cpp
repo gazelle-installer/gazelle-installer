@@ -109,6 +109,11 @@ MInstall::~MInstall() {
 void MInstall::startup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+	
+    rootSources = "/live/aufs/bin /live/aufs/dev"
+                  " /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt"
+                  " /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr"
+                  " /live/aufs/var /live/aufs/home";
 
     // calculate required disk space
     bootSource = "/live/aufs/boot";
