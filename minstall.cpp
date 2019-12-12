@@ -63,6 +63,10 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     REMOVE_NOSPLASH = settings.value("REMOVE_NOSPLASH", "false").toBool();
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
     gotoPage(0);
+    //load some live variables
+    QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
+    SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
+
 
     //disable encryption in gui if cryptsetup not present
     QFileInfo cryptsetup("/sbin/cryptsetup");
@@ -123,8 +127,12 @@ void MInstall::startup()
     //factors are same as used in live-remaster
 
     //get compression factor by reading the linuxfs squasfs file, if available
-    QString linuxfs_compression_type = proc.execOut("dd if=/live/boot-dev/antiX/linuxfs bs=1 skip=20 count=2 status=none 2>/dev/null| od -An -tdI");
+    qDebug() << "linuxfs file is at : " << SQFILE_FULL;
     long long compression_factor;
+    QString linuxfs_compression_type = "xz"; //default conservative
+    if (QFileInfo::exists(SQFILE_FULL)) {
+        linuxfs_compression_type = proc.execOut("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none 2>/dev/null| od -An -tdI");
+    }
     //gzip, xz, or lz4
     if ( linuxfs_compression_type == "1") {
         compression_factor = 37; // gzip
