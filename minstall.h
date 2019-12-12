@@ -80,6 +80,8 @@ public:
     QString PROJECTVERSION;
     QStringList ENABLE_SERVICES;
     bool REMOVE_NOSPLASH;
+    QString SQFILE_FULL;
+
 
     int showPage(int curr, int next);
     void gotoPage(int next);
