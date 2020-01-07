@@ -3477,7 +3477,7 @@ void MInstall::rsynchomefolder(QString dpath)
 
 void MInstall::changeRemasterdemoToNewUser(QString dpath)
 {
-    QString cmd = ("find " + dpath + " -type f | xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' %1/$").arg(dpath);
+    QString cmd = ("find " + dpath + " -type f | xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' $").arg(dpath);
     proc.exec(cmd);
 }
 
