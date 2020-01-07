@@ -245,4 +245,9 @@ private:
     void stashAdvancedFDE(bool save);
     int selectTimeZone(const QString &zone);
     void clearpartitiontables(const QString &dev);
+    bool checkForSnapshot();
+    bool checkForRemaster();
+    void rsynchomefolder(const QString dpath);
+    void changeRemasterdemoToNewUser(const QString dpath);
+    void resetBlueman();
 };
