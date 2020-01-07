@@ -3455,21 +3455,13 @@ void MInstall::clearpartitiontables(const QString &dev)
 bool MInstall::checkForSnapshot()
 {
     // test if there's another user than demo in /home, indicating a possible snapshot or complicated live-usb
-    if (proc.exec("/bin/ls -1 /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)) {
-        return true;
-    } else {
-        return false;
-    }
+    return proc.exec("/bin/ls -1 /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false);
 }
 
 bool MInstall::checkForRemaster()
 {
     // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
-    if (proc.exec("test -d /live/linux/home/demo", true)) {
-        return true;
-    } else {
-        return false;
-    }
+    return proc.exec("test -d /live/linux/home/demo", true);
 }
 
 void MInstall::rsynchomefolder(QString dpath)
