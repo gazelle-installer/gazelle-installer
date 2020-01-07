@@ -251,11 +251,7 @@ void MInstall::startup()
     }
 
     // Detect snapshot-backup account(s)
-    // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
-    if (proc.exec("/bin/ls -1 /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)
-        || proc.exec("test -d /live/linux/home/demo", true)) {
-        haveSnapshotUserAccounts = true;
-    }
+    haveSnapshotUserAccounts = checkForSnapshot();
 
     //check for samba
     QFileInfo info("/etc/init.d/smbd");
@@ -2003,15 +1999,18 @@ bool MInstall::setUserInfo()
     }
     // saving Desktop changes
     if (saveDesktopCheckBox->isChecked()) {
-        proc.exec("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
-        cmd = QString("rsync -a --info=name1 /home/demo/ %1"
-                      " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
-                      " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
-                      " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
-                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
-                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' %1/$").arg(dpath);
-        proc.exec(cmd);
+        resetBlueman();
+        rsynchomefolder(dpath);
     }
+
+    // sync remastered home folder.  check if remaster exists and saveDesktopCheckbox not checked, modify the remastered demo folder
+    if (checkForRemaster() && ! saveDesktopCheckBox->isChecked())
+    {
+        resetBlueman();
+        changeRemasterdemoToNewUser(dpath);
+    }
+
+
     // fix the ownership, demo=newuser
     cmd = QString("chown -R demo:demo %1").arg(dpath);
     if (!proc.exec(cmd)) {
@@ -3451,6 +3450,47 @@ void MInstall::clearpartitiontables(const QString &dev)
         proc.exec("dd conv=notrunc if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=" + QString::number(offset));
     }
 
-
-
 }
+
+bool MInstall::checkForSnapshot()
+{
+    // test if there's another user than demo in /home, indicating a possible snapshot or complicated live-usb
+    if (proc.exec("/bin/ls -1 /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool MInstall::checkForRemaster()
+{
+    // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
+    if (proc.exec("test -d /live/linux/home/demo", true)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void MInstall::rsynchomefolder(QString dpath)
+{
+    QString cmd = ("rsync -a --info=name1 /home/demo/ %1"
+                  " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
+                  " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
+                  " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
+                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
+                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' %1/$").arg(dpath);
+    proc.exec(cmd);
+}
+
+void MInstall::changeRemasterdemoToNewUser(QString dpath)
+{
+    QString cmd = ("find " + dpath + "| xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' %1/$").arg(dpath);
+    proc.exec(cmd);
+}
+
+void MInstall::resetBlueman()
+{
+    proc.exec("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
+}
+
