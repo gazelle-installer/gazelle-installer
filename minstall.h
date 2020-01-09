@@ -161,6 +161,7 @@ private:
     bool uefi = false;
     bool mactest = false;
     bool containsSystemD = false;
+    bool isRemasteredDemoPresent = false;
 
     // source medium
     QString rootSources;
