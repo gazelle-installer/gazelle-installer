@@ -66,6 +66,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     //load some live variables
     QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
     SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
+    isRemasteredDemoPresent = checkForRemaster();
 
 
     //disable encryption in gui if cryptsetup not present
@@ -1504,7 +1505,12 @@ bool MInstall::installLinux(const int progend)
     proc.exec("/usr/sbin/live-to-installed /mnt/antiX", false);
     qDebug() << "Desktop menu";
     proc.exec("chroot /mnt/antiX desktop-menu --write-out-global", false);
-    proc.exec("/bin/rm -rf /mnt/antiX/home/demo");
+
+    //remove home unless a demo home is found in remastered linuxfs
+    if (!isRemasteredDemoPresent) {
+        proc.exec("/bin/rm -rf /mnt/antiX/home/demo");
+    }
+
     proc.exec("/bin/rm -rf /mnt/antiX/media/sd*", false);
     proc.exec("/bin/rm -rf /mnt/antiX/media/hd*", false);
 
@@ -1973,11 +1979,18 @@ bool MInstall::setUserInfo()
     if ((dir = opendir(dpath.toUtf8())) == nullptr) {
         // dir does not exist, must create it
         // copy skel to demo
-        if (!proc.exec("/bin/cp -a /mnt/antiX/etc/skel /mnt/antiX/home")) {
-            failUI(tr("Sorry, failed to create user directory."));
-            return false;
+        // don't copy skel to demo if found demo folder in remastered linuxfs
+        if (!isRemasteredDemoPresent) {
+            if (!proc.exec("/bin/cp -a /mnt/antiX/etc/skel /mnt/antiX/home")) {
+                failUI(tr("Sorry, failed to create user directory."));
+                return false;
+            }
         }
+        //still rename the demo directory even if remastered demo home folder is detected
         cmd = QString("/bin/mv -f /mnt/antiX/home/skel %1").arg(dpath);
+        if (isRemasteredDemoPresent) {
+            cmd = QString("/bin/mv -f /mnt/antiX/home/demo %1").arg(dpath);
+        }
         if (!proc.exec(cmd)) {
             failUI(tr("Sorry, failed to name user directory."));
             return false;
@@ -2003,13 +2016,12 @@ bool MInstall::setUserInfo()
         rsynchomefolder(dpath);
     }
 
-    // sync remastered home folder.  check if remaster exists and saveDesktopCheckbox not checked, modify the remastered demo folder
-    if (checkForRemaster() && ! saveDesktopCheckBox->isChecked())
+    // check if remaster exists and saveDesktopCheckbox not checked, modify the remastered demo folder
+    if (isRemasteredDemoPresent && ! saveDesktopCheckBox->isChecked())
     {
         resetBlueman();
         changeRemasterdemoToNewUser(dpath);
     }
-
 
     // fix the ownership, demo=newuser
     cmd = QString("chown -R demo:demo %1").arg(dpath);
@@ -3455,12 +3467,14 @@ void MInstall::clearpartitiontables(const QString &dev)
 bool MInstall::checkForSnapshot()
 {
     // test if there's another user than demo in /home, indicating a possible snapshot or complicated live-usb
+    qDebug() << "check for possible snapshot";
     return proc.exec("/bin/ls -1 /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false);
 }
 
 bool MInstall::checkForRemaster()
 {
     // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
+    qDebug() << "check for remastered home demo folder";
     return proc.exec("test -d /live/linux/home/demo", true);
 }
 
