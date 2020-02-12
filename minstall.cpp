@@ -1510,9 +1510,11 @@ bool MInstall::installLinux(const int progend)
     if (!isRemasteredDemoPresent) {
         proc.exec("/bin/rm -rf /mnt/antiX/home/demo");
     }
-
-    proc.exec("/bin/rm -rf /mnt/antiX/media/sd*", false);
-    proc.exec("/bin/rm -rf /mnt/antiX/media/hd*", false);
+// if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
+    if (!POPULATE_MEDIA_MOUNTPOINTS) {
+        proc.exec("/bin/rm -rf /mnt/antiX/media/sd*", false);
+        proc.exec("/bin/rm -rf /mnt/antiX/media/hd*", false);
+    }
 
     // guess localtime vs UTC
     if (proc.execOut("guess-hwclock") == "localtime") {
