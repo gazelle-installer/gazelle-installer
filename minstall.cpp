@@ -1608,7 +1608,7 @@ void MInstall::makeFstab()
     }
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     if (POPULATE_MEDIA_MOUNTPOINTS) {
-        proc.exec("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
+        proc.exec("/sbin/make-fstab -O --install=/mnt/antiX --mntpnt=/media");
     }
 }
 
