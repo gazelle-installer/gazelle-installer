@@ -1497,20 +1497,23 @@ bool MInstall::installLinux(const int progend)
     updateStatus(tr("Fixing configuration"), progend);
     mkdir("/mnt/antiX/tmp", 01777);
     chmod("/mnt/antiX/tmp", 01777);
-    makeFstab();
-    writeKeyFile();
-    disablehiberanteinitramfs();
 
     // Copy live set up to install and clean up.
     proc.exec("/usr/sbin/live-to-installed /mnt/antiX", false);
     qDebug() << "Desktop menu";
     proc.exec("chroot /mnt/antiX desktop-menu --write-out-global", false);
 
+    makeFstab();
+    writeKeyFile();
+    disablehiberanteinitramfs();
+
     //remove home unless a demo home is found in remastered linuxfs
     if (!isRemasteredDemoPresent) {
         proc.exec("/bin/rm -rf /mnt/antiX/home/demo");
     }
-// if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
+
+    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
+    // not sure if this is still needed with the live-to-installed change but OK
     if (!POPULATE_MEDIA_MOUNTPOINTS) {
         proc.exec("/bin/rm -rf /mnt/antiX/media/sd*", false);
         proc.exec("/bin/rm -rf /mnt/antiX/media/hd*", false);
