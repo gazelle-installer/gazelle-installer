@@ -1,4 +1,4 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="ko" version="2.0">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="bn" version="2.0">
 <context>
     <name>MInstall</name>
     <message>
@@ -848,12 +848,12 @@ name before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="2606"/>
         <source>OK</source>
-        <translation>확인</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="2608"/>
         <source>Next</source>
-        <translation>다음으로</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="2654"/>
@@ -923,12 +923,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="60"/>
         <source>Help</source>
-        <translation>도움말</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="156"/>
         <source>Next</source>
-        <translation>다음으로</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="163"/>
@@ -938,7 +938,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="173"/>
         <source>Back</source>
-        <translation>뒤로</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="180"/>
@@ -964,7 +964,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="262"/>
         <source>Close</source>
-        <translation>닫기</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="310"/>
