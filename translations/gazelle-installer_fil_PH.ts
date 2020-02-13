@@ -1,28 +1,31 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="ko" version="2.0">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="fil_PH" version="2.0">
 <context>
     <name>MInstall</name>
     <message>
         <location filename="minstall.cpp" line="64"/>
         <source>%1 Installer</source>
-        <translation type="unfinished"/>
+        <translation>%1 Installer</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="99"/>
         <source>Gathering Information, please stand by.</source>
-        <translation type="unfinished"/>
+        <translation>Antabay habang kumakalap ng impormasyon.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="100"/>
         <source>Support %1
 
 %1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.</source>
-        <translation type="unfinished"/>
+        <translation>Tumangkilik %1
+
+%1 ay tinatangkilik ng mga taong kagaya mo. May ilang tumutulong sa pamamagitan ng paggabay sa forum - %2, o nagliliwat sa ibang wika, ay nagbibigay ng mungkahi, nagsusulat ng documentation, o tumutulong sa pagsubok ng bagong software.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="168"/>
         <source>Cannot access source medium.
 Activating pretend installation.</source>
-        <translation type="unfinished"/>
+        <translation>Di maaring mapasok ang source medium.
+Ina-activate ang pretend installation.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="278"/>
@@ -31,698 +34,717 @@ Activating pretend installation.</source>
 %1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.
 
 Enjoy using %1</source>
-        <translation type="unfinished"/>
+        <translation>%1 ay isang malayang   distribution ng Linux batay sa Debian Stable.
+
+%1 ay gumagamit ng mga kagamitan mula sa MEPIS Linux na mga nailathala sa ilalim ng libre pahintulot ng Apache. May ilang kagamitan ng MEPIS na nabago para sa %1.
+
+Gamiting may kagalakan ang %1</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="397"/>
         <source>Pretending to install %1</source>
-        <translation type="unfinished"/>
+        <translation>Wari baga ay ini-install ang  %1</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="534"/>
         <source>target drive</source>
-        <translation type="unfinished"/>
+        <translation>drive na pinupuntirya</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="553"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
-        <translation type="unfinished"/>
+        <translation>Ang disk na may partition na iyong napili para sa pag-iinstall ay pumalya:</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="557"/>
         <source>Smartmon tool output:</source>
-        <translation type="unfinished"/>
+        <translation>Output ng Smartmon tool :</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="558"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
-        <translation type="unfinished"/>
+        <translation>Ang disk na may partition na iyong napili pag sa pag-install ng pagsubok sa SMART monitor (smartctl), pero ang mag pagsubok ay nagsasalaysay na magkakaroon lamang ng mas higit na pagpalya sa hinaharap.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="563"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
-        <translation type="unfinished"/>
+        <translation>Kung di tiyak ay itigil muna ang pag-install at patakbuhin ang GSmartControl para sa karagdagang kaalaman. </translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="565"/>
         <source>Do you want to abort the installation?</source>
-        <translation type="unfinished"/>
+        <translation>Gusto mo bang itigil ang pag-iinstall?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="570"/>
         <source>Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>Gusto mo bang magpatuloy?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="584"/>
         <source>The password needs to be at least
 %1 characters long. Please select
 a longer password before proceeding.</source>
-        <translation type="unfinished"/>
+        <translation>Ang password ay kinakailangan mahigit sa
+%1 characters ang haba. Pumili
+ang mas mahabang password bago magpatuloy.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="603"/>
         <source>Preparing to install %1</source>
-        <translation type="unfinished"/>
+        <translation>Inihahanda ang pag-iinstall %1</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="615"/>
         <source>Failed to format required partitions.</source>
-        <translation type="unfinished"/>
+        <translation>Pumalya sa pag-format ng hinihiling na partitions.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="626"/>
         <source>Paused for required operator input</source>
-        <translation type="unfinished"/>
+        <translation>Nakatigil para sa pag-input ng gumagamit</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="636"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished"/>
+        <translation>Itinatakda ang configuration ng sistema</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="654"/>
         <source>Cleaning up</source>
-        <translation type="unfinished"/>
+        <translation>Naglilinis</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="821"/>
         <source>Invalid settings found in configuration file (%1). Please review marked fields as you encounter them.</source>
-        <translation type="unfinished"/>
+        <translation>Nakatuklas ang maling setting sa configuration ng file (%1). Rebisahing muli ang mga natatatatakang fields kung iyong makikita sila.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="860"/>
         <source>Setting up LUKS encrypted containers</source>
-        <translation type="unfinished"/>
+        <translation>Itinatakda ang LUKS encrypted containers</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="891"/>
         <source>Formatting swap partition</source>
-        <translation type="unfinished"/>
+        <translation>Pino-format ang swap partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="900"/>
         <source>Formatting the / (root) partition</source>
-        <translation type="unfinished"/>
+        <translation>Pino-format ang / (root) partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="910"/>
         <source>Formatting boot partition</source>
-        <translation type="unfinished"/>
+        <translation>Pino-formatting ang boot partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="916"/>
         <source>Formatting EFI System Partition</source>
-        <translation type="unfinished"/>
+        <translation>Pino-format ang  Sistema ng EFI Partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="923"/>
         <source>Formatting the /home partition</source>
-        <translation type="unfinished"/>
+        <translation>Pino-format ang /home partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="933"/>
         <source>Mounting the /home partition</source>
-        <translation type="unfinished"/>
+        <translation>Imina-mount ang /home partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1031"/>
         <source>Sorry, could not create %1 LUKS partition</source>
-        <translation type="unfinished"/>
+        <translation>Paumanhin, di maaring makagawa ng %1 LUKS partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1048"/>
         <source>Sorry, could not open %1 LUKS container</source>
-        <translation type="unfinished"/>
+        <translation>Paumanhin, Di maaring mabuksan ang %1 LUKS container.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1064"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
-        <translation type="unfinished"/>
+        <translation>Dapat gumamit ng bukod na boot partition kapag ginagawan ng encrypting ang root.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1078"/>
         <source>You must choose a root partition.
 The root partition must be at least %1.</source>
-        <translation type="unfinished"/>
+        <translation>Dapat pumili ng root partition.
+Ang root partition ay dapat mahigit sa %1.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1104"/>
         <source>Delete the data on %1 except for /home</source>
-        <translation type="unfinished"/>
+        <translation>Tanggalin ang laman ng  %1 maliban na lamang sa /home</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1114"/>
         <source>Reuse (no reformat) %1 as the /home partition</source>
-        <translation type="unfinished"/>
+        <translation>gamiting ang reuse (huwag ang reformat) %1 gaya ng sa  /home partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1134"/>
         <source>Configure %1 as swap space</source>
-        <translation type="unfinished"/>
+        <translation>Baguhin ang %1 bilang swap space</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1150"/>
         <source>The partition you selected for /boot is larger than expected.</source>
-        <translation type="unfinished"/>
+        <translation>Ang  partition na iyong napili para sa  /boot ay mas malaki kaysa sa inaasahan.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1155"/>
         <source>%1 for the %2 partition</source>
-        <translation type="unfinished"/>
+        <translation>%1 para sa %2 partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1158"/>
         <source>The following partitions you selected are not Linux partitions:</source>
-        <translation type="unfinished"/>
+        <translation>Ang mga  partitions na iyong napili ay Linux partitions:</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1166"/>
         <source>Are you sure you want to reformat these partitions?</source>
-        <translation type="unfinished"/>
+        <translation>Nakakatiyak ka ba na gusto mong i-reformat ang mga partitions na ito?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1176"/>
         <source>The %1 installer will now format and destroy the data on the following partitions:</source>
-        <translation type="unfinished"/>
+        <translation>Ang %1 installer ay magsasagawa ngayon ng format at sisirain ang lahat ng laman na nasa partitions:</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1184"/>
         <source>The %1 installer will now perform the following actions:</source>
-        <translation type="unfinished"/>
+        <translation>Ang %1 installer ay magsasagawa ng mga sumusunod na aksyon:</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1188"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation type="unfinished"/>
+        <translation>Ang mga akyson ay hindi maaring bawiin. Gusto mo bang magpatuloy?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1387"/>
         <source>Creating required partitions</source>
-        <translation type="unfinished"/>
+        <translation>Nagsasagawa ng mga hinihinging partitions.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1393"/>
         <source>Preparing required partitions</source>
-        <translation type="unfinished"/>
+        <translation>Inihahanda ang mga hinihinging partitions</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1463"/>
         <source>Mounting the / (root) partition</source>
-        <translation type="unfinished"/>
+        <translation>Imina-mount ang  / (root) partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1466"/>
         <source>Deleting old system</source>
-        <translation type="unfinished"/>
+        <translation>Tinatanggal ang lumang sistema</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1470"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
-        <translation type="unfinished"/>
+        <translation>Bigo sa pagtanggal ng lumang %1 on kinaroroonan
+Babalik sa hakbang bilang 1.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1477"/>
         <source>Creating system directories</source>
-        <translation type="unfinished"/>
+        <translation>Nagsasagawa ng system directories</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1497"/>
         <source>Fixing configuration</source>
-        <translation type="unfinished"/>
+        <translation>Inaayos ang  configuration</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1626"/>
         <source>Copying new system</source>
-        <translation type="unfinished"/>
+        <translation>Kinokopya ang sistema</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1666"/>
         <source>Copy progress unknown. No file system statistics.</source>
-        <translation type="unfinished"/>
+        <translation>Ang pagproseso ng pagkopya ay wlaang katiyakan. Walang  statistics ng  file system</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1673"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
-        <translation type="unfinished"/>
+        <translation>Pumalya sa pagsulat  %1 sa kinalalagyan
+Pabalik na sa hakbang bilang 1.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1690"/>
         <source>Installing GRUB</source>
-        <translation type="unfinished"/>
+        <translation>Ini-install ang GRUB</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1771"/>
         <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
-        <translation type="unfinished"/>
+        <translation>Pumalya ang pag-iinstall ng GRUB. Maaring simulang muli ang medium  gamit ang menu ng GRUB Rescue para kumpunihin ang installation.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1787"/>
         <source>NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu.</source>
-        <translation type="unfinished"/>
+        <translation>Ang boot ng NVRAM variable update ay pumalya. Maaring hindi magsimula ang sistema ng boot, pero maaring makumpuni sa boot menu ng GRUB Rescue.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1882"/>
         <source>Please enter a user name.</source>
-        <translation type="unfinished"/>
+        <translation>Ipasok ang pangalan ng gumagamit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1886"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
-        <translation type="unfinished"/>
+        <translation>Ang pangalan ng gumagamit ay hindi maaring maglamang ng mga espesyal na character maging ng espasyo.
+Pumili ng ibang pangalan bago magpatuloy.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1897"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
-        <translation type="unfinished"/>
+        <translation>Paumanhin, ang pangalan ay gamit na.
+Pumili ng ibang pangalan.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1906"/>
         <source>Please enter the user password.</source>
-        <translation type="unfinished"/>
+        <translation>Ipasok ang password ng gumagamit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1912"/>
         <source>Please enter the root password.</source>
-        <translation type="unfinished"/>
+        <translation>Ipasok ang root password.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1918"/>
         <source>The user password entries do not match.
 Please try again.</source>
-        <translation type="unfinished"/>
+        <translation>Ang password ng gumagamit ay hindi tugma.
+Subuking muli.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1925"/>
         <source>The root password entries do not match.
 Please try again.</source>
-        <translation type="unfinished"/>
+        <translation>Ang root password ay hindi nagtutugma.
+Subuking muli.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1935"/>
         <source>The home directory for %1 already exists.</source>
-        <translation type="unfinished"/>
+        <translation>Ang home directory para sa %1 ay umiiral na.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1952"/>
         <source>Failed to set user account passwords.</source>
-        <translation type="unfinished"/>
+        <translation>Pumalya sa pagtatakda ng passwords ng user account .</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1971"/>
         <source>Failed to save old home directory.</source>
-        <translation type="unfinished"/>
+        <translation>Pumalya sa pagse-save ng lumang home directory.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1978"/>
         <source>Failed to delete old home directory.</source>
-        <translation type="unfinished"/>
+        <translation>Pumalya sa pagtanggal ng lumang home directory.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1990"/>
         <source>Sorry, failed to create user directory.</source>
-        <translation type="unfinished"/>
+        <translation>Paumanhin, pumalya sa paggawa ng directory ng gumagamit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2000"/>
         <source>Sorry, failed to name user directory.</source>
-        <translation type="unfinished"/>
+        <translation>Paumanhin, pumalya sa paglalagay ng pangalan directory ng gumagamit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2034"/>
         <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="unfinished"/>
+        <translation>Paumanhin, pumalya sa pagtatakda ng pagmamay-ari ng directory ng gumagamit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2070"/>
         <source>Please enter a computer name.</source>
-        <translation type="unfinished"/>
+        <translation>Ipasok ang pangalan ng computer.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2074"/>
         <source>Sorry, your computer name contains invalid characters.
 You'll have to select a different
 name before proceeding.</source>
-        <translation type="unfinished"/>
+        <translation>Paumanhin, ang pangalan ng iyong computer ay naglalaman ng character na hindi katanggap tanggap.
+Dapat pumili ng ibang
+pangalan bago magpatuloy.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2080"/>
         <source>Please enter a domain name.</source>
-        <translation type="unfinished"/>
+        <translation>Ipasok ang pangalan ng domain.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2084"/>
         <source>Sorry, your computer domain contains invalid characters.
 You'll have to select a different
 name before proceeding.</source>
-        <translation type="unfinished"/>
+        <translation>Paumanhin, ang iyong computer ay naglalaman ng mga characters na hindi katanggap tanggap.
+Dapat kang pumili ng ibang
+pangalan bago magpatuloy.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2091"/>
         <source>Please enter a workgroup.</source>
-        <translation type="unfinished"/>
+        <translation>Magpasok ng workgroup.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2297"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
-        <translation type="unfinished"/>
+        <translation>OK upang iformat at gamitin ang buong disk (%1) para sa %2?</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2301"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
-        <translation type="unfinished"/>
+        <translation>BABALA: Ang drive na napili ay may kakayahan na hindi bababa sa 2TB at dapat i-format gamit ang GPT. Sa ibang mga sistema ang disk na may GPT-format ay hindi aandar.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2321"/>
         <source>The data in /home cannot be preserved because the required information could not be obtained.</source>
-        <translation type="unfinished"/>
+        <translation>Ang data sa /home ay hindi maaring mapreserve dahil hindi maaring makuhang ang hinihinging impormasyon.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2322"/>
         <source>If the partition containing /home is encrypted, please ensure the correct &quot;Encrypt&quot; boxes are selected, and that the entered password is correct.</source>
-        <translation type="unfinished"/>
+        <translation>Ang partition na naglalamang ng  /home ay natatatakan, tiyaking tama ang &quot;Encrypt&quot; na napili, at tiyaking ang ipinasok na password ay tama.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2323"/>
         <source>The installer cannot encrypt an existing /home directory or partition.</source>
-        <translation type="unfinished"/>
+        <translation>Ang installer ay hindi maaring makapag-encrypt sa umiiral na /home directory o partition.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2375"/>
         <source>General Instructions</source>
-        <translation type="unfinished"/>
+        <translation>Mga Bilin na Pangkalahatan</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2376"/>
         <source>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</source>
-        <translation type="unfinished"/>
+        <translation>ISARA MUNA LAHAT NG MGA IBANG APPLICATIONS BAGO MAGPATULOY.
+</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2377"/>
         <source>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.</source>
-        <translation type="unfinished"/>
+        <translation>Sa bawat pagina ay dapat basahin ang mga bilin, piliin ang iyong minamarapat at i-click ang Next kapat handa ng magpatuloy. Ikaw ay tatanungin para sa pagtitibay bago maganap ang anomang maaring makakapinsala sa isasagawa. 
+</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2379"/>
         <source>Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions.</source>
-        <translation type="unfinished"/>
+        <translation>Ang installation ay nagkakailangan ng mga %1 ng espasyo. %2 or mas mataas ay mas mainam. Maari ding gamitin ang buong disk o maaring mailagay ang installation sa kasalukuyang partitions.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2381"/>
         <source>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.</source>
-        <translation type="unfinished"/>
+        <translation>Kung gumagamit ka ng Mac OS o Window (mula Vista pasulong), maaring mangangailangan ka ng sistema ng gayong mga software para magawan ng set up ang partitions o boot manager bago mag-install.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2382"/>
         <source>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"/>
+        <translation>Ang ext2, ext3, ext4, jfs, xfs, btrfs at reiserfs na mga Linux filesystems ay sinasangayunan at ang ext4 ay ipinapayo.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2383"/>
         <source>Autoinstall will place home on the root partition.</source>
-        <translation type="unfinished"/>
+        <translation>Ilalagay ng Autoinstall ang home sa root partition.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2384"/>
         <location filename="minstall.cpp" line="2418"/>
         <source>Encryption</source>
-        <translation type="unfinished"/>
+        <translation>Encryption</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2385"/>
         <location filename="minstall.cpp" line="2419"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
-        <translation type="unfinished"/>
+        <translation>Ang Encryption ay maaring sa pamamgitan ng LUKS. Ang password ay kinakailangan.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2386"/>
         <location filename="minstall.cpp" line="2420"/>
         <source>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the &lt;b&gt;Advanced encryption settings&lt;/b&gt; button.</source>
-        <translation type="unfinished"/>
+        <translation>Hindi kinakailangan ang hiwalay na unencrypted na partition ng boot. Para sa karagdagang pagsasaayos kalakip ng pagpili ng cipher ay gamitin ang &lt;b&gt;Para sa mas lubusang kaayusan ng encryption&lt;/b&gt; boton.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2388"/>
         <source>When encryption is used with autoinstall, the separate boot partition will be automatically created.</source>
-        <translation type="unfinished"/>
+        <translation>Kung ang encryption ay ginagamit lakip ng autoinstall, ang bukod na  boot partition ay kusang malilikha.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2400"/>
         <source>Limitations</source>
-        <translation type="unfinished"/>
+        <translation>Mga Limitasyon</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2401"/>
         <source>Remember, this software is provided AS-IS with no warranty what-so-ever. It is solely your responsibility to backup your data before proceeding.</source>
-        <translation type="unfinished"/>
+        <translation>Paalala, ang software na ito ay ganito na at walang garantiya o kung ano pa man. Nasa sa iyo ang buong pananagutan na i-backup ang date bago magpatuloy.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2403"/>
         <source>Choose Partitions</source>
-        <translation type="unfinished"/>
+        <translation>Pumili ng partition</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2404"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
-        <translation type="unfinished"/>
+        <translation>Ang %1 ay humihingi ng root partition. Ang swap partition ay di sapilitan bagaman iminumungkahit. Kung gusto mong gamitin ang   Suspend-sa-Disk na feature ng %1, mangangailangan ka ng swap na partition na yaon ay mas malaki sa totoo ng laki ng iyong tunay na memory. </translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2406"/>
         <source>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</source>
-        <translation type="unfinished"/>
+        <translation>Kung pipiliin mo ang bukod na /home partition ay mas magiging madali sa iyo ang upgrade sa hinaharap, bagaman hindi hindi ito maari kung ang upgrade ay mula sa installation na walang bukod na  home partition.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2407"/>
         <source>Upgrading</source>
-        <translation type="unfinished"/>
+        <translation>Nagsasagawa ng upgrade</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2408"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.</source>
-        <translation type="unfinished"/>
+        <translation>Upang mag-upgrade mula sa umiiral na  installation ng Linux, piliin ang gayunding home partition gaya ng dati ay siyasating ang mga  preference para maipanatili ang mga data sa /home.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2409"/>
         <source>If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.</source>
-        <translation type="unfinished"/>
+        <translation>Kung ipinapanatili mo ang kasalukuyang¿ /home directory tree na nasa iyong root partition, ang installer ay hindi magsasagawa ng reformat sa root partition. Bilang kalalabasan, ang installation ay mag magtatagal kaysa sa karaniwan.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2411"/>
         <source>Preferred Filesystem Type</source>
-        <translation type="unfinished"/>
+        <translation>Mungkahing Uri ng Filesystem</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2412"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.</source>
-        <translation type="unfinished"/>
+        <translation>Para %1, maari kang mamili ng format sa partitions bilang ext2, ext3, ext4, f2fs, jfs, xfs, btrfs o reiser.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2413"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
-        <translation type="unfinished"/>
+        <translation>Ang mga karagdagang pagpipilian sa compression maaring makuha para sa drives gamit ang btrfs. Lzo na mabilis, pero ang compression mababa. Ang Zlib ay mas mabagal pero may mataas na compression.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2415"/>
         <source>Bad Blocks</source>
-        <translation type="unfinished"/>
+        <translation>Blocks na sira</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2416"/>
         <source>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
-        <translation type="unfinished"/>
+        <translation>Kung makakapili ka sa  ext2, ext3 or ext4 bilang uri ng format, meron kang pagpipilian sa pagsisiyasat sa mga sirang blocks na nasa drive. Ang mga sirang block ay dapat masiyasat palagi bagaman mas makapagpapatagal, kaya naman maari mong lampasan ang hakbang na ito maliban na lamang kung may hinala ka na ang iyong drive ay may mga masamang blocks.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2425"/>
         <source>Advanced Encryption Settings</source>
-        <translation type="unfinished"/>
+        <translation>Mas Malawak na Ayos ng Encryption</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2425"/>
         <source>This page allows fine-tuning of LUKS encrypted partitions.</source>
-        <translation type="unfinished"/>
+        <translation>Ang pahinang ito ay nagpapahintulot na pakinisin ang encrypted na  partitions ng LUKS.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2426"/>
         <source>In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>Sa kadalasang mga pagkakataon, ang karaniwang ayos ay nagbibigay ng praktical na balanse sa pagitan ng siguridad at performance na naaangkop  sa mga maseselang applications. </translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2428"/>
         <source>This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.</source>
-        <translation type="unfinished"/>
+        <translation>Ang texto na ito ay sumasakop sa mga basiko ng mga parametro na gamit sa LUKS, bagamang hindi nangangahulugan pangmalawakang gabay sa cryptography. </translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2429"/>
         <source>Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.</source>
-        <translation type="unfinished"/>
+        <translation>Ang paglilikot o pagbabago kaayusan nito kung walang sapat na kaalaman sa cryptography ay maaring magbunga ng mahinang encryption na gamit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2430"/>
         <source>Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.</source>
-        <translation type="unfinished"/>
+        <translation>Ang pagbago sa field ay kadalasang nakakaapekto sa mga pagpipilian sa ibaba. Ang mga field sa baba ay maaring kusang mabago sa iminumungkahing bilang.  </translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2431"/>
         <source>Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.</source>
-        <translation type="unfinished"/>
+        <translation>Samantalang ang mas mainam na performance o ang mas mahigpit na siguridad ay maaring mataglay sa pamamagitan ng pagbabago ng settings mula sa mga iminumungkahing bilang, yaon ay nasa sa iyong sariling ikapipinsala.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2433"/>
         <source>You can use the &lt;b&gt;Benchmark&lt;/b&gt; button (which runs &lt;i&gt;cryptsetup benchmark&lt;/i&gt; in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.</source>
-        <translation type="unfinished"/>
+        <translation>Maaring gamiting ang &lt;b&gt;para sa Benchmark&lt;/b&gt; boton (na aandar &lt;i&gt;cryptsetup benchmark&lt;/i&gt; sa kaniyang sariling terminal window) para maicompare ang pagtatrabaho ang karaniwang combination ng mga hash, ciphers at chain modes.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2434"/>
         <source>Please note that &lt;i&gt;cryptsetup benchmark&lt;/i&gt; does not cover all the combinations or selections possible, and generally covers the most commonly used selections.</source>
-        <translation type="unfinished"/>
+        <translation>Tandaan na ang &lt;i&gt;cryptsetup benchmark&lt;/i&gt; ay hindi sumasakop sa lahat ng  combination o mga posibleng pagpipilian at sa kadalasan ay sumasakop sa mga kadalasang mga selections na ginagamit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2436"/>
         <source>Cipher</source>
-        <translation type="unfinished"/>
+        <translation>Cipher</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2436"/>
         <source>A variety of ciphers are available.</source>
-        <translation type="unfinished"/>
+        <translation>Ang ibat ibang uri ng ciphers ay maaring makuha.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2437"/>
         <source>was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.</source>
-        <translation type="unfinished"/>
+        <translation>isa sa limang  finalists ng AES. Ito ay itinuturing na may mas mataas na siguridad kaysa sa  Rijndael at iba pang mga finalists ng AES. Ito ay nagbibigay ng mas malakas na pagtatrabaho sa ibang mga  CPU na 64-bit.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2438"/>
         <source>(also known as &lt;i&gt;Rijndael&lt;/i&gt;) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.</source>
-        <translation type="unfinished"/>
+        <translation>(kilala rin bilang &lt;i&gt;Rijndael&lt;/i&gt;) ay isang lalong karaniwang cipher, ang maraming mga makabagong CPU ay may kalakip na panuntunang mas masinsin para sa AES, dahil sa kaniyang pag-iral sa kadalasan. Bagaman ang Rijndael ay napili kaysa sa Serpent dahil sa kaniyang pagtatrabaho, walang praktikal attack sa kasalukuyan ang inaasahan.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2439"/>
         <source>is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.</source>
-        <translation type="unfinished"/>
+        <translation>ay ang kasunod ng Blowfish. Ito ay naging isa sa limang  finalist ng AES bagaman hindi napili bilang standard.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2440"/>
         <source>(CAST-256) was a candidate in the AES contest, however it did not become a finalist.</source>
-        <translation type="unfinished"/>
+        <translation>Ang (CAST-256) ay kandidato sa paligsahan ng AES  bagaman hindi ito naging finalist.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2441"/>
         <source>is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.</source>
-        <translation type="unfinished"/>
+        <translation>ay isang 64-bit block cipher na ginawa ni Bruce Schneier. Ito ay hindi iminumungkahi sa mga maseselang application bilang CBC at  ECB mode lamang ang sinusuportahan. Ang Blowfish ay tumatanggap ng dami ng key sa pagitan ng  32 and 448 bits na maaring maparami sa bilang ng 8.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2443"/>
         <source>Chain mode</source>
-        <translation type="unfinished"/>
+        <translation>Chain mode</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2443"/>
         <source>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.</source>
-        <translation type="unfinished"/>
+        <translation>Kung ang lahat ng  blocks ay encrypted gamit ang kaparehong key, isang padron ay maaring lumitaw para mahulaan ang payak na text.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2444"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.</source>
-        <translation type="unfinished"/>
+        <translation>XEX-based Tweaked codebook na may lakip na pangnakaw ng ciphertext) ay isang makabagong chain mode, na humahangga sa CBC at EBC. Ito ay sa madalas at iminumungkahi) bilang chain mode. Gamit ang ESSIV kaysa sa Plain64 ay magaganap at magdudulot na pasakit sa pagtatrabaho, na may kalakip na maaring ipagwalang bahalang  pakinabang sa siguridad.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2445"/>
         <source>(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>(Ang Cipher Block Chaining) ay mas payak kaysa sa XTS, pero ito ay maaring tablan sa mga   attack ng padding oracle (parang pinahihina ng ESSIV) kung kayat hindi iminumungkahi para sa mga maselang applications.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2446"/>
         <source>(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.</source>
-        <translation type="unfinished"/>
+        <translation>(Ang Electronic CodeBook) ay mas mahina sa siguridad kaysa sa CBC at hindi maaring gamiting sa mga maseselang applications.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2448"/>
         <source>IV generator</source>
-        <translation type="unfinished"/>
+        <translation>IV generator</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2448"/>
         <source>For XTS and CBC, this selects how the &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector is generated. &lt;b&gt;ESSIV&lt;/b&gt; requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.</source>
-        <translation type="unfinished"/>
+        <translation>Para sa XTS at CBC, pinipili nito kung paanong ang &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector ay nalilikha. &lt;b&gt;Ang ESSIV&lt;/b&gt; ay humihingi ng pagtatrabaho ng hash at dahil sa roon ay ang ikalawang drop-down box ay maaring makuha kung ito ay napili. Ang mga hash ay maaring makuha depende na piling cipher.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2449"/>
         <source>ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.</source>
-        <translation type="unfinished"/>
+        <translation>Ang ECB mode ay hindi gumagamit IV, so ang mga fields na ito ay di maaring magamit kung ang  ECB ay napili para sa chain mode.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2451"/>
         <source>Key size</source>
-        <translation type="unfinished"/>
+        <translation>Laki ng Key</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2451"/>
         <source>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.</source>
-        <translation type="unfinished"/>
+        <translation>Itatakda nito ang laki ng key sa bits. Ang mga key sizes na maaring makuha ay limitado ng cipher at ng  chain mode.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2452"/>
         <source>The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).</source>
-        <translation type="unfinished"/>
+        <translation>Ang XTS cipher chain mode ay humahati ng key sa dalawa (halimbawa, ang AES-256 in XTS ay humihiling ng 512-bit na laki ng key).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2454"/>
         <source>LUKS key hash</source>
-        <translation type="unfinished"/>
+        <translation>LUKS key hash</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2454"/>
         <source>The hash used for PBKDF2 and for the AF splitter.</source>
-        <translation type="unfinished"/>
+        <translation>Ang hash na ginamit para sa PBKDF2 at para sa AF splitter.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2455"/>
         <source>SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.</source>
-        <translation type="unfinished"/>
+        <translation>Ang SHA-1 at  RIPEMD-160 ang hindi na iminumungkahing gamitin dahil sa maseselang application yamang mga napag-aalamang sira.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2457"/>
         <source>Kernel RNG</source>
-        <translation type="unfinished"/>
+        <translation>Kernel RNG</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2457"/>
         <source>Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).</source>
-        <translation type="unfinished"/>
+        <translation>Itinatakda kung aling  generator ng random number ng kernel ang gagamitin sa paggawa ng master key volume (pangmatagalang key)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2458"/>
         <source>Two options are available: /dev/&lt;b&gt;random&lt;/b&gt; which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/&lt;b&gt;urandom&lt;/b&gt; which will not block even if there is insufficient entropy (possibly weaker keys).</source>
-        <translation type="unfinished"/>
+        <translation>May maaring dalawang mapagpipilian: /dev/&lt;b&gt;random&lt;/b&gt; na sumasagka hanggang maging sapat ang nakukuhang entropy (maaring tumagal ng husto sa may kalagayang may mababang-entropy), at /dev/&lt;b&gt;urandom&lt;/b&gt; di hindi sumasagka bagaman may kakulangan sa entropy (mas malamang na mahinang keys)</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2460"/>
         <source>KDF round time&lt;/b&gt;&lt;br/&gt;The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.</source>
-        <translation type="unfinished"/>
+        <translation>KDF round time&lt;/b&gt;&lt;br/&gt;Ang gugugulin panahon (sa bahagi ng sandali) ay gagamitin sa PBKDF2 pagpoproceso ng passphrase</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2461"/>
         <source>A value of 0 selects the compiled-in default (run &lt;i&gt;cryptsetup --help&lt;/i&gt; for details).</source>
-        <translation type="unfinished"/>
+        <translation>Ang halaga ng 0 ay pipili ng compline-in default (patakbuhin ang &lt;i&gt;cryptsetup --help&lt;/i&gt; para sa iba pang kaalaman).</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2462"/>
         <source>If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.</source>
-        <translation type="unfinished"/>
+        <translation>Kung mabagal ang iyong computer ay maari kang magdagdag ng bilang para sa siguridad, bilang kapalit ng oraspara matuklasan ang dami ng passphrase na naipasok</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2467"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;p&gt;&lt;b&gt;Ang Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 ay gumagamit ng GRUB bootloader upang magbukas %1 at MS-Windows. &lt;p&gt;Sa kalakaran ang GRUB2 ay nakainstall sa Master Boot Record (MBR) o ESP (EFI System Partition para sa 64-bit UEFI na system ng boot ) ng iyong drive na gamit sa pang boot at pinapalitan nito ang boot loader na dati mong ginagamit. Ito ay normal&lt;/p&gt;&lt;p&gt;Kung nais mong iinstall ang  GRUB2 sa Partition Boot Record (PBR) sa halip at pagkatapos ay ang GRUB2 ay aarangkasa sa iyong minamarapat na partition. Ang pagpiling ito ay para lamang sa mga bihasa.&lt;/p&gt;&lt;p&gt;Kung tatanggalang ng check ang  Install GRUB box, ang GRUB ay hindi maiinstal sa ngayon. Ang pagpiling ito ay para lamang sa mga bihasa.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2482"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;p&gt;&lt;b&gt; Para sindihan ang Common Services &lt;/b&gt;&lt;br/&gt;Pumili ng alinman sa mga ito na common services na maari mong magamit sa configuration ng iyong sistema at ng mga services na maaring kusang umandar sa iyong pagsisimula  %1.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2486"/>
@@ -787,7 +809,7 @@ name before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="2523"/>
         <source>Warning</source>
-        <translation type="unfinished"/>
+        <translation>Babala</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2524"/>
@@ -848,12 +870,12 @@ name before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="2606"/>
         <source>OK</source>
-        <translation>확인</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2608"/>
         <source>Next</source>
-        <translation>다음으로</translation>
+        <translation>Kasunod</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2654"/>
@@ -923,22 +945,22 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="60"/>
         <source>Help</source>
-        <translation>도움말</translation>
+        <translation>Tulong</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="156"/>
         <source>Next</source>
-        <translation>다음으로</translation>
+        <translation>Kasunod</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="163"/>
         <source>Alt+N</source>
-        <translation type="unfinished"/>
+        <translation>Alt+N</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="173"/>
         <source>Back</source>
-        <translation>뒤로</translation>
+        <translation>Magbalik</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="180"/>
@@ -959,12 +981,12 @@ Do you really want to stop now?</source>
         <location filename="meinstall.ui" line="239"/>
         <location filename="meinstall.ui" line="1859"/>
         <source>Alt+A</source>
-        <translation type="unfinished"/>
+        <translation>Alt+A</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="262"/>
         <source>Close</source>
-        <translation>닫기</translation>
+        <translation>Isara</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="310"/>
@@ -1069,7 +1091,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="801"/>
         <source>Preferences</source>
-        <translation type="unfinished"/>
+        <translation>Mga Minamarapat</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="828"/>
@@ -1090,7 +1112,7 @@ Do you really want to stop now?</source>
         <location filename="meinstall.ui" line="904"/>
         <location filename="meinstall.ui" line="1108"/>
         <source>ext4</source>
-        <translation type="unfinished"/>
+        <translation>ext4</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="909"/>
@@ -1160,7 +1182,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="1000"/>
         <source>Label</source>
-        <translation type="unfinished"/>
+        <translation>Label</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1019"/>
@@ -1176,12 +1198,12 @@ Do you really want to stop now?</source>
         <location filename="meinstall.ui" line="1093"/>
         <location filename="meinstall.ui" line="1267"/>
         <source>root</source>
-        <translation type="unfinished"/>
+        <translation>root</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1172"/>
         <source>Type</source>
-        <translation type="unfinished"/>
+        <translation>Uri</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1188"/>
@@ -1336,17 +1358,17 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="1750"/>
         <source>Select Boot Method</source>
-        <translation type="unfinished"/>
+        <translation>Pumili ng paraan ng pag Boot</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1796"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished"/>
+        <translation> Sistema ng Partition ng EFI</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1799"/>
         <source>ESP</source>
-        <translation type="unfinished"/>
+        <translation>ESP</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1818"/>
@@ -1376,17 +1398,17 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="1941"/>
         <source>Master Boot Record</source>
-        <translation type="unfinished"/>
+        <translation>Pangunahing Record ng Boot</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1947"/>
         <source>MBR</source>
-        <translation type="unfinished"/>
+        <translation>MBR</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1950"/>
         <source>Alt+B</source>
-        <translation type="unfinished"/>
+        <translation>Alt+B</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1995"/>
@@ -1481,7 +1503,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="2486"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>Tanawan</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2547"/>
@@ -1506,12 +1528,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="2733"/>
         <source>username</source>
-        <translation type="unfinished"/>
+        <translation>pangalan ng user o tagagamit</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2746"/>
         <source>Confirm user password:</source>
-        <translation type="unfinished"/>
+        <translation>Kumpirmahin ang password ng user of gumagamit:</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2762"/>

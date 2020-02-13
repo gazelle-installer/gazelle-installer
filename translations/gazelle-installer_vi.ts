@@ -1,10 +1,10 @@
-<?xml version="1.0" ?><!DOCTYPE TS><TS language="ko" version="2.0">
+<?xml version="1.0" ?><!DOCTYPE TS><TS language="vi" version="2.0">
 <context>
     <name>MInstall</name>
     <message>
         <location filename="minstall.cpp" line="64"/>
         <source>%1 Installer</source>
-        <translation type="unfinished"/>
+        <translation>%1 Trình cài đặt</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="99"/>
@@ -16,7 +16,9 @@
         <source>Support %1
 
 %1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.</source>
-        <translation type="unfinished"/>
+        <translation>Hỗ trợ %1
+
+%1 được hỗ trợ bởi những người như bạn. Một số giúp đỡ ở diễn đàn hỗ trợ - %2, hoặc phiên dịch các tệp trợ giúp sang những ngôn ngữ khác nhau, hoặc đưa ra khuyến nghị, viết tài liệu, hoặc giúp đỡ kiểm thử phần mềm mới.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="168"/>
@@ -31,7 +33,11 @@ Activating pretend installation.</source>
 %1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.
 
 Enjoy using %1</source>
-        <translation type="unfinished"/>
+        <translation>%1 là một bản phân phối Linux độc lập dựa trên phiên bản ổn định của Debian.
+
+%1 sử dụng một số thành phần từ MEPIS Linux vốn được phát hành dưới giấy phép tự do Apache. Một số thành phần của MEPIS đã được sửa đổi cho %1.
+
+Tận hưởng sử dụng %1</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="397"/>
@@ -41,7 +47,7 @@ Enjoy using %1</source>
     <message>
         <location filename="minstall.cpp" line="534"/>
         <source>target drive</source>
-        <translation type="unfinished"/>
+        <translation>Ổ đĩa đích</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="553"/>
@@ -78,17 +84,19 @@ Enjoy using %1</source>
         <source>The password needs to be at least
 %1 characters long. Please select
 a longer password before proceeding.</source>
-        <translation type="unfinished"/>
+        <translation>Mật khẩu cần phải có chiều dài ít nhất
+%1 kí tự. Xin hãy chọn
+một mật khẩu dài hơn trước khi tiếp tục.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="603"/>
         <source>Preparing to install %1</source>
-        <translation type="unfinished"/>
+        <translation>Đang chuẩn bị cài đặt %1</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="615"/>
         <source>Failed to format required partitions.</source>
-        <translation type="unfinished"/>
+        <translation>Định dạng các phân vùng cần thiết thất bại.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="626"/>
@@ -98,7 +106,7 @@ a longer password before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="636"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished"/>
+        <translation>Đang thiết lập cấu hình hệ thống</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="654"/>
@@ -219,12 +227,12 @@ The root partition must be at least %1.</source>
     <message>
         <location filename="minstall.cpp" line="1387"/>
         <source>Creating required partitions</source>
-        <translation type="unfinished"/>
+        <translation>Đang tạo các phân vùng cần thiết</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1393"/>
         <source>Preparing required partitions</source>
-        <translation type="unfinished"/>
+        <translation>Đang chuẩn bị các phân vùng cần thiết</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1463"/>
@@ -245,7 +253,7 @@ Returning to Step 1.</source>
     <message>
         <location filename="minstall.cpp" line="1477"/>
         <source>Creating system directories</source>
-        <translation type="unfinished"/>
+        <translation>Đang tạo các thư mục hệ thống</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1497"/>
@@ -848,12 +856,12 @@ name before proceeding.</source>
     <message>
         <location filename="minstall.cpp" line="2606"/>
         <source>OK</source>
-        <translation>확인</translation>
+        <translation>Đồng ý</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="2608"/>
         <source>Next</source>
-        <translation>다음으로</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="minstall.cpp" line="2654"/>
@@ -923,22 +931,22 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="60"/>
         <source>Help</source>
-        <translation>도움말</translation>
+        <translation>Trợ giúp</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="156"/>
         <source>Next</source>
-        <translation>다음으로</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="163"/>
         <source>Alt+N</source>
-        <translation type="unfinished"/>
+        <translation>Alt+N</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="173"/>
         <source>Back</source>
-        <translation>뒤로</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="meinstall.ui" line="180"/>
@@ -964,7 +972,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="262"/>
         <source>Close</source>
-        <translation>닫기</translation>
+        <translation>Đóng</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="310"/>
@@ -1386,7 +1394,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="1950"/>
         <source>Alt+B</source>
-        <translation type="unfinished"/>
+        <translation>Alt+B</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="1995"/>
@@ -1481,7 +1489,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="meinstall.ui" line="2486"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>Xem</translation>
     </message>
     <message>
         <location filename="meinstall.ui" line="2547"/>
