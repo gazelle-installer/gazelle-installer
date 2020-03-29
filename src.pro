@@ -26,7 +26,6 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_is.ts \
                 translations/gazelle-installer_it.ts \
                 translations/gazelle-installer_ja.ts \
-                translations/gazelle-installer_ja_JP.ts \
                 translations/gazelle-installer_kk.ts \
                 translations/gazelle-installer_ko.ts \
                 translations/gazelle-installer_lt.ts \
