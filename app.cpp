@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
        return EXIT_SUCCESS;
     }
 
-
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
 
     // Set the logging files
@@ -182,6 +181,9 @@ void printHelp()
            "                 Without this option, GPT will only be used on drives with at least 2TB capacity.\n"
            "                 GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.\n"
            "  -n --nocopy    Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.\n"
+           "  --oem          Install the operating system, delaying prompts for user-specific options until the first reboot.\n"
+           "                 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.\n"
+           "                 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.\n"
            "  -p --pretend   Test mode for GUI, you can advance to different screens without actially installing.\n"
            "  -s --sync      Installing with rsync instead of cp on custom partitioning.\n"
            "                 -- doesn't format /root and it doesn't work with encryption.\n"
