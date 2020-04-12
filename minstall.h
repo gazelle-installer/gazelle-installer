@@ -54,6 +54,7 @@ public:
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
     bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString(), const bool failHard = true);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
+    void setupOOBE(bool active);
     bool validateUserInfo();
     bool validateComputerName();
     bool setComputerName();
@@ -151,6 +152,7 @@ private:
 
     // command line options
     bool brave, pretend, automatic, nocopy, sync, gptoverride;
+    bool oem, oobe;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
