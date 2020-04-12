@@ -44,7 +44,13 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     automatic = args.contains("--auto");
     nocopy = (args.contains("--nocopy") || args.contains("-n"));
     sync = (args.contains("--sync") || args.contains("-s"));
+    oem = args.contains("--oem");
+    oobe = args.contains("--oobe");
     gptoverride = args.contains("--gpt-override");
+    if(oobe) {
+        brave = automatic = oem = gptoverride = false;
+        pretend = true; // OOBE is still experimental
+    }
     if (pretend) listHomes = args; // dummy existing homes
 
     // setup system variables
@@ -634,14 +640,18 @@ bool MInstall::processNextPhase()
         backButton->setEnabled(false);
         if (!pretend) {
             updateStatus(tr("Setting system configuration"), progPhase23);
-            setServices();
-            if (!setComputerName()) return false;
-            setLocale();
-            if (haveSnapshotUserAccounts) { // skip user account creation
-                QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
-                proc.exec(cmd);
-            } else {
-                if (!setUserInfo()) return false;
+            if (oem) setupOOBE(true);
+            else {
+                setServices();
+                if (!setComputerName()) return false;
+                setLocale();
+                if (haveSnapshotUserAccounts) { // skip user account creation
+                    QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
+                    proc.exec(cmd);
+                } else {
+                    if (!setUserInfo()) return false;
+                }
+                if(oobe) setupOOBE(false);
             }
             manageConfig(ConfigSave);
             config->dumpDebug();
@@ -1870,6 +1880,16 @@ bool MInstall::installLoader()
     return true;
 }
 
+// out-of-box experience
+void MInstall::setupOOBE(bool active)
+{
+    if (active) {
+        proc.exec("chroot /mnt/antiX/ update-rc.d oobe defaults", true);
+    } else {
+        proc.exec("update-rc.d oobe disable", false);
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////
 // user account functions
 
@@ -2288,7 +2308,9 @@ int MInstall::showPage(int curr, int next)
         return next;
     }
 
-    if (next == 2 && curr == 1) { // at Step_Disk (forward)
+    if (next == 1 && curr == 0) { // at Step_Terms (forward)
+        if (oobe) return 6; // go straight to Step_Network
+    } else if (next == 2 && curr == 1) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
                 return curr;
@@ -2331,14 +2353,16 @@ int MInstall::showPage(int curr, int next)
         ixPageRefAdvancedFDE = 0;
         return next;
     } else if (next == 5 && curr == 4) { // at Step_Boot (forward)
+        if (oem) return 10; // straight to Step_Progress
         return next + 1; // skip Services screen
     } else if (next == 9 && curr == 8) { // at Step_User_Accounts (forward)
         if (!validateUserInfo()) return curr;
-        if (!haveOldHome) return 10; /// skip Step_Old_Home
+        if (!haveOldHome) return 10; // skip Step_Old_Home
     } else if (next == 7 && curr == 6) { // at Step_Network (forward)
         if (!validateComputerName()) return curr;
     } else if (next == 5 && curr == 6) { // at Step_Network (backward)
-       return next - 1; // skip Services screen
+        if (oobe) return 0; // go back to Step_Terms
+        return next - 1; // skip Services screen
     } else if (next == 8 && curr == 7) { // at Step_Localization (forward)
         if (!pretend && haveSnapshotUserAccounts) {
             return 9; // skip Step_User_Accounts and go to Step_Progress
@@ -2348,6 +2372,7 @@ int MInstall::showPage(int curr, int next)
             return 7; // skip Step_User_Accounts and go to Step_Localization
         }
     } else if (next == 9 && curr == 10) { // at Step_Progress (backward)
+        if (oem) return 4; // go back to Step_Boot
         if (!haveOldHome) {
             // skip Step_Old_Home
             if (!pretend && haveSnapshotUserAccounts) {
@@ -2364,11 +2389,13 @@ int MInstall::showPage(int curr, int next)
 
 void MInstall::pageDisplayed(int next)
 {
-    const int ixProgress = widgetStack->indexOf(Step_Progress);
-    // progress bar shown only for install and configuration pages.
-    installBox->setVisible(next >= widgetStack->indexOf(Step_Boot) && next <= ixProgress);
-    // save the last tip and stop it updating when the progress page is hidden.
-    if(next != ixProgress) ixTipStart = ixTip;
+    if (!oobe) {
+        const int ixProgress = widgetStack->indexOf(Step_Progress);
+        // progress bar shown only for install and configuration pages.
+        installBox->setVisible(next >= widgetStack->indexOf(Step_Boot) && next <= ixProgress);
+        // save the last tip and stop it updating when the progress page is hidden.
+        if(next != ixProgress) ixTipStart = ixTip;
+    }
 
     switch (next) {
     case 1: // choose disk
