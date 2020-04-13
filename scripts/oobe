@@ -15,7 +15,7 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 case "$1" in
   start)
 	# Boot will hold here since the process is not being forked.
-	startx /usr/sbin/minstall --oobe 2>/dev/null
+	startx /usr/sbin/minstall --oobe --config 2>/dev/null
 	# Boot will continue after the OOBE application and X exits.
 	;;
 esac
