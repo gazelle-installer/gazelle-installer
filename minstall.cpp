@@ -35,24 +35,25 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
 {
     setupUi(this);
     updateCursor(Qt::WaitCursor);
-    this->setEnabled(false);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     installBox->hide();
 
-    brave = args.contains("--brave");
+    oobe = args.contains("--oobe");
     pretend = (args.contains("--pretend") || args.contains("-p"));
-    automatic = args.contains("--auto");
     nocopy = (args.contains("--nocopy") || args.contains("-n"));
     sync = (args.contains("--sync") || args.contains("-s"));
-    oem = args.contains("--oem");
-    oobe = args.contains("--oobe");
-    gptoverride = args.contains("--gpt-override");
-    if(oobe) {
+    if(!oobe) {
+        brave = args.contains("--brave");
+        automatic = args.contains("--auto");
+        oem = args.contains("--oem");
+        gptoverride = args.contains("--gpt-override");
+    } else {
         brave = automatic = oem = gptoverride = false;
         closeButton->setText(tr("Shutdown"));
         phase = 2;
     }
     if (pretend) listHomes = args; // dummy existing homes
+    gotoPage(0);
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
@@ -69,7 +70,6 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     PREFERRED_MIN_INSTALL_SIZE = settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
     REMOVE_NOSPLASH = settings.value("REMOVE_NOSPLASH", "false").toBool();
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
-    gotoPage(0);
     //load some live variables
     QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
     SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
@@ -103,13 +103,9 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     settings.endGroup();
 
     // set some distro-centric text
-    copyrightBrowser->setPlainText(tr("Gathering Information, please stand by."));
+    labelSplash->setText(tr("Gathering Information, please stand by."));
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
                         + "\n" + link_block);
-
-    // ensure the help widgets are displayed correctly when started
-    // Qt will delete the heap-allocated event object when posted
-    qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
 
     QTimer::singleShot(0, this, &MInstall::startup);
 }
@@ -286,10 +282,13 @@ void MInstall::startup()
     }
     stashServices(true);
 
-    // set some distro-centric text
-    copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
-
-    this->setEnabled(true);
+    if (oobe) gotoPage(7); // go to Network page
+    else {
+        copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
+            "%1 uses some components from MEPIS Linux which are released under an Apache free license."
+            " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
+        gotoPage(1);
+    }
     updateCursor();
 
     // automatic installation
@@ -2321,13 +2320,11 @@ void MInstall::failUI(const QString &msg)
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
 {
-    if (next == 3 && ixPageRefAdvancedFDE != 0) { // at Step_FDE
+    if (next == 4 && ixPageRefAdvancedFDE != 0) { // at Step_FDE
         return next;
     }
 
-    if (next == 1 && curr == 0) { // at Step_Terms (forward)
-        if (oobe) return 6; // go straight to Step_Network
-    } else if (next == 2 && curr == 1) { // at Step_Disk (forward)
+    if (next == 3 && curr == 2) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
                 return curr;
@@ -2350,9 +2347,9 @@ int MInstall::showPage(int curr, int next)
                 }
             }
             calculateDefaultPartitions();
-            return 4; // Go to Step_Boot
+            return 5; // Go to Step_Boot
         }
-    } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
+    } else if (next == 4 && curr == 3) { // at Step_Partition (fwd)
         if (!validateChosenPartitions()) {
             return curr;
         }
@@ -2363,43 +2360,42 @@ int MInstall::showPage(int curr, int next)
             QMessageBox::critical(this, windowTitle(), msg);
             return curr;
         }
-        return 4; // Go to Step_Boot
-    } else if (curr == 3) { // at Step_FDE
-        stashAdvancedFDE(next >= 4);
+        return 5; // Go to Step_Boot
+    } else if (curr == 4) { // at Step_FDE
+        stashAdvancedFDE(next >= 5);
         next = ixPageRefAdvancedFDE;
         ixPageRefAdvancedFDE = 0;
         return next;
-    } else if (next == 5 && curr == 4) { // at Step_Boot (forward)
-        if (oem) return 10; // straight to Step_Progress
+    } else if (next == 6 && curr == 5) { // at Step_Boot (forward)
+        if (oem) return 11; // straight to Step_Progress
         return next + 1; // skip Services screen
-    } else if (next == 9 && curr == 8) { // at Step_User_Accounts (forward)
+    } else if (next == 10 && curr == 9) { // at Step_User_Accounts (forward)
         if (!validateUserInfo()) return curr;
-        if (!haveOldHome) return 10; // skip Step_Old_Home
-    } else if (next == 7 && curr == 6) { // at Step_Network (forward)
+        if (!haveOldHome) return next + 1; // skip Step_Old_Home
+    } else if (next == 8 && curr == 7) { // at Step_Network (forward)
         if (!validateComputerName()) return curr;
-    } else if (next == 5 && curr == 6) { // at Step_Network (backward)
-        if (oobe) return 0; // go back to Step_Terms
+    } else if (next == 6 && curr == 7) { // at Step_Network (backward)
         return next - 1; // skip Services screen
-    } else if (next == 8 && curr == 7) { // at Step_Localization (forward)
+    } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
         if (!pretend && haveSnapshotUserAccounts) {
-            return 9; // skip Step_User_Accounts and go to Step_Progress
+            return 11; // skip Step_User_Accounts and go to Step_Progress
         }
-    } else if (next == 8 && curr == 9) { // at Step_Old_Home (backward)
+    } else if (next == 9 && curr == 10) { // at Step_Old_Home (backward)
         if (!pretend && haveSnapshotUserAccounts) {
-            return 7; // skip Step_User_Accounts and go to Step_Localization
+            return 8; // skip Step_User_Accounts and go to Step_Localization
         }
-    } else if (next == 9 && curr == 10) { // at Step_Progress (backward)
-        if (oem) return 4; // go back to Step_Boot
+    } else if (next == 10 && curr == 11) { // at Step_Progress (backward)
+        if (oem) return 5; // go back to Step_Boot
         if (!haveOldHome) {
             // skip Step_Old_Home
             if (!pretend && haveSnapshotUserAccounts) {
-                return 7; // go to Step_Localization
+                return 8; // go to Step_Localization
             }
-            return 8; // go to Step_User_Accounts
+            return 9; // go to Step_User_Accounts
         }
-    } else if (curr == 5) { // at Step_Services
-        stashServices(next >= 6);
-        return 7; // goes back to the screen that called Services screen
+    } else if (curr == 6) { // at Step_Services
+        stashServices(next >= 7);
+        return 8; // goes back to the screen that called Services screen
     }
     return next;
 }
@@ -2415,7 +2411,7 @@ void MInstall::pageDisplayed(int next)
     }
 
     switch (next) {
-    case 1: // choose disk
+    case 2: // choose disk
         mainHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
                           + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
                           "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
@@ -2440,7 +2436,7 @@ void MInstall::pageDisplayed(int next)
         }
         break;
 
-    case 2:  // choose partition
+    case 3:  // choose partition
         mainHelp->setText("<p><b>" + tr("Limitations") + "</b><br/>"
                           + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
                                " It is solely your responsibility to backup your data before proceeding.") + "</p>"
@@ -2464,7 +2460,7 @@ void MInstall::pageDisplayed(int next)
                           "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>");
         break;
 
-    case 3: // advanced encryption settings
+    case 4: // advanced encryption settings
         mainHelp->setText("<p><b>"
                           + tr("Advanced Encryption Settings") + "</b><br/>" + tr("This page allows fine-tuning of LUKS encrypted partitions.") + "<br/>"
                           + tr("In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.")
@@ -2507,7 +2503,7 @@ void MInstall::pageDisplayed(int next)
                           + "</p>");
         break;
 
-    case 4: // set bootloader (start of installation)
+    case 5: // set bootloader (start of installation)
         mainHelp->setText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
                              "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
                              "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
@@ -2522,26 +2518,31 @@ void MInstall::pageDisplayed(int next)
         return; // avoid the end that enables both Back and Next buttons
         break;
 
-    case 5: // set services
+    case 6: // set services
         mainHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         break;
 
-    case 6: // set computer name
+    case 7: // set computer name
         mainHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
                              "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
+        if(oobe) {
+            backButton->setEnabled(false);
+            nextButton->setEnabled(true);
+            return; // avoid the end that enables both Back and Next buttons
+        }
         break;
 
-    case 7: // set localization, clock, services button
+    case 8: // set localization, clock, services button
         mainHelp->setText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
                              "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
                              "<p><b>Timezone Settings</b><br/>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</p>"
                              "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
         break;
 
-    case 8: // set username and passwords
+    case 9: // set username and passwords
         mainHelp->setText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
                              "You should not use the root user as your daily user account. "
                              "Please enter the name for a new (default) user account that you will use on a daily basis. "
@@ -2551,7 +2552,7 @@ void MInstall::pageDisplayed(int next)
         if (!nextFocus) nextFocus = userNameEdit;
         break;
 
-    case 9: // deal with an old home directory
+    case 10: // deal with an old home directory
         mainHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
                           + tr("A home directory already exists for the user name you have chosen."
                                " This screen allows you to choose what happens to this directory.") + "</p>"
@@ -2576,7 +2577,7 @@ void MInstall::pageDisplayed(int next)
         }
         break;
 
-    case 10: // installation step
+    case 11: // installation step
         if(ixTipStart >= 0) {
             iLastProgress = progressBar->value();
             on_progressBar_valueChanged(iLastProgress);
@@ -2596,7 +2597,7 @@ void MInstall::pageDisplayed(int next)
         return; // avoid enabling both Back and Next buttons at the end
         break;
 
-    case 11: // done
+    case 12: // done
         closeButton->setEnabled(false);
         mainHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                              "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -2607,11 +2608,12 @@ void MInstall::pageDisplayed(int next)
         break;
 
     default:
-        // case 0 or any other
-        mainHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n " + tr("<p><b>Support %1</b><br/>"
-                                                                                                  "%1 is supported by people like you. Some help others at the "
-                                                                                                  "support forum - %2 - or translate help files into different "
-                                                                                                  "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
+        // case 1 or any other
+        mainHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n "
+                          + tr("<p><b>Support %1</b><br/>"
+                               "%1 is supported by people like you. Some help others at the "
+                               "support forum - %2 - or translate help files into different "
+                               "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
         nextButton->setDefault(true);
         break;
     }
@@ -2629,13 +2631,18 @@ void MInstall::gotoPage(int next)
     next = showPage(curr, next);
 
     // modify ui for standard cases
-    if (next == 0) {
-        // entering first page
-        backButton->hide();
-    } else {
-        // default
-        backButton->show();
+    if(oobe) {
+        if(next == 0) mainTabs->hide();
+        else {
+            mainTabs->show();
+            // ensure the help widgets are displayed correctly when started
+            // Qt will delete the heap-allocated event object when posted
+            qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
+        }
     }
+    closeButton->setHidden(next == 0);
+    backButton->setHidden(next <= 1);
+    nextButton->setHidden(next == 0);
 
     int c = widgetStack->count();
     QSize isize = nextButton->iconSize();
@@ -2644,7 +2651,7 @@ void MInstall::gotoPage(int next)
         // entering the last page
         backButton->hide();
         nextButton->setText(tr("Finish"));
-    } else if (next == 3 || next == 5){
+    } else if (next == 4 || next == 6){
         // Advanced Encryption Settings and Services pages
         isize.setWidth(0);
         nextButton->setText(tr("OK"));
@@ -2684,7 +2691,7 @@ void MInstall::gotoPage(int next)
     if (next == widgetStack->indexOf(Step_Boot) || next == widgetStack->indexOf(Step_Progress)) {
         if (!processNextPhase() && phase > -2) {
             cleanup(false);
-            gotoPage(1);
+            gotoPage(2);
         }
     }
 }
@@ -2909,7 +2916,7 @@ void MInstall::on_abortInstallButton_clicked()
 // clicking advanced button to go to Services page
 void MInstall::on_viewServicesButton_clicked()
 {
-    gotoPage(5);
+    gotoPage(6);
 }
 
 void MInstall::on_qtpartedButton_clicked()
@@ -2969,7 +2976,7 @@ bool MInstall::abort(bool onclose)
         phase = -2;
     } else if (phase == 2 && widgetStack->currentWidget() != Step_Progress) {
         phase = -1;
-        gotoPage(1);
+        gotoPage(2);
     } else {
         phase = -1;
     }
@@ -3245,13 +3252,13 @@ void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
 void MInstall::on_buttonAdvancedFDE_clicked()
 {
     ixPageRefAdvancedFDE = widgetStack->currentIndex();
-    gotoPage(3);
+    gotoPage(4);
 }
 
 void MInstall::on_buttonAdvancedFDECust_clicked()
 {
     ixPageRefAdvancedFDE = widgetStack->currentIndex();
-    gotoPage(3);
+    gotoPage(4);
 }
 
 void MInstall::on_comboFDEcipher_currentIndexChanged(const QString &arg1)
