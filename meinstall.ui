@@ -150,6 +150,17 @@
       <number>0</number>
      </property>
      <layout class="QGridLayout" name="_2">
+      <item row="4" column="0">
+       <widget class="QPushButton" name="closeButton">
+        <property name="text">
+         <string>Close</string>
+        </property>
+        <property name="icon">
+         <iconset theme="window-close">
+          <normaloff>.</normaloff>.</iconset>
+        </property>
+       </widget>
+      </item>
       <item row="4" column="5">
        <widget class="QPushButton" name="nextButton">
         <property name="text">
@@ -167,20 +178,6 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="4">
-       <widget class="QPushButton" name="backButton">
-        <property name="text">
-         <string>Back</string>
-        </property>
-        <property name="icon">
-         <iconset theme="go-previous">
-          <normaloff>.</normaloff>.</iconset>
-        </property>
-        <property name="shortcut">
-         <string>Alt+K</string>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="1" colspan="3">
        <spacer name="horizontalSpacer_6">
         <property name="orientation">
@@ -193,79 +190,6 @@
          </size>
         </property>
        </spacer>
-      </item>
-      <item row="1" column="0" colspan="6">
-       <widget class="QGroupBox" name="installBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="title">
-         <string>Installation in progress</string>
-        </property>
-        <layout class="QGridLayout">
-         <property name="leftMargin">
-          <number>9</number>
-         </property>
-         <property name="topMargin">
-          <number>9</number>
-         </property>
-         <property name="rightMargin">
-          <number>9</number>
-         </property>
-         <property name="bottomMargin">
-          <number>9</number>
-         </property>
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="abortInstallButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::ClickFocus</enum>
-           </property>
-           <property name="text">
-            <string>Abort</string>
-           </property>
-           <property name="shortcut">
-            <string>Alt+A</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QProgressBar" name="progressBar">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QPushButton" name="closeButton">
-        <property name="text">
-         <string>Close</string>
-        </property>
-        <property name="icon">
-         <iconset theme="window-close">
-          <normaloff>.</normaloff>.</iconset>
-        </property>
-       </widget>
       </item>
       <item row="2" column="0" colspan="6">
        <widget class="QStackedWidget" name="widgetStack">
@@ -282,8 +206,27 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>11</number>
+         <number>0</number>
         </property>
+        <widget class="QWidget" name="Step_Splash">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QLabel" name="labelSplash">
+            <property name="font">
+             <font>
+              <pointsize>36</pointsize>
+             </font>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="Step_Terms">
          <layout class="QGridLayout" name="_3">
           <property name="leftMargin">
@@ -310,6 +253,28 @@
              <string>Terms of Use</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="0">
+              <widget class="QPlainTextEdit" name="copyrightBrowser">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="acceptDrops">
+                <bool>false</bool>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Plain</enum>
+               </property>
+               <property name="textInteractionFlags">
+                <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+               </property>
+              </widget>
+             </item>
              <item row="1" column="0">
               <layout class="QGridLayout" name="gridLayout_2">
                <item row="4" column="3">
@@ -383,28 +348,6 @@
                 <widget class="QLabel" name="labelModel"/>
                </item>
               </layout>
-             </item>
-             <item row="0" column="0">
-              <widget class="QPlainTextEdit" name="copyrightBrowser">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="acceptDrops">
-                <bool>false</bool>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Plain</enum>
-               </property>
-               <property name="textInteractionFlags">
-                <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-               </property>
-              </widget>
              </item>
             </layout>
            </widget>
@@ -3074,6 +3017,82 @@
           </item>
          </layout>
         </widget>
+       </widget>
+      </item>
+      <item row="4" column="4">
+       <widget class="QPushButton" name="backButton">
+        <property name="text">
+         <string>Back</string>
+        </property>
+        <property name="icon">
+         <iconset theme="go-previous">
+          <normaloff>.</normaloff>.</iconset>
+        </property>
+        <property name="shortcut">
+         <string>Alt+K</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="6">
+       <widget class="QGroupBox" name="installBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Installation in progress</string>
+        </property>
+        <layout class="QGridLayout">
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
+          <number>9</number>
+         </property>
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="abortInstallButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::ClickFocus</enum>
+           </property>
+           <property name="text">
+            <string>Abort</string>
+           </property>
+           <property name="shortcut">
+            <string>Alt+A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QProgressBar" name="progressBar">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
