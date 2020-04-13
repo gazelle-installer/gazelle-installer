@@ -129,7 +129,8 @@ int main(int argc, char *argv[])
     qDebug() << "Installer version:" << VERSION;
     MInstall minstall(a.arguments(), cfgfile);
     const QRect &geo = a.desktop()->availableGeometry(&minstall);
-    minstall.move((geo.width()-minstall.width())/2, (geo.height()-minstall.height())/2);
+    if(a.arguments().contains("--oobe")) minstall.setGeometry(geo);
+    else minstall.move((geo.width()-minstall.width())/2, (geo.height()-minstall.height())/2);
     minstall.show();
     return a.exec();
 }
