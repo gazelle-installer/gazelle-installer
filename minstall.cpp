@@ -53,7 +53,6 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
         phase = 2;
     }
     if (pretend) listHomes = args; // dummy existing homes
-    gotoPage(0);
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
@@ -75,6 +74,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
     isRemasteredDemoPresent = checkForRemaster();
 
+    gotoPage(0);
 
     //disable encryption in gui if cryptsetup not present
     QFileInfo cryptsetup("/sbin/cryptsetup");
@@ -88,7 +88,6 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
         buttonAdvancedFDECust->hide();
         label_8->hide();
     }
-
 
     // config file
     config = new MSettings(cfgfile, this);
@@ -107,6 +106,9 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
                         + "\n" + link_block);
 
+    // ensure the help widgets are displayed correctly when started
+    // Qt will delete the heap-allocated event object when posted
+    qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
     QTimer::singleShot(0, this, &MInstall::startup);
 }
 
@@ -2631,15 +2633,6 @@ void MInstall::gotoPage(int next)
     next = showPage(curr, next);
 
     // modify ui for standard cases
-    if(oobe) {
-        if(next == 0) mainTabs->hide();
-        else {
-            mainTabs->show();
-            // ensure the help widgets are displayed correctly when started
-            // Qt will delete the heap-allocated event object when posted
-            qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
-        }
-    }
     closeButton->setHidden(next == 0);
     backButton->setHidden(next <= 1);
     nextButton->setHidden(next == 0);
