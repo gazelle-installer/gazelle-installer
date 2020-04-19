@@ -25,9 +25,6 @@
   <property name="windowTitle">
    <string notr="true">MeInstall</string>
   </property>
-  <property name="sizeGripEnabled">
-   <bool>true</bool>
-  </property>
   <layout class="QHBoxLayout">
    <item>
     <widget class="QTabWidget" name="mainTabs">
