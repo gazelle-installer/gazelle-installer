@@ -69,25 +69,8 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     PREFERRED_MIN_INSTALL_SIZE = settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
     REMOVE_NOSPLASH = settings.value("REMOVE_NOSPLASH", "false").toBool();
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
-    //load some live variables
-    QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
-    SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
-    isRemasteredDemoPresent = checkForRemaster();
 
     gotoPage(0);
-
-    //disable encryption in gui if cryptsetup not present
-    QFileInfo cryptsetup("/sbin/cryptsetup");
-    QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
-    if ( !cryptsetup.exists() && !cryptsetup.isExecutable() && !crypsetupinitramfs.exists()) {
-        checkBoxEncryptAuto->hide();
-        checkBoxEncryptHome->hide();
-        checkBoxEncryptRoot->hide();
-        checkBoxEncryptSwap->hide();
-        buttonAdvancedFDE->hide();
-        buttonAdvancedFDECust->hide();
-        label_8->hide();
-    }
 
     // config file
     config = new MSettings(cfgfile, this);
@@ -120,14 +103,21 @@ void MInstall::startup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
-    if (oobe) containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
-    else {
+    if (oobe) {
+        containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
+        saveDesktopCheckBox->hide();
+    } else {
         containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
 
         rootSources = "/live/aufs/bin /live/aufs/dev"
                       " /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt"
                       " /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr"
                       " /live/aufs/var /live/aufs/home";
+
+        //load some live variables
+        QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
+        SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
+        isRemasteredDemoPresent = checkForRemaster();
 
         // calculate required disk space
         bootSource = "/live/aufs/boot";
@@ -217,6 +207,19 @@ void MInstall::startup()
         buttonAdvancedFDE->hide();
         gbEncrPass->hide();
         existing_partitionsButton->hide();
+
+        //disable encryption in gui if cryptsetup not present
+        QFileInfo cryptsetup("/sbin/cryptsetup");
+        QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
+        if ( !cryptsetup.exists() && !cryptsetup.isExecutable() && !crypsetupinitramfs.exists()) {
+            checkBoxEncryptAuto->hide();
+            checkBoxEncryptHome->hide();
+            checkBoxEncryptRoot->hide();
+            checkBoxEncryptSwap->hide();
+            buttonAdvancedFDE->hide();
+            buttonAdvancedFDECust->hide();
+            labelEncrypt->hide();
+        }
 
         // Detect snapshot-backup account(s)
         haveSnapshotUserAccounts = checkForSnapshot();
@@ -654,19 +657,8 @@ bool MInstall::processNextPhase()
                 proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
                 proc.exec("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1", false);
             }
-            if (oem) setupOOBE(true);
-            else {
-                setServices();
-                if (!setComputerName()) return false;
-                setLocale();
-                if (haveSnapshotUserAccounts) { // skip user account creation
-                    QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
-                    proc.exec(cmd);
-                } else {
-                    if (!setUserInfo()) return false;
-                }
-                if(oobe) setupOOBE(false);
-            }
+            if (oem) enableOOBE();
+            else if(!processOOBE()) return false;
             manageConfig(ConfigSave);
             config->dumpDebug();
             proc.exec("/bin/sync", true); // the sync(2) system call will block the GUI
@@ -823,6 +815,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->manageLineEdit("Username", userNameEdit);
         config->manageCheckBox("Autologin", autologinCheckBox);
         config->manageCheckBox("SaveDesktop", saveDesktopCheckBox);
+        if(oobe) saveDesktopCheckBox->setCheckState(Qt::Unchecked);
         const char *oldHomeActions[] = {"Use", "Save", "Delete"};
         QRadioButton *oldHomeRadios[] = {radioOldHomeUse, radioOldHomeSave, radioOldHomeDelete};
         config->manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
@@ -1897,13 +1890,23 @@ bool MInstall::installLoader()
 }
 
 // out-of-box experience
-void MInstall::setupOOBE(bool active)
+void MInstall::enableOOBE()
 {
-    if (active) {
-        proc.exec("chroot /mnt/antiX/ update-rc.d oobe defaults", true);
+    proc.exec("chroot /mnt/antiX/ update-rc.d oobe defaults", true);
+}
+bool MInstall::processOOBE()
+{
+    setServices();
+    if (!setComputerName()) return false;
+    setLocale();
+    if (haveSnapshotUserAccounts) { // skip user account creation
+        QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
+        proc.exec(cmd);
     } else {
-        proc.exec("update-rc.d oobe disable", false);
+        if (!setUserInfo()) return false;
     }
+    if(oobe) proc.exec("update-rc.d oobe disable", false);
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -2682,7 +2685,18 @@ void MInstall::gotoPage(int next)
 
     // process next installation phase
     if (next == widgetStack->indexOf(Step_Boot) || next == widgetStack->indexOf(Step_Progress)) {
-        if (!processNextPhase() && phase > -2) {
+        if (oobe) {
+            labelSplash->setText(tr("Configuring sytem. Please wait."));
+            gotoPage(0);
+            if(processOOBE()) {
+                labelSplash->setText(tr("Configuration complete. Restarting system."));
+                proc.exec("/usr/sbin/reboot", true);
+                qApp->exit(EXIT_SUCCESS);
+            } else {
+                labelSplash->setText(tr("Could not complete configuration."));
+                closeButton->show();
+            }
+        } else if (!processNextPhase() && phase > -2) {
             cleanup(false);
             gotoPage(2);
         }
