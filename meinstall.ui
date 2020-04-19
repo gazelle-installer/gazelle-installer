@@ -2383,7 +2383,7 @@
                 <font/>
                </property>
                <property name="text">
-                <string>Language/Locale:</string>
+                <string>Locale:</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
