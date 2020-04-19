@@ -39,9 +39,9 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     installBox->hide();
 
     oobe = args.contains("--oobe");
-    pretend = (args.contains("--pretend") || args.contains("-p"));
-    nocopy = (args.contains("--nocopy") || args.contains("-n"));
-    sync = (args.contains("--sync") || args.contains("-s"));
+    pretend = args.contains("--pretend");
+    nocopy = args.contains("--nocopy");
+    sync = args.contains("--sync");
     if(!oobe) {
         brave = args.contains("--brave");
         automatic = args.contains("--auto");
