@@ -217,6 +217,9 @@
               <pointsize>36</pointsize>
              </font>
             </property>
+            <property name="text">
+             <string>Gathering Information, please stand by.</string>
+            </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
@@ -2215,7 +2218,7 @@
              <item row="3" column="2">
               <widget class="QRadioButton" name="radio12h">
                <property name="text">
-                <string notr="true">1:57</string>
+                <string notr="true">1:57 PM</string>
                </property>
               </widget>
              </item>
@@ -2232,15 +2235,8 @@
                </property>
               </spacer>
              </item>
-             <item row="2" column="0" colspan="3">
-              <widget class="QCheckBox" name="localClockCheckBox">
-               <property name="text">
-                <string>System clock uses LOCAL</string>
-               </property>
-              </widget>
-             </item>
              <item row="3" column="0">
-              <widget class="QLabel" name="label">
+              <widget class="QLabel" name="labelClockFormat">
                <property name="text">
                 <string>Format:</string>
                </property>
@@ -2312,6 +2308,13 @@
                </item>
               </layout>
              </item>
+             <item row="2" column="0" colspan="4">
+              <widget class="QCheckBox" name="localClockCheckBox">
+               <property name="text">
+                <string>System clock uses local time</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -2380,7 +2383,7 @@
                 <font/>
                </property>
                <property name="text">
-                <string>Locale:</string>
+                <string>Language/Locale:</string>
                </property>
                <property name="wordWrap">
                 <bool>false</bool>
