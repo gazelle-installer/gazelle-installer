@@ -85,7 +85,6 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     settings.endGroup();
 
     // set some distro-centric text
-    labelSplash->setText(tr("Gathering Information, please stand by."));
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
                         + "\n" + link_block);
 
