@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
     //exit if "minstall" is already running
     if (system("ps -C minstall | sed '0,/minstall/{s/minstall//}' | grep minstall") == 0) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(nullptr, QString(),
                               QApplication::tr("The installer won't launch because it appears to be running already in the background.\n\n"
                                                "Please close it if possible, or run 'pkill minstall' in terminal."));
         return EXIT_FAILURE;
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     // check if 32bit on 64 bit UEFI
     if (system("uname -m | grep -q i686") == 0 && system("grep -q 64 /sys/firmware/efi/fw_platform_size") == 0)
     {
-        int ans = QMessageBox::question(0, QString::null, QApplication::tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot"
+        int ans = QMessageBox::question(nullptr, QString(), QApplication::tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot"
                                                                            " unless you select Legacy Boot or similar at restart.\n"
                                                                            "We recommend you quit now and restart in Legacy Boot\n\n"
                                                                            "Do you want to continue the installation?"),
@@ -101,9 +101,9 @@ int main(int argc, char *argv[])
         QApplication::beep();
         const QString &msg = QApplication::tr("You must run this app as root.");
         if (a.arguments().contains("--pretend") || a.arguments().contains("-p")) {
-            QMessageBox::warning(0, QString::null, msg);
+            QMessageBox::warning(nullptr, QString(), msg);
         } else {
-            QMessageBox::critical(0, QString::null, msg);
+            QMessageBox::critical(nullptr, QString(), msg);
             return EXIT_FAILURE;
         }
     }
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
         }
         //give error message and exit if no config file found
         if (! QFile::exists(cfgfile)) {
-            QMessageBox::warning(0, QString::null,
+            QMessageBox::warning(nullptr, QString(),
                                  QApplication::tr("Configuration file (%1) not found.").arg(cfgfile));
             return EXIT_FAILURE;
         }
