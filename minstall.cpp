@@ -2540,10 +2540,17 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 8: // set localization, clock, services button
-        mainHelp->setText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
-                             "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
-                             "<p><b>Timezone Settings</b><br/>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</p>"
-                             "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
+        mainHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
+                          + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"
+                          "<p><b>" + tr("Configure Clock") + "</b><br/>"
+                          + tr("If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC)."
+                               " To change this, check the \"<b>System clock uses local time</b>\" box.") + "</p>"
+                          "<p>" + tr("The system boots with the timezone preset to GMT/UTC."
+                               " To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.") + "</p>"
+                          "<p><b>" + tr("Service Settings") + "</b><br/>"
+                          + tr("Most users should not change the defaults."
+                               " Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible."
+                               " Make sure you know what you are doing!"));
         break;
 
     case 9: // set username and passwords
