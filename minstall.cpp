@@ -1667,8 +1667,8 @@ bool MInstall::copyLinux(const int progend)
     if (!nocopy) {
         if (phase < 0) return false;
         QEventLoop eloop;
-        connect(&proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
-        connect(&proc, static_cast<void (QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
+        connect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), &eloop, &QEventLoop::quit);
+        connect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
         qDebug() << cmd;
         proc.start(cmd);
         const int progspace = progend - progstart;
@@ -1684,8 +1684,8 @@ bool MInstall::copyLinux(const int progend)
                 updateStatus(tr("Copy progress unknown. No file system statistics."));
             }
         }
-        disconnect(&proc, SIGNAL(readyRead()), nullptr, nullptr);
-        disconnect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), nullptr, nullptr);
+        disconnect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), nullptr, nullptr);
+        disconnect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), nullptr, nullptr);
 
         if (proc.exitStatus() != QProcess::NormalExit) {
             failUI(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
