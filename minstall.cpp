@@ -51,6 +51,27 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
         brave = automatic = oem = gptoverride = false;
         closeButton->setText(tr("Shutdown"));
         phase = 2;
+        // dark palette for the OOBE screen
+        QColor charcoal(56, 56, 56);
+        QPalette pal;
+        pal.setColor(QPalette::Window, charcoal);
+        pal.setColor(QPalette::WindowText, Qt::white);
+        pal.setColor(QPalette::Base, charcoal.darker());
+        pal.setColor(QPalette::AlternateBase, charcoal);
+        pal.setColor(QPalette::Text, Qt::white);
+        pal.setColor(QPalette::Button, charcoal);
+        pal.setColor(QPalette::ButtonText, Qt::white);
+        pal.setColor(QPalette::Active, QPalette::Button, charcoal);
+        pal.setColor(QPalette::Disabled, QPalette::Light, charcoal.darker());
+        pal.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
+        pal.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGray);
+        pal.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
+        pal.setColor(QPalette::Highlight, Qt::lightGray);
+        pal.setColor(QPalette::HighlightedText, Qt::black);
+        pal.setColor(QPalette::ToolTipBase, Qt::black);
+        pal.setColor(QPalette::ToolTipText, Qt::white);
+        pal.setColor(QPalette::Link, Qt::cyan);
+        qApp->setPalette(pal);
     }
     if (pretend) listHomes = args; // dummy existing homes
 
@@ -2692,6 +2713,7 @@ void MInstall::gotoPage(int next)
     // process next installation phase
     if (next == widgetStack->indexOf(Step_Boot) || next == widgetStack->indexOf(Step_Progress)) {
         if (oobe) {
+            updateCursor(Qt::BusyCursor);
             labelSplash->setText(tr("Configuring sytem. Please wait."));
             gotoPage(0);
             if(processOOBE()) {
@@ -2702,6 +2724,7 @@ void MInstall::gotoPage(int next)
                 labelSplash->setText(tr("Could not complete configuration."));
                 closeButton->show();
             }
+            updateCursor();
         } else if (!processNextPhase() && phase > -2) {
             cleanup(false);
             gotoPage(2);
@@ -2849,7 +2872,7 @@ void MInstall::changeEvent(QEvent *event)
     if (etype == QEvent::ApplicationPaletteChange
         || etype == QEvent::PaletteChange || etype == QEvent::StyleChange)
     {
-        QPalette pal = mainHelp->style()->standardPalette();
+        QPalette pal = qApp->palette(mainHelp);
         QColor col = pal.color(QPalette::Base);
         col.setAlpha(200);
         pal.setColor(QPalette::Base, col);
