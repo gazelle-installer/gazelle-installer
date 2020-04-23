@@ -2998,10 +2998,11 @@ bool MInstall::abort(bool onclose)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
-        if(QMessageBox::warning(this, tr("Confirmation"),
-                                tr("The installation and configuration is incomplete.\n"
-                                   "Do you really want to stop now?"),
-                                QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
+        const QMessageBox::StandardButton rc = QMessageBox::warning(this,
+            tr("Confirmation"), tr("The installation and configuration"
+                " is incomplete.\nDo you really want to stop now?"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if(rc == QMessageBox::No) {
             this->setEnabled(true);
             return false;
         }
