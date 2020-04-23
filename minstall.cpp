@@ -1912,6 +1912,7 @@ bool MInstall::installLoader()
 // out-of-box experience
 void MInstall::enableOOBE()
 {
+    setServices(); // Disable services to speed up the OOBE boot.
     proc.exec("chroot /mnt/antiX/ update-rc.d oobe defaults", true);
 }
 bool MInstall::processOOBE()
@@ -2315,12 +2316,12 @@ void MInstall::setServices()
         if ((*it)->parent() != nullptr) {
             QString service = (*it)->text(0);
             qDebug() << "Service: " << service;
-            if ((*it)->checkState(0) == Qt::Checked) {
+            if (!oem && (*it)->checkState(0) == Qt::Checked) {
                 proc.exec(chroot + "update-rc.d " + service + " enable");
                 if (containsSystemD) {
                     proc.exec(chroot + "systemctl enable " + service);
                 }
-            } else {
+            } else { // In OEM mode, disable the services for the OOBE.
                 proc.exec(chroot + "update-rc.d " + service + " disable");
                 if (containsSystemD) {
                     proc.exec(chroot + "systemctl disable " + service);
