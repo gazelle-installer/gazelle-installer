@@ -649,119 +649,6 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="Step_Partitions1">
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="1" column="1">
-           <widget class="QToolButton" name="toolButton">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset theme="add">
-              <normaloff>.</normaloff>.</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QToolButton" name="toolButton_2">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset theme="remove">
-              <normaloff>.</normaloff>.</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QToolButton" name="toolButton_3">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset theme="undo">
-              <normaloff>.</normaloff>.</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QToolButton" name="toolButton_4">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset theme="revert">
-              <normaloff>.</normaloff>.</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" rowspan="6">
-           <widget class="QTreeWidget" name="treePartitions">
-            <column>
-             <property name="text">
-              <string>Device</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Size</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Check</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Encrypt</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Mount Point</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QToolButton" name="toolButton_5">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset theme="gparted"/>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QFrame" name="frame">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Sunken</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QToolButton" name="toolButton_6">
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset theme="dialog-apply"/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
         <widget class="QWidget" name="Step_Partitions">
          <layout class="QGridLayout" name="_5">
           <property name="leftMargin">
@@ -776,6 +663,59 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
+          <item row="2" column="0">
+           <widget class="QGroupBox" name="gbEncrPass">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="title">
+             <string>Encryption options</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout2c">
+             <item row="0" column="2" colspan="2">
+              <widget class="QLineEdit" name="FDEpassCust">
+               <property name="maxLength">
+                <number>512</number>
+               </property>
+               <property name="echoMode">
+                <enum>QLineEdit::Password</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2" colspan="2">
+              <widget class="QLineEdit" name="FDEpassCust2">
+               <property name="maxLength">
+                <number>512</number>
+               </property>
+               <property name="echoMode">
+                <enum>QLineEdit::Password</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" colspan="2">
+              <widget class="QLabel" name="labelFDEpassCust">
+               <property name="text">
+                <string>Encryption password:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QLabel" name="labelFDEpassCust2">
+               <property name="text">
+                <string>Confirm password:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2" colspan="2">
+              <widget class="QPushButton" name="buttonAdvancedFDECust">
+               <property name="text">
+                <string>Advanced encryption settings</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
           <item row="1" column="0">
            <widget class="QGroupBox" name="partsPreferencesBox">
             <property name="sizePolicy">
@@ -828,33 +768,72 @@
             <property name="title">
              <string>Choose partitions</string>
             </property>
-            <layout class="QGridLayout">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>9</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>9</number>
-             </property>
-             <property name="spacing">
-              <number>6</number>
-             </property>
-             <item row="3" column="5" alignment="Qt::AlignHCenter">
-              <widget class="QCheckBox" name="checkBoxEncryptSwap">
-               <property name="enabled">
-                <bool>false</bool>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <item row="5" column="4">
+              <widget class="QLineEdit" name="rootLabelEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
+               <property name="maximumSize">
+                <size>
+                 <width>90</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string notr="true">rootMX17.1</string>
+               </property>
+               <property name="maxLength">
+                <number>16</number>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="homeLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>home:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="5">
+              <widget class="QToolButton" name="buttonRunParted">
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="gparted">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="5">
+              <widget class="QToolButton" name="buttonPartUndo">
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="undo">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="3">
+              <widget class="QCheckBox" name="checkBoxEncryptRoot">
                <property name="text">
                 <string/>
                </property>
               </widget>
              </item>
-             <item row="2" column="4">
+             <item row="6" column="2">
               <widget class="QComboBox" name="homeTypeCombo">
                <property name="maximumSize">
                 <size>
@@ -919,82 +898,30 @@
                </item>
               </widget>
              </item>
-             <item row="3" column="2" colspan="2">
-              <widget class="QComboBox" name="swapCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="bootLabel">
+             <item row="2" column="5">
+              <widget class="QToolButton" name="buttonPartRemove">
                <property name="text">
-                <string>boot:</string>
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="remove">
+                 <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="0" column="6">
-              <widget class="QLabel" name="label_7">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="font">
-                <font>
-                 <underline>false</underline>
-                 <kerning>true</kerning>
-                </font>
-               </property>
+             <item row="1" column="5">
+              <widget class="QToolButton" name="buttonPartAdd">
                <property name="text">
-                <string>Label</string>
+                <string>...</string>
                </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="rootLabel">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="font">
-                <font/>
-               </property>
-               <property name="text">
-                <string>root:</string>
+               <property name="icon">
+                <iconset theme="add">
+                 <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="swapLabel">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>swap:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="6">
-              <widget class="QLineEdit" name="homeLabelEdit">
+             <item row="7" column="4">
+              <widget class="QLineEdit" name="swapLabelEdit">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1008,24 +935,25 @@
                 </size>
                </property>
                <property name="text">
-                <string notr="true">homeMX</string>
+                <string notr="true">swap</string>
                </property>
                <property name="maxLength">
                 <number>16</number>
                </property>
               </widget>
              </item>
-             <item row="1" column="2" colspan="2">
-              <widget class="QComboBox" name="rootCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+             <item row="4" column="5">
+              <widget class="QToolButton" name="buttonPartReload">
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="revert">
+                 <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="2" column="2" colspan="2">
+             <item row="6" column="1">
               <widget class="QComboBox" name="homeCombo">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -1043,7 +971,27 @@
                </item>
               </widget>
              </item>
-             <item row="1" column="4">
+             <item row="7" column="3">
+              <widget class="QCheckBox" name="checkBoxEncryptSwap">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QComboBox" name="swapCombo">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="2">
               <widget class="QComboBox" name="rootTypeCombo">
                <property name="maximumSize">
                 <size>
@@ -1108,101 +1056,7 @@
                </item>
               </widget>
              </item>
-             <item row="0" column="4">
-              <widget class="QLabel" name="label_6">
-               <property name="maximumSize">
-                <size>
-                 <width>80</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Type</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="homeLabel">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>home:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="6">
-              <widget class="QLineEdit" name="swapLabelEdit">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string notr="true">swap</string>
-               </property>
-               <property name="maxLength">
-                <number>16</number>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="6">
-              <widget class="QLineEdit" name="rootLabelEdit">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string notr="true">rootMX17.1</string>
-               </property>
-               <property name="maxLength">
-                <number>16</number>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="5" alignment="Qt::AlignHCenter">
-              <widget class="QCheckBox" name="checkBoxEncryptHome">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="5" alignment="Qt::AlignHCenter">
-              <widget class="QCheckBox" name="checkBoxEncryptRoot">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="5">
-              <widget class="QLabel" name="labelEncrypt">
-               <property name="text">
-                <string>Encrypt</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="2" colspan="2">
+             <item row="8" column="1">
               <widget class="QComboBox" name="bootCombo">
                <property name="currentText">
                 <string notr="true">root</string>
@@ -1214,72 +1068,112 @@
                </item>
               </widget>
              </item>
-             <item row="0" column="2">
-              <widget class="QLabel" name="label_5">
+             <item row="8" column="0">
+              <widget class="QLabel" name="bootLabel">
+               <property name="text">
+                <string>boot:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" rowspan="5" colspan="5">
+              <widget class="QTreeWidget" name="treePartitions">
+               <column>
+                <property name="text">
+                 <string>Device</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Size</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Label</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Use For</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Encrypt</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Type</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QComboBox" name="rootCombo">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="4">
+              <widget class="QLineEdit" name="homeLabelEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>90</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string notr="true">homeMX</string>
+               </property>
+               <property name="maxLength">
+                <number>16</number>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="3">
+              <widget class="QCheckBox" name="checkBoxEncryptHome">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="rootLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="font">
+                <font/>
+               </property>
+               <property name="text">
+                <string>root:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="swapLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>Location</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QGroupBox" name="gbEncrPass">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="title">
-             <string>Encryption options</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout2c">
-             <item row="0" column="2" colspan="2">
-              <widget class="QLineEdit" name="FDEpassCust">
-               <property name="maxLength">
-                <number>512</number>
-               </property>
-               <property name="echoMode">
-                <enum>QLineEdit::Password</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="2" colspan="2">
-              <widget class="QLineEdit" name="FDEpassCust2">
-               <property name="maxLength">
-                <number>512</number>
-               </property>
-               <property name="echoMode">
-                <enum>QLineEdit::Password</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0" colspan="2">
-              <widget class="QLabel" name="labelFDEpassCust">
-               <property name="text">
-                <string>Encryption password:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" colspan="2">
-              <widget class="QLabel" name="labelFDEpassCust2">
-               <property name="text">
-                <string>Confirm password:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2" colspan="2">
-              <widget class="QPushButton" name="buttonAdvancedFDECust">
-               <property name="text">
-                <string>Advanced encryption settings</string>
+                <string>swap:</string>
                </property>
               </widget>
              </item>
@@ -1820,6 +1714,12 @@
               <spacer name="horizontalSpacer_3">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
                </property>
               </spacer>
              </item>
@@ -2689,6 +2589,12 @@
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
               </spacer>
              </item>
             </layout>
@@ -2910,7 +2816,6 @@
   <tabstop>homeLabelEdit</tabstop>
   <tabstop>swapCombo</tabstop>
   <tabstop>checkBoxEncryptSwap</tabstop>
-  <tabstop>swapLabelEdit</tabstop>
   <tabstop>bootCombo</tabstop>
   <tabstop>saveHomeCheck</tabstop>
   <tabstop>badblocksCheck</tabstop>
