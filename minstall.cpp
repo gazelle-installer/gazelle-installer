@@ -3603,6 +3603,6 @@ void MInstall::changeRemasterdemoToNewUser(QString dpath)
 
 void MInstall::resetBlueman()
 {
-    proc.exec("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
+    proc.exec("runuser -l demo -c 'dconf reset /org/blueman/transfer/shared-path'"); //reset blueman path
 }
 
