@@ -31,7 +31,7 @@
 #include "minstall.h"
 
 MInstall::MInstall(const QStringList &args, const QString &cfgfile)
-    : proc(this)
+    : proc(this), parted(proc, listBlkDevs, this)
 {
     setupUi(this);
     updateCursor(Qt::WaitCursor);
@@ -238,8 +238,9 @@ void MInstall::startup()
             checkBoxEncryptSwap->hide();
             buttonAdvancedFDE->hide();
             buttonAdvancedFDECust->hide();
-            labelEncrypt->hide();
+            treePartitions->setColumnHidden(4, true);
         }
+        parted.setup(treePartitions);
 
         // Detect snapshot-backup account(s)
         haveSnapshotUserAccounts = checkForSnapshot();
@@ -2775,23 +2776,7 @@ void MInstall::updatePartitionWidgets()
     on_rootCombo_currentIndexChanged(rootCombo->currentText());
 
     // partition tree
-    QTreeWidgetItem *curdrv = nullptr;
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        QTreeWidgetItem *curdev;
-        if (bdinfo.isDrive) {
-            curdrv = curdev = new QTreeWidgetItem(treePartitions);
-        } else {
-            curdev = new QTreeWidgetItem(curdrv);
-            curdev->setCheckState(2, Qt::Unchecked);
-            curdev->setCheckState(3, Qt::Unchecked);
-        }
-        curdev->setText(0, bdinfo.name);
-        curdev->setText(1, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
-    }
-    treePartitions->expandAll();
-    for (int ixi = treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
-        treePartitions->resizeColumnToContents(ixi);
-    }
+    parted.populate();
 }
 
 void MInstall::updatePartitionCombos(QComboBox *changed)
