@@ -21,6 +21,8 @@
 #include <QFileInfo>
 #include <QTimer>
 #include <QProcess>
+#include <QProcessEnvironment>
+#include <QTimeZone>
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
@@ -33,16 +35,44 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
 {
     setupUi(this);
     updateCursor(Qt::WaitCursor);
-    this->setEnabled(false);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     installBox->hide();
 
-    brave = args.contains("--brave");
-    pretend = (args.contains("--pretend") || args.contains("-p"));
-    automatic = args.contains("--auto");
-    nocopy = (args.contains("--nocopy") || args.contains("-n"));
-    sync = (args.contains("--sync") || args.contains("-s"));
-    gptoverride = args.contains("--gpt-override");
+    oobe = args.contains("--oobe");
+    pretend = args.contains("--pretend");
+    nocopy = args.contains("--nocopy");
+    sync = args.contains("--sync");
+    if(!oobe) {
+        brave = args.contains("--brave");
+        automatic = args.contains("--auto");
+        oem = args.contains("--oem");
+        gptoverride = args.contains("--gpt-override");
+    } else {
+        brave = automatic = oem = gptoverride = false;
+        closeButton->setText(tr("Shutdown"));
+        phase = 2;
+        // dark palette for the OOBE screen
+        QColor charcoal(56, 56, 56);
+        QPalette pal;
+        pal.setColor(QPalette::Window, charcoal);
+        pal.setColor(QPalette::WindowText, Qt::white);
+        pal.setColor(QPalette::Base, charcoal.darker());
+        pal.setColor(QPalette::AlternateBase, charcoal);
+        pal.setColor(QPalette::Text, Qt::white);
+        pal.setColor(QPalette::Button, charcoal);
+        pal.setColor(QPalette::ButtonText, Qt::white);
+        pal.setColor(QPalette::Active, QPalette::Button, charcoal);
+        pal.setColor(QPalette::Disabled, QPalette::Light, charcoal.darker());
+        pal.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
+        pal.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGray);
+        pal.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
+        pal.setColor(QPalette::Highlight, Qt::lightGray);
+        pal.setColor(QPalette::HighlightedText, Qt::black);
+        pal.setColor(QPalette::ToolTipBase, Qt::black);
+        pal.setColor(QPalette::ToolTipText, Qt::white);
+        pal.setColor(QPalette::Link, Qt::cyan);
+        qApp->setPalette(pal);
+    }
     if (pretend) listHomes = args; // dummy existing homes
 
     // setup system variables
@@ -53,8 +83,6 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     PROJECTURL = settings.value("PROJECT_URL").toString();
     PROJECTFORUM = settings.value("FORUM_URL").toString();
     INSTALL_FROM_ROOT_DEVICE = settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
-    MIN_ROOT_DEVICE_SIZE = settings.value("MIN_ROOT_DRIVE_SIZE").toLongLong() * 1048576;
-    MIN_BOOT_DEVICE_SIZE = settings.value("MIN_BOOT_DRIVE_SIZE", "256").toLongLong() * 1048576;
     DEFAULT_HOSTNAME = settings.value("DEFAULT_HOSTNAME").toString();
     ENABLE_SERVICES = settings.value("ENABLE_SERVICES").toStringList();
     POPULATE_MEDIA_MOUNTPOINTS = settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
@@ -62,6 +90,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     PREFERRED_MIN_INSTALL_SIZE = settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
     REMOVE_NOSPLASH = settings.value("REMOVE_NOSPLASH", "false").toBool();
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
+
     gotoPage(0);
 
     // config file
@@ -77,14 +106,12 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     settings.endGroup();
 
     // set some distro-centric text
-    copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n%1 uses some components from MEPIS Linux which are released under an Apache free license. Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
     remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
                         + "\n" + link_block);
 
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
     qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
-
     QTimer::singleShot(0, this, &MInstall::startup);
 }
 
@@ -96,88 +123,148 @@ void MInstall::startup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
-
-    // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
-    if (proc.exec("uname -m | grep -q i686", false) && proc.exec("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
-        uefi = false;
+    if (oobe) {
+        containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
+        saveDesktopCheckBox->hide();
     } else {
-        uefi = proc.exec("test -d /sys/firmware/efi", true);
-    }
-    qDebug() << "uefi =" << uefi;
+        containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
 
-    if (!pretend) {
-        // disable automounting in Thunar
-        auto_mount = proc.execOut("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled'");
-        proc.exec("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false'", false);
-    }
+        rootSources = "/live/aufs/bin /live/aufs/dev"
+                      " /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt"
+                      " /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr"
+                      " /live/aufs/var /live/aufs/home";
 
-    //disable automounting in antiX
-    if (!pretend) {
-        // disable automounting in automount-antix
-        QString test = proc.execOut("ps -aux |grep -v grep | grep devmon");
-        if ( ! test.isEmpty() ) {
-            proc.exec("command -v pkill >/dev/null && pkill devmon", false);
-            auto_mount_antix = "su $(logname) -c /usr/local/lib/desktop-session/desktop-session-restart &";
+        //load some live variables
+        QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
+        SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
+        isRemasteredDemoPresent = checkForRemaster();
+
+        // calculate required disk space
+        bootSource = "/live/aufs/boot";
+        bootSpaceNeeded = proc.execOut("du -sb " + bootSource).section('\t', 0, 0).toLongLong();
+
+        //rootspaceneeded is the size of the linuxfs file * a compression factor + contents of the rootfs.  conservative but fast
+        //factors are same as used in live-remaster
+
+        //get compression factor by reading the linuxfs squasfs file, if available
+        qDebug() << "linuxfs file is at : " << SQFILE_FULL;
+        long long compression_factor;
+        QString linuxfs_compression_type = "xz"; //default conservative
+        if (QFileInfo::exists(SQFILE_FULL)) {
+            linuxfs_compression_type = proc.execOut("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none 2>/dev/null| od -An -tdI");
         }
-    //disable spacefm desktop during install
-        test = proc.execOut("grep space /home/$(logname)/.desktop-session/desktop-code.*");
-        if ( ! test.isEmpty()) {
-            proc.exec("command -v pkill >/dev/null && pkill spacefm",false);
-            auto_mount_antix = "su $(logname) -c /usr/local/lib/desktop-session/desktop-session-restart &";
+        //gzip, xz, or lz4
+        if ( linuxfs_compression_type == "1") {
+            compression_factor = 37; // gzip
+        } else if (linuxfs_compression_type == "2") {
+            compression_factor = 52; //lzo, not used by antiX
+        } else if (linuxfs_compression_type == "3") {
+            compression_factor = 52;  //lzma, not used by antiX
+        } else if (linuxfs_compression_type == "4") {
+            compression_factor = 31; //xz
+        } else if (linuxfs_compression_type == "5") {
+            compression_factor = 52; // lz4
+        } else {
+            compression_factor = 30; //anythng else or linuxfs not reachable (toram), should be pretty conservative
         }
+
+        qDebug() << "linuxfs compression type is " << linuxfs_compression_type << "compression factor is " << compression_factor;
+
+        long long rootfs_file_size = 0;
+        long long linuxfs_file_size = proc.execOut("df /live/linux --output=used --total |tail -n1").toLongLong() * 1024 * 100 / compression_factor;
+        if (QFileInfo::exists("/live/perist-root")) {
+            rootfs_file_size = proc.execOut("df /live/persist-root --output=used --total |tail -n1").toLongLong() * 1024;
+        }
+
+        qDebug() << "linuxfs file size is " << linuxfs_file_size << " rootfs file size is " << rootfs_file_size;
+
+        //add rootfs file size to the calculated linuxfs file size.  probaby conservative, as rootfs will likely have some overlap with linuxfs
+        long long safety_factor = 128 * 1024 * 1024; // 128 MB safety factor
+        rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
+
+        if (!(bootSpaceNeeded)) {
+            QMessageBox::warning(this, windowTitle(),
+                 tr("Cannot access source medium.\nActivating pretend installation."));
+            pretend = true;
+        }
+        const long long spaceBlock = 134217728; // 128MB
+        bootSpaceNeeded += 2*spaceBlock - (bootSpaceNeeded % spaceBlock);
+
+        qDebug() << "Minimum space:" << bootSpaceNeeded << "(boot)," << rootSpaceNeeded << "(root)";
+
+        // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
+        if (proc.exec("uname -m | grep -q i686", false) && proc.exec("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
+            uefi = false;
+        } else {
+            uefi = proc.exec("test -d /sys/firmware/efi", true);
+        }
+        qDebug() << "uefi =" << uefi;
+
+        autoMountEnabled = true; // disable auto mount by force
+        if (!pretend) setupAutoMount(false);
+
+        // advanced encryption settings page defaults
+        on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
+        on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
+        on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
+
+        rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
+        homeLabelEdit->setText("home" + PROJECTSHORTNAME);
+        swapLabelEdit->setText("swap" + PROJECTSHORTNAME);
+
+        rootTypeCombo->setEnabled(false);
+        homeTypeCombo->setEnabled(false);
+        checkBoxEncryptRoot->setEnabled(false);
+        checkBoxEncryptHome->setEnabled(false);
+        rootLabelEdit->setEnabled(false);
+        homeLabelEdit->setEnabled(false);
+        swapLabelEdit->setEnabled(false);
+
+        FDEpassword->hide();
+        FDEpassword2->hide();
+        labelFDEpass->hide();
+        labelFDEpass2->hide();
+        buttonAdvancedFDE->hide();
+        gbEncrPass->hide();
+        existing_partitionsButton->hide();
+
+        //disable encryption in gui if cryptsetup not present
+        QFileInfo cryptsetup("/sbin/cryptsetup");
+        QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
+        if ( !cryptsetup.exists() && !cryptsetup.isExecutable() && !crypsetupinitramfs.exists()) {
+            checkBoxEncryptAuto->hide();
+            checkBoxEncryptHome->hide();
+            checkBoxEncryptRoot->hide();
+            checkBoxEncryptSwap->hide();
+            buttonAdvancedFDE->hide();
+            buttonAdvancedFDECust->hide();
+            labelEncrypt->hide();
+        }
+
+        // Detect snapshot-backup account(s)
+        haveSnapshotUserAccounts = checkForSnapshot();
     }
 
     // set default host name
     computerNameEdit->setText(DEFAULT_HOSTNAME);
 
-    // advanced encryption settings page defaults
-    on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
-    on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
-    on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
-
-    rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
-    homeLabelEdit->setText("home" + PROJECTSHORTNAME);
-    swapLabelEdit->setText("swap" + PROJECTSHORTNAME);
-
-    rootTypeCombo->setEnabled(false);
-    homeTypeCombo->setEnabled(false);
-    checkBoxEncryptRoot->setEnabled(false);
-    checkBoxEncryptHome->setEnabled(false);
-    rootLabelEdit->setEnabled(false);
-    homeLabelEdit->setEnabled(false);
-    swapLabelEdit->setEnabled(false);
-
-    FDEpassword->hide();
-    FDEpassword2->hide();
-    labelFDEpass->hide();
-    labelFDEpass2->hide();
-    buttonAdvancedFDE->hide();
-    gbEncrPass->hide();
-    existing_partitionsButton->hide();
-
     setupkeyboardbutton();
 
-    // timezone
-    timezoneCombo->clear();
-    QFile file("/usr/share/zoneinfo/zone.tab");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while(!file.atEnd()) {
-            const QString line(file.readLine().trimmed());
-            if(!line.startsWith('#')) {
-                timezoneCombo->addItem(line.section("\t", 2, 2));
-            }
+    // timezone lists
+    listTimeZones = proc.execOutLines("find -L /usr/share/zoneinfo/posix -mindepth 2 -type f -printf %P\\n", true);
+    cmbTimeArea->clear();
+    for (const QString &zone : listTimeZones) {
+        const QString &area = zone.section('/', 0, 0);
+        if (cmbTimeArea->findData(QVariant(area)) < 0) {
+            QString text(area);
+            if (area == "Indian" || area == "Pacific"
+                || area == "Atlantic" || area == "Arctic") text.append(" Ocean");
+            cmbTimeArea->addItem(text, area);
         }
-        file.close();
     }
-    timezoneCombo->model()->sort(0);
-    file.setFileName("/etc/timezone");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        const QString line(file.readLine().trimmed());
-        timezoneCombo->setCurrentIndex(timezoneCombo->findText(line));
-        file.close();
-    }
+    cmbTimeArea->model()->sort(0);
 
-    // locale
+    // locale list
     localeCombo->clear();
     QStringList loclist = proc.execOutLines("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'");
     for (QString &strloc : loclist) {
@@ -186,35 +273,15 @@ void MInstall::startup()
         localeCombo->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
     }
     localeCombo->model()->sort(0);
-    file.setFileName("/etc/default/locale");
-    QString locale;
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while (!file.atEnd()) {
-            const QString line(file.readLine());
-            if(line.startsWith("LANG")) {
-                locale = line.section('=', 1).trimmed();
-            }
-        }
-        file.close();
-    }
-    int iloc = localeCombo->findData(QVariant(locale));
-    if (iloc == -1) {
-        // set to British English to show that the system locale was probably not picked up
-        iloc = localeCombo->findData(QVariant("en_GB.UTF-8"));
-    }
-    localeCombo->setCurrentIndex(iloc);
+    // default locale selection
+    int ixLocale = localeCombo->findData(QVariant(QLocale::system().name() + ".UTF-8"));
+    if (localeCombo->currentIndex() != ixLocale) localeCombo->setCurrentIndex(ixLocale);
+    else on_localeCombo_currentIndexChanged(ixLocale);
 
     // if it looks like an apple...
     if (proc.exec("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
         mactest = true;
         localClockCheckBox->setChecked(true);
-    }
-
-    // Detect snapshot-backup account(s)
-    // test if there's another user than demo in /home, if exists, copy the /home and skip to next step, also skip account setup if demo is present on squashfs
-    if (proc.exec("/bin/ls -1 /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false)
-        || proc.exec("test -d /live/linux/home/demo", true)) {
-        haveSnapshotUserAccounts = true;
     }
 
     //check for samba
@@ -232,29 +299,101 @@ void MInstall::startup()
     haveSamba = (val.compare("installed") == 0);
 
     buildServiceList();
-    updatePartitionWidgets();
-    manageConfig(ConfigLoadA);
-    stashAdvancedFDE(true);
+    if (oobe) manageConfig(ConfigLoadB);
+    else {
+        updatePartitionWidgets();
+        manageConfig(ConfigLoadA);
+        stashAdvancedFDE(true);
+    }
     stashServices(true);
-    this->setEnabled(true);
+
+    if (oobe) gotoPage(7); // go to Network page
+    else {
+        copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
+            "%1 uses some components from MEPIS Linux which are released under an Apache free license."
+            " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
+        gotoPage(1);
+    }
     updateCursor();
 
     // automatic installation
     if (automatic) nextButton->click();
 }
 
+// turn auto-mount off and on
+void MInstall::setupAutoMount(bool enabled)
+{
+    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+
+    if (autoMountEnabled == enabled) return;
+    QFileInfo finfo;
+    // check if the systemctl program is present
+    bool have_sysctl = false;
+    const QStringList &envpath = QProcessEnvironment::systemEnvironment().value("PATH").split(':');
+    for(const QString &path : envpath) {
+        finfo.setFile(path + "/systemctl");
+        if (finfo.isExecutable()) {
+            have_sysctl = true;
+            break;
+        }
+    }
+    // check if udisksd is running.
+    bool udisksd_running = false;
+    if (proc.exec("ps -e | grep 'udisksd'")) udisksd_running = true;
+    // create a list of rules files that are being temporarily overridden
+    QStringList udev_temp_mdadm_rules;
+    finfo.setFile("/run/udev");
+    if (finfo.isDir()) {
+        udev_temp_mdadm_rules = proc.execOutLines("egrep -l '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d");
+        for (QString &rule : udev_temp_mdadm_rules) {
+            rule.replace("/lib/udev", "/run/udev");
+        }
+    }
+
+    // auto-mount setup
+    if (!enabled) {
+        // disable auto-mount
+        if (have_sysctl) {
+            // Use systemctl to prevent automount by masking currently unmasked mount points
+            listMaskedMounts = proc.execOutLines("systemctl list-units --full --all -t mount --no-legend 2>/dev/null | grep -v masked | cut -f1 -d' '"
+                " | egrep -v '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'").join(' ');
+            if (!listMaskedMounts.isEmpty()) {
+                proc.exec("systemctl --runtime mask --quiet -- " + listMaskedMounts);
+            }
+        }
+        // create temporary blank overrides for all udev rules which
+        // automatically start Linux Software RAID array members
+        proc.exec("mkdir -p /run/udev/rules.d");
+        for (const QString &rule : udev_temp_mdadm_rules) {
+            proc.exec("touch " + rule);
+        }
+        if (udisksd_running) {
+            proc.exec("echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/91-mx-udisks-inhibit.rules");
+            proc.exec("udevadm control --reload");
+            proc.exec("udevadm trigger --subsystem-match=block");
+        }
+    } else {
+        // enable auto-mount
+        if (udisksd_running) {
+            proc.exec("rm -f /run/udev/rules.d/91-mx-udisks-inhibit.rules");
+            proc.exec("udevadm control --reload");
+            proc.exec("partprobe -s");
+            proc.sleep(1000);
+        }
+        // clear the rules that were temporarily overridden
+        for (const QString &rule : udev_temp_mdadm_rules) {
+            proc.exec("rm -f " + rule);
+        }
+        // Use systemctl to restore that status of any mount points changed above
+        if (have_sysctl && !listMaskedMounts.isEmpty()) {
+            proc.exec("systemctl --runtime unmask --quiet -- $MOUNTLIST");
+        }
+    }
+    autoMountEnabled = enabled;
+}
+
 /////////////////////////////////////////////////////////////////////////
 // util functions
-
-// Custom sleep
-void MInstall::csleep(int msec)
-{
-    QTimer cstimer(this);
-    QEventLoop eloop;
-    connect(&cstimer, &QTimer::timeout, &eloop, &QEventLoop::quit);
-    cstimer.start(msec);
-    eloop.exec();
-}
 
 // Check if running inside VirtualBox
 bool MInstall::isInsideVB()
@@ -292,7 +431,7 @@ bool MInstall::pretendToInstall(int start, int stop)
 {
     for (int ixi = start; ixi <= stop; ++ixi) {
         updateStatus(tr("Pretending to install %1").arg(PROJECTNAME), ixi);
-        csleep(phase == 1 ? 100 : 1000);
+        proc.sleep(phase == 1 ? 100 : 1000, true);
         if (phase < 0) return false;
     }
     return true;
@@ -531,15 +670,15 @@ bool MInstall::processNextPhase()
         backButton->setEnabled(false);
         if (!pretend) {
             updateStatus(tr("Setting system configuration"), progPhase23);
-            setServices();
-            if (!setComputerName()) return false;
-            setLocale();
-            if (haveSnapshotUserAccounts) { // skip user account creation
-                QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
-                proc.exec(cmd);
-            } else {
-                if (!setUserInfo()) return false;
+            if (!isInsideVB() && !oobe) {
+                proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
+                proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
+                proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
+                proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
+                proc.exec("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1", false);
             }
+            if (oem) enableOOBE();
+            else if(!processOOBE()) return false;
             manageConfig(ConfigSave);
             config->dumpDebug();
             proc.exec("/bin/sync", true); // the sync(2) system call will block the GUI
@@ -550,7 +689,7 @@ bool MInstall::processNextPhase()
         phase = 4;
         updateStatus(tr("Cleaning up"), 100);
         cleanup();
-        gotoPage(10);
+        gotoPage(widgetStack->indexOf(Step_End));
     }
     return true;
 }
@@ -559,7 +698,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
 {
     if (mode == ConfigSave) {
         delete config;
-        config = new MSettings("/.minstalled", this);
+        config = new MSettings("/mnt/antiX/etc/minstall.conf", this);
     }
     if (!config) return;
     config->bad = false;
@@ -570,7 +709,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->setValue("Version", VERSION);
         config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
-    if (mode == ConfigSave || mode == ConfigLoadA) {
+    if ((mode == ConfigSave || mode == ConfigLoadA) && !oobe) {
         config->startGroup("Storage", Step_Disk);
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
@@ -584,20 +723,26 @@ void MInstall::manageConfig(enum ConfigAction mode)
         } else {
             // Partition step
             config->setGroupWidget(Step_Partitions);
-            config->manageComboBox("Root", rootCombo, true);
-            config->manageComboBox("Home", homeCombo, true);
-            config->manageComboBox("Swap", swapCombo, true);
-            config->manageComboBox("Boot", bootCombo, true);
-            config->manageComboBox("RootType", rootTypeCombo, false);
-            config->manageComboBox("HomeType", homeTypeCombo, false);
-            config->manageCheckBox("RootEncrypt", checkBoxEncryptRoot);
-            config->manageCheckBox("HomeEncrypt", checkBoxEncryptHome);
-            config->manageCheckBox("SwapEncrypt", checkBoxEncryptSwap);
-            config->manageLineEdit("RootLabel", rootLabelEdit);
-            config->manageLineEdit("HomeLabel", homeLabelEdit);
-            config->manageLineEdit("SwapLabel", swapLabelEdit);
             config->manageCheckBox("SaveHome", saveHomeCheck);
             config->manageCheckBox("BadBlocksCheck", badblocksCheck);
+            // Swap space
+            config->manageComboBox("Swap/Device", swapCombo, true);
+            config->manageCheckBox("Swap/Encrypt", checkBoxEncryptSwap);
+            config->manageLineEdit("Swap/Label", swapLabelEdit);
+            // Tree starting with root (/)
+            config->beginGroup("Tree");
+            config->manageComboBox("Device", rootCombo, true);
+            config->manageCheckBox("Encrypt", checkBoxEncryptRoot);
+            config->manageComboBox("Type", rootTypeCombo, false);
+            config->manageLineEdit("Label", rootLabelEdit);
+            // Boot (/boot)
+            config->manageComboBox("boot/Device", bootCombo, true);
+            // Home (/home)
+            config->manageComboBox("home/Device", homeCombo, true);
+            config->manageComboBox("home/Type", homeTypeCombo, false);
+            config->manageCheckBox("home/Encrypt", checkBoxEncryptHome);
+            config->manageLineEdit("home/Label", homeLabelEdit);
+            config->endGroup();
         }
         config->endGroup();
 
@@ -630,15 +775,17 @@ void MInstall::manageConfig(enum ConfigAction mode)
     }
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
-        // GRUB step
-        config->startGroup("GRUB", Step_Boot);
-        if(grubCheckBox->isChecked()) {
-            const char *grubChoices[] = {"MBR", "PBR", "ESP"};
-            QRadioButton *grubRadios[] = {grubMbrButton, grubPbrButton, grubEspButton};
-            config->manageRadios("Install", 3, grubChoices, grubRadios);
+        if (!oobe) {
+            // GRUB step
+            config->startGroup("GRUB", Step_Boot);
+            if(grubCheckBox->isChecked()) {
+                const char *grubChoices[] = {"MBR", "PBR", "ESP"};
+                QRadioButton *grubRadios[] = {grubMbrButton, grubPbrButton, grubEspButton};
+                config->manageRadios("Install", 3, grubChoices, grubRadios);
+            }
+            config->manageComboBox("Location", grubBootCombo, true);
+            config->endGroup();
         }
-        config->manageComboBox("Location", grubBootCombo, true);
-        config->endGroup();
 
         // Services step
         config->startGroup("Services", Step_Services);
@@ -672,7 +819,15 @@ void MInstall::manageConfig(enum ConfigAction mode)
         const char *clockChoices[] = {"24", "12"};
         QRadioButton *clockRadios[] = {radio24h, radio12h};
         config->manageRadios("ClockHours", 2, clockChoices, clockRadios);
-        config->manageComboBox("Timezone", timezoneCombo, false);
+        if (mode == ConfigSave) {
+            config->setValue("Timezone", cmbTimeZone->currentData().toString());
+        } else {
+            QVariant def(QString(QTimeZone::systemTimeZoneId()));
+            const int rc = selectTimeZone(config->value("Timezone", def).toString());
+            if (rc == 1) config->markBadWidget(cmbTimeArea);
+            else if (rc == 2) config->markBadWidget(cmbTimeZone);
+        }
+        config->manageComboBox("Timezone", cmbTimeZone, true);
         config->endGroup();
 
         // User Accounts step
@@ -680,10 +835,10 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->manageLineEdit("Username", userNameEdit);
         config->manageCheckBox("Autologin", autologinCheckBox);
         config->manageCheckBox("SaveDesktop", saveDesktopCheckBox);
-        const char *oldHomeActionChoices[] = {"Nothing", "Use", "Save", "Delete"};
-        int ohaVal = config->manageEnum("OldHomeAction", 4, oldHomeActionChoices, oldHomeAction);
-        if (ohaVal >= 0) oldHomeAction = static_cast<OldHomeAction>(ohaVal);
-        else config->markBadWidget(nullptr);
+        if(oobe) saveDesktopCheckBox->setCheckState(Qt::Unchecked);
+        const char *oldHomeActions[] = {"Use", "Save", "Delete"};
+        QRadioButton *oldHomeRadios[] = {radioOldHomeUse, radioOldHomeSave, radioOldHomeDelete};
+        config->manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
         if (mode != ConfigSave) {
             const QString &upass = config->value("UserPass").toString();
             userPasswordEdit->setText(upass);
@@ -697,7 +852,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
 
     if (mode == ConfigSave) {
         config->sync();
-        proc.exec("/bin/cp /.minstalled /mnt/antiX/.minstall >/dev/null 2>&1", false);
+        QFile::copy(config->fileName(), "/etc/minstalled.conf");
     }
 
     if (config->bad) {
@@ -773,8 +928,10 @@ bool MInstall::formatPartitions()
     //if no swap is chosen do nothing
     if (swapFormatSize) {
         updateStatus(tr("Formatting swap partition"));
-        const QString cmd("/sbin/mkswap %1 -L %2");
-        if (!proc.exec(cmd.arg(swapdev, swapLabelEdit->text()))) return false;
+        QString cmd("/sbin/mkswap " + swapdev);
+        const QString &mkswaplabel = swapLabelEdit->text();
+        if (!mkswaplabel.isEmpty()) cmd.append(" -L \"" + mkswaplabel + "\"");
+        if (!proc.exec(cmd, true)) return false;
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
@@ -784,7 +941,6 @@ bool MInstall::formatPartitions()
                                 badblocksCheck->isChecked(), rootLabelEdit->text())) {
             return false;
         }
-        root_mntops = "defaults,noatime";
     }
     if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) return false;
 
@@ -799,6 +955,7 @@ bool MInstall::formatPartitions()
         updateStatus(tr("Formatting EFI System Partition"));
         if (!proc.exec("mkfs.msdos -F 32 " + espDevice)) return false;
         proc.exec("parted -s " + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
+        proc.sleep(1000);
     }
     // maybe format home
     if (homeFormatSize) {
@@ -819,11 +976,12 @@ bool MInstall::formatPartitions()
     return true;
 }
 
-bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label)
+bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label)
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return false;
     QString homedev = homeDevice;
+    boot_mntops = "defaults,noatime";
     if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
         home_mntops = "defaults,noatime";
     } else {
@@ -832,40 +990,21 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
 
     QString cmd;
     if (type == "reiserfs") {
-        cmd = QString("mkfs.reiserfs -q %1 -l \"%2\"").arg(dev).arg(label);
+        cmd = "mkfs.reiserfs -q";
     } else if (type == "reiser4") {
-        // reiser4
-        cmd = QString("mkfs.reiser4 -f -y %1 -L \"%2\"").arg(dev).arg(label);
-    } else if (type == "ext3") {
-        // ext3
-        if (bad) {
-            // do with badblocks
-            cmd = QString("mkfs.ext3 -c %1 -L \"%2\"").arg(dev).arg(label);
-        } else {
-            // do no badblocks
-            cmd = QString("mkfs.ext3 -F %1 -L \"%2\"").arg(dev).arg(label);
-        }
-    } else if (type == "ext2") {
-        // ext2
-        if (bad) {
-            // do with badblocks
-            cmd = QString("mkfs.ext2 -c %1 -L \"%2\"").arg(dev).arg(label);
-        } else {
-            // do no badblocks
-            cmd = QString("mkfs.ext2 -F %1 -L \"%2\"").arg(dev).arg(label);
-        }
-    } else if (type == "btrfs") {
+        cmd = "mkfs.reiser4 -f -y";
+    } else if (type.startsWith("btrfs")) {
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
         QString size_str = proc.execOut("/sbin/sfdisk -s " + dev);
-        quint64 size = size_str.toULongLong();
+        long long size = size_str.toLongLong();
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
         if (size < 6000) {
-            cmd = QString("mkfs.btrfs -f -M -O skinny-metadata %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = "mkfs.btrfs -f -M -O skinny-metadata";
         } else {
-            cmd = QString("mkfs.btrfs -f %1 -L \"%2\"").arg(dev).arg(label);
+            cmd = "mkfs.btrfs -f";
         }
         // if compression has been selected by user, set flag
         if (type == "btrfs-zlib") {
@@ -881,37 +1020,28 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
                 root_mntops = "defaults,noatime,compress-force=lzo";
             }
         }
-    } else if (type == "xfs") {
-        cmd = QString("mkfs.xfs -f %1 -L \"%2\"").arg(dev).arg(label);
-    } else if (type == "jfs") {
-        if (bad) {
-            // do with badblocks
-            cmd = QString("mkfs.jfs -q -c %1 -L \"%2\"").arg(dev).arg(label);
-        } else {
-            // do no badblocks
-            cmd = QString("mkfs.jfs -q %1 -L \"%2\"").arg(dev).arg(label);
-        }
-    } else { // must be ext4
-        if (bad) {
-            // do with badblocks
-            cmd = QString("mkfs.ext4 -c %1 -L \"%2\"").arg(dev).arg(label);
-        } else {
-            // do no badblocks
-            cmd = QString("mkfs.ext4 -F %1 -L \"%2\"").arg(dev).arg(label);
-        }
+    } else if (type == "xfs" || type == "f2fs") {
+        cmd = "mkfs." + type + " -f";
+    } else { // jfs, ext2, ext3, ext4
+        cmd = "mkfs." + type;
+        if (type == "jfs") cmd.append(" -q");
+        else cmd.append(" -F");
+        if (chkBadBlocks) cmd.append(" -c");
     }
-    if (!proc.exec(cmd)) {
-        // error
-        return false;
+
+    cmd.append(" " + dev);
+    if (!label.isEmpty()) {
+        if (type == "reiserfs" || type == "f2fs") cmd.append(" -l \"");
+        else cmd.append(" -L \"");
+        cmd.append(label + "\"");
     }
+    if (!proc.exec(cmd)) return false;
 
     if (type.startsWith("ext")) {
         // ext4 tuning
-        cmd = QString("/sbin/tune2fs -c0 -C0 -i1m %1").arg(dev);
-        if (!proc.exec(cmd)) {
-            // error
-        }
+        proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
     }
+    proc.sleep(1000);
     return true;
 }
 
@@ -940,6 +1070,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
         failUI(tr("Sorry, could not create %1 LUKS partition").arg(dev));
         return false;
     }
+    proc.sleep(1000);
     return true;
 }
 
@@ -1108,7 +1239,7 @@ bool MInstall::validateChosenPartitions()
     if (!homedev.isEmpty()) homeDevice = "/dev/" + homedev;
 
     // calculate the future partitions here
-    auto lambdaCalcBD = [this](const qint64 size, QComboBox *combo, const QString &label,
+    auto lambdaCalcBD = [this](const long long size, QComboBox *combo, const QString &label,
             const QString &fs, const bool isEncrypted) -> int {
         int index = size ? listBlkDevs.findDevice(combo->currentData().toString()) : -1;
         if (index >= 0) {
@@ -1156,7 +1287,7 @@ bool MInstall::calculateDefaultPartitions()
 
     // calculate new partition sizes
     // get the total disk size
-    const qint64 driveSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
+    const long long driveSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
     rootFormatSize = driveSize;
     rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
 
@@ -1199,7 +1330,7 @@ bool MInstall::calculateDefaultPartitions()
     int ixAddBD = bdindex;
     int ixpart = 1;
     auto lambdaAddFutureBD = [this, bdindex, &ixpart, &ixAddBD, &drv, &mmcnvmepartdesignator]
-            (qint64 size, const QString &fs) -> BlockDeviceInfo &  {
+            (long long size, const QString &fs) -> BlockDeviceInfo &  {
         BlockDeviceInfo bdinfo;
         bdinfo.name = drv + mmcnvmepartdesignator + QString::number(ixpart);
         bdinfo.fs = fs;
@@ -1255,15 +1386,15 @@ bool MInstall::makePartitions()
     }
     listToUnmount.clear();
 
-    qint64 start = 1; // start with 1 MB to aid alignment
+    long long start = 1; // start with 1 MB to aid alignment
 
     auto lambdaPreparePart = [this, &start]
-            (const QString &strdev, qint64 size, const QString &type) -> bool {
+            (const QString &strdev, long long size, const QString &type) -> bool {
         const QStringList devsplit = BlockDeviceInfo::split(strdev);
         bool rc = true;
         // size=0 = nothing, size>0 = creation, size<0 = allocation.
         if (size > 0) {
-            const qint64 end = start + size;
+            const long long end = start + size;
             rc = proc.exec("parted -s --align optimal /dev/" + devsplit.at(0) + " mkpart " + type
                          + " " + QString::number(start) + "MiB " + QString::number(end) + "MiB");
             start = end;
@@ -1278,6 +1409,7 @@ bool MInstall::makePartitions()
             }
             rc = proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1)));
         }
+        proc.sleep(1000);
         return rc;
     };
 
@@ -1292,12 +1424,14 @@ bool MInstall::makePartitions()
     if (entireDiskButton->isChecked()) {
         const QString &drv = diskCombo->currentData().toString();
         updateStatus(tr("Creating required partitions"));
-        proc.exec(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
+        //proc.exec(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
+        clearpartitiontables(drv);
         const bool useGPT = listBlkDevs.at(listBlkDevs.findDevice(drv)).isGPT;
         if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
     } else {
         updateStatus(tr("Preparing required partitions"));
     }
+    proc.sleep(1000);
 
     // any new partitions they will appear in this order on the disk
     if (!biosGrubDevice.isEmpty()) {
@@ -1308,7 +1442,8 @@ bool MInstall::makePartitions()
     if (!lambdaPreparePart(rootDevice, rootFormatSize, "primary ext4")) return false;
     if (!lambdaPreparePart(homeDevice, homeFormatSize, "primary")) return false;
     if (!lambdaPreparePart(swapDevice, swapFormatSize, "primary")) return false;
-    proc.exec("partprobe", true);
+    proc.exec("partprobe -s", true);
+    proc.sleep(1000);
     return true;
 }
 
@@ -1334,11 +1469,11 @@ bool MInstall::saveHomeBasic()
             if (!openLuksPartition(homedev, "homefs", pass, "--readonly", false)) goto ending2;
             homedev = "/dev/mapper/homefs";
         }
-        if (!mountPartition(homedev, "/mnt/antiX/home", "ro")) goto ending1;
+        if (!mountPartition(homedev, "/mnt/home-tmp", "ro")) goto ending1;
     }
 
     // store a listing of /home to compare with the user name given later
-    listHomes = proc.execOutLines("/bin/ls -1 /mnt/antiX/home/");
+    listHomes = proc.execOutLines("/bin/ls -1 /mnt/home-tmp/");
     // recycle the old key for /home if possible
     key.load("/mnt/antiX/root/keyfile", -1);
 
@@ -1346,8 +1481,9 @@ bool MInstall::saveHomeBasic()
  ending1:
     // unmount partitions
     if (homedev != rootDevice) {
-        proc.exec("/bin/umount -l /mnt/antiX/home", false);
+        proc.exec("/bin/umount -l /mnt/home-tmp", false);
         if (isHomeEncrypted) proc.exec("cryptsetup close homefs", true);
+        proc.exec("rmdir /mnt/home-tmp");
     }
  ending2:
     proc.exec("/bin/umount -l /mnt/antiX", false);
@@ -1388,28 +1524,39 @@ bool MInstall::installLinux(const int progend)
     if (!bootDevice.isEmpty() && bootDevice != rootDevice) {
         mkdir("/mnt/antiX/boot", 0755);
         proc.exec("fsck.ext4 -y " + bootDevice); // needed to run fsck because sfdisk --part-type can mess up the partition
-        if (!mountPartition(bootDevice, "/mnt/antiX/boot", root_mntops)) {
+        if (!mountPartition(bootDevice, "/mnt/antiX/boot", boot_mntops)) {
             qDebug() << "Could not mount /boot on " + bootDevice;
             return false;
         }
     }
 
+    setupAutoMount(true);
     if(!copyLinux(progend - 1)) return false;
 
     updateStatus(tr("Fixing configuration"), progend);
     mkdir("/mnt/antiX/tmp", 01777);
     chmod("/mnt/antiX/tmp", 01777);
-    makeFstab();
-    writeKeyFile();
-    disablehiberanteinitramfs();
 
     // Copy live set up to install and clean up.
     proc.exec("/usr/sbin/live-to-installed /mnt/antiX", false);
     qDebug() << "Desktop menu";
     proc.exec("chroot /mnt/antiX desktop-menu --write-out-global", false);
-    proc.exec("/bin/rm -rf /mnt/antiX/home/demo");
-    proc.exec("/bin/rm -rf /mnt/antiX/media/sd*", false);
-    proc.exec("/bin/rm -rf /mnt/antiX/media/hd*", false);
+
+    makeFstab();
+    writeKeyFile();
+    disablehiberanteinitramfs();
+
+    //remove home unless a demo home is found in remastered linuxfs
+    if (!isRemasteredDemoPresent) {
+        proc.exec("/bin/rm -rf /mnt/antiX/home/demo");
+    }
+
+    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
+    // not sure if this is still needed with the live-to-installed change but OK
+    if (!POPULATE_MEDIA_MOUNTPOINTS) {
+        proc.exec("/bin/rm -rf /mnt/antiX/media/sd*", false);
+        proc.exec("/bin/rm -rf /mnt/antiX/media/hd*", false);
+    }
 
     // guess localtime vs UTC
     if (proc.execOut("guess-hwclock") == "localtime") {
@@ -1473,7 +1620,7 @@ void MInstall::makeFstab()
         //add bootdev if present
         //only ext4 (for now) for max compatibility with other linuxes
         if (!bootDevice.isEmpty() && bootDevice != rootDevice) {
-            out << bootdevUUID + " /boot ext4 " + root_mntops + " 1 1\n";
+            out << bootdevUUID + " /boot ext4 " + boot_mntops + " 1 1\n";
         }
         if (grubEspButton->isChecked()) {
             const QString espdev = "/dev/" + grubBootCombo->currentData().toString();
@@ -1503,7 +1650,7 @@ void MInstall::makeFstab()
     }
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     if (POPULATE_MEDIA_MOUNTPOINTS) {
-        proc.exec("/sbin/make-fstab -O --install /mnt/antiX --mntpnt=/media");
+        proc.exec("/sbin/make-fstab -O --install=/mnt/antiX --mntpnt=/media");
     }
 }
 
@@ -1526,10 +1673,7 @@ bool MInstall::copyLinux(const int progend)
             cmd.append(" --filter 'protect home/*'");
         }
     }
-    cmd.append(" /live/aufs/bin /live/aufs/boot /live/aufs/dev");
-    cmd.append(" /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt");
-    cmd.append(" /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr");
-    cmd.append(" /live/aufs/var /live/aufs/home /mnt/antiX");
+    cmd.append(" " + bootSource + " " + rootSources + " /mnt/antiX");
     struct statvfs svfs;
 
     fsfilcnt_t sourceInodes = 1;
@@ -1544,15 +1688,15 @@ bool MInstall::copyLinux(const int progend)
     if (!nocopy) {
         if (phase < 0) return false;
         QEventLoop eloop;
-        connect(&proc, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
-        connect(&proc, static_cast<void (QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
+        connect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), &eloop, &QEventLoop::quit);
+        connect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
         qDebug() << cmd;
         proc.start(cmd);
         const int progspace = progend - progstart;
         const int progdiv = (progspace != 0) ? (sourceInodes / progspace) : 0;
         while (proc.state() != QProcess::NotRunning) {
             eloop.exec();
-            proc.readAll();
+            proc.readAllStandardOutput();
             if(statvfs("/mnt/antiX", &svfs) == 0 && progdiv != 0) {
                 int i = (svfs.f_files - svfs.f_ffree - targetInodes) / progdiv;
                 if (i > progspace) i = progspace;
@@ -1561,8 +1705,8 @@ bool MInstall::copyLinux(const int progend)
                 updateStatus(tr("Copy progress unknown. No file system statistics."));
             }
         }
-        disconnect(&proc, SIGNAL(readyRead()), 0, 0);
-        disconnect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), 0, 0);
+        disconnect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), nullptr, nullptr);
+        disconnect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), nullptr, nullptr);
 
         if (proc.exitStatus() != QProcess::NormalExit) {
             failUI(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
@@ -1594,6 +1738,13 @@ bool MInstall::installLoader()
 
     if (!grubCheckBox->isChecked()) {
         // skip it
+        //if useing f2fs, then add modules to /etc/initramfs-tools/modules
+        qDebug() << "Update initramfs";
+        if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
+            proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
+            proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
+        }
+        proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
         return true;
     }
 
@@ -1624,10 +1775,13 @@ bool MInstall::installLoader()
         if (bootflag) proc.exec("parted -s " + boot + " set " + part_num + bootflag, true);
     }
 
+    proc.sleep(1000);
+
     // set mounts for chroot
     proc.exec("/bin/mount -o bind /dev /mnt/antiX/dev", true);
     proc.exec("/bin/mount -o bind /sys /mnt/antiX/sys", true);
     proc.exec("/bin/mount -o bind /proc /mnt/antiX/proc", true);
+    proc.exec("/bin/mount -o bind /run /mnt/antiX/run", true);
 
     QString arch;
 
@@ -1657,6 +1811,7 @@ bool MInstall::installLoader()
         proc.exec("/bin/umount /mnt/antiX/proc", true);
         proc.exec("/bin/umount /mnt/antiX/sys", true);
         proc.exec("/bin/umount /mnt/antiX/dev", true);
+        proc.exec("/bin/umount /mnt/antiX/run", true);
         if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
             proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
         }
@@ -1735,16 +1890,43 @@ bool MInstall::installLoader()
     updateStatus(statup);
 
     qDebug() << "Update initramfs";
+    //if useing f2fs, then add modules to /etc/initramfs-tools/modules
+    if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
+        proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
+        proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
+    }
     proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
     updateStatus(statup);
     qDebug() << "clear chroot env";
     proc.exec("/bin/umount /mnt/antiX/proc", true);
     proc.exec("/bin/umount /mnt/antiX/sys", true);
     proc.exec("/bin/umount /mnt/antiX/dev", true);
+    proc.exec("/bin/umount /mnt/antiX/run", true);
     if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
         proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
     }
 
+    return true;
+}
+
+// out-of-box experience
+void MInstall::enableOOBE()
+{
+    setServices(); // Disable services to speed up the OOBE boot.
+    proc.exec("chroot /mnt/antiX/ update-rc.d oobe defaults", true);
+}
+bool MInstall::processOOBE()
+{
+    setServices();
+    if (!setComputerName()) return false;
+    setLocale();
+    if (haveSnapshotUserAccounts) { // skip user account creation
+        QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
+        proc.exec(cmd);
+    } else {
+        if (!setUserInfo()) return false;
+    }
+    if(oobe) proc.exec("update-rc.d oobe disable", false);
     return true;
 }
 
@@ -1808,21 +1990,10 @@ bool MInstall::validateUserInfo()
 
     // Check for pre-existing /home directory
     // see if user directory already exists
-    if (oldHomeAction == OldHomeNothing && listHomes.contains(userNameEdit->text())) {
-        QMessageBox msgbox(this);
-        msgbox.setWindowTitle(windowTitle());
-        msgbox.setText(tr("The home directory for %1 already exists.").arg(userNameEdit->text()));
-        msgbox.setInformativeText(tr("What would you like to do with the old directory?"));
-        QPushButton *msgbtnUse = msgbox.addButton(tr("Reuse"), QMessageBox::ActionRole);
-        QPushButton *msgbtnSave = msgbox.addButton(tr("Save"), QMessageBox::ActionRole);
-        QPushButton *msgbtnDelete = msgbox.addButton(tr("Delete"), QMessageBox::ActionRole);
-        msgbox.setDefaultButton(msgbox.addButton(QMessageBox::Cancel));
-        msgbox.exec();
-        QAbstractButton *msgbtn = msgbox.clickedButton();
-        if (msgbtn == msgbtnDelete) oldHomeAction = OldHomeDelete; // delete the directory
-        else if (msgbtn == msgbtnSave) oldHomeAction = OldHomeSave; // save the old directory
-        else if (msgbtn == msgbtnUse) oldHomeAction = OldHomeUse; // use the old home
-        else return false; // don't save, reuse or delete -- can't proceed
+    haveOldHome = listHomes.contains(userNameEdit->text());
+    if (haveOldHome) {
+        const QString &str = tr("The home directory for %1 already exists.");
+        labelOldHome->setText(str.arg(userNameEdit->text()));
     }
     nextFocus = nullptr;
     return true;
@@ -1837,19 +2008,22 @@ bool MInstall::setUserInfo()
     // set the user passwords first
     const QByteArray &userinfo = QString("root:" + rootPasswordEdit->text() + "\n"
                                  "demo:" + userPasswordEdit->text()).toUtf8();
-    if (!proc.exec("chroot /mnt/antiX chpasswd", true, &userinfo)) {
+    if (!proc.exec(oobe ? "chpasswd" : "chroot /mnt/antiX chpasswd", true, &userinfo)) {
         failUI(tr("Failed to set user account passwords."));
         return false;
     }
 
+    QString rootpath;
+    if (!oobe) rootpath = "/mnt/antiX";
+    QString skelpath = rootpath + "/etc/skel";
     DIR *dir;
     QString cmd;
     // see if user directory already exists
-    QString dpath = QString("/mnt/antiX/home/%1").arg(userNameEdit->text());
+    QString dpath = rootpath + "/home/" + userNameEdit->text();
     if ((dir = opendir(dpath.toUtf8())) != nullptr) {
         // already exists
         closedir(dir);
-        if (oldHomeAction == OldHomeSave) {
+        if (radioOldHomeSave->isChecked()) {
             // save the old directory
             bool ok = false;
             cmd = QString("/bin/mv -f %1 %1.00%2").arg(dpath);
@@ -1860,7 +2034,7 @@ bool MInstall::setUserInfo()
                 failUI(tr("Failed to save old home directory."));
                 return false;
             }
-        } else if (oldHomeAction == OldHomeDelete) {
+        } else if (radioOldHomeDelete->isChecked()) {
             // delete the directory
             cmd = QString("/bin/rm -rf %1").arg(dpath);
             if (!proc.exec(cmd)) {
@@ -1873,41 +2047,44 @@ bool MInstall::setUserInfo()
     if ((dir = opendir(dpath.toUtf8())) == nullptr) {
         // dir does not exist, must create it
         // copy skel to demo
-        if (!proc.exec("/bin/cp -a /mnt/antiX/etc/skel /mnt/antiX/home")) {
-            failUI(tr("Sorry, failed to create user directory."));
-            return false;
+        // don't copy skel to demo if found demo folder in remastered linuxfs
+        if (!isRemasteredDemoPresent) {
+            if (!proc.exec("/bin/cp -a " + skelpath + " " + rootpath + "/home")) {
+                failUI(tr("Sorry, failed to create user directory."));
+                return false;
+            }
         }
-        cmd = QString("/bin/mv -f /mnt/antiX/home/skel %1").arg(dpath);
+        //still rename the demo directory even if remastered demo home folder is detected
+        cmd = QString("/bin/mv -f " + skelpath + " %1").arg(dpath);
+        if (isRemasteredDemoPresent) {
+            cmd = QString("/bin/mv -f " + rootpath + "/home/demo %1").arg(dpath);
+        }
         if (!proc.exec(cmd)) {
             failUI(tr("Sorry, failed to name user directory."));
             return false;
         }
     } else {
         // dir does exist, clean it up
-        cmd = QString("/bin/cp -n /mnt/antiX/etc/skel/.bash_profile %1").arg(dpath);
-        proc.exec(cmd);
-        cmd = QString("/bin/cp -n /mnt/antiX/etc/skel/.bashrc %1").arg(dpath);
-        proc.exec(cmd);
-        cmd = QString("/bin/cp -n /mnt/antiX/etc/skel/.gtkrc %1").arg(dpath);
-        proc.exec(cmd);
-        cmd = QString("/bin/cp -n /mnt/antiX/etc/skel/.gtkrc-2.0 %1").arg(dpath);
-        proc.exec(cmd);
-        cmd = QString("/bin/cp -Rn /mnt/antiX/etc/skel/.config %1").arg(dpath);
-        proc.exec(cmd);
-        cmd = QString("/bin/cp -Rn /mnt/antiX/etc/skel/.local %1").arg(dpath);
-        proc.exec(cmd);
+        proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
+        proc.exec("/bin/cp -n " + skelpath + "/.bashrc " + dpath, true);
+        proc.exec("/bin/cp -n " + skelpath + "/.gtkrc " + dpath, true);
+        proc.exec("/bin/cp -n " + skelpath + "/.gtkrc-2.0 " + dpath, true);
+        proc.exec("/bin/cp -Rn " + skelpath + "/.config " + dpath, true);
+        proc.exec("/bin/cp -Rn " + skelpath + "/.local " + dpath, true);
     }
     // saving Desktop changes
     if (saveDesktopCheckBox->isChecked()) {
-        proc.exec("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
-        cmd = QString("rsync -a --info=name1 /home/demo/ %1"
-                      " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
-                      " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
-                      " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
-                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
-                      " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' %1/$").arg(dpath);
-        proc.exec(cmd);
+        resetBlueman();
+        rsynchomefolder(dpath);
     }
+
+    // check if remaster exists and saveDesktopCheckbox not checked, modify the remastered demo folder
+    if (isRemasteredDemoPresent && ! saveDesktopCheckBox->isChecked())
+    {
+        resetBlueman();
+        changeRemasterdemoToNewUser(dpath);
+    }
+
     // fix the ownership, demo=newuser
     cmd = QString("chown -R demo:demo %1").arg(dpath);
     if (!proc.exec(cmd)) {
@@ -1916,24 +2093,24 @@ bool MInstall::setUserInfo()
     }
 
     // change in files
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/group");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/gshadow");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/passwd");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/shadow");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/slim.conf");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/etc/lightdm/lightdm.conf");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/home/*/.gtkrc-2.0");
-    replaceStringInFile("demo", userNameEdit->text(), "/mnt/antiX/root/.gtkrc-2.0");
+    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/group");
+    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/gshadow");
+    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/passwd");
+    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/shadow");
+    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/slim.conf");
+    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/lightdm/lightdm.conf");
+    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/home/*/.gtkrc-2.0");
+    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/root/.gtkrc-2.0");
     if (autologinCheckBox->isChecked()) {
-        replaceStringInFile("#auto_login", "auto_login", "/mnt/antiX/etc/slim.conf");
-        replaceStringInFile("#default_user ", "default_user ", "/mnt/antiX/etc/slim.conf");
+        replaceStringInFile("#auto_login", "auto_login", rootpath + "/etc/slim.conf");
+        replaceStringInFile("#default_user ", "default_user ", rootpath + "/etc/slim.conf");
     }
     else {
-        replaceStringInFile("auto_login", "#auto_login", "/mnt/antiX/etc/slim.conf");
-        replaceStringInFile("default_user ", "#default_user ", "/mnt/antiX/etc/slim.conf");
-        replaceStringInFile("autologin-user=", "#autologin-user=", "/mnt/antiX/etc/lightdm/lightdm.conf");
+        replaceStringInFile("auto_login", "#auto_login", rootpath + "/etc/slim.conf");
+        replaceStringInFile("default_user ", "#default_user ", rootpath + "/etc/slim.conf");
+        replaceStringInFile("autologin-user=", "#autologin-user=", rootpath + "/etc/lightdm/lightdm.conf");
     }
-    cmd = QString("touch /mnt/antiX/var/mail/%1").arg(userNameEdit->text());
+    cmd = QString("touch " + rootpath + "/var/mail/%1").arg(userNameEdit->text());
     proc.exec(cmd);
 
     return true;
@@ -1984,62 +2161,62 @@ bool MInstall::validateComputerName()
 bool MInstall::setComputerName()
 {
     if (phase < 0) return false;
+    QString etcpath = oobe ? "/etc" : "/mnt/antiX/etc";
     if (haveSamba) {
         //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
-        replaceStringInFile("WORKGROUP", computerGroupEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
+        replaceStringInFile("WORKGROUP", computerGroupEdit->text(), etcpath + "/samba/smb.conf");
     }
     if (sambaCheckBox->isChecked()) {
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/K*smbd /mnt/antiX/etc/rc5.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/K*smbd /mnt/antiX/etc/rc4.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/K*smbd /mnt/antiX/etc/rc3.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/K*smbd /mnt/antiX/etc/rc2.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/K*samba-ad-dc /mnt/antiX/etc/rc5.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/K*samba-ad-dc /mnt/antiX/etc/rc4.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/K*samba-ad-dc /mnt/antiX/etc/rc3.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/K*samba-ad-dc /mnt/antiX/etc/rc2.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/K*nmbd /mnt/antiX/etc/rc5.d/S01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/K*nmbd /mnt/antiX/etc/rc4.d/S01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/K*nmbd /mnt/antiX/etc/rc3.d/S01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/K*nmbd /mnt/antiX/etc/rc2.d/S01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*smbd " + etcpath + "/rc5.d/S06smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*smbd " + etcpath + "/rc4.d/S06smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*smbd " + etcpath + "/rc3.d/S06smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/K*smbd " + etcpath + "/rc2.d/S06smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*samba-ad-dc " + etcpath + "/rc5.d/S01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*samba-ad-dc " + etcpath + "/rc4.d/S01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*samba-ad-dc " + etcpath + "/rc3.d/S01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/K*samba-ad-dc " + etcpath + "/rc2.d/S01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*nmbd " + etcpath + "/rc5.d/S01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*nmbd " + etcpath + "/rc4.d/S01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*nmbd " + etcpath + "/rc3.d/S01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/K*nmbd " + etcpath + "/rc2.d/S01nmbd >/dev/null 2>&1", false);
     } else {
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*smbd /mnt/antiX/etc/rc5.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*smbd /mnt/antiX/etc/rc4.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*smbd /mnt/antiX/etc/rc3.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*smbd /mnt/antiX/etc/rc2.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*samba-ad-dc /mnt/antiX/etc/rc5.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*samba-ad-dc /mnt/antiX/etc/rc4.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*samba-ad-dc /mnt/antiX/etc/rc3.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*samba-ad-dc /mnt/antiX/etc/rc2.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*nmbd /mnt/antiX/etc/rc5.d/K01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*nmbd /mnt/antiX/etc/rc4.d/K01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*nmbd /mnt/antiX/etc/rc3.d/K01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*nmbd /mnt/antiX/etc/rc2.d/K01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/S*smbd " + etcpath + "/rc5.d/K01smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/S*smbd " + etcpath + "/rc4.d/K01smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/S*smbd " + etcpath + "/rc3.d/K01smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*smbd " + etcpath + "/rc2.d/K01smbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/S*samba-ad-dc " + etcpath + "/rc5.d/K01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/S*samba-ad-dc " + etcpath + "/rc4.d/K01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/S*samba-ad-dc " + etcpath + "/rc3.d/K01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*samba-ad-dc " + etcpath + "/rc2.d/K01samba-ad-dc >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/S*nmbd " + etcpath + "/rc5.d/K01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/S*nmbd " + etcpath + "/rc4.d/K01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/S*nmbd " + etcpath + "/rc3.d/K01nmbd >/dev/null 2>&1", false);
+        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*nmbd " + etcpath + "/rc2.d/K01nmbd >/dev/null 2>&1", false);
     }
 
-    char rbuf[4];
-    if (readlink("/mnt/antiX/sbin/init", rbuf, sizeof(rbuf)) >= 0) { // systemd check
-        if (!sambaCheckBox->isChecked()) {
-            proc.exec("chroot /mnt/antiX systemctl disable smbd");
-            proc.exec("chroot /mnt/antiX systemctl disable nmbd");
-            proc.exec("chroot /mnt/antiX systemctl disable samba-ad-dc");
-            proc.exec("chroot /mnt/antiX systemctl mask smbd");
-            proc.exec("chroot /mnt/antiX systemctl mask nmbd");
-            proc.exec("chroot /mnt/antiX systemctl mask samba-ad-dc");
-        }
+    if (containsSystemD && !sambaCheckBox->isChecked()) {
+        proc.exec("chroot /mnt/antiX systemctl disable smbd");
+        proc.exec("chroot /mnt/antiX systemctl disable nmbd");
+        proc.exec("chroot /mnt/antiX systemctl disable samba-ad-dc");
+        proc.exec("chroot /mnt/antiX systemctl mask smbd");
+        proc.exec("chroot /mnt/antiX systemctl mask nmbd");
+        proc.exec("chroot /mnt/antiX systemctl mask samba-ad-dc");
     }
 
     //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
-    QString cmd;
-    cmd = QString("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost | head -1 | awk '{print $2}')\"'/" + computerNameEdit->text() + "/' /mnt/antiX/etc/hosts");
-    proc.exec(cmd, false);
-    cmd = QString("echo \"%1\" | cat > /mnt/antiX/etc/hostname").arg(computerNameEdit->text());
-    proc.exec(cmd, false);
-    cmd = QString("echo \"%1\" | cat > /mnt/antiX/etc/mailname").arg(computerNameEdit->text());
-    proc.exec(cmd, false);
-    cmd = QString("sed -i 's/.*send host-name.*/send host-name \"%1\";/g' /mnt/antiX/etc/dhcp/dhclient.conf").arg(computerNameEdit->text());
-    proc.exec(cmd, false);
-    cmd = QString("echo \"%1\" | cat > /mnt/antiX/etc/defaultdomain").arg(computerDomainEdit->text());
-    proc.exec(cmd, false);
+    const QString &compname = computerNameEdit->text();
+    QString cmd("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost"
+        " | head -1 | awk '{print $2}')\"'/" + compname + "/' ");
+    if (!oobe) proc.exec(cmd + "/mnt/antiX/etc/hosts", false);
+    else {
+        proc.exec(cmd + "/tmp/hosts", false);
+        proc.exec("/bin/mv -f /tmp/hosts " + etcpath, true);
+    }
+    proc.exec("echo \"" + compname + "\" | cat > " + etcpath + "/hostname", false);
+    proc.exec("echo \"" + compname + "\" | cat > " + etcpath + "/mailname", false);
+    proc.exec("sed -i 's/.*send host-name.*/send host-name \""
+        + compname + "\";/g' " + etcpath + "/dhcp/dhclient.conf", false);
+    proc.exec("echo \"" + compname + "\" | cat > " + etcpath + "/defaultdomain", false);
     return true;
 }
 
@@ -2051,25 +2228,28 @@ void MInstall::setLocale()
     QString cmd;
 
     //locale
-    cmd = QString("chroot /mnt/antiX /usr/sbin/update-locale \"LANG=%1\"").arg(localeCombo->currentData().toString());
+    if (!oobe) cmd = "chroot /mnt/antiX ";
+    cmd += QString("/usr/sbin/update-locale \"LANG=%1\"").arg(localeCombo->currentData().toString());
     qDebug() << "Update locale";
     proc.exec(cmd);
     cmd = QString("Language=%1").arg(localeCombo->currentData().toString());
 
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
     //replace with link
-    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(timezoneCombo->currentText());
-    proc.exec(cmd, false);
-    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(timezoneCombo->currentText());
+    if (!oobe) {
+        cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(cmbTimeZone->currentData().toString());
+        proc.exec(cmd, false);
+    }
+    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(cmbTimeZone->currentData().toString());
     proc.exec(cmd, false);
     // /etc/timezone is text file with the timezone written in it. Write the user-selected timezone in it now.
-    cmd = QString("echo %1 > /mnt/antiX/etc/timezone").arg(timezoneCombo->currentText());
-    proc.exec(cmd, false);
-    cmd = QString("echo %1 > /etc/timezone").arg(timezoneCombo->currentText());
+    if (!oobe) {
+        cmd = QString("echo %1 > /mnt/antiX/etc/timezone").arg(cmbTimeZone->currentData().toString());
+        proc.exec(cmd, false);
+    }
+    cmd = QString("echo %1 > /etc/timezone").arg(cmbTimeZone->currentData().toString());
     proc.exec(cmd, false);
 
-    // timezone
-    proc.exec("/bin/cp -f /etc/default/rcS /mnt/antiX/etc/default");
     // Set clock to use LOCAL
     if (localClockCheckBox->isChecked()) {
         proc.exec("echo '0.0 0 0.0\n0\nLOCAL' > /etc/adjtime", false);
@@ -2077,35 +2257,40 @@ void MInstall::setLocale()
         proc.exec("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime", false);
     }
     proc.exec("hwclock --hctosys");
-    proc.exec("/bin/cp -f /etc/adjtime /mnt/antiX/etc/");
+    if (!oobe) {
+        proc.exec("/bin/cp -f /etc/adjtime /mnt/antiX/etc/");
+        proc.exec("/bin/cp -f /etc/default/rcS /mnt/antiX/etc/default");
+    }
 
     // Set clock format
+    QString skelpath = oobe ? "/etc/skel" : "/mnt/antiX/etc/skel";
     if (radio12h->isChecked()) {
         //mx systems
         proc.exec("sed -i '/data0=/c\\data0=%l:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
-        proc.exec("sed -i '/data0=/c\\data0=%l:%M' /mnt/antiX/etc/skel/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
+        proc.exec("sed -i '/data0=/c\\data0=%l:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
         proc.exec("sed -i '/time_format=/c\\time_format=%l:%M' /home/demo/.config/xfce4/panel/datetime-1.rc", false);
-        proc.exec("sed -i '/time_format=/c\\time_format=%l:%M' /mnt/antiX/etc/skel/.config/xfce4/panel/datetime-1.rc", false);
+        proc.exec("sed -i '/time_format=/c\\time_format=%l:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc", false);
 
         //antix systems
-        proc.exec("sed -i 's/%H:%M/%l:%M/g' /mnt/antiX/etc/skel/.icewm/preferences", false);
-        proc.exec("sed -i 's/%k:%M/%l:%M/g' /mnt/antiX/etc/skel/.fluxbox/init", false);
-        proc.exec("sed -i 's/%k:%M/%l:%M/g' /mnt/antiX/etc/skel/.jwm/tray", false);
+        proc.exec("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.icewm/preferences", false);
+        proc.exec("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.fluxbox/init", false);
+        proc.exec("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.jwm/tray", false);
     } else {
         //mx systems
         proc.exec("sed -i '/data0=/c\\data0=%H:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
-        proc.exec("sed -i '/data0=/c\\data0=%H:%M' /mnt/antiX/etc/skel/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
+        proc.exec("sed -i '/data0=/c\\data0=%H:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
         proc.exec("sed -i '/time_format=/c\\time_format=%H:%M' /home/demo/.config/xfce4/panel/datetime-1.rc", false);
-        proc.exec("sed -i '/time_format=/c\\time_format=%H:%M' /mnt/antiX/etc/skel/.config/xfce4/panel/datetime-1.rc", false);
+        proc.exec("sed -i '/time_format=/c\\time_format=%H:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc", false);
         //antix systems
-        proc.exec("sed -i 's/%H:%M/%H:%M/g' /mnt/antiX/etc/skel/.icewm/preferences", false);
-        proc.exec("sed -i 's/%k:%M/%k:%M/g' /mnt/antiX/etc/skel/.fluxbox/init", false);
-        proc.exec("sed -i 's/%k:%M/%k:%M/g' /mnt/antiX/etc/skel/.jwm/tray", false);
+        proc.exec("sed -i 's/%H:%M/%H:%M/g' " + skelpath + "/.icewm/preferences", false);
+        proc.exec("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.fluxbox/init", false);
+        proc.exec("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.jwm/tray", false);
     }
 
     // localize repo
     qDebug() << "Localize repo";
-    proc.exec("chroot /mnt/antiX localize-repo default");
+    if (oobe) proc.exec("localize-repo default");
+    else proc.exec("chroot /mnt/antiX localize-repo default");
 }
 
 void MInstall::stashServices(bool save)
@@ -2124,39 +2309,27 @@ void MInstall::setServices()
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (phase < 0) return;
 
-    // systemd check
-    char rbuf[4];
-    bool systemd = (readlink("/mnt/antiX/sbin/init", rbuf, sizeof(rbuf)) >= 0);
-
+    QString chroot;
+    if (!oobe) chroot = "chroot /mnt/antiX ";
     QTreeWidgetItemIterator it(csView);
     while (*it) {
         if ((*it)->parent() != nullptr) {
             QString service = (*it)->text(0);
             qDebug() << "Service: " << service;
-            if ((*it)->checkState(0) == Qt::Checked) {
-                if (!systemd) {
-                    proc.exec("chroot /mnt/antiX update-rc.d " + service + " enable");
-                } else {
-                    proc.exec("chroot /mnt/antiX systemctl enable " + service);
+            if (!oem && (*it)->checkState(0) == Qt::Checked) {
+                proc.exec(chroot + "update-rc.d " + service + " enable");
+                if (containsSystemD) {
+                    proc.exec(chroot + "systemctl enable " + service);
                 }
-            } else {
-                if (!systemd) {
-                    proc.exec("chroot /mnt/antiX update-rc.d " + service + " disable");
-                } else {
-                    proc.exec("chroot /mnt/antiX systemctl disable " + service);
-                    proc.exec("chroot /mnt/antiX systemctl mask " + service);
+            } else { // In OEM mode, disable the services for the OOBE.
+                proc.exec(chroot + "update-rc.d " + service + " disable");
+                if (containsSystemD) {
+                    proc.exec(chroot + "systemctl disable " + service);
+                    proc.exec(chroot + "systemctl mask " + service);
                 }
             }
         }
         ++it;
-    }
-
-    if (!isInsideVB()) {
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1", false);
     }
 }
 
@@ -2173,11 +2346,11 @@ void MInstall::failUI(const QString &msg)
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
 {
-    if (next == 3 && ixPageRefAdvancedFDE != 0) { // at Step_FDE
+    if (next == 4 && ixPageRefAdvancedFDE != 0) { // at Step_FDE
         return next;
     }
 
-    if (next == 2 && curr == 1) { // at Step_Disk (forward)
+    if (next == 3 && curr == 2) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
             if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
                 return curr;
@@ -2200,9 +2373,9 @@ int MInstall::showPage(int curr, int next)
                 }
             }
             calculateDefaultPartitions();
-            return 4; // Go to Step_Boot
+            return 5; // Go to Step_Boot
         }
-    } else if (next == 3 && curr == 2) { // at Step_Partition (fwd)
+    } else if (next == 4 && curr == 3) { // at Step_Partition (fwd)
         if (!validateChosenPartitions()) {
             return curr;
         }
@@ -2213,55 +2386,72 @@ int MInstall::showPage(int curr, int next)
             QMessageBox::critical(this, windowTitle(), msg);
             return curr;
         }
-        return 4; // Go to Step_Boot
-    } else if (curr == 3) { // at Step_FDE
-        stashAdvancedFDE(next >= 4);
+        return 5; // Go to Step_Boot
+    } else if (curr == 4) { // at Step_FDE
+        stashAdvancedFDE(next >= 5);
         next = ixPageRefAdvancedFDE;
         ixPageRefAdvancedFDE = 0;
         return next;
-    } else if (next == 5 && curr == 4) { // at Step_Boot (forward)
+    } else if (next == 6 && curr == 5) { // at Step_Boot (forward)
+        if (oem) return 11; // straight to Step_Progress
         return next + 1; // skip Services screen
-    } else if (next == 9 && curr == 8) { // at Step_User_Accounts (forward)
+    } else if (next == 10 && curr == 9) { // at Step_User_Accounts (forward)
         if (!validateUserInfo()) return curr;
-    } else if (next == 7 && curr == 6) { // at Step_Network (forward)
+        if (!haveOldHome) return next + 1; // skip Step_Old_Home
+    } else if (next == 8 && curr == 7) { // at Step_Network (forward)
         if (!validateComputerName()) return curr;
-    } else if (next == 5 && curr == 6) { // at Step_Network (backward)
-       return next - 1; // skip Services screen
-    } else if (next == 8 && curr == 7) { // at Step_Localization (forward)
+    } else if (next == 6 && curr == 7) { // at Step_Network (backward)
+        return next - 1; // skip Services screen
+    } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
         if (!pretend && haveSnapshotUserAccounts) {
-            return 9; // skip Step_User_Accounts and go to Step_Progress
+            return 11; // skip Step_User_Accounts and go to Step_Progress
         }
-    } else if (next == 8 && curr == 9) { // at Step_Progress (backward)
+    } else if (next == 9 && curr == 10) { // at Step_Old_Home (backward)
         if (!pretend && haveSnapshotUserAccounts) {
-            return 7; // skip Step_User_Accounts and go to Step_Localization
+            return 8; // skip Step_User_Accounts and go to Step_Localization
         }
-    } else if (curr == 5) { // at Step_Services
-        stashServices(next >= 6);
-        return 7; // goes back to the screen that called Services screen
+    } else if (next == 10 && curr == 11) { // at Step_Progress (backward)
+        if (oem) return 5; // go back to Step_Boot
+        if (!haveOldHome) {
+            // skip Step_Old_Home
+            if (!pretend && haveSnapshotUserAccounts) {
+                return 8; // go to Step_Localization
+            }
+            return 9; // go to Step_User_Accounts
+        }
+    } else if (curr == 6) { // at Step_Services
+        stashServices(next >= 7);
+        return 8; // goes back to the screen that called Services screen
     }
     return next;
 }
 
 void MInstall::pageDisplayed(int next)
 {
-    // progress bar shown only for install and configuration pages.
-    installBox->setVisible(next >= 4 && next <= 9);
-
-    if(next >= 4 && next <= 8) ixTipStart = ixTip;
+    if (!oobe) {
+        const int ixProgress = widgetStack->indexOf(Step_Progress);
+        // progress bar shown only for install and configuration pages.
+        installBox->setVisible(next >= widgetStack->indexOf(Step_Boot) && next <= ixProgress);
+        // save the last tip and stop it updating when the progress page is hidden.
+        if(next != ixProgress) ixTipStart = ixTip;
+    }
 
     switch (next) {
-    case 1: // choose disk
-        mainHelp->setText(tr("<p><b>General Instructions</b><br/>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</p>"
-                             "<p>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. "
-                             "You will be prompted for confirmation before any destructive actions are performed.</p>"
-                             "<p>Installation requires about %1 of space. %2 or more is preferred. "
-                             "You can use the entire disk or you can put the installation on existing partitions. </p>"
-                             "<p>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.</p>"
-                             "<p>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</p>").arg(MIN_INSTALL_SIZE).arg(PREFERRED_MIN_INSTALL_SIZE) + tr(""
-                             "<p>Autoinstall will place home on the root partition.</p>") + tr(""
-                             "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
-                             "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>") + tr(""
-                             "<p>When encryption is used with autoinstall, the separate boot partition will be automatically created</p>"));
+    case 2: // choose disk
+        mainHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
+                          + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
+                          "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
+                                     " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
+                          "<p>" + tr("Installation requires about %1 of space. %2 or more is preferred."
+                                     " You can use the entire disk or you can put the installation on existing partitions.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
+                          "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
+                          "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
+                          "<p>" + tr("Autoinstall will place home on the root partition.") + "</p>"
+                          "<p><b>" + tr("Encryption") + "</b><br/>"
+                          + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
+                          "<p>" + tr("A separate unencrypted boot partition is required."
+                                     " For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
+                          "<p>" + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>");
         if (phase < 0) {
             updateCursor(Qt::WaitCursor);
             phase = 0;
@@ -2272,24 +2462,31 @@ void MInstall::pageDisplayed(int next)
         }
         break;
 
-    case 2:  // choose partition
-        mainHelp->setText(tr("<p><b>Limitations</b><br/>Remember, this software is provided AS-IS with no warranty what-so-ever. "
-                             "It's solely your responsibility to backup your data before proceeding.</p>"
-                             "<p><b>Choose Partitions</b><br/>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</p>"
-                             "<p>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</p>"
-                             "<p><b>Upgrading</b><br/>To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.</p>"
-                             "<p>If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. "
-                             "As a result, the installation will take much longer than usual.</p>"
-                             "<p><b>Preferred Filesystem Type</b><br/>For %1, you may choose to format the partitions as ext2, ext3, ext4, jfs, xfs, btrfs or reiser. </p>"
-                             "<p>Additional compression options are available for drives using btrfs. "
-                             "Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</p>"
-                             "<p><b>Bad Blocks</b><br/>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. "
-                             "The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</p>").arg(PROJECTNAME)+ tr(""
-                             "<p><b>Encryption</b><br/>Encryption is possible via LUKS.  A password is required (8 characters minimum length)</p>") + tr(""
-                             "<p>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Edit advanced encryption settings</b> button.</p>"));
+    case 3:  // choose partition
+        mainHelp->setText("<p><b>" + tr("Limitations") + "</b><br/>"
+                          + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
+                               " It is solely your responsibility to backup your data before proceeding.") + "</p>"
+                          "<p><b>" + tr("Choose Partitions") + "</b><br/>"
+                          + tr("%1 requires a root partition. The swap partition is optional but highly recommended."
+                               " If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.").arg(PROJECTNAME) + "</p>"
+                          "<p>" + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.") + "</p>"
+                          "<p><b>" + tr("Upgrading") + "</b><br/>"
+                          + tr("To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.") + "</p>"
+                          "<p>" + tr("If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition."
+                                     " As a result, the installation will take much longer than usual.") + "</p>"
+                          "<p><b>" + tr("Preferred Filesystem Type") + "</b><br/>"
+                          + tr("For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.").arg(PROJECTNAME) + "</p>"
+                          "<p>" + tr("Additional compression options are available for drives using btrfs."
+                                     " Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.") + "</p>"
+                          "<p><b>" + tr("Bad Blocks") + "</b><br/>"
+                          + tr("If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive."
+                               " The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"
+                          "<p><b>" + tr("Encryption") + "</b><br/>"
+                          + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
+                          "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>");
         break;
 
-    case 3: // advanced encryption settings
+    case 4: // advanced encryption settings
         mainHelp->setText("<p><b>"
                           + tr("Advanced Encryption Settings") + "</b><br/>" + tr("This page allows fine-tuning of LUKS encrypted partitions.") + "<br/>"
                           + tr("In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.")
@@ -2332,7 +2529,7 @@ void MInstall::pageDisplayed(int next)
                           + "</p>");
         break;
 
-    case 4: // set bootloader (start of installation)
+    case 5: // set bootloader (start of installation)
         mainHelp->setText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
                              "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
                              "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
@@ -2347,26 +2544,38 @@ void MInstall::pageDisplayed(int next)
         return; // avoid the end that enables both Back and Next buttons
         break;
 
-    case 5: // set services
+    case 6: // set services
         mainHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         break;
 
-    case 6: // set computer name
+    case 7: // set computer name
         mainHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
                              "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
+        if(oobe) {
+            backButton->setEnabled(false);
+            nextButton->setEnabled(true);
+            return; // avoid the end that enables both Back and Next buttons
+        }
         break;
 
-    case 7: // set localization, clock, services button
-        mainHelp->setText(tr("<p><b>Localization Defaults</b><br/>Set the default keyboard and locale. These will apply unless they are overridden later by the user.</p>"
-                             "<p><b>Configure Clock</b><br/>If you have an Apple or a pure Unix computer, by default the system clock is set to GMT or Universal Time. To change, check the box for 'System clock uses LOCAL.'</p>"
-                             "<p><b>Timezone Settings</b><br/>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</p>"
-                             "<p><b>Service Settings</b><br/>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing! "));
+    case 8: // set localization, clock, services button
+        mainHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
+                          + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"
+                          "<p><b>" + tr("Configure Clock") + "</b><br/>"
+                          + tr("If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC)."
+                               " To change this, check the \"<b>System clock uses local time</b>\" box.") + "</p>"
+                          "<p>" + tr("The system boots with the timezone preset to GMT/UTC."
+                               " To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.") + "</p>"
+                          "<p><b>" + tr("Service Settings") + "</b><br/>"
+                          + tr("Most users should not change the defaults."
+                               " Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible."
+                               " Make sure you know what you are doing!"));
         break;
 
-    case 8: // set username and passwords
+    case 9: // set username and passwords
         mainHelp->setText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
                              "You should not use the root user as your daily user account. "
                              "Please enter the name for a new (default) user account that you will use on a daily basis. "
@@ -2376,7 +2585,32 @@ void MInstall::pageDisplayed(int next)
         if (!nextFocus) nextFocus = userNameEdit;
         break;
 
-    case 9: // installation step
+    case 10: // deal with an old home directory
+        mainHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
+                          + tr("A home directory already exists for the user name you have chosen."
+                               " This screen allows you to choose what happens to this directory.") + "</p>"
+                          "<p><b>" + tr("Re-use it for this installation") + "</b><br/>"
+                          + tr("The old home directory will be used for this user account."
+                               " This is a good choice when upgrading, and your files and settings will be readily available.") + "</p>"
+                          "<p><b>" + tr("Rename it and create a new directory") + "</b><br/>"
+                          + tr("A new home directory will be created for the user, but the old home directory will be renamed."
+                               " Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.") + "</p>"
+                          "<p>" + tr("The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.") + "</p>"
+                          "<p><b>" + tr("Delete it and create a new directory") + +"</b><br/>"
+                          + tr("The old home directory will be deleted, and a new one will be created from scratch.") + "<br/>"
+                          "<b>" + tr("Warning") + "</b>: "
+                          + tr("All files and settings will be deleted permanently if this option is selected."
+                               " Your chances of recovering them are low.") + "</p>");
+        // disable the Next button if none of the old home options are selected
+        on_radioOldHomeUse_toggled(false);
+        // if the Next button is disabled, avoid enabling both Back and Next at the end
+        if(nextButton->isEnabled() == false) {
+            backButton->setEnabled(true);
+            return;
+        }
+        break;
+
+    case 11: // installation step
         if(ixTipStart >= 0) {
             iLastProgress = progressBar->value();
             on_progressBar_valueChanged(iLastProgress);
@@ -2396,7 +2630,7 @@ void MInstall::pageDisplayed(int next)
         return; // avoid enabling both Back and Next buttons at the end
         break;
 
-    case 10: // done
+    case 12: // done
         closeButton->setEnabled(false);
         mainHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                              "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -2407,11 +2641,12 @@ void MInstall::pageDisplayed(int next)
         break;
 
     default:
-        // case 0 or any other
-        mainHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n " + tr("<p><b>Support %1</b><br/>"
-                                                                                                  "%1 is supported by people like you. Some help others at the "
-                                                                                                  "support forum - %2 - or translate help files into different "
-                                                                                                  "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
+        // case 1 or any other
+        mainHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n "
+                          + tr("<p><b>Support %1</b><br/>"
+                               "%1 is supported by people like you. Some help others at the "
+                               "support forum - %2 - or translate help files into different "
+                               "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
         nextButton->setDefault(true);
         break;
     }
@@ -2429,13 +2664,9 @@ void MInstall::gotoPage(int next)
     next = showPage(curr, next);
 
     // modify ui for standard cases
-    if (next == 0) {
-        // entering first page
-        backButton->hide();
-    } else {
-        // default
-        backButton->show();
-    }
+    closeButton->setHidden(next == 0);
+    backButton->setHidden(next <= 1);
+    nextButton->setHidden(next == 0);
 
     int c = widgetStack->count();
     QSize isize = nextButton->iconSize();
@@ -2444,7 +2675,7 @@ void MInstall::gotoPage(int next)
         // entering the last page
         backButton->hide();
         nextButton->setText(tr("Finish"));
-    } else if (next == 3 || next == 5){
+    } else if (next == 4 || next == 6){
         // Advanced Encryption Settings and Services pages
         isize.setWidth(0);
         nextButton->setText(tr("OK"));
@@ -2481,10 +2712,23 @@ void MInstall::gotoPage(int next)
     }
 
     // process next installation phase
-    if (next == 4 || next == 9) {
-        if (!processNextPhase() && phase > -2) {
+    if (next == widgetStack->indexOf(Step_Boot) || next == widgetStack->indexOf(Step_Progress)) {
+        if (oobe) {
+            updateCursor(Qt::BusyCursor);
+            labelSplash->setText(tr("Configuring sytem. Please wait."));
+            gotoPage(0);
+            if(processOOBE()) {
+                labelSplash->setText(tr("Configuration complete. Restarting system."));
+                proc.exec("/usr/sbin/reboot", true);
+                qApp->exit(EXIT_SUCCESS);
+            } else {
+                labelSplash->setText(tr("Could not complete configuration."));
+                closeButton->show();
+            }
+            updateCursor();
+        } else if (!processNextPhase() && phase > -2) {
             cleanup(false);
-            gotoPage(1);
+            gotoPage(2);
         }
     }
 }
@@ -2506,7 +2750,7 @@ void MInstall::updatePartitionWidgets()
     // disk combo box
     diskCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDrive && bdinfo.size >= MIN_ROOT_DEVICE_SIZE
+        if (bdinfo.isDrive && bdinfo.size >= rootSpaceNeeded
                 && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
             bdinfo.addToCombo(diskCombo);
         }
@@ -2542,7 +2786,7 @@ void MInstall::updatePartitionWidgets()
             curdev->setCheckState(3, Qt::Unchecked);
         }
         curdev->setText(0, bdinfo.name);
-        curdev->setText(1, bdinfo.formattedDataSize());
+        curdev->setText(1, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
     }
     treePartitions->expandAll();
     for (int ixi = treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
@@ -2561,6 +2805,7 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
             combo->clear();
             if (combo == homeCombo || combo == bootCombo) combo->addItem("root", "root");
             else if (combo == swapCombo) combo->addItem("none");
+            else if (combo == rootCombo) combo->addItem(tr("Select target root partition"));
 
             // add each eligible partition that is not already selected elsewhere
             for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
@@ -2571,11 +2816,11 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
                         && !(bootCombo->currentText().startsWith(bdinfo.name))) {
                     bool add = true;
                     if (combo == rootCombo) {
-                        add = (!bdinfo.isSwap && bdinfo.size >= MIN_ROOT_DEVICE_SIZE);
+                        add = (!bdinfo.isSwap && bdinfo.size >= rootSpaceNeeded);
                     } else if (combo == homeCombo) {
                         add = (!bdinfo.isSwap);
                     } else if (combo == bootCombo) {
-                        add = (!bdinfo.isESP && bdinfo.size >= MIN_BOOT_DEVICE_SIZE);
+                        add = (!bdinfo.isESP && bdinfo.size >= bootSpaceNeeded);
                     }
                     if (add) bdinfo.addToCombo(combo);
                 }
@@ -2594,8 +2839,6 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
 void MInstall::buildServiceList()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    QLocale locale;
-    QString lang = locale.bcp47Name().toUpper();
 
     //setup csView
     csView->header()->setMinimumSectionSize(150);
@@ -2604,7 +2847,8 @@ void MInstall::buildServiceList()
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
 
     for (const QString &service : qAsConst(ENABLE_SERVICES)) {
-        QString lang_str = (lang == "EN")? "" : "_" + lang;
+        const QString &lang = QLocale::system().bcp47Name().toLower();
+        QString lang_str = (lang == "en")? "" : "_" + lang;
         QStringList list = services_desc.value(service + lang_str).toStringList();
         if (list.size() != 2) {
             list = services_desc.value(service).toStringList(); // Use English definition
@@ -2648,9 +2892,9 @@ void MInstall::changeEvent(QEvent *event)
     if (etype == QEvent::ApplicationPaletteChange
         || etype == QEvent::PaletteChange || etype == QEvent::StyleChange)
     {
-        QPalette pal = mainHelp->style()->standardPalette();
+        QPalette pal = qApp->palette(mainHelp);
         QColor col = pal.color(QPalette::Base);
-        col.setAlpha(150);
+        col.setAlpha(200);
         pal.setColor(QPalette::Base, col);
         mainHelp->setPalette(pal);
         resizeEvent(nullptr);
@@ -2667,7 +2911,11 @@ void MInstall::closeEvent(QCloseEvent *event)
 {
     if (abort(true)) {
         event->accept();
-        cleanup();
+        if (!oobe) cleanup();
+        else if (!pretend) {
+            proc.unhalt();
+            proc.exec("/usr/sbin/shutdown -hP now");
+        }
         QWidget::closeEvent(event);
         if (widgetStack->currentWidget() != Step_End) {
             qApp->exit(EXIT_FAILURE);
@@ -2724,7 +2972,7 @@ void MInstall::on_abortInstallButton_clicked()
 // clicking advanced button to go to Services page
 void MInstall::on_viewServicesButton_clicked()
 {
-    gotoPage(5);
+    gotoPage(6);
 }
 
 void MInstall::on_qtpartedButton_clicked()
@@ -2769,10 +3017,11 @@ bool MInstall::abort(bool onclose)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
-        if(QMessageBox::warning(this, tr("Confirmation"),
-                                tr("The installation and configuration is incomplete.\n"
-                                   "Do you really want to stop now?"),
-                                QMessageBox::Yes | QMessageBox::No) == QMessageBox::No) {
+        const QMessageBox::StandardButton rc = QMessageBox::warning(this,
+            tr("Confirmation"), tr("The installation and configuration"
+                " is incomplete.\nDo you really want to stop now?"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if(rc == QMessageBox::No) {
             this->setEnabled(true);
             return false;
         }
@@ -2784,7 +3033,7 @@ bool MInstall::abort(bool onclose)
         phase = -2;
     } else if (phase == 2 && widgetStack->currentWidget() != Step_Progress) {
         phase = -1;
-        gotoPage(1);
+        gotoPage(2);
     } else {
         phase = -1;
     }
@@ -2798,11 +3047,9 @@ void MInstall::cleanup(bool endclean)
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     if (pretend) return;
 
+    proc.unhalt();
     if (endclean) {
-        proc.exec("command -v xfconf-query >/dev/null && su $(logname) -c 'xfconf-query --channel thunar-volman --property /automount-drives/enabled --set " + auto_mount.toUtf8() + "'", false);
-        if ( ! auto_mount_antix.isEmpty()) {
-            proc.exec(auto_mount_antix.toUtf8(),false);
-        }
+        setupAutoMount(true);
         proc.exec("/bin/cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
         proc.exec("/bin/rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
     }
@@ -2909,7 +3156,7 @@ void MInstall::setupkeyboardbutton()
 void MInstall::on_buttonSetKeyboard_clicked()
 {
     hide();
-    proc.exec("fskbsetting", false);
+    proc.exec("env GTK_THEME='Adwaita' fskbsetting", false);
     show();
     setupkeyboardbutton();
 }
@@ -3047,7 +3294,6 @@ void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
 
 void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
 {
-    nextButton->setDisabled(checked);
     if (checked) {
         FDEpassCust2->clear();
         FDEpassCust->clear();
@@ -3063,13 +3309,13 @@ void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
 void MInstall::on_buttonAdvancedFDE_clicked()
 {
     ixPageRefAdvancedFDE = widgetStack->currentIndex();
-    gotoPage(3);
+    gotoPage(4);
 }
 
 void MInstall::on_buttonAdvancedFDECust_clicked()
 {
     ixPageRefAdvancedFDE = widgetStack->currentIndex();
-    gotoPage(3);
+    gotoPage(4);
 }
 
 void MInstall::on_comboFDEcipher_currentIndexChanged(const QString &arg1)
@@ -3258,3 +3504,120 @@ void MInstall::buildBootLists()
         grubPbrButton->setChecked(true);
     }
 }
+
+void MInstall::on_localeCombo_currentIndexChanged(int index)
+{
+    // riot control
+    QLocale locale(localeCombo->itemData(index).toString());
+    if (locale.timeFormat().startsWith('h')) radio12h->setChecked(true);
+    else radio24h->setChecked(true);
+}
+
+// return 0 = success, 1 = bad area, 2 = bad zone
+int MInstall::selectTimeZone(const QString &zone)
+{
+    int index = cmbTimeArea->findData(QVariant(zone.section('/', 0, 0)));
+    if (index < 0) return 1;
+    cmbTimeArea->setCurrentIndex(index);
+    qApp->processEvents();
+    index = cmbTimeZone->findData(QVariant(zone));
+    if (index < 0) return 2;
+    cmbTimeZone->setCurrentIndex(index);
+    return 0;
+}
+void MInstall::on_cmbTimeArea_currentIndexChanged(int index)
+{
+    if (index < 0 || index >= cmbTimeArea->count()) return;
+    const QString &area = cmbTimeArea->itemData(index).toString();
+    cmbTimeZone->clear();
+    for (const QString &zone : listTimeZones) {
+        if (zone.startsWith(area)) {
+            QString text(QString(zone).section('/', 1));
+            text.replace('_', ' ');
+            cmbTimeZone->addItem(text, QVariant(zone));
+        }
+    }
+    cmbTimeZone->model()->sort(0);
+}
+
+void MInstall::on_radioOldHomeUse_toggled(bool)
+{
+    nextButton->setEnabled(radioOldHomeUse->isChecked()
+                           || radioOldHomeSave->isChecked()
+                           || radioOldHomeDelete->isChecked());
+}
+void MInstall::on_radioOldHomeSave_toggled(bool)
+{
+    on_radioOldHomeUse_toggled(false);
+}
+void MInstall::on_radioOldHomeDelete_toggled(bool)
+{
+    on_radioOldHomeUse_toggled(false);
+}
+
+void MInstall::clearpartitiontables(const QString &dev)
+{
+    //setup block size and offsets info
+    QString bytes = proc.execOut("parted --script /dev/" + dev + " unit B print 2>/dev/null | sed -rn 's/^Disk.*: ([0-9]+)B$/\\1/ip\'");
+    qDebug() << "bytes is " << bytes;
+    int block_size = 512;
+    int pt_size = 17 * 1024;
+    int pt_count = pt_size / block_size;
+    int total_blocks = bytes.toLongLong() / block_size;
+    qDebug() << "total blocks is " << total_blocks;
+
+    //clear primary partition table
+    proc.exec("dd if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count));
+
+    // Clear out sneaky iso-hybrid partition table
+    proc.exec("dd if=/dev/zero of=/dev/" + dev +" bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=64");
+
+    // clear secondary partition table
+
+    if ( ! bytes.isEmpty()) {
+        int offset = total_blocks - pt_count;
+        proc.exec("dd conv=notrunc if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=" + QString::number(offset));
+    }
+
+}
+
+bool MInstall::checkForSnapshot()
+{
+    // test if there's another user than demo in /home, indicating a possible snapshot or complicated live-usb
+    qDebug() << "check for possible snapshot";
+    return proc.exec("/bin/ls -1 /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false);
+}
+
+bool MInstall::checkForRemaster()
+{
+    // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
+    qDebug() << "check for remastered home demo folder";
+    return proc.exec("test -d /live/linux/home/demo", true);
+}
+
+void MInstall::rsynchomefolder(QString dpath)
+{
+    QString cmd = ("rsync -a --info=name1 /home/demo/ %1"
+                  " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
+                  " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
+                  " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
+                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
+                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' %1/$").arg(dpath);
+    proc.exec(cmd);
+}
+
+void MInstall::changeRemasterdemoToNewUser(QString dpath)
+{
+    QString cmd = ("find " + dpath + " -maxdepth 1 -type f -name '.*' -print0 | xargs -0 sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'").arg(dpath);
+    proc.exec(cmd);
+    cmd = ("find " + dpath + "/.config -type f -print0 | xargs -0 sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'").arg(dpath);
+    proc.exec(cmd);
+    cmd = ("find " + dpath + "/.local -type f  -print0 | xargs -0 sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'").arg(dpath);
+    proc.exec(cmd);
+}
+
+void MInstall::resetBlueman()
+{
+    proc.exec("su -c 'dconf reset /org/blueman/transfer/shared-path' demo"); //reset blueman path
+}
+
