@@ -45,16 +45,17 @@ public:
 
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
-    void csleep(int msec);
 
     bool isInsideVB();
 
     bool checkTargetDrivesOK();
     bool installLoader();
-    bool makeLinuxPartition(const QString &dev, const QString &type, bool bad, const QString &label);
+    bool makeLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
     bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString(), const bool failHard = true);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
+    void enableOOBE();
+    bool processOOBE();
     bool validateUserInfo();
     bool validateComputerName();
     bool setComputerName();
@@ -71,8 +72,6 @@ public:
     bool INSTALL_FROM_ROOT_DEVICE;
     bool POPULATE_MEDIA_MOUNTPOINTS;
 
-    qlonglong MIN_BOOT_DEVICE_SIZE;
-    qlonglong MIN_ROOT_DEVICE_SIZE;
     QString DEFAULT_HOSTNAME;
     QString MIN_INSTALL_SIZE;
     QString PREFERRED_MIN_INSTALL_SIZE;
@@ -83,6 +82,8 @@ public:
     QString PROJECTVERSION;
     QStringList ENABLE_SERVICES;
     bool REMOVE_NOSPLASH;
+    QString SQFILE_FULL;
+
 
     int showPage(int curr, int next);
     void gotoPage(int next);
@@ -136,7 +137,15 @@ private slots:
     void on_grubPbrButton_toggled();
     void on_grubEspButton_toggled();
 
+    void on_localeCombo_currentIndexChanged(int index);
+    void on_cmbTimeArea_currentIndexChanged(int index);
+
+    void on_radioOldHomeUse_toggled(bool);
+    void on_radioOldHomeSave_toggled(bool);
+    void on_radioOldHomeDelete_toggled(bool);
+
     void on_progressBar_valueChanged(int value);
+
 
 private:
     MProcess proc;
@@ -144,25 +153,36 @@ private:
 
     // command line options
     bool brave, pretend, automatic, nocopy, sync, gptoverride;
+    bool oem, oobe;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
 
-    QString auto_mount;
-    QString auto_mount_antix;
     bool isHomeEncrypted = false;
     bool isRootEncrypted = false;
     bool isSwapEncrypted = false;
     bool uefi = false;
     bool mactest = false;
+    bool containsSystemD = false;
+    bool isRemasteredDemoPresent = false;
+
+    // source medium
+    QString rootSources;
+    QString bootSource;
+    long long rootSpaceNeeded = 0;
+    long long bootSpaceNeeded = 0;
+
+    // auto-mount setup
+    QString listMaskedMounts;
+    bool autoMountEnabled = true;
 
     // if these variables are non-zero then the installer formats the partition
     // if they are negative the installer formats an existing partition
-    qint64 rootFormatSize = 0;
-    qint64 homeFormatSize = 0;
-    qint64 swapFormatSize = 0;
-    qint64 bootFormatSize = 0;
-    qint64 espFormatSize = 0;
+    long long rootFormatSize = 0;
+    long long homeFormatSize = 0;
+    long long swapFormatSize = 0;
+    long long bootFormatSize = 0;
+    long long espFormatSize = 0;
 
     QString bootDevice;
     QString swapDevice;
@@ -176,6 +196,7 @@ private:
     QStringList listToUnmount;
     QString home_mntops = "defaults";
     QString root_mntops = "defaults";
+    QString boot_mntops = "defaults";
     QStringList listHomes;
     SafeCache key;
 
@@ -188,9 +209,7 @@ private:
     bool canMBR, canPBR, canESP;
     bool haveSamba = false;
     bool haveSnapshotUserAccounts = false;
-    enum OldHomeAction {
-        OldHomeNothing, OldHomeUse, OldHomeSave, OldHomeDelete
-    } oldHomeAction = OldHomeNothing;
+    bool haveOldHome = false;
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
@@ -203,6 +222,9 @@ private:
     int indexFDErandom;
     int iFDEroundtime;
 
+    // cached time zone list
+    QStringList listTimeZones;
+
     // slots
     void startup();
     // helpers
@@ -212,6 +234,7 @@ private:
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
     void updatePartitionCombos(QComboBox *changed);
+    void setupAutoMount(bool enabled);
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
     bool validateChosenPartitions();
@@ -224,4 +247,11 @@ private:
     void manageConfig(enum ConfigAction mode);
     void stashServices(bool save);
     void stashAdvancedFDE(bool save);
+    int selectTimeZone(const QString &zone);
+    void clearpartitiontables(const QString &dev);
+    bool checkForSnapshot();
+    bool checkForRemaster();
+    void rsynchomefolder(const QString dpath);
+    void changeRemasterdemoToNewUser(const QString dpath);
+    void resetBlueman();
 };
