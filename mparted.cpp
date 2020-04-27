@@ -15,10 +15,10 @@
 //
 // This file is part of the gazelle-installer.
 
+#include <QDebug>
 #include <QLocale>
 #include <QTreeWidget>
 #include <QLineEdit>
-#include <QComboBox>
 
 #include "mparted.h"
 
@@ -60,7 +60,9 @@ void MParted::populate()
             comboUse->setAutoFillBackground(true);
             treePartitions->setItemWidget(curdev, 3, comboUse);
             comboUse->setEditable(true);
+            comboUse->setInsertPolicy(QComboBox::NoInsert);
             comboUse->addItems(listUsePresets);
+            connect(comboUse, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MParted::comboUseIndexChange);
             const QLineEdit *editUse = comboUse->lineEdit();
             connect(editUse, &QLineEdit::editingFinished, this, &MParted::comboUseEditFinish);
             // Type
@@ -80,13 +82,19 @@ void MParted::populate()
     }
 }
 
+void MParted::comboUseIndexChange(int)
+{
+    comboUseProcessUI(static_cast<QComboBox *>(sender()));
+}
 void MParted::comboUseEditFinish()
 {
-    QLineEdit *comboUseEdit = static_cast<QLineEdit *>(sender());
-    QComboBox *combo = static_cast<QComboBox *>(comboUseEdit->parent());
+    QLineEdit *comboEdit = static_cast<QLineEdit *>(sender());
+    comboUseProcessUI(static_cast<QComboBox *>(comboEdit->parent()));
+}
+void MParted::comboUseProcessUI(QComboBox *combo)
+{
     if(!combo) return;
     const QString &text = combo->currentText();
-    if(text == combo->itemData(0).toString()) return;
 
     QTreeWidgetItemIterator it(treePartitions);
     while (*it) {
@@ -130,5 +138,4 @@ void MParted::comboUseEditFinish()
         }
         ++it;
     }
-    combo->setItemData(0, text);
 }
