@@ -18,6 +18,7 @@
 #include <QDebug>
 #include <QLocale>
 #include <QTreeWidget>
+#include <QComboBox>
 #include <QLineEdit>
 
 #include "mparted.h"
@@ -62,9 +63,8 @@ void MParted::populate()
             comboUse->setEditable(true);
             comboUse->setInsertPolicy(QComboBox::NoInsert);
             comboUse->addItems(listUsePresets);
-            connect(comboUse, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MParted::comboUseIndexChange);
-            const QLineEdit *editUse = comboUse->lineEdit();
-            connect(editUse, &QLineEdit::editingFinished, this, &MParted::comboUseEditFinish);
+            comboUse->setProperty("row", QVariant::fromValue<void *>(curdev));
+            connect(comboUse, &QComboBox::currentTextChanged, this, &MParted::comboUseTextChange);
             // Type
             QComboBox *comboType = new QComboBox(treePartitions);
             comboType->setAutoFillBackground(true);
@@ -82,60 +82,41 @@ void MParted::populate()
     }
 }
 
-void MParted::comboUseIndexChange(int)
+void MParted::comboUseTextChange(const QString &text)
 {
-    comboUseProcessUI(static_cast<QComboBox *>(sender()));
-}
-void MParted::comboUseEditFinish()
-{
-    QLineEdit *comboEdit = static_cast<QLineEdit *>(sender());
-    comboUseProcessUI(static_cast<QComboBox *>(comboEdit->parent()));
-}
-void MParted::comboUseProcessUI(QComboBox *combo)
-{
+    QComboBox *combo = static_cast<QComboBox *>(sender());
     if(!combo) return;
-    const QString &text = combo->currentText();
-
-    QTreeWidgetItemIterator it(treePartitions);
-    while (*it) {
-        if ((*it)->parent() != nullptr) {
-            QComboBox *comboUse = static_cast<QComboBox *>(treePartitions->itemWidget(*it, 3));
-            QString ctext = comboUse->currentText();
-            if(comboUse == combo) {
-                QComboBox *comboType = static_cast<QComboBox *>(treePartitions->itemWidget(*it, 5));
-                const QString &fs = (*it)->text(5);
-                comboType->setEnabled(false);
-                comboType->clear();
-                if(ctext.isEmpty()) comboType->addItem(fs);
-                else if(ctext == "swap") comboType->addItem("SWAP");
-                else if(ctext == "/boot") comboType->addItem("ext4");
-                else {
-                    comboType->addItem("ext4");
-                    comboType->addItem("ext3");
-                    comboType->addItem("ext2");
-                    comboType->addItem("f2fs");
-                    comboType->addItem("jfs");
-                    comboType->addItem("xfs");
-                    comboType->addItem("btrfs");
-                    comboType->addItem("btrfs-zlib");
-                    comboType->addItem("btrfs-lzo");
-                    comboType->addItem("reiserfs");
-                    comboType->addItem("reiser4");
-                    int ixFS = comboType->findText(fs, Qt::MatchExactly);
-                    if(ixFS >= 0) comboType->setCurrentIndex(ixFS);
-                    comboType->setEnabled(true);
-                }
-                treePartitions->itemWidget(*it, 2)->setDisabled(text.isEmpty());
-            } else if(comboUse->findText(text) >= 0) {
-                comboUse->blockSignals(true);
-                comboUse->clear();
-                for(const QString &preset : listUsePresets) {
-                    if(text.isEmpty() || text != preset) comboUse->addItem(preset);
-                }
-                comboUse->blockSignals(false);
-                if(text != ctext) comboUse->setCurrentText(ctext);
-            }
+    int oldUseClass = combo->property("class").toInt();
+    int useClass = -1;
+    if(text.isEmpty()) useClass = 0;
+    else if(text == "swap") useClass = 1;
+    else if(text == "/boot") useClass = 2;
+    else useClass = 3;
+    if(useClass != oldUseClass) {
+        QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
+        if(!item) return;
+        QComboBox *comboType = static_cast<QComboBox *>(treePartitions->itemWidget(item, 5));
+        const QString &fs = item->text(5);
+        comboType->setEnabled(false);
+        comboType->clear();
+        if(useClass == 0) comboType->addItem(fs);
+        else if(useClass == 1) comboType->addItem("SWAP");
+        else if(useClass == 2) comboType->addItem("ext4");
+        else if(useClass == 3) {
+            comboType->addItem("ext4");
+            comboType->addItem("ext3");
+            comboType->addItem("ext2");
+            comboType->addItem("f2fs");
+            comboType->addItem("jfs");
+            comboType->addItem("xfs");
+            comboType->addItem("btrfs");
+            comboType->addItem("btrfs-zlib");
+            comboType->addItem("btrfs-lzo");
+            comboType->addItem("reiserfs");
+            comboType->addItem("reiser4");
+            comboType->setEnabled(true);
         }
-        ++it;
+        treePartitions->itemWidget(item, 2)->setDisabled(text.isEmpty());
+        combo->setProperty("class", QVariant(useClass));
     }
 }
