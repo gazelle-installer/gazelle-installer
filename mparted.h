@@ -20,7 +20,7 @@
 
 #include <QObject>
 #include <QTreeWidget>
-#include <QComboBox>
+#include <QString>
 
 #include "mprocess.h"
 #include "blockdev.h"
@@ -32,9 +32,7 @@ class MParted : public QObject
     BlockDeviceList &listBlkDevs;
     QTreeWidget *treePartitions;
     QStringList listUsePresets;
-    void comboUseIndexChange(int);
-    void comboUseEditFinish();
-    void comboUseProcessUI(QComboBox *combo);
+    void comboUseTextChange(const QString &text);
 public:
     explicit MParted(MProcess &mproc, BlockDeviceList &bdlist, QObject *parent = nullptr);
     void setup(QTreeWidget *twParts);
