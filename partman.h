@@ -1,4 +1,4 @@
-// Basic partition editor for the installer.
+// Basic partition manager for the installer.
 //
 //   Copyright (C) 2020 by AK-47
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,8 @@
 //
 // This file is part of the gazelle-installer.
 
-#ifndef MPARTED_H
-#define MPARTED_H
+#ifndef PARTMAN_H
+#define PARTMAN_H
 
 #include <QObject>
 #include <QTreeWidget>
@@ -25,7 +25,7 @@
 #include "mprocess.h"
 #include "blockdev.h"
 
-class MParted : public QObject
+class PartMan : public QObject
 {
     Q_OBJECT
     MProcess &proc;
@@ -34,7 +34,7 @@ class MParted : public QObject
     QStringList listUsePresets;
     void comboUseTextChange(const QString &text);
 public:
-    explicit MParted(MProcess &mproc, BlockDeviceList &bdlist, QObject *parent = nullptr);
+    explicit PartMan(MProcess &mproc, BlockDeviceList &bdlist, QObject *parent = nullptr);
     void setup(QTreeWidget *twParts);
     void populate();
 signals:
@@ -42,4 +42,4 @@ signals:
 public slots:
 };
 
-#endif // MPARTED_H
+#endif // PARTMAN_H
