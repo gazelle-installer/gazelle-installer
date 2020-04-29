@@ -1,4 +1,4 @@
-// Basic partition editor for the installer.
+// Basic partition manager for the installer.
 //
 //   Copyright (C) 2020 by AK-47
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,21 +21,21 @@
 #include <QComboBox>
 #include <QLineEdit>
 
-#include "mparted.h"
+#include "partman.h"
 
-MParted::MParted(MProcess &mproc, BlockDeviceList &bdlist, QObject *parent)
+PartMan::PartMan(MProcess &mproc, BlockDeviceList &bdlist, QObject *parent)
     : QObject(parent), proc(mproc), listBlkDevs(bdlist)
 {
 
 }
 
-void MParted::setup(QTreeWidget *twParts)
+void PartMan::setup(QTreeWidget *twParts)
 {
     treePartitions = twParts;
     listUsePresets << "" << "/" << "/boot" << "/home" << "swap";
 }
 
-void MParted::populate()
+void PartMan::populate()
 {
     treePartitions->clear();
     QTreeWidgetItem *curdrv = nullptr;
@@ -64,7 +64,7 @@ void MParted::populate()
             comboUse->setInsertPolicy(QComboBox::NoInsert);
             comboUse->addItems(listUsePresets);
             comboUse->setProperty("row", QVariant::fromValue<void *>(curdev));
-            connect(comboUse, &QComboBox::currentTextChanged, this, &MParted::comboUseTextChange);
+            connect(comboUse, &QComboBox::currentTextChanged, this, &PartMan::comboUseTextChange);
             // Type
             QComboBox *comboType = new QComboBox(treePartitions);
             comboType->setAutoFillBackground(true);
@@ -82,7 +82,7 @@ void MParted::populate()
     }
 }
 
-void MParted::comboUseTextChange(const QString &text)
+void PartMan::comboUseTextChange(const QString &text)
 {
     QComboBox *combo = static_cast<QComboBox *>(sender());
     if(!combo) return;

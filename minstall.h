@@ -26,7 +26,7 @@
 
 #include "mprocess.h"
 #include "msettings.h"
-#include "mparted.h"
+#include "partman.h"
 #include "blockdev.h"
 #include "safecache.h"
 
@@ -193,7 +193,7 @@ private:
     QString biosGrubDevice;
 
     QWidget *nextFocus = nullptr;
-    MParted parted;
+    PartMan partman;
     BlockDeviceList listBlkDevs;
     QStringList listToUnmount;
     QString home_mntops = "defaults";

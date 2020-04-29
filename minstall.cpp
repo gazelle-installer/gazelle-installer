@@ -31,7 +31,7 @@
 #include "minstall.h"
 
 MInstall::MInstall(const QStringList &args, const QString &cfgfile)
-    : proc(this), parted(proc, listBlkDevs, this)
+    : proc(this), partman(proc, listBlkDevs, this)
 {
     setupUi(this);
     updateCursor(Qt::WaitCursor);
@@ -240,7 +240,7 @@ void MInstall::startup()
             buttonAdvancedFDECust->hide();
             treePartitions->setColumnHidden(4, true);
         }
-        parted.setup(treePartitions);
+        partman.setup(treePartitions);
 
         // Detect snapshot-backup account(s)
         haveSnapshotUserAccounts = checkForSnapshot();
@@ -2776,7 +2776,7 @@ void MInstall::updatePartitionWidgets()
     on_rootCombo_currentIndexChanged(rootCombo->currentText());
 
     // partition tree
-    parted.populate();
+    partman.populate();
 }
 
 void MInstall::updatePartitionCombos(QComboBox *changed)

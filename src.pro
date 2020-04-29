@@ -50,18 +50,18 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_zh_TW.ts
 FORMS += meinstall.ui
 HEADERS += minstall.h \
+    partman.h \
     version.h \
     msettings.h \
     blockdev.h \
     safecache.h \
-    mprocess.h \
-    mparted.h
+    mprocess.h
 SOURCES += app.cpp minstall.cpp \
     msettings.cpp \
     blockdev.cpp \
+    partman.cpp \
     safecache.cpp \
-    mprocess.cpp \
-    mparted.cpp
+    mprocess.cpp
 LIBS +=
 CONFIG += release warn_on thread qt c++11
 
