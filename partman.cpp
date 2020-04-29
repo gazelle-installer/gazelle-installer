@@ -72,9 +72,17 @@ void PartMan::populate()
             comboType->setEnabled(false);
             curdev->setText(5, bdinfo.fs);
             comboType->addItem(bdinfo.fs);
+            // Mount options
+            QLineEdit *editOptions = new QLineEdit(treePartitions);
+            editOptions->setAutoFillBackground(true);
+            treePartitions->setItemWidget(curdev, 6, editOptions);
+            editOptions->setEnabled(false);
+            editOptions->setText("defaults");
         }
+        // Device name and size
         curdev->setText(0, bdinfo.name);
         curdev->setText(1, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
+        curdev->setData(1, Qt::UserRole, QVariant(bdinfo.size));
     }
     treePartitions->expandAll();
     for (int ixi = treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
@@ -117,6 +125,7 @@ void PartMan::comboUseTextChange(const QString &text)
             comboType->setEnabled(true);
         }
         treePartitions->itemWidget(item, 2)->setDisabled(text.isEmpty());
+        treePartitions->itemWidget(item, 6)->setDisabled(useClass <= 1); // nothing or SWAP
         combo->setProperty("class", QVariant(useClass));
     }
 }
