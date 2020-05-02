@@ -295,5 +295,33 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, bool automatic, co
         }
     }
 
+    // calculate the future partitions here
+    auto lambdaCalcBD = [this](QTreeWidgetItem *twit) -> int {
+        if(!twit) return -1;
+        int index = twit->data(Size, Qt::UserRole).toInt() ? listBlkDevs.findDevice(twit->text(Device)) : -1;
+        if (index >= 0) {
+            BlockDeviceInfo &bdinfo = listBlkDevs[index];
+            if(twit->checkState(Encrypt) == Qt::Checked) bdinfo.fs = QStringLiteral("crypt_LUKS");
+            else {
+                QComboBox *comboType = static_cast<QComboBox *>(gui.treePartitions->itemWidget(twit, Type));
+                if(comboType) bdinfo.fs = comboType->currentText().toLower();
+            }
+            QLineEdit *editLabel = static_cast<QLineEdit *>(gui.treePartitions->itemWidget(twit, Label));
+            if(editLabel) bdinfo.label = editLabel->text();
+            bdinfo.isNasty = false; // future partitions are safe
+            bdinfo.isFuture = bdinfo.isNative = true;
+        }
+        return index;
+    };
+    QMapIterator<QString, QTreeWidgetItem *> mi(mounts);
+    while(mi.hasNext()) {
+        mi.next();
+        lambdaCalcBD(mi.value());
+    }
+    for(QTreeWidgetItem *swap : swaps) {
+        const int ixswap = lambdaCalcBD(swap);
+        if (ixswap >= 0) listBlkDevs[ixswap].isSwap = true;
+    }
+
     return nullptr;
 }
