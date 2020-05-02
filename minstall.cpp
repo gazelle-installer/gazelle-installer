@@ -31,7 +31,7 @@
 #include "minstall.h"
 
 MInstall::MInstall(const QStringList &args, const QString &cfgfile)
-    : proc(this), partman(proc, listBlkDevs, this)
+    : proc(this), partman(proc, listBlkDevs, *this, this)
 {
     setupUi(this);
     updateCursor(Qt::WaitCursor);
@@ -240,7 +240,6 @@ void MInstall::startup()
             buttonAdvancedFDECust->hide();
             treePartitions->setColumnHidden(4, true);
         }
-        partman.setup(treePartitions);
 
         // Detect snapshot-backup account(s)
         haveSnapshotUserAccounts = checkForSnapshot();
