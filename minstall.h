@@ -123,16 +123,6 @@ private slots:
     void on_spinFDEkeysize_valueChanged(int i);
     void on_comboFDEivgen_currentIndexChanged(const QString &arg1);
 
-    void on_checkBoxEncryptRoot_toggled(bool checked);
-    void on_checkBoxEncryptHome_toggled(bool checked);
-    void on_checkBoxEncryptSwap_toggled(bool checked);
-
-    void on_rootTypeCombo_activated(QString item = "");
-    void on_rootCombo_currentIndexChanged(const QString &text);
-    void on_homeCombo_currentIndexChanged(const QString &text);
-    void on_swapCombo_currentIndexChanged(const QString &text);
-    void on_bootCombo_currentIndexChanged(int);
-
     void on_grubCheckBox_toggled(bool checked);
     void on_grubMbrButton_toggled();
     void on_grubPbrButton_toggled();

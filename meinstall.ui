@@ -769,70 +769,6 @@
              <string>Choose partitions</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
-             <item row="5" column="4">
-              <widget class="QLineEdit" name="rootLabelEdit">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string notr="true">rootMX17.1</string>
-               </property>
-               <property name="maxLength">
-                <number>16</number>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="homeLabel">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>home:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="5">
-              <widget class="QToolButton" name="buttonRunParted">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="gparted">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="5">
-              <widget class="QToolButton" name="buttonPartUndo">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="undo">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="3">
-              <widget class="QCheckBox" name="checkBoxEncryptRoot">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
              <item row="6" column="2">
               <widget class="QComboBox" name="homeTypeCombo">
                <property name="maximumSize">
@@ -898,30 +834,8 @@
                </item>
               </widget>
              </item>
-             <item row="2" column="5">
-              <widget class="QToolButton" name="buttonPartRemove">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="remove">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="5">
-              <widget class="QToolButton" name="buttonPartAdd">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="add">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="4">
-              <widget class="QLineEdit" name="swapLabelEdit">
+             <item row="6" column="3">
+              <widget class="QLineEdit" name="homeLabelEdit">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -935,21 +849,20 @@
                 </size>
                </property>
                <property name="text">
-                <string notr="true">swap</string>
+                <string notr="true">homeMX</string>
                </property>
                <property name="maxLength">
                 <number>16</number>
                </property>
               </widget>
              </item>
-             <item row="4" column="5">
-              <widget class="QToolButton" name="buttonPartReload">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="revert">
-                 <normaloff>.</normaloff>.</iconset>
+             <item row="7" column="1">
+              <widget class="QComboBox" name="swapCombo">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
               </widget>
              </item>
@@ -971,24 +884,38 @@
                </item>
               </widget>
              </item>
-             <item row="7" column="3">
-              <widget class="QCheckBox" name="checkBoxEncryptSwap">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
+             <item row="4" column="4">
+              <widget class="QToolButton" name="buttonPartReload">
                <property name="text">
-                <string/>
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="revert">
+                 <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="7" column="1">
-              <widget class="QComboBox" name="swapCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+             <item row="1" column="4">
+              <widget class="QToolButton" name="buttonPartAdd">
+               <property name="text">
+                <string>...</string>
                </property>
+               <property name="icon">
+                <iconset theme="add">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="1">
+              <widget class="QComboBox" name="bootCombo">
+               <property name="currentText">
+                <string notr="true">root</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>root</string>
+                </property>
+               </item>
               </widget>
              </item>
              <item row="5" column="2">
@@ -1056,26 +983,29 @@
                </item>
               </widget>
              </item>
-             <item row="8" column="1">
-              <widget class="QComboBox" name="bootCombo">
-               <property name="currentText">
-                <string notr="true">root</string>
+             <item row="5" column="3">
+              <widget class="QLineEdit" name="rootLabelEdit">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
-               <item>
-                <property name="text">
-                 <string>root</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="8" column="0">
-              <widget class="QLabel" name="bootLabel">
+               <property name="maximumSize">
+                <size>
+                 <width>90</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
-                <string>boot:</string>
+                <string notr="true">rootMX17.1</string>
+               </property>
+               <property name="maxLength">
+                <number>16</number>
                </property>
               </widget>
              </item>
-             <item row="0" column="0" rowspan="5" colspan="5">
+             <item row="0" column="0" rowspan="5" colspan="4">
               <widget class="QTreeWidget" name="treePartitions">
                <column>
                 <property name="text">
@@ -1114,18 +1044,19 @@
                </column>
               </widget>
              </item>
-             <item row="5" column="1">
-              <widget class="QComboBox" name="rootCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+             <item row="0" column="4">
+              <widget class="QToolButton" name="buttonRunParted">
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="gparted">
+                 <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="6" column="4">
-              <widget class="QLineEdit" name="homeLabelEdit">
+             <item row="7" column="3">
+              <widget class="QLineEdit" name="swapLabelEdit">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1139,46 +1070,42 @@
                 </size>
                </property>
                <property name="text">
-                <string notr="true">homeMX</string>
+                <string notr="true">swap</string>
                </property>
                <property name="maxLength">
                 <number>16</number>
                </property>
               </widget>
              </item>
-             <item row="6" column="3">
-              <widget class="QCheckBox" name="checkBoxEncryptHome">
+             <item row="3" column="4">
+              <widget class="QToolButton" name="buttonPartUndo">
                <property name="text">
-                <string/>
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="undo">
+                 <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="rootLabel">
+             <item row="5" column="1">
+              <widget class="QComboBox" name="rootCombo">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="font">
-                <font/>
-               </property>
-               <property name="text">
-                <string>root:</string>
-               </property>
               </widget>
              </item>
-             <item row="7" column="0">
-              <widget class="QLabel" name="swapLabel">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
+             <item row="2" column="4">
+              <widget class="QToolButton" name="buttonPartRemove">
                <property name="text">
-                <string>swap:</string>
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="remove">
+                 <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
@@ -2813,14 +2740,11 @@
   <tabstop>FDEpassword2</tabstop>
   <tabstop>rootCombo</tabstop>
   <tabstop>rootTypeCombo</tabstop>
-  <tabstop>checkBoxEncryptRoot</tabstop>
   <tabstop>rootLabelEdit</tabstop>
   <tabstop>homeCombo</tabstop>
   <tabstop>homeTypeCombo</tabstop>
-  <tabstop>checkBoxEncryptHome</tabstop>
   <tabstop>homeLabelEdit</tabstop>
   <tabstop>swapCombo</tabstop>
-  <tabstop>checkBoxEncryptSwap</tabstop>
   <tabstop>bootCombo</tabstop>
   <tabstop>saveHomeCheck</tabstop>
   <tabstop>badblocksCheck</tabstop>
