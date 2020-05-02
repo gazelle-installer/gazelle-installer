@@ -74,6 +74,7 @@ void PartMan::populate()
             comboType->setEnabled(false);
             curdev->setText(5, bdinfo.fs);
             comboType->addItem(bdinfo.fs);
+            connect(comboType, &QComboBox::currentTextChanged, this, &PartMan::comboTypeTextChange);
             // Mount options
             QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
             editOptions->setAutoFillBackground(true);
@@ -162,6 +163,21 @@ void PartMan::comboUseTextChange(const QString &text)
         combo->setProperty("class", QVariant(useClass));
     }
     gui.treePartitions->blockSignals(false);
+}
+
+void PartMan::comboTypeTextChange(const QString &)
+{
+    QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+    while (*it) {
+        QComboBox *comboUse = static_cast<QComboBox *>(gui.treePartitions->itemWidget(*it, UseFor));
+        if(comboUse && !(comboUse->currentText().isEmpty())) {
+            QComboBox *comboType = static_cast<QComboBox *>(gui.treePartitions->itemWidget(*it, Type));
+            if(!comboType) return;
+            const QString &type = comboType->currentText();
+            gui.badblocksCheck->setEnabled(type.startsWith("ext") || type == "jfs");
+        }
+        ++it;
+    }
 }
 
 void PartMan::treeItemChange(QTreeWidgetItem *item, int column)

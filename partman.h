@@ -51,6 +51,7 @@ class PartMan : public QObject
     static QString translateUse(const QString &alias);
     void setEncryptChecks(const QString &use, enum Qt::CheckState state);
     void comboUseTextChange(const QString &text);
+    void comboTypeTextChange(const QString &);
     void treeItemChange(QTreeWidgetItem *item, int column);
 public:
     bool automatic, sync;
