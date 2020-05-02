@@ -16,6 +16,7 @@
 // This file is part of the gazelle-installer.
 
 #include <QDebug>
+#include <QTimer>
 #include <QLocale>
 #include <QMessageBox>
 #include <QTreeWidget>
@@ -27,11 +28,17 @@
 PartMan::PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent)
     : QObject(parent), proc(mproc), listBlkDevs(bdlist), gui(ui), master(parent)
 {
+    QTimer::singleShot(0, this, &PartMan::setup);
+}
+void PartMan::setup()
+{
     listUsePresets << "" << "root" << "boot" << "home" << "swap";
+    connect(gui.treePartitions, &QTreeWidget::itemChanged, this, &PartMan::treeItemChange);
 }
 
 void PartMan::populate()
 {
+    gui.treePartitions->blockSignals(true);
     gui.treePartitions->clear();
     QTreeWidgetItem *curdrv = nullptr;
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
@@ -83,10 +90,34 @@ void PartMan::populate()
     for (int ixi = gui.treePartitions->columnCount() - 2; ixi >= 0; --ixi) {
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
+    gui.treePartitions->blockSignals(false);
+}
+
+QString PartMan::translateUse(const QString &alias)
+{
+    if(alias == "root") return QStringLiteral("/");
+    else if(alias == "boot") return QStringLiteral("/boot");
+    else if(alias == "home") return QStringLiteral("/home");
+    else return alias;
+}
+
+void PartMan::setEncryptChecks(const QString &use, enum Qt::CheckState state)
+{
+    QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+    while (*it) {
+        QComboBox *comboUse = static_cast<QComboBox *>(gui.treePartitions->itemWidget(*it, UseFor));
+        if(comboUse && !(comboUse->currentText().isEmpty())) {
+            if(translateUse(comboUse->currentText()) == use) {
+                (*it)->setCheckState(Encrypt, state);
+            }
+        }
+        ++it;
+    }
 }
 
 void PartMan::comboUseTextChange(const QString &text)
 {
+    gui.treePartitions->blockSignals(true);
     QComboBox *combo = static_cast<QComboBox *>(sender());
     if(!combo) return;
     int oldUseClass = combo->property("class").toInt();
@@ -119,40 +150,63 @@ void PartMan::comboUseTextChange(const QString &text)
             comboType->addItem("reiser4");
             comboType->setEnabled(true);
         }
+        // Changing to and from a mount/use that support encryption.
         if(useClass == 0 || useClass == 2) {
-            // Stash and hide the encrypt setting when changing to nothing or boot.
-            if(oldUseClass != 0 && oldUseClass != 2) {
-                const Qt::CheckState cs = item->checkState(Encrypt);
-                item->setData(Encrypt, Qt::CheckStateRole, QVariant());
-                item->setData(Encrypt, Qt::UserRole, QVariant(cs));
-            }
+            item->setData(Encrypt, Qt::CheckStateRole, QVariant());
         } else if(oldUseClass == 0 || oldUseClass == 2) {
-            // Load and show the encrypt setting when changing from nothing or boot.
-            const int cs = item->data(Encrypt, Qt::UserRole).toInt();
-            item->setCheckState(Encrypt, static_cast<Qt::CheckState>(cs));
+            item->setCheckState(Encrypt, encryptCheckRoot);
         }
+        // Label and options
         gui.treePartitions->itemWidget(item, Label)->setDisabled(text.isEmpty());
         gui.treePartitions->itemWidget(item, Options)->setDisabled(useClass <= 1); // nothing or SWAP
         combo->setProperty("class", QVariant(useClass));
     }
+    gui.treePartitions->blockSignals(false);
 }
 
-QWidget *PartMan::composeValidate(const QString &minSizeText, bool automatic, const QString &project)
+void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
+{
+    if(column == Encrypt) {
+        gui.treePartitions->blockSignals(true);
+        QComboBox *comboUse = static_cast<QComboBox *>(gui.treePartitions->itemWidget(item, UseFor));
+        if(comboUse) {
+            const QString use = translateUse(comboUse->currentText());
+            if(use == "/") {
+                encryptCheckRoot = item->checkState(column);
+                if(encryptCheckRoot) {
+                    setEncryptChecks("swap", Qt::Checked);
+                    setEncryptChecks("/home", Qt::Checked);
+                }
+            } else if(use == "swap") {
+                enum Qt::CheckState state = item->checkState(column);
+                if(!automatic && state == Qt::Checked) {
+                    QMessageBox::warning(master, master->windowTitle(),
+                        tr("This option also encrypts swap partition if selected,"
+                           " which will render the swap partition unable to be shared"
+                           " with other installed operating systems."), QMessageBox::Ok);
+                    setEncryptChecks("swap", Qt::Checked);
+                }
+            } else if(use == "/home") {
+                if(item->checkState(column) == Qt::Checked) setEncryptChecks("swap", Qt::Checked);
+                else setEncryptChecks("swap", encryptCheckRoot);
+            }
+        }
+        gui.treePartitions->blockSignals(false);
+    }
+}
+
+QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &project)
 {
     QStringList msgForeignList;
     QString msgConfirm;
     QStringList msgFormatList;
+    bool encryptAny = false, encryptRoot = false;
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
-    bool encryptAny = false;
-    bool encryptRoot = false;
     while (*it) {
         QComboBox *comboUse = static_cast<QComboBox *>(gui.treePartitions->itemWidget(*it, UseFor));
         if(comboUse && !(comboUse->currentText().isEmpty())) {
-            QString mount = comboUse->currentText();
-            if(mount == "root") mount = "/";
-            else if(mount == "boot") mount = "/boot";
-            else if(mount == "home") mount = "/home";
-            else if(mount == "swap") {
+            QString mount = translateUse(comboUse->currentText());
+            if(mount == "swap") {
                 swaps << *it;
                 mount.clear();
             }

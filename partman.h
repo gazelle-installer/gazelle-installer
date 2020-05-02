@@ -46,12 +46,17 @@ class PartMan : public QObject
     QStringList listUsePresets;
     QMap<QString, QTreeWidgetItem *> mounts;
     QList<QTreeWidgetItem *> swaps;
+    enum Qt::CheckState encryptCheckRoot = Qt::Unchecked;
+    void setup();
+    static QString translateUse(const QString &alias);
+    void setEncryptChecks(const QString &use, enum Qt::CheckState state);
     void comboUseTextChange(const QString &text);
+    void treeItemChange(QTreeWidgetItem *item, int column);
 public:
-    bool sync;
+    bool automatic, sync;
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
     void populate();
-    QWidget *composeValidate(const QString &minSizeText, bool automatic, const QString &project);
+    QWidget *composeValidate(const QString &minSizeText, const QString &project);
 signals:
 
 public slots:
