@@ -239,7 +239,6 @@ private:
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
-    bool validateChosenPartitions();
     bool calculateDefaultPartitions();
     bool makePartitions();
     bool formatPartitions();
