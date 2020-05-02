@@ -214,8 +214,6 @@ void MInstall::startup()
 
         rootTypeCombo->setEnabled(false);
         homeTypeCombo->setEnabled(false);
-        checkBoxEncryptRoot->setEnabled(false);
-        checkBoxEncryptHome->setEnabled(false);
         rootLabelEdit->setEnabled(false);
         homeLabelEdit->setEnabled(false);
         swapLabelEdit->setEnabled(false);
@@ -233,9 +231,6 @@ void MInstall::startup()
         QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
         if ( !cryptsetup.exists() && !cryptsetup.isExecutable() && !crypsetupinitramfs.exists()) {
             checkBoxEncryptAuto->hide();
-            checkBoxEncryptHome->hide();
-            checkBoxEncryptRoot->hide();
-            checkBoxEncryptSwap->hide();
             buttonAdvancedFDE->hide();
             buttonAdvancedFDECust->hide();
             treePartitions->setColumnHidden(4, true);
@@ -727,12 +722,12 @@ void MInstall::manageConfig(enum ConfigAction mode)
             config->manageCheckBox("BadBlocksCheck", badblocksCheck);
             // Swap space
             config->manageComboBox("Swap/Device", swapCombo, true);
-            config->manageCheckBox("Swap/Encrypt", checkBoxEncryptSwap);
+            //config->manageCheckBox("Swap/Encrypt", checkBoxEncryptSwap);
             config->manageLineEdit("Swap/Label", swapLabelEdit);
             // Tree starting with root (/)
             config->beginGroup("Tree");
             config->manageComboBox("Device", rootCombo, true);
-            config->manageCheckBox("Encrypt", checkBoxEncryptRoot);
+            //config->manageCheckBox("Encrypt", checkBoxEncryptRoot);
             config->manageComboBox("Type", rootTypeCombo, false);
             config->manageLineEdit("Label", rootLabelEdit);
             // Boot (/boot)
@@ -740,7 +735,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
             // Home (/home)
             config->manageComboBox("home/Device", homeCombo, true);
             config->manageComboBox("home/Type", homeTypeCombo, false);
-            config->manageCheckBox("home/Encrypt", checkBoxEncryptHome);
+            //config->manageCheckBox("home/Encrypt", checkBoxEncryptHome);
             config->manageLineEdit("home/Label", homeLabelEdit);
             config->endGroup();
         }
@@ -2598,54 +2593,8 @@ void MInstall::updatePartitionWidgets()
         }
     }
 
-    // partition combo boxes
-    updatePartitionCombos(nullptr);
-    on_rootCombo_currentIndexChanged(rootCombo->currentText());
-
     // partition tree
     partman.populate();
-}
-
-void MInstall::updatePartitionCombos(QComboBox *changed)
-{
-    // rebuild the other combo boxes and leave the changed one alone
-    for (QComboBox *combo : {rootCombo, swapCombo, homeCombo, bootCombo}) {
-        if (combo != changed) {
-            // block events for now and save the combo box state
-            combo->blockSignals(true);
-            QString curItem = combo->currentText();
-            combo->clear();
-            if (combo == homeCombo || combo == bootCombo) combo->addItem("root", "root");
-            else if (combo == swapCombo) combo->addItem("none");
-            else if (combo == rootCombo) combo->addItem(tr("Select target root partition"));
-
-            // add each eligible partition that is not already selected elsewhere
-            for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-                if (!bdinfo.isDrive && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
-                        && !(rootCombo->currentText().startsWith(bdinfo.name))
-                        && !(swapCombo->currentText().startsWith(bdinfo.name))
-                        && !(homeCombo->currentText().startsWith(bdinfo.name))
-                        && !(bootCombo->currentText().startsWith(bdinfo.name))) {
-                    bool add = true;
-                    if (combo == rootCombo) {
-                        add = (!bdinfo.isSwap && bdinfo.size >= rootSpaceNeeded);
-                    } else if (combo == homeCombo) {
-                        add = (!bdinfo.isSwap);
-                    } else if (combo == bootCombo) {
-                        add = (!bdinfo.isESP && bdinfo.size >= bootSpaceNeeded);
-                    }
-                    if (add) bdinfo.addToCombo(combo);
-                }
-            }
-
-            // restore the combo box state (if possible) and allow events again
-            const int icur = combo->findText(curItem);
-            if (icur >= 0) combo->setCurrentIndex(icur);
-            combo->blockSignals(false);
-        }
-    }
-    // if no valid root is found, the user should know
-    if (rootCombo->count() == 0) rootCombo->addItem("none");
 }
 
 void MInstall::buildServiceList()
@@ -2803,24 +2752,6 @@ void MInstall::on_buttonBenchmarkFDE_clicked()
 {
     proc.exec("x-terminal-emulator -e bash -c \"/sbin/cryptsetup benchmark"
             " && echo && read -n 1 -srp 'Press any key to close the benchmark window.'\"");
-}
-
-// root partition changed, rebuild home, swap, boot combo boxes
-void MInstall::on_rootCombo_currentIndexChanged(const QString &text)
-{
-    updatePartitionCombos(rootCombo);
-    rootLabelEdit->setEnabled(!text.isEmpty());
-    rootTypeCombo->setEnabled(!text.isEmpty());
-    checkBoxEncryptRoot->setEnabled(!text.isEmpty());
-}
-
-void MInstall::on_rootTypeCombo_activated(QString)
-{
-    if (rootTypeCombo->currentText().startsWith("ext") || rootTypeCombo->currentText() == "jfs") {
-        badblocksCheck->setEnabled(true);
-    } else {
-        badblocksCheck->setEnabled(false);
-    }
 }
 
 bool MInstall::abort(bool onclose)
@@ -3077,47 +3008,6 @@ void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
     FDEpassCust2->setPalette(pal);
 }
 
-void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
-{
-    if (homeCombo->currentText() == "root") { // if home on root set disable home encryption checkbox and set same encryption option
-        checkBoxEncryptHome->setEnabled(false);
-        checkBoxEncryptHome->setChecked(checked);
-    }
-
-    if (checked) {
-        gbEncrPass->setVisible(true);
-        checkBoxEncryptSwap->setChecked(true);
-    } else {
-        gbEncrPass->setVisible(checkBoxEncryptHome->isChecked());
-        checkBoxEncryptSwap->setChecked(checkBoxEncryptHome->isChecked());
-    }
-}
-
-void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
-{
-    if (checked) {
-        gbEncrPass->setVisible(true);
-        checkBoxEncryptSwap->setChecked(true);
-    } else {
-        gbEncrPass->setVisible(checkBoxEncryptRoot->isChecked());
-        checkBoxEncryptSwap->setChecked(checkBoxEncryptRoot->isChecked());
-    }
-}
-
-void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
-{
-    if (checked) {
-        FDEpassCust2->clear();
-        FDEpassCust->clear();
-        FDEpassCust->setFocus();
-        if (!automatic && checkBoxEncryptSwap->isVisible()) {
-            QMessageBox::warning(this, windowTitle(),
-                tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
-                QMessageBox::Ok);
-        }
-    }
-}
-
 void MInstall::on_buttonAdvancedFDE_clicked()
 {
     ixPageRefAdvancedFDE = widgetStack->currentIndex();
@@ -3222,30 +3112,6 @@ void MInstall::on_spinFDEkeysize_valueChanged(int i)
         int iMod = i % iSingleStep;
         if (iMod) spinFDEkeysize->setValue(i + (iSingleStep-iMod));
     }
-}
-
-void MInstall::on_homeCombo_currentIndexChanged(const QString &text)
-{
-    updatePartitionCombos(homeCombo);
-    if (text.isEmpty()) return;
-    homeLabelEdit->setEnabled(text != "root");
-    homeTypeCombo->setEnabled(text != "root");
-    checkBoxEncryptHome->setEnabled(text != "root");
-    checkBoxEncryptHome->setChecked(checkBoxEncryptRoot->isChecked() && text == "root");
-    if (text == "root") {
-        homeTypeCombo->setCurrentIndex(rootTypeCombo->currentIndex());
-    }
-}
-
-void MInstall::on_swapCombo_currentIndexChanged(const QString &text)
-{
-    updatePartitionCombos(swapCombo);
-    swapLabelEdit->setEnabled(text != "none");
-}
-
-void MInstall::on_bootCombo_currentIndexChanged(int)
-{
-    updatePartitionCombos(bootCombo);
 }
 
 void MInstall::on_grubCheckBox_toggled(bool checked)
