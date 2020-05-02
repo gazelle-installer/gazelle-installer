@@ -21,22 +21,37 @@
 #include <QObject>
 #include <QTreeWidget>
 #include <QString>
+#include <QMap>
 
 #include "mprocess.h"
 #include "blockdev.h"
+#include "ui_meinstall.h"
 
 class PartMan : public QObject
 {
     Q_OBJECT
+    enum TreeColumns {
+        Device,
+        Size,
+        Label,
+        UseFor,
+        Encrypt,
+        Type,
+        Options
+    };
     MProcess &proc;
     BlockDeviceList &listBlkDevs;
-    QTreeWidget *treePartitions;
+    Ui::MeInstall &gui;
+    QWidget *master;
     QStringList listUsePresets;
+    QMap<QString, QTreeWidgetItem *> mounts;
+    QList<QTreeWidgetItem *> swaps;
     void comboUseTextChange(const QString &text);
 public:
-    explicit PartMan(MProcess &mproc, BlockDeviceList &bdlist, QObject *parent = nullptr);
-    void setup(QTreeWidget *twParts);
+    bool sync;
+    PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
     void populate();
+    QWidget *composeValidate(const QString &minSizeText, bool automatic, const QString &project);
 signals:
 
 public slots:
