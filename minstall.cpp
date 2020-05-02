@@ -2202,7 +2202,7 @@ int MInstall::showPage(int curr, int next)
             return 5; // Go to Step_Boot
         }
     } else if (next == 4 && curr == 3) { // at Step_Partition (fwd)
-        QWidget *nf = partman.composeValidate(MIN_INSTALL_SIZE, automatic, PROJECTNAME);
+        QWidget *nf = partman.composeValidate(MIN_INSTALL_SIZE, PROJECTNAME);
         if (nf) {
             nextFocus = nf;
             return curr;
