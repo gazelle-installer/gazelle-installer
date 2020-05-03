@@ -208,15 +208,9 @@ void MInstall::startup()
         on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
         on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
 
-        rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
-        homeLabelEdit->setText("home" + PROJECTSHORTNAME);
-        swapLabelEdit->setText("swap" + PROJECTSHORTNAME);
-
-        rootTypeCombo->setEnabled(false);
-        homeTypeCombo->setEnabled(false);
-        rootLabelEdit->setEnabled(false);
-        homeLabelEdit->setEnabled(false);
-        swapLabelEdit->setEnabled(false);
+        //rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
+        //homeLabelEdit->setText("home" + PROJECTSHORTNAME);
+        //swapLabelEdit->setText("swap" + PROJECTSHORTNAME);
 
         FDEpassword->hide();
         FDEpassword2->hide();
@@ -655,22 +649,22 @@ void MInstall::manageConfig(enum ConfigAction mode)
             config->manageCheckBox("SaveHome", saveHomeCheck);
             config->manageCheckBox("BadBlocksCheck", badblocksCheck);
             // Swap space
-            config->manageComboBox("Swap/Device", swapCombo, true);
+            //config->manageComboBox("Swap/Device", swapCombo, true);
             //config->manageCheckBox("Swap/Encrypt", checkBoxEncryptSwap);
-            config->manageLineEdit("Swap/Label", swapLabelEdit);
+            //config->manageLineEdit("Swap/Label", swapLabelEdit);
             // Tree starting with root (/)
             config->beginGroup("Tree");
-            config->manageComboBox("Device", rootCombo, true);
+            //config->manageComboBox("Device", rootCombo, true);
             //config->manageCheckBox("Encrypt", checkBoxEncryptRoot);
-            config->manageComboBox("Type", rootTypeCombo, false);
-            config->manageLineEdit("Label", rootLabelEdit);
+            //config->manageComboBox("Type", rootTypeCombo, false);
+            //config->manageLineEdit("Label", rootLabelEdit);
             // Boot (/boot)
-            config->manageComboBox("boot/Device", bootCombo, true);
+            //config->manageComboBox("boot/Device", bootCombo, true);
             // Home (/home)
-            config->manageComboBox("home/Device", homeCombo, true);
-            config->manageComboBox("home/Type", homeTypeCombo, false);
+            //config->manageComboBox("home/Device", homeCombo, true);
+            //config->manageComboBox("home/Type", homeTypeCombo, false);
             //config->manageCheckBox("home/Encrypt", checkBoxEncryptHome);
-            config->manageLineEdit("home/Label", homeLabelEdit);
+            //config->manageLineEdit("home/Label", homeLabelEdit);
             config->endGroup();
         }
         config->endGroup();
@@ -858,16 +852,16 @@ bool MInstall::formatPartitions()
     if (swapFormatSize) {
         updateStatus(tr("Formatting swap partition"));
         QString cmd("/sbin/mkswap " + swapdev);
-        const QString &mkswaplabel = swapLabelEdit->text();
-        if (!mkswaplabel.isEmpty()) cmd.append(" -L \"" + mkswaplabel + "\"");
+        //const QString &mkswaplabel = swapLabelEdit->text();
+        //if (!mkswaplabel.isEmpty()) cmd.append(" -L \"" + mkswaplabel + "\"");
         if (!proc.exec(cmd, true)) return false;
     }
 
     // maybe format root (if not saving /home on root), or if using --sync option
     if (rootFormatSize) {
         updateStatus(tr("Formatting the / (root) partition"));
-        if (!makeLinuxPartition(rootdev, rootTypeCombo->currentText(),
-                                badblocksCheck->isChecked(), rootLabelEdit->text())) {
+        if (!makeLinuxPartition(rootdev, "ext4", //rootTypeCombo->currentText(),
+                                badblocksCheck->isChecked(), "")) { // rootLabelEdit->text())) {
             return false;
         }
     }
@@ -889,8 +883,8 @@ bool MInstall::formatPartitions()
     // maybe format home
     if (homeFormatSize) {
         updateStatus(tr("Formatting the /home partition"));
-        if (!makeLinuxPartition(homedev, homeTypeCombo->currentText(),
-                                badblocksCheck->isChecked(), homeLabelEdit->text())) {
+        if (!makeLinuxPartition(homedev, "ext4", //homeTypeCombo->currentText(),
+                                badblocksCheck->isChecked(), "")) { //homeLabelEdit->text())) {
             return false;
         }
         proc.exec("/bin/rm -r /mnt/antiX/home", true);
@@ -1122,7 +1116,7 @@ bool MInstall::calculateDefaultPartitions()
     bdinfo.isSwap = true;
     swapDevice = "/dev/" + bdinfo.name;
     homeDevice = rootDevice;
-    rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
+    //rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
     return true;
 }
 
@@ -1495,10 +1489,10 @@ bool MInstall::installLoader()
         // skip it
         //if useing f2fs, then add modules to /etc/initramfs-tools/modules
         qDebug() << "Update initramfs";
-        if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
-            proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
-            proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
-        }
+        //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
+            //proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
+            //proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
+        //}
         proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
         return true;
     }
@@ -1646,10 +1640,10 @@ bool MInstall::installLoader()
 
     qDebug() << "Update initramfs";
     //if useing f2fs, then add modules to /etc/initramfs-tools/modules
-    if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
-        proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
-        proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
-    }
+    //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
+        //proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
+        //proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
+    //}
     proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
     updateStatus(statup);
     qDebug() << "clear chroot env";

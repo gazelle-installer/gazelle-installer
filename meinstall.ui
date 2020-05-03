@@ -769,243 +769,18 @@
              <string>Choose partitions</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
-             <item row="6" column="2">
-              <widget class="QComboBox" name="homeTypeCombo">
-               <property name="maximumSize">
-                <size>
-                 <width>80</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>ext4</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>ext3</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>ext2</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>f2fs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>jfs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>xfs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>btrfs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>btrfs-zlib</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>btrfs-lzo</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>reiserfs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>reiser4</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="6" column="3">
-              <widget class="QLineEdit" name="homeLabelEdit">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string notr="true">homeMX</string>
-               </property>
-               <property name="maxLength">
-                <number>16</number>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1">
-              <widget class="QComboBox" name="swapCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QComboBox" name="homeCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="currentText">
-                <string notr="true">root</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>root</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="4" column="4">
-              <widget class="QToolButton" name="buttonPartReload">
+             <item row="3" column="2">
+              <widget class="QToolButton" name="buttonPartUndo">
                <property name="text">
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset theme="revert">
+                <iconset theme="undo">
                  <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="1" column="4">
-              <widget class="QToolButton" name="buttonPartAdd">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="add">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="1">
-              <widget class="QComboBox" name="bootCombo">
-               <property name="currentText">
-                <string notr="true">root</string>
-               </property>
-               <item>
-                <property name="text">
-                 <string>root</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="5" column="2">
-              <widget class="QComboBox" name="rootTypeCombo">
-               <property name="maximumSize">
-                <size>
-                 <width>80</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <item>
-                <property name="text">
-                 <string>ext4</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>ext3</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>ext2</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>f2fs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>jfs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>xfs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>btrfs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>btrfs-zlib</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>btrfs-lzo</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>reiserfs</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>reiser4</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item row="5" column="3">
-              <widget class="QLineEdit" name="rootLabelEdit">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string notr="true">rootMX17.1</string>
-               </property>
-               <property name="maxLength">
-                <number>16</number>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0" rowspan="5" colspan="4">
+             <item row="0" column="0" rowspan="5" colspan="2">
               <widget class="QTreeWidget" name="treePartitions">
                <column>
                 <property name="text">
@@ -1044,67 +819,46 @@
                </column>
               </widget>
              </item>
-             <item row="0" column="4">
-              <widget class="QToolButton" name="buttonRunParted">
+             <item row="1" column="2">
+              <widget class="QToolButton" name="buttonPartAdd">
                <property name="text">
                 <string>...</string>
                </property>
                <property name="icon">
-                <iconset theme="gparted">
+                <iconset theme="add">
                  <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="7" column="3">
-              <widget class="QLineEdit" name="swapLabelEdit">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>90</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string notr="true">swap</string>
-               </property>
-               <property name="maxLength">
-                <number>16</number>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="4">
-              <widget class="QToolButton" name="buttonPartUndo">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="undo">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QComboBox" name="rootCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="4">
+             <item row="2" column="2">
               <widget class="QToolButton" name="buttonPartRemove">
                <property name="text">
                 <string>...</string>
                </property>
                <property name="icon">
                 <iconset theme="remove">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="2">
+              <widget class="QToolButton" name="buttonPartReload">
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="revert">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QToolButton" name="buttonRunParted">
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="gparted">
                  <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
@@ -2738,14 +2492,6 @@
   <tabstop>existing_partitionsButton</tabstop>
   <tabstop>FDEpassword</tabstop>
   <tabstop>FDEpassword2</tabstop>
-  <tabstop>rootCombo</tabstop>
-  <tabstop>rootTypeCombo</tabstop>
-  <tabstop>rootLabelEdit</tabstop>
-  <tabstop>homeCombo</tabstop>
-  <tabstop>homeTypeCombo</tabstop>
-  <tabstop>homeLabelEdit</tabstop>
-  <tabstop>swapCombo</tabstop>
-  <tabstop>bootCombo</tabstop>
   <tabstop>saveHomeCheck</tabstop>
   <tabstop>badblocksCheck</tabstop>
   <tabstop>grubCheckBox</tabstop>
