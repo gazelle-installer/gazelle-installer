@@ -20,6 +20,7 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QListWidget>
 
 class MProcess : public QProcess
 {
@@ -28,6 +29,7 @@ class MProcess : public QProcess
     bool halting = false;
     bool debugUnusedOutput = true;
 public:
+    QListWidget *logView;
     MProcess(QObject *parent = Q_NULLPTR);
     bool exec(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
     QString execOut(const QString &cmd, bool everything = false);
@@ -35,6 +37,8 @@ public:
     void sleep(const int msec, const bool silent = false);
     void halt();
     void unhalt();
+    QListWidgetItem *log(const QString &text, const bool section = true);
+    void log(QListWidgetItem *entry, const int status = 1);
 };
 
 #endif // MPROCESS_H
