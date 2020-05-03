@@ -3279,11 +3279,6 @@ void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
         FDEpassCust2->clear();
         FDEpassCust->clear();
         FDEpassCust->setFocus();
-        if (!automatic && checkBoxEncryptSwap->isVisible()) {
-            QMessageBox::warning(this, windowTitle(),
-                tr("This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems."),
-                QMessageBox::Ok);
-        }
     }
 }
 
