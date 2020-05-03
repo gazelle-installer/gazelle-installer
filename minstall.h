@@ -93,6 +93,8 @@ public:
     void cleanup(bool endclean = true);
 
 private slots:
+    void on_mainTabs_currentChanged(int index);
+
     void on_abortInstallButton_clicked();
     void on_backButton_clicked();
     void on_buttonSetKeyboard_clicked();
@@ -145,7 +147,6 @@ private slots:
     void on_radioOldHomeDelete_toggled(bool);
 
     void on_progressBar_valueChanged(int value);
-
 
 private:
     MProcess proc;

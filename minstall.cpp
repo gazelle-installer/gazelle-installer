@@ -123,6 +123,7 @@ void MInstall::startup()
 {
     qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
 
+    proc.logView = listLog;
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
         saveDesktopCheckBox->hide();
@@ -2884,7 +2885,7 @@ void MInstall::changeEvent(QEvent *event)
 
 void MInstall::resizeEvent(QResizeEvent *)
 {
-    mainHelp->resize(tab->size());
+    mainHelp->resize(tabHelp->size());
     helpbackdrop->resize(mainHelp->size());
 }
 
@@ -2916,6 +2917,12 @@ void MInstall::reject()
 
 /////////////////////////////////////////////////////////////////////////
 // slots
+
+void MInstall::on_mainTabs_currentChanged(int index)
+{
+    // Make the help widgets the correct size.
+    if(index == 0) resizeEvent(nullptr);
+}
 
 void MInstall::on_passwordCheckBox_stateChanged(int state)
 {
@@ -2995,7 +3002,7 @@ void MInstall::on_rootTypeCombo_activated(QString)
 bool MInstall::abort(bool onclose)
 {
     this->setEnabled(false);
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
         const QMessageBox::StandardButton rc = QMessageBox::warning(this,
@@ -3596,4 +3603,3 @@ void MInstall::resetBlueman()
 {
     proc.exec("runuser -l demo -c 'dconf reset /org/blueman/transfer/shared-path'"); //reset blueman path
 }
-

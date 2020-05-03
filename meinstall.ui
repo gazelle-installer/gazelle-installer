@@ -34,7 +34,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tabHelp">
       <attribute name="title">
        <string>Help</string>
       </attribute>
@@ -90,6 +90,28 @@
       </widget>
       <zorder>helpbackdrop</zorder>
       <zorder>mainHelp</zorder>
+     </widget>
+     <widget class="QWidget" name="tabLog">
+      <attribute name="title">
+       <string>Log</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QListWidget" name="listLog"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
