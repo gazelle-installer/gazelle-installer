@@ -126,6 +126,7 @@ QListWidgetItem *MProcess::log(const QString &text, const bool section)
         font.setItalic(true);
         entry->setFont(font);
     }
+    logView->scrollToBottom();
     return entry;
 }
 void MProcess::log(QListWidgetItem *entry, const int status)
