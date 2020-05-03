@@ -58,9 +58,7 @@ public:
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
     void populate();
     QWidget *composeValidate(const QString &minSizeText, const QString &project);
-signals:
-
-public slots:
+    bool checkTargetDrivesOK();
 };
 
 #endif // PARTMAN_H

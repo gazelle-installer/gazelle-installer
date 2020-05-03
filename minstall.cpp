@@ -541,72 +541,6 @@ bool MInstall::mountPartition(const QString dev, const QString point, const QStr
     return proc.exec(cmd);
 }
 
-// checks SMART status of the selected drives, returns false if it detects errors and user chooses to abort
-bool MInstall::checkTargetDrivesOK()
-{
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-    if (phase < 0) return false;
-
-    QString smartFail, smartWarn;
-    auto lambdaSMART = [this, &smartFail, &smartWarn](const QString &drv, const QString &purpose) -> void {
-        proc.exec("smartctl -H /dev/" + drv, true);
-        if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & 8) {
-            // see smartctl(8) manual: EXIT STATUS (Bit 3)
-            smartFail += " - " + drv + " (" + purpose + ")\n";
-        } else {
-            const QString &output = proc.execOut("smartctl -A /dev/" + drv + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
-            if (!output.isEmpty()) {
-                smartWarn += " ---- " + drv + " (" + purpose + ") ---\n" + output + "\n\n";
-            }
-        }
-    };
-
-    if (entireDiskButton->isChecked()) {
-        lambdaSMART(diskCombo->currentData().toString(), tr("target drive"));
-    } else {
-        // this loop prevents the same drive being checked multiple times
-        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (bdinfo.isDrive) {
-                // list everything this drive is used for
-                QStringList purposes;
-                if (bdinfo.name == rootCombo->currentData().toString()) purposes << "root";
-                if (bdinfo.name == homeCombo->currentData().toString()) purposes << "/home";
-                if (bdinfo.name == swapCombo->currentData().toString()) purposes << "swap";
-                if (bdinfo.name == bootCombo->currentData().toString()) purposes << "boot";
-                // if selected run the SMART tests
-                if (!purposes.isEmpty()) lambdaSMART(bdinfo.name, purposes.join(", "));
-            }
-        }
-    }
-
-    QString msg;
-    if (!smartFail.isEmpty()) {
-        msg = tr("The disks with the partitions you selected for installation are failing:")
-              + "\n\n" + smartFail + "\n";
-    }
-    if (!smartWarn.isEmpty()) {
-        msg += tr("Smartmon tool output:") + "\n\n" + smartWarn
-               + tr("The disks with the partitions you selected for installation pass the SMART monitor test (smartctl),"
-                    " but the tests indicate it will have a higher than average failure rate in the near future.");
-    }
-    if (!msg.isEmpty()) {
-        int ans;
-        msg += tr("If unsure, please exit the Installer and run GSmartControl for more information.") + "\n\n";
-        if (!smartFail.isEmpty()) {
-            msg += tr("Do you want to abort the installation?");
-            ans = QMessageBox::critical(this, windowTitle(), msg,
-                      QMessageBox::Yes|QMessageBox::Default|QMessageBox::Escape, QMessageBox::No);
-            if (ans == QMessageBox::Yes) return false;
-        } else {
-            msg += tr("Do you want to continue?");
-            ans = QMessageBox::warning(this, windowTitle(), msg,
-                      QMessageBox::Yes|QMessageBox::Default, QMessageBox::No|QMessageBox::Escape);
-            if (ans != QMessageBox::Yes) return false;
-        }
-    }
-    return true;
-}
-
 // check password length (maybe complexity)
 bool MInstall::checkPassword(QLineEdit *passEdit)
 {
@@ -632,7 +566,7 @@ bool MInstall::processNextPhase()
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps
     if (phase == 0) { // no install started yet
         updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
-        if (!checkTargetDrivesOK()) return false;
+        if (!partman.checkTargetDrivesOK()) return false;
         phase = 1; // installation.
 
         // cleanup previous mounts
