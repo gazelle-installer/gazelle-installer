@@ -33,6 +33,10 @@ PartMan::PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QW
 void PartMan::setup()
 {
     listUsePresets << "" << "root" << "boot" << "home" << "swap";
+    QFont smallFont = gui.treePartitions->headerItem()->font(Encrypt);
+    smallFont.setPointSizeF(smallFont.pointSizeF() * 0.6);
+    gui.treePartitions->headerItem()->setFont(Encrypt, smallFont);
+    gui.treePartitions->header()->setMinimumSectionSize(5);
     connect(gui.treePartitions, &QTreeWidget::itemChanged, this, &PartMan::treeItemChange);
 }
 
@@ -209,6 +213,13 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
                 else setEncryptChecks("swap", encryptCheckRoot);
             }
         }
+        bool needsCrypto = false;
+        QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+        while (*it) {
+            if((*it)->checkState(Encrypt) == Qt::Checked) needsCrypto = true;
+            ++it;
+        }
+        gui.gbEncrPass->setVisible(needsCrypto);
         gui.treePartitions->blockSignals(false);
     }
 }
