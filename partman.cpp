@@ -200,14 +200,7 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
                     setEncryptChecks("/home", Qt::Checked);
                 }
             } else if(use == "swap") {
-                enum Qt::CheckState state = item->checkState(column);
-                if(!automatic && state == Qt::Checked) {
-                    QMessageBox::warning(master, master->windowTitle(),
-                        tr("This option also encrypts swap partition if selected,"
-                           " which will render the swap partition unable to be shared"
-                           " with other installed operating systems."), QMessageBox::Ok);
-                    setEncryptChecks("swap", Qt::Checked);
-                }
+                if(item->checkState(column) == Qt::Checked) setEncryptChecks("swap", Qt::Checked);
             } else if(use == "/home") {
                 if(item->checkState(column) == Qt::Checked) setEncryptChecks("swap", Qt::Checked);
                 else setEncryptChecks("swap", encryptCheckRoot);
