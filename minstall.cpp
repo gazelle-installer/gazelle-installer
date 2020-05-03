@@ -121,8 +121,8 @@ MInstall::~MInstall() {
 // meant to be run after the installer becomes visible
 void MInstall::startup()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
-
+    proc.log(__PRETTY_FUNCTION__);
+    proc.logView = listLog;
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
         saveDesktopCheckBox->hide();
@@ -312,7 +312,7 @@ void MInstall::startup()
 // turn auto-mount off and on
 void MInstall::setupAutoMount(bool enabled)
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
 
     if (autoMountEnabled == enabled) return;
     QFileInfo finfo;
@@ -528,7 +528,7 @@ void MInstall::disablehiberanteinitramfs()
 
 bool MInstall::mountPartition(const QString dev, const QString point, const QString mntops)
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return -1;
     mkdir(point.toUtf8(), 0755);
     QString cmd = QString("/bin/mount %1 %2 -o %3").arg(dev).arg(point).arg(mntops);
@@ -810,7 +810,7 @@ void MInstall::stashAdvancedFDE(bool save)
 
 bool MInstall::formatPartitions()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
     QString rootdev = rootDevice;
     QString swapdev = swapDevice;
@@ -901,7 +901,7 @@ bool MInstall::formatPartitions()
 
 bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label)
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
     QString homedev = homeDevice;
     boot_mntops = "defaults,noatime";
@@ -971,7 +971,7 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
 // Create and open Luks partitions; return false if it cannot create one
 bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
 
     // format partition
@@ -999,7 +999,7 @@ bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
 
 bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options, const bool failHard)
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
 
     // open containers, assigning container names
@@ -1125,7 +1125,7 @@ bool MInstall::calculateDefaultPartitions()
 
 bool MInstall::makePartitions()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
 
     // detach all existing partitions on the selected drive
@@ -1198,7 +1198,7 @@ bool MInstall::makePartitions()
 
 bool MInstall::saveHomeBasic()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (!(saveHomeCheck->isChecked())) return true;
     cleanup(false); // cleanup previous mounts
     // if preserving /home, obtain some basic information
@@ -1242,7 +1242,7 @@ bool MInstall::saveHomeBasic()
 
 bool MInstall::installLinux(const int progend)
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevice);
     if (phase < 0) return false;
 
@@ -1405,7 +1405,7 @@ void MInstall::makeFstab()
 
 bool MInstall::copyLinux(const int progend)
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
 
     // copy most except usr, mnt and home
@@ -1472,7 +1472,7 @@ bool MInstall::copyLinux(const int progend)
 // build a grub configuration and install grub
 bool MInstall::installLoader()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
 
     const QString &statup = tr("Installing GRUB");
@@ -1971,7 +1971,7 @@ bool MInstall::setComputerName()
 
 void MInstall::setLocale()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return;
     QString cmd2;
     QString cmd;
@@ -2055,7 +2055,7 @@ void MInstall::stashServices(bool save)
 
 void MInstall::setServices()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return;
 
     QString chroot;
@@ -2486,7 +2486,7 @@ void MInstall::gotoPage(int next)
 
 void MInstall::updatePartitionWidgets()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
 
     diskCombo->setEnabled(false);
     diskCombo->clear();
@@ -2527,7 +2527,7 @@ void MInstall::updatePartitionWidgets()
 
 void MInstall::buildServiceList()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
 
     //setup csView
     csView->header()->setMinimumSectionSize(150);
@@ -2592,7 +2592,7 @@ void MInstall::changeEvent(QEvent *event)
 
 void MInstall::resizeEvent(QResizeEvent *)
 {
-    mainHelp->resize(tab->size());
+    mainHelp->resize(tabHelp->size());
     helpbackdrop->resize(mainHelp->size());
 }
 
@@ -2624,6 +2624,12 @@ void MInstall::reject()
 
 /////////////////////////////////////////////////////////////////////////
 // slots
+
+void MInstall::on_mainTabs_currentChanged(int index)
+{
+    // Make the help widgets the correct size.
+    if(index == 0) resizeEvent(nullptr);
+}
 
 void MInstall::on_passwordCheckBox_stateChanged(int state)
 {
@@ -2684,8 +2690,8 @@ void MInstall::on_buttonBenchmarkFDE_clicked()
 
 bool MInstall::abort(bool onclose)
 {
+    proc.log(__PRETTY_FUNCTION__);
     this->setEnabled(false);
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
         const QMessageBox::StandardButton rc = QMessageBox::warning(this,
@@ -2715,7 +2721,7 @@ bool MInstall::abort(bool onclose)
 // run before closing the app, do some cleanup
 void MInstall::cleanup(bool endclean)
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     if (pretend) return;
 
     proc.unhalt();
@@ -2804,7 +2810,7 @@ void MInstall::on_closeButton_clicked()
 
 void MInstall::setupkeyboardbutton()
 {
-    qDebug() << "+++" << __PRETTY_FUNCTION__ << "+++";
+    proc.log(__PRETTY_FUNCTION__);
     QFile file("/etc/default/keyboard");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         while (!file.atEnd()) {
@@ -3226,4 +3232,3 @@ void MInstall::resetBlueman()
 {
     proc.exec("runuser -l demo -c 'dconf reset /org/blueman/transfer/shared-path'"); //reset blueman path
 }
-
