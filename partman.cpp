@@ -88,7 +88,7 @@ void PartMan::populate()
         curdev->setData(Size, Qt::UserRole, QVariant(-bdinfo.size)); // negative = reuse partition
     }
     gui.treePartitions->expandAll();
-    for (int ixi = gui.treePartitions->columnCount() - 2; ixi >= 0; --ixi) {
+    for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
     gui.treePartitions->blockSignals(false);
@@ -168,16 +168,18 @@ void PartMan::comboUseTextChange(const QString &text)
 void PartMan::comboTypeTextChange(const QString &)
 {
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+    bool canCheckBlocks = false;
     while (*it) {
         QComboBox *comboUse = static_cast<QComboBox *>(gui.treePartitions->itemWidget(*it, UseFor));
         if(comboUse && !(comboUse->currentText().isEmpty())) {
             QComboBox *comboType = static_cast<QComboBox *>(gui.treePartitions->itemWidget(*it, Type));
             if(!comboType) return;
             const QString &type = comboType->currentText();
-            gui.badblocksCheck->setEnabled(type.startsWith("ext") || type == "jfs");
+            if(type.startsWith("ext") || type == "jfs") canCheckBlocks = true;
         }
         ++it;
     }
+    gui.badblocksCheck->setEnabled(canCheckBlocks);
 }
 
 void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
