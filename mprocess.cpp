@@ -31,6 +31,7 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     if (halting) return false;
     ++execount;
     qDebug().nospace() << "Exec #" << execount << ": " << cmd;
+    QListWidgetItem *logEntry = log(cmd, false);
     QEventLoop eloop;
     connect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (rawexec) start(cmd);
@@ -43,16 +44,25 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     closeWriteChannel();
     eloop.exec();
     disconnect(this, SIGNAL(finished(int, QProcess::ExitStatus)), nullptr, nullptr);
+    int status = 1;
     if (debugUnusedOutput) {
         if (!needRead) {
             const QByteArray &StdOut = readAllStandardOutput();
-            if (!StdOut.isEmpty()) qDebug().nospace() << "SOut #" << execount << ": " << StdOut;
+            if (!StdOut.isEmpty()) {
+                qDebug().nospace() << "SOut #" << execount << ": " << StdOut;
+                status = 0;
+            }
         }
         const QByteArray &StdErr = readAllStandardError();
-        if (!StdErr.isEmpty()) qDebug().nospace() << "SErr #" << execount << ": " << StdErr;
+        if (StdErr.isEmpty()) {
+            qDebug().nospace() << "SErr #" << execount << ": " << StdErr;
+            status = 0;
+        }
     }
     qDebug().nospace() << "Exit #" << execount << ": " << exitCode() << " " << exitStatus();
-    return (exitStatus() == QProcess::NormalExit && exitCode() == 0);
+    if(exitStatus() != QProcess::NormalExit || exitCode() != 0) status = -1;
+    log(logEntry, status);
+    return (status >= 0);
 }
 
 QString MProcess::execOut(const QString &cmd, bool everything)
@@ -102,4 +112,26 @@ void MProcess::unhalt()
     }
     disconnect(this, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), nullptr, nullptr);
     halting = false;
+}
+
+QListWidgetItem *MProcess::log(const QString &text, const bool section)
+{
+    if(section) qDebug().noquote() << "+++" << text << "+++";
+    if(!logView) return nullptr;
+    QListWidgetItem *entry = new QListWidgetItem(text, logView);
+    logView->addItem(entry);
+    if(!section) entry->setBackgroundColor(Qt::darkBlue);
+    else {
+        QFont font(entry->font());
+        font.setItalic(true);
+        entry->setFont(font);
+    }
+    return entry;
+}
+void MProcess::log(QListWidgetItem *entry, const int status)
+{
+    if(!entry) return;
+    if(status > 0) entry->setBackgroundColor(Qt::darkGreen);
+    else if(status < 0) entry->setBackgroundColor(Qt::darkRed);
+    else entry->setBackgroundColor(Qt::darkYellow);
 }
