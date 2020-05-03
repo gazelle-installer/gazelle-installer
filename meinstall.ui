@@ -93,7 +93,7 @@
      </widget>
      <widget class="QWidget" name="tabLog">
       <attribute name="title">
-       <string>Log</string>
+       <string>Live Log</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <property name="leftMargin">
