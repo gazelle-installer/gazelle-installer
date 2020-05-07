@@ -410,47 +410,42 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
 bool PartMan::checkTargetDrivesOK()
 {
     QString smartFail, smartWarn;
-    auto lambdaSMART = [this, &smartFail, &smartWarn](const QString &drv, const QString &purpose) -> void {
-        proc.exec("smartctl -H /dev/" + drv, true);
-        if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & 8) {
-            // see smartctl(8) manual: EXIT STATUS (Bit 3)
-            smartFail += " - " + drv + " (" + purpose + ")\n";
-        } else {
-            const QString &output = proc.execOut("smartctl -A /dev/" + drv + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
-            if (!output.isEmpty()) {
-                smartWarn += " ---- " + drv + " (" + purpose + ") ---\n" + output + "\n\n";
+    for(int ixi = 0; ixi < gui.treePartitions->topLevelItemCount(); ++ixi) {
+        QStringList purposes;
+        QTreeWidgetItem *tlit =  gui.treePartitions->topLevelItem(ixi);
+        for(int oxo = 0; oxo < tlit->childCount(); ++oxo) {
+            QComboBox *comboUse = static_cast<QComboBox *>
+                (gui.treePartitions->itemWidget(tlit->child(oxo), UseFor));
+            if(comboUse) {
+                const QString &text = comboUse->currentText();
+                if(!text.isEmpty()) purposes << text;
             }
         }
-    };
-
-    if (gui.entireDiskButton->isChecked()) {
-        lambdaSMART(gui.diskCombo->currentData().toString(), tr("target drive"));
-    } else {
-        for(int ixi = 0; ixi < gui.treePartitions->topLevelItemCount(); ++ixi) {
-            QStringList purposes;
-            QTreeWidgetItem *tlit =  gui.treePartitions->topLevelItem(ixi);
-            for(int oxo = 0; oxo < tlit->childCount(); ++oxo) {
-                QComboBox *comboUse = static_cast<QComboBox *>
-                    (gui.treePartitions->itemWidget(tlit->child(oxo), UseFor));
-                if(comboUse) {
-                    const QString &text = comboUse->currentText();
-                    if(!text.isEmpty()) purposes << text;
-                }
+        // If any partitions are selected run the SMART tests.
+        if (!purposes.isEmpty()) {
+            const QString &drive = tlit->text(Device);
+            QString smartMsg = drive + " (" + purposes.join(", ") + ")";
+            proc.exec("smartctl -H /dev/" + drive, true);
+            if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & 8) {
+                // See smartctl(8) manual: EXIT STATUS (Bit 3)
+                smartFail += " - " + smartMsg + "\n";
+            } else {
+                const QString &out = proc.execOut("smartctl -A /dev/" + drive
+                        + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
+                if (!out.isEmpty()) smartWarn += " ---- " + smartMsg + " ---\n" + out + "\n\n";
             }
-            // If any partitions are selected run the SMART tests.
-            if (!purposes.isEmpty()) lambdaSMART(tlit->text(Device), purposes.join(", "));
         }
     }
 
     QString msg;
     if (!smartFail.isEmpty()) {
         msg = tr("The disks with the partitions you selected for installation are failing:")
-              + "\n\n" + smartFail + "\n";
+            + "\n\n" + smartFail + "\n";
     }
     if (!smartWarn.isEmpty()) {
         msg += tr("Smartmon tool output:") + "\n\n" + smartWarn
-               + tr("The disks with the partitions you selected for installation pass the SMART monitor test (smartctl),"
-                    " but the tests indicate it will have a higher than average failure rate in the near future.");
+            + tr("The disks with the partitions you selected for installation pass the SMART monitor test (smartctl),"
+                " but the tests indicate it will have a higher than average failure rate in the near future.");
     }
     if (!msg.isEmpty()) {
         int ans;
@@ -458,12 +453,12 @@ bool PartMan::checkTargetDrivesOK()
         if (!smartFail.isEmpty()) {
             msg += tr("Do you want to abort the installation?");
             ans = QMessageBox::critical(master, master->windowTitle(), msg,
-                      QMessageBox::Yes|QMessageBox::Default|QMessageBox::Escape, QMessageBox::No);
+                    QMessageBox::Yes|QMessageBox::Default|QMessageBox::Escape, QMessageBox::No);
             if (ans == QMessageBox::Yes) return false;
         } else {
             msg += tr("Do you want to continue?");
             ans = QMessageBox::warning(master, master->windowTitle(), msg,
-                      QMessageBox::Yes|QMessageBox::Default, QMessageBox::No|QMessageBox::Escape);
+                    QMessageBox::Yes|QMessageBox::Default, QMessageBox::No|QMessageBox::Escape);
             if (ans != QMessageBox::Yes) return false;
         }
     }
