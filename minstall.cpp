@@ -34,6 +34,10 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     : proc(this)
 {
     setupUi(this);
+    QPalette palLog = listLog->palette();
+    palLog.setColor(QPalette::Base, Qt::black);
+    palLog.setColor(QPalette::Text, Qt::white);
+    listLog->setPalette(palLog);
     proc.logView = listLog;
     updateCursor(Qt::WaitCursor);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
