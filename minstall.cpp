@@ -34,6 +34,12 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     : proc(this), partman(proc, listBlkDevs, *this, this)
 {
     setupUi(this);
+    QPalette palLog = listLog->palette();
+    palLog.setColor(QPalette::Base, Qt::black);
+    palLog.setColor(QPalette::Text, Qt::white);
+    listLog->setPalette(palLog);
+    proc.logView = listLog;
+    proc.progressBar = progressBar;
     updateCursor(Qt::WaitCursor);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     installBox->hide();
@@ -122,7 +128,6 @@ MInstall::~MInstall() {
 void MInstall::startup()
 {
     proc.log(__PRETTY_FUNCTION__);
-    proc.logView = listLog;
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
         saveDesktopCheckBox->hide();
@@ -408,18 +413,10 @@ void MInstall::updateCursor(const Qt::CursorShape shape)
     qApp->processEvents();
 }
 
-void MInstall::updateStatus(const QString &msg, int val)
-{
-    progressBar->setFormat("%p% - " + msg.toUtf8());
-    if (val < 0) val = progressBar->value() + 1;
-    progressBar->setValue(val);
-    qApp->processEvents();
-}
-
 bool MInstall::pretendToInstall(int start, int stop)
 {
     for (int ixi = start; ixi <= stop; ++ixi) {
-        updateStatus(tr("Pretending to install %1").arg(PROJECTNAME), ixi);
+        proc.status(tr("Pretending to install %1").arg(PROJECTNAME), ixi);
         proc.sleep(phase == 1 ? 100 : 1000, true);
         if (phase < 0) return false;
     }
@@ -559,7 +556,7 @@ bool MInstall::processNextPhase()
     // Phase 0 = install not started yet, Phase 1 = install in progress
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps
     if (phase == 0) { // no install started yet
-        updateStatus(tr("Preparing to install %1").arg(PROJECTNAME), 0);
+        proc.status(tr("Preparing to install %1").arg(PROJECTNAME), 0);
         if (!partman.checkTargetDrivesOK()) return false;
         phase = 1; // installation.
 
@@ -582,7 +579,7 @@ bool MInstall::processNextPhase()
         }
         if (widgetStack->currentWidget() != Step_Progress) {
             progressBar->setEnabled(false);
-            updateStatus(tr("Paused for required operator input"), progPhase23);
+            proc.status(tr("Paused for required operator input"), progPhase23);
             QApplication::beep();
         }
         phase = 2;
@@ -592,7 +589,7 @@ bool MInstall::processNextPhase()
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
         if (!pretend) {
-            updateStatus(tr("Setting system configuration"), progPhase23);
+            proc.status(tr("Setting system configuration"), progPhase23);
             if (!isInsideVB() && !oobe) {
                 proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
                 proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
@@ -610,7 +607,7 @@ bool MInstall::processNextPhase()
             return false;
         }
         phase = 4;
-        updateStatus(tr("Cleaning up"), 100);
+        proc.status(tr("Cleaning up"), 100);
         cleanup();
         gotoPage(widgetStack->indexOf(Step_End));
     }
@@ -822,35 +819,35 @@ bool MInstall::formatPartitions()
     const QString &statup = tr("Setting up LUKS encrypted containers");
     if (isSwapEncrypted) {
         if (swapFormatSize) {
-            updateStatus(statup);
+            proc.status(statup);
             if (!makeLuksPartition(swapdev, encPass)) return false;
         }
-        updateStatus(statup);
+        proc.status(statup);
         if (!openLuksPartition(swapdev, "swapfs", encPass)) return false;
         swapdev = "/dev/mapper/swapfs";
     }
     if (isRootEncrypted) {
         if (rootFormatSize) {
-            updateStatus(statup);
+            proc.status(statup);
             if (!makeLuksPartition(rootdev, encPass)) return false;
         }
-        updateStatus(statup);
+        proc.status(statup);
         if (!openLuksPartition(rootdev, "rootfs", encPass)) return false;
         rootdev = "/dev/mapper/rootfs";
     }
     if (isHomeEncrypted) {
         if (homeFormatSize) {
-            updateStatus(statup);
+            proc.status(statup);
             if (!makeLuksPartition(homedev, encPass)) return false;
         }
-        updateStatus(statup);
+        proc.status(statup);
         if (!openLuksPartition(homedev, "homefs", encPass)) return false;
         homedev = "/dev/mapper/homefs";
     }
 
     //if no swap is chosen do nothing
     if (swapFormatSize) {
-        updateStatus(tr("Formatting swap partition"));
+        proc.status(tr("Formatting swap partition"));
         QString cmd("/sbin/mkswap " + swapdev);
         //const QString &mkswaplabel = swapLabelEdit->text();
         //if (!mkswaplabel.isEmpty()) cmd.append(" -L \"" + mkswaplabel + "\"");
@@ -859,7 +856,7 @@ bool MInstall::formatPartitions()
 
     // maybe format root (if not saving /home on root), or if using --sync option
     if (rootFormatSize) {
-        updateStatus(tr("Formatting the / (root) partition"));
+        proc.status(tr("Formatting the / (root) partition"));
         if (!makeLinuxPartition(rootdev, "ext4", //rootTypeCombo->currentText(),
                                 badblocksCheck->isChecked(), "")) { // rootLabelEdit->text())) {
             return false;
@@ -869,20 +866,20 @@ bool MInstall::formatPartitions()
 
     // format and mount /boot if different than root
     if (bootFormatSize) {
-        updateStatus(tr("Formatting boot partition"));
+        proc.status(tr("Formatting boot partition"));
         if (!makeLinuxPartition(bootDevice, "ext4", false, "boot")) return false;
     }
 
     // format ESP if necessary
     if (espFormatSize) {
-        updateStatus(tr("Formatting EFI System Partition"));
+        proc.status(tr("Formatting EFI System Partition"));
         if (!proc.exec("mkfs.msdos -F 32 " + espDevice)) return false;
         proc.exec("parted -s " + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
         proc.sleep(1000);
     }
     // maybe format home
     if (homeFormatSize) {
-        updateStatus(tr("Formatting the /home partition"));
+        proc.status(tr("Formatting the /home partition"));
         if (!makeLinuxPartition(homedev, "ext4", //homeTypeCombo->currentText(),
                                 badblocksCheck->isChecked(), "")) { //homeLabelEdit->text())) {
             return false;
@@ -892,7 +889,7 @@ bool MInstall::formatPartitions()
     mkdir("/mnt/antiX/home", 0755);
     if (homedev != rootDevice) {
         // not on root
-        updateStatus(tr("Mounting the /home partition"));
+        proc.status(tr("Mounting the /home partition"));
         if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) return false;
     }
 
@@ -1172,13 +1169,13 @@ bool MInstall::makePartitions()
 
     if (entireDiskButton->isChecked()) {
         const QString &drv = diskCombo->currentData().toString();
-        updateStatus(tr("Creating required partitions"));
+        proc.status(tr("Creating required partitions"));
         //proc.exec(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
         clearpartitiontables(drv);
         const bool useGPT = listBlkDevs.at(listBlkDevs.findDevice(drv)).isGPT;
         if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
     } else {
-        updateStatus(tr("Preparing required partitions"));
+        proc.status(tr("Preparing required partitions"));
     }
     proc.sleep(1000);
 
@@ -1248,10 +1245,10 @@ bool MInstall::installLinux(const int progend)
 
     if (!(rootFormatSize || sync)) {
         // if root was not formatted and not using --sync option then re-use it
-        updateStatus(tr("Mounting the / (root) partition"));
+        proc.status(tr("Mounting the / (root) partition"));
         mountPartition(rootdev, "/mnt/antiX", root_mntops);
         // remove all folders in root except for /home
-        updateStatus(tr("Deleting old system"));
+        proc.status(tr("Deleting old system"));
         proc.exec("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;", false);
 
         if (proc.exitStatus() != QProcess::NormalExit) {
@@ -1262,7 +1259,7 @@ bool MInstall::installLinux(const int progend)
 
     // make empty dirs for opt, dev, proc, sys, run,
     // home already done
-    updateStatus(tr("Creating system directories"));
+    proc.status(tr("Creating system directories"));
     mkdir("/mnt/antiX/opt", 0755);
     mkdir("/mnt/antiX/dev", 0755);
     mkdir("/mnt/antiX/proc", 0755);
@@ -1282,7 +1279,7 @@ bool MInstall::installLinux(const int progend)
     setupAutoMount(true);
     if(!copyLinux(progend - 1)) return false;
 
-    updateStatus(tr("Fixing configuration"), progend);
+    proc.status(tr("Fixing configuration"), progend);
     mkdir("/mnt/antiX/tmp", 01777);
     chmod("/mnt/antiX/tmp", 01777);
 
@@ -1411,7 +1408,7 @@ bool MInstall::copyLinux(const int progend)
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
-    updateStatus(tr("Copying new system"));
+    proc.status(tr("Copying new system"));
     int progstart = progressBar->value();
     // setup and start the process
     QString cmd;
@@ -1451,7 +1448,7 @@ bool MInstall::copyLinux(const int progend)
                 if (i > progspace) i = progspace;
                 progressBar->setValue(i + progstart);
             } else {
-                updateStatus(tr("Copy progress unknown. No file system statistics."));
+                proc.status(tr("Copy progress unknown. No file system statistics."));
             }
         }
         disconnect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), nullptr, nullptr);
@@ -1476,7 +1473,7 @@ bool MInstall::installLoader()
     if (phase < 0) return false;
 
     const QString &statup = tr("Installing GRUB");
-    updateStatus(statup);
+    proc.status(statup);
     QString cmd;
     QString val = proc.execOut("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -1568,7 +1565,7 @@ bool MInstall::installLoader()
     }
 
     // update NVRAM boot entries (only if installing on ESP)
-    updateStatus(statup);
+    proc.status(statup);
     if (grubEspButton->isChecked()) {
         cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
         if (!proc.exec(cmd)) {
@@ -1630,13 +1627,13 @@ bool MInstall::installLoader()
             proc.exec("/bin/cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt", true);
         }
     }
-    updateStatus(statup);
+    proc.status(statup);
 
     //update grub with new config
 
     qDebug() << "Update Grub";
     proc.exec("chroot /mnt/antiX update-grub");
-    updateStatus(statup);
+    proc.status(statup);
 
     qDebug() << "Update initramfs";
     //if useing f2fs, then add modules to /etc/initramfs-tools/modules
@@ -1645,7 +1642,7 @@ bool MInstall::installLoader()
         //proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
     //}
     proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
-    updateStatus(statup);
+    proc.status(statup);
     qDebug() << "clear chroot env";
     proc.exec("/bin/umount /mnt/antiX/proc", true);
     proc.exec("/bin/umount /mnt/antiX/sys", true);

@@ -222,7 +222,6 @@ private:
     // helpers
     bool checkPassword(QLineEdit *passEdit);
     // private functions
-    void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
     void updatePartitionCombos(QComboBox *changed);
