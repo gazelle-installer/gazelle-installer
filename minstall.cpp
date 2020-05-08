@@ -34,6 +34,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     : proc(this)
 {
     setupUi(this);
+    proc.logView = listLog;
     updateCursor(Qt::WaitCursor);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     installBox->hide();
@@ -122,7 +123,6 @@ MInstall::~MInstall() {
 void MInstall::startup()
 {
     proc.log(__PRETTY_FUNCTION__);
-    proc.logView = listLog;
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
         saveDesktopCheckBox->hide();
