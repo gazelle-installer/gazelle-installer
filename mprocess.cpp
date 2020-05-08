@@ -54,7 +54,7 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
             }
         }
         const QByteArray &StdErr = readAllStandardError();
-        if (StdErr.isEmpty()) {
+        if (!StdErr.isEmpty()) {
             qDebug().nospace() << "SErr #" << execount << ": " << StdErr;
             status = 0;
         }
