@@ -815,28 +815,28 @@ bool MInstall::formatPartitions()
     if (isSwapEncrypted) {
         if (swapFormatSize) {
             proc.status(statup);
-            if (!makeLuksPartition(swapdev, encPass)) return false;
+            if (!partman.luksMake(swapdev, encPass)) return false;
         }
         proc.status(statup);
-        if (!openLuksPartition(swapdev, "swapfs", encPass)) return false;
+        if (!partman.luksOpen(swapdev, "swapfs", encPass)) return false;
         swapdev = "/dev/mapper/swapfs";
     }
     if (isRootEncrypted) {
         if (rootFormatSize) {
             proc.status(statup);
-            if (!makeLuksPartition(rootdev, encPass)) return false;
+            if (!partman.luksMake(rootdev, encPass)) return false;
         }
         proc.status(statup);
-        if (!openLuksPartition(rootdev, "rootfs", encPass)) return false;
+        if (!partman.luksOpen(rootdev, "rootfs", encPass)) return false;
         rootdev = "/dev/mapper/rootfs";
     }
     if (isHomeEncrypted) {
         if (homeFormatSize) {
             proc.status(statup);
-            if (!makeLuksPartition(homedev, encPass)) return false;
+            if (!partman.luksMake(homedev, encPass)) return false;
         }
         proc.status(statup);
-        if (!openLuksPartition(homedev, "homefs", encPass)) return false;
+        if (!partman.luksOpen(homedev, "homefs", encPass)) return false;
         homedev = "/dev/mapper/homefs";
     }
 
@@ -957,51 +957,6 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
     }
     proc.sleep(1000);
-    return true;
-}
-
-// Create and open Luks partitions; return false if it cannot create one
-bool MInstall::makeLuksPartition(const QString &dev, const QByteArray &password)
-{
-    proc.log(__PRETTY_FUNCTION__);
-    if (phase < 0) return false;
-
-    // format partition
-    QString strCipherSpec = comboFDEcipher->currentText() + "-" + comboFDEchain->currentText();
-    if (comboFDEchain->currentText() != "ECB") {
-        strCipherSpec += "-" + comboFDEivgen->currentText();
-        if (comboFDEivgen->currentText() == "ESSIV") {
-            strCipherSpec += ":" + comboFDEivhash->currentData().toString();
-        }
-    }
-    QString cmd = "cryptsetup --batch-mode"
-                  " --cipher " + strCipherSpec.toLower()
-                  + " --key-size " + spinFDEkeysize->cleanText()
-                  + " --hash " + comboFDEhash->currentText().toLower().remove('-')
-                  + " --use-" + comboFDErandom->currentText()
-                  + " --iter-time " + spinFDEroundtime->cleanText()
-                  + " luksFormat " + dev;
-    if (!proc.exec(cmd, true, &password)) {
-        failUI(tr("Sorry, could not create %1 LUKS partition").arg(dev));
-        return false;
-    }
-    proc.sleep(1000);
-    return true;
-}
-
-bool MInstall::openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options, const bool failHard)
-{
-    proc.log(__PRETTY_FUNCTION__);
-    if (phase < 0) return false;
-
-    // open containers, assigning container names
-    QString cmd = "cryptsetup luksOpen " + dev;
-    if (!fs_name.isEmpty()) cmd += " " + fs_name;
-    if (!options.isEmpty()) cmd += " " + options;
-    if (!proc.exec(cmd, true, &password)) {
-        if (failHard) failUI(tr("Sorry, could not open %1 LUKS container").arg(fs_name));
-        return false;
-    }
     return true;
 }
 
@@ -1200,14 +1155,14 @@ bool MInstall::saveHomeBasic()
     QString homedev = homeDevice;
     // mount the root partition
     if (isRootEncrypted) {
-        if (!openLuksPartition(rootdev, "rootfs", pass, "--readonly", false)) return false;
+        if (!partman.luksOpen(rootdev, "rootfs", pass, "--readonly")) return false;
         rootdev = "/dev/mapper/rootfs";
     }
     if (!mountPartition(rootdev, "/mnt/antiX", "ro")) goto ending2;
     // mount the home partition
     if (homedev != rootDevice) {
         if (isHomeEncrypted) {
-            if (!openLuksPartition(homedev, "homefs", pass, "--readonly", false)) goto ending2;
+            if (!partman.luksOpen(homedev, "homefs", pass, "--readonly")) goto ending2;
             homedev = "/dev/mapper/homefs";
         }
         if (!mountPartition(homedev, "/mnt/home-tmp", "ro")) goto ending1;

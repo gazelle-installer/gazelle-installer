@@ -464,3 +464,34 @@ bool PartMan::checkTargetDrivesOK()
     }
     return true;
 }
+
+bool PartMan::luksMake(const QString &dev, const QByteArray &password)
+{
+    QString strCipherSpec = gui.comboFDEcipher->currentText()
+        + "-" + gui.comboFDEchain->currentText();
+    if (gui.comboFDEchain->currentText() != "ECB") {
+        strCipherSpec += "-" + gui.comboFDEivgen->currentText();
+        if (gui.comboFDEivgen->currentText() == "ESSIV") {
+            strCipherSpec += ":" + gui.comboFDEivhash->currentData().toString();
+        }
+    }
+    QString cmd = "cryptsetup --batch-mode"
+        " --cipher " + strCipherSpec.toLower()
+        + " --key-size " + gui.spinFDEkeysize->cleanText()
+        + " --hash " + gui.comboFDEhash->currentText().toLower().remove('-')
+        + " --use-" + gui.comboFDErandom->currentText()
+        + " --iter-time " + gui.spinFDEroundtime->cleanText()
+        + " luksFormat " + dev;
+    if (!proc.exec(cmd, true, &password)) return false;
+    proc.sleep(1000);
+    return true;
+}
+
+bool PartMan::luksOpen(const QString &dev, const QString &luksfs,
+    const QByteArray &password, const QString &options)
+{
+    QString cmd = "cryptsetup luksOpen " + dev;
+    if (!luksfs.isEmpty()) cmd += " " + luksfs;
+    if (!options.isEmpty()) cmd += " " + options;
+    return proc.exec(cmd, true, &password);
+}
