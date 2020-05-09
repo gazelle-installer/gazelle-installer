@@ -27,6 +27,16 @@ MProcess::MProcess(QObject *parent)
 {
 }
 
+void MProcess::setupUI(QListWidget *listLog, QProgressBar *progressBar)
+{
+    logView = listLog;
+    progBar = progressBar;
+    QPalette pal = listLog->palette();
+    pal.setColor(QPalette::Base, Qt::black);
+    pal.setColor(QPalette::Text, Qt::white);
+    listLog->setPalette(pal);
+}
+
 bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *input, bool needRead)
 {
     if (halting) return false;
@@ -150,15 +160,15 @@ void MProcess::log(QListWidgetItem *entry, const int status)
 
 void MProcess::status(const QString &text, int progress)
 {
-    if(!progressBar) log(text, Status);
+    if(!progBar) log(text, Status);
     else {
         QString fmt = "%p% - " + text;
-        if(progressBar->format() != fmt) {
+        if(progBar->format() != fmt) {
             log(text, Status);
-            progressBar->setFormat(fmt);
+            progBar->setFormat(fmt);
         }
-        if(progress < 0) progress = progressBar->value() + 1;
-        progressBar->setValue(progress);
+        if(progress < 0) progress = progBar->value() + 1;
+        progBar->setValue(progress);
         qApp->processEvents();
     }
 }
