@@ -34,12 +34,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     : proc(this), partman(proc, listBlkDevs, *this, this)
 {
     setupUi(this);
-    QPalette palLog = listLog->palette();
-    palLog.setColor(QPalette::Base, Qt::black);
-    palLog.setColor(QPalette::Text, Qt::white);
-    listLog->setPalette(palLog);
-    proc.logView = listLog;
-    proc.progressBar = progressBar;
+    proc.setupUI(listLog, progressBar);
     updateCursor(Qt::WaitCursor);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     installBox->hide();
@@ -1433,10 +1428,12 @@ bool MInstall::copyLinux(const int progend)
 
     if (!nocopy) {
         if (phase < 0) return false;
+        qDebug() << "Exec COPY:" << cmd;
+        QListWidgetItem *logEntry = proc.log(cmd, MProcess::Exec);
+
         QEventLoop eloop;
         connect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), &eloop, &QEventLoop::quit);
         connect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
-        qDebug() << cmd;
         proc.start(cmd);
         const int progspace = progend - progstart;
         const int progdiv = (progspace != 0) ? (sourceInodes / progspace) : 0;
@@ -1454,10 +1451,13 @@ bool MInstall::copyLinux(const int progend)
         disconnect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), nullptr, nullptr);
         disconnect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), nullptr, nullptr);
 
+        qDebug() << "Exit COPY:" << proc.exitCode() << proc.exitStatus();
         if (proc.exitStatus() != QProcess::NormalExit) {
+            proc.log(logEntry, -1);
             failUI(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
             return false;
         }
+        proc.log(logEntry, proc.exitCode() ? 0 : 1);
     }
 
     return true;
