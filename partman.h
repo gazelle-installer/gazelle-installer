@@ -59,6 +59,9 @@ public:
     void populate();
     QWidget *composeValidate(const QString &minSizeText, const QString &project);
     bool checkTargetDrivesOK();
+    bool luksMake(const QString &dev, const QByteArray &password);
+    bool luksOpen(const QString &dev, const QString &luksfs,
+        const QByteArray &password, const QString &options = QString());
 };
 
 #endif // PARTMAN_H
