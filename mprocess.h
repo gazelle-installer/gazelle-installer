@@ -29,6 +29,8 @@ class MProcess : public QProcess
     int sleepcount = 0;
     bool halting = false;
     bool debugUnusedOutput = true;
+    QListWidget *logView = nullptr;
+    QProgressBar *progBar = nullptr;
 public:
     enum LogType {
         Standard,
@@ -36,9 +38,8 @@ public:
         Status,
         Exec
     };
-    QListWidget *logView = nullptr;
-    QProgressBar *progressBar = nullptr;
     MProcess(QObject *parent = Q_NULLPTR);
+    void setupUI(QListWidget *listLog, QProgressBar *progressBar);
     bool exec(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
     QString execOut(const QString &cmd, bool everything = false);
     QStringList execOutLines(const QString &cmd, const bool rawexec = false);
