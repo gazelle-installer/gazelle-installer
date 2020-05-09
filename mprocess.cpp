@@ -44,7 +44,7 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     if (input && !(input->isEmpty())) write(*input);
     closeWriteChannel();
     eloop.exec();
-    disconnect(this, SIGNAL(finished(int, QProcess::ExitStatus)), nullptr, nullptr);
+    disconnect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), nullptr, nullptr);
     if (debugUnusedOutput) {
         bool hasOut = false;
         if (!needRead) {
@@ -105,7 +105,7 @@ void MProcess::halt()
 {
     halting = true;
     terminate();
-    QTimer::singleShot(5000, this, SLOT(kill()));
+    QTimer::singleShot(5000, this, &QProcess::kill);
 }
 
 void MProcess::unhalt()
