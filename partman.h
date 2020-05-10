@@ -43,7 +43,6 @@ class PartMan : public QObject
     BlockDeviceList &listBlkDevs;
     Ui::MeInstall &gui;
     QWidget *master;
-    QStringList listUsePresets;
     QMap<QString, QTreeWidgetItem *> mounts;
     QList<QTreeWidgetItem *> swaps;
     enum Qt::CheckState encryptCheckRoot = Qt::Unchecked;

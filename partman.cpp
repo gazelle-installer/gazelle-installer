@@ -32,7 +32,6 @@ PartMan::PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QW
 }
 void PartMan::setup()
 {
-    listUsePresets << "" << "root" << "boot" << "home" << "swap";
     QFont smallFont = gui.treePartitions->headerItem()->font(Encrypt);
     smallFont.setPointSizeF(smallFont.pointSizeF() * 0.6);
     gui.treePartitions->headerItem()->setFont(Encrypt, smallFont);
@@ -60,6 +59,7 @@ void PartMan::populate()
             editLabel->setAutoFillBackground(true);
             gui.treePartitions->setItemWidget(curdev, Label, editLabel);
             editLabel->setEnabled(false);
+            curdev->setText(Label, bdinfo.label);
             editLabel->setText(bdinfo.label);
             // Use For
             QComboBox *comboUse = new QComboBox(gui.treePartitions);
@@ -67,7 +67,14 @@ void PartMan::populate()
             gui.treePartitions->setItemWidget(curdev, UseFor, comboUse);
             comboUse->setEditable(true);
             comboUse->setInsertPolicy(QComboBox::NoInsert);
-            comboUse->addItems(listUsePresets);
+            comboUse->addItem("");
+            if(bdinfo.size <= 4294967296) {
+                comboUse->addItem("ESP");
+                comboUse->addItem("boot");
+            }
+            comboUse->addItem("root");
+            comboUse->addItem("swap");
+            comboUse->addItem("home");
             comboUse->setProperty("row", QVariant::fromValue<void *>(curdev));
             comboUse->lineEdit()->setPlaceholderText("----");
             connect(comboUse, &QComboBox::currentTextChanged, this, &PartMan::comboUseTextChange);
@@ -76,7 +83,7 @@ void PartMan::populate()
             comboType->setAutoFillBackground(true);
             gui.treePartitions->setItemWidget(curdev, Type, comboType);
             comboType->setEnabled(false);
-            curdev->setText(5, bdinfo.fs);
+            curdev->setText(Type, bdinfo.fs);
             comboType->addItem(bdinfo.fs);
             connect(comboType, &QComboBox::currentTextChanged, this, &PartMan::comboTypeTextChange);
             // Mount options
@@ -128,20 +135,26 @@ void PartMan::comboUseTextChange(const QString &text)
     int oldUseClass = combo->property("class").toInt();
     int useClass = -1;
     if(text.isEmpty()) useClass = 0;
-    else if(text == "swap") useClass = 1;
+    else if(text == "ESP") useClass = 1;
     else if(text == "boot" || text == "/boot") useClass = 2;
-    else useClass = 3;
+    else if(text == "swap") useClass = 3;
+    else useClass = 4;
     if(useClass != oldUseClass) {
         QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
         if(!item) return;
         QComboBox *comboType = static_cast<QComboBox *>(gui.treePartitions->itemWidget(item, Type));
-        const QString &fs = item->text(Type);
+        QLineEdit *editLabel = static_cast<QLineEdit *>(gui.treePartitions->itemWidget(item, Label));
         comboType->setEnabled(false);
         comboType->clear();
-        if(useClass == 0) comboType->addItem(fs);
-        else if(useClass == 1) comboType->addItem("SWAP");
-        else if(useClass == 2) comboType->addItem("ext4");
-        else if(useClass == 3) {
+        switch(useClass) {
+        case 0:
+            editLabel->setText(item->text(Label));
+            comboType->addItem(item->text(Type));
+            break;
+        case 1: comboType->addItem("FAT32"); break;
+        case 2: comboType->addItem("ext4"); break;
+        case 3: comboType->addItem("SWAP"); break;
+        default:
             comboType->addItem("ext4");
             comboType->addItem("ext3");
             comboType->addItem("ext2");
@@ -156,14 +169,14 @@ void PartMan::comboUseTextChange(const QString &text)
             comboType->setEnabled(true);
         }
         // Changing to and from a mount/use that support encryption.
-        if(useClass == 0 || useClass == 2) {
+        if(useClass >= 0 && useClass <= 2) {
             item->setData(Encrypt, Qt::CheckStateRole, QVariant());
-        } else if(oldUseClass == 0 || oldUseClass == 2) {
+        } else if(oldUseClass >= 0 && oldUseClass <= 2) {
             item->setCheckState(Encrypt, encryptCheckRoot);
         }
         // Label and options
-        gui.treePartitions->itemWidget(item, Label)->setDisabled(text.isEmpty());
-        gui.treePartitions->itemWidget(item, Options)->setDisabled(useClass <= 1); // nothing or SWAP
+        editLabel->setDisabled(useClass == 0);
+        gui.treePartitions->itemWidget(item, Options)->setDisabled(useClass == 0);
         combo->setProperty("class", QVariant(useClass));
     }
     gui.treePartitions->blockSignals(false);
@@ -231,6 +244,7 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
             (gui.treePartitions->itemWidget(*it, UseFor));
         if(comboUse && !(comboUse->currentText().isEmpty())) {
             QString mount = translateUse(comboUse->currentText());
+            const QString &devname = (*it)->text(Device);
             if(mount == "swap") {
                 swaps << *it;
                 mount.clear();
@@ -239,7 +253,11 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
             QString desc;
             if(mount=="/") desc = "/ (root)";
             else if(mount.isEmpty()) desc = "swap";
-            else desc = mount;
+            else {
+                if(mount == "ESP") desc = tr("EFI System Partition");
+                else desc = mount;
+                msgFormatList << devname << desc;
+            }
             QTreeWidgetItem *twit = mounts.value(mount);
 
             // The mount can only be selected once.
@@ -250,7 +268,6 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
             } else {
                 if(!mount.isEmpty()) mounts.insert(mount, *it);
                 // Warn if using a non-Linux partition (potential install of another OS).
-                const QString &devname = (*it)->text(Device);
                 const int bdindex = listBlkDevs.findDevice(devname);
                 if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
                     msgForeignList << devname << desc;
@@ -289,19 +306,6 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
 
     if(!automatic) {
         QString msg;
-
-        // format /boot?
-        twit = mounts.value("/boot");
-        if (twit) {
-            const QString &bootdev = twit->text(Device);
-            msgFormatList << bootdev << "/boot";
-            // warn if partition too big (not needed for boot, likely data or other useful partition
-            const int bdindex = listBlkDevs.findDevice(bootdev);
-            if (bdindex < 0 || listBlkDevs.at(bdindex).size > 2147483648) {
-                // if > 2GB or not in block device list for some reason
-                msg = tr("The partition you selected for /boot is larger than expected.") + "\n\n";
-            }
-        }
 
         // format swap if encrypting or not already swap (if no swap is chosen do nothing)
         QStringList swapEncrypt;
