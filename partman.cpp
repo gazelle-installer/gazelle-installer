@@ -245,25 +245,30 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
         if(comboUse && !(comboUse->currentText().isEmpty())) {
             QString mount = translateUse(comboUse->currentText());
             const QString &devname = (*it)->text(Device);
+            if(!mount.startsWith("/") && comboUse->findText(mount)<0) {
+                QMessageBox::critical(master, master->windowTitle(),
+                    tr("Invalid use for %1: %2").arg(devname, mount));
+                return comboUse;
+            }
             if(mount == "swap") {
                 swaps << *it;
                 mount.clear();
             }
             // Mount description
             QString desc;
-            if(mount=="/") desc = "/ (root)";
-            else if(mount.isEmpty()) desc = "swap";
+            if(mount == "/") desc = "/ (root)";
+            else if(mount.isEmpty()) desc = tr("swap space");
             else {
                 if(mount == "ESP") desc = tr("EFI System Partition");
                 else desc = mount;
-                msgFormatList << devname << desc;
+                if(mount != "/home") msgFormatList << devname << desc;
             }
             QTreeWidgetItem *twit = mounts.value(mount);
 
             // The mount can only be selected once.
             if(twit) {
                 QMessageBox::critical(master, master->windowTitle(),
-                     tr("%1 is already selected for: %2").arg(twit->text(0), desc));
+                    tr("%1 is already selected for: %2").arg(twit->text(Device), desc));
                 return comboUse;
             } else {
                 if(!mount.isEmpty()) mounts.insert(mount, *it);
@@ -322,7 +327,7 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
                 swapNoEncrypt << swapdev;
             }
             if (format) {
-                msgFormatList << swapdev << "swap";
+                msgFormatList << swapdev << tr("swap space");
             } else {
                 msgConfirm += " - " + tr("Configure %1 as swap space").arg(swapdev) + "\n";
             }
@@ -340,7 +345,7 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
         }
 
         int ans;
-        const QString msgPartSel = " - " + tr("%1 for the %2 partition") + "\n";
+        const QString msgPartSel = " - " + tr("%1, to be used for %2") + "\n";
         // message to advise of issues found.
         if (msgForeignList.count() > 0) {
             msg += tr("The following partitions you selected are not Linux partitions:") + "\n\n";
