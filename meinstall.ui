@@ -690,6 +690,12 @@
             <property name="enabled">
              <bool>true</bool>
             </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="title">
              <string>Encryption options</string>
             </property>
@@ -738,6 +744,146 @@
             </layout>
            </widget>
           </item>
+          <item row="0" column="0">
+           <widget class="QGroupBox" name="rootBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="title">
+             <string>Choose partitions</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_4">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item row="1" column="2">
+              <widget class="QToolButton" name="buttonPartClear">
+               <property name="toolTip">
+                <string>Mark the selected drive to be cleared for a new layout.</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="star-new-symbolic">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QToolButton" name="buttonPartAdd">
+               <property name="toolTip">
+                <string>Add a new partition entry. This only works with a new layout.</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="add">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QToolButton" name="buttonRunParted">
+               <property name="toolTip">
+                <string>Run the partition tool.</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="gparted">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2">
+              <widget class="QToolButton" name="buttonPartRemove">
+               <property name="toolTip">
+                <string>Remove an existing entry from the layout. This only works with entries to a new layout.</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="remove">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="2">
+              <widget class="QToolButton" name="buttonPartReload">
+               <property name="toolTip">
+                <string>Reload the existing setup for one or more disks.</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="icon">
+                <iconset theme="revert">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="2">
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="0" column="0" rowspan="7" colspan="2">
+              <widget class="QTreeWidget" name="treePartitions">
+               <column>
+                <property name="text">
+                 <string>Device</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Size</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Label</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Use For</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Encrypt</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Type</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Mount Options</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
           <item row="1" column="0">
            <widget class="QGroupBox" name="partsPreferencesBox">
             <property name="sizePolicy">
@@ -778,128 +924,6 @@
              </item>
             </layout>
            </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QGroupBox" name="rootBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="title">
-             <string>Choose partitions</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_4">
-             <item row="3" column="2">
-              <widget class="QToolButton" name="buttonPartUndo">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="undo">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0" rowspan="5" colspan="2">
-              <widget class="QTreeWidget" name="treePartitions">
-               <column>
-                <property name="text">
-                 <string>Device</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Size</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Label</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Use For</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Encrypt</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Type</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Mount Options</string>
-                </property>
-               </column>
-              </widget>
-             </item>
-             <item row="1" column="2">
-              <widget class="QToolButton" name="buttonPartAdd">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="add">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2">
-              <widget class="QToolButton" name="buttonPartRemove">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="remove">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="2">
-              <widget class="QToolButton" name="buttonPartReload">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="revert">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QToolButton" name="buttonRunParted">
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="gparted">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <spacer>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>10</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>
