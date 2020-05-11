@@ -52,10 +52,12 @@ class PartMan : public QObject
     void comboUseTextChange(const QString &text);
     void comboTypeTextChange(const QString &);
     void treeItemChange(QTreeWidgetItem *item, int column);
+    void treeSelChange();
+    void partClearClick(bool);
 public:
     bool automatic, sync;
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
-    void populate();
+    void populate(QTreeWidgetItem *drvstart = nullptr);
     QWidget *composeValidate(const QString &minSizeText, const QString &project);
     bool checkTargetDrivesOK();
     bool luksMake(const QString &dev, const QByteArray &password);

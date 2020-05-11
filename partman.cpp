@@ -37,21 +37,31 @@ void PartMan::setup()
     gui.treePartitions->headerItem()->setFont(Encrypt, smallFont);
     gui.treePartitions->header()->setMinimumSectionSize(5);
     connect(gui.treePartitions, &QTreeWidget::itemChanged, this, &PartMan::treeItemChange);
+    connect(gui.treePartitions, &QTreeWidget::itemSelectionChanged, this, &PartMan::treeSelChange);
+    connect(gui.buttonPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
+    gui.buttonPartAdd->setDisabled(true);
+    gui.buttonPartRemove->setDisabled(true);
+    gui.buttonPartClear->setDisabled(true);
 }
 
-void PartMan::populate()
+void PartMan::populate(QTreeWidgetItem *drvstart)
 {
     gui.treePartitions->blockSignals(true);
-    gui.treePartitions->clear();
+    if(!drvstart) gui.treePartitions->clear();
     QTreeWidgetItem *curdrv = nullptr;
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         QTreeWidgetItem *curdev;
         if (bdinfo.isDrive) {
-            curdrv = curdev = new QTreeWidgetItem(gui.treePartitions);
+            if(!drvstart) curdrv = new QTreeWidgetItem(gui.treePartitions);
+            else if(bdinfo.name == drvstart->text(Device)) curdrv = drvstart;
+            else if(!curdrv) continue; // Skip until the drive is drvstart.
+            else break; // Exit the loop early if the drive isn't drvstart.
+            curdev = curdrv;
             curdrv->setData(Device, Qt::UserRole, QVariant(false)); // drive starts off "unused"
             // Model
             curdev->setText(Label, bdinfo.model);
         } else {
+            if(!curdrv) continue;
             curdev = new QTreeWidgetItem(curdrv);
             curdrv->setData(Device, Qt::UserRole, QVariant(true)); // drive is now "used"
             // Label
@@ -228,6 +238,35 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
         gui.gbEncrPass->setVisible(needsCrypto);
         gui.treePartitions->blockSignals(false);
     }
+}
+
+void PartMan::treeSelChange()
+{
+    QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
+    QIcon iconClear = QIcon::fromTheme("star-new-symbolic");
+    if(twit) {
+        bool used = true;
+        if(!(twit->parent())) used = twit->data(Device, Qt::UserRole).toBool();
+        else used = twit->parent()->data(Device, Qt::UserRole).toBool();
+        gui.buttonPartClear->setEnabled(twit->parent()==nullptr);
+        if(!used) iconClear = QIcon::fromTheme("undo");
+        gui.buttonPartAdd->setDisabled(used);
+        gui.buttonPartAdd->setDisabled(used || twit->parent());
+    } else {
+        gui.buttonPartAdd->setDisabled(true);
+        gui.buttonPartRemove->setDisabled(true);
+    }
+    gui.buttonPartClear->setIcon(iconClear);
+}
+
+void PartMan::partClearClick(bool)
+{
+    QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
+    if(!twit || twit->parent()) return;
+    while(twit->childCount()) twit->removeChild(twit->child(0));
+    if(twit->data(Device, Qt::UserRole).toBool() == false) populate(twit);
+    else twit->setData(Device, Qt::UserRole, QVariant(false));
+    treeSelChange();
 }
 
 QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &project)
