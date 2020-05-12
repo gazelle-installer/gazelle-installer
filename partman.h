@@ -47,6 +47,8 @@ class PartMan : public QObject
     QList<QTreeWidgetItem *> swaps;
     enum Qt::CheckState encryptCheckRoot = Qt::Unchecked;
     void setup();
+    void setupItem(QTreeWidgetItem *item, const BlockDeviceInfo *bdinfo);
+    void labelParts(QTreeWidgetItem *drive);
     static QString translateUse(const QString &alias);
     void setEncryptChecks(const QString &use, enum Qt::CheckState state);
     void comboUseTextChange(const QString &text);
@@ -54,6 +56,8 @@ class PartMan : public QObject
     void treeItemChange(QTreeWidgetItem *item, int column);
     void treeSelChange();
     void partClearClick(bool);
+    void partAddClick(bool);
+    void partRemoveClick(bool);
 public:
     bool automatic, sync;
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);

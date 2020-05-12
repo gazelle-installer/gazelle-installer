@@ -20,6 +20,7 @@
 #include <QLocale>
 #include <QMessageBox>
 #include <QTreeWidget>
+#include <QSpinBox>
 #include <QComboBox>
 #include <QLineEdit>
 
@@ -39,9 +40,11 @@ void PartMan::setup()
     connect(gui.treePartitions, &QTreeWidget::itemChanged, this, &PartMan::treeItemChange);
     connect(gui.treePartitions, &QTreeWidget::itemSelectionChanged, this, &PartMan::treeSelChange);
     connect(gui.buttonPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
-    gui.buttonPartAdd->setDisabled(true);
-    gui.buttonPartRemove->setDisabled(true);
-    gui.buttonPartClear->setDisabled(true);
+    connect(gui.buttonPartAdd, &QToolButton::clicked, this, &PartMan::partAddClick);
+    connect(gui.buttonPartRemove, &QToolButton::clicked, this, &PartMan::partRemoveClick);
+    gui.buttonPartAdd->setEnabled(false);
+    gui.buttonPartRemove->setEnabled(false);
+    gui.buttonPartClear->setEnabled(false);
 }
 
 void PartMan::populate(QTreeWidgetItem *drvstart)
@@ -64,44 +67,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
             if(!curdrv) continue;
             curdev = new QTreeWidgetItem(curdrv);
             curdrv->setData(Device, Qt::UserRole, QVariant(true)); // drive is now "used"
-            // Label
-            QLineEdit *editLabel = new QLineEdit(gui.treePartitions);
-            editLabel->setAutoFillBackground(true);
-            gui.treePartitions->setItemWidget(curdev, Label, editLabel);
-            editLabel->setEnabled(false);
-            curdev->setText(Label, bdinfo.label);
-            editLabel->setText(bdinfo.label);
-            // Use For
-            QComboBox *comboUse = new QComboBox(gui.treePartitions);
-            comboUse->setAutoFillBackground(true);
-            gui.treePartitions->setItemWidget(curdev, UseFor, comboUse);
-            comboUse->setEditable(true);
-            comboUse->setInsertPolicy(QComboBox::NoInsert);
-            comboUse->addItem("");
-            if(bdinfo.size <= 4294967296) {
-                comboUse->addItem("ESP");
-                comboUse->addItem("boot");
-            }
-            comboUse->addItem("root");
-            comboUse->addItem("swap");
-            comboUse->addItem("home");
-            comboUse->setProperty("row", QVariant::fromValue<void *>(curdev));
-            comboUse->lineEdit()->setPlaceholderText("----");
-            connect(comboUse, &QComboBox::currentTextChanged, this, &PartMan::comboUseTextChange);
-            // Type
-            QComboBox *comboType = new QComboBox(gui.treePartitions);
-            comboType->setAutoFillBackground(true);
-            gui.treePartitions->setItemWidget(curdev, Type, comboType);
-            comboType->setEnabled(false);
-            curdev->setText(Type, bdinfo.fs);
-            comboType->addItem(bdinfo.fs);
-            connect(comboType, &QComboBox::currentTextChanged, this, &PartMan::comboTypeTextChange);
-            // Mount options
-            QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
-            editOptions->setAutoFillBackground(true);
-            gui.treePartitions->setItemWidget(curdev, Options, editOptions);
-            editOptions->setEnabled(false);
-            editOptions->setText("defaults");
+            setupItem(curdev, &bdinfo);
         }
         // Device name and size
         curdev->setText(Device, bdinfo.name);
@@ -113,6 +79,66 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
     gui.treePartitions->blockSignals(false);
+}
+
+void PartMan::setupItem(QTreeWidgetItem *item, const BlockDeviceInfo *bdinfo)
+{
+    // Size
+    if(!bdinfo) {
+        QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
+        spinSize->setAutoFillBackground(true);
+        gui.treePartitions->setItemWidget(item, Size, spinSize);
+    }
+    // Label
+    QLineEdit *editLabel = new QLineEdit(gui.treePartitions);
+    editLabel->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(item, Label, editLabel);
+    editLabel->setEnabled(false);
+    if(bdinfo) {
+        item->setText(Label, bdinfo->label);
+        editLabel->setText(bdinfo->label);
+    }
+    // Use For
+    QComboBox *comboUse = new QComboBox(gui.treePartitions);
+    comboUse->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(item, UseFor, comboUse);
+    comboUse->setEditable(true);
+    comboUse->setInsertPolicy(QComboBox::NoInsert);
+    comboUse->addItem("");
+    if(!bdinfo || bdinfo->size <= 4294967296) {
+        comboUse->addItem("ESP");
+        comboUse->addItem("boot");
+    }
+    comboUse->addItem("root");
+    comboUse->addItem("swap");
+    comboUse->addItem("home");
+    comboUse->setProperty("row", QVariant::fromValue<void *>(item));
+    comboUse->lineEdit()->setPlaceholderText("----");
+    connect(comboUse, &QComboBox::currentTextChanged, this, &PartMan::comboUseTextChange);
+    // Type
+    QComboBox *comboType = new QComboBox(gui.treePartitions);
+    comboType->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(item, Type, comboType);
+    comboType->setEnabled(false);
+    if(bdinfo) {
+        item->setText(Type, bdinfo->fs);
+        comboType->addItem(bdinfo->fs);
+    }
+    connect(comboType, &QComboBox::currentTextChanged, this, &PartMan::comboTypeTextChange);
+    // Mount options
+    QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
+    editOptions->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(item, Options, editOptions);
+    editOptions->setEnabled(false);
+    editOptions->setText("defaults");
+}
+
+void PartMan::labelParts(QTreeWidgetItem *drive)
+{
+    const QString name = drive->text(Device) + "%1";
+    for(int ixi = drive->childCount() - 1; ixi >= 0; --ixi) {
+        drive->child(ixi)->setText(Device, name.arg(ixi+1));
+    }
 }
 
 QString PartMan::translateUse(const QString &alias)
@@ -185,8 +211,8 @@ void PartMan::comboUseTextChange(const QString &text)
             item->setCheckState(Encrypt, encryptCheckRoot);
         }
         // Label and options
-        editLabel->setDisabled(useClass == 0);
-        gui.treePartitions->itemWidget(item, Options)->setDisabled(useClass == 0);
+        editLabel->setEnabled(useClass!=0);
+        gui.treePartitions->itemWidget(item, Options)->setEnabled(useClass!=0);
         combo->setProperty("class", QVariant(useClass));
     }
     gui.treePartitions->blockSignals(false);
@@ -250,11 +276,11 @@ void PartMan::treeSelChange()
         else used = twit->parent()->data(Device, Qt::UserRole).toBool();
         gui.buttonPartClear->setEnabled(twit->parent()==nullptr);
         if(!used) iconClear = QIcon::fromTheme("undo");
-        gui.buttonPartAdd->setDisabled(used);
-        gui.buttonPartAdd->setDisabled(used || twit->parent());
+        gui.buttonPartAdd->setEnabled(!used);
+        gui.buttonPartRemove->setEnabled(!used && twit->parent());
     } else {
-        gui.buttonPartAdd->setDisabled(true);
-        gui.buttonPartRemove->setDisabled(true);
+        gui.buttonPartAdd->setEnabled(false);
+        gui.buttonPartRemove->setEnabled(false);
     }
     gui.buttonPartClear->setIcon(iconClear);
 }
@@ -267,6 +293,31 @@ void PartMan::partClearClick(bool)
     if(twit->data(Device, Qt::UserRole).toBool() == false) populate(twit);
     else twit->setData(Device, Qt::UserRole, QVariant(false));
     treeSelChange();
+}
+
+void PartMan::partAddClick(bool)
+{
+    QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
+    if(!twit) return;
+    QTreeWidgetItem *drive = twit->parent();
+    int index = 0;
+    if(!drive) drive = twit;
+    else index = drive->indexOfChild(twit) + 1;
+
+    QTreeWidgetItem *part = new QTreeWidgetItem;
+    drive->insertChild(index, part);
+    setupItem(part, nullptr);
+
+    labelParts(drive);
+    part->setSelected(true);
+    twit->setSelected(false);
+}
+
+void PartMan::partRemoveClick(bool)
+{
+    QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
+    if(!twit || !(twit->parent())) return;
+    twit->parent()->removeChild(twit);
 }
 
 QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &project)
