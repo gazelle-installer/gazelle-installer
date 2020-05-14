@@ -47,7 +47,8 @@ class PartMan : public QObject
     QList<QTreeWidgetItem *> swaps;
     enum Qt::CheckState encryptCheckRoot = Qt::Unchecked;
     void setup();
-    void setupItem(QTreeWidgetItem *item, const BlockDeviceInfo *bdinfo);
+    QTreeWidgetItem *setupItem(QTreeWidgetItem *parent, const BlockDeviceInfo *bdinfo,
+        int defaultMB = 1, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drive);
     static QString translateUse(const QString &alias);
     void setEncryptChecks(const QString &use, enum Qt::CheckState state);
@@ -60,6 +61,8 @@ class PartMan : public QObject
     void partRemoveClick(bool);
 public:
     bool automatic, sync;
+    bool gptoverride, uefi;
+    QMap<QString, QString> defaultLabels;
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
     void populate(QTreeWidgetItem *drvstart = nullptr);
     QWidget *composeValidate(const QString &minSizeText, const QString &project);
@@ -67,6 +70,7 @@ public:
     bool luksMake(const QString &dev, const QByteArray &password);
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
+    bool layoutDefault();
 };
 
 #endif // PARTMAN_H

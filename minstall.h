@@ -226,7 +226,6 @@ private:
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
-    bool calculateDefaultPartitions();
     bool makePartitions();
     bool formatPartitions();
     bool installLinux(const int progend);
