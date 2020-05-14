@@ -45,6 +45,8 @@ void PartMan::setup()
     gui.buttonPartAdd->setEnabled(false);
     gui.buttonPartRemove->setEnabled(false);
     gui.buttonPartClear->setEnabled(false);
+    defaultLabels["ESP"] = "EFI System";
+    defaultLabels["bios_grub"] = "BIOS GRUB";
 }
 
 void PartMan::populate(QTreeWidgetItem *drvstart)
@@ -65,14 +67,14 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
             curdev->setText(Label, bdinfo.model);
         } else {
             if(!curdrv) continue;
-            curdev = new QTreeWidgetItem(curdrv);
+            curdev = setupItem(curdrv, &bdinfo);
             curdrv->setData(Device, Qt::UserRole, QVariant(true)); // drive is now "used"
-            setupItem(curdev, &bdinfo);
+
         }
         // Device name and size
         curdev->setText(Device, bdinfo.name);
         curdev->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
-        curdev->setData(Size, Qt::UserRole, QVariant(-bdinfo.size)); // negative = reuse partition
+        curdev->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
     }
     gui.treePartitions->expandAll();
     for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
@@ -81,30 +83,35 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     gui.treePartitions->blockSignals(false);
 }
 
-void PartMan::setupItem(QTreeWidgetItem *item, const BlockDeviceInfo *bdinfo)
+QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *parent, const BlockDeviceInfo *bdinfo,
+    int defaultMB, const QString &defaultUse)
 {
+    QTreeWidgetItem *twit = new QTreeWidgetItem(parent);
     // Size
     if(!bdinfo) {
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
         spinSize->setAutoFillBackground(true);
-        gui.treePartitions->setItemWidget(item, Size, spinSize);
+        gui.treePartitions->setItemWidget(twit, Size, spinSize);
+        spinSize->setRange(1, parent->data(Size, Qt::UserRole).toLongLong() / 1048576);
+        spinSize->setValue(defaultMB);
     }
     // Label
     QLineEdit *editLabel = new QLineEdit(gui.treePartitions);
     editLabel->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(item, Label, editLabel);
+    gui.treePartitions->setItemWidget(twit, Label, editLabel);
     editLabel->setEnabled(false);
     if(bdinfo) {
-        item->setText(Label, bdinfo->label);
+        twit->setText(Label, bdinfo->label);
         editLabel->setText(bdinfo->label);
     }
     // Use For
     QComboBox *comboUse = new QComboBox(gui.treePartitions);
     comboUse->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(item, UseFor, comboUse);
+    gui.treePartitions->setItemWidget(twit, UseFor, comboUse);
     comboUse->setEditable(true);
     comboUse->setInsertPolicy(QComboBox::NoInsert);
     comboUse->addItem("");
+    if(!bdinfo || bdinfo->size <= 16) comboUse->addItem("bios_grub");
     if(!bdinfo || bdinfo->size <= 4294967296) {
         comboUse->addItem("ESP");
         comboUse->addItem("boot");
@@ -112,30 +119,35 @@ void PartMan::setupItem(QTreeWidgetItem *item, const BlockDeviceInfo *bdinfo)
     comboUse->addItem("root");
     comboUse->addItem("swap");
     comboUse->addItem("home");
-    comboUse->setProperty("row", QVariant::fromValue<void *>(item));
+    comboUse->setProperty("row", QVariant::fromValue<void *>(twit));
     comboUse->lineEdit()->setPlaceholderText("----");
     connect(comboUse, &QComboBox::currentTextChanged, this, &PartMan::comboUseTextChange);
     // Type
     QComboBox *comboType = new QComboBox(gui.treePartitions);
     comboType->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(item, Type, comboType);
+    gui.treePartitions->setItemWidget(twit, Type, comboType);
     comboType->setEnabled(false);
     if(bdinfo) {
-        item->setText(Type, bdinfo->fs);
+        twit->setText(Type, bdinfo->fs);
         comboType->addItem(bdinfo->fs);
     }
     connect(comboType, &QComboBox::currentTextChanged, this, &PartMan::comboTypeTextChange);
     // Mount options
     QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
     editOptions->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(item, Options, editOptions);
+    gui.treePartitions->setItemWidget(twit, Options, editOptions);
     editOptions->setEnabled(false);
     editOptions->setText("defaults");
+
+    if(!defaultUse.isEmpty()) comboUse->setCurrentText(defaultUse);
+    return twit;
 }
 
 void PartMan::labelParts(QTreeWidgetItem *drive)
 {
-    const QString name = drive->text(Device) + "%1";
+    QString name = drive->text(Device);
+    if (name.startsWith("nvme") || name.startsWith("mmcblk")) name += "p";
+    name += "%1";
     for(int ixi = drive->childCount() - 1; ixi >= 0; --ixi) {
         drive->child(ixi)->setText(Device, name.arg(ixi+1));
     }
@@ -168,18 +180,21 @@ void PartMan::comboUseTextChange(const QString &text)
     gui.treePartitions->blockSignals(true);
     QComboBox *combo = static_cast<QComboBox *>(sender());
     if(!combo) return;
-    int oldUseClass = combo->property("class").toInt();
+    QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
+    if(!item) return;
+    QLineEdit *editLabel = static_cast<QLineEdit *>(gui.treePartitions->itemWidget(item, Label));
+
+    const QString &usetext = translateUse(text);
     int useClass = -1;
-    if(text.isEmpty()) useClass = 0;
-    else if(text == "ESP") useClass = 1;
-    else if(text == "boot" || text == "/boot") useClass = 2;
-    else if(text == "swap") useClass = 3;
-    else useClass = 4;
+    if(usetext.isEmpty()) useClass = 0;
+    else if(usetext == "ESP") useClass = 1;
+    else if(usetext == "bios_grub") useClass = 2;
+    else if(usetext == "/boot") useClass = 3;
+    else if(usetext == "swap") useClass = 4;
+    else useClass = 5;
+    int oldUseClass = combo->property("class").toInt();
     if(useClass != oldUseClass) {
-        QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
-        if(!item) return;
         QComboBox *comboType = static_cast<QComboBox *>(gui.treePartitions->itemWidget(item, Type));
-        QLineEdit *editLabel = static_cast<QLineEdit *>(gui.treePartitions->itemWidget(item, Label));
         comboType->setEnabled(false);
         comboType->clear();
         switch(useClass) {
@@ -188,8 +203,9 @@ void PartMan::comboUseTextChange(const QString &text)
             comboType->addItem(item->text(Type));
             break;
         case 1: comboType->addItem("FAT32"); break;
-        case 2: comboType->addItem("ext4"); break;
-        case 3: comboType->addItem("SWAP"); break;
+        case 2: comboType->addItem("GRUB"); break;
+        case 3: comboType->addItem("ext4"); break;
+        case 4: comboType->addItem("SWAP"); break;
         default:
             comboType->addItem("ext4");
             comboType->addItem("ext3");
@@ -205,9 +221,9 @@ void PartMan::comboUseTextChange(const QString &text)
             comboType->setEnabled(true);
         }
         // Changing to and from a mount/use that support encryption.
-        if(useClass >= 0 && useClass <= 2) {
+        if(useClass >= 0 && useClass <= 3) {
             item->setData(Encrypt, Qt::CheckStateRole, QVariant());
-        } else if(oldUseClass >= 0 && oldUseClass <= 2) {
+        } else if(oldUseClass >= 0 && oldUseClass <= 3) {
             item->setCheckState(Encrypt, encryptCheckRoot);
         }
         // Label and options
@@ -215,6 +231,7 @@ void PartMan::comboUseTextChange(const QString &text)
         gui.treePartitions->itemWidget(item, Options)->setEnabled(useClass!=0);
         combo->setProperty("class", QVariant(useClass));
     }
+    editLabel->setText(defaultLabels.value(usetext));
     gui.treePartitions->blockSignals(false);
 }
 
@@ -304,9 +321,8 @@ void PartMan::partAddClick(bool)
     if(!drive) drive = twit;
     else index = drive->indexOfChild(twit) + 1;
 
-    QTreeWidgetItem *part = new QTreeWidgetItem;
+    QTreeWidgetItem *part = setupItem(nullptr, nullptr);
     drive->insertChild(index, part);
-    setupItem(part, nullptr);
 
     labelParts(drive);
     part->setSelected(true);
@@ -593,4 +609,56 @@ bool PartMan::luksOpen(const QString &dev, const QString &luksfs,
     if (!luksfs.isEmpty()) cmd += " " + luksfs;
     if (!options.isEmpty()) cmd += " " + options;
     return proc.exec(cmd, true, &password);
+}
+
+bool PartMan::layoutDefault()
+{
+    QString drv(gui.diskCombo->currentData().toString());
+    int bdindex = listBlkDevs.findDevice(drv);
+    if (bdindex < 0) return false;
+    // Clear the existing layout from the target device.
+    QTreeWidgetItem *drivetree = nullptr;
+    for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
+        QTreeWidgetItem *twit = gui.treePartitions->topLevelItem(ixi);
+        if(twit->text(Device) == drv) {
+            drivetree = twit;
+            while(twit->childCount()) twit->removeChild(twit->child(0));
+        }
+    }
+    if(!drivetree) return false;
+
+    // Drive geometry basics.
+    bool ok = true;
+    int free = gui.freeSpaceEdit->text().toInt(&ok,10);
+    if (!ok) return false;
+    const int driveSize = listBlkDevs.at(bdindex).size / 1048576;
+    int rootFormatSize = driveSize - 32; // Compensate for rounding errors.
+    // Boot partitions.
+    if(uefi) {
+        setupItem(drivetree, nullptr, 256, "ESP");
+        rootFormatSize -= 256;
+    } else if(driveSize >= 2097152 || gptoverride) {
+        setupItem(drivetree, nullptr, 1, "bios_grub");
+        rootFormatSize -= 1;
+    }
+    if (gui.checkBoxEncryptAuto->isChecked()){
+        setupItem(drivetree, nullptr, 512, "boot");
+        rootFormatSize -= 512;
+    }
+    // Operating system.
+    int swapFormatSize = 2048;
+    if (rootFormatSize < 2048) swapFormatSize = 128;
+    else if (rootFormatSize < 3096) swapFormatSize = 256;
+    else if (rootFormatSize < 4096) swapFormatSize = 512;
+    else if (rootFormatSize < 12288) swapFormatSize = 1024;
+    rootFormatSize -= swapFormatSize;
+    if (free > 0 && rootFormatSize > 8192) {
+        if (free > (rootFormatSize - 8192)) free = rootFormatSize - 8192;
+        rootFormatSize -= free;
+    }
+    setupItem(drivetree, nullptr, rootFormatSize, "root");
+    setupItem(drivetree, nullptr, swapFormatSize, "swap");
+
+    labelParts(drivetree);
+    return true;
 }
