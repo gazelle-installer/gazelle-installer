@@ -208,9 +208,10 @@ void MInstall::startup()
         on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
         on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
 
-        //rootLabelEdit->setText("root" + PROJECTSHORTNAME + PROJECTVERSION);
-        //homeLabelEdit->setText("home" + PROJECTSHORTNAME);
-        //swapLabelEdit->setText("swap" + PROJECTSHORTNAME);
+        partman.defaultLabels["/boot"] = "boot";
+        partman.defaultLabels["/"] = "root" + PROJECTSHORTNAME + PROJECTVERSION;
+        partman.defaultLabels["/home"] = "home" + PROJECTSHORTNAME;
+        partman.defaultLabels["swap"] = "swap" + PROJECTSHORTNAME;
 
         FDEpassword->hide();
         FDEpassword2->hide();
@@ -957,113 +958,6 @@ bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool 
         proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
     }
     proc.sleep(1000);
-    return true;
-}
-
-bool MInstall::calculateDefaultPartitions()
-{
-    QString drv(diskCombo->currentData().toString());
-    int bdindex = listBlkDevs.findDevice(drv);
-    if (bdindex < 0) return false;
-    QString mmcnvmepartdesignator;
-    if (drv.startsWith("nvme") || drv.startsWith("mmcblk")) {
-        mmcnvmepartdesignator = "p";
-    }
-
-    // remove partitions from the list that belong to this drive
-    const int ixRemoveBD = bdindex + 1;
-    while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs.at(ixRemoveBD).isDrive) {
-        listToUnmount << listBlkDevs.at(ixRemoveBD).name;
-        listBlkDevs.removeAt(ixRemoveBD);
-    }
-
-    bool ok = true;
-    int free = freeSpaceEdit->text().toInt(&ok,10);
-    if (!ok) free = 0;
-
-    // calculate new partition sizes
-    // get the total disk size
-    const long long driveSize = listBlkDevs.at(bdindex).size / 1048576; // in MB
-    rootFormatSize = driveSize;
-    rootFormatSize -= 32; // pre-compensate for rounding errors in disk geometry
-
-    // allocate space for ESP if booted from UEFI
-    espFormatSize = uefi ? 256 : 0;
-    rootFormatSize -= espFormatSize;
-
-    // allocate space for /boot if encrypting
-    bootFormatSize = 0;
-    if (checkBoxEncryptAuto->isChecked()){ // set root and swap status encrypted
-        isRootEncrypted = true;
-        isSwapEncrypted = true;
-        bootFormatSize = 512;
-        rootFormatSize -= bootFormatSize;
-    }
-
-    // no default separate /home just yet
-    homeFormatSize = 0;
-
-    // 2048 swap should be ample
-    swapFormatSize = 2048;
-    if (rootFormatSize < 2048) swapFormatSize = 128;
-    else if (rootFormatSize < 3096) swapFormatSize = 256;
-    else if (rootFormatSize < 4096) swapFormatSize = 512;
-    else if (rootFormatSize < 12288) swapFormatSize = 1024;
-    rootFormatSize -= swapFormatSize;
-
-    if (free > 0 && rootFormatSize > 8192) {
-        // allow free_size
-        // remaining is capped until free is satisfied
-        if (free > rootFormatSize - 8192) {
-            free = rootFormatSize - 8192;
-        }
-        rootFormatSize -= free;
-    } else { // no free space
-        free = 0;
-    }
-
-    // code for adding future partitions to the list
-    int ixAddBD = bdindex;
-    int ixpart = 1;
-    auto lambdaAddFutureBD = [this, bdindex, &ixpart, &ixAddBD, &drv, &mmcnvmepartdesignator]
-            (long long size, const QString &fs) -> BlockDeviceInfo &  {
-        BlockDeviceInfo bdinfo;
-        bdinfo.name = drv + mmcnvmepartdesignator + QString::number(ixpart);
-        bdinfo.fs = fs;
-        bdinfo.size = size * 1048576; // back into bytes
-        bdinfo.isFuture = bdinfo.isNative = true;
-        bdinfo.isGPT = listBlkDevs.at(bdindex).isGPT;
-        ++ixAddBD;
-        listBlkDevs.insert(ixAddBD, bdinfo);
-        ++ixpart;
-        return listBlkDevs[ixAddBD];
-    };
-    // see if GPT needs to be used (either UEFI or >=2TB drive)
-    BlockDeviceInfo &bddrive = listBlkDevs[bdindex];
-    bddrive.isGPT = (uefi || driveSize >= 2097152 || gptoverride);
-
-    // add future partitions to the block device list and store new names
-    if (uefi) {
-        // create an ESP if installing on a system with EFI
-        BlockDeviceInfo &bdinfo = lambdaAddFutureBD(espFormatSize, "vfat");
-        espDevice = "/dev/" + bdinfo.name;
-        bdinfo.isNative = false;
-        bdinfo.isESP = true;
-    } else if (bddrive.isGPT){
-        // create a bios_grub partition if using GPT on a non-EFI system
-        BlockDeviceInfo &bdinfo = lambdaAddFutureBD(1, QString());
-        biosGrubDevice = "/dev/" + bdinfo.name;
-        bdinfo.isNative = false;
-    }
-    if (!isRootEncrypted) bootDevice.clear();
-    else bootDevice = "/dev/" + lambdaAddFutureBD(bootFormatSize, "ext4").name;
-    rootDevice = "/dev/" + lambdaAddFutureBD(rootFormatSize,
-                          isRootEncrypted ? "crypto_LUKS" : "ext4").name;
-    BlockDeviceInfo &bdinfo = lambdaAddFutureBD(swapFormatSize, "swap");
-    bdinfo.isSwap = true;
-    swapDevice = "/dev/" + bdinfo.name;
-    homeDevice = rootDevice;
-    //rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
     return true;
 }
 
@@ -2073,7 +1967,7 @@ int MInstall::showPage(int curr, int next)
                     return curr; // don't format - stop install
                 }
             }
-            calculateDefaultPartitions();
+            partman.layoutDefault();
             return 5; // Go to Step_Boot
         }
     } else if (next == 4 && curr == 3) { // at Step_Partition (fwd)
