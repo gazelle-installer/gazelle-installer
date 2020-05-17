@@ -611,6 +611,16 @@ bool PartMan::luksOpen(const QString &dev, const QString &luksfs,
     return proc.exec(cmd, true, &password);
 }
 
+QString PartMan::mapperName(const QString &mount)
+{
+    if(mount.isEmpty() || mount == "/") return "fs.root";
+    QString mn("fs");
+    int nslash = mount.count('/');
+    if(nslash > 1) mn = QString::number(nslash-1);
+    mn += mount;
+    return mn.replace('/', '.');
+}
+
 bool PartMan::layoutDefault()
 {
     QString drv(gui.diskCombo->currentData().toString());
@@ -661,4 +671,56 @@ bool PartMan::layoutDefault()
 
     labelParts(drivetree);
     return true;
+}
+
+int PartMan::countPrepSteps()
+{
+    int pcount = 0;
+    // Creation of new partitions
+    for(int ixi = gui.treePartitions->topLevelItemCount(); ixi>=0; --ixi) {
+        QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
+        QComboBox *comboDriveType = static_cast<QComboBox *>(gui.treePartitions->itemWidget(drvit, Type));
+        if(comboDriveType) pcount += drvit->childCount() + 1; // Partition table creation included.
+    }
+    // Formatting partitions
+    pcount += mounts.count();
+    QMapIterator<QString, QTreeWidgetItem *> mi(mounts);
+    while(mi.hasNext()) {
+        mi.next();
+        QTreeWidgetItem *twit = mi.value();
+        if(twit->checkState(Encrypt)) ++pcount; //LUKS format.
+    }
+    // Formatting swap space
+    pcount += swaps.count();
+    for(QTreeWidgetItem *twit : swaps) {
+        if(twit->checkState(Encrypt)) ++pcount; //LUKS format.
+    }
+    // Final count
+    return pcount;
+}
+
+bool PartMan::prepareParts()
+{
+    return true;
+}
+
+void PartMan::unmount(bool all)
+{
+    for(int ixi = swaps.count()-1; ixi>=0; --ixi) {
+        if(all || swaps.at(ixi)->checkState(Encrypt)) {
+            QString cmd("cryptsetup close swap%1");
+            proc.exec(cmd.arg(ixi), true);
+        }
+    }
+    QMapIterator<QString, QTreeWidgetItem *> mi(mounts);
+    mi.toBack();
+    while(mi.hasPrevious()) {
+        mi.previous();
+        proc.exec("/bin/umount -l /mnt/antiX" + mi.key(), true);
+        QTreeWidgetItem *twit = mi.value();
+        if(all || twit->checkState(Encrypt)) {
+            QString cmd("cryptsetup close %1");
+            proc.exec(cmd.arg(mapperName(mi.key())), true);
+        }
+    }
 }
