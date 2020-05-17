@@ -70,7 +70,11 @@ public:
     bool luksMake(const QString &dev, const QByteArray &password);
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
+    QString mapperName(const QString &mount);
     bool layoutDefault();
+    int countPrepSteps();
+    bool prepareParts();
+    void unmount(bool all = false);
 };
 
 #endif // PARTMAN_H

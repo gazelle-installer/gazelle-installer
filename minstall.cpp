@@ -2581,12 +2581,7 @@ void MInstall::cleanup(bool endclean)
     proc.exec("/bin/umount -l /mnt/antiX/sys", true);
     proc.exec("/bin/umount -l /mnt/antiX/dev/shm", true);
     proc.exec("/bin/umount -l /mnt/antiX/dev", true);
-    proc.exec("/bin/umount -l /mnt/antiX/home", true);
-    proc.exec("/bin/umount -lR /mnt/antiX", true);
-
-    if (isRootEncrypted) proc.exec("cryptsetup close rootfs", true);
-    if (isHomeEncrypted) proc.exec("cryptsetup close homefs", true);
-    if (isSwapEncrypted) proc.exec("cryptsetup close swapfs", true);
+    partman.unmount(true);
 }
 
 void MInstall::on_progressBar_valueChanged(int value)
