@@ -54,6 +54,8 @@ public:
     bool makeLuksPartition(const QString &dev, const QByteArray &password);
     bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString(), const bool failHard = true);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
+    void enableOOBE();
+    bool processOOBE();
     bool validateUserInfo();
     bool validateComputerName();
     bool setComputerName();
@@ -91,6 +93,8 @@ public:
     void cleanup(bool endclean = true);
 
 private slots:
+    void on_mainTabs_currentChanged(int index);
+
     void on_abortInstallButton_clicked();
     void on_backButton_clicked();
     void on_buttonSetKeyboard_clicked();
@@ -144,13 +148,13 @@ private slots:
 
     void on_progressBar_valueChanged(int value);
 
-
 private:
     MProcess proc;
     int phase = 0;
 
     // command line options
     bool brave, pretend, automatic, nocopy, sync, gptoverride;
+    bool oem, oobe;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
@@ -227,7 +231,6 @@ private:
     // helpers
     bool checkPassword(QLineEdit *passEdit);
     // private functions
-    void updateStatus(const QString &msg, int val = -1);
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
     void updatePartitionCombos(QComboBox *changed);

@@ -20,6 +20,8 @@
 
 #include <QObject>
 #include <QProcess>
+#include <QListWidget>
+#include <QProgressBar>
 
 class MProcess : public QProcess
 {
@@ -27,14 +29,26 @@ class MProcess : public QProcess
     int sleepcount = 0;
     bool halting = false;
     bool debugUnusedOutput = true;
+    QListWidget *logView = nullptr;
+    QProgressBar *progBar = nullptr;
 public:
+    enum LogType {
+        Standard,
+        Section,
+        Status,
+        Exec
+    };
     MProcess(QObject *parent = Q_NULLPTR);
+    void setupUI(QListWidget *listLog, QProgressBar *progressBar);
     bool exec(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
     QString execOut(const QString &cmd, bool everything = false);
     QStringList execOutLines(const QString &cmd, const bool rawexec = false);
     void sleep(const int msec, const bool silent = false);
     void halt();
     void unhalt();
+    QListWidgetItem *log(const QString &text, const enum LogType type = Section);
+    void log(QListWidgetItem *entry, const int status = 1);
+    void status(const QString &text, int progress = -1);
 };
 
 #endif // MPROCESS_H
