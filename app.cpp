@@ -53,7 +53,6 @@ int main(int argc, char *argv[])
        return EXIT_SUCCESS;
     }
 
-
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
 
     // Set the logging files
@@ -78,7 +77,7 @@ int main(int argc, char *argv[])
 
     //exit if "minstall" is already running
     if (system("ps -C minstall | sed '0,/minstall/{s/minstall//}' | grep minstall") == 0) {
-        QMessageBox::critical(0, QString::null,
+        QMessageBox::critical(nullptr, QString(),
                               QApplication::tr("The installer won't launch because it appears to be running already in the background.\n\n"
                                                "Please close it if possible, or run 'pkill minstall' in terminal."));
         return EXIT_FAILURE;
@@ -87,7 +86,7 @@ int main(int argc, char *argv[])
     // check if 32bit on 64 bit UEFI
     if (system("uname -m | grep -q i686") == 0 && system("grep -q 64 /sys/firmware/efi/fw_platform_size") == 0)
     {
-        int ans = QMessageBox::question(0, QString::null, QApplication::tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot"
+        int ans = QMessageBox::question(nullptr, QString(), QApplication::tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot"
                                                                            " unless you select Legacy Boot or similar at restart.\n"
                                                                            "We recommend you quit now and restart in Legacy Boot\n\n"
                                                                            "Do you want to continue the installation?"),
@@ -102,9 +101,9 @@ int main(int argc, char *argv[])
         QApplication::beep();
         const QString &msg = QApplication::tr("You must run this app as root.");
         if (a.arguments().contains("--pretend") || a.arguments().contains("-p")) {
-            QMessageBox::warning(0, QString::null, msg);
+            QMessageBox::warning(nullptr, QString(), msg);
         } else {
-            QMessageBox::critical(0, QString::null, msg);
+            QMessageBox::critical(nullptr, QString(), msg);
             return EXIT_FAILURE;
         }
     }
@@ -120,7 +119,7 @@ int main(int argc, char *argv[])
         }
         //give error message and exit if no config file found
         if (! QFile::exists(cfgfile)) {
-            QMessageBox::warning(0, QString::null,
+            QMessageBox::warning(nullptr, QString(),
                                  QApplication::tr("Configuration file (%1) not found.").arg(cfgfile));
             return EXIT_FAILURE;
         }
@@ -130,7 +129,8 @@ int main(int argc, char *argv[])
     qDebug() << "Installer version:" << VERSION;
     MInstall minstall(a.arguments(), cfgfile);
     const QRect &geo = a.desktop()->availableGeometry(&minstall);
-    minstall.move((geo.width()-minstall.width())/2, (geo.height()-minstall.height())/2);
+    if(a.arguments().contains("--oobe")) minstall.setGeometry(geo);
+    else minstall.move((geo.width()-minstall.width())/2, (geo.height()-minstall.height())/2);
     minstall.show();
     return a.exec();
 }
@@ -181,15 +181,18 @@ void printHelp()
            "  --gpt-override Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"
            "                 Without this option, GPT will only be used on drives with at least 2TB capacity.\n"
            "                 GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.\n"
-           "  -n --nocopy    Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.\n"
-           "  -p --pretend   Test mode for GUI, you can advance to different screens without actially installing.\n"
-           "  -s --sync      Installing with rsync instead of cp on custom partitioning.\n"
+           "  --nocopy       Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.\n"
+           "  --oem          Install the operating system, delaying prompts for user-specific options until the first reboot.\n"
+           "                 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.\n"
+           "                 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.\n"
+           "  --pretend      Test mode for GUI, you can advance to different screens without actially installing.\n"
+           "  --sync         Installing with rsync instead of cp on custom partitioning.\n"
            "                 -- doesn't format /root and it doesn't work with encryption.\n"
            "  -v --version   Show version information.\n"
            "\n"
            "Configuration File:\n"
            "  If /etc/minstall.conf is present, the installer will load whatever configuration is stored inside.\n"
-           "  The use of -c or --config makes the installer load <config-file> instead.\n"
+           "  The use of --config makes the installer load <config-file> instead.\n"
            "  This configuration can be used with --auto for an unattended installation.\n"
            "  The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.\n"
            "  The installer will not write any passwords or ignored settings to the new configuration file.\n"

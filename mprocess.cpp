@@ -15,6 +15,7 @@
 //
 // This file is part of the gazelle-installer.
 
+#include <QApplication>
 #include <QDebug>
 #include <QEventLoop>
 #include <QTimer>
@@ -26,11 +27,22 @@ MProcess::MProcess(QObject *parent)
 {
 }
 
+void MProcess::setupUI(QListWidget *listLog, QProgressBar *progressBar)
+{
+    logView = listLog;
+    progBar = progressBar;
+    QPalette pal = listLog->palette();
+    pal.setColor(QPalette::Base, Qt::black);
+    pal.setColor(QPalette::Text, Qt::white);
+    listLog->setPalette(pal);
+}
+
 bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *input, bool needRead)
 {
     if (halting) return false;
     ++execount;
     qDebug().nospace() << "Exec #" << execount << ": " << cmd;
+    QListWidgetItem *logEntry = log(cmd, Exec);
     QEventLoop eloop;
     connect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (rawexec) start(cmd);
@@ -42,17 +54,33 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     if (input && !(input->isEmpty())) write(*input);
     closeWriteChannel();
     eloop.exec();
-    disconnect(this, SIGNAL(finished(int, QProcess::ExitStatus)), nullptr, nullptr);
+    disconnect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), nullptr, nullptr);
     if (debugUnusedOutput) {
+        bool hasOut = false;
         if (!needRead) {
             const QByteArray &StdOut = readAllStandardOutput();
-            if (!StdOut.isEmpty()) qDebug().nospace() << "SOut #" << execount << ": " << StdOut;
+            if (!StdOut.isEmpty()) {
+                qDebug().nospace() << "SOut #" << execount << ": " << StdOut;
+                hasOut = 1;
+            }
         }
         const QByteArray &StdErr = readAllStandardError();
-        if (!StdErr.isEmpty()) qDebug().nospace() << "SErr #" << execount << ": " << StdErr;
+        if (!StdErr.isEmpty()) {
+            qDebug().nospace() << "SErr #" << execount << ": " << StdErr;
+            hasOut = 1;
+        }
+        if(hasOut) {
+            QFont logFont = logEntry->font();
+            logFont.setItalic(true);
+            logEntry->setFont(logFont);
+        }
     }
     qDebug().nospace() << "Exit #" << execount << ": " << exitCode() << " " << exitStatus();
-    return (exitStatus() == QProcess::NormalExit && exitCode() == 0);
+    int status = 1;
+    if(exitStatus() != QProcess::NormalExit) status = -1;
+    else if(exitCode() != 0) status = 0;
+    log(logEntry, status);
+    return (status > 0);
 }
 
 QString MProcess::execOut(const QString &cmd, bool everything)
@@ -87,19 +115,60 @@ void MProcess::halt()
 {
     halting = true;
     terminate();
-    QTimer::singleShot(5000, this, SLOT(kill()));
+    QTimer::singleShot(5000, this, &QProcess::kill);
 }
 
 void MProcess::unhalt()
 {
     QEventLoop eloop;
-    connect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
+    connect(this, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (state() != QProcess::NotRunning) {
         closeReadChannel(QProcess::StandardOutput);
         closeReadChannel(QProcess::StandardError);
         closeWriteChannel();
         eloop.exec();
     }
-    disconnect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), nullptr, nullptr);
+    disconnect(this, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), nullptr, nullptr);
     halting = false;
+}
+
+QListWidgetItem *MProcess::log(const QString &text, const LogType type)
+{
+    if(type == Standard) qDebug().noquote() << text;
+    if(type == Section) qDebug().noquote() << "+++" << text << "+++";
+    else if(type == Status) qDebug().noquote() << "-" << text << "-";
+    if(!logView) return nullptr;
+    QListWidgetItem *entry = new QListWidgetItem(text, logView);
+    logView->addItem(entry);
+    if(type == Exec) entry->setTextColor(Qt::cyan);
+    else if(type != Standard) {
+        QFont font(entry->font());
+        if(type == Section) font.setBold(true);
+        else if(type == Status) font.setItalic(true);
+        entry->setFont(font);
+    }
+    logView->scrollToBottom();
+    return entry;
+}
+void MProcess::log(QListWidgetItem *entry, const int status)
+{
+    if(!entry) return;
+    if(status > 0) entry->setTextColor(Qt::green);
+    else if(status < 0) entry->setTextColor(Qt::red);
+    else entry->setTextColor(Qt::yellow);
+}
+
+void MProcess::status(const QString &text, int progress)
+{
+    if(!progBar) log(text, Status);
+    else {
+        QString fmt = "%p% - " + text;
+        if(progBar->format() != fmt) {
+            log(text, Status);
+            progBar->setFormat(fmt);
+        }
+        if(progress < 0) progress = progBar->value() + 1;
+        progBar->setValue(progress);
+        qApp->processEvents();
+    }
 }
