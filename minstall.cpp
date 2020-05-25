@@ -1157,7 +1157,7 @@ bool MInstall::validateChosenPartitions()
         if (isSwapEncrypted) swapFormatSize = -1;
         else {
             const int bdindex = listBlkDevs.findDevice(swapdev);
-            if (bdindex >= 0 && !listBlkDevs.at(bdindex).isSwap) swapFormatSize = -1;
+            if (bdindex >= 0 && listBlkDevs.at(bdindex).fs!="swap") swapFormatSize = -1;
         }
         if (swapFormatSize) {
             msgFormatList << swapdev << "swap";
@@ -1245,9 +1245,7 @@ bool MInstall::validateChosenPartitions()
         }
         return index;
     };
-    const int ixswap = lambdaCalcBD(swapFormatSize, swapCombo, swapLabelEdit->text(),
-                                    "swap", isSwapEncrypted);
-    if (ixswap >= 0) listBlkDevs[ixswap].isSwap = true;
+    lambdaCalcBD(swapFormatSize, swapCombo, swapLabelEdit->text(), "swap", isSwapEncrypted);
     lambdaCalcBD(rootFormatSize, rootCombo, rootLabelEdit->text(),
                  rootTypeCombo->currentData().toString(), isRootEncrypted);
     lambdaCalcBD(bootFormatSize, bootCombo, "boot", "ext4", false);
@@ -1356,7 +1354,6 @@ bool MInstall::calculateDefaultPartitions()
     rootDevice = "/dev/" + lambdaAddFutureBD(rootFormatSize,
                           isRootEncrypted ? "crypto_LUKS" : "ext4").name;
     BlockDeviceInfo &bdinfo = lambdaAddFutureBD(swapFormatSize, "swap");
-    bdinfo.isSwap = true;
     swapDevice = "/dev/" + bdinfo.name;
     homeDevice = rootDevice;
     rootTypeCombo->setCurrentIndex(rootTypeCombo->findText("ext4"));
@@ -2794,9 +2791,9 @@ void MInstall::updatePartitionCombos(QComboBox *changed)
                         && !(bootCombo->currentText().startsWith(bdinfo.name))) {
                     bool add = true;
                     if (combo == rootCombo) {
-                        add = (!bdinfo.isSwap && bdinfo.size >= rootSpaceNeeded);
+                        add = (bdinfo.fs!="swap" && bdinfo.size >= rootSpaceNeeded);
                     } else if (combo == homeCombo) {
-                        add = (!bdinfo.isSwap);
+                        add = (bdinfo.fs!="swap");
                     } else if (combo == bootCombo) {
                         add = (!bdinfo.isESP && bdinfo.size >= bootSpaceNeeded);
                     }
@@ -3440,7 +3437,7 @@ void MInstall::on_grubPbrButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!(bdinfo.isDrive || bdinfo.isSwap || bdinfo.isESP)
+        if (!(bdinfo.isDrive || bdinfo.fs=="swap" || bdinfo.isESP)
             && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
             && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
             // list only Linux partitions excluding crypto_LUKS partitions
