@@ -429,7 +429,7 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
                 swapEncrypt << swapdev;
             } else {
                 const int bdindex = listBlkDevs.findDevice(swap->text(Device));
-                if (bdindex >= 0 && !listBlkDevs.at(bdindex).isSwap) format = true;
+                if (bdindex >= 0 && listBlkDevs.at(bdindex).fs!="swap") format = true;
                 swapNoEncrypt << swapdev;
             }
             if (format) {
@@ -512,10 +512,7 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
         mi.next();
         lambdaCalcBD(mi.value());
     }
-    for(QTreeWidgetItem *swap : swaps) {
-        const int ixswap = lambdaCalcBD(swap);
-        if (ixswap >= 0) listBlkDevs[ixswap].isSwap = true;
-    }
+    for(QTreeWidgetItem *swap : swaps) lambdaCalcBD(swap);
 
     return nullptr;
 }

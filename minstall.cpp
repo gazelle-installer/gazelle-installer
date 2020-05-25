@@ -2914,7 +2914,7 @@ void MInstall::on_grubPbrButton_toggled()
 {
     grubBootCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!(bdinfo.isDrive || bdinfo.isSwap || bdinfo.isESP)
+        if (!(bdinfo.isDrive || bdinfo.fs=="swap" || bdinfo.isESP)
             && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
             && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
             // list only Linux partitions excluding crypto_LUKS partitions

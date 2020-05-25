@@ -35,8 +35,6 @@ struct BlockDeviceInfo
     bool isBoot = false;
     bool isESP = false;
     bool isNative = false;
-    bool isSwap = false;
-    QString formattedDataSize() const;
     void addToCombo(QComboBox *combo, bool warnNasty = false) const;
     static QStringList split(const QString &devname);
 };
