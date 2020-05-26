@@ -2010,13 +2010,11 @@ bool MInstall::setUserInfo()
     QString rootpath;
     if (!oobe) rootpath = "/mnt/antiX";
     QString skelpath = rootpath + "/etc/skel";
-    DIR *dir;
     QString cmd;
-    // see if user directory already exists
+
     QString dpath = rootpath + "/home/" + userNameEdit->text();
-    if ((dir = opendir(dpath.toUtf8())) != nullptr) {
-        // already exists
-        closedir(dir);
+
+    if (QFileInfo::exists(dpath.toUtf8())) {
         if (radioOldHomeSave->isChecked()) {
             // save the old directory
             bool ok = false;
@@ -2036,10 +2034,14 @@ bool MInstall::setUserInfo()
                 return false;
             }
         }
-    }
-
-    if ((dir = opendir(dpath.toUtf8())) == nullptr) {
-        // dir does not exist, must create it
+        // clean up directory
+        proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
+        proc.exec("/bin/cp -n " + skelpath + "/.bashrc " + dpath, true);
+        proc.exec("/bin/cp -n " + skelpath + "/.gtkrc " + dpath, true);
+        proc.exec("/bin/cp -n " + skelpath + "/.gtkrc-2.0 " + dpath, true);
+        proc.exec("/bin/cp -Rn " + skelpath + "/.config " + dpath, true);
+        proc.exec("/bin/cp -Rn " + skelpath + "/.local " + dpath, true);
+    } else { // dir does not exist, must create it
         // copy skel to demo
         // don't copy skel to demo if found demo folder in remastered linuxfs
         if (!isRemasteredDemoPresent) {
@@ -2047,25 +2049,16 @@ bool MInstall::setUserInfo()
                 failUI(tr("Sorry, failed to create user directory."));
                 return false;
             }
-        }
-        //still rename the demo directory even if remastered demo home folder is detected
-        cmd = QString("/bin/mv -f " + skelpath + " %1").arg(dpath);
-        if (isRemasteredDemoPresent) {
+            cmd = QString("/bin/mv -f " + rootpath + "/home/skel %1").arg(dpath);
+        } else { // still rename the demo directory even if remastered demo home folder is detected
             cmd = QString("/bin/mv -f " + rootpath + "/home/demo %1").arg(dpath);
         }
         if (!proc.exec(cmd)) {
             failUI(tr("Sorry, failed to name user directory."));
             return false;
         }
-    } else {
-        // dir does exist, clean it up
-        proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
-        proc.exec("/bin/cp -n " + skelpath + "/.bashrc " + dpath, true);
-        proc.exec("/bin/cp -n " + skelpath + "/.gtkrc " + dpath, true);
-        proc.exec("/bin/cp -n " + skelpath + "/.gtkrc-2.0 " + dpath, true);
-        proc.exec("/bin/cp -Rn " + skelpath + "/.config " + dpath, true);
-        proc.exec("/bin/cp -Rn " + skelpath + "/.local " + dpath, true);
     }
+
     // saving Desktop changes
     if (saveDesktopCheckBox->isChecked()) {
         resetBlueman();

@@ -4,7 +4,7 @@
 <context>
     <name>MInstall</name>
     <message>
-        <location filename="../minstall.cpp" line="92"/>
+        <location filename="../minstall.cpp" line="93"/>
         <source>%1 Installer</source>
         <translation>%1 Installer</translation>
     </message>
@@ -13,12 +13,12 @@
         <translation type="vanished">Antabay habang kumakalap ng impormasyon.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="52"/>
+        <location filename="../minstall.cpp" line="53"/>
         <source>Shutdown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="109"/>
+        <location filename="../minstall.cpp" line="110"/>
         <source>Support %1
 
 %1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.</source>
@@ -47,47 +47,47 @@ Enjoy using %1</source>
 Gamiting may kagalakan ang %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="433"/>
+        <location filename="../minstall.cpp" line="425"/>
         <source>Pretending to install %1</source>
         <translation>Wari baga ay ini-install ang  %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="570"/>
+        <location filename="../minstall.cpp" line="562"/>
         <source>target drive</source>
         <translation>drive na pinupuntirya</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="589"/>
+        <location filename="../minstall.cpp" line="581"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Ang disk na may partition na iyong napili para sa pag-iinstall ay pumalya:</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="593"/>
+        <location filename="../minstall.cpp" line="585"/>
         <source>Smartmon tool output:</source>
         <translation>Output ng Smartmon tool :</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="594"/>
+        <location filename="../minstall.cpp" line="586"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Ang disk na may partition na iyong napili pag sa pag-install ng pagsubok sa SMART monitor (smartctl), pero ang mag pagsubok ay nagsasalaysay na magkakaroon lamang ng mas higit na pagpalya sa hinaharap.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="599"/>
+        <location filename="../minstall.cpp" line="591"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>Kung di tiyak ay itigil muna ang pag-install at patakbuhin ang GSmartControl para sa karagdagang kaalaman. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="601"/>
+        <location filename="../minstall.cpp" line="593"/>
         <source>Do you want to abort the installation?</source>
         <translation>Gusto mo bang itigil ang pag-iinstall?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="606"/>
+        <location filename="../minstall.cpp" line="598"/>
         <source>Do you want to continue?</source>
         <translation>Gusto mo bang magpatuloy?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="620"/>
+        <location filename="../minstall.cpp" line="612"/>
         <source>The password needs to be at least
 %1 characters long. Please select
 a longer password before proceeding.</source>
@@ -96,296 +96,296 @@ a longer password before proceeding.</source>
 ang mas mahabang password bago magpatuloy.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="639"/>
+        <location filename="../minstall.cpp" line="631"/>
         <source>Preparing to install %1</source>
         <translation>Inihahanda ang pag-iinstall %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="651"/>
+        <location filename="../minstall.cpp" line="643"/>
         <source>Failed to format required partitions.</source>
         <translation>Pumalya sa pag-format ng hinihiling na partitions.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="662"/>
+        <location filename="../minstall.cpp" line="654"/>
         <source>Paused for required operator input</source>
         <translation>Nakatigil para sa pag-input ng gumagamit</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="672"/>
+        <location filename="../minstall.cpp" line="664"/>
         <source>Setting system configuration</source>
         <translation>Itinatakda ang configuration ng sistema</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="690"/>
+        <location filename="../minstall.cpp" line="682"/>
         <source>Cleaning up</source>
         <translation>Naglilinis</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="860"/>
+        <location filename="../minstall.cpp" line="852"/>
         <source>Invalid settings found in configuration file (%1). Please review marked fields as you encounter them.</source>
         <translation>Nakatuklas ang maling setting sa configuration ng file (%1). Rebisahing muli ang mga natatatatakang fields kung iyong makikita sila.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="899"/>
+        <location filename="../minstall.cpp" line="891"/>
         <source>Setting up LUKS encrypted containers</source>
         <translation>Itinatakda ang LUKS encrypted containers</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="930"/>
+        <location filename="../minstall.cpp" line="922"/>
         <source>Formatting swap partition</source>
         <translation>Pino-format ang swap partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="939"/>
+        <location filename="../minstall.cpp" line="931"/>
         <source>Formatting the / (root) partition</source>
         <translation>Pino-format ang / (root) partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="949"/>
+        <location filename="../minstall.cpp" line="941"/>
         <source>Formatting boot partition</source>
         <translation>Pino-formatting ang boot partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="955"/>
+        <location filename="../minstall.cpp" line="947"/>
         <source>Formatting EFI System Partition</source>
         <translation>Pino-format ang  Sistema ng EFI Partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="962"/>
+        <location filename="../minstall.cpp" line="954"/>
         <source>Formatting the /home partition</source>
         <translation>Pino-format ang /home partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="972"/>
+        <location filename="../minstall.cpp" line="964"/>
         <source>Mounting the /home partition</source>
         <translation>Imina-mount ang /home partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1070"/>
+        <location filename="../minstall.cpp" line="1062"/>
         <source>Sorry, could not create %1 LUKS partition</source>
         <translation>Paumanhin, di maaring makagawa ng %1 LUKS partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1087"/>
+        <location filename="../minstall.cpp" line="1079"/>
         <source>Sorry, could not open %1 LUKS container</source>
         <translation>Paumanhin, Di maaring mabuksan ang %1 LUKS container.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1103"/>
+        <location filename="../minstall.cpp" line="1095"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Dapat gumamit ng bukod na boot partition kapag ginagawan ng encrypting ang root.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1117"/>
+        <location filename="../minstall.cpp" line="1109"/>
         <source>You must choose a root partition.
 The root partition must be at least %1.</source>
         <translation>Dapat pumili ng root partition.
 Ang root partition ay dapat mahigit sa %1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1143"/>
+        <location filename="../minstall.cpp" line="1135"/>
         <source>Delete the data on %1 except for /home</source>
         <translation>Tanggalin ang laman ng  %1 maliban na lamang sa /home</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1153"/>
+        <location filename="../minstall.cpp" line="1145"/>
         <source>Reuse (no reformat) %1 as the /home partition</source>
         <translation>gamiting ang reuse (huwag ang reformat) %1 gaya ng sa  /home partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1173"/>
+        <location filename="../minstall.cpp" line="1165"/>
         <source>Configure %1 as swap space</source>
         <translation>Baguhin ang %1 bilang swap space</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1189"/>
+        <location filename="../minstall.cpp" line="1181"/>
         <source>The partition you selected for /boot is larger than expected.</source>
         <translation>Ang  partition na iyong napili para sa  /boot ay mas malaki kaysa sa inaasahan.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1194"/>
+        <location filename="../minstall.cpp" line="1186"/>
         <source>%1 for the %2 partition</source>
         <translation>%1 para sa %2 partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1197"/>
+        <location filename="../minstall.cpp" line="1189"/>
         <source>The following partitions you selected are not Linux partitions:</source>
         <translation>Ang mga  partitions na iyong napili ay Linux partitions:</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1205"/>
+        <location filename="../minstall.cpp" line="1197"/>
         <source>Are you sure you want to reformat these partitions?</source>
         <translation>Nakakatiyak ka ba na gusto mong i-reformat ang mga partitions na ito?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1215"/>
+        <location filename="../minstall.cpp" line="1207"/>
         <source>The %1 installer will now format and destroy the data on the following partitions:</source>
         <translation>Ang %1 installer ay magsasagawa ngayon ng format at sisirain ang lahat ng laman na nasa partitions:</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1223"/>
+        <location filename="../minstall.cpp" line="1215"/>
         <source>The %1 installer will now perform the following actions:</source>
         <translation>Ang %1 installer ay magsasagawa ng mga sumusunod na aksyon:</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1227"/>
+        <location filename="../minstall.cpp" line="1219"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation>Ang mga akyson ay hindi maaring bawiin. Gusto mo bang magpatuloy?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1426"/>
+        <location filename="../minstall.cpp" line="1415"/>
         <source>Creating required partitions</source>
         <translation>Nagsasagawa ng mga hinihinging partitions.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1432"/>
+        <location filename="../minstall.cpp" line="1421"/>
         <source>Preparing required partitions</source>
         <translation>Inihahanda ang mga hinihinging partitions</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1502"/>
+        <location filename="../minstall.cpp" line="1491"/>
         <source>Mounting the / (root) partition</source>
         <translation>Imina-mount ang  / (root) partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1505"/>
+        <location filename="../minstall.cpp" line="1494"/>
         <source>Deleting old system</source>
         <translation>Tinatanggal ang lumang sistema</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1509"/>
+        <location filename="../minstall.cpp" line="1498"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
         <translation>Bigo sa pagtanggal ng lumang %1 on kinaroroonan
 Babalik sa hakbang bilang 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1516"/>
+        <location filename="../minstall.cpp" line="1505"/>
         <source>Creating system directories</source>
         <translation>Nagsasagawa ng system directories</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1536"/>
+        <location filename="../minstall.cpp" line="1525"/>
         <source>Fixing configuration</source>
         <translation>Inaayos ang  configuration</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1665"/>
+        <location filename="../minstall.cpp" line="1654"/>
         <source>Copying new system</source>
         <translation>Kinokopya ang sistema</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1705"/>
+        <location filename="../minstall.cpp" line="1696"/>
         <source>Copy progress unknown. No file system statistics.</source>
         <translation>Ang pagproseso ng pagkopya ay wlaang katiyakan. Walang  statistics ng  file system</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1712"/>
+        <location filename="../minstall.cpp" line="1705"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Pumalya sa pagsulat  %1 sa kinalalagyan
 Pabalik na sa hakbang bilang 1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1729"/>
+        <location filename="../minstall.cpp" line="1723"/>
         <source>Installing GRUB</source>
         <translation>Ini-install ang GRUB</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1810"/>
+        <location filename="../minstall.cpp" line="1804"/>
         <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
         <translation>Pumalya ang pag-iinstall ng GRUB. Maaring simulang muli ang medium  gamit ang menu ng GRUB Rescue para kumpunihin ang installation.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1826"/>
+        <location filename="../minstall.cpp" line="1820"/>
         <source>NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu.</source>
         <translation>Ang boot ng NVRAM variable update ay pumalya. Maaring hindi magsimula ang sistema ng boot, pero maaring makumpuni sa boot menu ng GRUB Rescue.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1942"/>
+        <location filename="../minstall.cpp" line="1936"/>
         <source>Please enter a user name.</source>
         <translation>Ipasok ang pangalan ng gumagamit.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1946"/>
+        <location filename="../minstall.cpp" line="1940"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>Ang pangalan ng gumagamit ay hindi maaring maglamang ng mga espesyal na character maging ng espasyo.
 Pumili ng ibang pangalan bago magpatuloy.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1957"/>
+        <location filename="../minstall.cpp" line="1951"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Paumanhin, ang pangalan ay gamit na.
 Pumili ng ibang pangalan.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1966"/>
+        <location filename="../minstall.cpp" line="1960"/>
         <source>Please enter the user password.</source>
         <translation>Ipasok ang password ng gumagamit.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1972"/>
+        <location filename="../minstall.cpp" line="1966"/>
         <source>Please enter the root password.</source>
         <translation>Ipasok ang root password.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1978"/>
+        <location filename="../minstall.cpp" line="1972"/>
         <source>The user password entries do not match.
 Please try again.</source>
         <translation>Ang password ng gumagamit ay hindi tugma.
 Subuking muli.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1985"/>
+        <location filename="../minstall.cpp" line="1979"/>
         <source>The root password entries do not match.
 Please try again.</source>
         <translation>Ang root password ay hindi nagtutugma.
 Subuking muli.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1995"/>
+        <location filename="../minstall.cpp" line="1989"/>
         <source>The home directory for %1 already exists.</source>
         <translation>Ang home directory para sa %1 ay umiiral na.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2012"/>
+        <location filename="../minstall.cpp" line="2006"/>
         <source>Failed to set user account passwords.</source>
         <translation>Pumalya sa pagtatakda ng passwords ng user account .</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2034"/>
+        <location filename="../minstall.cpp" line="2026"/>
         <source>Failed to save old home directory.</source>
         <translation>Pumalya sa pagse-save ng lumang home directory.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2041"/>
+        <location filename="../minstall.cpp" line="2033"/>
         <source>Failed to delete old home directory.</source>
         <translation>Pumalya sa pagtanggal ng lumang home directory.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2053"/>
+        <location filename="../minstall.cpp" line="2049"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Paumanhin, pumalya sa paggawa ng directory ng gumagamit.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2063"/>
+        <location filename="../minstall.cpp" line="2057"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Paumanhin, pumalya sa paglalagay ng pangalan directory ng gumagamit.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2091"/>
+        <location filename="../minstall.cpp" line="2078"/>
         <source>Sorry, failed to set ownership of user directory.</source>
         <translation>Paumanhin, pumalya sa pagtatakda ng pagmamay-ari ng directory ng gumagamit.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2127"/>
+        <location filename="../minstall.cpp" line="2114"/>
         <source>Please enter a computer name.</source>
         <translation>Ipasok ang pangalan ng computer.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2131"/>
+        <location filename="../minstall.cpp" line="2118"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -394,12 +394,12 @@ Dapat pumili ng ibang
 pangalan bago magpatuloy.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2137"/>
+        <location filename="../minstall.cpp" line="2124"/>
         <source>Please enter a domain name.</source>
         <translation>Ipasok ang pangalan ng domain.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2141"/>
+        <location filename="../minstall.cpp" line="2128"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -408,585 +408,580 @@ Dapat kang pumili ng ibang
 pangalan bago magpatuloy.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2148"/>
+        <location filename="../minstall.cpp" line="2135"/>
         <source>Please enter a workgroup.</source>
         <translation>Magpasok ng workgroup.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2359"/>
+        <location filename="../minstall.cpp" line="2346"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
         <translation>OK upang iformat at gamitin ang buong disk (%1) para sa %2?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2363"/>
+        <location filename="../minstall.cpp" line="2350"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
         <translation>BABALA: Ang drive na napili ay may kakayahan na hindi bababa sa 2TB at dapat i-format gamit ang GPT. Sa ibang mga sistema ang disk na may GPT-format ay hindi aandar.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2383"/>
+        <location filename="../minstall.cpp" line="2370"/>
         <source>The data in /home cannot be preserved because the required information could not be obtained.</source>
         <translation>Ang data sa /home ay hindi maaring mapreserve dahil hindi maaring makuhang ang hinihinging impormasyon.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2384"/>
+        <location filename="../minstall.cpp" line="2371"/>
         <source>If the partition containing /home is encrypted, please ensure the correct &quot;Encrypt&quot; boxes are selected, and that the entered password is correct.</source>
         <translation>Ang partition na naglalamang ng  /home ay natatatakan, tiyaking tama ang &quot;Encrypt&quot; na napili, at tiyaking ang ipinasok na password ay tama.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2385"/>
+        <location filename="../minstall.cpp" line="2372"/>
         <source>The installer cannot encrypt an existing /home directory or partition.</source>
         <translation>Ang installer ay hindi maaring makapag-encrypt sa umiiral na /home directory o partition.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2441"/>
+        <location filename="../minstall.cpp" line="2428"/>
         <source>General Instructions</source>
         <translation>Mga Bilin na Pangkalahatan</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2442"/>
+        <location filename="../minstall.cpp" line="2429"/>
         <source>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</source>
         <translation>ISARA MUNA LAHAT NG MGA IBANG APPLICATIONS BAGO MAGPATULOY.
 </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2443"/>
+        <location filename="../minstall.cpp" line="2430"/>
         <source>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.</source>
         <translation>Sa bawat pagina ay dapat basahin ang mga bilin, piliin ang iyong minamarapat at i-click ang Next kapat handa ng magpatuloy. Ikaw ay tatanungin para sa pagtitibay bago maganap ang anomang maaring makakapinsala sa isasagawa. 
 </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2445"/>
+        <location filename="../minstall.cpp" line="2432"/>
         <source>Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions.</source>
         <translation>Ang installation ay nagkakailangan ng mga %1 ng espasyo. %2 or mas mataas ay mas mainam. Maari ding gamitin ang buong disk o maaring mailagay ang installation sa kasalukuyang partitions.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2447"/>
+        <location filename="../minstall.cpp" line="2434"/>
         <source>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.</source>
         <translation>Kung gumagamit ka ng Mac OS o Window (mula Vista pasulong), maaring mangangailangan ka ng sistema ng gayong mga software para magawan ng set up ang partitions o boot manager bago mag-install.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2448"/>
+        <location filename="../minstall.cpp" line="2435"/>
         <source>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</source>
         <translation>Ang ext2, ext3, ext4, jfs, xfs, btrfs at reiserfs na mga Linux filesystems ay sinasangayunan at ang ext4 ay ipinapayo.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2449"/>
+        <location filename="../minstall.cpp" line="2436"/>
         <source>Autoinstall will place home on the root partition.</source>
         <translation>Ilalagay ng Autoinstall ang home sa root partition.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2450"/>
-        <location filename="../minstall.cpp" line="2484"/>
+        <location filename="../minstall.cpp" line="2437"/>
+        <location filename="../minstall.cpp" line="2471"/>
         <source>Encryption</source>
         <translation>Encryption</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2451"/>
-        <location filename="../minstall.cpp" line="2485"/>
+        <location filename="../minstall.cpp" line="2438"/>
+        <location filename="../minstall.cpp" line="2472"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>Ang Encryption ay maaring sa pamamgitan ng LUKS. Ang password ay kinakailangan.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2452"/>
-        <location filename="../minstall.cpp" line="2486"/>
+        <location filename="../minstall.cpp" line="2439"/>
+        <location filename="../minstall.cpp" line="2473"/>
         <source>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the &lt;b&gt;Advanced encryption settings&lt;/b&gt; button.</source>
         <translation>Hindi kinakailangan ang hiwalay na unencrypted na partition ng boot. Para sa karagdagang pagsasaayos kalakip ng pagpili ng cipher ay gamitin ang &lt;b&gt;Para sa mas lubusang kaayusan ng encryption&lt;/b&gt; boton.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2454"/>
+        <location filename="../minstall.cpp" line="2441"/>
         <source>When encryption is used with autoinstall, the separate boot partition will be automatically created.</source>
         <translation>Kung ang encryption ay ginagamit lakip ng autoinstall, ang bukod na  boot partition ay kusang malilikha.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2466"/>
+        <location filename="../minstall.cpp" line="2453"/>
         <source>Limitations</source>
         <translation>Mga Limitasyon</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2467"/>
+        <location filename="../minstall.cpp" line="2454"/>
         <source>Remember, this software is provided AS-IS with no warranty what-so-ever. It is solely your responsibility to backup your data before proceeding.</source>
         <translation>Paalala, ang software na ito ay ganito na at walang garantiya o kung ano pa man. Nasa sa iyo ang buong pananagutan na i-backup ang date bago magpatuloy.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2469"/>
+        <location filename="../minstall.cpp" line="2456"/>
         <source>Choose Partitions</source>
         <translation>Pumili ng partition</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2470"/>
+        <location filename="../minstall.cpp" line="2457"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
         <translation>Ang %1 ay humihingi ng root partition. Ang swap partition ay di sapilitan bagaman iminumungkahit. Kung gusto mong gamitin ang   Suspend-sa-Disk na feature ng %1, mangangailangan ka ng swap na partition na yaon ay mas malaki sa totoo ng laki ng iyong tunay na memory. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2472"/>
+        <location filename="../minstall.cpp" line="2459"/>
         <source>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</source>
         <translation>Kung pipiliin mo ang bukod na /home partition ay mas magiging madali sa iyo ang upgrade sa hinaharap, bagaman hindi hindi ito maari kung ang upgrade ay mula sa installation na walang bukod na  home partition.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2473"/>
+        <location filename="../minstall.cpp" line="2460"/>
         <source>Upgrading</source>
         <translation>Nagsasagawa ng upgrade</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2474"/>
+        <location filename="../minstall.cpp" line="2461"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.</source>
         <translation>Upang mag-upgrade mula sa umiiral na  installation ng Linux, piliin ang gayunding home partition gaya ng dati ay siyasating ang mga  preference para maipanatili ang mga data sa /home.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2475"/>
+        <location filename="../minstall.cpp" line="2462"/>
         <source>If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.</source>
         <translation>Kung ipinapanatili mo ang kasalukuyang¿ /home directory tree na nasa iyong root partition, ang installer ay hindi magsasagawa ng reformat sa root partition. Bilang kalalabasan, ang installation ay mag magtatagal kaysa sa karaniwan.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2477"/>
+        <location filename="../minstall.cpp" line="2464"/>
         <source>Preferred Filesystem Type</source>
         <translation>Mungkahing Uri ng Filesystem</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2478"/>
+        <location filename="../minstall.cpp" line="2465"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.</source>
         <translation>Para %1, maari kang mamili ng format sa partitions bilang ext2, ext3, ext4, f2fs, jfs, xfs, btrfs o reiser.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2479"/>
+        <location filename="../minstall.cpp" line="2466"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>Ang mga karagdagang pagpipilian sa compression maaring makuha para sa drives gamit ang btrfs. Lzo na mabilis, pero ang compression mababa. Ang Zlib ay mas mabagal pero may mataas na compression.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2481"/>
+        <location filename="../minstall.cpp" line="2468"/>
         <source>Bad Blocks</source>
         <translation>Blocks na sira</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2482"/>
+        <location filename="../minstall.cpp" line="2469"/>
         <source>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
         <translation>Kung makakapili ka sa  ext2, ext3 or ext4 bilang uri ng format, meron kang pagpipilian sa pagsisiyasat sa mga sirang blocks na nasa drive. Ang mga sirang block ay dapat masiyasat palagi bagaman mas makapagpapatagal, kaya naman maari mong lampasan ang hakbang na ito maliban na lamang kung may hinala ka na ang iyong drive ay may mga masamang blocks.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2491"/>
+        <location filename="../minstall.cpp" line="2478"/>
         <source>Advanced Encryption Settings</source>
         <translation>Mas Malawak na Ayos ng Encryption</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2491"/>
+        <location filename="../minstall.cpp" line="2478"/>
         <source>This page allows fine-tuning of LUKS encrypted partitions.</source>
         <translation>Ang pahinang ito ay nagpapahintulot na pakinisin ang encrypted na  partitions ng LUKS.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2492"/>
+        <location filename="../minstall.cpp" line="2479"/>
         <source>In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.</source>
         <translation>Sa kadalasang mga pagkakataon, ang karaniwang ayos ay nagbibigay ng praktical na balanse sa pagitan ng siguridad at performance na naaangkop  sa mga maseselang applications. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2494"/>
+        <location filename="../minstall.cpp" line="2481"/>
         <source>This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.</source>
         <translation>Ang texto na ito ay sumasakop sa mga basiko ng mga parametro na gamit sa LUKS, bagamang hindi nangangahulugan pangmalawakang gabay sa cryptography. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2495"/>
+        <location filename="../minstall.cpp" line="2482"/>
         <source>Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.</source>
         <translation>Ang paglilikot o pagbabago kaayusan nito kung walang sapat na kaalaman sa cryptography ay maaring magbunga ng mahinang encryption na gamit.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2496"/>
+        <location filename="../minstall.cpp" line="2483"/>
         <source>Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.</source>
         <translation>Ang pagbago sa field ay kadalasang nakakaapekto sa mga pagpipilian sa ibaba. Ang mga field sa baba ay maaring kusang mabago sa iminumungkahing bilang.  </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2497"/>
+        <location filename="../minstall.cpp" line="2484"/>
         <source>Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.</source>
         <translation>Samantalang ang mas mainam na performance o ang mas mahigpit na siguridad ay maaring mataglay sa pamamagitan ng pagbabago ng settings mula sa mga iminumungkahing bilang, yaon ay nasa sa iyong sariling ikapipinsala.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2499"/>
+        <location filename="../minstall.cpp" line="2486"/>
         <source>You can use the &lt;b&gt;Benchmark&lt;/b&gt; button (which runs &lt;i&gt;cryptsetup benchmark&lt;/i&gt; in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.</source>
         <translation>Maaring gamiting ang &lt;b&gt;para sa Benchmark&lt;/b&gt; boton (na aandar &lt;i&gt;cryptsetup benchmark&lt;/i&gt; sa kaniyang sariling terminal window) para maicompare ang pagtatrabaho ang karaniwang combination ng mga hash, ciphers at chain modes.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2500"/>
+        <location filename="../minstall.cpp" line="2487"/>
         <source>Please note that &lt;i&gt;cryptsetup benchmark&lt;/i&gt; does not cover all the combinations or selections possible, and generally covers the most commonly used selections.</source>
         <translation>Tandaan na ang &lt;i&gt;cryptsetup benchmark&lt;/i&gt; ay hindi sumasakop sa lahat ng  combination o mga posibleng pagpipilian at sa kadalasan ay sumasakop sa mga kadalasang mga selections na ginagamit.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2502"/>
+        <location filename="../minstall.cpp" line="2489"/>
         <source>Cipher</source>
         <translation>Cipher</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2502"/>
+        <location filename="../minstall.cpp" line="2489"/>
         <source>A variety of ciphers are available.</source>
         <translation>Ang ibat ibang uri ng ciphers ay maaring makuha.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2503"/>
+        <location filename="../minstall.cpp" line="2490"/>
         <source>was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.</source>
         <translation>isa sa limang  finalists ng AES. Ito ay itinuturing na may mas mataas na siguridad kaysa sa  Rijndael at iba pang mga finalists ng AES. Ito ay nagbibigay ng mas malakas na pagtatrabaho sa ibang mga  CPU na 64-bit.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2504"/>
+        <location filename="../minstall.cpp" line="2491"/>
         <source>(also known as &lt;i&gt;Rijndael&lt;/i&gt;) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.</source>
         <translation>(kilala rin bilang &lt;i&gt;Rijndael&lt;/i&gt;) ay isang lalong karaniwang cipher, ang maraming mga makabagong CPU ay may kalakip na panuntunang mas masinsin para sa AES, dahil sa kaniyang pag-iral sa kadalasan. Bagaman ang Rijndael ay napili kaysa sa Serpent dahil sa kaniyang pagtatrabaho, walang praktikal attack sa kasalukuyan ang inaasahan.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2505"/>
+        <location filename="../minstall.cpp" line="2492"/>
         <source>is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.</source>
         <translation>ay ang kasunod ng Blowfish. Ito ay naging isa sa limang  finalist ng AES bagaman hindi napili bilang standard.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2506"/>
+        <location filename="../minstall.cpp" line="2493"/>
         <source>(CAST-256) was a candidate in the AES contest, however it did not become a finalist.</source>
         <translation>Ang (CAST-256) ay kandidato sa paligsahan ng AES  bagaman hindi ito naging finalist.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2507"/>
+        <location filename="../minstall.cpp" line="2494"/>
         <source>is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.</source>
         <translation>ay isang 64-bit block cipher na ginawa ni Bruce Schneier. Ito ay hindi iminumungkahi sa mga maseselang application bilang CBC at  ECB mode lamang ang sinusuportahan. Ang Blowfish ay tumatanggap ng dami ng key sa pagitan ng  32 and 448 bits na maaring maparami sa bilang ng 8.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2509"/>
+        <location filename="../minstall.cpp" line="2496"/>
         <source>Chain mode</source>
         <translation>Chain mode</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2509"/>
+        <location filename="../minstall.cpp" line="2496"/>
         <source>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.</source>
         <translation>Kung ang lahat ng  blocks ay encrypted gamit ang kaparehong key, isang padron ay maaring lumitaw para mahulaan ang payak na text.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2510"/>
+        <location filename="../minstall.cpp" line="2497"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.</source>
         <translation>XEX-based Tweaked codebook na may lakip na pangnakaw ng ciphertext) ay isang makabagong chain mode, na humahangga sa CBC at EBC. Ito ay sa madalas at iminumungkahi) bilang chain mode. Gamit ang ESSIV kaysa sa Plain64 ay magaganap at magdudulot na pasakit sa pagtatrabaho, na may kalakip na maaring ipagwalang bahalang  pakinabang sa siguridad.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2511"/>
+        <location filename="../minstall.cpp" line="2498"/>
         <source>(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.</source>
         <translation>(Ang Cipher Block Chaining) ay mas payak kaysa sa XTS, pero ito ay maaring tablan sa mga   attack ng padding oracle (parang pinahihina ng ESSIV) kung kayat hindi iminumungkahi para sa mga maselang applications.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2512"/>
+        <location filename="../minstall.cpp" line="2499"/>
         <source>(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.</source>
         <translation>(Ang Electronic CodeBook) ay mas mahina sa siguridad kaysa sa CBC at hindi maaring gamiting sa mga maseselang applications.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2514"/>
+        <location filename="../minstall.cpp" line="2501"/>
         <source>IV generator</source>
         <translation>IV generator</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2514"/>
+        <location filename="../minstall.cpp" line="2501"/>
         <source>For XTS and CBC, this selects how the &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector is generated. &lt;b&gt;ESSIV&lt;/b&gt; requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.</source>
         <translation>Para sa XTS at CBC, pinipili nito kung paanong ang &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector ay nalilikha. &lt;b&gt;Ang ESSIV&lt;/b&gt; ay humihingi ng pagtatrabaho ng hash at dahil sa roon ay ang ikalawang drop-down box ay maaring makuha kung ito ay napili. Ang mga hash ay maaring makuha depende na piling cipher.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2515"/>
+        <location filename="../minstall.cpp" line="2502"/>
         <source>ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.</source>
         <translation>Ang ECB mode ay hindi gumagamit IV, so ang mga fields na ito ay di maaring magamit kung ang  ECB ay napili para sa chain mode.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2517"/>
+        <location filename="../minstall.cpp" line="2504"/>
         <source>Key size</source>
         <translation>Laki ng Key</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2517"/>
+        <location filename="../minstall.cpp" line="2504"/>
         <source>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.</source>
         <translation>Itatakda nito ang laki ng key sa bits. Ang mga key sizes na maaring makuha ay limitado ng cipher at ng  chain mode.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2518"/>
+        <location filename="../minstall.cpp" line="2505"/>
         <source>The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).</source>
         <translation>Ang XTS cipher chain mode ay humahati ng key sa dalawa (halimbawa, ang AES-256 in XTS ay humihiling ng 512-bit na laki ng key).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2520"/>
+        <location filename="../minstall.cpp" line="2507"/>
         <source>LUKS key hash</source>
         <translation>LUKS key hash</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2520"/>
+        <location filename="../minstall.cpp" line="2507"/>
         <source>The hash used for PBKDF2 and for the AF splitter.</source>
         <translation>Ang hash na ginamit para sa PBKDF2 at para sa AF splitter.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2521"/>
+        <location filename="../minstall.cpp" line="2508"/>
         <source>SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.</source>
         <translation>Ang SHA-1 at  RIPEMD-160 ang hindi na iminumungkahing gamitin dahil sa maseselang application yamang mga napag-aalamang sira.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2523"/>
+        <location filename="../minstall.cpp" line="2510"/>
         <source>Kernel RNG</source>
         <translation>Kernel RNG</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2523"/>
+        <location filename="../minstall.cpp" line="2510"/>
         <source>Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).</source>
         <translation>Itinatakda kung aling  generator ng random number ng kernel ang gagamitin sa paggawa ng master key volume (pangmatagalang key)</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2524"/>
+        <location filename="../minstall.cpp" line="2511"/>
         <source>Two options are available: /dev/&lt;b&gt;random&lt;/b&gt; which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/&lt;b&gt;urandom&lt;/b&gt; which will not block even if there is insufficient entropy (possibly weaker keys).</source>
         <translation>May maaring dalawang mapagpipilian: /dev/&lt;b&gt;random&lt;/b&gt; na sumasagka hanggang maging sapat ang nakukuhang entropy (maaring tumagal ng husto sa may kalagayang may mababang-entropy), at /dev/&lt;b&gt;urandom&lt;/b&gt; di hindi sumasagka bagaman may kakulangan sa entropy (mas malamang na mahinang keys)</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2526"/>
+        <location filename="../minstall.cpp" line="2513"/>
         <source>KDF round time&lt;/b&gt;&lt;br/&gt;The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.</source>
         <translation>KDF round time&lt;/b&gt;&lt;br/&gt;Ang gugugulin panahon (sa bahagi ng sandali) ay gagamitin sa PBKDF2 pagpoproceso ng passphrase</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2527"/>
+        <location filename="../minstall.cpp" line="2514"/>
         <source>A value of 0 selects the compiled-in default (run &lt;i&gt;cryptsetup --help&lt;/i&gt; for details).</source>
         <translation>Ang halaga ng 0 ay pipili ng compline-in default (patakbuhin ang &lt;i&gt;cryptsetup --help&lt;/i&gt; para sa iba pang kaalaman).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2528"/>
+        <location filename="../minstall.cpp" line="2515"/>
         <source>If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.</source>
         <translation>Kung mabagal ang iyong computer ay maari kang magdagdag ng bilang para sa siguridad, bilang kapalit ng oraspara matuklasan ang dami ng passphrase na naipasok</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2533"/>
+        <location filename="../minstall.cpp" line="2520"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ang Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 ay gumagamit ng GRUB bootloader upang magbukas %1 at MS-Windows. &lt;p&gt;Sa kalakaran ang GRUB2 ay nakainstall sa Master Boot Record (MBR) o ESP (EFI System Partition para sa 64-bit UEFI na system ng boot ) ng iyong drive na gamit sa pang boot at pinapalitan nito ang boot loader na dati mong ginagamit. Ito ay normal&lt;/p&gt;&lt;p&gt;Kung nais mong iinstall ang  GRUB2 sa Partition Boot Record (PBR) sa halip at pagkatapos ay ang GRUB2 ay aarangkasa sa iyong minamarapat na partition. Ang pagpiling ito ay para lamang sa mga bihasa.&lt;/p&gt;&lt;p&gt;Kung tatanggalang ng check ang  Install GRUB box, ang GRUB ay hindi maiinstal sa ngayon. Ang pagpiling ito ay para lamang sa mga bihasa.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2548"/>
+        <location filename="../minstall.cpp" line="2535"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt; Para sindihan ang Common Services &lt;/b&gt;&lt;br/&gt;Pumili ng alinman sa mga ito na common services na maari mong magamit sa configuration ng iyong sistema at ng mga services na maaring kusang umandar sa iyong pagsisimula  %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2552"/>
+        <location filename="../minstall.cpp" line="2539"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2565"/>
+        <location filename="../minstall.cpp" line="2552"/>
         <source>Localization Defaults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2566"/>
+        <location filename="../minstall.cpp" line="2553"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2567"/>
+        <location filename="../minstall.cpp" line="2554"/>
         <source>Configure Clock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2568"/>
+        <location filename="../minstall.cpp" line="2555"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2570"/>
+        <location filename="../minstall.cpp" line="2557"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2572"/>
+        <location filename="../minstall.cpp" line="2559"/>
         <source>Service Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2573"/>
+        <location filename="../minstall.cpp" line="2560"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2579"/>
+        <location filename="../minstall.cpp" line="2566"/>
         <source>&lt;p&gt;&lt;b&gt;Default User Login&lt;/b&gt;&lt;br/&gt;The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwords&lt;/b&gt;&lt;br/&gt;Enter a new password for your default user account and for the root account. Each password must be entered twice.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2589"/>
+        <location filename="../minstall.cpp" line="2576"/>
         <source>Old Home Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2590"/>
+        <location filename="../minstall.cpp" line="2577"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2592"/>
+        <location filename="../minstall.cpp" line="2579"/>
         <source>Re-use it for this installation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2593"/>
+        <location filename="../minstall.cpp" line="2580"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2595"/>
+        <location filename="../minstall.cpp" line="2582"/>
         <source>Rename it and create a new directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2596"/>
+        <location filename="../minstall.cpp" line="2583"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2598"/>
+        <location filename="../minstall.cpp" line="2585"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2599"/>
+        <location filename="../minstall.cpp" line="2586"/>
         <source>Delete it and create a new directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2600"/>
+        <location filename="../minstall.cpp" line="2587"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2601"/>
+        <location filename="../minstall.cpp" line="2588"/>
         <source>Warning</source>
         <translation>Babala</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2602"/>
+        <location filename="../minstall.cpp" line="2589"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2618"/>
+        <location filename="../minstall.cpp" line="2605"/>
         <source>Installation in Progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2619"/>
+        <location filename="../minstall.cpp" line="2606"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2621"/>
+        <location filename="../minstall.cpp" line="2608"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2623"/>
+        <location filename="../minstall.cpp" line="2610"/>
         <source>Change settings while you wait</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2624"/>
+        <location filename="../minstall.cpp" line="2611"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2626"/>
+        <location filename="../minstall.cpp" line="2613"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2635"/>
+        <location filename="../minstall.cpp" line="2622"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2645"/>
+        <location filename="../minstall.cpp" line="2632"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2646"/>
-        <location filename="../minstall.cpp" line="3082"/>
+        <location filename="../minstall.cpp" line="2633"/>
+        <location filename="../minstall.cpp" line="3075"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2677"/>
+        <location filename="../minstall.cpp" line="2664"/>
         <source>Finish</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2681"/>
+        <location filename="../minstall.cpp" line="2668"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2683"/>
+        <location filename="../minstall.cpp" line="2670"/>
         <source>Next</source>
         <translation>Kasunod</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2718"/>
+        <location filename="../minstall.cpp" line="2705"/>
         <source>Configuring sytem. Please wait.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2721"/>
+        <location filename="../minstall.cpp" line="2708"/>
         <source>Configuration complete. Restarting system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2725"/>
+        <location filename="../minstall.cpp" line="2712"/>
         <source>Could not complete configuration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2742"/>
+        <location filename="../minstall.cpp" line="2729"/>
         <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2789"/>
+        <location filename="../minstall.cpp" line="2776"/>
         <source>Select target root partition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3002"/>
+        <location filename="../minstall.cpp" line="2995"/>
         <source>Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3002"/>
+        <location filename="../minstall.cpp" line="2995"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3068"/>
+        <location filename="../minstall.cpp" line="3061"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3076"/>
+        <location filename="../minstall.cpp" line="3069"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3090"/>
+        <location filename="../minstall.cpp" line="3083"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3098"/>
+        <location filename="../minstall.cpp" line="3091"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3103"/>
+        <location filename="../minstall.cpp" line="3096"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3284"/>
-        <source>This option also encrypts swap partition if selected, which will render the swap partition unable to be shared with other installed operating systems.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="3438"/>
+        <location filename="../minstall.cpp" line="3426"/>
         <source>System boot disk:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3452"/>
-        <location filename="../minstall.cpp" line="3461"/>
+        <location filename="../minstall.cpp" line="3440"/>
+        <location filename="../minstall.cpp" line="3449"/>
         <source>Partition to use:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -999,670 +994,675 @@ Do you really want to stop now?</source>
         <translation>Tulong</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="125"/>
+        <location filename="../meinstall.ui" line="147"/>
         <source>Next</source>
         <translation>Kasunod</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="132"/>
+        <location filename="../meinstall.ui" line="154"/>
         <source>Alt+N</source>
         <translation>Alt+N</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2719"/>
+        <location filename="../meinstall.ui" line="2741"/>
         <source>Back</source>
         <translation>Magbalik</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2726"/>
+        <location filename="../meinstall.ui" line="2748"/>
         <source>Alt+K</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2739"/>
+        <location filename="../meinstall.ui" line="2761"/>
         <source>Installation in progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2754"/>
+        <location filename="../meinstall.ui" line="2776"/>
         <source>Abort</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1655"/>
-        <location filename="../meinstall.ui" line="2757"/>
+        <location filename="../meinstall.ui" line="1677"/>
+        <location filename="../meinstall.ui" line="2779"/>
         <source>Alt+A</source>
         <translation>Alt+A</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="114"/>
+        <location filename="../meinstall.ui" line="96"/>
+        <source>Live Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="136"/>
         <source>Close</source>
         <translation>Isara</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="173"/>
+        <location filename="../meinstall.ui" line="195"/>
         <source>Gathering Information, please stand by.</source>
         <translation type="unfinished">Antabay habang kumakalap ng impormasyon.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="208"/>
+        <location filename="../meinstall.ui" line="230"/>
         <source>Terms of Use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="235"/>
+        <location filename="../meinstall.ui" line="257"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="242"/>
+        <location filename="../meinstall.ui" line="264"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="249"/>
+        <location filename="../meinstall.ui" line="271"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="272"/>
+        <location filename="../meinstall.ui" line="294"/>
         <source>Change Keyboard Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="279"/>
+        <location filename="../meinstall.ui" line="301"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="329"/>
+        <location filename="../meinstall.ui" line="351"/>
         <source>Rearrange disk partitions (optional)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="356"/>
+        <location filename="../meinstall.ui" line="378"/>
         <source>Modify partitions:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="372"/>
+        <location filename="../meinstall.ui" line="394"/>
         <source>Run partition tool...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="388"/>
+        <location filename="../meinstall.ui" line="410"/>
         <source>Select type of installation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="400"/>
+        <location filename="../meinstall.ui" line="422"/>
         <source>Auto-install using entire disk </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="407"/>
-        <location filename="../meinstall.ui" line="1155"/>
+        <location filename="../meinstall.ui" line="429"/>
+        <location filename="../meinstall.ui" line="1177"/>
         <source>Encryption password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="452"/>
+        <location filename="../meinstall.ui" line="474"/>
         <source>MB </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="462"/>
-        <location filename="../meinstall.ui" line="1162"/>
+        <location filename="../meinstall.ui" line="484"/>
+        <location filename="../meinstall.ui" line="1184"/>
         <source>Confirm password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="488"/>
+        <location filename="../meinstall.ui" line="510"/>
         <source>Leave free space up to:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="504"/>
+        <location filename="../meinstall.ui" line="526"/>
         <source>Custom install on existing partitions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="565"/>
-        <location filename="../meinstall.ui" line="1169"/>
-        <location filename="../meinstall.ui" line="1214"/>
+        <location filename="../meinstall.ui" line="587"/>
+        <location filename="../meinstall.ui" line="1191"/>
+        <location filename="../meinstall.ui" line="1236"/>
         <source>Advanced encryption settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="601"/>
-        <location filename="../meinstall.ui" line="1088"/>
+        <location filename="../meinstall.ui" line="623"/>
+        <location filename="../meinstall.ui" line="1110"/>
         <source>Encrypt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="617"/>
+        <location filename="../meinstall.ui" line="639"/>
         <source>Use disk:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="675"/>
+        <location filename="../meinstall.ui" line="697"/>
         <source>Preferences</source>
         <translation>Mga Minamarapat</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="687"/>
+        <location filename="../meinstall.ui" line="709"/>
         <source>Preserve data in /home (if upgrading)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="700"/>
+        <location filename="../meinstall.ui" line="722"/>
         <source>Check for badblocks (takes longer)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="716"/>
+        <location filename="../meinstall.ui" line="738"/>
         <source>Choose partitions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="754"/>
-        <location filename="../meinstall.ui" line="943"/>
+        <location filename="../meinstall.ui" line="776"/>
+        <location filename="../meinstall.ui" line="965"/>
         <source>ext4</source>
         <translation>ext4</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="759"/>
-        <location filename="../meinstall.ui" line="948"/>
+        <location filename="../meinstall.ui" line="781"/>
+        <location filename="../meinstall.ui" line="970"/>
         <source>ext3</source>
         <translation type="unfinished">ext3</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="764"/>
-        <location filename="../meinstall.ui" line="953"/>
+        <location filename="../meinstall.ui" line="786"/>
+        <location filename="../meinstall.ui" line="975"/>
         <source>ext2</source>
         <translation type="unfinished">ext2</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="769"/>
-        <location filename="../meinstall.ui" line="958"/>
+        <location filename="../meinstall.ui" line="791"/>
+        <location filename="../meinstall.ui" line="980"/>
         <source>f2fs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="774"/>
-        <location filename="../meinstall.ui" line="963"/>
+        <location filename="../meinstall.ui" line="796"/>
+        <location filename="../meinstall.ui" line="985"/>
         <source>jfs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="779"/>
-        <location filename="../meinstall.ui" line="968"/>
+        <location filename="../meinstall.ui" line="801"/>
+        <location filename="../meinstall.ui" line="990"/>
         <source>xfs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="784"/>
-        <location filename="../meinstall.ui" line="973"/>
+        <location filename="../meinstall.ui" line="806"/>
+        <location filename="../meinstall.ui" line="995"/>
         <source>btrfs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="789"/>
-        <location filename="../meinstall.ui" line="978"/>
+        <location filename="../meinstall.ui" line="811"/>
+        <location filename="../meinstall.ui" line="1000"/>
         <source>btrfs-zlib</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="794"/>
-        <location filename="../meinstall.ui" line="983"/>
+        <location filename="../meinstall.ui" line="816"/>
+        <location filename="../meinstall.ui" line="1005"/>
         <source>btrfs-lzo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="799"/>
-        <location filename="../meinstall.ui" line="988"/>
+        <location filename="../meinstall.ui" line="821"/>
+        <location filename="../meinstall.ui" line="1010"/>
         <source>reiserfs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="804"/>
-        <location filename="../meinstall.ui" line="993"/>
+        <location filename="../meinstall.ui" line="826"/>
+        <location filename="../meinstall.ui" line="1015"/>
         <source>reiser4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="822"/>
+        <location filename="../meinstall.ui" line="844"/>
         <source>boot:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="847"/>
+        <location filename="../meinstall.ui" line="869"/>
         <source>Label</source>
         <translation>Label</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="866"/>
+        <location filename="../meinstall.ui" line="888"/>
         <source>root:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="879"/>
+        <location filename="../meinstall.ui" line="901"/>
         <source>swap:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="928"/>
-        <location filename="../meinstall.ui" line="1099"/>
+        <location filename="../meinstall.ui" line="950"/>
+        <location filename="../meinstall.ui" line="1121"/>
         <source>root</source>
         <translation>root</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1007"/>
+        <location filename="../meinstall.ui" line="1029"/>
         <source>Type</source>
         <translation>Uri</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1023"/>
+        <location filename="../meinstall.ui" line="1045"/>
         <source>home:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1113"/>
+        <location filename="../meinstall.ui" line="1135"/>
         <source>Location</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1129"/>
+        <location filename="../meinstall.ui" line="1151"/>
         <source>Encryption options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1230"/>
+        <location filename="../meinstall.ui" line="1252"/>
         <source>SHA-512</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1235"/>
+        <location filename="../meinstall.ui" line="1257"/>
         <source>SHA-256</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1240"/>
+        <location filename="../meinstall.ui" line="1262"/>
         <source>Whirlpool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1245"/>
+        <location filename="../meinstall.ui" line="1267"/>
         <source>SHA-1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1250"/>
+        <location filename="../meinstall.ui" line="1272"/>
         <source>RIPEMD-160</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1267"/>
+        <location filename="../meinstall.ui" line="1289"/>
         <source>-bit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1286"/>
+        <location filename="../meinstall.ui" line="1308"/>
         <source> mS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1308"/>
+        <location filename="../meinstall.ui" line="1330"/>
         <source>LUKS key hash:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1321"/>
+        <location filename="../meinstall.ui" line="1343"/>
         <source>Key size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1347"/>
+        <location filename="../meinstall.ui" line="1369"/>
         <source>KDF round time:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1370"/>
+        <location filename="../meinstall.ui" line="1392"/>
         <source>Cipher:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1390"/>
+        <location filename="../meinstall.ui" line="1412"/>
         <source>Serpent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1395"/>
+        <location filename="../meinstall.ui" line="1417"/>
         <source>AES</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1400"/>
+        <location filename="../meinstall.ui" line="1422"/>
         <source>Twofish</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1405"/>
+        <location filename="../meinstall.ui" line="1427"/>
         <source>CAST6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1410"/>
+        <location filename="../meinstall.ui" line="1432"/>
         <source>Blowfish</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1427"/>
+        <location filename="../meinstall.ui" line="1449"/>
         <source>Benchmark...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1457"/>
+        <location filename="../meinstall.ui" line="1479"/>
         <source>ESSIV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1462"/>
+        <location filename="../meinstall.ui" line="1484"/>
         <source>Plain64</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1467"/>
+        <location filename="../meinstall.ui" line="1489"/>
         <source>Plain64BE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1472"/>
+        <location filename="../meinstall.ui" line="1494"/>
         <source>Plain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1477"/>
+        <location filename="../meinstall.ui" line="1499"/>
         <source>BENBI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1491"/>
+        <location filename="../meinstall.ui" line="1513"/>
         <source>IV generator:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1504"/>
+        <location filename="../meinstall.ui" line="1526"/>
         <source>Chain mode:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1524"/>
+        <location filename="../meinstall.ui" line="1546"/>
         <source>Kernel RNG:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1532"/>
+        <location filename="../meinstall.ui" line="1554"/>
         <source>urandom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1537"/>
+        <location filename="../meinstall.ui" line="1559"/>
         <source>random</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1564"/>
+        <location filename="../meinstall.ui" line="1586"/>
         <source>Select Boot Method</source>
         <translation>Pumili ng paraan ng pag Boot</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1601"/>
+        <location filename="../meinstall.ui" line="1623"/>
         <source>EFI System Partition</source>
         <translation> Sistema ng Partition ng EFI</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1604"/>
+        <location filename="../meinstall.ui" line="1626"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1623"/>
+        <location filename="../meinstall.ui" line="1645"/>
         <source>Partition Boot Record</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1626"/>
+        <location filename="../meinstall.ui" line="1648"/>
         <source>PBR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1639"/>
+        <location filename="../meinstall.ui" line="1661"/>
         <source>Location to install on:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1652"/>
+        <location filename="../meinstall.ui" line="1674"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1671"/>
+        <location filename="../meinstall.ui" line="1693"/>
         <source>System boot disk:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1693"/>
+        <location filename="../meinstall.ui" line="1715"/>
         <source>Master Boot Record</source>
         <translation>Pangunahing Record ng Boot</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1699"/>
+        <location filename="../meinstall.ui" line="1721"/>
         <source>MBR</source>
         <translation>MBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1702"/>
+        <location filename="../meinstall.ui" line="1724"/>
         <source>Alt+B</source>
         <translation>Alt+B</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1767"/>
+        <location filename="../meinstall.ui" line="1789"/>
         <source>Common Services to Enable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1786"/>
+        <location filename="../meinstall.ui" line="1808"/>
         <source>Service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1791"/>
+        <location filename="../meinstall.ui" line="1813"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1824"/>
+        <location filename="../meinstall.ui" line="1846"/>
         <source>Computer Network Names</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1851"/>
+        <location filename="../meinstall.ui" line="1873"/>
         <source>Workgroup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1864"/>
+        <location filename="../meinstall.ui" line="1886"/>
         <source>Workgroup:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1877"/>
+        <location filename="../meinstall.ui" line="1899"/>
         <source>SaMBa Server for MS Networking</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1893"/>
+        <location filename="../meinstall.ui" line="1915"/>
         <source>example.dom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1906"/>
+        <location filename="../meinstall.ui" line="1928"/>
         <source>Computer domain:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1932"/>
+        <location filename="../meinstall.ui" line="1954"/>
         <source>Computer name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1993"/>
+        <location filename="../meinstall.ui" line="2015"/>
         <source>Configure Clock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2034"/>
+        <location filename="../meinstall.ui" line="2056"/>
         <source>Format:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2062"/>
+        <location filename="../meinstall.ui" line="2084"/>
         <source>Timezone:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2107"/>
+        <location filename="../meinstall.ui" line="2129"/>
         <source>System clock uses local time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2139"/>
+        <location filename="../meinstall.ui" line="2161"/>
         <source>Localization Defaults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2179"/>
+        <location filename="../meinstall.ui" line="2201"/>
         <source>Locale:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2201"/>
+        <location filename="../meinstall.ui" line="2223"/>
         <source>Service Settings (advanced)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2219"/>
+        <location filename="../meinstall.ui" line="2241"/>
         <source>Adjust which services should run at startup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2222"/>
+        <location filename="../meinstall.ui" line="2244"/>
         <source>View</source>
         <translation>Tanawan</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2280"/>
+        <location filename="../meinstall.ui" line="2302"/>
         <source>Root (administrator) Account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2336"/>
+        <location filename="../meinstall.ui" line="2358"/>
         <source>Confirm root password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2349"/>
+        <location filename="../meinstall.ui" line="2371"/>
         <source>Root password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2365"/>
+        <location filename="../meinstall.ui" line="2387"/>
         <source>Default User Account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2430"/>
+        <location filename="../meinstall.ui" line="2452"/>
         <source>username</source>
         <translation>pangalan ng user o tagagamit</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2443"/>
+        <location filename="../meinstall.ui" line="2465"/>
         <source>Confirm user password:</source>
         <translation>Kumpirmahin ang password ng user of gumagamit:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2456"/>
+        <location filename="../meinstall.ui" line="2478"/>
         <source>Default user password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2469"/>
+        <location filename="../meinstall.ui" line="2491"/>
         <source>Default user login name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2488"/>
+        <location filename="../meinstall.ui" line="2510"/>
         <source>Autologin</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2501"/>
+        <location filename="../meinstall.ui" line="2523"/>
         <source>Show passwords</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2514"/>
+        <location filename="../meinstall.ui" line="2536"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2517"/>
+        <location filename="../meinstall.ui" line="2539"/>
         <source>Save live desktop changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2540"/>
+        <location filename="../meinstall.ui" line="2562"/>
         <source>Existing Home Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2549"/>
+        <location filename="../meinstall.ui" line="2571"/>
         <source>What would you like to do with the old directory?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2556"/>
+        <location filename="../meinstall.ui" line="2578"/>
         <source>Re-use it for this installation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2563"/>
+        <location filename="../meinstall.ui" line="2585"/>
         <source>Rename it and create a new directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2570"/>
+        <location filename="../meinstall.ui" line="2592"/>
         <source>Delete it and create a new directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2609"/>
+        <location filename="../meinstall.ui" line="2631"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2653"/>
+        <location filename="../meinstall.ui" line="2675"/>
         <source>Installation complete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2659"/>
+        <location filename="../meinstall.ui" line="2681"/>
         <source>Automatically reboot the system when the installer is closed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="2678"/>
+        <location filename="../meinstall.ui" line="2700"/>
         <source>Reminders</source>
         <translation type="unfinished"></translation>
     </message>
