@@ -71,8 +71,7 @@ void BlockDeviceList::build(MProcess &proc)
         bootUUID = livecfg.value("BOOT_UUID").toString();
     }
 
-    // backup detection for drives that don't have UUID for ESP
-    const QStringList backup_list = proc.execOutLines("fdisk -l -o DEVICE,TYPE |grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
+    QStringList backup_list; // Backup ESP detection. Populated when needed.
 
     // collect and sort lsblk info (sorting required for drives with >15 partitions)
     const QStringList &bdraw = proc.execOutLines("lsblk -brno TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL");
@@ -125,7 +124,11 @@ void BlockDeviceList::build(MProcess &proc)
         }
 
         if (!bdinfo.isDrive && !bdinfo.isESP) {
-            // check the backup ESP detection list
+            // Backup detection for drives that don't have UUID for ESP.
+            if(backup_list.isEmpty()) {
+                backup_list = proc.execOutLines("fdisk -l -o DEVICE,TYPE"
+                    " | grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
+            }
             bdinfo.isESP = backup_list.contains(bdinfo.name);
         }
         if (segsize > 5) {
