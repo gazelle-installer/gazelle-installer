@@ -23,6 +23,10 @@ if test "$EUID" != 0; then
     fi
 
     ###end Xfce automount feature
+    # wayland fix (chkboom)
+    if [ x"$WAYLAND_DISPLAY" != "x" ] && [ -n "${WAYLAND_DISPLAY##/*}" ]; then
+      WAYLAND_DISPLAY=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
+    fi
     
     QTENV="${XDG_RUNTIME_DIR:-/tmp}/mx-installer-qtenv.$EUID.$PPID.$$.$RANDOM$RANDOM"
     if [ -f "$QTENV" ] ; then
