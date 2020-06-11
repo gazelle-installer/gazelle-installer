@@ -11,57 +11,75 @@ if test "$EUID" != 0; then
     # normal user
     ##disable Xfce automount features
 
-	INITIALAUTOMOUNT=$(command -v xfconf-query && xfconf-query --channel thunar-volman --property /automount-drives/enabled)
-	echo "INITIALAUTOMOUNT =" "$INITIALAUTOMOUNT"
-	echo "$INITIALAUTOMOUNT" >> /tmp/minstall-auto
-	command -v xfconf-query && xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false
-	###end Xfce automount feature
+    INITIALAUTOMOUNT=false
+    if command -v xfconf-query >/dev/null && \
+       xfconf-query --channel thunar-volman --property /automount-drives/enabled 1>/dev/null 2>&1; then
+       INITIALAUTOMOUNT=$(xfconf-query --channel thunar-volman --property /automount-drives/enabled)
+       echo "INITIALAUTOMOUNT =" "$INITIALAUTOMOUNT"
+       if [ "$INITIALAUTOMOUNT" = "true" ]; then
+          echo "$INITIALAUTOMOUNT" > /tmp/minstall-auto
+          xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false
+       fi
+    fi
+
+    ###end Xfce automount feature
     
-    QTENV="/tmp/mx-installer-qtenv.$EUID.$PPID.$$.$RANDOM$RANDOM"
-    env | grep -E '^QT_|^LANG='  | sed -e 's/^/export /' 2>/dev/null  > "$QTENV"
-    chmod +r "$QTENV"
-    pkexec /usr/bin/minstall-pkexec "--qtenv" "$QTENV" "${@}"
+    QTENV="${XDG_RUNTIME_DIR:-/tmp}/mx-installer-qtenv.$EUID.$PPID.$$.$RANDOM$RANDOM"
     if [ -f "$QTENV" ] ; then
         rm  $QTENV
     fi
-    ##renable Xfce automount feature, if it was enabled in the first place
-	if [ -e "/tmp/minstall-auto" ]; then
-		rm /tmp/minstall-auto
-	fi
-	
-	if [ "$INITIALAUTOMOUNT" = "true" ]; then
-		command -v xfconf-query && xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true
-	fi
+    umask 0022
+    touch "$QTENV"
+    while IFS=$'\n' read -r ENV; do 
+        IFS='=' read PAR VAL < <(echo $ENV); 
+        echo "export $PAR=${VAL@Q}" >> $QTENV 
+    done < <(printenv | grep -E '^DESKTOP_SESSION|^KDE_FULL_SESSION=|^LANG=|^LANGUAGE=|^LC_|^QT_|^XDG_SESSION_TYPE|^WAYLAND_')
 
-##end Xfce automount feaure
+    echo "CURRENT_WORK_DIR='$PWD'" >> "$QTENV"
+    chmod +r "$QTENV"
+    pkexec /usr/bin/minstall-pkexec "--qtenv" "$QTENV" "${@}"
+    if [ -f "$QTENV" ] ; then
+       rm  $QTENV
+    fi
+
+    ##renable Xfce automount feature, if it was enabled in the first place
+    if [ -e "/tmp/minstall-auto" ]; then
+        rm /tmp/minstall-auto
+    fi
+    
+    if [ "$INITIALAUTOMOUNT" = "true" ]; then
+        xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true
+    fi
+
+    ##end Xfce automount feaure
 fi
 
 if test "$EUID" == 0; then
     # root user
     # set XDG_RUNTIME_DIR - do nothing if already set
-    
-    if [ x"$XDG_RUNTIME_DIR" = "x" ]; then
-        XDG_RUNTIME_DIR=/run/user/0
-        export XDG_RUNTIME_DIR
-        [ -d $XDG_RUNTIME_DIR ] || mkdir -p $XDG_RUNTIME_DIR
-        chmod 700 $XDG_RUNTIME_DIR
-        chown 0:0 $XDG_RUNTIME_DIR
-        fi
 
+    if [ x"$XDG_RUNTIME_DIR" = "x" ]; then
+      XDG_RUNTIME_DIR=/run/user/0
+      export XDG_RUNTIME_DIR
+      [ -d $XDG_RUNTIME_DIR ] || mkdir -p $XDG_RUNTIME_DIR
+      chmod 700 $XDG_RUNTIME_DIR
+      chown 0:0 $XDG_RUNTIME_DIR
+    fi
     if  [ "x$1" = "x--qtenv" ]; then
         QTENV="$2"
         shift
         shift
-        if [ -r "$QTENV" -a  "$QTENV" != "${QTENV#/tmp/mx-installer-qtenv.}" ] ; then
-            . $QTENV
-            rm  $QTENV
+        if [ -f "$QTENV" -a  "x$QTENV" != "x${QTENV#*/mx-installer-qtenv.}" ] ; then 
+            . "$QTENV"
+            rm  "$QTENV"
+            cd "${CURRENT_WORK_DIR}" 
+            unset CURRENT_WORK_DIR
         fi
-
         PATH="/usr/local/bin:$PATH"
     fi
 
     RUN="/sbin/minstall"
-    echo Starting  "$RUN"
+    echo Starting  "$RUN" "${@}"
     command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
     exec "$RUN" "${@}"
 fi
