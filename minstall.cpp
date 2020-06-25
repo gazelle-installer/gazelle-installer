@@ -2091,11 +2091,13 @@ bool MInstall::setUserInfo()
     if (autologinCheckBox->isChecked()) {
         replaceStringInFile("#auto_login", "auto_login", rootpath + "/etc/slim.conf");
         replaceStringInFile("#default_user ", "default_user ", rootpath + "/etc/slim.conf");
+        replaceStringInFile("User=", "User=" + userNameEdit->text(), rootpath + "/etc/sddm.conf");
     }
     else {
         replaceStringInFile("auto_login", "#auto_login", rootpath + "/etc/slim.conf");
         replaceStringInFile("default_user ", "#default_user ", rootpath + "/etc/slim.conf");
         replaceStringInFile("autologin-user=", "#autologin-user=", rootpath + "/etc/lightdm/lightdm.conf");
+        replaceStringInFile("User=.*", "User=", rootpath + "/etc/sddm.conf");
     }
     cmd = QString("touch " + rootpath + "/var/mail/%1").arg(userNameEdit->text());
     proc.exec(cmd);
