@@ -34,6 +34,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     : proc(this)
 {
     setupUi(this);
+    listLog->addItem("Version " VERSION);
     proc.setupUI(listLog, progressBar);
     updateCursor(Qt::WaitCursor);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
