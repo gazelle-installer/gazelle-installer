@@ -2034,6 +2034,10 @@ bool MInstall::setUserInfo()
                 return false;
             }
         }
+        //now that directory is moved or deleted, make new one
+        if (!QFileInfo::exists(dpath.toUtf8())) {
+            proc.exec("/usr/bin/mkdir -p " + dpath, true);
+        }
         // clean up directory
         proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
         proc.exec("/bin/cp -n " + skelpath + "/.bashrc " + dpath, true);
