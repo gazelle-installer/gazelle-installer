@@ -380,12 +380,12 @@ Yritä uudelleen.</translation>
         <translation>Valitettavasti omistusoikeuksien asettaminen käyttäjäkansiolle ei onnistunut.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2114"/>
+        <location filename="../minstall.cpp" line="2116"/>
         <source>Please enter a computer name.</source>
         <translation>Syötä nimi tietokoneelle. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2118"/>
+        <location filename="../minstall.cpp" line="2120"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -394,12 +394,12 @@ Sinun tulee valita eri
 nimi ennen jatkamista.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2124"/>
+        <location filename="../minstall.cpp" line="2126"/>
         <source>Please enter a domain name.</source>
         <translation>Syötä verkko-domain nimi.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2128"/>
+        <location filename="../minstall.cpp" line="2130"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -408,385 +408,385 @@ Sinun tulee valita eri
 nimi jatkaaksesi.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2135"/>
+        <location filename="../minstall.cpp" line="2137"/>
         <source>Please enter a workgroup.</source>
         <translation>Syötä työryhmä.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2346"/>
+        <location filename="../minstall.cpp" line="2348"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
         <translation>Hyväksytkö levyn alustamisen ja sen käytön kokonaisuudessaan (%1) näin %2?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2350"/>
+        <location filename="../minstall.cpp" line="2352"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
         <translation>VAROITUS: valittu asema omaa vähintään 2TT kapasiteetin ja se pitää alustaa käyttäen GPT:tä. Joissakin järjestelmissä GPT-alustettu levy ei käynnisty.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2370"/>
+        <location filename="../minstall.cpp" line="2372"/>
         <source>The data in /home cannot be preserved because the required information could not be obtained.</source>
         <translation>Tietokokoomaa kohteessa /home ei voida säilöä koska vaadittuja tietoja ei onnistuttu hankkimaan. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2371"/>
+        <location filename="../minstall.cpp" line="2373"/>
         <source>If the partition containing /home is encrypted, please ensure the correct &quot;Encrypt&quot; boxes are selected, and that the entered password is correct.</source>
         <translation>Mikäli osio joka sisältää /home alueen on varustettu salauksella, varmista että oikeat &quot;Encrypt&quot; laatikot ovat valitut ja syötetty salasana on oikein.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2372"/>
+        <location filename="../minstall.cpp" line="2374"/>
         <source>The installer cannot encrypt an existing /home directory or partition.</source>
         <translation>Asentaja ei kyennyt salaamaan olemassaolevaa /home hakemistoa tai osiota.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2428"/>
+        <location filename="../minstall.cpp" line="2430"/>
         <source>General Instructions</source>
         <translation>Yleiset ohjeet</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2429"/>
+        <location filename="../minstall.cpp" line="2431"/>
         <source>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</source>
         <translation>SULJE KAIKKI MUUT SOVELLUKSET ENNEN JATKAMISTA.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2430"/>
+        <location filename="../minstall.cpp" line="2432"/>
         <source>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.</source>
         <translation>Jokaisella sivulla lue ohjeet, tee valintasi, napsauta sitten aina Seuraava kun olet valmis jatkamaan. Tulet näkemään kehotteen varmistusta varten ennen minkään tuhoisan toiminnon toteuttamista.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2432"/>
+        <location filename="../minstall.cpp" line="2434"/>
         <source>Installation requires about %1 of space. %2 or more is preferred. You can use the entire disk or you can put the installation on existing partitions.</source>
         <translation>Asentaminen vaatii kokolailla %1 tilaa. %2 tai enemmän on suositus. Voit käyttää levyn kokonaisuudessan tai asentaa jo valmiiksi olemassaoleville osioille.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2434"/>
+        <location filename="../minstall.cpp" line="2436"/>
         <source>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.</source>
         <translation>Mikäli ajat Mac- tai Windows-käyttöjärjestelmää (Vista:sta eteenpäin lukien), voi olla että sinun pitää käyttää kyseisen järjestelmän ohjelmia luodaksesi osiot ja käynnistyksen hallinnan ennen asennusta.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2435"/>
+        <location filename="../minstall.cpp" line="2437"/>
         <source>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</source>
         <translation>Linux-tiedostojärjestelmät ext2, ext3, ext4, jfs, xfs, btrfs ja reiserfs ovat tuetut ja ext4 on suositeltu.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2436"/>
+        <location filename="../minstall.cpp" line="2438"/>
         <source>Autoinstall will place home on the root partition.</source>
         <translation>Automaatti-asennus asettaa kotihakemiston juuri-osioon.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2437"/>
-        <location filename="../minstall.cpp" line="2471"/>
+        <location filename="../minstall.cpp" line="2439"/>
+        <location filename="../minstall.cpp" line="2473"/>
         <source>Encryption</source>
         <translation>Salaus</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2438"/>
-        <location filename="../minstall.cpp" line="2472"/>
+        <location filename="../minstall.cpp" line="2440"/>
+        <location filename="../minstall.cpp" line="2474"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>Kiintolevyn salaus on mahdollista LUKS:in kautta. Salasana vaaditaan.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2439"/>
-        <location filename="../minstall.cpp" line="2473"/>
+        <location filename="../minstall.cpp" line="2441"/>
+        <location filename="../minstall.cpp" line="2475"/>
         <source>A separate unencrypted boot partition is required. For additional settings including cipher selection, use the &lt;b&gt;Advanced encryption settings&lt;/b&gt; button.</source>
         <translation>Erillinen salaamaton käynnistys-osio vaaditaan. Lisäasetuksia varten, sisältäen salauksen valinnat, käytä &lt;b&gt;Edistyneet salausasetukset&lt;/b&gt;painiketta.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2441"/>
+        <location filename="../minstall.cpp" line="2443"/>
         <source>When encryption is used with autoinstall, the separate boot partition will be automatically created.</source>
         <translation>Kun salausta käytetään automaattisen asennuksen yhteydessä, erillinen käynnistys-osio luodaan automaattisesti.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2453"/>
+        <location filename="../minstall.cpp" line="2455"/>
         <source>Limitations</source>
         <translation>Rajoitukset</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2454"/>
+        <location filename="../minstall.cpp" line="2456"/>
         <source>Remember, this software is provided AS-IS with no warranty what-so-ever. It is solely your responsibility to backup your data before proceeding.</source>
         <translation>Muistathan, että tämä ohjelmisto toimitetaan SELLAISENAAN ilman mitään takuuta. On yksin sinun omalla vastuullasi tehdä varmuuskopiot tiedostoistasi ennen jatkamista.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2456"/>
+        <location filename="../minstall.cpp" line="2458"/>
         <source>Choose Partitions</source>
         <translation>Valitse Osiot</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2457"/>
+        <location filename="../minstall.cpp" line="2459"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
         <translation>%1 vaatii juuri-osion. Swap-heittovaihtotiedosto-osio on valinnainen mutta erittäin suositeltava. Mikäli haluat käyttää Suspend-to-Disk %1 keskeytystilaominaisuutta, tarvitset heittovaihtotiedosto-osion joka on kooltaan suurempi kuin aineellinen keskusmuistisi määrä.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2459"/>
+        <location filename="../minstall.cpp" line="2461"/>
         <source>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</source>
         <translation>Mikäli valitset erillisen /home osion, tarkoittaa se helpompaa siirtymäpäivitystä tulevaisuudessa, mutta ei ole mahdollista päivitettäessä asennuksesta ilman erillistä koti-osiota.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2460"/>
+        <location filename="../minstall.cpp" line="2462"/>
         <source>Upgrading</source>
         <translation>Päivittäminen</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2461"/>
+        <location filename="../minstall.cpp" line="2463"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.</source>
         <translation>Kun päivität jo valmiiksi olemassaolevasta Linux-asennuksesta, valitse sama koti-osio kuten aikaisemminkin ja ruksaa suositukseksi säilyttää tiedot /home kohteessa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2462"/>
+        <location filename="../minstall.cpp" line="2464"/>
         <source>If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition. As a result, the installation will take much longer than usual.</source>
         <translation>Mikäli säilytät olemassaolevan /home kotihakemistopuun joka sijaitsee juuri-osiossasi, asennusohjelma ei uudelleenalusta tuota juuri-osiota. Tämän seurauksena asentaminen vie paljon enemmän aikaa kuin yleensä.   </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2464"/>
+        <location filename="../minstall.cpp" line="2466"/>
         <source>Preferred Filesystem Type</source>
         <translation>Suositeltu Tiedostojärjestelmätyyppi</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2465"/>
+        <location filename="../minstall.cpp" line="2467"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.</source>
         <translation>Saavuttaaksesi %1, voit alustaa osiot ext2, ext3, ext4, f2fs, jfs, xfs, btrfs tai reiser muodossa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2466"/>
+        <location filename="../minstall.cpp" line="2468"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>Pakkauksen lisävalinnat ovat tarjolla kiintolevyille jotka käyttävät btrfs-tiedostojärjestelmää. Lzo on nopea, mutta pakkaus on vähäisempi. Zlib on hitaampi, korkeammalla pakkauksella.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2468"/>
+        <location filename="../minstall.cpp" line="2470"/>
         <source>Bad Blocks</source>
         <translation>Vikaantuneet lohkot</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2469"/>
+        <location filename="../minstall.cpp" line="2471"/>
         <source>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
         <translation>Mikäli valitset ext2, ext3 tai ext4 alustusmuodon, sinulla on vaihtoehtona tarkistaa ja korjata vikaantuneet kiintolevylohkot. Viallisten lohkojen tarkistaminen vie paljon aikaa, joten halunnet sivuuttaa tuon askeleen ellet epäile kiintolevylläsi todellakin olevan vikaantuneita lohkoja.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2478"/>
+        <location filename="../minstall.cpp" line="2480"/>
         <source>Advanced Encryption Settings</source>
         <translation>Edistyneet Salausasetukset</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2478"/>
+        <location filename="../minstall.cpp" line="2480"/>
         <source>This page allows fine-tuning of LUKS encrypted partitions.</source>
         <translation>Tämä sivu sallii LUKS-osiosalauksen hienosäädön.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2479"/>
+        <location filename="../minstall.cpp" line="2481"/>
         <source>In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.</source>
         <translation>Useimmissa tapauksissa, vakioasetukset tarjoavat käytännöllisen tasapainon turvallisuuden ja  suorituskyvyn suhteen joka on sopiva arkaluontoisille sovelluksille.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2481"/>
+        <location filename="../minstall.cpp" line="2483"/>
         <source>This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.</source>
         <translation>Tämä kirjoitus kattaa LUKS:issa käytettyjen parametrien perusteet, mutta ei ole tarkoitettu kaikenkattavaksi oppaaksi salaustekniikkaan. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2482"/>
+        <location filename="../minstall.cpp" line="2484"/>
         <source>Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.</source>
         <translation>Näiden asetusten muuttaminen ilman selkeää ymmärrystä salaustekniikkaan voi päätyä heikon salauksen käyttämiseen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2483"/>
+        <location filename="../minstall.cpp" line="2485"/>
         <source>Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.</source>
         <translation>Kentän muokkaaminen vaikuttaa usein saatavilla oleviin vaihtoehtoihin sen alapuolella. Alapuoliset kentät voivat muuttua automaattisesti suositeltuihin arvoihin.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2484"/>
+        <location filename="../minstall.cpp" line="2486"/>
         <source>Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.</source>
         <translation>Vaikkakin parempi suorituskyky tai korkeampi tietoturva voidaan saavuttaa muuttamalla asetuksia niiden suositelluista arvoista, teet sen kaikkinensa omalla vastuullasi.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2486"/>
+        <location filename="../minstall.cpp" line="2488"/>
         <source>You can use the &lt;b&gt;Benchmark&lt;/b&gt; button (which runs &lt;i&gt;cryptsetup benchmark&lt;/i&gt; in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.</source>
         <translation>Voit käyttää &lt;b&gt;Benchmark-mittapuu&lt;/b&gt;painiketta (joka ajaa &lt;i&gt;cryptsetup mittapuun&lt;/i&gt;omassa pääteikkunassaan) vertaillaksesi suorituskykyä yleisissä hash-yhdistelmissä, salauksissa ja ketjutustiloissa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2487"/>
+        <location filename="../minstall.cpp" line="2489"/>
         <source>Please note that &lt;i&gt;cryptsetup benchmark&lt;/i&gt; does not cover all the combinations or selections possible, and generally covers the most commonly used selections.</source>
         <translation>Huomioi että &lt;i&gt;cryptsetup mittapuu&lt;/i&gt;ei kata kaikkia mahdollisia yhdistelmiä tai valintoja ja kattaa yleisesti kaikkein useimmin suositut ratkaisut.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2489"/>
+        <location filename="../minstall.cpp" line="2491"/>
         <source>Cipher</source>
         <translation>Salaustekniikka</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2489"/>
+        <location filename="../minstall.cpp" line="2491"/>
         <source>A variety of ciphers are available.</source>
         <translation>Tarjolla on useita salaustekniikoita.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2490"/>
+        <location filename="../minstall.cpp" line="2492"/>
         <source>was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.</source>
         <translation>oli yksi viidestä AES-finalisteista. Se omaa korkeamman tason turvalähtöisyyden kuin Rijndael ja kaikki muut AES-finalistit. Se on suorituskyvyltään parempi joillakin 64-bittisillä suorittimilla. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2491"/>
+        <location filename="../minstall.cpp" line="2493"/>
         <source>(also known as &lt;i&gt;Rijndael&lt;/i&gt;) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.</source>
         <translation>(tunnetaan myös nimellä&lt;i&gt;Rijndael&lt;/i&gt;) on erittäin yleinen salaustekniikka, ja monet nykyaikaiset suorittimet sisältävät ohjeet erityisesti AES:lle, sen yleisyyden johdosta. Vaikkakin Rijndael arvotettiin paremmaksi kuin Serpent sen suorituskyvyssä, mitään hyökkäystä ei pidetä tällä hetkellä käytännöllisenä.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2492"/>
+        <location filename="../minstall.cpp" line="2494"/>
         <source>is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.</source>
         <translation>on Blowfish:in seuraaja. Siitä tuli yksi niistä viidestä AES-finalistista, vaikkakaan se ei tullut valituksi standardille.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2493"/>
+        <location filename="../minstall.cpp" line="2495"/>
         <source>(CAST-256) was a candidate in the AES contest, however it did not become a finalist.</source>
         <translation>(CAST-256) oli AES-kilvassa ehdokkaana, kuitenkaan siitä ei finalistia tullut.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2494"/>
+        <location filename="../minstall.cpp" line="2496"/>
         <source>is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.</source>
         <translation>on 64-bittinen lohkosalaustekniikka jonka loi Bruce Schneier. Arkaluontoisia tietoja sisältävään käyttöön sitä ei suositella koska vain CBC ja ECB moodit ovat tuettuja. Blowfish tukee avainkokoja 32 ja 448 bitin välillä jotka ovat monistuksia 8:sta.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2496"/>
+        <location filename="../minstall.cpp" line="2498"/>
         <source>Chain mode</source>
         <translation>Ketjutustila</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2496"/>
+        <location filename="../minstall.cpp" line="2498"/>
         <source>If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.</source>
         <translation>Jos lohkot olisivat kaikki salattuja käyttäen samaa avainta, voi ilmaantua jatkumo jonka kautta ennakoitavissa perustekstiä.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2497"/>
+        <location filename="../minstall.cpp" line="2499"/>
         <source>XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.</source>
         <translation>XEX-perusteinen Tweaked-koodikirja ciphertext Stealing:illä) on nykyaikainen ketju-moodi, joka ylittää CBC:n ja EBC:n. Se on vakiollinen (ja suositeltu) ketju-moodi. Käyttämällä ESSIV:iä Plain64:n yli verottaa suorituskykyä ilman tiettävää turvaetua.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2498"/>
+        <location filename="../minstall.cpp" line="2500"/>
         <source>(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.</source>
         <translation>(Cipher Block Chaining) on yksinkertaisempi kuin XTS, mutta haavoittuvainen padding oracle hyökkäykselle (jokseenkin lievennettynä ESSIV:in johdosta) eikä ole suositeltu arkaluontoisia tietoja sisältävään käyttötarkoitukseen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2499"/>
+        <location filename="../minstall.cpp" line="2501"/>
         <source>(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.</source>
         <translation>(Electronic Codebook) on vähemmän turvallinen kuin CBC eikä sitä tule käyttää arkaluontoisia tietoja sisältäviin käyttötarkoituksiin.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2501"/>
+        <location filename="../minstall.cpp" line="2503"/>
         <source>IV generator</source>
         <translation>IV generaattori</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2501"/>
+        <location filename="../minstall.cpp" line="2503"/>
         <source>For XTS and CBC, this selects how the &lt;b&gt;i&lt;/b&gt;nitialisation &lt;b&gt;v&lt;/b&gt;ector is generated. &lt;b&gt;ESSIV&lt;/b&gt; requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.</source>
         <translation>XTS:n ja CBC:n suhtee, tämä määrittää kuinka &lt;b&gt;i&lt;/b&gt;nitalisaatio &lt;b&gt;v&lt;/b&gt;ektori tuotetaan. &lt;b&gt;ESSIV&lt;/b&gt;edellyttää hash-toiminnon, ja siitä syystä toinen pudotusvalikko tulee tarjolle mikäli se valitaan. Hash-arvot riippuvat valitusta salaustekniikasta.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2502"/>
+        <location filename="../minstall.cpp" line="2504"/>
         <source>ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.</source>
         <translation>ECB moodi ei käytä IV:tä, joten kaikki nämä kentät poistuvat käytöstä jos ECB on valittu ketju-moodiin.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2504"/>
+        <location filename="../minstall.cpp" line="2506"/>
         <source>Key size</source>
         <translation>Avainkoko</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2504"/>
+        <location filename="../minstall.cpp" line="2506"/>
         <source>Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.</source>
         <translation>Asettaa avainkoon tavuina. Valittavissa olevat avainkoot ovat rajoitetut liittyen salaustekniikkaan ja ketju-moodiin.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2505"/>
+        <location filename="../minstall.cpp" line="2507"/>
         <source>The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).</source>
         <translation>XTS salaustekniikka ketju-moodi puolittaa avaimen (esimerkiksi, AES-256 XTS-moodissa vaatii 512-bittisen avainkoon).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2507"/>
+        <location filename="../minstall.cpp" line="2509"/>
         <source>LUKS key hash</source>
         <translation>LUKS avain-hash</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2507"/>
+        <location filename="../minstall.cpp" line="2509"/>
         <source>The hash used for PBKDF2 and for the AF splitter.</source>
         <translation>Käytetty hash PBKDF2:ssa ja AF-puolittajassa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2508"/>
+        <location filename="../minstall.cpp" line="2510"/>
         <source>SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.</source>
         <translation>SHA-1 ja RIPEMD-160 eivät ole enää suositeltuja arkaluontoisia tietoja käsittelevään käyttöön koska ne on havaittu rikkinäisiksi.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2510"/>
+        <location filename="../minstall.cpp" line="2512"/>
         <source>Kernel RNG</source>
         <translation>Ytimen RNG</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2510"/>
+        <location filename="../minstall.cpp" line="2512"/>
         <source>Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).</source>
         <translation>Asettaa mitä ytimen satunnaista numero-generaattoria käytetään pääavaimen avaimen luomiseksi (joka on pitkäaikainen avain).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2511"/>
+        <location filename="../minstall.cpp" line="2513"/>
         <source>Two options are available: /dev/&lt;b&gt;random&lt;/b&gt; which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/&lt;b&gt;urandom&lt;/b&gt; which will not block even if there is insufficient entropy (possibly weaker keys).</source>
         <translation>Kaksi vaihtoehtoa on valittavissa: /dev/&lt;b&gt;random&lt;/b&gt;joka estää kunnes riittävä haje on saavutettu (voi kestää pitkään alhaisen hajeen tapauksissa), ja /dev/&lt;b&gt;urandom&lt;/b&gt;joka ei estä silloinkaan kun tarjolla on riittämätön haje (mahdollisesti heikommat avaimet).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2513"/>
+        <location filename="../minstall.cpp" line="2515"/>
         <source>KDF round time&lt;/b&gt;&lt;br/&gt;The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.</source>
         <translation>KDF kiertoaika &lt;/b&gt;&lt;br/&gt;Ajan määrä (millisekunneissa) käytettäväksi PBKDF2:n salauslause prosessoinnissa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2514"/>
+        <location filename="../minstall.cpp" line="2516"/>
         <source>A value of 0 selects the compiled-in default (run &lt;i&gt;cryptsetup --help&lt;/i&gt; for details).</source>
         <translation>Arvo 0 valitsee sisäänkokoomisvakion (aja &lt;i&gt;cryptsetup --help&lt;/i&gt;nähdäksesi yksityiskohdat).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2515"/>
+        <location filename="../minstall.cpp" line="2517"/>
         <source>If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.</source>
         <translation>Jos sinulla on hidas kone, saatat nostaa tätä arvoa lisäturvallisuuden saavuttamiseksi, hyvittääkseen aikaa joka käytetään taltion avaamiseksi sen jälkeen kun salauslause on syötetty.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2520"/>
+        <location filename="../minstall.cpp" line="2522"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Valitse Käynnistysmenetelmä&lt;/b&gt;&lt;br/&gt;%1 käyttää GRUB-käynnistyslatainta käynnistääkseen %1 ja MS-Windowsin. &lt;p&gt;Oletuksena GRUB2 asennetaan Pääkäynnistystaltioon (MBR) tai ESP:n (EFI-järjestelmäosio 64-bittisissä UEFI-käynnistyvissä järjestelmissä) käynnistysasemassasi ja korvaa käynnistyslataimen jota käytit aiemmin. Tämä on tavanomaista. &lt;/p&gt;&lt;p&gt; Jos valitset asentaa GRUB2 osiokäynnistystaltioon (PBR) sen sijaan, sitten GRUB2 asennetaan määritetyn osion alkuosaan. Tämä vaihtoehto on tarkoitettu vain kokeneille käyttäjille.&lt;/p&gt;&lt;p&gt; Mikäli ruksaat pois GRUB.in asentamisen, GRUB:ia ei tällä erää asenneta. Tämä on tarkoitettu vain kokeneille käyttäjille.&lt;/p&gt;   </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2535"/>
+        <location filename="../minstall.cpp" line="2537"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Kytkettävät tavanomaiset toiminnot &lt;/b&gt;&lt;br/&gt; Valitse toiminnot joita tulet tarvitsemaan järjestelmässäsi, sekä ne jotka haluat käynnistettävän automaattisesti kun aloitat %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2539"/>
+        <location filename="../minstall.cpp" line="2541"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Tietokoneen identiteetti &lt;/b&gt;&lt;br/&gt; Tietokoneen nimi on yleinen ainutlaatuinen nimi joka tunnistaa tietokoneesi jos se on kytkettynä verkkoon. Tietokoneen verkkoalue, domain, tuskin tulee käyttöön ellei sitten internetyhteyden tarjoajasi, ISP, tai paikallinen verkko vaadi sitä. &lt;/p&gt;&lt;p&gt; Tietokoneen ja verkkoalueen nimi voi sisältää vain aakkosnumeerisia merkkejä, pisteitä, yhdysmerkkejä. Ne eivät voi sisältää tyhjiä välejä eivätkä alkaa yhdysmerkeillä &lt;/p&gt;&lt;p&gt; Samba palvelin täytyy aktivoida jos haluat käyttää sitä jakaaksesi tiettyjä hakemistoja tai tulostimen paikallisen tietokoneen kanssa jonka käyttöjärjestelmänä on MS-Windows tai Mac OSX.&lt;/p&gt; </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2552"/>
+        <location filename="../minstall.cpp" line="2554"/>
         <source>Localization Defaults</source>
         <translation type="unfinished">Kotoistuksen oletukset</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2553"/>
+        <location filename="../minstall.cpp" line="2555"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2554"/>
+        <location filename="../minstall.cpp" line="2556"/>
         <source>Configure Clock</source>
         <translation type="unfinished">Kellon asetukset</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2555"/>
+        <location filename="../minstall.cpp" line="2557"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2557"/>
+        <location filename="../minstall.cpp" line="2559"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2559"/>
+        <location filename="../minstall.cpp" line="2561"/>
         <source>Service Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2560"/>
+        <location filename="../minstall.cpp" line="2562"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -795,185 +795,185 @@ nimi jatkaaksesi.</translation>
         <translation type="vanished">&lt;p&gt;&lt;b&gt;Vakiolliset paikallisasetukset&lt;/b&gt;&lt;br/&gt; Määritä vakiollinen näppäimistö ja sen paikallisasetus. Nämä toimeenpannaan ellei käyttäjä muuta niitä myöhemmin.&lt;/p&gt;&lt;p&gt;&lt;b&gt; Määritä kello &lt;/b&gt;&lt;br/&gt; Jos omistat Apple- tai Unix-tietokoneen, järjestelmäkello asetetaan vakiollisesti muotoon GMT tai yleismaailmallinen aika. Muuttaaksesi, merkitse pikkulaatikko &apos;Järjestelmän kello käyttää PAIKALLISTA.&apos;&lt;/p&gt;&lt;p&gt;&lt;b&gt;  Aikavyöhykkeen asetukset &lt;/b&gt;&lt;br/&gt; Järjestelmä käynnistyy vakiolliseen maailmanaikaan GMT/UTC.  Muuttaaksesi aikavyöhykkeen, jälkeen uudelleenkäynnistyksen, klikkaa hiiren oikealla napilla Paneelin kelloa ja valitse Asetukset. &lt;/p&gt;&lt;p&gt;&lt;b&gt; Palveluasetukset &lt;/b&gt;&lt;br/&gt; Useimpien käyttäjien ei tarvitse muuttaa vakioasetuksia. Käyttäjät joilla on matala-resurssiset tietokoneet, haluavat joskus kytkeä tarpeettomat palvelut pois säästääkseen keskusmuistia niin paljon kuin mahdollista. Varmista että tiedät mitä olet tekemässä! </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2566"/>
+        <location filename="../minstall.cpp" line="2568"/>
         <source>&lt;p&gt;&lt;b&gt;Default User Login&lt;/b&gt;&lt;br/&gt;The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager. &lt;/p&gt;&lt;p&gt;&lt;b&gt;Passwords&lt;/b&gt;&lt;br/&gt;Enter a new password for your default user account and for the root account. Each password must be entered twice.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Vakiokäyttäjän sisäänkirjautuminen &lt;/b&gt;&lt;br/&gt; Juuri-käyttäjä on samantyyppinen kuten Järjestelmänvalvoja joissakin muissa käyttöjärjestelmissä. Juuri-käyttäjänä ei tule toimia jokapäiväisesti. Valitse nimi uudelle (vakio) käyttäjätilille jota käytät päivittäin. Mikäli tarve on, voit lisätä muita tilejä myöhemmin %1 käyttäjähallinnan kautta. &lt;/p&gt;&lt;p&gt;&lt;b&gt; Salasanat &lt;/b&gt;&lt;br/&gt;Kirjoita uusi salasana vakiokäyttäjätilillesi sekä myös juurikäyttäjätilille. Kumpainenkin salasana pitää kirjoittaa kahdesti. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2576"/>
+        <location filename="../minstall.cpp" line="2578"/>
         <source>Old Home Directory</source>
         <translation>Vanha Kotihakemisto</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2577"/>
+        <location filename="../minstall.cpp" line="2579"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation>Kotikansio on valmiiksi olemassa valitsemallesi käyttäjänimelle. Tämä ruutu sallii sinun valita mitä tälle hakemistolle tapahtuu.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2579"/>
+        <location filename="../minstall.cpp" line="2581"/>
         <source>Re-use it for this installation</source>
         <translation>Käytä se uudelleen tätä asennusta varten</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2580"/>
+        <location filename="../minstall.cpp" line="2582"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation>Vanhaa kotikansiota tullaan käyttämään tälle käyttäjätilille. Tämä on hyvä valinta päivityksen tullessa kyseeseen, ja tiedostosi kuin myös asetuksesi tulevat olemaan valmiina ennallaan. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2582"/>
+        <location filename="../minstall.cpp" line="2584"/>
         <source>Rename it and create a new directory</source>
         <translation>Uudelleennimeä se ja luo uusi hakemisto</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2583"/>
+        <location filename="../minstall.cpp" line="2585"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation>Käyttäjälle tullaan luomaan uusi kotikansio, mutta vanha kotikansio nimetään uudelleen. Tiedostosi ja asetuksesi eivät tule olemaan välittömästi näkyvillä uudessa asennuksessa, mutta niihin pääsee käsiksi käyttäen uudelleennimettyä kansiota.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2585"/>
+        <location filename="../minstall.cpp" line="2587"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation>Vanhan hakemiston nimessä tulee olemaan numero sen lopussa, riippuen siitä kuinka minta kertaa tuo hakemisto on aiemmin uudelleennimetty.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2586"/>
+        <location filename="../minstall.cpp" line="2588"/>
         <source>Delete it and create a new directory</source>
         <translation>Poista se ja luo uusi hakemisto</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2587"/>
+        <location filename="../minstall.cpp" line="2589"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation>Vanha hakemisto poistetaan ja luodaan uusi alkutekijöistä.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2588"/>
+        <location filename="../minstall.cpp" line="2590"/>
         <source>Warning</source>
         <translation>Varoitus</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2589"/>
+        <location filename="../minstall.cpp" line="2591"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation>Kaikki tiedostot ja asetukset poistetaan pysyvästi jos tämä vaihtoehto on valittuna. Mahdollisuutesi palauttaa ne ovat pienet.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2605"/>
+        <location filename="../minstall.cpp" line="2607"/>
         <source>Installation in Progress</source>
         <translation>Asennus Käynnissä</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2606"/>
+        <location filename="../minstall.cpp" line="2608"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation>%1 asentuu. Puhtaan asennuksen ollessa kyseessä, se luultavasti kestää 3-20 minuuttia, riippuen järjestelmäsi nopeudesta ja uudelleenalustettavien osioiden koosta. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2608"/>
+        <location filename="../minstall.cpp" line="2610"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation>Jos napsautat Keskeytä painiketta, asennus pysäytetään niin pian kuin mahdollista.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2610"/>
+        <location filename="../minstall.cpp" line="2612"/>
         <source>Change settings while you wait</source>
         <translation>Muuta asetuksia odottaessasi</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2611"/>
+        <location filename="../minstall.cpp" line="2613"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation>Sillä välin kun %1 asentuu, voit napsauttaa &lt;b&gt;Seuraava&lt;/b&gt;tai &lt;b&gt;Takaisin&lt;/b&gt; painikkeita lukeaksesi muita asennuksen vaatimia tietoja.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2613"/>
+        <location filename="../minstall.cpp" line="2615"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation>Saata nämä askeleet valmiiksi omaan tahtiisi. Asennusohjelma odottaa syötteitäsi tarpeen vaatiessa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2622"/>
+        <location filename="../minstall.cpp" line="2624"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Onnittelut! &lt;/b&gt;&lt;br/&gt; Olet suorittanut asennuksen %1 &lt;/p&gt;&lt;p&gt;&lt;b&gt; Ohjelmien löytäminen &lt;/b&gt;&lt;br/&gt; Tarjolla on satoja erinomaisia ohjelmia asennettavaksi %1 Paras tapa oppia niistä on on selata käynnistysvalikkoa ja kokeilla. Monet näistä ohjelmista ovat kehitetyt yksinomaan %1 projektia varten. Nämä löytyvät päävalikoista. &lt;p&gt; Lisäksi %1 sisältää monia vakiollisia Linux-sovelluksia joita ajetaan komentokehotteesta ja täten eivät näy ohjelmien käynnistysvalikossa. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2632"/>
+        <location filename="../minstall.cpp" line="2634"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
         <translation>Pidä hauskaa käyttäessäsi %1:ia&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2633"/>
-        <location filename="../minstall.cpp" line="3075"/>
+        <location filename="../minstall.cpp" line="2635"/>
+        <location filename="../minstall.cpp" line="3077"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt; Tuki %1 &lt;/b&gt;&lt;br/&gt; %1 on ihmisten kuten sinä tukema. Eräät auttavat muita tukifoorumilla - %2 - tai kääntävät aputiedostoja eri kielille, tai antavat ehdotuksia, kirjoittavat dokumentaatiota, tai auttavat uusien ohjelmien testaamisessa. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2664"/>
+        <location filename="../minstall.cpp" line="2666"/>
         <source>Finish</source>
         <translation>Lopeta</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2668"/>
+        <location filename="../minstall.cpp" line="2670"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2670"/>
+        <location filename="../minstall.cpp" line="2672"/>
         <source>Next</source>
         <translation>Seuraava</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2705"/>
+        <location filename="../minstall.cpp" line="2707"/>
         <source>Configuring sytem. Please wait.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2708"/>
+        <location filename="../minstall.cpp" line="2710"/>
         <source>Configuration complete. Restarting system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2712"/>
+        <location filename="../minstall.cpp" line="2714"/>
         <source>Could not complete configuration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2729"/>
+        <location filename="../minstall.cpp" line="2731"/>
         <source>Loading...</source>
         <translation>Lataa...</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2776"/>
+        <location filename="../minstall.cpp" line="2778"/>
         <source>Select target root partition</source>
         <translation>Valitse kohde juuri-osio</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2995"/>
+        <location filename="../minstall.cpp" line="2997"/>
         <source>Confirmation</source>
         <translation>Vahvistus</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="2995"/>
+        <location filename="../minstall.cpp" line="2997"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>Asennus ja konfigurointi on kesken..
 Haluatko varmasti lopettaa nyt?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3061"/>
+        <location filename="../minstall.cpp" line="3063"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Avun hakeminen &lt;/b&gt;&lt;br/&gt; Perustiedot liittyen %1 on %2. &lt;/p&gt;&lt;p&gt; Vapaaehtoiset ovat valmiina auttamaan sinua %3 foorumilla, %4 &lt;/p&gt;&lt;p&gt; Kun pyydät apua, muista kuvailla ongelmasi sekä myös tietokoneesi niin hyvin kuin mahdollista. Yleensä lausunnot kuten &apos;se ei toiminut&apos; eivät ole avullisia.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3069"/>
+        <location filename="../minstall.cpp" line="3071"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Asennuksen korjaaminen&lt;/b&gt;&lt;br/&gt;Jos %1 lakkaa toimimasta kiintolevyllä, joskus ongelma on mahdollista korjata käynnistämällä järjestelmä LiveDVD:n tai LiveUSB:in kautta ja suorittamalla jokin vaihtoehto mukana olevasta %1 tai käyttämällä jotakin yleistä Linux-työkalua järjestelmän korjaamiseen.&lt;/p&gt;&lt;p&gt;Voit myös käyttää %1 LiveDVD:tä tai LiveUSB:ia palauttaaksesi tiedostoja MS-Windows käyttöjärjestelmistä!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3083"/>
+        <location filename="../minstall.cpp" line="3085"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt; Äänimikserin säätäminen &lt;/b&gt;&lt;br/&gt; %1 pyrkii määrittelemään äänimikserin sinulle valmiiksi mutta joskus on välttämätöntä itse vääntää äänitasoja ylös ja poistaa mykkäasetus kanavilta mikserissä kuullaksesi ääntä. &lt;/p&gt;&lt;p&gt; Mikserin oikopolkulinkki sijaitsee käynnistysvalikossa. Klikkaa sitä avataksesi mikserin. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3091"/>
+        <location filename="../minstall.cpp" line="3093"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Pidä %1-kopiosi ajan tasalla&lt;/b&gt;&lt;br/&gt;Saadaksesi lisätietoja sekä viimeisimmät päivitykset, vieraile osoitteessa&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3096"/>
+        <location filename="../minstall.cpp" line="3098"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Erityiskiitokset&lt;/b&gt;&lt;br/&gt;Kiitokset kaikille jotka ovat valinneet tukevansa %1 omalla ajalla, rahalla, ehdotuksilla, työllä, kehuilla, ideoilla, mainonnalla, ja/tai sitoutumisella.&lt;/p&gt;&lt;p&gt;Ilman teitä %1 ei olisi olemassa.&lt;/p&gt;&lt;p&gt;%2 Kehitystiimi&lt;/p&gt;</translation>
     </message>
@@ -982,13 +982,13 @@ Haluatko varmasti lopettaa nyt?</translation>
         <translation type="vanished">Tämä asetus salaa myös heittovaihto-osion mikäli valittuna, joka saattaa heittovaihto-osion mahdottomaksi jakaa tietokoneen muiden käyttöjärjestelmien kanssa. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3426"/>
+        <location filename="../minstall.cpp" line="3428"/>
         <source>System boot disk:</source>
         <translation>Järjestelmän käynnistyslevy:</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="3440"/>
-        <location filename="../minstall.cpp" line="3449"/>
+        <location filename="../minstall.cpp" line="3442"/>
+        <location filename="../minstall.cpp" line="3451"/>
         <source>Partition to use:</source>
         <translation>Osio jota käytetään:</translation>
     </message>
