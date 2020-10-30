@@ -947,7 +947,7 @@ bool MInstall::formatPartitions()
     if (espFormatSize) {
         proc.status(tr("Formatting EFI System Partition"));
         if (!proc.exec("mkfs.msdos -F 32 " + espDevice)) return false;
-        proc.exec("parted -s " + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
+        proc.exec("parted -s /dev/" + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
         proc.sleep(1000);
     }
     // maybe format home
