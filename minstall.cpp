@@ -30,7 +30,7 @@
 #include "version.h"
 #include "minstall.h"
 
-MInstall::MInstall(const QStringList &args, const QString &cfgfile)
+MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     : proc(this)
 {
     setupUi(this);
@@ -39,15 +39,15 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     installBox->hide();
 
-    oobe = args.contains("--oobe");
-    pretend = args.contains("--pretend");
-    nocopy = args.contains("--nocopy");
-    sync = args.contains("--sync");
+    oobe = args.isSet("oobe");
+    pretend = args.isSet("pretend");
+    nocopy = args.isSet("nocopy");
+    sync = args.isSet("sync");
     if(!oobe) {
-        brave = args.contains("--brave");
-        automatic = args.contains("--auto");
-        oem = args.contains("--oem");
-        gptoverride = args.contains("--gpt-override");
+        brave = args.isSet("brave");
+        automatic = args.isSet("auto");
+        oem = args.isSet("oem");
+        gptoverride = args.isSet("gpt-override");
     } else {
         brave = automatic = oem = gptoverride = false;
         closeButton->setText(tr("Shutdown"));
@@ -74,7 +74,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
         pal.setColor(QPalette::Link, Qt::cyan);
         qApp->setPalette(pal);
     }
-    if (pretend) listHomes = args; // dummy existing homes
+    //if (pretend) listHomes = qApp->arguments(); // dummy existing homes
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
