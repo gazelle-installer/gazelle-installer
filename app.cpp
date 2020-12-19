@@ -19,38 +19,64 @@
 #include <unistd.h>
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QCommandLineParser>
 #include <QDateTime>
+#include <QDebug>
+#include <QDesktopWidget>
+#include <QFile>
 #include <QFont>
-#include <QString>
+#include <QLibraryInfo>
 #include <QLocale>
 #include <QLoggingCategory>
-#include <QTranslator>
 #include <QMessageBox>
-#include <QFile>
 #include <QScopedPointer>
-#include <QDebug>
+#include <QString>
+#include <QTranslator>
 
 #include "minstall.h"
 #include "version.h"
 
-QScopedPointer<QFile> logFile;
+static QScopedPointer<QFile> logFile;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
-void printHelp();
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setApplicationVersion(VERSION);
 
-    if (a.arguments().contains("--help") || a.arguments().contains("-h") ) {
-        printHelp();
-        return EXIT_SUCCESS;
-    }
+    QCommandLineParser parser;
+    parser.setApplicationDescription(QApplication::tr("Customizable GUI installer for MX Linux and antiX Linux"));
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addOptions({{"auto", QApplication::tr("Installs automatically using the configuration file (more information below).\n"\
+                                                 "-- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.")},
+                       {"brave", QApplication::tr("Overrules sanity checks on partitions and drives, causing them to be displayed.\n"\
+                                                  "-- WARNING: this can break things, use it only if you don't care about data on drive.")},
+                       {{"c" , "config"}, QApplication::tr("Load a configuration file as specified by <config-file>.\n"\
+                                                           "By default /etc/minstall.conf is used.\n"\
+                                                           "This configuration can be used with --auto for an unattended installation.\n"\
+                                                           "The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.\n"\
+                                                           "The installer will not write any passwords or ignored settings to the new configuration file.\n"\
+                                                           "Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.")},
+                       {"gpt-overwride", QApplication::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"\
+                                                          "Without this option, GPT will only be used on drives with at least 2TB capacity.\n"\
+                                                          "GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.")},
+                       {{"n", "nocopy"}, QApplication::tr("Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.")},
+                       {{"o", "oem"}, QApplication::tr("Install the operating system, delaying prompts for user-specific options until the first reboot.\n"\
+                                                       "Upon rebooting, the installer will be run with --oobe so that the user can provide these details.\n"\
+                                                       "This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.")},
+                       {"oobe", QApplication::tr("Out Of the Box Experience option.\n"\
+                                                 "This will start automatically if installed with --oem option.")},
+                       {{"p", "pretend"}, QApplication::tr("Test mode for GUI, you can advance to different screens without actially installing.")},
+                       {{"s", "sync"}, QApplication::tr("Installing with rsync instead of cp on custom partitioning.\n"\
+                                                        "-- doesn't format /root and it doesn't work with encryption.")}});
+    parser.addPositionalArgument("config-file", QApplication::tr("Load a configuration file as specified by <config-file>."), "<config-file>");
+    parser.process(a);
 
-    if (a.arguments().contains("--version") || a.arguments().contains("-v") ) {
-       qDebug() << "Installer version:" << VERSION;
-       return EXIT_SUCCESS;
+    if (parser.positionalArguments().size() > 1) {
+        qDebug() << "Too many arguments, please check the command format by running the program with --help";
+        return EXIT_FAILURE;
     }
 
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
@@ -66,16 +92,19 @@ int main(int argc, char *argv[])
         qDebug() << "Cannot write to installer log:" << logFileName;
     }
 
-
     QTranslator qtTran;
-    qtTran.load(QString("qt_") + QLocale::system().name());
-    a.installTranslator(&qtTran);
+    if (qtTran.load(QLocale::system(), "qt", "_", QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+        a.installTranslator(&qtTran);
+
+    QTranslator qtBaseTran;
+    if (qtBaseTran.load("qtbase_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+        a.installTranslator(&qtBaseTran);
 
     QTranslator appTran;
-    appTran.load(QString("gazelle-installer_") + QLocale::system().name(), "/usr/share/gazelle-installer/locale");
-    a.installTranslator(&appTran);
+    if (appTran.load(QString("gazelle-installer_") + QLocale::system().name(), "/usr/share/gazelle-installer/locale"))
+        a.installTranslator(&appTran);
 
-    //exit if "minstall" is already running
+    // exit if "minstall" is already running
     if (system("ps -C minstall | sed '0,/minstall/{s/minstall//}' | grep minstall") == 0) {
         QMessageBox::critical(nullptr, QString(),
                               QApplication::tr("The installer won't launch because it appears to be running already in the background.\n\n"
@@ -100,24 +129,22 @@ int main(int argc, char *argv[])
     if (getuid() != 0) {
         QApplication::beep();
         const QString &msg = QApplication::tr("You must run this app as root.");
-        if (a.arguments().contains("--pretend") || a.arguments().contains("-p")) {
+        if (parser.isSet("pretend")) {
             QMessageBox::warning(nullptr, QString(), msg);
         } else {
             QMessageBox::critical(nullptr, QString(), msg);
             return EXIT_FAILURE;
         }
     }
+
     QString cfgfile;
-    //use config file if --config is specified
-    if (a.arguments().contains("--config")) {
-        // config file
-        cfgfile = "/etc/minstall.conf";
-        int cfgindex = a.arguments().lastIndexOf("--config");
-        if (cfgindex >= 0 && cfgindex < (a.arguments().count() - 1)) {
-            const QString clicfgfile(a.arguments().at(cfgindex + 1));
-            cfgfile = clicfgfile;
-        }
-        //give error message and exit if no config file found
+    if (parser.isSet("config") || parser.positionalArguments().size() == 1) {
+        if (parser.positionalArguments().size() == 1)  // use config file if passed as argument
+            cfgfile = parser.positionalArguments().at(0);
+        else if (parser.isSet("config")) // use default config file if no argument
+            cfgfile = "/etc/minstall.conf";
+
+        // give error message and exit if no config file found
         if (! QFile::exists(cfgfile)) {
             QMessageBox::warning(nullptr, QString(),
                                  QApplication::tr("Configuration file (%1) not found.").arg(cfgfile));
@@ -127,9 +154,9 @@ int main(int argc, char *argv[])
 
     // main routine
     qDebug() << "Installer version:" << VERSION;
-    MInstall minstall(a.arguments(), cfgfile);
+    MInstall minstall(parser, cfgfile);
     const QRect &geo = a.desktop()->availableGeometry(&minstall);
-    if(a.arguments().contains("--oobe")) minstall.setGeometry(geo);
+    if(parser.isSet("oobe")) minstall.setGeometry(geo);
     else minstall.move((geo.width()-minstall.width())/2, (geo.height()-minstall.height())/2);
     minstall.show();
     return a.exec();
@@ -155,46 +182,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     case QtWarningMsg:  out << "WRN "; break;
     case QtCriticalMsg: out << "CRT "; break;
     case QtFatalMsg:    out << "FTL "; break;
-    default:            out << "OTH"; break;
     }
     // Write to the output category of the message and the message itself
-    out << context.category << ": "
-        << msg << endl;
-    out.flush();    // Clear the buffered data
-}
-
-// print CLI help info
-void printHelp()
-{
-    printf("Here are some CLI options you can use. Please read the description carefully and be aware that these are experimental options.\n"
-           "\n"
-           "Usage: minstall [<options>]\n"
-           "       minstall [<options>] --config <config-file>\n"
-           "\n"
-           "Options:\n"
-           "  --config       Load a configuration file as specified by <config-file>.\n"
-           "                 By default /etc/minstall.conf is used.\n"
-           "  --auto         Installs automatically using the configuration file (more information below).\n"
-           "                 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.\n"
-           "  --brave        Overrules sanity checks on partitions and drives, causing them to be displayed.\n"
-           "                 -- WARNING: this can break things, use it only if you don't care about data on drive.\n"
-           "  --gpt-override Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"
-           "                 Without this option, GPT will only be used on drives with at least 2TB capacity.\n"
-           "                 GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.\n"
-           "  --nocopy       Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.\n"
-           "  --oem          Install the operating system, delaying prompts for user-specific options until the first reboot.\n"
-           "                 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.\n"
-           "                 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.\n"
-           "  --pretend      Test mode for GUI, you can advance to different screens without actially installing.\n"
-           "  --sync         Installing with rsync instead of cp on custom partitioning.\n"
-           "                 -- doesn't format /root and it doesn't work with encryption.\n"
-           "  -v --version   Show version information.\n"
-           "\n"
-           "Configuration File:\n"
-           "  If /etc/minstall.conf is present, the installer will load whatever configuration is stored inside.\n"
-           "  The use of --config makes the installer load <config-file> instead.\n"
-           "  This configuration can be used with --auto for an unattended installation.\n"
-           "  The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.\n"
-           "  The installer will not write any passwords or ignored settings to the new configuration file.\n"
-           "  Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.\n");
+    out << context.category << ": " << msg << endl;
 }
