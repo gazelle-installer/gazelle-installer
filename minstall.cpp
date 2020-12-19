@@ -34,6 +34,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     : proc(this)
 {
     setupUi(this);
+    listLog->addItem("Version " VERSION);
     proc.setupUI(listLog, progressBar);
     updateCursor(Qt::WaitCursor);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
@@ -946,7 +947,7 @@ bool MInstall::formatPartitions()
     if (espFormatSize) {
         proc.status(tr("Formatting EFI System Partition"));
         if (!proc.exec("mkfs.msdos -F 32 " + espDevice)) return false;
-        proc.exec("parted -s " + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
+        proc.exec("parted -s /dev/" + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
         proc.sleep(1000);
     }
     // maybe format home
@@ -2033,6 +2034,10 @@ bool MInstall::setUserInfo()
                 failUI(tr("Failed to delete old home directory."));
                 return false;
             }
+        }
+        //now that directory is moved or deleted, make new one
+        if (!QFileInfo::exists(dpath.toUtf8())) {
+            proc.exec("/usr/bin/mkdir -p " + dpath, true);
         }
         // clean up directory
         proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
