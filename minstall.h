@@ -15,6 +15,7 @@
 //   limitations under the License.
 //
 
+#include <QCommandLineParser>
 #include <QFile>
 #include <QMessageBox>
 #include <QProcess>
@@ -40,7 +41,7 @@ protected:
     void reject();
 
 public:
-    MInstall(const QStringList &args, const QString &cfgfile);
+    MInstall(const QCommandLineParser &args, const QString &cfgfile);
     ~MInstall();
 
     // helpers
