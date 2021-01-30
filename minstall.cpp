@@ -1956,12 +1956,6 @@ bool MInstall::validateUserInfo()
         }
     }
 
-    if (userPasswordEdit->text().isEmpty()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Please enter the user password."));
-        nextFocus = userPasswordEdit;
-        return false;
-    }
     if (rootPasswordEdit->text().isEmpty()) {
         QMessageBox::critical(this, windowTitle(),
                               tr("Please enter the root password."));
@@ -2001,9 +1995,14 @@ bool MInstall::setUserInfo()
     if (phase < 0) return false;
 
     // set the user passwords first
-    const QByteArray &userinfo = QString("root:" + rootPasswordEdit->text() + "\n"
-                                 "demo:" + userPasswordEdit->text()).toUtf8();
-    if (!proc.exec(oobe ? "chpasswd" : "chroot /mnt/antiX chpasswd", true, &userinfo)) {
+    bool ok = true;
+    const QString &userPass = userPasswordEdit->text();
+    QByteArray userinfo = QString("root:" + rootPasswordEdit->text()).toUtf8();
+    const QString cmdNoPass = oobe ? "passwd -d " : "chroot /mnt/antiX passwd -d ";
+    if(userPass.isEmpty()) ok = proc.exec(cmdNoPass + userPass, true);
+    else userinfo.append(QString("\ndemo:" + userPass).toUtf8());
+    if(ok) ok = proc.exec(oobe ? "chpasswd" : "chroot /mnt/antiX chpasswd", true, &userinfo);
+    if(!ok) {
         failUI(tr("Failed to set user account passwords."));
         return false;
     }
@@ -2579,12 +2578,19 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 9: // set username and passwords
-        mainHelp->setText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
-                             "You should not use the root user as your daily user account. "
-                             "Please enter the name for a new (default) user account that you will use on a daily basis. "
-                             "If needed, you can add other user accounts later with %1 User Manager. </p>"
-                             "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
-                             "Each password must be entered twice.</p>").arg(PROJECTNAME));
+        mainHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
+                          + tr("The root user is similar to the Administrator user in some other operating systems."
+                               " You should not use the root user as your daily user account."
+                               " Please enter the name for a new (default) user account that you will use on a daily basis."
+                               " If needed, you can add other user accounts later with %1 User Manager.").arg(PROJECTNAME) + "</p>"
+                          "<p><b>" + tr("Passwords") + "</b><br/>"
+                          + tr("Enter a new password for your default user account and for the root account."
+                               " Each password must be entered twice.") + "</p>"
+                          "<p><b>" + tr("No passwords") + "</b><br/>"
+                          + tr("If you want the default user account to have no password, leave its password fields empty."
+                               " This allows you to log in without requiring a password.") + "<br/>"
+                          + tr("Obviously, this should only be done in situations where the user account"
+                               " does not need to be secure, such as a public terminal.") + "</p>");
         if (!nextFocus) nextFocus = userNameEdit;
         break;
 
