@@ -105,18 +105,9 @@ private slots:
     void on_qtpartedButton_clicked();
     void on_viewServicesButton_clicked();
 
-    void on_userPasswordEdit2_textChanged(const QString &arg1);
-    void on_rootPasswordEdit2_textChanged(const QString &arg1);
-    void on_userPasswordEdit_textChanged();
-    void on_rootPasswordEdit_textChanged();
-
     void on_checkBoxEncryptAuto_toggled(bool checked);
     void on_existing_partitionsButton_clicked(bool checked);
 
-    void on_FDEpassword_textChanged();
-    void on_FDEpassword2_textChanged(const QString &arg1);
-    void on_FDEpassCust_textChanged();
-    void on_FDEpassCust2_textChanged(const QString &arg1);
     void on_buttonBenchmarkFDE_clicked();
     void on_buttonAdvancedFDE_clicked();
     void on_buttonAdvancedFDECust_clicked();
@@ -127,7 +118,7 @@ private slots:
 
     void on_checkBoxEncryptRoot_toggled(bool checked);
     void on_checkBoxEncryptHome_toggled(bool checked);
-    void on_checkBoxEncryptSwap_toggled(bool checked);
+    void on_checkBoxEncryptSwap_toggled();
 
     void on_rootTypeCombo_activated(QString item = "");
     void on_rootCombo_currentIndexChanged(const QString &text);
@@ -229,8 +220,8 @@ private:
 
     // slots
     void startup();
-    // helpers
-    bool checkPassword(QLineEdit *passEdit);
+    void diskPassValidationChanged(bool valid);
+    void userPassValidationChanged();
     // private functions
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();

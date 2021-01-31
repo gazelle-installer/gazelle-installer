@@ -246,6 +246,18 @@ void MInstall::startup()
         haveSnapshotUserAccounts = checkForSnapshot();
     }
 
+    // Password box setup
+    FDEpassword->setup(FDEpassword2, 1, 32, 9);
+    FDEpassCust->setup(FDEpassCust2, 1, 32, 9);
+    userPasswordEdit->setup(userPasswordEdit2);
+    rootPasswordEdit->setup(rootPasswordEdit2, 1);
+    connect(FDEpassword, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
+    connect(FDEpassCust, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
+    connect(userPasswordEdit, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
+    connect(rootPasswordEdit, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
+    // User name is required
+    connect(userNameEdit, &QLineEdit::textChanged, this, &MInstall::userPassValidationChanged);
+
     // set default host name
     computerNameEdit->setText(DEFAULT_HOSTNAME);
 
@@ -601,20 +613,6 @@ bool MInstall::checkTargetDrivesOK()
                       QMessageBox::Yes|QMessageBox::Default, QMessageBox::No|QMessageBox::Escape);
             if (ans != QMessageBox::Yes) return false;
         }
-    }
-    return true;
-}
-
-// check password length (maybe complexity)
-bool MInstall::checkPassword(QLineEdit *passEdit)
-{
-    if (passEdit->text().isEmpty()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("The password needs to be at least\n"
-                                 "%1 characters long. Please select\n"
-                                 "a longer password before proceeding.").arg("1"));
-        nextFocus = passEdit;
-        return false;
     }
     return true;
 }
@@ -1090,7 +1088,6 @@ bool MInstall::validateChosenPartitions()
 
     int ans;
     if (checkBoxEncryptSwap->isChecked() || checkBoxEncryptHome->isChecked() || checkBoxEncryptRoot->isChecked()) {
-        if (!checkPassword(FDEpassCust)) return false;
         if (bootCombo->currentText() == "root") {
             if (checkBoxEncryptRoot->isChecked()) {
                 QMessageBox::critical(this, windowTitle(), tr("You must choose a separate boot partition when encrypting root."));
@@ -1932,11 +1929,7 @@ bool MInstall::validateUserInfo()
 {
     nextFocus = userNameEdit;
     // see if username is reasonable length
-    if (userNameEdit->text().isEmpty()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Please enter a user name."));
-        return false;
-    } else if (!userNameEdit->text().contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
+    if (!userNameEdit->text().contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
         QMessageBox::critical(this, windowTitle(),
                               tr("The user name cannot contain special characters or spaces.\n"
                                  "Please choose another name before proceeding."));
@@ -1954,27 +1947,6 @@ bool MInstall::validateUserInfo()
                 return false;
             }
         }
-    }
-
-    if (rootPasswordEdit->text().isEmpty()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Please enter the root password."));
-        nextFocus = rootPasswordEdit;
-        return false;
-    }
-    if (userPasswordEdit->text() != userPasswordEdit2->text()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("The user password entries do not match.\n"
-                                 "Please try again."));
-        nextFocus = userPasswordEdit;
-        return false;
-    }
-    if (rootPasswordEdit->text() != rootPasswordEdit2->text()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("The root password entries do not match.\n"
-                                 "Please try again."));
-        nextFocus = rootPasswordEdit;
-        return false;
     }
 
     // Check for pre-existing /home directory
@@ -2354,9 +2326,6 @@ int MInstall::showPage(int curr, int next)
 
     if (next == 3 && curr == 2) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
-            if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
-                return curr;
-            }
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
                 if (!uefi) {
@@ -2592,6 +2561,9 @@ void MInstall::pageDisplayed(int next)
                           + tr("Obviously, this should only be done in situations where the user account"
                                " does not need to be secure, such as a public terminal.") + "</p>");
         if (!nextFocus) nextFocus = userNameEdit;
+        backButton->setEnabled(true);
+        userPassValidationChanged();
+        return; // avoid the end that enables both Back and Next buttons
         break;
 
     case 10: // deal with an old home directory
@@ -2932,6 +2904,16 @@ void MInstall::on_mainTabs_currentChanged(int index)
     if(index == 0) resizeEvent(nullptr);
 }
 
+void MInstall::diskPassValidationChanged(bool valid)
+{
+    nextButton->setEnabled(valid);
+}
+void MInstall::userPassValidationChanged()
+{
+    nextButton->setEnabled(!(userNameEdit->text().isEmpty())
+        && userPasswordEdit->isValid() && rootPasswordEdit->isValid());
+}
+
 void MInstall::on_passwordCheckBox_stateChanged(int state)
 {
     if (state == Qt::Unchecked) {
@@ -3157,48 +3139,9 @@ void MInstall::on_buttonSetKeyboard_clicked()
     setupkeyboardbutton();
 }
 
-void MInstall::on_userPasswordEdit2_textChanged(const QString &arg1)
-{
-    QPalette pal = userPasswordEdit->palette();
-    if (arg1 != userPasswordEdit->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
-    } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
-    }
-    userPasswordEdit->setPalette(pal);
-    userPasswordEdit2->setPalette(pal);
-}
-
-void MInstall::on_rootPasswordEdit2_textChanged(const QString &arg1)
-{
-    QPalette pal = rootPasswordEdit->palette();
-    if (arg1 != rootPasswordEdit->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
-    } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
-    }
-    rootPasswordEdit->setPalette(pal);
-    rootPasswordEdit2->setPalette(pal);
-}
-
-void MInstall::on_userPasswordEdit_textChanged()
-{
-    userPasswordEdit2->clear();
-    userPasswordEdit->setPalette(QApplication::palette());
-    userPasswordEdit2->setPalette(QApplication::palette());
-}
-
-void MInstall::on_rootPasswordEdit_textChanged()
-{
-    rootPasswordEdit2->clear();
-    rootPasswordEdit->setPalette(QApplication::palette());
-    rootPasswordEdit2->setPalette(QApplication::palette());
-}
-
 void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
 {
     FDEpassword->clear();
-    FDEpassword2->clear();
     nextButton->setDisabled(checked);
     FDEpassword->setVisible(checked);
     FDEpassword2->setVisible(checked);
@@ -3206,59 +3149,12 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
     labelFDEpass2->setVisible(checked);
     buttonAdvancedFDE->setVisible(checked);
     grubPbrButton->setDisabled(checked);
-
-    if (checked) {
-        FDEpassword->setFocus();
-    }
+    if (checked) FDEpassword->setFocus();
 }
 
 void MInstall::on_existing_partitionsButton_clicked(bool checked)
 {
     checkBoxEncryptAuto->setChecked(!checked);
-}
-
-void MInstall::on_FDEpassword_textChanged()
-{
-    FDEpassword2->clear();
-    FDEpassword->setPalette(QApplication::palette());
-    FDEpassword2->setPalette(QApplication::palette());
-    nextButton->setDisabled(true);
-}
-
-void MInstall::on_FDEpassword2_textChanged(const QString &arg1)
-{
-    QPalette pal = FDEpassword->palette();
-    if (arg1 != FDEpassword->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
-        nextButton->setDisabled(true);
-    } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
-        nextButton->setEnabled(true);
-    }
-    FDEpassword->setPalette(pal);
-    FDEpassword2->setPalette(pal);
-}
-
-void MInstall::on_FDEpassCust_textChanged()
-{
-    FDEpassCust2->clear();
-    FDEpassCust->setPalette(QApplication::palette());
-    FDEpassCust2->setPalette(QApplication::palette());
-    nextButton->setDisabled(true);
-}
-
-void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
-{
-    QPalette pal = FDEpassCust->palette();
-    if (arg1 != FDEpassCust->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
-        nextButton->setDisabled(true);
-    } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
-        nextButton->setEnabled(true);
-    }
-    FDEpassCust->setPalette(pal);
-    FDEpassCust2->setPalette(pal);
 }
 
 void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
@@ -3267,31 +3163,25 @@ void MInstall::on_checkBoxEncryptRoot_toggled(bool checked)
         checkBoxEncryptHome->setEnabled(false);
         checkBoxEncryptHome->setChecked(checked);
     }
-
-    if (checked) {
-        gbEncrPass->setVisible(true);
-        checkBoxEncryptSwap->setChecked(true);
-    } else {
-        gbEncrPass->setVisible(checkBoxEncryptHome->isChecked());
-        checkBoxEncryptSwap->setChecked(checkBoxEncryptHome->isChecked());
-    }
+    checkBoxEncryptSwap->setChecked(checked || checkBoxEncryptHome->isChecked());
+    on_checkBoxEncryptSwap_toggled();
 }
 
 void MInstall::on_checkBoxEncryptHome_toggled(bool checked)
 {
-    if (checked) {
-        gbEncrPass->setVisible(true);
-        checkBoxEncryptSwap->setChecked(true);
-    } else {
-        gbEncrPass->setVisible(checkBoxEncryptRoot->isChecked());
-        checkBoxEncryptSwap->setChecked(checkBoxEncryptRoot->isChecked());
-    }
+    checkBoxEncryptSwap->setChecked(checked || checkBoxEncryptRoot->isChecked());
+    on_checkBoxEncryptSwap_toggled();
 }
 
-void MInstall::on_checkBoxEncryptSwap_toggled(bool checked)
+void MInstall::on_checkBoxEncryptSwap_toggled()
 {
-    if (checked) {
-        FDEpassCust2->clear();
+    const bool encrypt = checkBoxEncryptRoot->isChecked()
+            || checkBoxEncryptHome->isChecked()
+            || checkBoxEncryptSwap->isChecked();
+    nextButton->setDisabled(encrypt);
+    if (!encrypt) gbEncrPass->hide();
+    else if(gbEncrPass->isHidden()) {
+        gbEncrPass->show();
         FDEpassCust->clear();
         FDEpassCust->setFocus();
     }

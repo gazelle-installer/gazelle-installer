@@ -563,7 +563,7 @@
               </spacer>
              </item>
              <item row="4" column="3" colspan="3">
-              <widget class="QLineEdit" name="FDEpassword2">
+              <widget class="MLineEdit" name="FDEpassword2">
                <property name="maxLength">
                 <number>512</number>
                </property>
@@ -589,7 +589,7 @@
               </widget>
              </item>
              <item row="3" column="3" colspan="3">
-              <widget class="QLineEdit" name="FDEpassword">
+              <widget class="MLineEdit" name="FDEpassword">
                <property name="maxLength">
                 <number>512</number>
                </property>
@@ -1152,7 +1152,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout2c">
              <item row="0" column="2" colspan="2">
-              <widget class="QLineEdit" name="FDEpassCust">
+              <widget class="MLineEdit" name="FDEpassCust">
                <property name="maxLength">
                 <number>512</number>
                </property>
@@ -1162,7 +1162,7 @@
               </widget>
              </item>
              <item row="1" column="2" colspan="2">
-              <widget class="QLineEdit" name="FDEpassCust2">
+              <widget class="MLineEdit" name="FDEpassCust2">
                <property name="maxLength">
                 <number>512</number>
                </property>
@@ -2303,7 +2303,7 @@
             </property>
             <layout class="QGridLayout">
              <item row="1" column="1">
-              <widget class="QLineEdit" name="rootPasswordEdit2">
+              <widget class="MLineEdit" name="rootPasswordEdit2">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                  <horstretch>0</horstretch>
@@ -2325,7 +2325,7 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QLineEdit" name="rootPasswordEdit">
+              <widget class="MLineEdit" name="rootPasswordEdit">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                  <horstretch>0</horstretch>
@@ -2388,7 +2388,7 @@
             </property>
             <layout class="QGridLayout">
              <item row="2" column="1">
-              <widget class="QLineEdit" name="userPasswordEdit2">
+              <widget class="MLineEdit" name="userPasswordEdit2">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                  <horstretch>0</horstretch>
@@ -2410,7 +2410,7 @@
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QLineEdit" name="userPasswordEdit">
+              <widget class="MLineEdit" name="userPasswordEdit">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                  <horstretch>0</horstretch>
@@ -2799,6 +2799,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>mlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>buttonSetKeyboard</tabstop>
   <tabstop>backButton</tabstop>
