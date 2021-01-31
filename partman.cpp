@@ -67,7 +67,8 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
             curdev->setText(Label, bdinfo.model);
         } else {
             if(!curdrv) continue;
-            curdev = setupItem(curdrv, &bdinfo);
+            curdev = new QTreeWidgetItem(curdrv);
+            setupItem(curdev, &bdinfo);
             curdrv->setData(Device, Qt::UserRole, QVariant(true)); // drive is now "used"
 
         }
@@ -83,16 +84,22 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     gui.treePartitions->blockSignals(false);
 }
 
-QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *parent, const BlockDeviceInfo *bdinfo,
+inline QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent,
+    int defaultMB, const QString &defaultUse) {
+    QTreeWidgetItem *twit = new QTreeWidgetItem(parent);
+    setupItem(twit, nullptr, defaultMB, defaultUse);
+    return twit;
+}
+QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     int defaultMB, const QString &defaultUse)
 {
-    QTreeWidgetItem *twit = new QTreeWidgetItem(parent);
     // Size
     if(!bdinfo) {
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
         spinSize->setAutoFillBackground(true);
         gui.treePartitions->setItemWidget(twit, Size, spinSize);
-        spinSize->setRange(1, parent->data(Size, Qt::UserRole).toLongLong() / 1048576);
+        const int maxMB = twit->parent()->data(Size, Qt::UserRole).toLongLong() / 1048576;
+        spinSize->setRange(1, maxMB);
         spinSize->setValue(defaultMB);
     }
     // Label
@@ -317,12 +324,12 @@ void PartMan::partAddClick(bool)
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit) return;
     QTreeWidgetItem *drive = twit->parent();
-    int index = 0;
+    QTreeWidgetItem *preceeding = nullptr;
     if(!drive) drive = twit;
-    else index = drive->indexOfChild(twit) + 1;
+    else preceeding = twit;
 
-    QTreeWidgetItem *part = setupItem(nullptr, nullptr);
-    drive->insertChild(index, part);
+    QTreeWidgetItem *part = new QTreeWidgetItem(drive, preceeding);
+    setupItem(part, nullptr);
 
     labelParts(drive);
     part->setSelected(true);
@@ -642,14 +649,14 @@ bool PartMan::layoutDefault()
     int rootFormatSize = driveSize - 32; // Compensate for rounding errors.
     // Boot partitions.
     if(uefi) {
-        setupItem(drivetree, nullptr, 256, "ESP");
+        addItem(drivetree, 256, "ESP");
         rootFormatSize -= 256;
     } else if(driveSize >= 2097152 || gptoverride) {
-        setupItem(drivetree, nullptr, 1, "bios_grub");
+        addItem(drivetree, 1, "bios_grub");
         rootFormatSize -= 1;
     }
     if (gui.checkBoxEncryptAuto->isChecked()){
-        setupItem(drivetree, nullptr, 512, "boot");
+        addItem(drivetree, 512, "boot");
         rootFormatSize -= 512;
     }
     // Operating system.
@@ -663,8 +670,8 @@ bool PartMan::layoutDefault()
         if (free > (rootFormatSize - 8192)) free = rootFormatSize - 8192;
         rootFormatSize -= free;
     }
-    setupItem(drivetree, nullptr, rootFormatSize, "root");
-    setupItem(drivetree, nullptr, swapFormatSize, "swap");
+    addItem(drivetree, rootFormatSize, "root");
+    addItem(drivetree, swapFormatSize, "swap");
 
     labelParts(drivetree);
     return true;
