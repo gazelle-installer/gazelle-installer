@@ -225,6 +225,7 @@ void MInstall::startup()
         FDEpassword2->hide();
         labelFDEpass->hide();
         labelFDEpass2->hide();
+        pbFDEpassMeter->hide();
         buttonAdvancedFDE->hide();
         gbEncrPass->hide();
         existing_partitionsButton->hide();
@@ -247,10 +248,10 @@ void MInstall::startup()
     }
 
     // Password box setup
-    FDEpassword->setup(FDEpassword2, 1, 32, 9);
-    FDEpassCust->setup(FDEpassCust2, 1, 32, 9);
-    userPasswordEdit->setup(userPasswordEdit2);
-    rootPasswordEdit->setup(rootPasswordEdit2, 1);
+    FDEpassword->setup(FDEpassword2, pbFDEpassMeter, 1, 32, 9);
+    FDEpassCust->setup(FDEpassCust2, pbFDEpassMeterCust, 1, 32, 9);
+    userPasswordEdit->setup(userPasswordEdit2, pbUserPassMeter);
+    rootPasswordEdit->setup(rootPasswordEdit2, pbRootPassMeter, 1);
     connect(FDEpassword, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
     connect(FDEpassCust, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
     connect(userPasswordEdit, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
@@ -3147,6 +3148,7 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
     FDEpassword2->setVisible(checked);
     labelFDEpass->setVisible(checked);
     labelFDEpass2->setVisible(checked);
+    pbFDEpassMeter->setVisible(checked);
     buttonAdvancedFDE->setVisible(checked);
     grubPbrButton->setDisabled(checked);
     if (checked) FDEpassword->setFocus();
