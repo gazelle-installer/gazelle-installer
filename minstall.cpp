@@ -251,7 +251,7 @@ void MInstall::startup()
     FDEpassword->setup(FDEpassword2, pbFDEpassMeter, 1, 32, 9);
     FDEpassCust->setup(FDEpassCust2, pbFDEpassMeterCust, 1, 32, 9);
     userPasswordEdit->setup(userPasswordEdit2, pbUserPassMeter);
-    rootPasswordEdit->setup(rootPasswordEdit2, pbRootPassMeter, 1);
+    rootPasswordEdit->setup(rootPasswordEdit2, pbRootPassMeter);
     connect(FDEpassword, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
     connect(FDEpassCust, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
     connect(userPasswordEdit, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
@@ -1928,9 +1928,10 @@ bool MInstall::processOOBE()
 
 bool MInstall::validateUserInfo()
 {
+    const QString &userName = userNameEdit->text();
     nextFocus = userNameEdit;
     // see if username is reasonable length
-    if (!userNameEdit->text().contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
+    if (!userName.contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
         QMessageBox::critical(this, windowTitle(),
                               tr("The user name cannot contain special characters or spaces.\n"
                                  "Please choose another name before proceeding."));
@@ -1939,7 +1940,7 @@ bool MInstall::validateUserInfo()
     // check that user name is not already used
     QFile file("/etc/passwd");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
-        const QByteArray &match = QString("%1:").arg(userNameEdit->text()).toUtf8();
+        const QByteArray &match = QString("%1:").arg(userName).toUtf8();
         while (!file.atEnd()) {
             if (file.readLine().startsWith(match)) {
                 QMessageBox::critical(this, windowTitle(),
@@ -1950,12 +1951,20 @@ bool MInstall::validateUserInfo()
         }
     }
 
+    if (!automatic && rootPasswordEdit->text().isEmpty()) {
+        // Confirm that an empty root password is not accidental.
+        const QMessageBox::StandardButton ans = QMessageBox::warning(this,
+            windowTitle(), tr("You did not provide a password for the root account."
+                " Do you want to continue?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+        if (ans!=QMessageBox::Yes) return false;
+    }
+
     // Check for pre-existing /home directory
     // see if user directory already exists
-    haveOldHome = listHomes.contains(userNameEdit->text());
+    haveOldHome = listHomes.contains(userName);
     if (haveOldHome) {
         const QString &str = tr("The home directory for %1 already exists.");
-        labelOldHome->setText(str.arg(userNameEdit->text()));
+        labelOldHome->setText(str.arg(userName));
     }
     nextFocus = nullptr;
     return true;
@@ -1969,12 +1978,21 @@ bool MInstall::setUserInfo()
 
     // set the user passwords first
     bool ok = true;
+    QString cmdChRoot;
+    if(!oobe) cmdChRoot = "chroot /mnt/antiX ";
     const QString &userPass = userPasswordEdit->text();
+    const QString &rootPass = rootPasswordEdit->text();
     QByteArray userinfo = QString("root:" + rootPasswordEdit->text()).toUtf8();
-    const QString cmdNoPass = oobe ? "passwd -d " : "chroot /mnt/antiX passwd -d ";
-    if(userPass.isEmpty()) ok = proc.exec(cmdNoPass + userPass, true);
-    else userinfo.append(QString("\ndemo:" + userPass).toUtf8());
-    if(ok) ok = proc.exec(oobe ? "chpasswd" : "chroot /mnt/antiX chpasswd", true, &userinfo);
+
+    if(rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
+    else userinfo.append(QString("root:" + rootPass).toUtf8());
+    if(ok && userPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d demo", true);
+    else {
+        if(!userinfo.isEmpty()) userinfo.append('\n');
+        userinfo.append(QString("demo:" + userPass).toUtf8());
+    }
+    if(ok && !userinfo.isEmpty()) ok = proc.exec(cmdChRoot + "chpasswd", true, &userinfo);
+
     if(!ok) {
         failUI(tr("Failed to set user account passwords."));
         return false;
