@@ -19,17 +19,17 @@
 #define MLINEEDIT_H
 
 #include <QLineEdit>
-#include <QPushButton>
+#include <QProgressBar>
 
 class MLineEdit : public QLineEdit
 {
     Q_OBJECT
 private:
     MLineEdit *slave = nullptr;
-    QPushButton *nextButton = nullptr;
     QString genText;
     int min, genMin, wordMax;
     bool lastValid = false;
+    QProgressBar *meter = nullptr;
     void generate();
     void menuGenText();
     void masterTextChanged();
@@ -38,7 +38,8 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
 public:
     MLineEdit(QWidget *parent = nullptr);
-    void setup(MLineEdit *slave, int min=0, int genMin=16, int wordMax=5);
+    void setup(MLineEdit *slave, QProgressBar *meter,
+               int min=0, int genMin=16, int wordMax=5);
     bool isValid();
 signals:
     void validationChanged(bool valid);
