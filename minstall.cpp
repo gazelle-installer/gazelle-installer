@@ -30,7 +30,7 @@
 #include "version.h"
 #include "minstall.h"
 
-MInstall::MInstall(const QStringList &args, const QString &cfgfile)
+MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     : proc(this), partman(proc, listBlkDevs, *this, this)
 {
     setupUi(this);
@@ -40,15 +40,15 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     installBox->hide();
 
-    oobe = args.contains("--oobe");
-    pretend = args.contains("--pretend");
-    nocopy = args.contains("--nocopy");
-    sync = args.contains("--sync");
+    oobe = args.isSet("oobe");
+    pretend = args.isSet("pretend");
+    nocopy = args.isSet("nocopy");
+    sync = args.isSet("sync");
     if(!oobe) {
-        brave = args.contains("--brave");
-        automatic = args.contains("--auto");
-        oem = args.contains("--oem");
-        gptoverride = args.contains("--gpt-override");
+        brave = args.isSet("brave");
+        automatic = args.isSet("auto");
+        oem = args.isSet("oem");
+        gptoverride = args.isSet("gpt-override");
     } else {
         brave = automatic = oem = gptoverride = false;
         closeButton->setText(tr("Shutdown"));
@@ -75,7 +75,7 @@ MInstall::MInstall(const QStringList &args, const QString &cfgfile)
         pal.setColor(QPalette::Link, Qt::cyan);
         qApp->setPalette(pal);
     }
-    if (pretend) listHomes = args; // dummy existing homes
+    //if (pretend) listHomes = qApp->arguments(); // dummy existing homes
 
     // setup system variables
     QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
@@ -183,7 +183,7 @@ void MInstall::startup()
         long long safety_factor = 128 * 1024 * 1024; // 128 MB safety factor
         rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
 
-        if (!(bootSpaceNeeded)) {
+        if (!pretend && bootSpaceNeeded==0) {
             QMessageBox::warning(this, windowTitle(),
                  tr("Cannot access source medium.\nActivating pretend installation."));
             pretend = true;
@@ -218,6 +218,7 @@ void MInstall::startup()
         FDEpassword2->hide();
         labelFDEpass->hide();
         labelFDEpass2->hide();
+        pbFDEpassMeter->hide();
         buttonAdvancedFDE->hide();
         gbEncrPass->hide();
         existing_partitionsButton->hide();
@@ -235,6 +236,18 @@ void MInstall::startup()
         // Detect snapshot-backup account(s)
         haveSnapshotUserAccounts = checkForSnapshot();
     }
+
+    // Password box setup
+    FDEpassword->setup(FDEpassword2, pbFDEpassMeter, 1, 32, 9);
+    FDEpassCust->setup(FDEpassCust2, pbFDEpassMeterCust, 1, 32, 9);
+    userPasswordEdit->setup(userPasswordEdit2, pbUserPassMeter);
+    rootPasswordEdit->setup(rootPasswordEdit2, pbRootPassMeter);
+    connect(FDEpassword, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
+    connect(FDEpassCust, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
+    connect(userPasswordEdit, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
+    connect(rootPasswordEdit, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
+    // User name is required
+    connect(userNameEdit, &QLineEdit::textChanged, this, &MInstall::userPassValidationChanged);
 
     // set default host name
     computerNameEdit->setText(DEFAULT_HOSTNAME);
@@ -527,20 +540,6 @@ bool MInstall::mountPartition(const QString dev, const QString point, const QStr
     mkdir(point.toUtf8(), 0755);
     QString cmd = QString("/bin/mount %1 %2 -o %3").arg(dev).arg(point).arg(mntops);
     return proc.exec(cmd);
-}
-
-// check password length (maybe complexity)
-bool MInstall::checkPassword(QLineEdit *passEdit)
-{
-    if (passEdit->text().isEmpty()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("The password needs to be at least\n"
-                                 "%1 characters long. Please select\n"
-                                 "a longer password before proceeding.").arg("1"));
-        nextFocus = passEdit;
-        return false;
-    }
-    return true;
 }
 
 // process the next phase of installation if possible
@@ -871,7 +870,7 @@ bool MInstall::formatPartitions()
     if (espFormatSize) {
         proc.status(tr("Formatting EFI System Partition"));
         if (!proc.exec("mkfs.msdos -F 32 " + espDevice)) return false;
-        proc.exec("parted -s " + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
+        proc.exec("parted -s /dev/" + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
         proc.sleep(1000);
     }
     // maybe format home
@@ -1531,13 +1530,10 @@ bool MInstall::processOOBE()
 
 bool MInstall::validateUserInfo()
 {
+    const QString &userName = userNameEdit->text();
     nextFocus = userNameEdit;
     // see if username is reasonable length
-    if (userNameEdit->text().isEmpty()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Please enter a user name."));
-        return false;
-    } else if (!userNameEdit->text().contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
+    if (!userName.contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
         QMessageBox::critical(this, windowTitle(),
                               tr("The user name cannot contain special characters or spaces.\n"
                                  "Please choose another name before proceeding."));
@@ -1546,7 +1542,7 @@ bool MInstall::validateUserInfo()
     // check that user name is not already used
     QFile file("/etc/passwd");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
-        const QByteArray &match = QString("%1:").arg(userNameEdit->text()).toUtf8();
+        const QByteArray &match = QString("%1:").arg(userName).toUtf8();
         while (!file.atEnd()) {
             if (file.readLine().startsWith(match)) {
                 QMessageBox::critical(this, windowTitle(),
@@ -1557,39 +1553,20 @@ bool MInstall::validateUserInfo()
         }
     }
 
-    if (userPasswordEdit->text().isEmpty()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Please enter the user password."));
-        nextFocus = userPasswordEdit;
-        return false;
-    }
-    if (rootPasswordEdit->text().isEmpty()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("Please enter the root password."));
-        nextFocus = rootPasswordEdit;
-        return false;
-    }
-    if (userPasswordEdit->text() != userPasswordEdit2->text()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("The user password entries do not match.\n"
-                                 "Please try again."));
-        nextFocus = userPasswordEdit;
-        return false;
-    }
-    if (rootPasswordEdit->text() != rootPasswordEdit2->text()) {
-        QMessageBox::critical(this, windowTitle(),
-                              tr("The root password entries do not match.\n"
-                                 "Please try again."));
-        nextFocus = rootPasswordEdit;
-        return false;
+    if (!automatic && rootPasswordEdit->text().isEmpty()) {
+        // Confirm that an empty root password is not accidental.
+        const QMessageBox::StandardButton ans = QMessageBox::warning(this,
+            windowTitle(), tr("You did not provide a password for the root account."
+                " Do you want to continue?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+        if (ans!=QMessageBox::Yes) return false;
     }
 
     // Check for pre-existing /home directory
     // see if user directory already exists
-    haveOldHome = listHomes.contains(userNameEdit->text());
+    haveOldHome = listHomes.contains(userName);
     if (haveOldHome) {
         const QString &str = tr("The home directory for %1 already exists.");
-        labelOldHome->setText(str.arg(userNameEdit->text()));
+        labelOldHome->setText(str.arg(userName));
     }
     nextFocus = nullptr;
     return true;
@@ -1602,9 +1579,23 @@ bool MInstall::setUserInfo()
     if (phase < 0) return false;
 
     // set the user passwords first
-    const QByteArray &userinfo = QString("root:" + rootPasswordEdit->text() + "\n"
-                                 "demo:" + userPasswordEdit->text()).toUtf8();
-    if (!proc.exec(oobe ? "chpasswd" : "chroot /mnt/antiX chpasswd", true, &userinfo)) {
+    bool ok = true;
+    QString cmdChRoot;
+    if(!oobe) cmdChRoot = "chroot /mnt/antiX ";
+    const QString &userPass = userPasswordEdit->text();
+    const QString &rootPass = rootPasswordEdit->text();
+    QByteArray userinfo = QString("root:" + rootPasswordEdit->text()).toUtf8();
+
+    if(rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
+    else userinfo.append(QString("root:" + rootPass).toUtf8());
+    if(ok && userPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d demo", true);
+    else {
+        if(!userinfo.isEmpty()) userinfo.append('\n');
+        userinfo.append(QString("demo:" + userPass).toUtf8());
+    }
+    if(ok && !userinfo.isEmpty()) ok = proc.exec(cmdChRoot + "chpasswd", true, &userinfo);
+
+    if(!ok) {
         failUI(tr("Failed to set user account passwords."));
         return false;
     }
@@ -1635,6 +1626,10 @@ bool MInstall::setUserInfo()
                 failUI(tr("Failed to delete old home directory."));
                 return false;
             }
+        }
+        //now that directory is moved or deleted, make new one
+        if (!QFileInfo::exists(dpath.toUtf8())) {
+            proc.exec("/usr/bin/mkdir -p " + dpath, true);
         }
         // clean up directory
         proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
@@ -1952,9 +1947,6 @@ int MInstall::showPage(int curr, int next)
 
     if (next == 3 && curr == 2) { // at Step_Disk (forward)
         if (entireDiskButton->isChecked()) {
-            if (checkBoxEncryptAuto->isChecked() && !checkPassword(FDEpassword)) {
-                return curr;
-            }
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
                 if (!uefi) {
@@ -2178,13 +2170,23 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 9: // set username and passwords
-        mainHelp->setText(tr("<p><b>Default User Login</b><br/>The root user is similar to the Administrator user in some other operating systems. "
-                             "You should not use the root user as your daily user account. "
-                             "Please enter the name for a new (default) user account that you will use on a daily basis. "
-                             "If needed, you can add other user accounts later with %1 User Manager. </p>"
-                             "<p><b>Passwords</b><br/>Enter a new password for your default user account and for the root account. "
-                             "Each password must be entered twice.</p>").arg(PROJECTNAME));
+        mainHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
+                          + tr("The root user is similar to the Administrator user in some other operating systems."
+                               " You should not use the root user as your daily user account."
+                               " Please enter the name for a new (default) user account that you will use on a daily basis."
+                               " If needed, you can add other user accounts later with %1 User Manager.").arg(PROJECTNAME) + "</p>"
+                          "<p><b>" + tr("Passwords") + "</b><br/>"
+                          + tr("Enter a new password for your default user account and for the root account."
+                               " Each password must be entered twice.") + "</p>"
+                          "<p><b>" + tr("No passwords") + "</b><br/>"
+                          + tr("If you want the default user account to have no password, leave its password fields empty."
+                               " This allows you to log in without requiring a password.") + "<br/>"
+                          + tr("Obviously, this should only be done in situations where the user account"
+                               " does not need to be secure, such as a public terminal.") + "</p>");
         if (!nextFocus) nextFocus = userNameEdit;
+        backButton->setEnabled(true);
+        userPassValidationChanged();
+        return; // avoid the end that enables both Back and Next buttons
         break;
 
     case 10: // deal with an old home directory
@@ -2482,6 +2484,16 @@ void MInstall::on_mainTabs_currentChanged(int index)
     if(index == 0) resizeEvent(nullptr);
 }
 
+void MInstall::diskPassValidationChanged(bool valid)
+{
+    nextButton->setEnabled(valid);
+}
+void MInstall::userPassValidationChanged()
+{
+    nextButton->setEnabled(!(userNameEdit->text().isEmpty())
+        && userPasswordEdit->isValid() && rootPasswordEdit->isValid());
+}
+
 void MInstall::on_passwordCheckBox_stateChanged(int state)
 {
     if (state == Qt::Unchecked) {
@@ -2684,108 +2696,23 @@ void MInstall::on_buttonSetKeyboard_clicked()
     setupkeyboardbutton();
 }
 
-void MInstall::on_userPasswordEdit2_textChanged(const QString &arg1)
-{
-    QPalette pal = userPasswordEdit->palette();
-    if (arg1 != userPasswordEdit->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
-    } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
-    }
-    userPasswordEdit->setPalette(pal);
-    userPasswordEdit2->setPalette(pal);
-}
-
-void MInstall::on_rootPasswordEdit2_textChanged(const QString &arg1)
-{
-    QPalette pal = rootPasswordEdit->palette();
-    if (arg1 != rootPasswordEdit->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
-    } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
-    }
-    rootPasswordEdit->setPalette(pal);
-    rootPasswordEdit2->setPalette(pal);
-}
-
-void MInstall::on_userPasswordEdit_textChanged()
-{
-    userPasswordEdit2->clear();
-    userPasswordEdit->setPalette(QApplication::palette());
-    userPasswordEdit2->setPalette(QApplication::palette());
-}
-
-void MInstall::on_rootPasswordEdit_textChanged()
-{
-    rootPasswordEdit2->clear();
-    rootPasswordEdit->setPalette(QApplication::palette());
-    rootPasswordEdit2->setPalette(QApplication::palette());
-}
-
 void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
 {
     FDEpassword->clear();
-    FDEpassword2->clear();
     nextButton->setDisabled(checked);
     FDEpassword->setVisible(checked);
     FDEpassword2->setVisible(checked);
     labelFDEpass->setVisible(checked);
     labelFDEpass2->setVisible(checked);
+    pbFDEpassMeter->setVisible(checked);
     buttonAdvancedFDE->setVisible(checked);
     grubPbrButton->setDisabled(checked);
-
-    if (checked) {
-        FDEpassword->setFocus();
-    }
+    if (checked) FDEpassword->setFocus();
 }
 
 void MInstall::on_existing_partitionsButton_clicked(bool checked)
 {
     checkBoxEncryptAuto->setChecked(!checked);
-}
-
-void MInstall::on_FDEpassword_textChanged()
-{
-    FDEpassword2->clear();
-    FDEpassword->setPalette(QApplication::palette());
-    FDEpassword2->setPalette(QApplication::palette());
-    nextButton->setDisabled(true);
-}
-
-void MInstall::on_FDEpassword2_textChanged(const QString &arg1)
-{
-    QPalette pal = FDEpassword->palette();
-    if (arg1 != FDEpassword->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
-        nextButton->setDisabled(true);
-    } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
-        nextButton->setEnabled(true);
-    }
-    FDEpassword->setPalette(pal);
-    FDEpassword2->setPalette(pal);
-}
-
-void MInstall::on_FDEpassCust_textChanged()
-{
-    FDEpassCust2->clear();
-    FDEpassCust->setPalette(QApplication::palette());
-    FDEpassCust2->setPalette(QApplication::palette());
-    nextButton->setDisabled(true);
-}
-
-void MInstall::on_FDEpassCust2_textChanged(const QString &arg1)
-{
-    QPalette pal = FDEpassCust->palette();
-    if (arg1 != FDEpassCust->text()) {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
-        nextButton->setDisabled(true);
-    } else {
-        pal.setColor(QPalette::Base, QColor(0, 255, 0, 40));
-        nextButton->setEnabled(true);
-    }
-    FDEpassCust->setPalette(pal);
-    FDEpassCust2->setPalette(pal);
 }
 
 void MInstall::on_buttonAdvancedFDE_clicked()
