@@ -183,7 +183,7 @@ void MInstall::startup()
         long long safety_factor = 128 * 1024 * 1024; // 128 MB safety factor
         rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
 
-        if (!(bootSpaceNeeded)) {
+        if (!pretend && bootSpaceNeeded==0) {
             QMessageBox::warning(this, windowTitle(),
                  tr("Cannot access source medium.\nActivating pretend installation."));
             pretend = true;
