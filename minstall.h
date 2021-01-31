@@ -15,6 +15,7 @@
 //   limitations under the License.
 //
 
+#include <QCommandLineParser>
 #include <QFile>
 #include <QMessageBox>
 #include <QProcess>
@@ -41,7 +42,7 @@ protected:
     void reject();
 
 public:
-    MInstall(const QStringList &args, const QString &cfgfile);
+    MInstall(const QCommandLineParser &args, const QString &cfgfile);
     ~MInstall();
 
     // helpers
@@ -102,18 +103,9 @@ private slots:
     void on_qtpartedButton_clicked();
     void on_viewServicesButton_clicked();
 
-    void on_userPasswordEdit2_textChanged(const QString &arg1);
-    void on_rootPasswordEdit2_textChanged(const QString &arg1);
-    void on_userPasswordEdit_textChanged();
-    void on_rootPasswordEdit_textChanged();
-
     void on_checkBoxEncryptAuto_toggled(bool checked);
     void on_existing_partitionsButton_clicked(bool checked);
 
-    void on_FDEpassword_textChanged();
-    void on_FDEpassword2_textChanged(const QString &arg1);
-    void on_FDEpassCust_textChanged();
-    void on_FDEpassCust2_textChanged(const QString &arg1);
     void on_buttonBenchmarkFDE_clicked();
     void on_buttonAdvancedFDE_clicked();
     void on_buttonAdvancedFDECust_clicked();
@@ -217,8 +209,8 @@ private:
 
     // slots
     void startup();
-    // helpers
-    bool checkPassword(QLineEdit *passEdit);
+    void diskPassValidationChanged(bool valid);
+    void userPassValidationChanged();
     // private functions
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
