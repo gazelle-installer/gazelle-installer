@@ -47,7 +47,9 @@ class PartMan : public QObject
     QList<QTreeWidgetItem *> swaps;
     enum Qt::CheckState encryptCheckRoot = Qt::Unchecked;
     void setup();
-    QTreeWidgetItem *setupItem(QTreeWidgetItem *parent, const BlockDeviceInfo *bdinfo,
+    inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent,
+        int defaultMB = 1, const QString &defaultUse = QString());
+    QTreeWidgetItem *setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
         int defaultMB = 1, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drive);
     static QString translateUse(const QString &alias);
