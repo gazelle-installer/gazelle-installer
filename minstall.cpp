@@ -1584,8 +1584,7 @@ bool MInstall::setUserInfo()
     if(!oobe) cmdChRoot = "chroot /mnt/antiX ";
     const QString &userPass = userPasswordEdit->text();
     const QString &rootPass = rootPasswordEdit->text();
-    QByteArray userinfo = QString("root:" + rootPasswordEdit->text()).toUtf8();
-
+    QByteArray userinfo;
     if(rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
     else userinfo.append(QString("root:" + rootPass).toUtf8());
     if(ok && userPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d demo", true);
@@ -1594,7 +1593,6 @@ bool MInstall::setUserInfo()
         userinfo.append(QString("demo:" + userPass).toUtf8());
     }
     if(ok && !userinfo.isEmpty()) ok = proc.exec(cmdChRoot + "chpasswd", true, &userinfo);
-
     if(!ok) {
         failUI(tr("Failed to set user account passwords."));
         return false;
@@ -2691,7 +2689,10 @@ void MInstall::setupkeyboardbutton()
 void MInstall::on_buttonSetKeyboard_clicked()
 {
     hide();
-    proc.exec("env GTK_THEME='Adwaita' fskbsetting", false);
+    if (proc.exec("command -v  system-keyboard-qt >/dev/null 2>&1", false))
+        proc.exec("system-keyboard-qt", false);
+    else
+        proc.exec("env GTK_THEME='Adwaita' fskbsetting", false);
     show();
     setupkeyboardbutton();
 }
