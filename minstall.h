@@ -104,7 +104,7 @@ private slots:
     void on_viewServicesButton_clicked();
 
     void on_checkBoxEncryptAuto_toggled(bool checked);
-    void on_existing_partitionsButton_clicked(bool checked);
+    void on_customPartButton_clicked(bool checked);
 
     void on_buttonBenchmarkFDE_clicked();
     void on_buttonAdvancedFDE_clicked();

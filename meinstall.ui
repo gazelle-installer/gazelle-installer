@@ -472,7 +472,7 @@
               </spacer>
              </item>
              <item row="8" column="0" colspan="5">
-              <widget class="QRadioButton" name="existing_partitionsButton">
+              <widget class="QRadioButton" name="customPartButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                  <horstretch>0</horstretch>
@@ -480,7 +480,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>Custom install on existing partitions</string>
+                <string>Customize the disk layout</string>
                </property>
               </widget>
              </item>
@@ -2453,7 +2453,7 @@
   <tabstop>qtpartedButton</tabstop>
   <tabstop>entireDiskButton</tabstop>
   <tabstop>checkBoxEncryptAuto</tabstop>
-  <tabstop>existing_partitionsButton</tabstop>
+  <tabstop>customPartButton</tabstop>
   <tabstop>FDEpassword</tabstop>
   <tabstop>FDEpassword2</tabstop>
   <tabstop>saveHomeCheck</tabstop>
