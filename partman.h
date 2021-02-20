@@ -61,6 +61,7 @@ class PartMan : public QObject
     void partClearClick(bool);
     void partAddClick(bool);
     void partRemoveClick(bool);
+    void partDefaultClick(bool);
 public:
     bool automatic, sync;
     bool gptoverride, uefi;

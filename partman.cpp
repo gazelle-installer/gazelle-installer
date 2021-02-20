@@ -42,6 +42,7 @@ void PartMan::setup()
     connect(gui.buttonPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
     connect(gui.buttonPartAdd, &QToolButton::clicked, this, &PartMan::partAddClick);
     connect(gui.buttonPartRemove, &QToolButton::clicked, this, &PartMan::partRemoveClick);
+    connect(gui.buttonPartDefault, &QToolButton::clicked, this, &PartMan::partDefaultClick);
     gui.buttonPartAdd->setEnabled(false);
     gui.buttonPartRemove->setEnabled(false);
     gui.buttonPartClear->setEnabled(false);
@@ -343,6 +344,11 @@ void PartMan::partRemoveClick(bool)
     twit->parent()->removeChild(twit);
 }
 
+void PartMan::partDefaultClick(bool)
+{
+    layoutDefault();
+}
+
 QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &project)
 {
     QStringList msgForeignList;
@@ -637,13 +643,15 @@ bool PartMan::layoutDefault()
         if(twit->text(Device) == drv) {
             drivetree = twit;
             while(twit->childCount()) twit->removeChild(twit->child(0));
+            twit->setData(Device, Qt::UserRole, QVariant(false)); // Mark the drive as "unused".
         }
     }
     if(!drivetree) return false;
 
     // Drive geometry basics.
     bool ok = true;
-    int free = gui.freeSpaceEdit->text().toInt(&ok,10);
+    const QString &fsText = gui.freeSpaceEdit->text().trimmed();
+    int free = fsText.isEmpty() ? 0 : fsText.toInt(&ok,10);
     if (!ok) return false;
     const int driveSize = listBlkDevs.at(bdindex).size / 1048576;
     int rootFormatSize = driveSize - 32; // Compensate for rounding errors.
