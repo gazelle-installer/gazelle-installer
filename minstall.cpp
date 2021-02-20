@@ -188,6 +188,14 @@ void MInstall::startup()
                  tr("Cannot access source medium.\nActivating pretend installation."));
             pretend = true;
         }
+
+        //diable external root apps when pretend is true
+
+        if (pretend){
+            buttonSetKeyboard->setDisabled(true);
+            qtpartedButton->setDisabled(true);
+        }
+
         const long long spaceBlock = 134217728; // 128MB
         bootSpaceNeeded += 2*spaceBlock - (bootSpaceNeeded % spaceBlock);
 
