@@ -221,7 +221,6 @@ void MInstall::startup()
         pbFDEpassMeter->hide();
         buttonAdvancedFDE->hide();
         gbEncrPass->hide();
-        existing_partitionsButton->hide();
 
         //disable encryption in gui if cryptsetup not present
         QFileInfo cryptsetup("/sbin/cryptsetup");
@@ -628,7 +627,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
     if ((mode == ConfigSave || mode == ConfigLoadA) && !oobe) {
         config->startGroup("Storage", Step_Disk);
         const char *diskChoices[] = {"Drive", "Partitions"};
-        QRadioButton *diskRadios[] = {entireDiskButton, existing_partitionsButton};
+        QRadioButton *diskRadios[] = {entireDiskButton, customPartButton};
         config->manageRadios("Target", 2, diskChoices, diskRadios);
         const bool targetDrive = entireDiskButton->isChecked();
 
@@ -2361,13 +2360,11 @@ void MInstall::updatePartitionWidgets()
     diskCombo->setEnabled(true);
 
     // whole-disk vs custom-partition radio buttons
-    existing_partitionsButton->hide();
     entireDiskButton->setChecked(true);
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (!bdinfo.isDrive) {
             // found at least one partition
-            existing_partitionsButton->show();
-            existing_partitionsButton->setChecked(true);
+            customPartButton->setChecked(true);
             break;
         }
     }
@@ -2711,7 +2708,7 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
     if (checked) FDEpassword->setFocus();
 }
 
-void MInstall::on_existing_partitionsButton_clicked(bool checked)
+void MInstall::on_customPartButton_clicked(bool checked)
 {
     checkBoxEncryptAuto->setChecked(!checked);
 }
