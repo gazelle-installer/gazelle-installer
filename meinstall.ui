@@ -327,66 +327,7 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="0" column="0" rowspan="2" colspan="2">
-           <widget class="QGroupBox" name="rearrangediskBox">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="title">
-             <string>Rearrange disk partitions (optional)</string>
-            </property>
-            <layout class="QGridLayout">
-             <property name="leftMargin">
-              <number>9</number>
-             </property>
-             <property name="topMargin">
-              <number>9</number>
-             </property>
-             <property name="rightMargin">
-              <number>9</number>
-             </property>
-             <property name="bottomMargin">
-              <number>9</number>
-             </property>
-             <property name="spacing">
-              <number>6</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="QLabel" name="repartitionLabel">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Modify partitions:</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="qtpartedButton">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Run partition tool...</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="2">
+          <item row="0" column="0" colspan="2">
            <widget class="QGroupBox" name="installationTypeBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -633,7 +574,7 @@
             </layout>
            </widget>
           </item>
-          <item row="3" column="0" colspan="2">
+          <item row="1" column="0" colspan="2">
            <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -2454,7 +2395,6 @@
   <tabstop>buttonSetKeyboard</tabstop>
   <tabstop>backButton</tabstop>
   <tabstop>nextButton</tabstop>
-  <tabstop>qtpartedButton</tabstop>
   <tabstop>entireDiskButton</tabstop>
   <tabstop>checkBoxEncryptAuto</tabstop>
   <tabstop>customPartButton</tabstop>

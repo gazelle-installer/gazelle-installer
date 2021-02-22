@@ -214,21 +214,26 @@ void MInstall::startup()
         partman.defaultLabels["/home"] = "home" + PROJECTSHORTNAME;
         partman.defaultLabels["swap"] = "swap" + PROJECTSHORTNAME;
 
-        FDEpassword->hide();
-        FDEpassword2->hide();
-        labelFDEpass->hide();
-        labelFDEpass2->hide();
-        pbFDEpassMeter->hide();
-        buttonAdvancedFDE->hide();
-        gbEncrPass->hide();
+        FDEpassword->setDisabled(true);
+        FDEpassword2->setDisabled(true);
+        labelFDEpass->setDisabled(true);
+        labelFDEpass2->setDisabled(true);
+        pbFDEpassMeter->setDisabled(true);
+        buttonAdvancedFDE->setDisabled(true);
+        gbEncrPass->setDisabled(true);
 
         //disable encryption in gui if cryptsetup not present
         QFileInfo cryptsetup("/sbin/cryptsetup");
         QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
         if ( !cryptsetup.exists() && !cryptsetup.isExecutable() && !crypsetupinitramfs.exists()) {
             checkBoxEncryptAuto->hide();
+            FDEpassword->hide();
+            FDEpassword2->hide();
+            labelFDEpass->hide();
+            labelFDEpass2->hide();
+            pbFDEpassMeter->hide();
             buttonAdvancedFDE->hide();
-            buttonAdvancedFDECust->hide();
+            gbEncrPass->hide();
             treePartitions->setColumnHidden(4, true);
         }
 
@@ -2528,15 +2533,13 @@ void MInstall::on_viewServicesButton_clicked()
     gotoPage(6);
 }
 
-void MInstall::on_qtpartedButton_clicked()
+void MInstall::on_buttonRunParted_clicked()
 {
     updateCursor(Qt::WaitCursor);
-    nextButton->setEnabled(false);
-    qtpartedButton->setEnabled(false);
+    mainFrame->setEnabled(false);
     proc.exec("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager", false);
     updatePartitionWidgets();
-    qtpartedButton->setEnabled(true);
-    nextButton->setEnabled(true);
+    mainFrame->setEnabled(true);
     updateCursor();
 }
 
@@ -2698,12 +2701,12 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
 {
     FDEpassword->clear();
     nextButton->setDisabled(checked);
-    FDEpassword->setVisible(checked);
-    FDEpassword2->setVisible(checked);
-    labelFDEpass->setVisible(checked);
-    labelFDEpass2->setVisible(checked);
-    pbFDEpassMeter->setVisible(checked);
-    buttonAdvancedFDE->setVisible(checked);
+    FDEpassword->setEnabled(checked);
+    FDEpassword2->setEnabled(checked);
+    labelFDEpass->setEnabled(checked);
+    labelFDEpass2->setEnabled(checked);
+    pbFDEpassMeter->setEnabled(checked);
+    buttonAdvancedFDE->setEnabled(checked);
     grubPbrButton->setDisabled(checked);
     if (checked) FDEpassword->setFocus();
 }
