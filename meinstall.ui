@@ -163,6 +163,12 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
        </spacer>
       </item>
       <item row="2" column="0" colspan="6">
@@ -280,6 +286,12 @@
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
                 </spacer>
                </item>
                <item row="6" column="1" colspan="3">
@@ -300,6 +312,12 @@
                 <spacer name="horizontalSpacer_9">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
                  </property>
                 </spacer>
                </item>
@@ -339,80 +357,20 @@
              <string>Select type of installation</string>
             </property>
             <layout class="QGridLayout">
-             <item row="4" column="3" colspan="3">
-              <widget class="MLineEdit" name="FDEpassword2">
-               <property name="maxLength">
-                <number>512</number>
-               </property>
-               <property name="echoMode">
-                <enum>QLineEdit::Password</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QCheckBox" name="checkBoxEncryptAuto">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Encrypt</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="2">
-              <spacer name="horizontalSpacer_12">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </spacer>
-             </item>
-             <item row="3" column="1" colspan="2">
-              <widget class="QLabel" name="labelFDEpass">
-               <property name="text">
-                <string>Encryption password:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="3" colspan="3">
-              <widget class="MLineEdit" name="FDEpassword">
-               <property name="maxLength">
-                <number>512</number>
-               </property>
-               <property name="echoMode">
-                <enum>QLineEdit::Password</enum>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="useDiskLabel">
+             <item row="0" column="0" colspan="2">
+              <widget class="QRadioButton" name="entireDiskButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="font">
-                <font/>
-               </property>
                <property name="text">
-                <string>Use disk:</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
+                <string>Auto-install using entire disk</string>
                </property>
               </widget>
              </item>
-             <item row="7" column="1">
-              <spacer name="horizontalSpacer_11">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </spacer>
-             </item>
-             <item row="8" column="0" colspan="5">
+             <item row="3" column="0" colspan="2">
               <widget class="QRadioButton" name="customPartButton">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -425,150 +383,270 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="3">
-              <widget class="QLineEdit" name="freeSpaceEdit">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+             <item row="1" column="0" colspan="2">
+              <widget class="QGroupBox" name="groupAutoPart">
+               <property name="title">
+                <string/>
                </property>
-               <property name="inputMask">
-                <string notr="true">00000000</string>
-               </property>
-               <property name="cursorPosition">
-                <number>0</number>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight</set>
-               </property>
-               <property name="clearButtonEnabled">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="4">
-              <widget class="QLabel" name="freeLabel">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>MB </string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1" colspan="2">
-              <widget class="QLabel" name="labelFDEpass2">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="text">
-                <string>Confirm password:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <spacer>
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>12</width>
-                 <height>4</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="5" column="1" colspan="2">
-              <widget class="QLabel" name="leaveLabel">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Leave free space up to:</string>
-               </property>
-               <property name="wordWrap">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="3" colspan="4">
-              <widget class="QPushButton" name="buttonAdvancedFDE">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Advanced encryption settings</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3" colspan="4">
-              <widget class="QComboBox" name="diskCombo">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="5" colspan="2">
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </spacer>
-             </item>
-             <item row="7" column="3" colspan="4">
-              <spacer name="horizontalSpacer_13">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-              </spacer>
-             </item>
-             <item row="0" column="0" colspan="7">
-              <widget class="QRadioButton" name="entireDiskButton">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Auto-install using entire disk </string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="6" rowspan="2">
-              <widget class="QProgressBar" name="pbFDEpassMeter">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
+               <layout class="QGridLayout" name="gridLayout">
+                <item row="5" column="0" colspan="2">
+                 <widget class="QLabel" name="labelFDEpass2">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Confirm password:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0" colspan="2">
+                 <widget class="QLabel" name="useDiskLabel">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="font">
+                   <font/>
+                  </property>
+                  <property name="text">
+                   <string>Use disk:</string>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1" colspan="6">
+                 <widget class="QFrame" name="frameSliderPart">
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Sunken</enum>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_4">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="labelSliderRoot">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Root</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSlider" name="sliderPart">
+                     <property name="maximum">
+                      <number>100</number>
+                     </property>
+                     <property name="sliderPosition">
+                      <number>40</number>
+                     </property>
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="tickPosition">
+                      <enum>QSlider::TicksBothSides</enum>
+                     </property>
+                     <property name="tickInterval">
+                      <number>10</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="labelSliderHome">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Home</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item row="3" column="2" colspan="5">
+                 <widget class="QPushButton" name="buttonAdvancedFDE">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Advanced encryption settings</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="4" colspan="3">
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item row="0" column="2" colspan="5">
+                 <widget class="QComboBox" name="diskCombo">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="2">
+                 <widget class="QLineEdit" name="freeSpaceEdit">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="inputMask">
+                   <string notr="true">00000000</string>
+                  </property>
+                  <property name="cursorPosition">
+                   <number>0</number>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight</set>
+                  </property>
+                  <property name="clearButtonEnabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="2" colspan="4">
+                 <widget class="MLineEdit" name="FDEpassword">
+                  <property name="maxLength">
+                   <number>512</number>
+                  </property>
+                  <property name="echoMode">
+                   <enum>QLineEdit::Password</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0" colspan="2">
+                 <widget class="QLabel" name="leaveLabel">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Leave free space up to:</string>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="6" rowspan="2">
+                 <widget class="QProgressBar" name="pbFDEpassMeter">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="2" colspan="4">
+                 <widget class="MLineEdit" name="FDEpassword2">
+                  <property name="maxLength">
+                   <number>512</number>
+                  </property>
+                  <property name="echoMode">
+                   <enum>QLineEdit::Password</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0" colspan="2">
+                 <widget class="QCheckBox" name="checkBoxEncryptAuto">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Encrypt</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QLabel" name="freeLabel">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>MB </string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="labelSliderPart">
+                  <property name="text">
+                   <string>Partitions:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="0" colspan="2">
+                 <widget class="QLabel" name="labelFDEpass">
+                  <property name="text">
+                   <string>Encryption password:</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -578,6 +656,12 @@
            <spacer name="verticalSpacer_3">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
            </spacer>
           </item>
@@ -691,6 +775,12 @@
               <spacer name="verticalSpacer_5">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
                </property>
               </spacer>
              </item>
@@ -992,6 +1082,12 @@
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
               </spacer>
              </item>
              <item row="22" column="0">
@@ -1168,6 +1264,12 @@
               <spacer name="horizontalSpacer_4">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
                </property>
               </spacer>
              </item>
@@ -1361,6 +1463,12 @@
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
               </spacer>
              </item>
              <item row="2" column="2" colspan="4">
@@ -1383,6 +1491,12 @@
            <spacer name="v_spacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
            </spacer>
           </item>
@@ -1604,6 +1718,12 @@
             <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
            </spacer>
           </item>
          </layout>
@@ -1661,6 +1781,12 @@
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
               </spacer>
              </item>
              <item row="3" column="0">
@@ -1702,6 +1828,12 @@
                 <spacer name="horizontalSpacer_7">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
                  </property>
                 </spacer>
                </item>
@@ -1747,6 +1879,12 @@
             </property>
             <property name="sizeType">
              <enum>QSizePolicy::Expanding</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
            </spacer>
           </item>
@@ -1851,6 +1989,12 @@
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
               </spacer>
              </item>
             </layout>
@@ -1876,6 +2020,12 @@
            <spacer>
             <property name="orientation">
              <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
            </spacer>
           </item>
@@ -2183,6 +2333,12 @@
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
               </spacer>
              </item>
             </layout>
@@ -2396,10 +2552,14 @@
   <tabstop>backButton</tabstop>
   <tabstop>nextButton</tabstop>
   <tabstop>entireDiskButton</tabstop>
+  <tabstop>diskCombo</tabstop>
+  <tabstop>sliderPart</tabstop>
+  <tabstop>freeSpaceEdit</tabstop>
   <tabstop>checkBoxEncryptAuto</tabstop>
-  <tabstop>customPartButton</tabstop>
   <tabstop>FDEpassword</tabstop>
   <tabstop>FDEpassword2</tabstop>
+  <tabstop>buttonAdvancedFDE</tabstop>
+  <tabstop>customPartButton</tabstop>
   <tabstop>saveHomeCheck</tabstop>
   <tabstop>badblocksCheck</tabstop>
   <tabstop>grubCheckBox</tabstop>
@@ -2428,102 +2588,51 @@
   <tabstop>copyrightBrowser</tabstop>
   <tabstop>csView</tabstop>
   <tabstop>tipsEdit</tabstop>
+  <tabstop>mainTabs</tabstop>
+  <tabstop>closeButton</tabstop>
+  <tabstop>mainHelp</tabstop>
+  <tabstop>listLog</tabstop>
+  <tabstop>FDEpassCust2</tabstop>
+  <tabstop>FDEpassCust</tabstop>
+  <tabstop>buttonAdvancedFDECust</tabstop>
+  <tabstop>buttonPartClear</tabstop>
+  <tabstop>buttonPartAdd</tabstop>
+  <tabstop>buttonPartRemove</tabstop>
+  <tabstop>buttonPartReload</tabstop>
+  <tabstop>treePartitions</tabstop>
+  <tabstop>buttonRunParted</tabstop>
+  <tabstop>buttonPartDefault</tabstop>
+  <tabstop>comboFDEhash</tabstop>
+  <tabstop>spinFDEkeysize</tabstop>
+  <tabstop>spinFDEroundtime</tabstop>
+  <tabstop>comboFDEchain</tabstop>
+  <tabstop>comboFDEcipher</tabstop>
+  <tabstop>buttonBenchmarkFDE</tabstop>
+  <tabstop>comboFDEivhash</tabstop>
+  <tabstop>comboFDEivgen</tabstop>
+  <tabstop>comboFDErandom</tabstop>
+  <tabstop>grubBootCombo</tabstop>
+  <tabstop>cmbTimeArea</tabstop>
+  <tabstop>radioOldHomeUse</tabstop>
+  <tabstop>radioOldHomeSave</tabstop>
+  <tabstop>radioOldHomeDelete</tabstop>
+  <tabstop>checkBoxExitReboot</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
    <sender>entireDiskButton</sender>
    <signal>toggled(bool)</signal>
-   <receiver>leaveLabel</receiver>
+   <receiver>groupAutoPart</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>332</x>
-     <y>208</y>
+     <x>354</x>
+     <y>145</y>
     </hint>
     <hint type="destinationlabel">
-     <x>334</x>
-     <y>381</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>entireDiskButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>freeSpaceEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>332</x>
-     <y>208</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>549</x>
-     <y>381</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>entireDiskButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>freeLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>332</x>
-     <y>208</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>581</x>
-     <y>381</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>entireDiskButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>checkBoxEncryptAuto</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>332</x>
-     <y>208</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>327</x>
-     <y>278</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>entireDiskButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>diskCombo</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>404</x>
-     <y>197</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>472</x>
-     <y>241</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>entireDiskButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>useDiskLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>377</x>
-     <y>201</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>319</x>
-     <y>236</y>
+     <x>354</x>
+     <y>162</y>
     </hint>
    </hints>
   </connection>

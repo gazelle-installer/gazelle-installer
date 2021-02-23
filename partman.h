@@ -65,6 +65,8 @@ class PartMan : public QObject
 public:
     bool automatic, sync;
     bool gptoverride, uefi;
+    long long rootSpaceNeeded = 0;
+    long long bootSpaceNeeded = 0;
     QMap<QString, QString> defaultLabels;
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
     void populate(QTreeWidgetItem *drvstart = nullptr);
@@ -74,7 +76,8 @@ public:
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
     QString mapperName(const QString &mount);
-    bool layoutDefault();
+    QTreeWidgetItem *selectedDriveAuto();
+    int layoutDefault(QTreeWidgetItem *driveitem, int rootPercent=100, bool updateTree=true);
     int countPrepSteps();
     bool prepareParts();
     void unmount(bool all = false);
