@@ -7,6 +7,17 @@
 
 ##launch installer
 
+##exit early if arguments present
+
+if [ -n "$1" ]; then
+	echo ""
+	echo "INFORMATION: options are not supported by this script"
+	echo "             use alternate authentication to launch installer"
+	echo "             sudo minstall [OPTIONS]"
+	echo ""
+	exit 0
+fi
+
 if test "$EUID" != 0; then
     # normal user
     ##disable Xfce automount features
@@ -47,7 +58,7 @@ if test "$EUID" != 0; then
 		AUTHENTICATION="su-to-root -X -c"
    fi
     
-    $AUTHENTICATION /usr/bin/minstall-launcher "--qtenv" "$QTENV" "${@}"
+    $AUTHENTICATION /usr/bin/minstall-launcher "--qtenv" "$QTENV"
     if [ -f "$QTENV" ] ; then
        rm  $QTENV
     fi
