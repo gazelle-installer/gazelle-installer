@@ -23,6 +23,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDesktopWidget>
+#include <QDir>
 #include <QFile>
 #include <QFont>
 #include <QLibraryInfo>
@@ -31,6 +32,7 @@
 #include <QMessageBox>
 #include <QScopedPointer>
 #include <QString>
+#include <QStringList>
 #include <QTranslator>
 
 #include "minstall.h"
@@ -104,6 +106,31 @@ int main(int argc, char *argv[])
     if (appTran.load(QString("gazelle-installer_") + QLocale::system().name(), "/usr/share/gazelle-installer/locale"))
         a.installTranslator(&appTran);
 
+    // SECURITY BODGE for MX Linux: users can run the installer
+    // on the installed system without root authentication.
+    // The new sudo config and scripts now only allow unauthenticated
+    // root access to the installer with zero command line arguments.
+    // This code ensures that "minstall" with zero arguments only works
+    // on the live system and not on the installed system.
+    // Below is a bodge. Ideally, the sudo config and scripts responsible for
+    // the installer exemption should only be present in a live environment.
+    if (!(parser.isSet("pretend") || parser.isSet("oobe"))) {
+        QStringList liveTests;
+        liveTests << "/live/aufs" << "/live/aufs/boot" << "/live/aufs/dev"
+            << "/live/aufs/etc" << "/live/aufs/var" << "/live/aufs/usr"
+            << "/live/aufs/root" << "/live/aufs/home";
+        for(const QString &test : liveTests) {
+            if(!QDir(test).exists()) {
+                QApplication::beep();
+                QMessageBox::critical(nullptr, QString(),
+                     QApplication::tr("This operation requires a live environment."));
+                qDebug() << "Live directory not found: " << test;
+                return EXIT_FAILURE;
+            }
+        }
+    }
+    // END OF SECURITY BODGE for MX Linux.
+
     // exit if "minstall" is already running
     if (system("ps -C minstall | sed '0,/minstall/{s/minstall//}' | grep minstall") == 0) {
         QMessageBox::critical(nullptr, QString(),
@@ -126,15 +153,11 @@ int main(int argc, char *argv[])
     }
 
     // alert the user if not running as root
-    if (getuid() != 0) {
+    if (!parser.isSet("pretend") && getuid()!=0) {
         QApplication::beep();
-        const QString &msg = QApplication::tr("You must run this app as root.");
-        if (parser.isSet("pretend")) {
-            QMessageBox::warning(nullptr, QString(), msg);
-        } else {
-            QMessageBox::critical(nullptr, QString(), msg);
-            return EXIT_FAILURE;
-        }
+        QMessageBox::critical(nullptr, QString(),
+            QApplication::tr("This operation requires root access."));
+        return EXIT_FAILURE;
     }
 
     QString cfgfile;
