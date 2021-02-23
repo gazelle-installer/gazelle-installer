@@ -346,7 +346,7 @@ void PartMan::partRemoveClick(bool)
 
 void PartMan::partDefaultClick(bool)
 {
-    layoutDefault();
+    layoutDefault(gui.treePartitions->selectedItems().value(0), 40, true);
 }
 
 QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &project)
@@ -631,41 +631,45 @@ QString PartMan::mapperName(const QString &mount)
     return mn.replace('/', '.');
 }
 
-bool PartMan::layoutDefault()
+QTreeWidgetItem *PartMan::selectedDriveAuto()
 {
     QString drv(gui.diskCombo->currentData().toString());
     int bdindex = listBlkDevs.findDevice(drv);
-    if (bdindex < 0) return false;
-    // Clear the existing layout from the target device.
-    QTreeWidgetItem *drivetree = nullptr;
+    if (bdindex<0) return nullptr;
     for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
         QTreeWidgetItem *twit = gui.treePartitions->topLevelItem(ixi);
-        if(twit->text(Device) == drv) {
-            drivetree = twit;
-            while(twit->childCount()) twit->removeChild(twit->child(0));
-            twit->setData(Device, Qt::UserRole, QVariant(false)); // Mark the drive as "unused".
-        }
+        if(twit->text(Device) == drv) return twit;
     }
-    if(!drivetree) return false;
-
+    return nullptr;
+}
+int PartMan::layoutDefault(QTreeWidgetItem *drivetree, int rootPercent, bool updateTree)
+{
+    if(updateTree) {
+        // Clear the existing layout from the target device.
+        while(drivetree->childCount()) drivetree->removeChild(drivetree->child(0));
+        // Mark the drive as "unused" as its layout will be replaced.
+        drivetree->setData(Device, Qt::UserRole, QVariant(false));
+    }
     // Drive geometry basics.
     bool ok = true;
     const QString &fsText = gui.freeSpaceEdit->text().trimmed();
     int free = fsText.isEmpty() ? 0 : fsText.toInt(&ok,10);
-    if (!ok) return false;
-    const int driveSize = listBlkDevs.at(bdindex).size / 1048576;
+    if (!ok) return 0;
+    const int driveSize = drivetree->data(Size, Qt::UserRole).toLongLong() / 1048576;
     int rootFormatSize = driveSize - 32; // Compensate for rounding errors.
     // Boot partitions.
     if(uefi) {
-        addItem(drivetree, 256, "ESP");
+        if(updateTree) addItem(drivetree, 256, "ESP");
         rootFormatSize -= 256;
     } else if(driveSize >= 2097152 || gptoverride) {
-        addItem(drivetree, 1, "bios_grub");
+        if(updateTree) addItem(drivetree, 1, "bios_grub");
         rootFormatSize -= 1;
     }
     if (gui.checkBoxEncryptAuto->isChecked()){
-        addItem(drivetree, 512, "boot");
-        rootFormatSize -= 512;
+        int bootFormatSize = 512;
+        while(bootFormatSize < (bootSpaceNeeded/1048576)) bootFormatSize*=2;
+        if(updateTree) addItem(drivetree, bootFormatSize, "boot");
+        rootFormatSize -= bootFormatSize;
     }
     // Operating system.
     int swapFormatSize = 2048;
@@ -678,11 +682,19 @@ bool PartMan::layoutDefault()
         if (free > (rootFormatSize - 8192)) free = rootFormatSize - 8192;
         rootFormatSize -= free;
     }
-    addItem(drivetree, rootFormatSize, "root");
-    addItem(drivetree, swapFormatSize, "swap");
-
-    labelParts(drivetree);
-    return true;
+    // Home
+    int homeFormatSize = rootFormatSize;
+    rootFormatSize = (rootFormatSize * rootPercent) / 100;
+    const int rootMinMB = rootSpaceNeeded / 1048576;
+    if(rootFormatSize < rootMinMB) rootFormatSize = rootMinMB;
+    homeFormatSize -= rootFormatSize;
+    if(updateTree) {
+        addItem(drivetree, rootFormatSize, "root");
+        addItem(drivetree, swapFormatSize, "swap");
+        if(homeFormatSize>0) addItem(drivetree, homeFormatSize, "home");
+        labelParts(drivetree);
+    }
+    return rootFormatSize;
 }
 
 int PartMan::countPrepSteps()

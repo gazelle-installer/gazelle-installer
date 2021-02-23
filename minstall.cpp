@@ -142,7 +142,7 @@ void MInstall::startup()
 
         // calculate required disk space
         bootSource = "/live/aufs/boot";
-        bootSpaceNeeded = proc.execOut("du -sb " + bootSource).section('\t', 0, 0).toLongLong();
+        partman.bootSpaceNeeded = proc.execOut("du -sb " + bootSource).section('\t', 0, 0).toLongLong();
 
         //rootspaceneeded is the size of the linuxfs file * a compression factor + contents of the rootfs.  conservative but fast
         //factors are same as used in live-remaster
@@ -181,17 +181,17 @@ void MInstall::startup()
 
         //add rootfs file size to the calculated linuxfs file size.  probaby conservative, as rootfs will likely have some overlap with linuxfs
         long long safety_factor = 128 * 1024 * 1024; // 128 MB safety factor
-        rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
+        partman.rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
 
-        if (!pretend && bootSpaceNeeded==0) {
+        if (!pretend && partman.bootSpaceNeeded==0) {
             QMessageBox::warning(this, windowTitle(),
                  tr("Cannot access source medium.\nActivating pretend installation."));
             pretend = true;
         }
         const long long spaceBlock = 134217728; // 128MB
-        bootSpaceNeeded += 2*spaceBlock - (bootSpaceNeeded % spaceBlock);
+        partman.bootSpaceNeeded += 2*spaceBlock - (partman.bootSpaceNeeded % spaceBlock);
 
-        qDebug() << "Minimum space:" << bootSpaceNeeded << "(boot)," << rootSpaceNeeded << "(root)";
+        qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
 
         // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
         if (proc.exec("uname -m | grep -q i686", false) && proc.exec("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
@@ -204,15 +204,16 @@ void MInstall::startup()
         autoMountEnabled = true; // disable auto mount by force
         if (!pretend) setupAutoMount(false);
 
-        // advanced encryption settings page defaults
-        on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
-        on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
-        on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
-
         partman.defaultLabels["/boot"] = "boot";
         partman.defaultLabels["/"] = "root" + PROJECTSHORTNAME + PROJECTVERSION;
         partman.defaultLabels["/home"] = "home" + PROJECTSHORTNAME;
         partman.defaultLabels["swap"] = "swap" + PROJECTSHORTNAME;
+        leaveLabel->hide(); freeSpaceEdit->hide(); freeLabel->hide(); // FIXME: This is a test.
+
+        // advanced encryption settings page defaults
+        on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
+        on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
+        on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
 
         FDEpassword->setDisabled(true);
         FDEpassword2->setDisabled(true);
@@ -1966,7 +1967,7 @@ int MInstall::showPage(int curr, int next)
                     return curr; // don't format - stop install
                 }
             }
-            partman.layoutDefault();
+            partman.layoutDefault(partman.selectedDriveAuto());
             return 5; // Go to Step_Boot
         }
     } else if (next == 4 && curr == 3) { // at Step_Partition (fwd)
@@ -2356,7 +2357,7 @@ void MInstall::updatePartitionWidgets()
     // disk combo box
     diskCombo->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDrive && bdinfo.size >= rootSpaceNeeded
+        if (bdinfo.isDrive && bdinfo.size >= partman.rootSpaceNeeded
                 && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
             bdinfo.addToCombo(diskCombo);
         }
@@ -2374,8 +2375,27 @@ void MInstall::updatePartitionWidgets()
         }
     }
 
-    // partition tree
+    // Partition tree.
     partman.populate();
+    // Partition slider.
+    setupPartitionSlider();
+}
+void MInstall::setupPartitionSlider()
+{
+    frameSliderPart->setDisabled(true);
+    const long long maxMB = 1073731338; // "1,023.99 GB"
+    const QString strMB = QLocale::system().formattedDataSize(maxMB,
+        2, QLocale::DataSizeTraditionalFormat);
+    // Allow the slider labels to fit all possible formatted sizes.
+    labelSliderRoot->setText(strMB+"\n"+tr("Root"));
+    labelSliderHome->setText(strMB+"\n"+tr("Home"));
+    qApp->processEvents(); // Allow labels to adjust their sizes.
+    labelSliderRoot->setMinimumWidth(labelSliderRoot->width());
+    labelSliderHome->setMinimumWidth(labelSliderHome->width());
+    qApp->processEvents(); // Allow labels to accept their sizes.
+    labelSliderRoot->setText("----");
+    labelSliderHome->setText("----");
+    on_sliderPart_valueChanged(-1);
 }
 
 void MInstall::buildServiceList()
@@ -2439,6 +2459,7 @@ void MInstall::changeEvent(QEvent *event)
         col.setAlpha(200);
         pal.setColor(QPalette::Base, col);
         mainHelp->setPalette(pal);
+        setupPartitionSlider();
         resizeEvent(nullptr);
     }
 }
@@ -2695,6 +2716,40 @@ void MInstall::on_buttonSetKeyboard_clicked()
         proc.exec("env GTK_THEME='Adwaita' fskbsetting", false);
     show();
     setupkeyboardbutton();
+}
+
+void MInstall::on_sliderPart_valueChanged(int value)
+{
+    QTreeWidgetItem *drvitem = partman.selectedDriveAuto();
+    if(!drvitem) return;
+    long long available = partman.layoutDefault(drvitem, 100, false);
+    const int rootMinMB = partman.rootSpaceNeeded / 1048576;
+    const int minPercent = (rootMinMB*100) / available;
+    if(value<0) { // Internal setup.
+        value = sliderPart->value();
+        frameSliderPart->setEnabled(true);
+    }
+    if(value<minPercent) {
+        if(value>=0) qApp->beep();
+        value = minPercent;
+        sliderPart->blockSignals(true);
+        sliderPart->setValue(value);
+        sliderPart->blockSignals(false);
+    }
+
+    const long long availRoot = partman.layoutDefault(drvitem, value, false);
+    QString valstr = QLocale::system().formattedDataSize(availRoot*1048576,
+        (availRoot>1023)?2:0, QLocale::DataSizeTraditionalFormat);
+    available -= availRoot;
+    labelSliderRoot->setText(valstr + "\n" + tr("Root"));
+
+    if(value==100) valstr = tr("----");
+    else {
+        valstr = QLocale::system().formattedDataSize(available*1048576,
+            (available>1023)?2:0, QLocale::DataSizeTraditionalFormat);
+        valstr += "\n" + tr("Home");
+    }
+    labelSliderHome->setText(valstr);
 }
 
 void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
