@@ -103,6 +103,7 @@ private slots:
     void on_buttonRunParted_clicked();
     void on_viewServicesButton_clicked();
 
+    void on_sliderPart_valueChanged(int value);
     void on_checkBoxEncryptAuto_toggled(bool checked);
     void on_customPartButton_clicked(bool checked);
 
@@ -215,6 +216,7 @@ private:
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets();
     void updatePartitionCombos(QComboBox *changed);
+    void setupPartitionSlider();
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
