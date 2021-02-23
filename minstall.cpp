@@ -183,19 +183,6 @@ void MInstall::startup()
         long long safety_factor = 128 * 1024 * 1024; // 128 MB safety factor
         rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
 
-        if (!pretend && bootSpaceNeeded==0) {
-            QMessageBox::warning(this, windowTitle(),
-                 tr("Cannot access source medium.\nActivating pretend installation."));
-            pretend = true;
-        }
-
-        //diable external root apps when pretend is true
-
-        if (pretend){
-            buttonSetKeyboard->setDisabled(true);
-            qtpartedButton->setDisabled(true);
-        }
-
         const long long spaceBlock = 134217728; // 128MB
         bootSpaceNeeded += 2*spaceBlock - (bootSpaceNeeded % spaceBlock);
 
