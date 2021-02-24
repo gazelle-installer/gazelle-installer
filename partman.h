@@ -53,7 +53,12 @@ class PartMan : public QObject
         int defaultMB = 1, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drive);
     static QString translateUse(const QString &alias);
+    void clearPartitionTables(const QString &dev);
+    bool formatLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
     void setEncryptChecks(const QString &use, enum Qt::CheckState state);
+    inline bool willFormatPart(QTreeWidgetItem *twit);
+    inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column);
+    inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column);
     void comboUseTextChange(const QString &text);
     void comboTypeTextChange(const QString &);
     void treeItemChange(QTreeWidgetItem *item, int column);
@@ -75,12 +80,14 @@ public:
     bool luksMake(const QString &dev, const QByteArray &password);
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
-    QString mapperName(const QString &mount);
+    QString mapperName(const QString &mount) const;
     QTreeWidgetItem *selectedDriveAuto();
     int layoutDefault(QTreeWidgetItem *driveitem, int rootPercent=100, bool updateTree=true);
     int countPrepSteps();
-    bool prepareParts();
+    bool preparePartitions();
+    bool formatPartitions();
     void unmount(bool all = false);
+    bool willFormatRoot();
 };
 
 #endif // PARTMAN_H
