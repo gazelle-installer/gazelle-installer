@@ -51,7 +51,6 @@ public:
     bool isInsideVB();
 
     bool installLoader();
-    bool makeLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
     bool mountPartition(const QString dev, const QString point, const QString mntops);
     void enableOOBE();
     bool processOOBE();
@@ -220,8 +219,6 @@ private:
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
-    bool makePartitions();
-    bool formatPartitions();
     bool installLinux(const int progend);
     bool copyLinux(const int progend);
     void failUI(const QString &msg);

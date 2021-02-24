@@ -561,8 +561,8 @@ bool MInstall::processNextPhase()
 
         // the core of the installation
         if (!pretend) {
-            bool ok = makePartitions();
-            if (ok) ok = formatPartitions();
+            bool ok = partman.preparePartitions();
+            if (ok) ok = partman.formatPartitions();
             if (!ok) {
                 failUI(tr("Failed to format required partitions."));
                 return false;
@@ -639,7 +639,6 @@ void MInstall::manageConfig(enum ConfigAction mode)
         } else {
             // Partition step
             config->setGroupWidget(Step_Partitions);
-            config->manageCheckBox("SaveHome", saveHomeCheck);
             config->manageCheckBox("BadBlocksCheck", badblocksCheck);
             // Swap space
             //config->manageComboBox("Swap/Device", swapCombo, true);
@@ -801,246 +800,13 @@ void MInstall::stashAdvancedFDE(bool save)
     }
 }
 
-bool MInstall::formatPartitions()
-{
-    proc.log(__PRETTY_FUNCTION__);
-    if (phase < 0) return false;
-    QString rootdev = rootDevice;
-    QString swapdev = swapDevice;
-    QString homedev = homeDevice;
-
-    // set up LUKS containers
-    const QByteArray &encPass = (entireDiskButton->isChecked()
-                                 ? FDEpassword : FDEpassCust)->text().toUtf8();
-    const QString &statup = tr("Setting up LUKS encrypted containers");
-    if (isSwapEncrypted) {
-        if (swapFormatSize) {
-            proc.status(statup);
-            if (!partman.luksMake(swapdev, encPass)) return false;
-        }
-        proc.status(statup);
-        if (!partman.luksOpen(swapdev, "swapfs", encPass)) return false;
-        swapdev = "/dev/mapper/swapfs";
-    }
-    if (isRootEncrypted) {
-        if (rootFormatSize) {
-            proc.status(statup);
-            if (!partman.luksMake(rootdev, encPass)) return false;
-        }
-        proc.status(statup);
-        if (!partman.luksOpen(rootdev, "rootfs", encPass)) return false;
-        rootdev = "/dev/mapper/rootfs";
-    }
-    if (isHomeEncrypted) {
-        if (homeFormatSize) {
-            proc.status(statup);
-            if (!partman.luksMake(homedev, encPass)) return false;
-        }
-        proc.status(statup);
-        if (!partman.luksOpen(homedev, "homefs", encPass)) return false;
-        homedev = "/dev/mapper/homefs";
-    }
-
-    //if no swap is chosen do nothing
-    if (swapFormatSize) {
-        proc.status(tr("Formatting swap partition"));
-        QString cmd("/sbin/mkswap " + swapdev);
-        //const QString &mkswaplabel = swapLabelEdit->text();
-        //if (!mkswaplabel.isEmpty()) cmd.append(" -L \"" + mkswaplabel + "\"");
-        if (!proc.exec(cmd, true)) return false;
-    }
-
-    // maybe format root (if not saving /home on root), or if using --sync option
-    if (rootFormatSize) {
-        proc.status(tr("Formatting the / (root) partition"));
-        if (!makeLinuxPartition(rootdev, "ext4", //rootTypeCombo->currentText(),
-                                badblocksCheck->isChecked(), "")) { // rootLabelEdit->text())) {
-            return false;
-        }
-    }
-    if (!mountPartition(rootdev, "/mnt/antiX", root_mntops)) return false;
-
-    // format and mount /boot if different than root
-    if (bootFormatSize) {
-        proc.status(tr("Formatting boot partition"));
-        if (!makeLinuxPartition(bootDevice, "ext4", false, "boot")) return false;
-    }
-
-    // format ESP if necessary
-    if (espFormatSize) {
-        proc.status(tr("Formatting EFI System Partition"));
-        if (!proc.exec("mkfs.msdos -F 32 " + espDevice)) return false;
-        proc.exec("parted -s /dev/" + BlockDeviceInfo::split(espDevice).at(0) + " set 1 esp on"); // sets boot flag and esp flag
-        proc.sleep(1000);
-    }
-    // maybe format home
-    if (homeFormatSize) {
-        proc.status(tr("Formatting the /home partition"));
-        if (!makeLinuxPartition(homedev, "ext4", //homeTypeCombo->currentText(),
-                                badblocksCheck->isChecked(), "")) { //homeLabelEdit->text())) {
-            return false;
-        }
-        proc.exec("/bin/rm -r /mnt/antiX/home", true);
-    }
-    mkdir("/mnt/antiX/home", 0755);
-    if (homedev != rootDevice) {
-        // not on root
-        proc.status(tr("Mounting the /home partition"));
-        if (!mountPartition(homedev, "/mnt/antiX/home", home_mntops)) return false;
-    }
-
-    return true;
-}
-
-bool MInstall::makeLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label)
-{
-    proc.log(__PRETTY_FUNCTION__);
-    if (phase < 0) return false;
-    QString homedev = homeDevice;
-    boot_mntops = "defaults,noatime";
-    if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
-        home_mntops = "defaults,noatime";
-    } else {
-        root_mntops = "defaults,noatime";
-    }
-
-    QString cmd;
-    if (type == "reiserfs") {
-        cmd = "mkfs.reiserfs -q";
-    } else if (type == "reiser4") {
-        cmd = "mkfs.reiser4 -f -y";
-    } else if (type.startsWith("btrfs")) {
-        // btrfs and set up fsck
-        proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
-        // set creation options for small drives using btrfs
-        QString size_str = proc.execOut("/sbin/sfdisk -s " + dev);
-        long long size = size_str.toLongLong();
-        size = size / 1024; // in MiB
-        // if drive is smaller than 6GB, create in mixed mode
-        if (size < 6000) {
-            cmd = "mkfs.btrfs -f -M -O skinny-metadata";
-        } else {
-            cmd = "mkfs.btrfs -f";
-        }
-        // if compression has been selected by user, set flag
-        if (type == "btrfs-zlib") {
-            if (homedev == dev || dev == "/dev/mapper/homefs") { // if formatting /home partition
-                home_mntops = "defaults,noatime,compress-force=zlib";
-            } else {
-                root_mntops = "defaults,noatime,compress-force=zlib";
-            }
-        } else if (type == "btrfs-lzo") {
-            if (homedev == dev || dev == "/dev/mapper/homefs") {  // if formatting /home partition
-                home_mntops = "defaults,noatime,compress-force=lzo";
-            } else {
-                root_mntops = "defaults,noatime,compress-force=lzo";
-            }
-        }
-    } else if (type == "xfs" || type == "f2fs") {
-        cmd = "mkfs." + type + " -f";
-    } else { // jfs, ext2, ext3, ext4
-        cmd = "mkfs." + type;
-        if (type == "jfs") cmd.append(" -q");
-        else cmd.append(" -F");
-        if (chkBadBlocks) cmd.append(" -c");
-    }
-
-    cmd.append(" " + dev);
-    if (!label.isEmpty()) {
-        if (type == "reiserfs" || type == "f2fs") cmd.append(" -l \"");
-        else cmd.append(" -L \"");
-        cmd.append(label + "\"");
-    }
-    if (!proc.exec(cmd)) return false;
-
-    if (type.startsWith("ext")) {
-        // ext4 tuning
-        proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
-    }
-    proc.sleep(1000);
-    return true;
-}
-
 ///////////////////////////////////////////////////////////////////////////
 // Make the chosen partitions and mount them
-
-bool MInstall::makePartitions()
-{
-    proc.log(__PRETTY_FUNCTION__);
-    if (phase < 0) return false;
-
-    // detach all existing partitions on the selected drive
-    for (const QString &strdev : listToUnmount) {
-        proc.exec("swapoff /dev/" + strdev, true);
-        proc.exec("/bin/umount /dev/" + strdev, true);
-    }
-    listToUnmount.clear();
-
-    long long start = 1; // start with 1 MB to aid alignment
-
-    auto lambdaPreparePart = [this, &start]
-            (const QString &strdev, long long size, const QString &type) -> bool {
-        const QStringList devsplit = BlockDeviceInfo::split(strdev);
-        bool rc = true;
-        // size=0 = nothing, size>0 = creation, size<0 = allocation.
-        if (size > 0) {
-            const long long end = start + size;
-            rc = proc.exec("parted -s --align optimal /dev/" + devsplit.at(0) + " mkpart " + type
-                         + " " + QString::number(start) + "MiB " + QString::number(end) + "MiB");
-            start = end;
-        } else if (size < 0){
-            // command to set the partition type
-            QString cmd;
-            const int ixdev = listBlkDevs.findDevice(devsplit.at(0));
-            if (ixdev >= 0 && listBlkDevs.at(ixdev).isGPT) {
-                cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
-            } else {
-                cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
-            }
-            rc = proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1)));
-        }
-        proc.sleep(1000);
-        return rc;
-    };
-
-    qDebug() << " ---- PARTITION FORMAT SCHEDULE ----";
-    qDebug() << "Root:" << rootDevice << rootFormatSize;
-    qDebug() << "Home:" << homeDevice << homeFormatSize;
-    qDebug() << "Swap:" << swapDevice << swapFormatSize;
-    qDebug() << "Boot:" << bootDevice << bootFormatSize;
-    qDebug() << "ESP:" << espDevice << espFormatSize;
-    qDebug() << "BIOS-GRUB:" << biosGrubDevice;
-
-    if (entireDiskButton->isChecked()) {
-        const QString &drv = diskCombo->currentData().toString();
-        proc.status(tr("Creating required partitions"));
-        //proc.exec(QStringLiteral("/bin/dd if=/dev/zero of=/dev/%1 bs=512 count=100").arg(drv));
-        clearpartitiontables(drv);
-        const bool useGPT = listBlkDevs.at(listBlkDevs.findDevice(drv)).isGPT;
-        if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
-    } else {
-        proc.status(tr("Preparing required partitions"));
-    }
-    proc.sleep(1000);
-
-    // any new partitions they will appear in this order on the disk
-    if (!biosGrubDevice.isEmpty()) {
-        if (!lambdaPreparePart(biosGrubDevice, 1, "primary")) return false;
-    }
-    if (!lambdaPreparePart(espDevice, espFormatSize, "ESP")) return false;
-    if (!lambdaPreparePart(bootDevice, bootFormatSize, "primary")) return false;
-    if (!lambdaPreparePart(rootDevice, rootFormatSize, "primary ext4")) return false;
-    if (!lambdaPreparePart(homeDevice, homeFormatSize, "primary")) return false;
-    if (!lambdaPreparePart(swapDevice, swapFormatSize, "primary")) return false;
-    proc.exec("partprobe -s", true);
-    proc.sleep(1000);
-    return true;
-}
 
 bool MInstall::saveHomeBasic()
 {
     proc.log(__PRETTY_FUNCTION__);
-    if (!(saveHomeCheck->isChecked())) return true;
+    if (partman.willFormatRoot()) return true;
     cleanup(false); // cleanup previous mounts
     // if preserving /home, obtain some basic information
     bool ok = false;
@@ -1259,7 +1025,7 @@ bool MInstall::copyLinux(const int progend)
     cmd = "/bin/cp -av";
     if (sync) {
         cmd = "rsync -av --delete";
-        if (saveHomeCheck->isChecked()) {
+        if (!partman.willFormatRoot()) {
             cmd.append(" --filter 'protect home/*'");
         }
     }
@@ -2531,7 +2297,6 @@ void MInstall::on_nextButton_clicked()
 {
     gotoPage(widgetStack->currentIndex() + 1);
 }
-
 void MInstall::on_backButton_clicked()
 {
     gotoPage(widgetStack->currentIndex() - 1);
@@ -2989,32 +2754,6 @@ void MInstall::on_radioOldHomeSave_toggled(bool)
 void MInstall::on_radioOldHomeDelete_toggled(bool)
 {
     on_radioOldHomeUse_toggled(false);
-}
-
-void MInstall::clearpartitiontables(const QString &dev)
-{
-    //setup block size and offsets info
-    QString bytes = proc.execOut("parted --script /dev/" + dev + " unit B print 2>/dev/null | sed -rn 's/^Disk.*: ([0-9]+)B$/\\1/ip\'");
-    qDebug() << "bytes is " << bytes;
-    int block_size = 512;
-    int pt_size = 17 * 1024;
-    int pt_count = pt_size / block_size;
-    int total_blocks = bytes.toLongLong() / block_size;
-    qDebug() << "total blocks is " << total_blocks;
-
-    //clear primary partition table
-    proc.exec("dd if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count));
-
-    // Clear out sneaky iso-hybrid partition table
-    proc.exec("dd if=/dev/zero of=/dev/" + dev +" bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=64");
-
-    // clear secondary partition table
-
-    if ( ! bytes.isEmpty()) {
-        int offset = total_blocks - pt_count;
-        proc.exec("dd conv=notrunc if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=" + QString::number(offset));
-    }
-
 }
 
 bool MInstall::checkForSnapshot()
