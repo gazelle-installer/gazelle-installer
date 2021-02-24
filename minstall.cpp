@@ -216,14 +216,15 @@ void MInstall::startup()
         homeLabelEdit->setEnabled(false);
         swapLabelEdit->setEnabled(false);
 
-        FDEpassword->hide();
-        FDEpassword2->hide();
-        labelFDEpass->hide();
-        labelFDEpass2->hide();
-        pbFDEpassMeter->hide();
-        buttonAdvancedFDE->hide();
-        gbEncrPass->hide();
-        existing_partitionsButton->hide();
+        FDEpassword->setEnabled(false);
+        FDEpassword2->setEnabled(false);
+        labelFDEpass->setEnabled(false);
+        labelFDEpass2->setEnabled(false);
+        pbFDEpassMeter->setEnabled(false);
+        buttonAdvancedFDE->setEnabled(false);
+        gbEncrPass->setEnabled(false);
+        existing_partitionsButton->setEnabled(false);
+        leaveLabel->hide(); freeSpaceEdit->hide(); freeLabel->hide();
 
         //disable encryption in gui if cryptsetup not present
         QFileInfo cryptsetup("/sbin/cryptsetup");
@@ -2761,12 +2762,12 @@ void MInstall::updatePartitionWidgets()
     diskCombo->setEnabled(true);
 
     // whole-disk vs custom-partition radio buttons
-    existing_partitionsButton->hide();
+    existing_partitionsButton->setDisabled(true);
     entireDiskButton->setChecked(true);
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (!bdinfo.isDrive) {
             // found at least one partition
-            existing_partitionsButton->show();
+            existing_partitionsButton->setEnabled(true);
             existing_partitionsButton->setChecked(true);
             break;
         }
@@ -3167,12 +3168,12 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
 {
     FDEpassword->clear();
     nextButton->setDisabled(checked);
-    FDEpassword->setVisible(checked);
-    FDEpassword2->setVisible(checked);
-    labelFDEpass->setVisible(checked);
-    labelFDEpass2->setVisible(checked);
-    pbFDEpassMeter->setVisible(checked);
-    buttonAdvancedFDE->setVisible(checked);
+    FDEpassword->setEnabled(checked);
+    FDEpassword2->setEnabled(checked);
+    labelFDEpass->setEnabled(checked);
+    labelFDEpass2->setEnabled(checked);
+    pbFDEpassMeter->setEnabled(checked);
+    buttonAdvancedFDE->setEnabled(checked);
     grubPbrButton->setDisabled(checked);
     if (checked) FDEpassword->setFocus();
 }
@@ -3204,9 +3205,9 @@ void MInstall::on_checkBoxEncryptSwap_toggled()
             || checkBoxEncryptHome->isChecked()
             || checkBoxEncryptSwap->isChecked();
     nextButton->setDisabled(encrypt);
-    if (!encrypt) gbEncrPass->hide();
-    else if(gbEncrPass->isHidden()) {
-        gbEncrPass->show();
+    if (!encrypt) gbEncrPass->setDisabled(true);
+    else if(!(gbEncrPass->isEnabled())) {
+        gbEncrPass->setEnabled(true);
         FDEpassCust->clear();
         FDEpassCust->setFocus();
     }
