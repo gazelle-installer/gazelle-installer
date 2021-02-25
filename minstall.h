@@ -148,35 +148,18 @@ private:
     // source medium
     QString rootSources;
     QString bootSource;
-    long long rootSpaceNeeded = 0;
-    long long bootSpaceNeeded = 0;
 
     // auto-mount setup
     QString listMaskedMounts;
     bool autoMountEnabled = true;
 
-    // if these variables are non-zero then the installer formats the partition
-    // if they are negative the installer formats an existing partition
-    long long rootFormatSize = 0;
-    long long homeFormatSize = 0;
-    long long swapFormatSize = 0;
-    long long bootFormatSize = 0;
-    long long espFormatSize = 0;
-
-    QString bootDevice;
     QString swapDevice;
     QString rootDevice;
     QString homeDevice;
-    QString espDevice;
-    QString biosGrubDevice;
 
     QWidget *nextFocus = nullptr;
     PartMan partman;
     BlockDeviceList listBlkDevs;
-    QStringList listToUnmount;
-    QString home_mntops = "defaults";
-    QString root_mntops = "defaults";
-    QString boot_mntops = "defaults";
     QStringList listHomes;
     SafeCache key;
 
