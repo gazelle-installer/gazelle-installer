@@ -808,7 +808,7 @@ bool PartMan::preparePartitions()
                 QWidget *twSize = gui.treePartitions->itemWidget(twit, Size);
                 const QString &useFor = comboUseFor->currentText();
                 const QString type(useFor.compare("ESP", Qt::CaseInsensitive)
-                    ? "mkpart primary " : "mkpart ESP ");
+                    ? " mkpart primary " : " mkpart ESP ");
                 const long long end = start + static_cast<QSpinBox *>(twSize)->value();
                 bool rc = proc.exec(cmdParted + type
                     + QString::number(start) + "MiB " + QString::number(end) + "MiB");
