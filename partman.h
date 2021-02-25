@@ -57,7 +57,8 @@ class PartMan : public QObject
     bool formatLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
     void setEncryptChecks(const QString &use, enum Qt::CheckState state);
     inline bool willFormatPart(QTreeWidgetItem *twit);
-    inline QString twitMappedDevice(QTreeWidgetItem * const twit, const bool full=false) const;
+    inline bool twitIsMapped(const QTreeWidgetItem * twit);
+    inline QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
     inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column);
     inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column);
     void comboUseTextChange(const QString &text);
@@ -86,6 +87,7 @@ public:
     int countPrepSteps();
     bool preparePartitions();
     bool formatPartitions();
+    bool makeFstab(bool populateMediaMounts);
     void unmount(bool all = false);
     bool willFormatRoot();
 };

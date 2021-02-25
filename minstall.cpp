@@ -898,7 +898,8 @@ bool MInstall::installLinux(const int progend)
     qDebug() << "Desktop menu";
     proc.exec("chroot /mnt/antiX desktop-menu --write-out-global", false);
 
-    makeFstab();
+    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
+    partman.makeFstab(POPULATE_MEDIA_MOUNTPOINTS);
     writeKeyFile();
     disablehiberanteinitramfs();
 
@@ -920,94 +921,6 @@ bool MInstall::installLinux(const int progend)
     }
 
     return true;
-}
-
-// create /etc/fstab file
-void MInstall::makeFstab()
-{
-    if (phase < 0) return;
-
-    // get config
-    QString rootdev = rootDevice;
-    QString homedev = homeDevice;
-    QString swapdev = swapDevice;
-
-    //get UUIDs
-    const QString cmdBlkID("blkid -o value UUID -s UUID ");
-    QString rootdevUUID = "UUID=" + proc.execOut(cmdBlkID + rootDevice);
-    QString homedevUUID = "UUID=" + proc.execOut(cmdBlkID + homeDevice);
-    QString swapdevUUID = "UUID=" + proc.execOut(cmdBlkID + swapDevice);
-    const QString bootdevUUID = "UUID=" + proc.execOut(cmdBlkID + bootDevice);
-
-    // if encrypting, modify devices to /dev/mapper categories
-    if (isRootEncrypted){
-        rootdev = "/dev/mapper/rootfs";
-        rootdevUUID = rootdev;
-    }
-    if (isHomeEncrypted) {
-        homedev = "/dev/mapper/homefs";
-        homedevUUID = homedev;
-    }
-    if (isSwapEncrypted) {
-        swapdev = "/dev/mapper/swapfs";
-        swapdevUUID = swapdev;
-    }
-    qDebug() << "Create fstab entries for:";
-    qDebug() << "rootdev" << rootdev << rootdevUUID;
-    qDebug() << "homedev" << homedev << homedevUUID;
-    qDebug() << "swapdev" << swapdev << swapdevUUID;
-    qDebug() << "bootdev" << bootDevice << bootdevUUID;
-
-    QString fstype = proc.execOut("blkid " + rootdev + " -o value -s TYPE");
-    QString dump_pass = "1 1";
-
-    if (fstype.startsWith("btrfs")) {
-        dump_pass = "1 0";
-    } else if (fstype.startsWith("reiser") ) {
-        root_mntops += ",notail";
-        dump_pass = "0 0";
-    }
-
-    QFile file("/mnt/antiX/etc/fstab");
-    if (file.open(QIODevice::WriteOnly)) {
-        QTextStream out(&file);
-        out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
-        out << rootdevUUID + " / " + fstype + " " + root_mntops + " " + dump_pass + "\n";
-        //add bootdev if present
-        //only ext4 (for now) for max compatibility with other linuxes
-        if (!bootDevice.isEmpty() && bootDevice != rootDevice) {
-            out << bootdevUUID + " /boot ext4 " + boot_mntops + " 1 1\n";
-        }
-        if (grubEspButton->isChecked()) {
-            const QString espdev = "/dev/" + grubBootCombo->currentData().toString();
-            const QString espdevUUID = "UUID=" + proc.execOut(cmdBlkID + espdev);
-            qDebug() << "espdev" << espdev << espdevUUID;
-            out << espdevUUID + " /boot/efi vfat defaults,noatime,dmask=0002,fmask=0113 0 0\n";
-        }
-        if (!homedev.isEmpty() && homedev != rootDevice) {
-            fstype = proc.execOut("blkid " + homedev + " -o value -s TYPE");
-            if (homeFormatSize) {
-                dump_pass = "1 2";
-                if (fstype.startsWith("btrfs")) {
-                    dump_pass = "1 2";
-                } else if (fstype.startsWith("reiser") ) {
-                    home_mntops += ",notail";
-                    dump_pass = "0 0";
-                }
-                out << homedevUUID + " /home " + fstype + " " + home_mntops + " " + dump_pass + "\n";
-            } else { // if not formatted
-                out << homedevUUID + " /home " + fstype + " defaults,noatime 1 2\n";
-            }
-        }
-        if (!swapdev.isEmpty()) {
-            out << swapdevUUID +" swap swap defaults 0 0 \n";
-        }
-        file.close();
-    }
-    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
-    if (POPULATE_MEDIA_MOUNTPOINTS) {
-        proc.exec("/sbin/make-fstab -O --install=/mnt/antiX --mntpnt=/media");
-    }
 }
 
 bool MInstall::copyLinux(const int progend)
