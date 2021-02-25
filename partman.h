@@ -88,8 +88,10 @@ public:
     bool preparePartitions();
     bool formatPartitions();
     bool makeFstab(bool populateMediaMounts);
+    bool mountPartitions();
     void unmount(bool all = false);
     bool willFormatRoot();
+    QString getMountDev(const QString &point, const bool mapped=true);
 };
 
 #endif // PARTMAN_H

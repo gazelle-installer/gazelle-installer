@@ -51,7 +51,6 @@ public:
     bool isInsideVB();
 
     bool installLoader();
-    bool mountPartition(const QString dev, const QString point, const QString mntops);
     void enableOOBE();
     bool processOOBE();
     bool validateUserInfo();
