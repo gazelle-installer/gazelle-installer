@@ -995,11 +995,15 @@ void PartMan::unmount(bool all)
         QString cmd("cryptsetup close swap%1");
         proc.exec(cmd.arg(twitMappedDevice(twit)), true);
     }
-    for(const auto &it : mounts.toStdMap()) {
-        proc.exec("/bin/umount -l /mnt/antiX" + it.first, true);
-        if(!(all || it.second->checkState(Encrypt))) continue;
+    QMapIterator<QString, QTreeWidgetItem *> it(mounts);
+    it.toBack();
+    while(it.hasPrevious()) {
+        it.previous();
+        proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
+        QTreeWidgetItem *twit = it.value();
+        if(!(all || twit->checkState(Encrypt))) continue;
         QString cmd("cryptsetup close %1");
-        proc.exec(cmd.arg(twitMappedDevice(it.second)), true);
+        proc.exec(cmd.arg(twitMappedDevice(twit)), true);
     }
 }
 
