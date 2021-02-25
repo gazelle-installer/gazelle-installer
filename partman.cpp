@@ -50,6 +50,7 @@ void PartMan::setup()
     gui.buttonPartAdd->setEnabled(false);
     gui.buttonPartRemove->setEnabled(false);
     gui.buttonPartClear->setEnabled(false);
+    gui.buttonPartDefault->setEnabled(false);
     defaultLabels["ESP"] = "EFI System";
     defaultLabels["bios_grub"] = "BIOS GRUB";
 }
@@ -305,15 +306,18 @@ void PartMan::treeSelChange()
     QIcon iconClear = QIcon::fromTheme("star-new-symbolic");
     if(twit) {
         bool used = true;
-        if(!(twit->parent())) used = twit->data(Device, Qt::UserRole).toBool();
+        const bool isDrive = (twit->parent()==nullptr);
+        if(isDrive) used = twit->data(Device, Qt::UserRole).toBool();
         else used = twit->parent()->data(Device, Qt::UserRole).toBool();
-        gui.buttonPartClear->setEnabled(twit->parent()==nullptr);
+        gui.buttonPartClear->setEnabled(isDrive);
         if(!used) iconClear = QIcon::fromTheme("undo");
         gui.buttonPartAdd->setEnabled(!used);
         gui.buttonPartRemove->setEnabled(!used && twit->parent());
+        gui.buttonPartDefault->setEnabled(isDrive);
     } else {
         gui.buttonPartAdd->setEnabled(false);
         gui.buttonPartRemove->setEnabled(false);
+        gui.buttonPartDefault->setEnabled(false);
     }
     gui.buttonPartClear->setIcon(iconClear);
 }
@@ -366,47 +370,52 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
     mounts.clear();
     swaps.clear();
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
-    while (*it) {
+    for(; *it; ++it) {
         QComboBox *comboUse = twitComboBox(*it, UseFor);
-        if(comboUse && !(comboUse->currentText().isEmpty())) {
-            QString mount = translateUse(comboUse->currentText());
-            const QString &devname = (*it)->text(Device);
-            if(!mount.startsWith("/") && comboUse->findText(mount)<0) {
-                QMessageBox::critical(master, master->windowTitle(),
-                    tr("Invalid use for %1: %2").arg(devname, mount));
-                return comboUse;
-            }
-            if(mount == "swap") {
-                swaps << *it;
-                mount.clear();
-            }
-            // Mount description
-            QString desc;
-            if(mount == "/") desc = "/ (root)";
-            else if(mount.isEmpty()) desc = tr("swap space");
-            else {
-                if(mount == "ESP") desc = tr("EFI System Partition");
-                else desc = mount;
-                if(mount != "/home") msgFormatList << devname << desc;
-            }
-            QTreeWidgetItem *twit = mounts.value(mount);
-
-            // The mount can only be selected once.
-            if(twit) {
-                QMessageBox::critical(master, master->windowTitle(),
-                    tr("%1 is already selected for: %2").arg(twit->text(Device), desc));
-                return comboUse;
-            } else {
-                if(!mount.isEmpty()) mounts.insert(mount, *it);
-                // Warn if using a non-Linux partition (potential install of another OS).
-                const int bdindex = listBlkDevs.findDevice(devname);
-                if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
-                    msgForeignList << devname << desc;
-                }
-            }
-            if((*it)->checkState(Encrypt) == Qt::Checked) encryptAny = true;
+        if(!comboUse || comboUse->currentText().isEmpty()) continue;
+        QString mount = translateUse(comboUse->currentText());
+        const QString &devname = (*it)->text(Device);
+        if(!mount.startsWith("/") && comboUse->findText(mount)<0) {
+            QMessageBox::critical(master, master->windowTitle(),
+                tr("Invalid use for %1: %2").arg(devname, mount));
+            return comboUse;
         }
-        ++it;
+        if(mount == "swap") {
+            swaps << *it;
+            mount.clear();
+        }
+        // Mount description
+        QString desc;
+        if(mount == "/") desc = "/ (root)";
+        else if(mount.isEmpty()) desc = tr("swap space");
+        else {
+            if(mount == "ESP") desc = tr("EFI System Partition");
+            else desc = mount;
+            if(mount != "/home") msgFormatList << devname << desc;
+        }
+        QTreeWidgetItem *twit = mounts.value(mount);
+
+        // The mount can only be selected once.
+        if(twit) {
+            QMessageBox::critical(master, master->windowTitle(),
+                tr("%1 is already selected for: %2").arg(twit->text(Device), desc));
+            return comboUse;
+        } else {
+            if(!mount.isEmpty()) mounts.insert(mount, *it);
+            // Warn if using a non-Linux partition (potential install of another OS).
+            const int bdindex = listBlkDevs.findDevice(devname);
+            if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
+                msgForeignList << devname << desc;
+            }
+        }
+        QVariant mapperData;
+        if((*it)->checkState(Encrypt) == Qt::Checked) {
+            if(mount.isEmpty()) mapperData = QString("fs.swap%1").arg(swaps.count()-1);
+            else if(mount == "/") mapperData = "fs.root";
+            else mapperData = QString("fs%1").arg(mounts.count()) + mount.replace('/', '.');
+            encryptAny = true;
+        }
+        (*it)->setData(Device, Qt::UserRole, mapperData);
     }
 
     if(encryptAny) {
@@ -605,16 +614,6 @@ bool PartMan::luksOpen(const QString &dev, const QString &luksfs,
     if (!luksfs.isEmpty()) cmd += " " + luksfs;
     if (!options.isEmpty()) cmd += " " + options;
     return proc.exec(cmd, true, &password);
-}
-
-QString PartMan::mapperName(const QString &mount) const
-{
-    if(mount.isEmpty() || mount == "/") return "fs.root";
-    QString mn("fs");
-    int nslash = mount.count('/');
-    if(nslash > 1) mn = QString::number(nslash-1);
-    mn += mount;
-    return mn.replace('/', '.');
 }
 
 QTreeWidgetItem *PartMan::selectedDriveAuto()
@@ -832,27 +831,26 @@ bool PartMan::formatPartitions()
                                  ? gui.FDEpassword : gui.FDEpassCust)->text().toUtf8();
     const QString &statup = tr("Setting up LUKS encrypted containers");
     // Swap partitions.
-    for(int ixi = swaps.count()-1; ixi>=0; --ixi) {
-        QTreeWidgetItem *twit = swaps.at(ixi);
-        const QString &dev = twit->text(Device);
+    for(QTreeWidgetItem *twit : swaps) {
+        const QString dev = "/dev/" + twit->text(Device);
         if(!(twit->checkState(Encrypt))) continue;
         if(willFormatPart(twit)) {
             proc.status(statup);
             if(!luksMake(dev, encPass)) return false;
         }
         proc.status(statup);
-        if (!luksOpen(dev, QString("swap%1").arg(ixi), encPass)) return false;
+        if (!luksOpen(dev, twitMappedDevice(twit), encPass)) return false;
     }
     // Other partitions.
-    for(const auto &it : mounts.toStdMap()) {
-        const QString &dev = it.first;
-        if(!(it.second->checkState(Encrypt))) continue;
-        if(willFormatPart(it.second)) {
+    for(QTreeWidgetItem *twit : mounts) {
+        const QString dev = "/dev/" + twit->text(Device);
+        if(!(twit->checkState(Encrypt))) continue;
+        if(willFormatPart(twit)) {
             proc.status(statup);
             if (!luksMake(dev, encPass)) return false;
         }
         proc.status(statup);
-        if (!luksOpen(dev, mapperName(dev), encPass)) return false;
+        if (!luksOpen(dev, twitMappedDevice(twit), encPass)) return false;
     }
 
     // Format all swaps.
@@ -860,9 +858,7 @@ bool PartMan::formatPartitions()
         QTreeWidgetItem *twit = swaps.at(ixi);
         if(!willFormatPart(twit)) continue;
         proc.status(tr("Formatting swap partitions"));
-        QString dev = twit->text(Device);
-        if(twit->checkState(Encrypt)) dev = QString("swap%1").arg(ixi);
-        QString cmd("/sbin/mkswap " + dev);
+        QString cmd("/sbin/mkswap " + twitMappedDevice(twit, true));
         const QString &label = twitLineEdit(twit, Label)->text();
         if(!label.isEmpty()) cmd.append(" -L \"" + label + "\"");
         if(!proc.exec(cmd, true)) return false;
@@ -872,15 +868,15 @@ bool PartMan::formatPartitions()
     for(const auto &it : mounts.toStdMap()) {
         QTreeWidgetItem *twit = it.second;
         if(!willFormatPart(twit)) continue;
-        QString dev = it.first;
-        proc.status(tr("Formatting partition: %1").arg(dev));
-        if(twit->checkState(Encrypt)) dev = mapperName(dev);
+        proc.status(tr("Formatting: %1").arg(it.first));
         if(twitComboBox(twit, UseFor)->currentText().compare("ESP", Qt::CaseInsensitive) == 0) {
+            const QString &dev = twit->text(Device);
             proc.status(tr("Formatting EFI System Partition"));
             if (!proc.exec("mkfs.msdos -F 32 " + dev)) return false;
             // Sets boot flag and ESP flag.
             proc.exec("parted -s /dev/" + BlockDeviceInfo::split(dev).at(0) + " set 1 esp on");
         } else {
+            const QString &dev = twitMappedDevice(twit, true);
             if(!formatLinuxPartition(dev, twitComboBox(twit, Type)->currentText(),
                 badblocks, twitLineEdit(twit, Label)->text())) return false;
         }
@@ -939,22 +935,16 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &type, bool
 
 void PartMan::unmount(bool all)
 {
-    for(int ixi = swaps.count()-1; ixi>=0; --ixi) {
-        if(all || swaps.at(ixi)->checkState(Encrypt)) {
-            QString cmd("cryptsetup close swap%1");
-            proc.exec(cmd.arg(ixi), true);
-        }
+    for(QTreeWidgetItem *twit : swaps) {
+        if(!(all || twit->checkState(Encrypt))) continue;
+        QString cmd("cryptsetup close swap%1");
+        proc.exec(cmd.arg(twitMappedDevice(twit)), true);
     }
-    QMapIterator<QString, QTreeWidgetItem *> mi(mounts);
-    mi.toBack();
-    while(mi.hasPrevious()) {
-        mi.previous();
-        proc.exec("/bin/umount -l /mnt/antiX" + mi.key(), true);
-        QTreeWidgetItem *twit = mi.value();
-        if(all || twit->checkState(Encrypt)) {
-            QString cmd("cryptsetup close %1");
-            proc.exec(cmd.arg(mapperName(mi.key())), true);
-        }
+    for(const auto &it : mounts.toStdMap()) {
+        proc.exec("/bin/umount -l /mnt/antiX" + it.first, true);
+        if(!(all || it.second->checkState(Encrypt))) continue;
+        QString cmd("cryptsetup close %1");
+        proc.exec(cmd.arg(twitMappedDevice(it.second)), true);
     }
 }
 
@@ -970,6 +960,16 @@ inline bool PartMan::willFormatPart(QTreeWidgetItem *twit)
 {
     QComboBox *combo = twitComboBox(twit, Type);
     return !(combo->currentData(Qt::UserRole).toBool());
+}
+inline QString PartMan::twitMappedDevice(QTreeWidgetItem *const twit, const bool full) const
+{
+    const QVariant &d = twit->data(Device, Qt::UserRole);
+    if(d.isNull()) {
+        if(!full) return twit->text(Device);
+        else return "/dev/" + twit->text(Device);
+    }
+    if(full) return "/dev/mapper/" + d.toString();
+    return d.toString();
 }
 inline QComboBox *PartMan::twitComboBox(QTreeWidgetItem  *twit, int column)
 {
