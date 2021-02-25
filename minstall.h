@@ -61,7 +61,6 @@ public:
     void buildBootLists();
     void buildServiceList();
     void disablehiberanteinitramfs();
-    void makeFstab();
     bool processNextPhase();
     void setLocale();
     void setServices();

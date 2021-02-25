@@ -260,9 +260,12 @@ void PartMan::comboTypeTextChange(const QString &)
         QComboBox *comboUse = twitComboBox(*it, UseFor);
         if(comboUse && !(comboUse->currentText().isEmpty())) {
             QComboBox *comboType = twitComboBox(*it, Type);
-            if(!comboType) return;
+            QLineEdit *editOpts = twitLineEdit(*it, Options);
+            if(!comboType || !editOpts) return;
             const QString &type = comboType->currentText();
             if(type.startsWith("ext") || type == "jfs") canCheckBlocks = true;
+            else if(type.startsWith("reiser")) editOpts->setText("defaults,notail");
+            else editOpts->setText("defaults");
         }
         ++it;
     }
@@ -933,6 +936,58 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &type, bool
     return true;
 }
 
+// create /etc/fstab file
+bool PartMan::makeFstab(bool populateMediaMounts)
+{
+    QFile file("/mnt/antiX/etc/fstab");
+    if(!file.open(QIODevice::WriteOnly)) return false;
+
+    QTextStream out(&file);
+    out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
+    const QString cmdBlkID("blkid -o value UUID -s UUID ");
+    // File systems
+    for(auto &it : mounts.toStdMap()) {
+        if(it.first == "EFI") continue; // EFI will be dealt with later.
+        const QString &dev = twitMappedDevice(it.second, true);
+        qDebug() << "Creating fstab entry for:" << it.first << dev;
+        // Device ID or UUID
+        if(twitIsMapped(it.second)) out << dev;
+        else out << "UUID=" + proc.execOut(cmdBlkID + dev);
+        // Mount point, file system
+        QString fstype = proc.execOut("blkid " + dev + " -o value -s TYPE");
+        out << " " << it.first << " " << fstype;
+        // Options
+        out << " " << twitLineEdit(it.second, Options)->text();
+        // Dump, pass
+        if(fstype.startsWith("reiser")) out << " 0 0";
+        else if(it.first=="/boot") out << " 1 1\n";
+        else if(it.first=="/") {
+            if(fstype.startsWith("btrfs")) out << " 1 0\n";
+            else out << " 1 1\n";
+        } else out << " 1 2\n";
+    }
+    // Swap spaces
+    for(QTreeWidgetItem *twit : swaps) {
+        const QString &dev = twitMappedDevice(twit, true);
+        if(twitIsMapped(twit)) out << dev;
+        else out << "UUID=" + proc.execOut(cmdBlkID + dev);
+        out << " swap swap " << twitLineEdit(twit, Options)->text() << " 0 0\n";
+    }
+    // EFI System Partition
+    if (gui.grubEspButton->isChecked()) {
+        const QString espdev = "/dev/" + gui.grubBootCombo->currentData().toString();
+        const QString espdevUUID = "UUID=" + proc.execOut(cmdBlkID + espdev);
+        qDebug() << "espdev" << espdev << espdevUUID;
+        out << espdevUUID + " /boot/efi vfat defaults,noatime,dmask=0002,fmask=0113 0 0\n";
+    }
+    file.close();
+    if (populateMediaMounts) {
+        if(!proc.exec("/sbin/make-fstab -O --install=/mnt/antiX"
+            " --mntpnt=/media")) return false;
+    }
+    return true;
+}
+
 void PartMan::unmount(bool all)
 {
     for(QTreeWidgetItem *twit : swaps) {
@@ -961,15 +1016,22 @@ inline bool PartMan::willFormatPart(QTreeWidgetItem *twit)
     QComboBox *combo = twitComboBox(twit, Type);
     return !(combo->currentData(Qt::UserRole).toBool());
 }
-inline QString PartMan::twitMappedDevice(QTreeWidgetItem *const twit, const bool full) const
+inline bool PartMan::twitIsMapped(const QTreeWidgetItem * twit)
 {
-    const QVariant &d = twit->data(Device, Qt::UserRole);
-    if(d.isNull()) {
-        if(!full) return twit->text(Device);
-        else return "/dev/" + twit->text(Device);
+    if(twit->parent()!=nullptr) return false;
+    return !(twit->data(Device, Qt::UserRole).isNull());
+}
+inline QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool full) const
+{
+    if(twit->parent()==nullptr) {
+        const QVariant &d = twit->data(Device, Qt::UserRole);
+        if(!d.isNull()) {
+            if(full) return "/dev/mapper/" + d.toString();
+            return d.toString();
+        }
     }
-    if(full) return "/dev/mapper/" + d.toString();
-    return d.toString();
+    if(!full) return twit->text(Device);
+    else return "/dev/" + twit->text(Device);
 }
 inline QComboBox *PartMan::twitComboBox(QTreeWidgetItem  *twit, int column)
 {
