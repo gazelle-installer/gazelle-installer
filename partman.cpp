@@ -421,6 +421,11 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
         }
         (*it)->setData(Device, Qt::UserRole, mapperData);
     }
+    qDebug() << "Mount points:";
+    for(const auto &it : mounts.toStdMap()) {
+        qDebug() << " -" << it.first << '-' << it.second->text(Device)
+            << twitMappedDevice(it.second) << twitMappedDevice(it.second, true);
+    }
 
     if(encryptAny) {
         // TODO: Validate encryption settings.
@@ -992,6 +997,7 @@ bool PartMan::mountPartitions()
 {
     proc.log(__PRETTY_FUNCTION__);
     for(auto &it : mounts.toStdMap()) {
+        if(it.first.at(0)!='/') continue;
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = twitMappedDevice(it.second, true);
         proc.status(tr("Mounting: %1").arg(dev));
@@ -1018,6 +1024,7 @@ void PartMan::unmount(bool all)
     it.toBack();
     while(it.hasPrevious()) {
         it.previous();
+        if(it.key().at(0)!='/') continue;
         proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
         QTreeWidgetItem *twit = it.value();
         if(!(all || twit->checkState(Encrypt))) continue;

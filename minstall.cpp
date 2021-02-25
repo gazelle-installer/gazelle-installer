@@ -1007,6 +1007,9 @@ bool MInstall::installLoader()
     boot.insert(0, "/dev/");
 
     if (grubMbrButton->isChecked() && ixboot >= 0) {
+        const QString &bootDevice = partman.getMountDev("/boot", false);
+        const QString &rootDevice = partman.getMountDev("/", false);
+        const QString &homeDevice = partman.getMountDev("/home", false);
         QString part_num;
         if (bootDevice.startsWith(boot)) part_num = bootDevice;
         else if (rootDevice.startsWith(boot)) part_num = rootDevice;
@@ -1018,6 +1021,7 @@ bool MInstall::installLoader()
         const char *bootflag = nullptr;
         if (listBlkDevs.at(ixboot).isGPT) {
             if (!part_num.isEmpty()) bootflag = " legacy_boot on";
+            const QString &biosGrubDevice = partman.getMountDev("bios_grub", false);
             if (!biosGrubDevice.isEmpty()) {
                 QStringList devsplit(BlockDeviceInfo::split(biosGrubDevice));
                 proc.exec("parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1) + " bios_grub on", true);
@@ -1104,9 +1108,7 @@ bool MInstall::installLoader()
     finalcmdline.removeAll("BOOT_IMAGE=/antiX/vmlinuz");
 
     //remove nosplash boot code if configured in installer.conf
-    if (REMOVE_NOSPLASH) {
-        finalcmdline.removeAll("nosplash");
-    }
+    if (REMOVE_NOSPLASH) finalcmdline.removeAll("nosplash");
     //remove in null or empty strings that might have crept in
     finalcmdline.removeAll({});
     qDebug() << "Add cmdline options to Grub" << finalcmdline;
@@ -1716,7 +1718,6 @@ void MInstall::pageDisplayed(int next)
             phase = 0;
             proc.unhalt();
             updatePartitionWidgets();
-            listToUnmount.clear();
             updateCursor();
         }
         break;
