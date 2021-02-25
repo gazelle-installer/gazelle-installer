@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
     // the installer exemption should only be present in a live environment.
     if (!(parser.isSet("pretend") || parser.isSet("oobe"))) {
         QStringList liveTests;
-        liveTests << "/live/aufs" << "/live/aufs/boot" << "/live/aufs/dev"
-            << "/live/aufs/etc" << "/live/aufs/var" << "/live/aufs/usr"
-            << "/live/aufs/root" << "/live/aufs/home";
+        liveTests << "/live/linux" << "/live/aufs" << "/live/aufs/boot"
+            << "/live/aufs/dev" << "/live/aufs/etc" << "/live/aufs/var"
+            << "/live/aufs/usr" << "/live/aufs/root" << "/live/aufs/home";
         for(const QString &test : liveTests) {
             if(!QDir(test).exists()) {
                 QApplication::beep();

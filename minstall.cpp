@@ -1463,6 +1463,15 @@ bool MInstall::setUserInfo()
     cmd = QString("touch " + rootpath + "/var/mail/%1").arg(userNameEdit->text());
     proc.exec(cmd);
 
+    // FIX for MX-19 and earlier: Ensure graphical sudo works with password-free root.
+    if(rootPass.isEmpty()) {
+        QFile file(rootpath + "/etc/polkit-1/localauthority.conf.d/55-tweak-override.conf");
+        if (file.open(QIODevice::WriteOnly)) {
+            QTextStream(&file) << "[Configuration]\nAdminIdentities=unix-group:sudo";
+        }
+        file.close();
+    }
+
     return true;
 }
 
