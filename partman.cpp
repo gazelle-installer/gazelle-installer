@@ -19,6 +19,7 @@
 //
 // This file is part of the gazelle-installer.
 
+#include <sys/stat.h>
 #include <QDebug>
 #include <QTimer>
 #include <QLocale>
@@ -793,7 +794,7 @@ bool PartMan::preparePartitions()
                 QTreeWidgetItem *twit = drvitem->child(ixdev);
                 QComboBox *comboUseFor = twitComboBox(twit, UseFor);
                 if(!comboUseFor || comboUseFor->currentText().isEmpty()) continue;
-                const QStringList devsplit = BlockDeviceInfo::split(twit->text(Device));
+                const QStringList devsplit(BlockDeviceInfo::split("/dev/" + twit->text(Device)));
                 if(!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1)))) return false;
                 proc.sleep(1000);
             }
@@ -872,14 +873,13 @@ bool PartMan::formatPartitions()
         QTreeWidgetItem *twit = it.second;
         if(!willFormatPart(twit)) continue;
         proc.status(tr("Formatting: %1").arg(it.first));
+        const QString &dev = twitMappedDevice(twit, true);
         if(twitComboBox(twit, UseFor)->currentText().compare("ESP", Qt::CaseInsensitive) == 0) {
-            const QString &dev = twit->text(Device);
             proc.status(tr("Formatting EFI System Partition"));
             if (!proc.exec("mkfs.msdos -F 32 " + dev)) return false;
             // Sets boot flag and ESP flag.
             proc.exec("parted -s /dev/" + BlockDeviceInfo::split(dev).at(0) + " set 1 esp on");
         } else {
-            const QString &dev = twitMappedDevice(twit, true);
             if(!formatLinuxPartition(dev, twitComboBox(twit, Type)->currentText(),
                 badblocks, twitLineEdit(twit, Label)->text())) return false;
         }
@@ -988,6 +988,25 @@ bool PartMan::makeFstab(bool populateMediaMounts)
     return true;
 }
 
+bool PartMan::mountPartitions()
+{
+    proc.log(__PRETTY_FUNCTION__);
+    for(auto &it : mounts.toStdMap()) {
+        const QString point("/mnt/antiX" + it.first);
+        const QString &dev = twitMappedDevice(it.second, true);
+        proc.status(tr("Mounting: %1").arg(dev));
+        mkdir(point.toUtf8(), 0755);
+        if(it.first=="/boot") {
+             // needed to run fsck because sfdisk --part-type can mess up the partition
+            if(!proc.exec("fsck.ext4 -y " + dev)) return false;
+        }
+        const QString &cmd = QString("/bin/mount %1 %2 -o %3").arg(dev,
+            point, twitLineEdit(it.second, Options)->text());
+        if(!proc.exec(cmd)) return false;
+    }
+    return true;
+}
+
 void PartMan::unmount(bool all)
 {
     for(QTreeWidgetItem *twit : swaps) {
@@ -1012,6 +1031,14 @@ bool PartMan::willFormatRoot()
     QTreeWidgetItem *rootitem = mounts.value("/");
     if(rootitem) return willFormatPart(rootitem);
     return false;
+}
+
+QString PartMan::getMountDev(const QString &point, const bool mapped)
+{
+    const QTreeWidgetItem *twit = mounts.value(point);
+    if(!twit) return QString();
+    if(mapped) return twitMappedDevice(twit, true);
+    return QString("/dev" + twit->text(Device));
 }
 
 // Helpers
