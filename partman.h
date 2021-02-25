@@ -57,6 +57,7 @@ class PartMan : public QObject
     bool formatLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
     void setEncryptChecks(const QString &use, enum Qt::CheckState state);
     inline bool willFormatPart(QTreeWidgetItem *twit);
+    inline QString twitMappedDevice(QTreeWidgetItem * const twit, const bool full=false) const;
     inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column);
     inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column);
     void comboUseTextChange(const QString &text);
@@ -80,7 +81,6 @@ public:
     bool luksMake(const QString &dev, const QByteArray &password);
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
-    QString mapperName(const QString &mount) const;
     QTreeWidgetItem *selectedDriveAuto();
     int layoutDefault(QTreeWidgetItem *driveitem, int rootPercent=100, bool updateTree=true);
     int countPrepSteps();
