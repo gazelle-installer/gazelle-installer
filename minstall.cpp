@@ -533,15 +533,6 @@ void MInstall::disablehiberanteinitramfs()
     }
 }
 
-bool MInstall::mountPartition(const QString dev, const QString point, const QString mntops)
-{
-    proc.log(__PRETTY_FUNCTION__);
-    if (phase < 0) return -1;
-    mkdir(point.toUtf8(), 0755);
-    QString cmd = QString("/bin/mount %1 %2 -o %3").arg(dev).arg(point).arg(mntops);
-    return proc.exec(cmd);
-}
-
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
@@ -800,9 +791,6 @@ void MInstall::stashAdvancedFDE(bool save)
     }
 }
 
-///////////////////////////////////////////////////////////////////////////
-// Make the chosen partitions and mount them
-
 bool MInstall::saveHomeBasic()
 {
     proc.log(__PRETTY_FUNCTION__);
@@ -811,21 +799,24 @@ bool MInstall::saveHomeBasic()
     // if preserving /home, obtain some basic information
     bool ok = false;
     const QByteArray &pass = FDEpassCust->text().toUtf8();
-    QString rootdev = rootDevice;
-    QString homedev = homeDevice;
+    QString rootdev = partman.getMountDev("/", false);
+    QString homedev = partman.getMountDev("/home", false);
+    const QString cmdMount("/bin/mount %1 %2 -o ro");
     // mount the root partition
     if (isRootEncrypted) {
         if (!partman.luksOpen(rootdev, "rootfs", pass, "--readonly")) return false;
         rootdev = "/dev/mapper/rootfs";
     }
-    if (!mountPartition(rootdev, "/mnt/antiX", "ro")) goto ending2;
+    mkdir("/mnt/antiX", 0755);
+    if(!proc.exec(cmdMount.arg(rootdev, "/mnt/antiX"))) goto ending2;
     // mount the home partition
-    if (homedev != rootDevice) {
+    if(!homedev.isEmpty()) {
         if (isHomeEncrypted) {
             if (!partman.luksOpen(homedev, "homefs", pass, "--readonly")) goto ending2;
             homedev = "/dev/mapper/homefs";
         }
-        if (!mountPartition(homedev, "/mnt/home-tmp", "ro")) goto ending1;
+        mkdir("/mnt/home-tmp", 0755);
+        if (!proc.exec(cmdMount.arg(homedev, "/mnt/home-tmp"))) goto ending1;
     }
 
     // store a listing of /home to compare with the user name given later
@@ -836,7 +827,7 @@ bool MInstall::saveHomeBasic()
     ok = true;
  ending1:
     // unmount partitions
-    if (homedev != rootDevice) {
+    if (!homedev.isEmpty()) {
         proc.exec("/bin/umount -l /mnt/home-tmp", false);
         if (isHomeEncrypted) proc.exec("cryptsetup close homefs", true);
         proc.exec("rmdir /mnt/home-tmp");
@@ -850,13 +841,11 @@ bool MInstall::saveHomeBasic()
 bool MInstall::installLinux(const int progend)
 {
     proc.log(__PRETTY_FUNCTION__);
-    QString rootdev = (isRootEncrypted ? "/dev/mapper/rootfs" : rootDevice);
     if (phase < 0) return false;
 
-    if (!(rootFormatSize || sync)) {
+    if(!partman.mountPartitions()) return false;
+    if(!partman.willFormatRoot()) {
         // if root was not formatted and not using --sync option then re-use it
-        proc.status(tr("Mounting the / (root) partition"));
-        mountPartition(rootdev, "/mnt/antiX", root_mntops);
         // remove all folders in root except for /home
         proc.status(tr("Deleting old system"));
         proc.exec("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;", false);
@@ -875,16 +864,6 @@ bool MInstall::installLinux(const int progend)
     mkdir("/mnt/antiX/proc", 0755);
     mkdir("/mnt/antiX/sys", 0755);
     mkdir("/mnt/antiX/run", 0755);
-
-    //if separate /boot in use, mount that to /mnt/antiX/boot
-    if (!bootDevice.isEmpty() && bootDevice != rootDevice) {
-        mkdir("/mnt/antiX/boot", 0755);
-        proc.exec("fsck.ext4 -y " + bootDevice); // needed to run fsck because sfdisk --part-type can mess up the partition
-        if (!mountPartition(bootDevice, "/mnt/antiX/boot", boot_mntops)) {
-            qDebug() << "Could not mount /boot on " + bootDevice;
-            return false;
-        }
-    }
 
     setupAutoMount(true);
     if(!copyLinux(progend - 1)) return false;
