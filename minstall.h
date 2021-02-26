@@ -89,6 +89,7 @@ public:
     void cleanup(bool endclean = true);
 
 private slots:
+    void on_splitter_splitterMoved(int, int);
     void on_mainTabs_currentChanged(int index);
 
     void on_abortInstallButton_clicked();
