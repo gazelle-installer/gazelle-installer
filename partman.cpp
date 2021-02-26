@@ -432,7 +432,7 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
     }
     QTreeWidgetItem *rootitem = mounts.value("/");
     if(rootitem) {
-        const bool formatRoot = willFormatPart(rootitem);
+        const bool formatRoot = twitWillFormat(rootitem);
         if(!formatRoot && mounts.contains("/home")) {
             const QString errmsg = tr("Cannot preserve /home inside root (/) if"
                 " a separate /home partition is also mounted.");
@@ -456,13 +456,13 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
         // Format (vs just configuring) swap partitions?
         for(QTreeWidgetItem *swap : swaps) {
             const QString &dev = swap->text(Device);
-            if (willFormatPart(swap)) msgFormatList << dev << tr("swap space");
+            if (twitWillFormat(swap)) msgFormatList << dev << tr("swap space");
             else msgConfirm += " - " + tr("Configure %1 as swap space").arg(dev) + "\n";
         }
         // Format (vs just mounting) other partitions?
         for(const auto &it : mounts.toStdMap()) {
             const QString &dev = it.second->text(Device);
-            if(willFormatPart(it.second)) msgFormatList << dev << it.first;
+            if(twitWillFormat(it.second)) msgFormatList << dev << it.first;
             else if(it.first == "/") {
                 msgConfirm += " - " + tr("Delete the data on %1"
                     " except for /home").arg(dev) + "\n";
@@ -843,7 +843,7 @@ bool PartMan::formatPartitions()
     for(QTreeWidgetItem *twit : swaps) {
         const QString dev = "/dev/" + twit->text(Device);
         if(!(twit->checkState(Encrypt))) continue;
-        if(willFormatPart(twit)) {
+        if(twitWillFormat(twit)) {
             proc.status(statup);
             if(!luksMake(dev, encPass)) return false;
         }
@@ -854,7 +854,7 @@ bool PartMan::formatPartitions()
     for(QTreeWidgetItem *twit : mounts) {
         const QString dev = "/dev/" + twit->text(Device);
         if(!(twit->checkState(Encrypt))) continue;
-        if(willFormatPart(twit)) {
+        if(twitWillFormat(twit)) {
             proc.status(statup);
             if (!luksMake(dev, encPass)) return false;
         }
@@ -865,7 +865,7 @@ bool PartMan::formatPartitions()
     // Format all swaps.
     for(int ixi = swaps.count()-1; ixi>=0; --ixi) {
         QTreeWidgetItem *twit = swaps.at(ixi);
-        if(!willFormatPart(twit)) continue;
+        if(!twitWillFormat(twit)) continue;
         proc.status(tr("Formatting swap partitions"));
         QString cmd("/sbin/mkswap " + twitMappedDevice(twit, true));
         const QString &label = twitLineEdit(twit, Label)->text();
@@ -876,7 +876,7 @@ bool PartMan::formatPartitions()
     const bool badblocks = gui.badblocksCheck->isChecked();
     for(const auto &it : mounts.toStdMap()) {
         QTreeWidgetItem *twit = it.second;
-        if(!willFormatPart(twit)) continue;
+        if(!twitWillFormat(twit)) continue;
         proc.status(tr("Formatting: %1").arg(it.first));
         const QString &dev = twitMappedDevice(twit, true);
         if(twitComboBox(twit, UseFor)->currentText().compare("ESP", Qt::CaseInsensitive) == 0) {
@@ -941,12 +941,61 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &type, bool
     return true;
 }
 
+// write out crypttab if encrypting for auto-opening
+bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
+{
+    QFile file("/mnt/antiX/etc/crypttab");
+    if(!file.open(QIODevice::WriteOnly)) return false;
+    QTextStream out(&file);
+    const QLineEdit *passedit = gui.checkBoxEncryptAuto->isChecked()
+        ? gui.FDEpassword : gui.FDEpassCust;
+    const QByteArray password(passedit->text().toUtf8());
+    const QString cmdAddKey("cryptsetup luksAddKey /dev/%1 " + keyfile);
+    const QString cmdBlkID("blkid -s UUID -o value /dev/");
+    // Find the file system device which contains the key
+    QString keyMount;
+    const bool noKey = keyfile.isEmpty();
+    if(!noKey) {
+        for(const auto &it : mounts.toStdMap()) {
+            if(keyfile.startsWith("/mnt/antiX"+it.first+'/')) keyMount = it.first;
+        }
+    }
+    // File systems
+    for(auto &it : mounts.toStdMap()) {
+        if(it.second->checkState(Encrypt)==Qt::Unchecked) continue;
+        const QString &dev = it.second->text(Device);
+        QString uuid = proc.execOut(cmdBlkID + dev);
+        if(isNewKey) {
+            if(!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
+        }
+        out << twitMappedDevice(it.second, false) << " /dev/disk/by-uuid/" << uuid;
+        if(noKey || it.first==keyMount) out << " none luks \n";
+        else out << ' ' << keyfile << "luks \n";
+    }
+    // Swap spaces
+    for(QTreeWidgetItem *twit : swaps) {
+        if(twit->checkState(Encrypt)==Qt::Unchecked) continue;
+        const QString &dev = twit->text(Device);
+        QString uuid = proc.execOut(cmdBlkID + dev);
+        if(!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
+        out << twitMappedDevice(twit, false) << " /dev/disk/by-uuid/" << uuid;
+        if(noKey) out << " none luks,nofail \n";
+        else out << ' ' << keyfile << "luks,nofail \n";
+    }
+    // Update cryptdisks if the key is not in the root file system.
+    if(!keyMount.isEmpty() && keyMount!='/') {
+        if(!proc.exec("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\" + keyMount
+            + "\"/' /mnt/antiX/etc/default/cryptdisks", false)) return false;
+    }
+    file.close();
+    return true;
+}
+
 // create /etc/fstab file
 bool PartMan::makeFstab(bool populateMediaMounts)
 {
     QFile file("/mnt/antiX/etc/fstab");
     if(!file.open(QIODevice::WriteOnly)) return false;
-
     QTextStream out(&file);
     out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
     const QString cmdBlkID("blkid -o value UUID -s UUID ");
@@ -1033,23 +1082,44 @@ void PartMan::unmount(bool all)
     }
 }
 
+// Public properties
 bool PartMan::willFormatRoot()
 {
     QTreeWidgetItem *rootitem = mounts.value("/");
-    if(rootitem) return willFormatPart(rootitem);
+    if(rootitem) return twitWillFormat(rootitem);
     return false;
 }
-
 QString PartMan::getMountDev(const QString &point, const bool mapped)
 {
     const QTreeWidgetItem *twit = mounts.value(point);
     if(!twit) return QString();
     if(mapped) return twitMappedDevice(twit, true);
-    return QString("/dev" + twit->text(Device));
+    return QString("/dev/" + twit->text(Device));
+}
+int PartMan::swapCount()
+{
+    return swaps.count();
+}
+int PartMan::isEncrypt(const QString &point)
+{
+    int count = 0;
+    if(point.isEmpty() || point=="SWAP") {
+        for(QTreeWidgetItem *twit : swaps) {
+            if(twit->checkState(Encrypt)) ++count;
+        }
+    }
+    if(point.isEmpty()) {
+        for(QTreeWidgetItem *twit : mounts) {
+            if(twit->checkState(Encrypt)) ++count;
+        }
+    }
+    const QTreeWidgetItem *twit = mounts.value(point);
+    if(twit && twit->checkState(Encrypt)) ++count;
+    return count;
 }
 
 // Helpers
-inline bool PartMan::willFormatPart(QTreeWidgetItem *twit)
+inline bool PartMan::twitWillFormat(QTreeWidgetItem *twit)
 {
     QComboBox *combo = twitComboBox(twit, Type);
     return !(combo->currentData(Qt::UserRole).toBool());
