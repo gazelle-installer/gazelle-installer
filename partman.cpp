@@ -1177,7 +1177,7 @@ inline bool PartMan::twitIsMapped(const QTreeWidgetItem * twit)
 }
 inline QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool full) const
 {
-    if(twit->parent()==nullptr) {
+    if(twit->parent()!=nullptr) {
         const QVariant &d = twit->data(Device, Qt::UserRole);
         if(!d.isNull()) {
             if(full) return "/dev/mapper/" + d.toString();
