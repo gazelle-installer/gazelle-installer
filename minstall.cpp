@@ -433,96 +433,34 @@ bool MInstall::pretendToInstall(int start, int stop)
     return true;
 }
 
-// write out crypttab if encrypting for auto-opening
 void MInstall::writeKeyFile()
 {
     if (phase < 0) return;
-    // create keyfile
-    // add key file to luks containers
-    // get uuid of devices
-    // write out crypttab
-    // if encrypt-auto, add home and swap
-    // if encrypt just home, just add swap
-    // blkid -s UUID -o value devicename for UUID
-    // containerName     /dev/disk/by-uuid/UUID_OF_PARTITION  /root/keyfile  luks >>/etc/crypttab
-    // for auto install, only need to add swap
-    // for root and home, need to add home and swap
-    // for root only, add swap
-    // for home only, add swap
-
     QString rngfile = "/dev/" + comboFDErandom->currentText();
     const unsigned int keylength = 4096;
     const QLineEdit *passedit = checkBoxEncryptAuto->isChecked() ? FDEpassword : FDEpassCust;
     const QByteArray password(passedit->text().toUtf8());
-    if (isRootEncrypted) { // if encrypting root
+    const char *keyfile = nullptr;
+    if (partman.isEncrypt("/")) { // if encrypting root
         bool newkey = (key.length() == 0);
-
-        //create keyfile
-        if (newkey) key.load(rngfile.toUtf8(), keylength);
-        key.save("/mnt/antiX/root/keyfile", 0400);
-
-        //add keyfile to container
-        QString swapUUID;
-        if (!swapDevice.isEmpty()) {
-            swapUUID = proc.execOut("blkid -s UUID -o value " + swapDevice);
-
-            proc.exec("cryptsetup luksAddKey " + swapDevice + " /mnt/antiX/root/keyfile",
-                    true, &password);
-        }
-
-        if (isHomeEncrypted && newkey) { // if encrypting separate /home
-            proc.exec("cryptsetup luksAddKey " + homeDevice + " /mnt/antiX/root/keyfile",
-                    true, &password);
-        }
-        QString rootUUID = proc.execOut("blkid -s UUID -o value " + rootDevice);
-        //write crypttab keyfile entry
-        QFile file("/mnt/antiX/etc/crypttab");
-        if (file.open(QIODevice::WriteOnly)) {
-            QTextStream out(&file);
-            out << "rootfs /dev/disk/by-uuid/" + rootUUID +" none luks \n";
-            if (isHomeEncrypted) {
-                QString homeUUID =  proc.execOut("blkid -s UUID -o value " + homeDevice);
-                out << "homefs /dev/disk/by-uuid/" + homeUUID +" /root/keyfile luks \n";
-            }
-            if (!swapDevice.isEmpty()) {
-                out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /root/keyfile luks,nofail \n";
-            }
-        }
-        file.close();
-    } else if (isHomeEncrypted) { // if encrypting /home without encrypting root
-        QString swapUUID;
-        if (!swapDevice.isEmpty()) {
-            //create keyfile
-            key.load(rngfile.toUtf8(), keylength);
-            key.save("/mnt/antiX/home/.keyfileDONOTdelete", 0400);
-            key.erase();
-
-            //add keyfile to container
-            swapUUID = proc.execOut("blkid -s UUID -o value " + swapDevice);
-
-            proc.exec("cryptsetup luksAddKey " + swapDevice + " /mnt/antiX/home/.keyfileDONOTdelete",
-                    true, &password);
-        }
-        QString homeUUID = proc.execOut("blkid -s UUID -o value " + homeDevice);
-        //write crypttab keyfile entry
-        QFile file("/mnt/antiX/etc/crypttab");
-        if (file.open(QIODevice::WriteOnly)) {
-            QTextStream out(&file);
-            out << "homefs /dev/disk/by-uuid/" + homeUUID +" none luks \n";
-            if (!swapDevice.isEmpty()) {
-                out << "swapfs /dev/disk/by-uuid/" + swapUUID +" /home/.keyfileDONOTdelete luks,nofail \n";
-                proc.exec("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\/home\"/' /mnt/antiX/etc/default/cryptdisks", false);
-            }
-        }
-        file.close();
+        keyfile = "/mnt/antiX/root/keyfile";
+        if(newkey) key.load(rngfile.toUtf8(), keylength);
+        key.save(keyfile, 0400);
+    } else if (partman.isEncrypt("/home") && partman.isEncrypt(QString())>1) {
+        // if encrypting /home without encrypting root
+        keyfile = "/mnt/antiX/home/.keyfileDONOTdelete";
+        key.load(rngfile.toUtf8(), keylength);
+        key.save(keyfile, 0400);
+        key.erase();
     }
+    partman.fixCryptoSetup(keyfile, false);
 }
 
 // disable hibernate when using encrypted swap
 void MInstall::disablehiberanteinitramfs()
 {
     if (phase < 0) return;
-    if (isSwapEncrypted) {
+    if (partman.isEncrypt("SWAP")) {
         proc.exec("touch /mnt/antiX/initramfs-tools/conf.d/resume");
         QFile file("/mnt/antiX/etc/initramfs-tools/conf.d/resume");
         if (file.open(QIODevice::WriteOnly)) {
@@ -798,12 +736,15 @@ bool MInstall::saveHomeBasic()
     cleanup(false); // cleanup previous mounts
     // if preserving /home, obtain some basic information
     bool ok = false;
+    const bool isRootEncrypt = partman.isEncrypt("/");
+    const bool isHomeEncrypt = partman.isEncrypt("/home");
     const QByteArray &pass = FDEpassCust->text().toUtf8();
     QString rootdev = partman.getMountDev("/", false);
     QString homedev = partman.getMountDev("/home", false);
     const QString cmdMount("/bin/mount %1 %2 -o ro");
+
     // mount the root partition
-    if (isRootEncrypted) {
+    if (isRootEncrypt) {
         if (!partman.luksOpen(rootdev, "rootfs", pass, "--readonly")) return false;
         rootdev = "/dev/mapper/rootfs";
     }
@@ -811,7 +752,7 @@ bool MInstall::saveHomeBasic()
     if(!proc.exec(cmdMount.arg(rootdev, "/mnt/antiX"))) goto ending2;
     // mount the home partition
     if(!homedev.isEmpty()) {
-        if (isHomeEncrypted) {
+        if (isHomeEncrypt) {
             if (!partman.luksOpen(homedev, "homefs", pass, "--readonly")) goto ending2;
             homedev = "/dev/mapper/homefs";
         }
@@ -829,12 +770,12 @@ bool MInstall::saveHomeBasic()
     // unmount partitions
     if (!homedev.isEmpty()) {
         proc.exec("/bin/umount -l /mnt/home-tmp", false);
-        if (isHomeEncrypted) proc.exec("cryptsetup close homefs", true);
+        if (isHomeEncrypt) proc.exec("cryptsetup close homefs", true);
         proc.exec("rmdir /mnt/home-tmp");
     }
  ending2:
     proc.exec("/bin/umount -l /mnt/antiX", false);
-    if (isRootEncrypted) proc.exec("cryptsetup close rootfs", true);
+    if (isRootEncrypt) proc.exec("cryptsetup close rootfs", true);
     return ok;
 }
 

@@ -137,9 +137,6 @@ private:
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
 
-    bool isHomeEncrypted = false;
-    bool isRootEncrypted = false;
-    bool isSwapEncrypted = false;
     bool uefi = false;
     bool mactest = false;
     bool containsSystemD = false;
@@ -152,10 +149,6 @@ private:
     // auto-mount setup
     QString listMaskedMounts;
     bool autoMountEnabled = true;
-
-    QString swapDevice;
-    QString rootDevice;
-    QString homeDevice;
 
     QWidget *nextFocus = nullptr;
     PartMan partman;
