@@ -97,6 +97,7 @@ private slots:
     void on_closeButton_clicked();
     void on_nextButton_clicked();
     void on_passwordCheckBox_stateChanged(int);
+    void on_buttonPartReload_clicked();
     void on_buttonRunParted_clicked();
     void on_viewServicesButton_clicked();
 
@@ -187,7 +188,7 @@ private:
     void userPassValidationChanged();
     // private functions
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
-    void updatePartitionWidgets();
+    void updatePartitionWidgets(bool all);
     void updatePartitionCombos(QComboBox *changed);
     void setupPartitionSlider();
     void setupAutoMount(bool enabled);
