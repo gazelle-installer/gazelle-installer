@@ -45,17 +45,18 @@ class PartMan : public QObject
     QWidget *master;
     QMap<QString, QTreeWidgetItem *> mounts;
     QList<QTreeWidgetItem *> swaps;
-    enum Qt::CheckState encryptCheckRoot = Qt::Unchecked;
     void setup();
-    inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent,
-        int defaultMB = 1, const QString &defaultUse = QString());
+    inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
+        const QString &defaultUse, bool crypto);
     QTreeWidgetItem *setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
         int defaultMB = 1, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drive);
     static QString translateUse(const QString &alias);
     void clearPartitionTables(const QString &dev);
     bool formatLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
-    void setEncryptChecks(const QString &use, enum Qt::CheckState state);
+    void setEncryptChecks(const QString &use,
+        enum Qt::CheckState state, QTreeWidgetItem *exclude);
+    inline long long twitSize(QTreeWidgetItem *twit, bool bytes=false);
     inline bool twitWillFormat(QTreeWidgetItem *twit);
     inline bool twitIsMapped(const QTreeWidgetItem * twit);
     inline QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
@@ -65,6 +66,7 @@ class PartMan : public QObject
     void comboTypeTextChange(const QString &);
     void treeItemChange(QTreeWidgetItem *item, int column);
     void treeSelChange();
+    void treeMenu(const QPoint &);
     void partClearClick(bool);
     void partAddClick(bool);
     void partRemoveClick(bool);
@@ -83,7 +85,8 @@ public:
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
     QTreeWidgetItem *selectedDriveAuto();
-    int layoutDefault(QTreeWidgetItem *driveitem, int rootPercent=100, bool updateTree=true);
+    int layoutDefault(QTreeWidgetItem *driveitem,
+        int rootPercent, bool crypto, bool updateTree=true);
     int countPrepSteps();
     bool preparePartitions();
     bool formatPartitions();

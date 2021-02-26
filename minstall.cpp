@@ -305,7 +305,7 @@ void MInstall::startup()
     buildServiceList();
     if (oobe) manageConfig(ConfigLoadB);
     else {
-        updatePartitionWidgets();
+        updatePartitionWidgets(true);
         manageConfig(ConfigLoadA);
         stashAdvancedFDE(true);
     }
@@ -1572,7 +1572,8 @@ int MInstall::showPage(int curr, int next)
                     return curr; // don't format - stop install
                 }
             }
-            partman.layoutDefault(partman.selectedDriveAuto());
+            partman.layoutDefault(partman.selectedDriveAuto(),
+                sliderPart->value(), checkBoxEncryptAuto->isChecked());
             return 5; // Go to Step_Boot
         }
     } else if (next == 4 && curr == 3) { // at Step_Partition (fwd)
@@ -1658,7 +1659,7 @@ void MInstall::pageDisplayed(int next)
             updateCursor(Qt::WaitCursor);
             phase = 0;
             proc.unhalt();
-            updatePartitionWidgets();
+            updatePartitionWidgets(true);
             updateCursor();
         }
         break;
@@ -1944,7 +1945,7 @@ void MInstall::gotoPage(int next)
     }
 }
 
-void MInstall::updatePartitionWidgets()
+void MInstall::updatePartitionWidgets(bool all)
 {
     proc.log(__PRETTY_FUNCTION__);
 
@@ -1969,13 +1970,15 @@ void MInstall::updatePartitionWidgets()
     diskCombo->setCurrentIndex(0);
     diskCombo->setEnabled(true);
 
-    // whole-disk vs custom-partition radio buttons
-    entireDiskButton->setChecked(true);
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!bdinfo.isDrive) {
-            // found at least one partition
-            customPartButton->setChecked(true);
-            break;
+    if(all) {
+        // whole-disk vs custom-partition radio buttons
+        entireDiskButton->setChecked(true);
+        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+            if (!bdinfo.isDrive) {
+                // found at least one partition
+                customPartButton->setChecked(true);
+                break;
+            }
         }
     }
 
@@ -2157,12 +2160,20 @@ void MInstall::on_viewServicesButton_clicked()
     gotoPage(6);
 }
 
+void MInstall::on_buttonPartReload_clicked()
+{
+    updateCursor(Qt::WaitCursor);
+    mainFrame->setEnabled(false);
+    updatePartitionWidgets(false);
+    mainFrame->setEnabled(true);
+    updateCursor();
+}
 void MInstall::on_buttonRunParted_clicked()
 {
     updateCursor(Qt::WaitCursor);
     mainFrame->setEnabled(false);
     proc.exec("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager", false);
-    updatePartitionWidgets();
+    updatePartitionWidgets(false);
     mainFrame->setEnabled(true);
     updateCursor();
 }
@@ -2323,9 +2334,10 @@ void MInstall::on_buttonSetKeyboard_clicked()
 
 void MInstall::on_sliderPart_valueChanged(int value)
 {
+    const bool crypto = checkBoxEncryptAuto->isChecked();
     QTreeWidgetItem *drvitem = partman.selectedDriveAuto();
     if(!drvitem) return;
-    long long available = partman.layoutDefault(drvitem, 100, false);
+    long long available = partman.layoutDefault(drvitem, 100, crypto, false);
     const int rootMinMB = partman.rootSpaceNeeded / 1048576;
     const int minPercent = (rootMinMB*100) / available;
     if(value<0) { // Internal setup.
@@ -2340,7 +2352,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
         sliderPart->blockSignals(false);
     }
 
-    const long long availRoot = partman.layoutDefault(drvitem, value, false);
+    const long long availRoot = partman.layoutDefault(drvitem, value, crypto, false);
     QString valstr = QLocale::system().formattedDataSize(availRoot*1048576,
         (availRoot>1023)?2:0, QLocale::DataSizeTraditionalFormat);
     available -= availRoot;
