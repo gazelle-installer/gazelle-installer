@@ -56,7 +56,7 @@ class PartMan : public QObject
     void clearPartitionTables(const QString &dev);
     bool formatLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
     void setEncryptChecks(const QString &use, enum Qt::CheckState state);
-    inline bool willFormatPart(QTreeWidgetItem *twit);
+    inline bool twitWillFormat(QTreeWidgetItem *twit);
     inline bool twitIsMapped(const QTreeWidgetItem * twit);
     inline QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
     inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column);
@@ -87,11 +87,14 @@ public:
     int countPrepSteps();
     bool preparePartitions();
     bool formatPartitions();
+    bool fixCryptoSetup(const QString &keyfile, bool isNewKey);
     bool makeFstab(bool populateMediaMounts);
     bool mountPartitions();
     void unmount(bool all = false);
     bool willFormatRoot();
     QString getMountDev(const QString &point, const bool mapped=true);
+    int swapCount();
+    int isEncrypt(const QString &point);
 };
 
 #endif // PARTMAN_H
