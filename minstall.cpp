@@ -124,6 +124,8 @@ MInstall::~MInstall() {
 void MInstall::startup()
 {
     proc.log(__PRETTY_FUNCTION__);
+    resizeEvent(nullptr);
+
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
         saveDesktopCheckBox->hide();
@@ -1539,7 +1541,7 @@ void MInstall::setServices()
 void MInstall::failUI(const QString &msg)
 {
     if (phase >= 0) {
-        this->setEnabled(false);
+        mainFrame->setEnabled(false);
         QMessageBox::critical(this, windowTitle(), msg);
         updateCursor(Qt::WaitCursor);
     }
@@ -2106,6 +2108,10 @@ void MInstall::reject()
 /////////////////////////////////////////////////////////////////////////
 // slots
 
+void MInstall::on_splitter_splitterMoved(int, int)
+{
+    resizeEvent(nullptr);
+}
 void MInstall::on_mainTabs_currentChanged(int index)
 {
     // Make the help widgets the correct size.
@@ -2187,7 +2193,7 @@ void MInstall::on_buttonBenchmarkFDE_clicked()
 bool MInstall::abort(bool onclose)
 {
     proc.log(__PRETTY_FUNCTION__);
-    this->setEnabled(false);
+    mainFrame->setEnabled(false);
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
         const QMessageBox::StandardButton rc = QMessageBox::warning(this,
@@ -2195,7 +2201,7 @@ bool MInstall::abort(bool onclose)
                 " is incomplete.\nDo you really want to stop now?"),
             QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if(rc == QMessageBox::No) {
-            this->setEnabled(true);
+            mainFrame->setEnabled(true);
             return false;
         }
     }
@@ -2210,7 +2216,7 @@ bool MInstall::abort(bool onclose)
     } else {
         phase = -1;
     }
-    if (!onclose) this->setEnabled(true);
+    if (!onclose) mainFrame->setEnabled(true);
     return true;
 }
 
