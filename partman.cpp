@@ -363,6 +363,7 @@ void PartMan::partRemoveClick(bool)
 void PartMan::partDefaultClick(bool)
 {
     layoutDefault(gui.treePartitions->selectedItems().value(0), 40, true);
+    treeSelChange();
 }
 
 QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &project)
