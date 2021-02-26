@@ -689,34 +689,6 @@
              <property name="spacing">
               <number>0</number>
              </property>
-             <item row="12" column="2">
-              <widget class="QToolButton" name="buttonRunParted">
-               <property name="toolTip">
-                <string>Run the partition tool.</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="gparted">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="2">
-              <widget class="QToolButton" name="buttonPartRemove">
-               <property name="toolTip">
-                <string>Remove an existing entry from the layout. This only works with entries to a new layout.</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="remove">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
              <item row="7" column="2">
               <spacer name="verticalSpacer_5">
                <property name="orientation">
@@ -735,30 +707,13 @@
                <property name="toolTip">
                 <string>Add a new partition entry. This only works with a new layout.</string>
                </property>
-               <property name="text">
-                <string>...</string>
-               </property>
                <property name="icon">
-                <iconset theme="add">
+                <iconset theme="list-add">
                  <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="1" column="2">
-              <widget class="QToolButton" name="buttonPartClear">
-               <property name="toolTip">
-                <string>Mark the selected drive to be cleared for a new layout.</string>
-               </property>
-               <property name="text">
-                <string>...</string>
-               </property>
-               <property name="icon">
-                <iconset theme="star-new-symbolic">
-                 <normaloff>.</normaloff>.</iconset>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0" rowspan="13" colspan="2">
+             <item row="0" column="0" rowspan="12" colspan="2">
               <widget class="QTreeWidget" name="treePartitions">
                <column>
                 <property name="text">
@@ -800,22 +755,15 @@
              <item row="10" column="2">
               <widget class="QToolButton" name="buttonPartReload">
                <property name="toolTip">
-                <string>Reload the existing setup for one or more disks.</string>
+                <string>Query the operating system and reload the layouts of all drives.</string>
                </property>
                <property name="icon">
-                <iconset theme="revert">
+                <iconset theme="drive-harddisk">
                  <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
-             <item row="11" column="2">
-              <widget class="QToolButton" name="buttonPartDefault">
-               <property name="toolTip">
-                <string>Use the default partition layout.</string>
-               </property>
-              </widget>
-             </item>
-             <item row="13" column="0">
+             <item row="12" column="0">
               <widget class="QCheckBox" name="badblocksCheck">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -825,6 +773,39 @@
                </property>
                <property name="text">
                 <string>Check for badblocks (takes longer)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2">
+              <widget class="QToolButton" name="buttonPartRemove">
+               <property name="toolTip">
+                <string>Remove an existing entry from the layout. This only works with entries to a new layout.</string>
+               </property>
+               <property name="icon">
+                <iconset theme="list-remove">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QToolButton" name="buttonPartClear">
+               <property name="toolTip">
+                <string>Mark the selected drive to be cleared for a new layout.</string>
+               </property>
+               <property name="icon">
+                <iconset theme="star-new-symbolic">
+                 <normaloff>.</normaloff>.</iconset>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="2">
+              <widget class="QToolButton" name="buttonRunParted">
+               <property name="toolTip">
+                <string>Run the partition management application of this operating system.</string>
+               </property>
+               <property name="icon">
+                <iconset theme="gparted">
+                 <normaloff>.</normaloff>.</iconset>
                </property>
               </widget>
              </item>
@@ -2531,7 +2512,6 @@
   <tabstop>buttonPartRemove</tabstop>
   <tabstop>buttonPartReload</tabstop>
   <tabstop>buttonRunParted</tabstop>
-  <tabstop>buttonPartDefault</tabstop>
   <tabstop>badblocksCheck</tabstop>
   <tabstop>FDEpassCust</tabstop>
   <tabstop>FDEpassCust2</tabstop>

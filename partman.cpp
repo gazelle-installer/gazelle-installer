@@ -25,11 +25,14 @@
 #include <QLocale>
 #include <QMessageBox>
 #include <QTreeWidget>
+#include <QMenu>
 #include <QSpinBox>
 #include <QComboBox>
 #include <QLineEdit>
 
 #include "partman.h"
+
+#define PARTMAN_UNUSABLE_MB 2 // 1MB at start + 1MB at the end.
 
 PartMan::PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent)
     : QObject(parent), proc(mproc), listBlkDevs(bdlist), gui(ui), master(parent)
@@ -42,16 +45,16 @@ void PartMan::setup()
     smallFont.setPointSizeF(smallFont.pointSizeF() * 0.6);
     gui.treePartitions->headerItem()->setFont(Encrypt, smallFont);
     gui.treePartitions->header()->setMinimumSectionSize(5);
+    gui.treePartitions->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(gui.treePartitions, &QTreeWidget::customContextMenuRequested, this,&PartMan::treeMenu);
     connect(gui.treePartitions, &QTreeWidget::itemChanged, this, &PartMan::treeItemChange);
     connect(gui.treePartitions, &QTreeWidget::itemSelectionChanged, this, &PartMan::treeSelChange);
     connect(gui.buttonPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
     connect(gui.buttonPartAdd, &QToolButton::clicked, this, &PartMan::partAddClick);
     connect(gui.buttonPartRemove, &QToolButton::clicked, this, &PartMan::partRemoveClick);
-    connect(gui.buttonPartDefault, &QToolButton::clicked, this, &PartMan::partDefaultClick);
     gui.buttonPartAdd->setEnabled(false);
     gui.buttonPartRemove->setEnabled(false);
     gui.buttonPartClear->setEnabled(false);
-    gui.buttonPartDefault->setEnabled(false);
     defaultLabels["ESP"] = "EFI System";
     defaultLabels["bios_grub"] = "BIOS GRUB";
 }
@@ -89,12 +92,17 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
     gui.treePartitions->blockSignals(false);
+    treeSelChange();
 }
 
 inline QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent,
-    int defaultMB, const QString &defaultUse) {
+    int defaultMB, const QString &defaultUse, bool crypto) {
     QTreeWidgetItem *twit = new QTreeWidgetItem(parent);
     setupItem(twit, nullptr, defaultMB, defaultUse);
+    // If the layout needs crypto and it is supported, check the box.
+    if(twit->data(Encrypt, Qt::CheckStateRole).isValid()) {
+        twit->setCheckState(Encrypt, (crypto ? Qt::Checked : Qt::Unchecked));
+    }
     return twit;
 }
 QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
@@ -105,8 +113,7 @@ QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
         spinSize->setAutoFillBackground(true);
         gui.treePartitions->setItemWidget(twit, Size, spinSize);
-        const int maxMB = twit->parent()->data(Size, Qt::UserRole).toLongLong() / 1048576;
-        spinSize->setRange(1, maxMB);
+        spinSize->setRange(1, twitSize(twit->parent())-PARTMAN_UNUSABLE_MB);
         spinSize->setValue(defaultMB);
     }
     // Label
@@ -175,17 +182,17 @@ QString PartMan::translateUse(const QString &alias)
     else return alias;
 }
 
-void PartMan::setEncryptChecks(const QString &use, enum Qt::CheckState state)
+void PartMan::setEncryptChecks(const QString &use,
+    enum Qt::CheckState state, QTreeWidgetItem *exclude)
 {
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
-    while (*it) {
+    for(; *it; ++it) {
+        if(*it == exclude) continue;
         QComboBox *comboUse = twitComboBox(*it, UseFor);
-        if(comboUse && !(comboUse->currentText().isEmpty())) {
-            if(translateUse(comboUse->currentText()) == use) {
-                (*it)->setCheckState(Encrypt, state);
-            }
+        if(!comboUse || comboUse->currentText().isEmpty()) continue;
+        if(translateUse(comboUse->currentText()) == use) {
+            (*it)->setCheckState(Encrypt, state);
         }
-        ++it;
     }
 }
 
@@ -235,9 +242,10 @@ void PartMan::comboUseTextChange(const QString &text)
         if(useClass >= 0 && useClass <= 3) {
             item->setData(Encrypt, Qt::CheckStateRole, QVariant());
         } else if(oldUseClass >= 0 && oldUseClass <= 3) {
-            item->setCheckState(Encrypt, encryptCheckRoot);
+            // Qt::PartiallyChecked tells treeItemChange() to include this item in the refresh.
+            item->setCheckState(Encrypt, Qt::PartiallyChecked);
         }
-        if(!(item->checkState(Encrypt))
+        if(item->checkState(Encrypt)
             && comboType->findText(curtype, Qt::MatchFixedString)>=0) {
             // Add an item at the start to allow preserving the existing format.
             comboType->insertItem(0, tr("%1 (keep)").arg(curtype), QVariant(true));
@@ -251,8 +259,8 @@ void PartMan::comboUseTextChange(const QString &text)
     }
     editLabel->setText(defaultLabels.value(usetext));
     gui.treePartitions->blockSignals(false);
+    treeItemChange(item, UseFor);
 }
-
 void PartMan::comboTypeTextChange(const QString &)
 {
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
@@ -275,67 +283,78 @@ void PartMan::comboTypeTextChange(const QString &)
 
 void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
 {
-    if(column == Encrypt) {
+    if(column==Encrypt || column==UseFor) {
         gui.treePartitions->blockSignals(true);
-        QComboBox *comboUse = twitComboBox(item, UseFor);
-        if(comboUse) {
-            const QString use = translateUse(comboUse->currentText());
-            if(use == "/") {
-                encryptCheckRoot = item->checkState(column);
-                if(encryptCheckRoot) {
-                    setEncryptChecks("swap", Qt::Checked);
-                    setEncryptChecks("/home", Qt::Checked);
-                }
-            } else if(use == "swap") {
-                if(item->checkState(column) == Qt::Checked) setEncryptChecks("swap", Qt::Checked);
-            } else if(use == "/home") {
-                if(item->checkState(column) == Qt::Checked) setEncryptChecks("swap", Qt::Checked);
-                else setEncryptChecks("swap", encryptCheckRoot);
-            }
-        }
-        bool needsCrypto = false;
+        // Check all items in the tree for those marked for encryption.
+        bool cryptoAny=false;
         QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
-        while (*it) {
-            if((*it)->checkState(Encrypt) == Qt::Checked) needsCrypto = true;
-            ++it;
+        for(; *it && !cryptoAny; ++it) {
+            if((*it)->checkState(Encrypt)==Qt::Checked) cryptoAny = true;
         }
-        gui.gbEncrPass->setEnabled(needsCrypto);
+        gui.gbEncrPass->setEnabled(cryptoAny);
+        const Qt::CheckState csCrypto = item->checkState(Encrypt);
+        if(csCrypto!=Qt::Unchecked) {
+            // New items are pre-set with Qt::PartiallyChecked and cannot be excluded.
+            QTreeWidgetItem *exclude = (csCrypto==Qt::PartiallyChecked) ? nullptr : item;
+            // Set checkboxes and enable the crypto password controls as needed.
+            if(cryptoAny) setEncryptChecks("swap", Qt::Checked, exclude);
+            QComboBox *comboUse = twitComboBox(item, UseFor);
+            if(comboUse && translateUse(comboUse->currentText())=="/" && csCrypto==Qt::Checked) {
+                setEncryptChecks("/home", Qt::Checked, exclude);
+            }
+            if(csCrypto==Qt::PartiallyChecked) item->setCheckState(Encrypt, Qt::Unchecked);
+        }
+        // Make the tree responsive again.
         gui.treePartitions->blockSignals(false);
     }
 }
-
 void PartMan::treeSelChange()
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
-    QIcon iconClear = QIcon::fromTheme("star-new-symbolic");
     if(twit) {
         bool used = true;
         const bool isDrive = (twit->parent()==nullptr);
         if(isDrive) used = twit->data(Device, Qt::UserRole).toBool();
         else used = twit->parent()->data(Device, Qt::UserRole).toBool();
         gui.buttonPartClear->setEnabled(isDrive);
-        if(!used) iconClear = QIcon::fromTheme("undo");
         gui.buttonPartAdd->setEnabled(!used);
         gui.buttonPartRemove->setEnabled(!used && twit->parent());
-        gui.buttonPartDefault->setEnabled(isDrive);
     } else {
         gui.buttonPartAdd->setEnabled(false);
         gui.buttonPartRemove->setEnabled(false);
-        gui.buttonPartDefault->setEnabled(false);
     }
-    gui.buttonPartClear->setIcon(iconClear);
 }
 
+void PartMan::treeMenu(const QPoint &)
+{
+    QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
+    if(!twit || twit->parent()) return;
+    QMenu menu(gui.treePartitions);
+    menu.addAction(tr("&Reset to on-disk layout"));
+    menu.addSeparator();
+    const QAction *actAuto = menu.addAction(tr("&Automatic layout"));
+    const QAction *actAutoCrypto = menu.addAction(tr("Automatic layout with &encryption"));
+    const QAction *action = menu.exec(QCursor::pos());
+    if(action) {
+        QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
+        if(!twit || twit->parent()) return;
+        if(action==actAuto) layoutDefault(twit, 40, false);
+        else if(action==actAutoCrypto) layoutDefault(twit, 40, true);
+        else { // Reset
+            while(twit->childCount()) twit->removeChild(twit->child(0));
+            populate(twit);
+        }
+    }
+}
+// Partition manager list buttons
 void PartMan::partClearClick(bool)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit || twit->parent()) return;
     while(twit->childCount()) twit->removeChild(twit->child(0));
-    if(twit->data(Device, Qt::UserRole).toBool() == false) populate(twit);
-    else twit->setData(Device, Qt::UserRole, QVariant(false));
+    twit->setData(Device, Qt::UserRole, QVariant(false));
     treeSelChange();
 }
-
 void PartMan::partAddClick(bool)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
@@ -352,18 +371,11 @@ void PartMan::partAddClick(bool)
     part->setSelected(true);
     twit->setSelected(false);
 }
-
 void PartMan::partRemoveClick(bool)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit || !(twit->parent())) return;
     twit->parent()->removeChild(twit);
-}
-
-void PartMan::partDefaultClick(bool)
-{
-    layoutDefault(gui.treePartitions->selectedItems().value(0), 40, true);
-    treeSelChange();
 }
 
 QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &project)
@@ -374,6 +386,25 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
     bool encryptAny = false, encryptRoot = false;
     mounts.clear();
     swaps.clear();
+    // Partition size validation
+    const int driveCount = gui.treePartitions->topLevelItemCount();
+    for(int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
+        QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
+        const int partCount = drvit->childCount();
+        long long layoutMB = 0;
+        for(int ixPart = 0; ixPart < partCount; ++ixPart) {
+            layoutMB += twitSize(drvit->child(ixPart));
+        }
+        const long long availableMB = twitSize(drvit)-PARTMAN_UNUSABLE_MB;
+        if(layoutMB > availableMB) {
+            const QString &msg = tr("The layout chosen for drive <i>%1</i> requires"
+                    " %3MB, and will not fit on the drive which has only %2MB available.");
+            QMessageBox::critical(master, master->windowTitle(),
+                msg.arg(drvit->text(Device)).arg(availableMB).arg(layoutMB));
+            return gui.treePartitions;
+        }
+    }
+    // Partition use and other validation
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
     for(; *it; ++it) {
         QComboBox *comboUse = twitComboBox(*it, UseFor);
@@ -637,7 +668,8 @@ QTreeWidgetItem *PartMan::selectedDriveAuto()
     }
     return nullptr;
 }
-int PartMan::layoutDefault(QTreeWidgetItem *drivetree, int rootPercent, bool updateTree)
+int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
+    int rootPercent, bool crypto, bool updateTree)
 {
     if(updateTree) {
         // Clear the existing layout from the target device.
@@ -650,20 +682,20 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree, int rootPercent, bool upd
     const QString &fsText = gui.freeSpaceEdit->text().trimmed();
     int free = fsText.isEmpty() ? 0 : fsText.toInt(&ok,10);
     if (!ok) return 0;
-    const int driveSize = drivetree->data(Size, Qt::UserRole).toLongLong() / 1048576;
+    const long long driveSize = twitSize(drivetree);
     int rootFormatSize = driveSize - 32; // Compensate for rounding errors.
     // Boot partitions.
     if(uefi) {
-        if(updateTree) addItem(drivetree, 256, "ESP");
+        if(updateTree) addItem(drivetree, 256, "ESP", crypto);
         rootFormatSize -= 256;
     } else if(driveSize >= 2097152 || gptoverride) {
-        if(updateTree) addItem(drivetree, 1, "bios_grub");
+        if(updateTree) addItem(drivetree, 1, "bios_grub", crypto);
         rootFormatSize -= 1;
     }
-    if (gui.checkBoxEncryptAuto->isChecked()){
+    if(crypto){
         int bootFormatSize = 512;
         while(bootFormatSize < (bootSpaceNeeded/1048576)) bootFormatSize*=2;
-        if(updateTree) addItem(drivetree, bootFormatSize, "boot");
+        if(updateTree) addItem(drivetree, bootFormatSize, "boot", crypto);
         rootFormatSize -= bootFormatSize;
     }
     // Operating system.
@@ -684,10 +716,11 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree, int rootPercent, bool upd
     if(rootFormatSize < rootMinMB) rootFormatSize = rootMinMB;
     homeFormatSize -= rootFormatSize;
     if(updateTree) {
-        addItem(drivetree, rootFormatSize, "root");
-        addItem(drivetree, swapFormatSize, "swap");
-        if(homeFormatSize>0) addItem(drivetree, homeFormatSize, "home");
+        addItem(drivetree, rootFormatSize, "root", crypto);
+        addItem(drivetree, swapFormatSize, "swap", crypto);
+        if(homeFormatSize>0) addItem(drivetree, homeFormatSize, "home", crypto);
         labelParts(drivetree);
+        treeSelChange();
     }
     return rootFormatSize;
 }
@@ -706,12 +739,12 @@ int PartMan::countPrepSteps()
     while(mi.hasNext()) {
         mi.next();
         QTreeWidgetItem *twit = mi.value();
-        if(twit->checkState(Encrypt)) ++pcount; //LUKS format.
+        if(twit->checkState(Encrypt)==Qt::Checked) ++pcount; //LUKS format.
     }
     // Formatting swap space
     pcount += swaps.count();
     for(QTreeWidgetItem *twit : swaps) {
-        if(twit->checkState(Encrypt)) ++pcount; //LUKS format.
+        if(twit->checkState(Encrypt)==Qt::Checked) ++pcount; //LUKS format.
     }
     // Final count
     return pcount;
@@ -758,14 +791,14 @@ bool PartMan::preparePartitions()
 
     qDebug() << " ---- PARTITION FORMAT SCHEDULE ----";
     for(const auto &it : mounts.toStdMap()) {
-        const QTreeWidgetItem *twit = it.second;
-        qDebug().nospace().noquote() << twit->text(UseFor) << ": " << twit->text(Device)
-            << " (" << twit->data(Size, Qt::UserRole).toLongLong() / 1048576 << "MB)";
+        QTreeWidgetItem *twit = it.second;
+        qDebug().nospace().noquote() << twit->text(UseFor) << ": "
+            << twit->text(Device) << " (" << twitSize(twit) << "MB)";
     }
     for(int ixi = swaps.count()-1; ixi>=0; --ixi) {
-        const QTreeWidgetItem *twit = swaps.at(ixi);
-        qDebug().nospace().noquote() << "swap" << ixi << ": " << twit->text(Device)
-            << " (" << twit->data(Size, Qt::UserRole).toLongLong() / 1048576 << "MB)";
+        QTreeWidgetItem *twit = swaps.at(ixi);
+        qDebug().nospace().noquote() << "swap" << ixi << ": "
+            << twit->text(Device) << " (" << twitSize(twit) << "MB)";
     }
 
     // Clear the existing partition tables on devices which will have a new layout.
@@ -812,11 +845,10 @@ bool PartMan::preparePartitions()
                 QTreeWidgetItem *twit = drvitem->child(ixdev);
                 QComboBox *comboUseFor = twitComboBox(twit, UseFor);
                 if(!comboUseFor) continue;
-                QWidget *twSize = gui.treePartitions->itemWidget(twit, Size);
                 const QString &useFor = comboUseFor->currentText();
                 const QString type(useFor.compare("ESP", Qt::CaseInsensitive)
                     ? " mkpart primary " : " mkpart ESP ");
-                const long long end = start + static_cast<QSpinBox *>(twSize)->value();
+                const long long end = start + twitSize(twit);
                 bool rc = proc.exec(cmdParted + type
                     + QString::number(start) + "MiB " + QString::number(end) + "MiB");
                 if(!rc) return false;
@@ -843,7 +875,7 @@ bool PartMan::formatPartitions()
     // Swap partitions.
     for(QTreeWidgetItem *twit : swaps) {
         const QString dev = "/dev/" + twit->text(Device);
-        if(!(twit->checkState(Encrypt))) continue;
+        if(twit->checkState(Encrypt)!=Qt::Checked) continue;
         if(twitWillFormat(twit)) {
             proc.status(statup);
             if(!luksMake(dev, encPass)) return false;
@@ -854,7 +886,7 @@ bool PartMan::formatPartitions()
     // Other partitions.
     for(QTreeWidgetItem *twit : mounts) {
         const QString dev = "/dev/" + twit->text(Device);
-        if(!(twit->checkState(Encrypt))) continue;
+        if(twit->checkState(Encrypt)!=Qt::Checked) continue;
         if(twitWillFormat(twit)) {
             proc.status(statup);
             if (!luksMake(dev, encPass)) return false;
@@ -963,7 +995,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     }
     // File systems
     for(auto &it : mounts.toStdMap()) {
-        if(it.second->checkState(Encrypt)==Qt::Unchecked) continue;
+        if(it.second->checkState(Encrypt)!=Qt::Checked) continue;
         const QString &dev = it.second->text(Device);
         QString uuid = proc.execOut(cmdBlkID + dev);
         if(isNewKey) {
@@ -975,7 +1007,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     }
     // Swap spaces
     for(QTreeWidgetItem *twit : swaps) {
-        if(twit->checkState(Encrypt)==Qt::Unchecked) continue;
+        if(twit->checkState(Encrypt)!=Qt::Checked) continue;
         const QString &dev = twit->text(Device);
         QString uuid = proc.execOut(cmdBlkID + dev);
         if(!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
@@ -1066,7 +1098,7 @@ bool PartMan::mountPartitions()
 void PartMan::unmount(bool all)
 {
     for(QTreeWidgetItem *twit : swaps) {
-        if(!(all || twit->checkState(Encrypt))) continue;
+        if(!(all || twit->checkState(Encrypt)==Qt::Checked)) continue;
         QString cmd("cryptsetup close swap%1");
         proc.exec(cmd.arg(twitMappedDevice(twit)), true);
     }
@@ -1077,7 +1109,7 @@ void PartMan::unmount(bool all)
         if(it.key().at(0)!='/') continue;
         proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
         QTreeWidgetItem *twit = it.value();
-        if(!(all || twit->checkState(Encrypt))) continue;
+        if(!(all || twit->checkState(Encrypt)==Qt::Checked)) continue;
         QString cmd("cryptsetup close %1");
         proc.exec(cmd.arg(twitMappedDevice(twit)), true);
     }
@@ -1106,20 +1138,33 @@ int PartMan::isEncrypt(const QString &point)
     int count = 0;
     if(point.isEmpty() || point=="SWAP") {
         for(QTreeWidgetItem *twit : swaps) {
-            if(twit->checkState(Encrypt)) ++count;
+            if(twit->checkState(Encrypt)==Qt::Checked) ++count;
         }
     }
     if(point.isEmpty()) {
         for(QTreeWidgetItem *twit : mounts) {
-            if(twit->checkState(Encrypt)) ++count;
+            if(twit->checkState(Encrypt)==Qt::Checked) ++count;
         }
     }
     const QTreeWidgetItem *twit = mounts.value(point);
-    if(twit && twit->checkState(Encrypt)) ++count;
+    if(twit && twit->checkState(Encrypt)==Qt::Checked) ++count;
     return count;
 }
 
 // Helpers
+inline long long PartMan::twitSize(QTreeWidgetItem *twit, bool bytes)
+{
+    QWidget *spin = gui.treePartitions->itemWidget(twit, Size);
+    long long size = 0;
+    if(spin) {
+        size = static_cast<QSpinBox *>(spin)->value();
+        if(bytes) size *= 1048576;
+    } else {
+        size = twit->data(Size, Qt::UserRole).toLongLong();
+        if(!bytes) size /= 1048576;
+    }
+    return size;
+}
 inline bool PartMan::twitWillFormat(QTreeWidgetItem *twit)
 {
     QComboBox *combo = twitComboBox(twit, Type);
