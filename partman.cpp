@@ -291,7 +291,11 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
         for(; *it && !cryptoAny; ++it) {
             if((*it)->checkState(Encrypt)==Qt::Checked) cryptoAny = true;
         }
-        gui.gbEncrPass->setEnabled(cryptoAny);
+        if(gui.gbEncrPass->isEnabled() != cryptoAny) {
+            gui.FDEpassCust->clear();
+            gui.nextButton->setDisabled(cryptoAny);
+            gui.gbEncrPass->setEnabled(cryptoAny);
+        }
         const Qt::CheckState csCrypto = item->checkState(Encrypt);
         if(csCrypto!=Qt::Unchecked) {
             // New items are pre-set with Qt::PartiallyChecked and cannot be excluded.
@@ -378,11 +382,11 @@ void PartMan::partRemoveClick(bool)
     twit->parent()->removeChild(twit);
 }
 
-QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &project)
+QWidget *PartMan::composeValidate(bool automatic,
+    const QString &minSizeText, const QString &project)
 {
     QStringList msgForeignList;
     QString msgConfirm;
-    QStringList msgFormatList;
     bool encryptAny = false, encryptRoot = false;
     mounts.clear();
     swaps.clear();
@@ -405,6 +409,7 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
         }
     }
     // Partition use and other validation
+    int mapnum = 0;
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
     for(; *it; ++it) {
         QComboBox *comboUse = twitComboBox(*it, UseFor);
@@ -424,11 +429,8 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
         QString desc;
         if(mount == "/") desc = "/ (root)";
         else if(mount.isEmpty()) desc = tr("swap space");
-        else {
-            if(mount == "ESP") desc = tr("EFI System Partition");
-            else desc = mount;
-            if(mount != "/home") msgFormatList << devname << desc;
-        }
+        else if(mount == "ESP") desc = tr("EFI System Partition");
+        else desc = mount;
         QTreeWidgetItem *twit = mounts.value(mount);
 
         // The mount can only be selected once.
@@ -446,9 +448,15 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
         }
         QVariant mapperData;
         if((*it)->checkState(Encrypt) == Qt::Checked) {
-            if(mount.isEmpty()) mapperData = QString("fs.swap%1").arg(swaps.count()-1);
-            else if(mount == "/") mapperData = "fs.root";
-            else mapperData = QString("fs%1").arg(mounts.count()) + mount.replace('/', '.');
+            if(mount == "/") mapperData = "root.fsm";
+            else if(mount.isEmpty()) {
+                const int swapnum = swaps.count();
+                if(swapnum <= 1) mapperData = "swap.fsm";
+                else mapperData = QString("swap%1.fsm").arg(swapnum);
+            } else {
+                mapperData = QString::number(++mapnum)
+                    + mount.replace('/','.') + ".fsm";
+            }
             encryptAny = true;
         }
         (*it)->setData(Device, Qt::UserRole, mapperData);
@@ -485,6 +493,7 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
 
     if(!automatic) {
         QString msg;
+        QStringList msgFormatList;
         // Format (vs just configuring) swap partitions?
         for(QTreeWidgetItem *swap : swaps) {
             const QString &dev = swap->text(Device);
@@ -543,28 +552,62 @@ QWidget *PartMan::composeValidate(const QString &minSizeText, const QString &pro
         }
     }
 
-    // calculate the future partitions here
-    auto lambdaCalcBD = [this](QTreeWidgetItem *twit) -> int {
-        if(!twit) return -1;
-        int index = twit->data(Size, Qt::UserRole).toInt() ? listBlkDevs.findDevice(twit->text(Device)) : -1;
-        if (index >= 0) {
-            BlockDeviceInfo &bdinfo = listBlkDevs[index];
-            if(twit->checkState(Encrypt) == Qt::Checked) bdinfo.fs = QStringLiteral("crypt_LUKS");
-            else {
-                QComboBox *comboType = twitComboBox(twit, Type);
-                if(comboType) bdinfo.fs = comboType->currentText().toLower();
-            }
-            QLineEdit *editLabel = static_cast<QLineEdit *>(gui.treePartitions->itemWidget(twit, Label));
-            if(editLabel) bdinfo.label = editLabel->text();
-            bdinfo.isNasty = false; // future partitions are safe
-            bdinfo.isFuture = bdinfo.isNative = true;
-        }
-        return index;
-    };
-    for(const auto &it : mounts.toStdMap()) lambdaCalcBD(it.second);
-    for(QTreeWidgetItem *swap : swaps) lambdaCalcBD(swap);
-
+    calculatePartBD();
     return nullptr;
+}
+
+bool PartMan::calculatePartBD()
+{
+    listToUnmount.clear();
+    const int driveCount = gui.treePartitions->topLevelItemCount();
+    for(int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
+        QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
+        const bool useExist = drvit->data(Device, Qt::UserRole).toBool();
+        QString drv = drvit->text(Device);
+        int ixDriveBD = listBlkDevs.findDevice(drv);
+        const int partCount = drvit->childCount();
+        const long long driveSize = twitSize(drvit);
+
+        if(!useExist) {
+            // Remove partitions from the list that belong to this drive.
+            const int ixRemoveBD = ixDriveBD + 1;
+            if (ixDriveBD < 0) return false;
+            while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs.at(ixRemoveBD).isDrive) {
+                listToUnmount << listBlkDevs.at(ixRemoveBD).name;
+                listBlkDevs.removeAt(ixRemoveBD);
+            }
+            // see if GPT needs to be used (either UEFI or >=2TB drive)
+            listBlkDevs[ixDriveBD].isGPT = gptoverride || uefi
+                || driveSize >= 2097152 || partCount>4 || gptoverride;
+        }
+        // code for adding future partitions to the list
+        for(int ixPart=0, ixPartBD=ixDriveBD+1; ixPart < partCount; ++ixPart, ++ixPartBD) {
+            QTreeWidgetItem *twit = drvit->child(ixPart);
+            QComboBox *combo = twitComboBox(twit, UseFor);
+            if(!combo || combo->currentText().isEmpty()) continue;
+            QString bdFS;
+            if(twit->checkState(Encrypt) == Qt::Checked) bdFS = QStringLiteral("crypt_LUKS");
+            else bdFS = twitComboBox(twit, Type)->currentText();
+            if(useExist) {
+                BlockDeviceInfo &bdinfo = listBlkDevs[ixPartBD];
+                listToUnmount << bdinfo.name;
+                QLineEdit *editLabel = static_cast<QLineEdit *>(gui.treePartitions->itemWidget(twit, Label));
+                if(editLabel) bdinfo.label = editLabel->text();
+                if(twitWillFormat(twit) && !bdFS.isEmpty()) bdinfo.fs = bdFS;
+                bdinfo.isNasty = false; // future partitions are safe
+                bdinfo.isFuture = bdinfo.isNative = true;
+            } else {
+                BlockDeviceInfo bdinfo;
+                bdinfo.name = twit->text(Device);
+                bdinfo.fs = bdFS;
+                bdinfo.size = twitSize(twit, true); // back into bytes
+                bdinfo.isFuture = bdinfo.isNative = true;
+                bdinfo.isGPT = listBlkDevs.at(ixDriveBD).isGPT;
+                listBlkDevs.insert(ixPartBD, bdinfo);
+            }
+        }
+    }
+    return true;
 }
 
 // Checks SMART status of the selected drives.
@@ -780,14 +823,10 @@ bool PartMan::preparePartitions()
     proc.log(__PRETTY_FUNCTION__);
 
     // detach all existing partitions on the selected drive
-    QStringList listUnmount;
-    for(QTreeWidgetItem *twit : swaps) listUnmount << twit->text(Device);
-    for(const auto &it : mounts.toStdMap()) listUnmount << it.second->text(Device);
-    for (const QString &strdev : listUnmount) {
+    for (const QString &strdev : listToUnmount) {
         proc.exec("swapoff /dev/" + strdev, true);
         proc.exec("/bin/umount /dev/" + strdev, true);
     }
-    listUnmount.clear();
 
     qDebug() << " ---- PARTITION FORMAT SCHEDULE ----";
     for(const auto &it : mounts.toStdMap()) {
@@ -983,14 +1022,14 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     const QLineEdit *passedit = gui.checkBoxEncryptAuto->isChecked()
         ? gui.FDEpassword : gui.FDEpassCust;
     const QByteArray password(passedit->text().toUtf8());
-    const QString cmdAddKey("cryptsetup luksAddKey /dev/%1 " + keyfile);
+    const QString cmdAddKey("cryptsetup luksAddKey /dev/%1 /mnt/antiX" + keyfile);
     const QString cmdBlkID("blkid -s UUID -o value /dev/");
     // Find the file system device which contains the key
-    QString keyMount;
+    QString keyMount('/'); // If no mount point matches, it's in a directory on the root.
     const bool noKey = keyfile.isEmpty();
     if(!noKey) {
         for(const auto &it : mounts.toStdMap()) {
-            if(keyfile.startsWith("/mnt/antiX"+it.first+'/')) keyMount = it.first;
+            if(keyfile.startsWith(it.first+'/')) keyMount = it.first;
         }
     }
     // File systems
@@ -998,12 +1037,14 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         if(it.second->checkState(Encrypt)!=Qt::Checked) continue;
         const QString &dev = it.second->text(Device);
         QString uuid = proc.execOut(cmdBlkID + dev);
-        if(isNewKey) {
-            if(!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
-        }
         out << twitMappedDevice(it.second, false) << " /dev/disk/by-uuid/" << uuid;
         if(noKey || it.first==keyMount) out << " none luks \n";
-        else out << ' ' << keyfile << "luks \n";
+        else {
+            if(isNewKey) {
+                if(!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
+            }
+            out << ' ' << keyfile << " luks \n";
+        }
     }
     // Swap spaces
     for(QTreeWidgetItem *twit : swaps) {
@@ -1013,10 +1054,10 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         if(!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
         out << twitMappedDevice(twit, false) << " /dev/disk/by-uuid/" << uuid;
         if(noKey) out << " none luks,nofail \n";
-        else out << ' ' << keyfile << "luks,nofail \n";
+        else out << ' ' << keyfile << " luks,nofail \n";
     }
     // Update cryptdisks if the key is not in the root file system.
-    if(!keyMount.isEmpty() && keyMount!='/') {
+    if(keyMount!='/') {
         if(!proc.exec("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\" + keyMount
             + "\"/' /mnt/antiX/etc/default/cryptdisks", false)) return false;
     }
@@ -1099,7 +1140,7 @@ void PartMan::unmount(bool all)
 {
     for(QTreeWidgetItem *twit : swaps) {
         if(!(all || twit->checkState(Encrypt)==Qt::Checked)) continue;
-        QString cmd("cryptsetup close swap%1");
+        QString cmd("cryptsetup close %1");
         proc.exec(cmd.arg(twitMappedDevice(twit)), true);
     }
     QMapIterator<QString, QTreeWidgetItem *> it(mounts);
@@ -1172,7 +1213,7 @@ inline bool PartMan::twitWillFormat(QTreeWidgetItem *twit)
 }
 inline bool PartMan::twitIsMapped(const QTreeWidgetItem * twit)
 {
-    if(twit->parent()!=nullptr) return false;
+    if(twit->parent()==nullptr) return false;
     return !(twit->data(Device, Qt::UserRole).isNull());
 }
 inline QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool full) const
