@@ -48,9 +48,9 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
         brave = args.isSet("brave");
         automatic = args.isSet("auto");
         oem = args.isSet("oem");
-        gptoverride = args.isSet("gpt-override");
+        partman.gptoverride = args.isSet("gpt-override");
     } else {
-        brave = automatic = oem = gptoverride = false;
+        brave = automatic = oem = partman.gptoverride = false;
         closeButton->setText(tr("Shutdown"));
         phase = 2;
         // dark palette for the OOBE screen
@@ -196,6 +196,7 @@ void MInstall::startup()
         } else {
             uefi = proc.exec("test -d /sys/firmware/efi", true);
         }
+        partman.uefi = uefi;
         qDebug() << "uefi =" << uefi;
 
         autoMountEnabled = true; // disable auto mount by force
