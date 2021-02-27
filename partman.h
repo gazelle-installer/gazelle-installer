@@ -64,6 +64,7 @@ class PartMan : public QObject
     inline QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
     inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column);
     inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column);
+    void spinSizeValueChange(int i);
     void comboUseTextChange(const QString &text);
     void comboTypeTextChange(const QString &);
     void treeItemChange(QTreeWidgetItem *item, int column);

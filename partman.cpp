@@ -32,7 +32,7 @@
 
 #include "partman.h"
 
-#define PARTMAN_UNUSABLE_MB 2 // 1MB at start + 1MB at the end.
+#define PARTMAN_SAFETY_MB 32 // 1MB at start + Compensate for rounding errors.
 
 PartMan::PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent)
     : QObject(parent), proc(mproc), listBlkDevs(bdlist), gui(ui), master(parent)
@@ -113,7 +113,10 @@ QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
         spinSize->setAutoFillBackground(true);
         gui.treePartitions->setItemWidget(twit, Size, spinSize);
-        spinSize->setRange(1, twitSize(twit->parent())-PARTMAN_UNUSABLE_MB);
+        spinSize->setRange(1, twitSize(twit->parent())-PARTMAN_SAFETY_MB);
+        spinSize->setProperty("row", QVariant::fromValue<void *>(twit));
+        connect(spinSize, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &PartMan::spinSizeValueChange);
         spinSize->setValue(defaultMB);
     }
     // Label
@@ -196,6 +199,25 @@ void PartMan::setEncryptChecks(const QString &use,
     }
 }
 
+void PartMan::spinSizeValueChange(int i)
+{
+    QSpinBox *spin = static_cast<QSpinBox *>(sender());
+    if(!spin) return;
+    QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(spin->property("row").value<void *>());
+    if(!item) return;
+    QTreeWidgetItem *drvit = item->parent();
+    if(!drvit) return;
+    // Partition size validation
+    spin->blockSignals(true);
+    long long maxMB = twitSize(drvit)-PARTMAN_SAFETY_MB;
+    for(int ixi = drvit->childCount()-1; ixi >= 0; --ixi) {
+        QTreeWidgetItem *twit = drvit->child(ixi);
+        if(twit!=item) maxMB -= twitSize(twit);
+    }
+    if(i > maxMB) spin->setValue(maxMB);
+    gui.buttonPartAdd->setEnabled(i < maxMB);
+    spin->blockSignals(false);
+}
 void PartMan::comboUseTextChange(const QString &text)
 {
     gui.treePartitions->blockSignals(true);
@@ -317,12 +339,21 @@ void PartMan::treeSelChange()
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(twit) {
         bool used = true;
-        const bool isDrive = (twit->parent()==nullptr);
-        if(isDrive) used = twit->data(Device, Qt::UserRole).toBool();
+        QTreeWidgetItem *drvit = twit->parent();
+        if(!drvit) used = twit->data(Device, Qt::UserRole).toBool();
         else used = twit->parent()->data(Device, Qt::UserRole).toBool();
-        gui.buttonPartClear->setEnabled(isDrive);
-        gui.buttonPartAdd->setEnabled(!used);
+        gui.buttonPartClear->setEnabled(!drvit);
         gui.buttonPartRemove->setEnabled(!used && twit->parent());
+        // Only allow adding partitions if there is enough space.
+        if(used) gui.buttonPartAdd->setEnabled(false);
+        else {
+            if(!drvit) drvit = twit;
+            long long maxMB = twitSize(drvit)-PARTMAN_SAFETY_MB;
+            for(int ixi = drvit->childCount()-1; ixi >= 0; --ixi) {
+                maxMB -= twitSize(drvit->child(ixi));
+            }
+            gui.buttonPartAdd->setEnabled(maxMB > 0);
+        }
     } else {
         gui.buttonPartClear->setEnabled(false);
         gui.buttonPartAdd->setEnabled(false);
@@ -351,6 +382,7 @@ void PartMan::treeMenu(const QPoint &)
         }
     }
 }
+
 // Partition manager list buttons
 void PartMan::partClearClick(bool)
 {
@@ -381,6 +413,7 @@ void PartMan::partRemoveClick(bool)
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit || !(twit->parent())) return;
     twit->parent()->removeChild(twit);
+    treeSelChange();
 }
 
 QWidget *PartMan::composeValidate(bool automatic,
@@ -391,24 +424,6 @@ QWidget *PartMan::composeValidate(bool automatic,
     bool encryptAny = false, encryptRoot = false;
     mounts.clear();
     swaps.clear();
-    // Partition size validation
-    const int driveCount = gui.treePartitions->topLevelItemCount();
-    for(int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
-        QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
-        const int partCount = drvit->childCount();
-        long long layoutMB = 0;
-        for(int ixPart = 0; ixPart < partCount; ++ixPart) {
-            layoutMB += twitSize(drvit->child(ixPart));
-        }
-        const long long availableMB = twitSize(drvit)-PARTMAN_UNUSABLE_MB;
-        if(layoutMB > availableMB) {
-            const QString &msg = tr("The layout chosen for drive <i>%1</i> requires"
-                    " %3MB, and will not fit on the drive which has only %2MB available.");
-            QMessageBox::critical(master, master->windowTitle(),
-                msg.arg(drvit->text(Device)).arg(availableMB).arg(layoutMB));
-            return gui.treePartitions;
-        }
-    }
     // Partition use and other validation
     int mapnum = 0;
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
@@ -727,7 +742,7 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     int free = fsText.isEmpty() ? 0 : fsText.toInt(&ok,10);
     if (!ok) return 0;
     const long long driveSize = twitSize(drivetree);
-    int rootFormatSize = driveSize - 32; // Compensate for rounding errors.
+    int rootFormatSize = driveSize-PARTMAN_SAFETY_MB;
     // Boot partitions.
     if(uefi) {
         if(updateTree) addItem(drivetree, 256, "ESP", crypto);
@@ -761,8 +776,8 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     homeFormatSize -= rootFormatSize;
     if(updateTree) {
         addItem(drivetree, rootFormatSize, "root", crypto);
-        addItem(drivetree, swapFormatSize, "swap", crypto);
         if(homeFormatSize>0) addItem(drivetree, homeFormatSize, "home", crypto);
+        if(swapFormatSize>0) addItem(drivetree, swapFormatSize, "swap", crypto);
         labelParts(drivetree);
         treeSelChange();
     }
