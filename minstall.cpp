@@ -572,23 +572,8 @@ void MInstall::manageConfig(enum ConfigAction mode)
             // Partition step
             config->setGroupWidget(Step_Partitions);
             config->manageCheckBox("BadBlocksCheck", badblocksCheck);
-            // Swap space
-            //config->manageComboBox("Swap/Device", swapCombo, true);
-            //config->manageCheckBox("Swap/Encrypt", checkBoxEncryptSwap);
-            //config->manageLineEdit("Swap/Label", swapLabelEdit);
-            // Tree starting with root (/)
+            // TODO: Add code for partition configuration here.
             config->beginGroup("Tree");
-            //config->manageComboBox("Device", rootCombo, true);
-            //config->manageCheckBox("Encrypt", checkBoxEncryptRoot);
-            //config->manageComboBox("Type", rootTypeCombo, false);
-            //config->manageLineEdit("Label", rootLabelEdit);
-            // Boot (/boot)
-            //config->manageComboBox("boot/Device", bootCombo, true);
-            // Home (/home)
-            //config->manageComboBox("home/Device", homeCombo, true);
-            //config->manageComboBox("home/Type", homeTypeCombo, false);
-            //config->manageCheckBox("home/Encrypt", checkBoxEncryptHome);
-            //config->manageLineEdit("home/Label", homeLabelEdit);
             config->endGroup();
         }
         config->endGroup();
@@ -1651,16 +1636,25 @@ void MInstall::pageDisplayed(int next)
                           + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
                           "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
                                      " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
-                          "<p>" + tr("Installation requires about %1 of space. %2 or more is preferred."
-                                     " You can use the entire disk or you can put the installation on existing partitions.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
+                          "<p>" + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
                           "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
                           "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
-                          "<p>" + tr("Autoinstall will place home on the root partition.") + "</p>"
+                          "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
+                          + tr("By default, the automatic install results in separate root and home partitions."
+                               " The slider allows you to control how much space is allocated to each partition.") + "</p>"
+                          "<p>" + tr("Move the slider to the left to increase the space for <b>home</b>. Move it to the right to increase the space for <b>root</b>."
+                                     " Move the slider all the way to the right if you want both root and home on the same partition; <b>this is not recommended.</b>") + "</p>"
+                          "<p>" + tr("Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier."
+                                     " This can also improve overall performance by constraining the system files to a defined portion of the drive.") + "</p>"
                           "<p><b>" + tr("Encryption") + "</b><br/>"
                           + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
                           "<p>" + tr("A separate unencrypted boot partition is required."
                                      " For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
-                          "<p>" + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>");
+                          "<p>" + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>"
+                          "<p><b>" + tr("Using a custom disk layout") + "</b><br/>"
+                          + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
+                                " On the next page, you will then be able to select and configure the storage devices and"
+                                " partitions you need.").arg(PROJECTNAME, customPartButton->text().remove('&')) + "</p>");
         if (phase < 0) {
             updateCursor(Qt::WaitCursor);
             phase = 0;
@@ -1677,9 +1671,13 @@ void MInstall::pageDisplayed(int next)
                           "<p><b>" + tr("Choose Partitions") + "</b><br/>"
                           + tr("%1 requires a root partition. The swap partition is optional but highly recommended."
                                " If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.").arg(PROJECTNAME) + "</p>"
-                          "<p>" + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.") + "</p>"
+                          "<p>" + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future,"
+                                     " but this will not be possible if you are upgrading from an installation that does not have a separate home partition.") + "</p>"
+                          "<p><b>" + tr("Need help creating a layout?") + "</b><br/>"
+                          + tr("Just right-click on a drive to bring up a menu, and select one of the automatic layouts. These layouts are similar to that of the automatic install.") + "</p>"
+                          "<p>" + tr("The automatic layout for encryption contains the required boot partition. This layout can even be used as the basis for a multi-boot system.") + "</p>"
                           "<p><b>" + tr("Upgrading") + "</b><br/>"
-                          + tr("To upgrade from an existing Linux installation, select the same home partition as before and check the preference to preserve data in /home.") + "</p>"
+                          + tr("To upgrade from an existing Linux installation, select the same home partition as before and select <b>keep</b> as the file system type.") + "</p>"
                           "<p>" + tr("If you are preserving an existing /home directory tree located on your root partition, the installer will not reformat the root partition."
                                      " As a result, the installation will take much longer than usual.") + "</p>"
                           "<p><b>" + tr("Preferred Filesystem Type") + "</b><br/>"
@@ -1689,9 +1687,14 @@ void MInstall::pageDisplayed(int next)
                           "<p><b>" + tr("Bad Blocks") + "</b><br/>"
                           + tr("If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive."
                                " The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"
+                          "<p><b>" + tr("System drive management tool") + "</b><br/>"
+                          + tr("If you want more control over the drive layouts than what can be provided on this page, click the button to the bottom-right of the list."
+                               " This will run the drive management tool provided with the operating system, which will allow you to create the exact layout you need.") + "</p>"
                           "<p><b>" + tr("Encryption") + "</b><br/>"
                           + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
-                          "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>");
+                          "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
+                          "<p><b>" + tr("Other partitions") + "</b><br/>"
+                          + tr("The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.") + "</p>");
         break;
 
     case 4: // advanced encryption settings
