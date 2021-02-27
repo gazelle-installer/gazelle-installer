@@ -45,6 +45,7 @@ class PartMan : public QObject
     QWidget *master;
     QMap<QString, QTreeWidgetItem *> mounts;
     QList<QTreeWidgetItem *> swaps;
+    QStringList listToUnmount;
     void setup();
     inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
         const QString &defaultUse, bool crypto);
@@ -56,6 +57,7 @@ class PartMan : public QObject
     bool formatLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
     void setEncryptChecks(const QString &use,
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
+    bool calculatePartBD();
     inline long long twitSize(QTreeWidgetItem *twit, bool bytes=false);
     inline bool twitWillFormat(QTreeWidgetItem *twit);
     inline bool twitIsMapped(const QTreeWidgetItem * twit);
@@ -72,14 +74,15 @@ class PartMan : public QObject
     void partRemoveClick(bool);
     void partDefaultClick(bool);
 public:
-    bool automatic, sync;
+    bool sync;
     bool gptoverride, uefi;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
     QMap<QString, QString> defaultLabels;
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
     void populate(QTreeWidgetItem *drvstart = nullptr);
-    QWidget *composeValidate(const QString &minSizeText, const QString &project);
+    QWidget *composeValidate(bool automatic,
+        const QString &minSizeText, const QString &project);
     bool checkTargetDrivesOK();
     bool luksMake(const QString &dev, const QByteArray &password);
     bool luksOpen(const QString &dev, const QString &luksfs,
