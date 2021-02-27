@@ -50,7 +50,7 @@ class PartMan : public QObject
     inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
         const QString &defaultUse, bool crypto);
     QTreeWidgetItem *setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
-        int defaultMB = 1, const QString &defaultUse = QString());
+        int defaultMB = 0, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drive);
     static QString translateUse(const QString &alias);
     void clearPartitionTables(const QString &dev);
@@ -75,8 +75,7 @@ class PartMan : public QObject
     void partRemoveClick(bool);
     void partDefaultClick(bool);
 public:
-    bool sync;
-    bool gptoverride, uefi;
+    bool gptoverride=false, uefi=false;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
     QMap<QString, QString> defaultLabels;

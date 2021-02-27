@@ -133,7 +133,7 @@ private:
     int phase = 0;
 
     // command line options
-    bool brave, pretend, automatic, nocopy, sync, gptoverride;
+    bool brave, pretend, automatic, nocopy, sync;
     bool oem, oobe;
     // configuration management
     MSettings *config = nullptr;
