@@ -765,10 +765,11 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     int swapFormatSize = rootFormatSize-rootMinMB;
     struct sysinfo sinfo;
     if(sysinfo(&sinfo)!=0) sinfo.totalram = 2048;
-    else sinfo.totalram = (sinfo.totalram / 2097152) * 3; //1.5xRAM
-    sinfo.totalram/=128; ++sinfo.totalram; sinfo.totalram*=128; //Multiple of 128MB
-	if(swapFormatSize > (int)sinfo.totalram) swapFormatSize = sinfo.totalram;
-    if(swapFormatSize > 8192) swapFormatSize = 8192;
+    else sinfo.totalram = (sinfo.totalram / (1048576*2)) * 3; // 1.5xRAM
+    sinfo.totalram/=128; ++sinfo.totalram; sinfo.totalram*=128; // Multiple of 128MB
+    if(swapFormatSize > (int)sinfo.totalram) swapFormatSize = sinfo.totalram;
+    int swapMaxMB = rootFormatSize/(20*128); ++swapMaxMB; swapMaxMB*=128; // 5% root
+    if(swapFormatSize > swapMaxMB) swapFormatSize = swapMaxMB;
     rootFormatSize -= swapFormatSize;
     if (free > 0 && rootFormatSize > 8192) {
         if (free > (rootFormatSize - 8192)) free = rootFormatSize - 8192;
