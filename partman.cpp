@@ -19,6 +19,7 @@
 //
 // This file is part of the gazelle-installer.
 
+#include <sys/sysinfo.h>
 #include <sys/stat.h>
 #include <QDebug>
 #include <QTimer>
@@ -113,10 +114,12 @@ QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
         spinSize->setAutoFillBackground(true);
         gui.treePartitions->setItemWidget(twit, Size, spinSize);
-        spinSize->setRange(1, twitSize(twit->parent())-PARTMAN_SAFETY_MB);
+        const int maxMB = (int)twitSize(twit->parent())-PARTMAN_SAFETY_MB;
+        spinSize->setRange(1, maxMB);
         spinSize->setProperty("row", QVariant::fromValue<void *>(twit));
         connect(spinSize, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &PartMan::spinSizeValueChange);
+        if(!defaultMB) defaultMB = maxMB;
         spinSize->setValue(defaultMB);
     }
     // Label
@@ -757,12 +760,15 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
         if(updateTree) addItem(drivetree, bootFormatSize, "boot", crypto);
         rootFormatSize -= bootFormatSize;
     }
-    // Operating system.
-    int swapFormatSize = 2048;
-    if (rootFormatSize < 2048) swapFormatSize = 128;
-    else if (rootFormatSize < 3096) swapFormatSize = 256;
-    else if (rootFormatSize < 4096) swapFormatSize = 512;
-    else if (rootFormatSize < 12288) swapFormatSize = 1024;
+    // Swap space.
+    const int rootMinMB = rootSpaceNeeded / 1048576;
+    int swapFormatSize = rootFormatSize-rootMinMB;
+    struct sysinfo sinfo;
+    if(sysinfo(&sinfo)!=0) sinfo.totalram = 2048;
+    else sinfo.totalram = (sinfo.totalram / 2097152) * 3; //1.5xRAM
+    sinfo.totalram/=128; ++sinfo.totalram; sinfo.totalram*=128; //Multiple of 128MB
+	if(swapFormatSize > (int)sinfo.totalram) swapFormatSize = sinfo.totalram;
+    if(swapFormatSize > 8192) swapFormatSize = 8192;
     rootFormatSize -= swapFormatSize;
     if (free > 0 && rootFormatSize > 8192) {
         if (free > (rootFormatSize - 8192)) free = rootFormatSize - 8192;
@@ -771,13 +777,12 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     // Home
     int homeFormatSize = rootFormatSize;
     rootFormatSize = (rootFormatSize * rootPercent) / 100;
-    const int rootMinMB = rootSpaceNeeded / 1048576;
     if(rootFormatSize < rootMinMB) rootFormatSize = rootMinMB;
     homeFormatSize -= rootFormatSize;
     if(updateTree) {
         addItem(drivetree, rootFormatSize, "root", crypto);
-        if(homeFormatSize>0) addItem(drivetree, homeFormatSize, "home", crypto);
         if(swapFormatSize>0) addItem(drivetree, swapFormatSize, "swap", crypto);
+        if(homeFormatSize>0) addItem(drivetree, homeFormatSize, "home", crypto);
         labelParts(drivetree);
         treeSelChange();
     }
