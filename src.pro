@@ -67,5 +67,5 @@ SOURCES += app.cpp minstall.cpp \
 LIBS +=
 CONFIG += release warn_on thread qt c++11
 
-#RESOURCES += \
-#    images.qrc
+RESOURCES += \
+    images.qrc
