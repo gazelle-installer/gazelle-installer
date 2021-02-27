@@ -324,6 +324,7 @@ void PartMan::treeSelChange()
         gui.buttonPartAdd->setEnabled(!used);
         gui.buttonPartRemove->setEnabled(!used && twit->parent());
     } else {
+        gui.buttonPartClear->setEnabled(false);
         gui.buttonPartAdd->setEnabled(false);
         gui.buttonPartRemove->setEnabled(false);
     }
