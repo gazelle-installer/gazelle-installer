@@ -443,8 +443,9 @@ void MInstall::writeKeyFile()
     const QLineEdit *passedit = checkBoxEncryptAuto->isChecked() ? FDEpassword : FDEpassCust;
     const QByteArray password(passedit->text().toUtf8());
     const char *keyfile = nullptr;
+    bool newkey = true;
     if (partman.isEncrypt("/")) { // if encrypting root
-        bool newkey = (key.length() == 0);
+        newkey = (key.length() == 0);
         keyfile = "/mnt/antiX/root/keyfile";
         if(newkey) key.load(rngfile.toUtf8(), keylength);
         key.save(keyfile, 0400);
@@ -455,7 +456,7 @@ void MInstall::writeKeyFile()
         key.save(keyfile, 0400);
         key.erase();
     }
-    partman.fixCryptoSetup(keyfile, false);
+    partman.fixCryptoSetup(QString(keyfile).remove(0,10), newkey);
 }
 
 // disable hibernate when using encrypted swap
@@ -1570,16 +1571,19 @@ int MInstall::showPage(int curr, int next)
                 int ans = QMessageBox::warning(this, windowTitle(),
                                                msg.arg(diskCombo->currentData().toString(), PROJECTNAME),
                                                QMessageBox::Yes, QMessageBox::No);
-                if (ans != QMessageBox::Yes) {
-                    return curr; // don't format - stop install
-                }
+                if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
             partman.layoutDefault(partman.selectedDriveAuto(),
                 sliderPart->value(), checkBoxEncryptAuto->isChecked());
+            QWidget *nf = partman.composeValidate(true, MIN_INSTALL_SIZE, PROJECTNAME);
+            if (nf) {
+                nextFocus = nf;
+                return curr;
+            }
             return 5; // Go to Step_Boot
         }
     } else if (next == 4 && curr == 3) { // at Step_Partition (fwd)
-        QWidget *nf = partman.composeValidate(MIN_INSTALL_SIZE, PROJECTNAME);
+        QWidget *nf = partman.composeValidate(automatic, MIN_INSTALL_SIZE, PROJECTNAME);
         if (nf) {
             nextFocus = nf;
             return curr;
