@@ -44,9 +44,9 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
     QString stricon;
-    if (isFuture) stricon = "appointment-soon-symbolic";
-    else if (isNasty && warnNasty) stricon = "dialog-warning-symbolic";
-    combo->addItem(QIcon::fromTheme(stricon), name + " (" + strout + ")", name);
+    if (isFuture) stricon = ":/appointment-soon";
+    else if (isNasty && warnNasty) stricon = ":/dialog-warning";
+    combo->addItem(QIcon(stricon), name + " (" + strout + ")", name);
 }
 
 //////////////////////////////////////////////////////////////////////////////
