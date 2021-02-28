@@ -385,12 +385,12 @@ void PartMan::treeMenu(const QPoint &)
         QMenu menu(gui.treePartitions);
         menu.addAction(tr("&Reset to on-disk layout"));
         menu.addSeparator();
-        const QAction *actAuto = menu.addAction(tr("&Automatic layout"));
-        const QAction *actAutoCrypto = menu.addAction(tr("Automatic layout with &encryption"));
+        const QAction *actBasic = menu.addAction(tr("Template: &Standard install"));
+        const QAction *actCrypto = menu.addAction(tr("Template: &Encrypted system"));
         const QAction *action = menu.exec(QCursor::pos());
         if(action) {
-            if(action==actAuto) layoutDefault(twit, 40, false);
-            else if(action==actAutoCrypto) layoutDefault(twit, 40, true);
+            if(action==actBasic) layoutDefault(twit, 40, false);
+            else if(action==actCrypto) layoutDefault(twit, 40, true);
             else { // Reset
                 while(twit->childCount()) twit->removeChild(twit->child(0));
                 populate(twit);
