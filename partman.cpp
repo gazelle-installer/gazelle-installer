@@ -196,11 +196,7 @@ void PartMan::setEncryptChecks(const QString &use,
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
     for(; *it; ++it) {
         if(*it == exclude) continue;
-        QComboBox *comboUse = twitComboBox(*it, UseFor);
-        if(!comboUse || comboUse->currentText().isEmpty()) continue;
-        if(translateUse(comboUse->currentText()) == use) {
-            (*it)->setCheckState(Encrypt, state);
-        }
+        if(twitUseFor(*it) == use) (*it)->setCheckState(Encrypt, state);
     }
 }
 
@@ -292,28 +288,25 @@ void PartMan::comboTypeTextChange(const QString &)
 {
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
     bool canCheckBlocks = false;
-    while (*it) {
-        QComboBox *comboUse = twitComboBox(*it, UseFor);
-        if(comboUse && !(comboUse->currentText().isEmpty())) {
-            QComboBox *comboType = twitComboBox(*it, Type);
-            QLineEdit *editOpts = twitLineEdit(*it, Options);
-            if(!comboType || !editOpts) return;
-            const QString &type = comboType->currentText();
-            const Qt::ItemFlags itflags = (*it)->flags();
-            if(comboType->currentData(Qt::UserRole).toBool()) {
-                if((*it)->data(Encrypt, Qt::CheckStateRole).isValid()) {
-                    const bool luks = ((*it)->text(Type)=="crypto_LUKS");
-                    (*it)->setCheckState(Encrypt, luks ? Qt::Checked : Qt::Unchecked);
-                }
-                (*it)->setFlags(itflags & ~Qt::ItemIsUserCheckable);
-            } else {
-                if(type.startsWith("ext") || type == "jfs") canCheckBlocks = true;
-                else if(type.startsWith("reiser")) editOpts->setText("defaults,notail");
-                else editOpts->setText("defaults");
-                (*it)->setFlags(itflags | Qt::ItemIsUserCheckable);
+    for(; *it; ++it) {
+        if(twitUseFor(*it).isEmpty()) continue;
+        QComboBox *comboType = twitComboBox(*it, Type);
+        QLineEdit *editOpts = twitLineEdit(*it, Options);
+        if(!comboType || !editOpts) return;
+        const QString &type = comboType->currentText();
+        const Qt::ItemFlags itflags = (*it)->flags();
+        if(comboType->currentData(Qt::UserRole).toBool()) {
+            if((*it)->data(Encrypt, Qt::CheckStateRole).isValid()) {
+                const bool luks = ((*it)->text(Type)=="crypto_LUKS");
+                (*it)->setCheckState(Encrypt, luks ? Qt::Checked : Qt::Unchecked);
             }
+            (*it)->setFlags(itflags & ~Qt::ItemIsUserCheckable);
+        } else {
+            if(type.startsWith("ext") || type == "jfs") canCheckBlocks = true;
+            else if(type.startsWith("reiser")) editOpts->setText("defaults,notail");
+            else editOpts->setText("defaults");
+            (*it)->setFlags(itflags | Qt::ItemIsUserCheckable);
         }
-        ++it;
     }
     gui.badblocksCheck->setEnabled(canCheckBlocks);
 }
@@ -339,8 +332,7 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
             QTreeWidgetItem *exclude = (csCrypto==Qt::PartiallyChecked) ? nullptr : item;
             // Set checkboxes and enable the crypto password controls as needed.
             if(cryptoAny) setEncryptChecks("swap", Qt::Checked, exclude);
-            QComboBox *comboUse = twitComboBox(item, UseFor);
-            if(comboUse && translateUse(comboUse->currentText())=="/" && csCrypto==Qt::Checked) {
+            if(twitUseFor(item)=="/" && csCrypto==Qt::Checked) {
                 setEncryptChecks("/home", Qt::Checked, exclude);
             }
             if(csCrypto==Qt::PartiallyChecked) item->setCheckState(Encrypt, Qt::Unchecked);
@@ -614,8 +606,8 @@ bool PartMan::calculatePartBD()
         // code for adding future partitions to the list
         for(int ixPart=0, ixPartBD=ixDriveBD+1; ixPart < partCount; ++ixPart, ++ixPartBD) {
             QTreeWidgetItem *twit = drvit->child(ixPart);
-            QComboBox *combo = twitComboBox(twit, UseFor);
-            if(!combo || combo->currentText().isEmpty()) continue;
+            const QString &useFor = twitUseFor(twit);
+            if(useFor.isEmpty()) continue;
             QString bdFS;
             if(twit->checkState(Encrypt) == Qt::Checked) bdFS = QStringLiteral("crypto_LUKS");
             else bdFS = twitComboBox(twit, Type)->currentText();
@@ -627,6 +619,7 @@ bool PartMan::calculatePartBD()
                 if(twitWillFormat(twit) && !bdFS.isEmpty()) bdinfo.fs = bdFS;
                 bdinfo.isNasty = false; // future partitions are safe
                 bdinfo.isFuture = bdinfo.isNative = true;
+                bdinfo.isESP = (useFor=="ESP");
             } else {
                 BlockDeviceInfo bdinfo;
                 bdinfo.name = twit->text(Device);
@@ -634,6 +627,7 @@ bool PartMan::calculatePartBD()
                 bdinfo.size = twitSize(twit, true); // back into bytes
                 bdinfo.isFuture = bdinfo.isNative = true;
                 bdinfo.isGPT = listBlkDevs.at(ixDriveBD).isGPT;
+                bdinfo.isESP = (useFor=="ESP");
                 listBlkDevs.insert(ixPartBD, bdinfo);
             }
         }
@@ -650,11 +644,8 @@ bool PartMan::checkTargetDrivesOK()
         QStringList purposes;
         QTreeWidgetItem *tlit =  gui.treePartitions->topLevelItem(ixi);
         for(int oxo = 0; oxo < tlit->childCount(); ++oxo) {
-            QComboBox *comboUse = twitComboBox(tlit->child(oxo), UseFor);
-            if(comboUse) {
-                const QString &text = comboUse->currentText();
-                if(!text.isEmpty()) purposes << text;
-            }
+            const QString &useFor = twitUseFor(tlit->child(oxo));
+            if(!useFor.isEmpty()) purposes << useFor;
         }
         // If any partitions are selected run the SMART tests.
         if (!purposes.isEmpty()) {
@@ -904,8 +895,7 @@ bool PartMan::preparePartitions()
             // Set the type for partitions that will be used in this installation.
             for(int ixdev=0; ixdev<devCount; ++ixdev) {
                 QTreeWidgetItem *twit = drvitem->child(ixdev);
-                QComboBox *comboUseFor = twitComboBox(twit, UseFor);
-                if(!comboUseFor || comboUseFor->currentText().isEmpty()) continue;
+                if(twitUseFor(twit).isEmpty()) continue;
                 const QStringList devsplit(BlockDeviceInfo::split("/dev/" + twit->text(Device)));
                 if(!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1)))) return false;
                 proc.sleep(1000);
@@ -916,10 +906,9 @@ bool PartMan::preparePartitions()
             long long start = 1; // start with 1 MB to aid alignment
             for(int ixdev=0; ixdev<devCount; ++ixdev) {
                 QTreeWidgetItem *twit = drvitem->child(ixdev);
-                QComboBox *comboUseFor = twitComboBox(twit, UseFor);
-                if(!comboUseFor) continue;
-                const QString &useFor = translateUse(comboUseFor->currentText());
-                const QString type(useFor=="ESP" ? " mkpart primary " : " mkpart ESP ");
+                const QString &useFor = twitUseFor(twit);
+                if(useFor.isEmpty()) continue;
+                const QString type(useFor!="ESP" ? " mkpart primary " : " mkpart ESP ");
                 const long long end = start + twitSize(twit);
                 bool rc = proc.exec(cmdParted + type
                     + QString::number(start) + "MiB " + QString::number(end) + "MiB");
@@ -1245,6 +1234,12 @@ inline bool PartMan::twitWillFormat(QTreeWidgetItem *twit)
     QComboBox *combo = twitComboBox(twit, Type);
     return !(combo->currentData(Qt::UserRole).toBool());
 }
+inline QString PartMan::twitUseFor(QTreeWidgetItem *twit)
+{
+    QComboBox *combo = twitComboBox(twit, UseFor);
+    if(!combo) return QString();
+    return translateUse(combo->currentText());
+}
 inline bool PartMan::twitIsMapped(const QTreeWidgetItem * twit)
 {
     if(twit->parent()==nullptr) return false;
@@ -1260,7 +1255,7 @@ inline QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool
         }
     }
     if(!full) return twit->text(Device);
-    else return "/dev/" + twit->text(Device);
+    return "/dev/" + twit->text(Device);
 }
 inline QComboBox *PartMan::twitComboBox(QTreeWidgetItem  *twit, int column)
 {
