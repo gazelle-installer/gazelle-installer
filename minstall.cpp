@@ -721,15 +721,17 @@ void MInstall::stashAdvancedFDE(bool save)
 bool MInstall::saveHomeBasic()
 {
     proc.log(__PRETTY_FUNCTION__);
-    if (partman.willFormatRoot()) return true;
+    QString rootdev = partman.getMountDev("/", false);
+    QString homedev = partman.getMountDev("/home", false);
+    if(partman.willFormat("/") && homedev.isEmpty()) return true;
+    else if(partman.willFormat("/home")) return true;
+
     cleanup(false); // cleanup previous mounts
     // if preserving /home, obtain some basic information
     bool ok = false;
     const bool isRootEncrypt = partman.isEncrypt("/");
     const bool isHomeEncrypt = partman.isEncrypt("/home");
     const QByteArray &pass = FDEpassCust->text().toUtf8();
-    QString rootdev = partman.getMountDev("/", false);
-    QString homedev = partman.getMountDev("/home", false);
     const QString cmdMount("/bin/mount %1 %2 -o ro");
 
     // mount the root partition
@@ -774,7 +776,7 @@ bool MInstall::installLinux(const int progend)
     if (phase < 0) return false;
 
     if(!partman.mountPartitions()) return false;
-    if(!partman.willFormatRoot()) {
+    if(!partman.willFormat("/")) {
         // if root was not formatted and not using --sync option then re-use it
         // remove all folders in root except for /home
         proc.status(tr("Deleting old system"));
@@ -847,9 +849,7 @@ bool MInstall::copyLinux(const int progend)
     cmd = "/bin/cp -av";
     if (sync) {
         cmd = "rsync -av --delete";
-        if (!partman.willFormatRoot()) {
-            cmd.append(" --filter 'protect home/*'");
-        }
+        if (!partman.willFormat("/")) cmd.append(" --filter 'protect home/*'");
     }
     cmd.append(" " + bootSource + " " + rootSources + " /mnt/antiX");
     struct statvfs svfs;

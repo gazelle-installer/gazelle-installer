@@ -1191,10 +1191,10 @@ void PartMan::unmount(bool all)
 }
 
 // Public properties
-bool PartMan::willFormatRoot()
+bool PartMan::willFormat(const QString &point)
 {
-    QTreeWidgetItem *rootitem = mounts.value("/");
-    if(rootitem) return twitWillFormat(rootitem);
+    QTreeWidgetItem *twit = mounts.value(point);
+    if(twit) return twitWillFormat(twit);
     return false;
 }
 QString PartMan::getMountDev(const QString &point, const bool mapped)
