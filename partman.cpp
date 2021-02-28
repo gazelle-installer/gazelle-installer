@@ -371,21 +371,30 @@ void PartMan::treeSelChange()
 void PartMan::treeMenu(const QPoint &)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
-    if(!twit || twit->parent()) return;
-    QMenu menu(gui.treePartitions);
-    menu.addAction(tr("&Reset to on-disk layout"));
-    menu.addSeparator();
-    const QAction *actAuto = menu.addAction(tr("&Automatic layout"));
-    const QAction *actAutoCrypto = menu.addAction(tr("Automatic layout with &encryption"));
-    const QAction *action = menu.exec(QCursor::pos());
-    if(action) {
-        QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
-        if(!twit || twit->parent()) return;
-        if(action==actAuto) layoutDefault(twit, 40, false);
-        else if(action==actAutoCrypto) layoutDefault(twit, 40, true);
-        else { // Reset
-            while(twit->childCount()) twit->removeChild(twit->child(0));
-            populate(twit);
+    if(!twit) return;
+    if(twit->parent()) {
+        if(twitComboBox(twit, Type)->currentText() != "btrfs") return;
+        QMenu menu(gui.treePartitions);
+        const QAction *actBtrfsZlib = menu.addAction(tr("Template: BTRFS compression (ZLIB)"));
+        const QAction *actBtrfsLzo = menu.addAction(tr("Template: BTRFS compression (LZO)"));
+        const QAction *action = menu.exec(QCursor::pos());
+        QLineEdit *editOpts = twitLineEdit(twit, Options);
+        if(action==actBtrfsZlib) editOpts->setText("defaults,noatime,compress-force=zlib");
+        else if(action==actBtrfsLzo) editOpts->setText("defaults,noatime,compress-force=lzo");
+    } else {
+        QMenu menu(gui.treePartitions);
+        menu.addAction(tr("&Reset to on-disk layout"));
+        menu.addSeparator();
+        const QAction *actAuto = menu.addAction(tr("&Automatic layout"));
+        const QAction *actAutoCrypto = menu.addAction(tr("Automatic layout with &encryption"));
+        const QAction *action = menu.exec(QCursor::pos());
+        if(action) {
+            if(action==actAuto) layoutDefault(twit, 40, false);
+            else if(action==actAutoCrypto) layoutDefault(twit, 40, true);
+            else { // Reset
+                while(twit->childCount()) twit->removeChild(twit->child(0));
+                populate(twit);
+            }
         }
     }
 }
