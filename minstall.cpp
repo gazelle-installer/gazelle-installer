@@ -182,7 +182,7 @@ void MInstall::startup()
         qDebug() << "linuxfs file size is " << linuxfs_file_size << " rootfs file size is " << rootfs_file_size;
 
         //add rootfs file size to the calculated linuxfs file size.  probaby conservative, as rootfs will likely have some overlap with linuxfs
-        long long safety_factor = 128 * 1024 * 1024; // 128 MB safety factor
+        long long safety_factor = 1024 * 1024 * 1024; // 1GB safety factor
         partman.rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
 
         const long long spaceBlock = 134217728; // 128MB
