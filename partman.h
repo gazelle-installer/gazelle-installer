@@ -98,7 +98,7 @@ public:
     bool makeFstab(bool populateMediaMounts);
     bool mountPartitions();
     void unmount(bool all = false);
-    bool willFormatRoot();
+    bool willFormat(const QString &point);
     QString getMountDev(const QString &point, const bool mapped=true);
     int swapCount();
     int isEncrypt(const QString &point);
