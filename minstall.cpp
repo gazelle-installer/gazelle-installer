@@ -224,7 +224,7 @@ void MInstall::startup()
         //disable encryption in gui if cryptsetup not present
         QFileInfo cryptsetup("/sbin/cryptsetup");
         QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
-        if ( !cryptsetup.exists() && !cryptsetup.isExecutable() && !crypsetupinitramfs.exists()) {
+        if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
             checkBoxEncryptAuto->hide();
             FDEpassword->hide();
             FDEpassword2->hide();
