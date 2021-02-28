@@ -117,6 +117,7 @@ QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo
         const int maxMB = (int)twitSize(twit->parent())-PARTMAN_SAFETY_MB;
         spinSize->setRange(1, maxMB);
         spinSize->setProperty("row", QVariant::fromValue<void *>(twit));
+        spinSize->setSuffix("MB");
         connect(spinSize, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &PartMan::spinSizeValueChange);
         if(!defaultMB) defaultMB = maxMB;
