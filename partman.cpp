@@ -186,6 +186,7 @@ QString PartMan::translateUse(const QString &alias)
     if(alias == "root") return QStringLiteral("/");
     else if(alias == "boot") return QStringLiteral("/boot");
     else if(alias == "home") return QStringLiteral("/home");
+    else if(!alias.compare("ESP", Qt::CaseInsensitive)) return QStringLiteral("ESP");
     else return alias;
 }
 
@@ -271,8 +272,8 @@ void PartMan::comboUseTextChange(const QString &text)
             // Qt::PartiallyChecked tells treeItemChange() to include this item in the refresh.
             item->setCheckState(Encrypt, Qt::PartiallyChecked);
         }
-        if(item->checkState(Encrypt)
-            && comboType->findText(curtype, Qt::MatchFixedString)>=0) {
+        if(useClass > 3 && (curtype == "crypto_LUKS"
+            || comboType->findText(curtype, Qt::MatchFixedString) >= 0)) {
             // Add an item at the start to allow preserving the existing format.
             comboType->insertItem(0, tr("%1 (keep)").arg(curtype), QVariant(true));
             comboType->insertSeparator(1);
@@ -298,9 +299,19 @@ void PartMan::comboTypeTextChange(const QString &)
             QLineEdit *editOpts = twitLineEdit(*it, Options);
             if(!comboType || !editOpts) return;
             const QString &type = comboType->currentText();
-            if(type.startsWith("ext") || type == "jfs") canCheckBlocks = true;
-            else if(type.startsWith("reiser")) editOpts->setText("defaults,notail");
-            else editOpts->setText("defaults");
+            const Qt::ItemFlags itflags = (*it)->flags();
+            if(comboType->currentData(Qt::UserRole).toBool()) {
+                if((*it)->data(Encrypt, Qt::CheckStateRole).isValid()) {
+                    const bool luks = ((*it)->text(Type)=="crypto_LUKS");
+                    (*it)->setCheckState(Encrypt, luks ? Qt::Checked : Qt::Unchecked);
+                }
+                (*it)->setFlags(itflags & ~Qt::ItemIsUserCheckable);
+            } else {
+                if(type.startsWith("ext") || type == "jfs") canCheckBlocks = true;
+                else if(type.startsWith("reiser")) editOpts->setText("defaults,notail");
+                else editOpts->setText("defaults");
+                (*it)->setFlags(itflags | Qt::ItemIsUserCheckable);
+            }
         }
         ++it;
     }
@@ -606,7 +617,7 @@ bool PartMan::calculatePartBD()
             QComboBox *combo = twitComboBox(twit, UseFor);
             if(!combo || combo->currentText().isEmpty()) continue;
             QString bdFS;
-            if(twit->checkState(Encrypt) == Qt::Checked) bdFS = QStringLiteral("crypt_LUKS");
+            if(twit->checkState(Encrypt) == Qt::Checked) bdFS = QStringLiteral("crypto_LUKS");
             else bdFS = twitComboBox(twit, Type)->currentText();
             if(useExist) {
                 BlockDeviceInfo &bdinfo = listBlkDevs[ixPartBD];
@@ -907,9 +918,8 @@ bool PartMan::preparePartitions()
                 QTreeWidgetItem *twit = drvitem->child(ixdev);
                 QComboBox *comboUseFor = twitComboBox(twit, UseFor);
                 if(!comboUseFor) continue;
-                const QString &useFor = comboUseFor->currentText();
-                const QString type(useFor.compare("ESP", Qt::CaseInsensitive)
-                    ? " mkpart primary " : " mkpart ESP ");
+                const QString &useFor = translateUse(comboUseFor->currentText());
+                const QString type(useFor=="ESP" ? " mkpart primary " : " mkpart ESP ");
                 const long long end = start + twitSize(twit);
                 bool rc = proc.exec(cmdParted + type
                     + QString::number(start) + "MiB " + QString::number(end) + "MiB");
@@ -974,7 +984,8 @@ bool PartMan::formatPartitions()
         if(!twitWillFormat(twit)) continue;
         proc.status(tr("Formatting: %1").arg(it.first));
         const QString &dev = twitMappedDevice(twit, true);
-        if(twitComboBox(twit, UseFor)->currentText().compare("ESP", Qt::CaseInsensitive) == 0) {
+        const QString &useFor = translateUse(twitComboBox(twit, UseFor)->currentText());
+        if(useFor=="ESP") {
             proc.status(tr("Formatting EFI System Partition"));
             if (!proc.exec("mkfs.msdos -F 32 " + dev)) return false;
             // Sets boot flag and ESP flag.
