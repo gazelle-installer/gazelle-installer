@@ -60,6 +60,7 @@ class PartMan : public QObject
     bool calculatePartBD();
     inline long long twitSize(QTreeWidgetItem *twit, bool bytes=false);
     inline bool twitWillFormat(QTreeWidgetItem *twit);
+    inline QString twitUseFor(QTreeWidgetItem *twit);
     inline bool twitIsMapped(const QTreeWidgetItem * twit);
     inline QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
     inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column);
