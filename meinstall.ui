@@ -368,7 +368,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Auto-install using entire disk</string>
+                 <string>Regular install using the entire disk</string>
                 </property>
                </widget>
               </item>
