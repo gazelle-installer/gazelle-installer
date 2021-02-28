@@ -19,7 +19,9 @@
 #include <QFile>
 #include <QSettings>
 #include <QRegularExpression>
-#include <QUrl>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "blockdev.h"
 
 // static function to split a device name into its drive and partition
@@ -72,81 +74,58 @@ void BlockDeviceList::build(MProcess &proc)
     }
 
     QStringList backup_list; // Backup ESP detection. Populated when needed.
+    // Collect information and populate the block device list.
+    const QString &bdRaw = proc.execOut("lsblk -T -bJo"
+        " TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL", true);
+    const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
+    const QString cmdTestGPT("blkid /dev/%1 | grep -q PTTYPE=\\\"gpt\\\"");
 
-    // collect and sort lsblk info (sorting required for drives with >15 partitions)
-    const QStringList &bdraw = proc.execOutLines("lsblk -brno TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL");
-    QStringList blkdevs, bdrives, bparts;
-    for (const QString &blkdev : bdraw) {
-        const QString &bdtype = blkdev.section(' ', 0, 0);
-        if (bdtype == "disk") bdrives << blkdev;
-        else if (bdtype == "part") bparts << blkdev;
-    }
-    for (const QString &bdrive : bdrives) {
-        blkdevs << bdrive;
-        for (QString &bpart : bparts) {
-            if (bpart.section(' ', 1, 1).startsWith(bdrive.section(' ', 1, 1))) {
-                blkdevs.append(bpart);
-                bpart.clear();
-            }
-        }
-    }
-
-    // populate the block device list
     clear();
-    bool gpt = false; // propagates to all partitions within the drive
-    int driveIndex = 0; // for propagating the nasty flag to the drive
-    for (const QString &blkdev : blkdevs) {
-        const QStringList &bdsegs = blkdev.split(' ');
-        const int segsize = bdsegs.size();
-        if (segsize < 3) continue;
-
+    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
+    for(const QJsonValue &jsonDrive : jsonBD) {
+        int driveIndex = count(); // For propagating the nasty flag to the drive.
+        if(jsonDrive["type"] != "disk") continue;
         BlockDeviceInfo bdinfo;
-        bdinfo.isFuture = false;
-        bdinfo.isDrive = (bdsegs.at(0) == "disk");
-        bdinfo.name = bdsegs.at(1);
-
-        if (bdinfo.isDrive) {
-            driveIndex = count();
-            const QString cmd("blkid /dev/%1 | grep -q PTTYPE=\\\"gpt\\\"");
-            gpt = proc.exec(cmd.arg(bdinfo.name), false);
-        }
-        bdinfo.isGPT = gpt;
-        bdinfo.isBoot = (!bootUUID.isEmpty() && bdsegs.at(2) == bootUUID);
-
-        bdinfo.size = bdsegs.at(3).toLongLong();
-        if (segsize > 4) {
-            const QString &seg4 = bdsegs.at(4);
-            bdinfo.isESP = (seg4.count(rxESP) >= 1);
-            bdinfo.isNative = (seg4.count(rxNative) >= 1);
-            if (!bdinfo.isNasty) bdinfo.isNasty = (seg4.count(rxWinLDM) >= 1);
-        } else {
-            bdinfo.isESP = bdinfo.isNative = false;
-        }
-
-        if (!bdinfo.isDrive && !bdinfo.isESP) {
-            // Backup detection for drives that don't have UUID for ESP.
-            if(backup_list.isEmpty()) {
-                backup_list = proc.execOutLines("fdisk -l -o DEVICE,TYPE"
-                    " | grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
-            }
-            bdinfo.isESP = backup_list.contains(bdinfo.name);
-        }
-        if (segsize > 5) {
-            bdinfo.fs = bdsegs.at(5);
-            if(bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
-        }
-        if (segsize > 6) {
-            const QByteArray seg(bdsegs.at(6).toUtf8().replace('%', "\\x25").replace("\\x", "%"));
-            bdinfo.label = QUrl::fromPercentEncoding(seg).trimmed();
-        }
-        if (segsize > 7) {
-            const QByteArray seg(bdsegs.at(7).toUtf8().replace('%', "\\x25").replace("\\x", "%"));
-            bdinfo.model = QUrl::fromPercentEncoding(seg).trimmed();
-        }
+        bdinfo.name = jsonDrive["name"].toString();
+        bdinfo.isDrive = true;
+        bdinfo.isGPT = proc.exec(cmdTestGPT.arg(bdinfo.name), false);
+        bdinfo.size = jsonDrive["size"].toVariant().toLongLong();
+        bdinfo.label = jsonDrive["label"].toString();
+        bdinfo.model = jsonDrive["model"].toString();
         append(bdinfo);
-        // propagate the boot and nasty flags up to the drive
-        if (bdinfo.isBoot) operator[](driveIndex).isBoot = true;
-        if (bdinfo.isNasty) operator[](driveIndex).isNasty = true;
+
+        const QJsonArray &jsonParts = jsonDrive["children"].toArray();
+        for(const QJsonValue &jsonPart : jsonParts) {
+            bdinfo.isDrive = false;
+            bdinfo.name = jsonPart["name"].toString();
+            bdinfo.size = jsonPart["size"].toVariant().toLongLong();
+            bdinfo.label = jsonPart["label"].toString();
+            bdinfo.model = jsonPart["model"].toString();
+
+            const QString &partType = jsonPart["parttype"].toString();
+            if(partType.isEmpty()) bdinfo.isESP = bdinfo.isNative = false;
+            else {
+                bdinfo.isESP = (partType.count(rxESP) >= 1);
+                bdinfo.isNative = (partType.count(rxNative) >= 1);
+                if(!bdinfo.isNasty) bdinfo.isNasty = (partType.count(rxWinLDM) >= 1);
+            }
+            if (!bdinfo.isESP) {
+                // Backup detection for drives that don't have UUID for ESP.
+                if(backup_list.isEmpty()) {
+                    backup_list = proc.execOutLines("fdisk -l -o DEVICE,TYPE"
+                        " | grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
+                }
+                bdinfo.isESP = backup_list.contains(bdinfo.name);
+            }
+
+            bdinfo.isBoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
+            bdinfo.fs = jsonPart["fstype"].toString();
+            if(bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
+            append(bdinfo);
+            // Propagate the boot and nasty flags up to the drive.
+            if (bdinfo.isBoot) operator[](driveIndex).isBoot = true;
+            if (bdinfo.isNasty) operator[](driveIndex).isNasty = true;
+        }
     }
     // propagate the boot flag across the entire drive
     bool driveBoot = false;
