@@ -766,14 +766,16 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
         if(updateTree) addItem(drivetree, 1, "bios_grub", crypto);
         rootFormatSize -= 1;
     }
-    if(crypto){
+    int rootMinMB = rootSpaceNeeded / 1048576;
+    const int bootMinMB = bootSpaceNeeded / 1048576;
+    if(!crypto) rootMinMB += bootMinMB;
+    else {
         int bootFormatSize = 512;
-        while(bootFormatSize < (bootSpaceNeeded/1048576)) bootFormatSize*=2;
+        if(bootFormatSize < bootMinMB) bootFormatSize = bootSpaceNeeded;
         if(updateTree) addItem(drivetree, bootFormatSize, "boot", crypto);
         rootFormatSize -= bootFormatSize;
     }
     // Swap space.
-    const int rootMinMB = rootSpaceNeeded / 1048576;
     int swapFormatSize = rootFormatSize-rootMinMB;
     struct sysinfo sinfo;
     if(sysinfo(&sinfo)!=0) sinfo.totalram = 2048;
