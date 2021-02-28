@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
                                                            "The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.\n"\
                                                            "The installer will not write any passwords or ignored settings to the new configuration file.\n"\
                                                            "Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.")},
-                       {"gpt-overwride", QApplication::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"\
+                       {"gpt-override", QApplication::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"\
                                                           "Without this option, GPT will only be used on drives with at least 2TB capacity.\n"\
                                                           "GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.")},
                        {{"n", "nocopy"}, QApplication::tr("Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.")},
