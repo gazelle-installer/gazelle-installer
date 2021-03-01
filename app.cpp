@@ -106,27 +106,6 @@ int main(int argc, char *argv[])
     if (appTran.load(QString("gazelle-installer_") + QLocale::system().name(), "/usr/share/gazelle-installer/locale"))
         a.installTranslator(&appTran);
 
-    // exit if "minstall" is already running
-    if (system("ps -C minstall | sed '0,/minstall/{s/minstall//}' | grep minstall") == 0) {
-        QMessageBox::critical(nullptr, QString(),
-                              QApplication::tr("The installer won't launch because it appears to be running already in the background.\n\n"
-                                               "Please close it if possible, or run 'pkill minstall' in terminal."));
-        return EXIT_FAILURE;
-    }
-
-    // check if 32bit on 64 bit UEFI
-    if (system("uname -m | grep -q i686") == 0 && system("grep -q 64 /sys/firmware/efi/fw_platform_size") == 0)
-    {
-        int ans = QMessageBox::question(nullptr, QString(), QApplication::tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot"
-                                                                           " unless you select Legacy Boot or similar at restart.\n"
-                                                                           "We recommend you quit now and restart in Legacy Boot\n\n"
-                                                                           "Do you want to continue the installation?"),
-                                    QMessageBox::Yes, QMessageBox::No);
-        if (ans != QMessageBox::Yes) {
-            return EXIT_FAILURE;
-        }
-    }
-
     // alert the user if not running as root
     if (!parser.isSet("pretend") && getuid()!=0) {
         QApplication::beep();

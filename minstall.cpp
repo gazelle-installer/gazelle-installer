@@ -17,6 +17,7 @@
 //   limitations under the License.
 //
 
+#include <cstdlib>
 #include <QDebug>
 #include <QFileInfo>
 #include <QTimer>
@@ -126,6 +127,14 @@ void MInstall::startup()
     proc.log(__PRETTY_FUNCTION__);
     resizeEvent(nullptr);
 
+    // Exit if "minstall" is already running.
+    if (proc.exec("ps -C minstall | sed '0,/minstall/{s/minstall//}' | grep minstall")) {
+        QMessageBox::critical(this, windowTitle(),
+            tr("The installer won't launch because it appears to be running already in the background.\n\n"
+                "Please close it if possible, or run 'pkill minstall' in terminal."));
+        exit(EXIT_FAILURE);
+    }
+
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
         saveDesktopCheckBox->hide();
@@ -147,8 +156,7 @@ void MInstall::startup()
         partman.bootSpaceNeeded = proc.execOut("du -sb " + bootSource).section('\t', 0, 0).toLongLong();
         if (!pretend && partman.bootSpaceNeeded==0) {
             QMessageBox::critical(this, windowTitle(), tr("Cannot access installation source."));
-            qApp->exit(EXIT_FAILURE);
-            return;
+            exit(EXIT_FAILURE);
         }
 
         //rootspaceneeded is the size of the linuxfs file * a compression factor + contents of the rootfs.  conservative but fast
@@ -197,6 +205,12 @@ void MInstall::startup()
 
         // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
         if (proc.exec("uname -m | grep -q i686", false) && proc.exec("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
+            const int ans = QMessageBox::question(this, windowTitle(),
+                tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not"
+                    " be able to boot unless you select Legacy Boot or similar at restart.\n"
+                    "We recommend you quit now and restart in Legacy Boot\n\n"
+                    "Do you want to continue the installation?"), QMessageBox::Yes, QMessageBox::No);
+            if (ans != QMessageBox::Yes) exit(EXIT_FAILURE);
             uefi = false;
         } else {
             uefi = proc.exec("test -d /sys/firmware/efi", true);
