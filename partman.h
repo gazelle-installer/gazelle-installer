@@ -26,6 +26,7 @@
 #include "mprocess.h"
 #include "blockdev.h"
 #include "ui_meinstall.h"
+#include "msettings.h"
 
 class PartMan : public QObject
 {
@@ -82,6 +83,7 @@ public:
     QMap<QString, QString> defaultLabels;
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
     void populate(QTreeWidgetItem *drvstart = nullptr);
+    bool manageConfig(MSettings &config, bool save);
     QWidget *composeValidate(bool automatic,
         const QString &minSizeText, const QString &project);
     bool checkTargetDrivesOK();
