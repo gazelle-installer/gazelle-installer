@@ -35,6 +35,12 @@ QStringList BlockDeviceInfo::split(const QString &devname)
     if (!list.isEmpty()) list.removeFirst();
     return list;
 }
+QString BlockDeviceInfo::join(const QString &drive, int partnum)
+{
+    QString name = drive;
+    if (name.startsWith("nvme") || name.startsWith("mmcblk")) name += 'p';
+    return (name + QString::number(partnum));
+}
 
 // return block device info that is suitable for a combo box
 void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
