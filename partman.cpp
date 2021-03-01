@@ -105,14 +105,16 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         const QString &drvDevice = drvit->text(Device);
         // Check if the drive is to be cleared and formatted.
         int partCount = drvit->childCount();
+        bool drvPreserve = drvit->data(Device, Qt::UserRole).toBool();
         if(save) {
-            const bool preserve = drvit->data(Device, Qt::UserRole).toBool();
-            if(!preserve) config.setValue("Storage/NewLayout."+drvDevice, partCount);
+            if(!drvPreserve) config.setValue("Storage/NewLayout."+drvDevice, partCount);
         } else {
-            partCount = config.value("Storage/NewLayout."+drvDevice).toInt();
-            if(partCount) {
+            const int newCount = config.value("Storage/NewLayout."+drvDevice).toInt();
+            if(newCount) {
+                drvPreserve = false;
                 while(drvit->childCount()) drvit->removeChild(drvit->child(0));
                 drvit->setData(Device, Qt::UserRole, QVariant(false));
+                partCount = newCount;
             }
         }
         // Partition configuration.
@@ -121,7 +123,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         for(int ixPart = 0; ixPart < partCount; ++ixPart) {
             QTreeWidgetItem *twit = nullptr;
             // Obtain the partition device name.
-            if(save) twit = drvit->child(ixPart);
+            if(save || drvPreserve) twit = drvit->child(ixPart);
             else {
                 twit = new QTreeWidgetItem(drvit);
                 twit->setText(Device, BlockDeviceInfo::join(drvDevice, ixPart+1));
@@ -131,7 +133,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             if(save) {
                 config.setValue("Size", twitSize(twit, true));
                 config.setValue("Encrypt", twit->checkState(Encrypt)==Qt::Checked);
-            } else {
+            } else if(!drvPreserve) {
                 const int size = config.value("Size").toLongLong() / 1048576;
                 totalMB += size;
                 QWidget *spinSize = gui.treePartitions->itemWidget(twit, Size);
@@ -326,7 +328,7 @@ void PartMan::comboUseTextChange(const QString &text)
         if(useClass > 3 && (curtype == "crypto_LUKS"
             || comboType->findText(curtype, Qt::MatchFixedString) >= 0)) {
             // Add an item at the start to allow preserving the existing format.
-            comboType->insertItem(0, tr("%1 (keep)").arg(curtype), "PRESERVE");
+            comboType->insertItem(0, tr("Preserve (%1)").arg(curtype), "PRESERVE");
             comboType->insertSeparator(1);
         }
         comboType->setEnabled(comboType->count()>1);

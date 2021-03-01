@@ -51,7 +51,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
         oem = args.isSet("oem");
         partman.gptoverride = args.isSet("gpt-override");
     } else {
-        brave = automatic = oem = partman.gptoverride = false;
+        brave = automatic = oem = false;
         closeButton->setText(tr("Shutdown"));
         phase = 2;
         // dark palette for the OOBE screen
@@ -557,6 +557,7 @@ bool MInstall::processNextPhase()
         phase = 4;
         proc.status(tr("Cleaning up"), 100);
         cleanup();
+        proc.status(tr("Finished"), 100);
         gotoPage(widgetStack->indexOf(Step_End));
     }
     return true;
@@ -1954,7 +1955,7 @@ void MInstall::gotoPage(int next)
     if (automatic) {
         if (!MSettings::isBadWidget(widgetStack->currentWidget())
             && next > curr) nextButton->click();
-        else automatic = false; // failed validation
+        else if(curr!=0) automatic = false; // failed validation
     }
 
     // process next installation phase
