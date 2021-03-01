@@ -31,6 +31,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 
+#include "msettings.h"
 #include "partman.h"
 
 #define PARTMAN_SAFETY_MB 32 // 1MB at start + Compensate for rounding errors.
@@ -94,6 +95,62 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     }
     gui.treePartitions->blockSignals(false);
     treeSelChange();
+}
+
+bool PartMan::manageConfig(MSettings &config, bool save)
+{
+    const int driveCount = gui.treePartitions->topLevelItemCount();
+    for(int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
+        QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
+        const QString &drvDevice = drvit->text(Device);
+        // Check if the drive is to be cleared and formatted.
+        int partCount = drvit->childCount();
+        if(save) {
+            const bool preserve = drvit->data(Device, Qt::UserRole).toBool();
+            if(!preserve) config.setValue("Storage/NewLayout."+drvDevice, partCount);
+        } else {
+            partCount = config.value("Storage/NewLayout."+drvDevice).toInt();
+            if(partCount) {
+                while(drvit->childCount()) drvit->removeChild(drvit->child(0));
+                drvit->setData(Device, Qt::UserRole, QVariant(false));
+            }
+        }
+        // Partition configuration.
+        const long long maxMB = twitSize(drvit) - PARTMAN_SAFETY_MB;
+        long long totalMB = 0;
+        for(int ixPart = 0; ixPart < partCount; ++ixPart) {
+            QTreeWidgetItem *twit = nullptr;
+            // Obtain the partition device name.
+            if(save) twit = drvit->child(ixPart);
+            else {
+                twit = new QTreeWidgetItem(drvit);
+                twit->setText(Device, BlockDeviceInfo::join(drvDevice, ixPart+1));
+            }
+            // Configuration management, accounting for automatic control correction order.
+            config.beginGroup("Storage." + twit->text(Device));
+            if(save) {
+                config.setValue("Size", twitSize(twit, true));
+                config.setValue("Encrypt", twit->checkState(Encrypt)==Qt::Checked);
+            } else {
+                const int size = config.value("Size").toLongLong() / 1048576;
+                totalMB += size;
+                QWidget *spinSize = gui.treePartitions->itemWidget(twit, Size);
+                static_cast<QSpinBox *>(spinSize)->setValue(size);
+                if(totalMB > maxMB) config.markBadWidget(spinSize);
+            }
+            config.manageComboBox("UseFor", twitComboBox(twit, UseFor), false);
+            config.manageComboBox("Format", twitComboBox(twit, Type), true);
+            if(!save) {
+                const bool crypto = config.value("Encrypt").toBool();
+                twit->setCheckState(Encrypt, crypto ? Qt::Checked : Qt::Unchecked);
+            }
+            config.manageLineEdit("Label", twitLineEdit(twit, Label));
+            config.manageLineEdit("Options", twitLineEdit(twit, Options));
+            config.endGroup();
+        }
+    }
+    treeSelChange();
+    return true;
 }
 
 inline QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent,
@@ -173,11 +230,9 @@ QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo
 
 void PartMan::labelParts(QTreeWidgetItem *drive)
 {
-    QString name = drive->text(Device);
-    if (name.startsWith("nvme") || name.startsWith("mmcblk")) name += "p";
-    name += "%1";
+    const QString &drv = drive->text(Device);
     for(int ixi = drive->childCount() - 1; ixi >= 0; --ixi) {
-        drive->child(ixi)->setText(Device, name.arg(ixi+1));
+        drive->child(ixi)->setText(Device, BlockDeviceInfo::join(drv, ixi+1));
     }
 }
 
@@ -246,20 +301,20 @@ void PartMan::comboUseTextChange(const QString &text)
             editLabel->setText(item->text(Label));
             comboType->addItem(curtype);
             break;
-        case 1: comboType->addItem("FAT32"); break;
-        case 2: comboType->addItem("GRUB"); break;
-        case 3: comboType->addItem("ext4"); break;
-        case 4: comboType->addItem("SWAP"); break;
+        case 1: comboType->addItem("FAT32", "FAT32"); break;
+        case 2: comboType->addItem("GRUB", "GRUB"); break;
+        case 3: comboType->addItem("ext4", "ext4"); break;
+        case 4: comboType->addItem("SWAP", "SWAP"); break;
         default:
-            comboType->addItem("ext4");
-            comboType->addItem("ext3");
-            comboType->addItem("ext2");
-            comboType->addItem("f2fs");
-            comboType->addItem("jfs");
-            comboType->addItem("xfs");
-            comboType->addItem("btrfs");
-            comboType->addItem("reiserfs");
-            comboType->addItem("reiser4");
+            comboType->addItem("ext4", "ext4");
+            comboType->addItem("ext3", "ext3");
+            comboType->addItem("ext2", "ext2");
+            comboType->addItem("f2fs", "f2fs");
+            comboType->addItem("jfs", "jfs");
+            comboType->addItem("xfs", "xfs");
+            comboType->addItem("btrfs", "btrfs");
+            comboType->addItem("reiserfs", "reiserfs");
+            comboType->addItem("reiser4", "reiser4");
         }
         // Changing to and from a mount/use that support encryption.
         if(useClass >= 0 && useClass <= 3) {
@@ -271,7 +326,7 @@ void PartMan::comboUseTextChange(const QString &text)
         if(useClass > 3 && (curtype == "crypto_LUKS"
             || comboType->findText(curtype, Qt::MatchFixedString) >= 0)) {
             // Add an item at the start to allow preserving the existing format.
-            comboType->insertItem(0, tr("%1 (keep)").arg(curtype), QVariant(true));
+            comboType->insertItem(0, tr("%1 (keep)").arg(curtype), "PRESERVE");
             comboType->insertSeparator(1);
         }
         comboType->setEnabled(comboType->count()>1);
@@ -295,7 +350,7 @@ void PartMan::comboTypeTextChange(const QString &)
         if(!comboType || !editOpts) return;
         const QString &type = comboType->currentText();
         const Qt::ItemFlags itflags = (*it)->flags();
-        if(comboType->currentData(Qt::UserRole).toBool()) {
+        if(comboType->currentData(Qt::UserRole)=="PRESERVE") {
             if((*it)->data(Encrypt, Qt::CheckStateRole).isValid()) {
                 const bool luks = ((*it)->text(Type)=="crypto_LUKS");
                 (*it)->setCheckState(Encrypt, luks ? Qt::Checked : Qt::Unchecked);
@@ -1243,7 +1298,7 @@ inline long long PartMan::twitSize(QTreeWidgetItem *twit, bool bytes)
 inline bool PartMan::twitWillFormat(QTreeWidgetItem *twit)
 {
     QComboBox *combo = twitComboBox(twit, Type);
-    return !(combo->currentData(Qt::UserRole).toBool());
+    return (combo->currentData(Qt::UserRole) != "PRESERVE");
 }
 inline QString PartMan::twitUseFor(QTreeWidgetItem *twit)
 {
