@@ -145,6 +145,11 @@ void MInstall::startup()
         // calculate required disk space
         bootSource = "/live/aufs/boot";
         partman.bootSpaceNeeded = proc.execOut("du -sb " + bootSource).section('\t', 0, 0).toLongLong();
+        if (!pretend && partman.bootSpaceNeeded==0) {
+            QMessageBox::critical(this, windowTitle(), tr("Cannot access installation source."));
+            qApp->exit(EXIT_FAILURE);
+            return;
+        }
 
         //rootspaceneeded is the size of the linuxfs file * a compression factor + contents of the rootfs.  conservative but fast
         //factors are same as used in live-remaster
