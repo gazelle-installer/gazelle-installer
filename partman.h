@@ -50,7 +50,7 @@ class PartMan : public QObject
     void setup();
     inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
         const QString &defaultUse, bool crypto);
-    QTreeWidgetItem *setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
+    void setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
         int defaultMB = 0, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drive);
     static QString translateUse(const QString &alias);
