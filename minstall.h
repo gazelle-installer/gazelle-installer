@@ -27,6 +27,7 @@
 
 #include "mprocess.h"
 #include "msettings.h"
+#include "partman.h"
 #include "blockdev.h"
 #include "safecache.h"
 
@@ -49,12 +50,7 @@ public:
 
     bool isInsideVB();
 
-    bool checkTargetDrivesOK();
     bool installLoader();
-    bool makeLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
-    bool makeLuksPartition(const QString &dev, const QByteArray &password);
-    bool openLuksPartition(const QString &dev, const QString &fs_name, const QByteArray &password, const QString &options = QString(), const bool failHard = true);
-    bool mountPartition(const QString dev, const QString point, const QString mntops);
     void enableOOBE();
     bool processOOBE();
     bool validateUserInfo();
@@ -64,7 +60,6 @@ public:
     void buildBootLists();
     void buildServiceList();
     void disablehiberanteinitramfs();
-    void makeFstab();
     bool processNextPhase();
     void setLocale();
     void setServices();
@@ -94,6 +89,7 @@ public:
     void cleanup(bool endclean = true);
 
 private slots:
+    void on_splitter_splitterMoved(int, int);
     void on_mainTabs_currentChanged(int index);
 
     void on_abortInstallButton_clicked();
@@ -102,21 +98,14 @@ private slots:
     void on_closeButton_clicked();
     void on_nextButton_clicked();
     void on_passwordCheckBox_stateChanged(int);
-    void on_qtpartedButton_clicked();
+    void on_buttonPartReload_clicked();
+    void on_buttonRunParted_clicked();
     void on_viewServicesButton_clicked();
 
-    void on_userPasswordEdit2_textChanged(const QString &arg1);
-    void on_rootPasswordEdit2_textChanged(const QString &arg1);
-    void on_userPasswordEdit_textChanged();
-    void on_rootPasswordEdit_textChanged();
-
+    void on_sliderPart_valueChanged(int value);
     void on_checkBoxEncryptAuto_toggled(bool checked);
-    void on_existing_partitionsButton_clicked(bool checked);
+    void on_customPartButton_clicked(bool checked);
 
-    void on_FDEpassword_textChanged();
-    void on_FDEpassword2_textChanged(const QString &arg1);
-    void on_FDEpassCust_textChanged();
-    void on_FDEpassCust2_textChanged(const QString &arg1);
     void on_buttonBenchmarkFDE_clicked();
     void on_buttonAdvancedFDE_clicked();
     void on_buttonAdvancedFDECust_clicked();
@@ -124,16 +113,6 @@ private slots:
     void on_comboFDEchain_currentIndexChanged(const QString &arg1);
     void on_spinFDEkeysize_valueChanged(int i);
     void on_comboFDEivgen_currentIndexChanged(const QString &arg1);
-
-    void on_checkBoxEncryptRoot_toggled(bool checked);
-    void on_checkBoxEncryptHome_toggled(bool checked);
-    void on_checkBoxEncryptSwap_toggled(bool checked);
-
-    void on_rootTypeCombo_activated(QString item = "");
-    void on_rootCombo_currentIndexChanged(const QString &text);
-    void on_homeCombo_currentIndexChanged(const QString &text);
-    void on_swapCombo_currentIndexChanged(const QString &text);
-    void on_bootCombo_currentIndexChanged(int);
 
     void on_grubCheckBox_toggled(bool checked);
     void on_grubMbrButton_toggled();
@@ -154,15 +133,12 @@ private:
     int phase = 0;
 
     // command line options
-    bool brave, pretend, automatic, nocopy, sync, gptoverride;
+    bool brave, pretend, automatic, nocopy, sync;
     bool oem, oobe;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
 
-    bool isHomeEncrypted = false;
-    bool isRootEncrypted = false;
-    bool isSwapEncrypted = false;
     bool uefi = false;
     bool mactest = false;
     bool containsSystemD = false;
@@ -171,34 +147,14 @@ private:
     // source medium
     QString rootSources;
     QString bootSource;
-    long long rootSpaceNeeded = 0;
-    long long bootSpaceNeeded = 0;
 
     // auto-mount setup
     QString listMaskedMounts;
     bool autoMountEnabled = true;
 
-    // if these variables are non-zero then the installer formats the partition
-    // if they are negative the installer formats an existing partition
-    long long rootFormatSize = 0;
-    long long homeFormatSize = 0;
-    long long swapFormatSize = 0;
-    long long bootFormatSize = 0;
-    long long espFormatSize = 0;
-
-    QString bootDevice;
-    QString swapDevice;
-    QString rootDevice;
-    QString homeDevice;
-    QString espDevice;
-    QString biosGrubDevice;
-
     QWidget *nextFocus = nullptr;
+    PartMan partman;
     BlockDeviceList listBlkDevs;
-    QStringList listToUnmount;
-    QString home_mntops = "defaults";
-    QString root_mntops = "defaults";
-    QString boot_mntops = "defaults";
     QStringList listHomes;
     SafeCache key;
 
@@ -229,19 +185,16 @@ private:
 
     // slots
     void startup();
-    // helpers
-    bool checkPassword(QLineEdit *passEdit);
+    void diskPassValidationChanged(bool valid);
+    void userPassValidationChanged();
     // private functions
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
-    void updatePartitionWidgets();
+    void updatePartitionWidgets(bool all);
     void updatePartitionCombos(QComboBox *changed);
+    void setupPartitionSlider();
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int start, int stop);
     bool saveHomeBasic();
-    bool validateChosenPartitions();
-    bool calculateDefaultPartitions();
-    bool makePartitions();
-    bool formatPartitions();
     bool installLinux(const int progend);
     bool copyLinux(const int progend);
     void failUI(const QString &msg);
