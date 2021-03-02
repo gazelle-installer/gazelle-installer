@@ -18,9 +18,10 @@ if test "$EUID" != 0; then
 
 	#exit early if not live
 
-	if [ ! -e "/live/linux" ]; then
+	if ! grep -sq '^overlay /live/aufs' /proc/mounts; then
 		exitearly=true
-	fi	
+	fi  
+	
 	
 	if [ "$exitearly" ]; then
 		echo ""
