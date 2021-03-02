@@ -106,16 +106,14 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         // Check if the drive is to be cleared and formatted.
         int partCount = drvit->childCount();
         bool drvPreserve = drvit->data(Device, Qt::UserRole).toBool();
+        const QString &configNewLayout = "Storage/NewLayout."+drvDevice;
         if(save) {
-            if(!drvPreserve) config.setValue("Storage/NewLayout."+drvDevice, partCount);
-        } else {
-            const int newCount = config.value("Storage/NewLayout."+drvDevice).toInt();
-            if(newCount) {
-                drvPreserve = false;
-                while(drvit->childCount()) drvit->removeChild(drvit->child(0));
-                drvit->setData(Device, Qt::UserRole, QVariant(false));
-                partCount = newCount;
-            }
+            if(!drvPreserve) config.setValue(configNewLayout, partCount);
+        } else if(config.contains(configNewLayout)) {
+            drvPreserve = false;
+            while(drvit->childCount()) drvit->removeChild(drvit->child(0));
+            drvit->setData(Device, Qt::UserRole, QVariant(false));
+            partCount = config.value(configNewLayout).toInt();
         }
         // Partition configuration.
         const long long maxMB = twitSize(drvit) - PARTMAN_SAFETY_MB;
@@ -126,6 +124,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             if(save || drvPreserve) twit = drvit->child(ixPart);
             else {
                 twit = new QTreeWidgetItem(drvit);
+                setupItem(twit, nullptr);
                 twit->setText(Device, BlockDeviceInfo::join(drvDevice, ixPart+1));
             }
             // Configuration management, accounting for automatic control correction order.
@@ -133,7 +132,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             if(save) {
                 config.setValue("Size", twitSize(twit, true));
                 config.setValue("Encrypt", twit->checkState(Encrypt)==Qt::Checked);
-            } else if(!drvPreserve) {
+            } else if(!drvPreserve && config.contains("Size")) {
                 const int size = config.value("Size").toLongLong() / 1048576;
                 totalMB += size;
                 QWidget *spinSize = gui.treePartitions->itemWidget(twit, Size);
@@ -142,7 +141,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             }
             config.manageComboBox("UseFor", twitComboBox(twit, UseFor), false);
             config.manageComboBox("Format", twitComboBox(twit, Type), true);
-            if(!save) {
+            if(!save && config.contains("Encrypt")) {
                 const bool crypto = config.value("Encrypt").toBool();
                 twit->setCheckState(Encrypt, crypto ? Qt::Checked : Qt::Unchecked);
             }
@@ -165,7 +164,7 @@ inline QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent,
     }
     return twit;
 }
-QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
+void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     int defaultMB, const QString &defaultUse)
 {
     // Size
@@ -227,7 +226,6 @@ QTreeWidgetItem *PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo
     editOptions->setText("defaults");
 
     if(!defaultUse.isEmpty()) comboUse->setCurrentText(defaultUse);
-    return twit;
 }
 
 void PartMan::labelParts(QTreeWidgetItem *drive)
