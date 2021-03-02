@@ -171,17 +171,17 @@ void MInstall::startup()
         }
         //gzip, xz, or lz4
         if ( linuxfs_compression_type == "1") {
-            compression_factor = 37; // gzip
+            compression_factor = 30; // gzip
         } else if (linuxfs_compression_type == "2") {
-            compression_factor = 52; //lzo, not used by antiX
+            compression_factor = 42; //lzo, not used by antiX
         } else if (linuxfs_compression_type == "3") {
-            compression_factor = 52;  //lzma, not used by antiX
+            compression_factor = 42;  //lzma, not used by antiX
         } else if (linuxfs_compression_type == "4") {
-            compression_factor = 31; //xz
+            compression_factor = 25; //xz
         } else if (linuxfs_compression_type == "5") {
-            compression_factor = 52; // lz4
+            compression_factor = 42; // lz4
         } else {
-            compression_factor = 30; //anythng else or linuxfs not reachable (toram), should be pretty conservative
+            compression_factor = 25; //anythng else or linuxfs not reachable (toram), should be pretty conservative
         }
 
         qDebug() << "linuxfs compression type is " << linuxfs_compression_type << "compression factor is " << compression_factor;
