@@ -584,12 +584,12 @@ void MInstall::manageConfig(enum ConfigAction mode)
         QRadioButton *diskRadios[] = {entireDiskButton, customPartButton};
         config->manageRadios("Target", 2, diskChoices, diskRadios);
         const bool targetDrive = entireDiskButton->isChecked();
-        if (targetDrive) {
+        if (targetDrive || mode!=ConfigSave) {
             config->manageComboBox("Drive", diskCombo, true);
             config->manageCheckBox("DriveEncrypt", checkBoxEncryptAuto);
-            if(mode==ConfigSave) config->setValue("RootSpace", sliderPart->value());
-            else {
-                 const int sliderVal = config->value("RootSpace").toInt();
+            if(mode==ConfigSave) config->setValue("RootPortion", sliderPart->value());
+            else if(config->contains("RootPortion")) {
+                 const int sliderVal = config->value("RootPortion").toInt();
                  sliderPart->setValue(sliderVal);
                  on_sliderPart_valueChanged(sliderVal);
                  if(sliderPart->value() != sliderVal) config->markBadWidget(sliderPart);
@@ -597,7 +597,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         }
         config->endGroup();
         // Custom partitions step. PartMan handles its config groups automatically.
-        if(!targetDrive) {
+        if(!targetDrive || mode!=ConfigSave) {
             config->setGroupWidget(Step_Partitions);
             config->manageCheckBox("Storage/BadBlocksCheck", badblocksCheck);
             partman.manageConfig(*config, mode==ConfigSave);
@@ -709,6 +709,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
 
     if (mode == ConfigSave) {
         config->sync();
+        QFile::remove("/etc/minstalled.conf");
         QFile::copy(config->fileName(), "/etc/minstalled.conf");
     }
 
