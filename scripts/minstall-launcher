@@ -6,31 +6,32 @@
 # based on mx-pkexec wrapper
 
 ##launch installer
-exitearly=false
-##exit early if arguments present
-
-if [ -n "$1" ]; then
-	exitearly=true
-fi
-
-#exit early if not live
-
-if [ ! -e "/live/linux" ]; then
-	exitearly=true
-fi	
-	
-if [ "$exitearly" ]; then
-	echo ""
-	echo "INFORMATION: Non-live enviroment or options not supported"
-	echo "             use alternate authentication to launch installer"
-	echo "             sudo minstall [OPTIONS]"
-	echo ""
-	exit 0
-fi
 
 if test "$EUID" != 0; then
     # normal user
-    ##disable Xfce automount features
+	##exit early if arguments present
+	exitearly=false
+
+	if [ -n "$1" ]; then
+		exitearly=true
+	fi
+
+	#exit early if not live
+
+	if [ ! -e "/live/linux" ]; then
+		exitearly=true
+	fi	
+	
+	if [ "$exitearly" ]; then
+		echo ""
+		echo "INFORMATION: Non-live enviroment or options not supported"
+		echo "             use alternate authentication to launch installer"
+		echo "             sudo minstall [OPTIONS]"
+		echo ""
+		exit 0
+	fi
+
+	##disable Xfce automount features
 
     INITIALAUTOMOUNT=false
     if command -v xfconf-query >/dev/null && \
