@@ -77,7 +77,7 @@ class PartMan : public QObject
     void partRemoveClick(bool);
     void partDefaultClick(bool);
 public:
-    bool gptoverride=false, uefi=false;
+    bool gptoverride=false, uefi=false, brave=false;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
     QMap<QString, QString> defaultLabels;
