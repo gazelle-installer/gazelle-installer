@@ -23,7 +23,7 @@ if test "$EUID" != 0; then
 	fi  
 	
 	
-	if [ "$exitearly" ]; then
+	if [ "$exitearly" = "true" ]; then
 		echo ""
 		echo "INFORMATION: Non-live enviroment or options not supported"
 		echo "             use alternate authentication to launch installer"
