@@ -46,7 +46,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     nocopy = args.isSet("nocopy");
     sync = args.isSet("sync");
     if(!oobe) {
-        brave = args.isSet("brave");
+        partman.brave = brave = args.isSet("brave");
         automatic = args.isSet("auto");
         oem = args.isSet("oem");
         partman.gptoverride = args.isSet("gpt-override");
@@ -433,6 +433,15 @@ bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtex
     return proc.exec(cmd);
 }
 
+QString MInstall::sliderSizeString(long long size)
+{
+    QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
+    if(strout.length()>6) {
+        return QLocale::system().formattedDataSize(size, 0, QLocale::DataSizeTraditionalFormat);
+    }
+    return strout;
+}
+
 void MInstall::updateCursor(const Qt::CursorShape shape)
 {
     if (shape != Qt::ArrowCursor) {
@@ -550,7 +559,9 @@ bool MInstall::processNextPhase()
             manageConfig(ConfigSave);
             config->dumpDebug();
             proc.exec("/bin/sync", true); // the sync(2) system call will block the GUI
-            if (!installLoader()) return false;
+            if(grubCheckBox->isChecked()) {
+                if (!installLoader()) return false;
+            }
         } else if (!pretendToInstall(progPhase23, 99)){
             return false;
         }
@@ -1584,8 +1595,7 @@ int MInstall::showPage(int curr, int next)
                                                QMessageBox::Yes, QMessageBox::No);
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
-            partman.layoutDefault(partman.selectedDriveAuto(),
-                sliderPart->value(), checkBoxEncryptAuto->isChecked());
+            partman.layoutDefault(partman.selectedDriveAuto(), -1, checkBoxEncryptAuto->isChecked());
             QWidget *nf = partman.composeValidate(true, MIN_INSTALL_SIZE, PROJECTNAME);
             if (nf) {
                 nextFocus = nf;
@@ -2026,18 +2036,16 @@ void MInstall::updatePartitionWidgets(bool all)
 void MInstall::setupPartitionSlider()
 {
     frameSliderPart->setDisabled(true);
-    const long long maxMB = 1073731338; // "1,023.99 GB"
-    const QString strMB = QLocale::system().formattedDataSize(maxMB,
-        2, QLocale::DataSizeTraditionalFormat);
     // Allow the slider labels to fit all possible formatted sizes.
-    labelSliderRoot->setText(strMB+"\n"+tr("Root"));
-    labelSliderHome->setText(strMB+"\n"+tr("Home"));
-    qApp->processEvents(); // Allow labels to adjust their sizes.
-    labelSliderRoot->setMinimumWidth(labelSliderRoot->width());
-    labelSliderHome->setMinimumWidth(labelSliderHome->width());
-    qApp->processEvents(); // Allow labels to accept their sizes.
+    const QString &strMB = sliderSizeString(1072693248) + '\n'; // "1,023 GB"
+    const QFontMetrics &fmetrics = labelSliderRoot->fontMetrics();
+    int mwidth = fmetrics.boundingRect(QRect(), Qt::AlignCenter, strMB+tr("Root")).width();
+    labelSliderRoot->setMinimumWidth(mwidth);
+    mwidth = fmetrics.boundingRect(QRect(), Qt::AlignCenter, strMB+tr("Home")).width();
+    labelSliderHome->setMinimumWidth(mwidth);
     labelSliderRoot->setText("----");
     labelSliderHome->setText("----");
+    // Snap the slider to the legal range.
     on_sliderPart_valueChanged(-1);
 }
 
@@ -2378,30 +2386,35 @@ void MInstall::on_sliderPart_valueChanged(int value)
     QTreeWidgetItem *drvitem = partman.selectedDriveAuto();
     if(!drvitem) return;
     long long available = partman.layoutDefault(drvitem, 100, crypto, false);
+    if(!available) return;
     const int rootMinMB = partman.rootSpaceNeeded / 1048576;
     const int minPercent = (rootMinMB*100) / available;
+    int origValue = value;
     if(value<0) { // Internal setup.
-        value = sliderPart->value();
+        origValue = value = sliderPart->value();
         frameSliderPart->setEnabled(true);
+        // 64GB cap on the default slider value, rounded to nearest percentage.
+        const int rootPortionMax = ((65536*100) + (available/2)) / available;
+        if(value > rootPortionMax) value = rootPortionMax;
     }
     if(value<minPercent) {
         if(value>=0) qApp->beep();
         value = minPercent;
+    }
+    if(value != origValue) {
         sliderPart->blockSignals(true);
         sliderPart->setValue(value);
         sliderPart->blockSignals(false);
     }
 
     const long long availRoot = partman.layoutDefault(drvitem, value, crypto, false);
-    QString valstr = QLocale::system().formattedDataSize(availRoot*1048576,
-        (availRoot>1023)?2:0, QLocale::DataSizeTraditionalFormat);
+    QString valstr = sliderSizeString(availRoot*1048576);
     available -= availRoot;
     labelSliderRoot->setText(valstr + "\n" + tr("Root"));
 
     if(value==100) valstr = tr("----");
     else {
-        valstr = QLocale::system().formattedDataSize(available*1048576,
-            (available>1023)?2:0, QLocale::DataSizeTraditionalFormat);
+        valstr = sliderSizeString(available*1048576);
         valstr += "\n" + tr("Home");
     }
     labelSliderHome->setText(valstr);

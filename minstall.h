@@ -47,6 +47,7 @@ public:
 
     // helpers
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
+    static QString sliderSizeString(long long size);
 
     bool isInsideVB();
 

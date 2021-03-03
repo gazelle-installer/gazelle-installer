@@ -67,6 +67,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     if(!drvstart) gui.treePartitions->clear();
     QTreeWidgetItem *curdrv = nullptr;
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
+        if(bdinfo.isBoot && !brave) continue;
         QTreeWidgetItem *curdev;
         if (bdinfo.isDrive) {
             if(!drvstart) curdrv = new QTreeWidgetItem(gui.treePartitions);
@@ -82,7 +83,6 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
             curdev = new QTreeWidgetItem(curdrv);
             setupItem(curdev, &bdinfo);
             curdrv->setData(Device, Qt::UserRole, QVariant(true)); // drive is now "used"
-
         }
         // Device name and size
         curdev->setText(Device, bdinfo.name);
@@ -444,8 +444,8 @@ void PartMan::treeMenu(const QPoint &)
         const QAction *actCrypto = menu.addAction(tr("Template: &Encrypted system"));
         const QAction *action = menu.exec(QCursor::pos());
         if(action) {
-            if(action==actBasic) layoutDefault(twit, 40, false);
-            else if(action==actCrypto) layoutDefault(twit, 40, true);
+            if(action==actBasic) layoutDefault(twit, -1, false);
+            else if(action==actCrypto) layoutDefault(twit, -1, true);
             else { // Reset
                 while(twit->childCount()) twit->removeChild(twit->child(0));
                 populate(twit);
@@ -800,6 +800,7 @@ QTreeWidgetItem *PartMan::selectedDriveAuto()
 int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     int rootPercent, bool crypto, bool updateTree)
 {
+    if(rootPercent<0) rootPercent = gui.sliderPart->value();
     if(updateTree) {
         // Clear the existing layout from the target device.
         while(drivetree->childCount()) drivetree->removeChild(drivetree->child(0));
@@ -838,6 +839,7 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     sinfo.totalram/=128; ++sinfo.totalram; sinfo.totalram*=128; // Multiple of 128MB
     if(swapFormatSize > (int)sinfo.totalram) swapFormatSize = sinfo.totalram;
     int swapMaxMB = rootFormatSize/(20*128); ++swapMaxMB; swapMaxMB*=128; // 5% root
+    if(swapMaxMB > 8192) swapMaxMB = 8192; // 8GB cap for the whole calculation.
     if(swapFormatSize > swapMaxMB) swapFormatSize = swapMaxMB;
     rootFormatSize -= swapFormatSize;
     if (free > 0 && rootFormatSize > 8192) {
