@@ -45,7 +45,6 @@ class PartMan : public QObject
     Ui::MeInstall &gui;
     QWidget *master;
     QMap<QString, QTreeWidgetItem *> mounts;
-    QList<QTreeWidgetItem *> swaps;
     QStringList listToUnmount;
     void setup();
     inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
