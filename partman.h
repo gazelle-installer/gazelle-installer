@@ -59,6 +59,7 @@ class PartMan : public QObject
     void setEncryptChecks(const QString &use,
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
     bool calculatePartBD();
+    inline bool twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp=true) const;
     inline long long twitSize(QTreeWidgetItem *twit, bool bytes=false);
     inline bool twitWillFormat(QTreeWidgetItem *twit);
     inline QString twitUseFor(QTreeWidgetItem *twit);
