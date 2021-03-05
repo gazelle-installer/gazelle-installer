@@ -137,13 +137,13 @@ void MInstall::startup()
 
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
-        if ( QFileInfo("/etc/sv").exists() && QFileInfo("/sbin/runit").exists() ){
+        if ( QFileInfo("/etc/service").exists() && QFileInfo("/sbin/runit").exists() ){
             containsRunit = true;
         }
         saveDesktopCheckBox->hide();
     } else {
         containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
-        if ( QFileInfo("live/aufs/etc/sv").exists() && QFileInfo("/live/aufs/sbin/runit").exists() ){
+        if ( QFileInfo("live/aufs/etc/service").exists() && QFileInfo("/live/aufs/sbin/runit").exists() ){
             containsRunit = true;
         }
 
@@ -1428,6 +1428,12 @@ bool MInstall::setComputerName()
     }
 
     if (containsRunit && !sambaCheckBox->isChecked()){
+        proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/smbd");
+        proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/nmbd");
+        proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/samba-ad-dc");
+        proc.exec("chroot /mnt/antiX ln -fs/etc/sv/smbd /etc/service/");
+        proc.exec("chroot /mnt/antiX ln -fs /etc/sv/nmbd /etc/service/");
+        proc.exec("chroot /mnt/antiX ln -fs /etc/sv/samba-ad-dc /etc/service/");
         proc.exec("chroot /mnt/antiX touch /etc/sv/smbd/down");
         proc.exec("chroot /mnt/antiX touch /etc/sv/nmbd/down");
         proc.exec("chroot /mnt/antiX touch /etc/sv/samba-ad-dc/down");
