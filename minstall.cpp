@@ -1564,6 +1564,10 @@ void MInstall::setServices()
                     if ( QFileInfo("/etc/sv/" + service + "/down").exists() ){
                         proc.exec(chroot + "rm /etc/sv/" + service + "/down");
                     }
+                    if ( ! QFileInfo("/etc/sv/" + service).exists()) {
+                        proc.exec(chroot + "mkdir -p /etc/sv/" + service);
+                        proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
+                    }
 
                 } else { // In OEM mode, disable the services for the OOBE.
                     proc.exec(chroot + "update-rc.d " + service + " remove");
@@ -1575,6 +1579,7 @@ void MInstall::setServices()
                     if (containsRunit) {
                         if ( ! QFileInfo("/etc/sv/" + service).exists() ) {
                             proc.exec(chroot + "mkdir -p /etc/sv/" + service);
+                            proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
                         }
                         proc.exec(chroot + "touch " + "/etc/sv/" + service + "/down");
                     }
