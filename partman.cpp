@@ -242,7 +242,15 @@ QString PartMan::translateUse(const QString &alias)
     else if(alias == "boot") return QStringLiteral("/boot");
     else if(alias == "home") return QStringLiteral("/home");
     else if(!alias.compare("ESP", Qt::CaseInsensitive)) return QStringLiteral("ESP");
+    else if(!alias.compare("SWAP", Qt::CaseInsensitive)) return QStringLiteral("SWAP");
     else return alias;
+}
+QString PartMan::describeUse(const QString &use)
+{
+    if(use == "/") return "/ (root)";
+    else if(use == "SWAP") return tr("swap space");
+    else if(use == "ESP") return tr("EFI System Partition");
+    return use;
 }
 
 void PartMan::setEncryptChecks(const QString &use,
@@ -289,7 +297,7 @@ void PartMan::comboUseTextChange(const QString &text)
     else if(usetext == "ESP") useClass = 1;
     else if(usetext == "bios_grub") useClass = 2;
     else if(usetext == "/boot") useClass = 3;
-    else if(usetext == "swap") useClass = 4;
+    else if(usetext == "SWAP") useClass = 4;
     else useClass = 5;
     int oldUseClass = combo->property("class").toInt();
     if(useClass != oldUseClass) {
@@ -386,7 +394,7 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
             // New items are pre-set with Qt::PartiallyChecked and cannot be excluded.
             QTreeWidgetItem *exclude = (csCrypto==Qt::PartiallyChecked) ? nullptr : item;
             // Set checkboxes and enable the crypto password controls as needed.
-            if(cryptoAny) setEncryptChecks("swap", Qt::Checked, exclude);
+            if(cryptoAny) setEncryptChecks("SWAP", Qt::Checked, exclude);
             if(twitUseFor(item)=="/" && csCrypto==Qt::Checked) {
                 setEncryptChecks("/home", Qt::Checked, exclude);
             }
@@ -503,34 +511,28 @@ QWidget *PartMan::composeValidate(bool automatic,
         if(!comboUse || comboUse->currentText().isEmpty()) continue;
         QString mount = translateUse(comboUse->currentText());
         const QString &devname = (*it)->text(Device);
-        if(!mount.startsWith("/") && comboUse->findText(mount)<0) {
+        if(!mount.startsWith("/") && comboUse->findText(mount, Qt::MatchFixedString)<0) {
             QMessageBox::critical(master, master->windowTitle(),
                 tr("Invalid use for %1: %2").arg(devname, mount));
             return comboUse;
         }
-        if(mount == "swap") {
+        if(mount == "SWAP") {
             swaps << *it;
             mount.clear();
         }
-        // Mount description
-        QString desc;
-        if(mount == "/") desc = "/ (root)";
-        else if(mount.isEmpty()) desc = tr("swap space");
-        else if(mount == "ESP") desc = tr("EFI System Partition");
-        else desc = mount;
         QTreeWidgetItem *twit = mounts.value(mount);
 
         // The mount can only be selected once.
         if(twit) {
-            QMessageBox::critical(master, master->windowTitle(),
-                tr("%1 is already selected for: %2").arg(twit->text(Device), desc));
+            QMessageBox::critical(master, master->windowTitle(), tr("%1 is already"
+                " selected for: %2").arg(twit->text(Device), describeUse(mount)));
             return comboUse;
         } else {
             if(!mount.isEmpty()) mounts.insert(mount, *it);
             // Warn if using a non-Linux partition (potential install of another OS).
             const int bdindex = listBlkDevs.findDevice(devname);
             if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
-                msgForeignList << devname << desc;
+                msgForeignList << devname << describeUse(mount);
             }
         }
         QVariant mapperData;
@@ -595,8 +597,8 @@ QWidget *PartMan::composeValidate(bool automatic,
                 msgConfirm += " - " + tr("Delete the data on %1"
                     " except for /home").arg(dev) + "\n";
             } else {
-                msgConfirm += " - " + tr("Reuse (no reformat) %1 as the"
-                    " %2 partition").arg(dev, it.first) + "\n";
+                msgConfirm += " - " + tr("Reuse (no reformat) %1 as"
+                    " %2").arg(dev, describeUse(it.first)) + "\n";
             }
         }
 
@@ -607,7 +609,7 @@ QWidget *PartMan::composeValidate(bool automatic,
             msg += tr("The following partitions you selected are not Linux partitions:") + "\n\n";
             for (QStringList::Iterator it = msgForeignList.begin(); it != msgForeignList.end(); ++it) {
                 QString &s = *it;
-                msg += msgPartSel.arg(s).arg((QString)*(++it));
+                msg += msgPartSel.arg(s, describeUse(*(++it)));
             }
             msg += "\n";
         }
@@ -623,7 +625,7 @@ QWidget *PartMan::composeValidate(bool automatic,
             msg += tr("The %1 installer will now format and destroy the data on the following partitions:").arg(project) + "\n\n";
             for (QStringList::Iterator it = msgFormatList.begin(); it != msgFormatList.end(); ++it) {
                 QString &s = *it;
-                msg += msgPartSel.arg(s).arg((QString)*(++it));
+                msg += msgPartSel.arg(s, describeUse(*(++it)));
             }
             if (!msgConfirm.isEmpty()) msg += "\n";
         }
