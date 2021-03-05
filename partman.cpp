@@ -105,7 +105,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         const QString &drvDevice = drvit->text(Device);
         // Check if the drive is to be cleared and formatted.
         int partCount = drvit->childCount();
-        bool drvPreserve = drvit->data(Device, Qt::UserRole).toBool();
+        bool drvPreserve = twitIsOldLayout(drvit, false);
         const QString &configNewLayout = "Storage/NewLayout."+drvDevice;
         if(save) {
             if(!drvPreserve) config.setValue(configNewLayout, partCount);
@@ -409,12 +409,10 @@ void PartMan::treeSelChange()
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(twit) {
-        bool used = true;
         QTreeWidgetItem *drvit = twit->parent();
-        if(!drvit) used = twit->data(Device, Qt::UserRole).toBool();
-        else used = twit->parent()->data(Device, Qt::UserRole).toBool();
+        const bool used = twitIsOldLayout(twit);
         gui.buttonPartClear->setEnabled(!drvit);
-        gui.buttonPartRemove->setEnabled(!used && twit->parent());
+        gui.buttonPartRemove->setEnabled(!used && drvit);
         // Only allow adding partitions if there is enough space.
         if(used) gui.buttonPartAdd->setEnabled(false);
         else {
@@ -529,10 +527,12 @@ QWidget *PartMan::composeValidate(bool automatic,
             return comboUse;
         } else {
             if(!mount.isEmpty()) mounts.insert(mount, *it);
-            // Warn if using a non-Linux partition (potential install of another OS).
-            const int bdindex = listBlkDevs.findDevice(devname);
-            if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
-                msgForeignList << devname << describeUse(mount);
+            if(twitIsOldLayout(*it)) {
+                // Warn if using a non-Linux partition (potential install of another OS).
+                const int bdindex = listBlkDevs.findDevice(devname);
+                if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
+                    msgForeignList << devname << describeUse(mount);
+                }
             }
         }
         QVariant mapperData;
@@ -642,7 +642,7 @@ bool PartMan::calculatePartBD()
     const int driveCount = gui.treePartitions->topLevelItemCount();
     for(int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
         QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
-        const bool useExist = drvit->data(Device, Qt::UserRole).toBool();
+        const bool useExist = twitIsOldLayout(drvit, false);
         QString drv = drvit->text(Device);
         int ixDriveBD = listBlkDevs.findDevice(drv);
         const int partCount = drvit->childCount();
@@ -911,7 +911,7 @@ bool PartMan::preparePartitions()
     // Clear the existing partition tables on devices which will have a new layout.
     for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
         QTreeWidgetItem *twit = gui.treePartitions->topLevelItem(ixi);
-        if(twit->data(Device, Qt::UserRole).toBool()) continue;
+        if(twitIsOldLayout(twit, false)) continue;
         const QString &drv = twit->text(Device);
         proc.status(tr("Clearing existing partition tables"));
         clearPartitionTables(drv);
@@ -926,7 +926,7 @@ bool PartMan::preparePartitions()
         QTreeWidgetItem *drvitem = gui.treePartitions->topLevelItem(ixi);
         const QString &drvdev = drvitem->text(Device);
         const int devCount = drvitem->childCount();
-        if(drvitem->data(Device, Qt::UserRole).toBool()) {
+        if(twitIsOldLayout(drvitem, true)) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
             const int ixBlkDev = listBlkDevs.findDevice(drvdev);
@@ -1231,6 +1231,14 @@ int PartMan::isEncrypt(const QString &point)
 }
 
 // Helpers
+inline bool PartMan::twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp) const
+{
+    if(chkUp) {
+        const QTreeWidgetItem *drvit = twit->parent();
+        if(drvit) return drvit->data(Device, Qt::UserRole).toBool();
+    }
+    return twit->data(Device, Qt::UserRole).toBool();
+}
 inline long long PartMan::twitSize(QTreeWidgetItem *twit, bool bytes)
 {
     QWidget *spin = gui.treePartitions->itemWidget(twit, Size);
