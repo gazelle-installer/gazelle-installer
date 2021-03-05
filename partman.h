@@ -54,6 +54,7 @@ class PartMan : public QObject
         int defaultMB = 0, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drive);
     static QString translateUse(const QString &alias);
+    static QString describeUse(const QString &use);
     void clearPartitionTables(const QString &dev);
     bool formatLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
     void setEncryptChecks(const QString &use,
