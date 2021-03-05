@@ -1166,7 +1166,7 @@ bool PartMan::makeFstab(bool populateMediaMounts)
     const QString cmdBlkID("blkid -o value UUID -s UUID ");
     // File systems
     for(auto &it : mounts.toStdMap()) {
-        if(it.first == "EFI") continue; // EFI will be dealt with later.
+        if(it.first == "ESP") continue; // EFI will be dealt with later.
         const QString &dev = twitMappedDevice(it.second, true);
         qDebug() << "Creating fstab entry for:" << it.first << dev;
         // Device ID or UUID
