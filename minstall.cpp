@@ -137,9 +137,15 @@ void MInstall::startup()
 
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
+        if ( QFileInfo("/etc/sv").exists() && QFileInfo("/sbin/runit").exists() ){
+            containsRunit = true;
+        }
         saveDesktopCheckBox->hide();
     } else {
         containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
+        if ( QFileInfo("live/aufs/etc/sv").exists() && QFileInfo("/live/aufs/sbin/runit").exists() ){
+            containsRunit = true;
+        }
 
         rootSources = "/live/aufs/bin /live/aufs/dev"
                       " /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt"
@@ -1421,6 +1427,12 @@ bool MInstall::setComputerName()
         proc.exec("chroot /mnt/antiX systemctl mask samba-ad-dc");
     }
 
+    if (containsRunit && !sambaCheckBox->isChecked()){
+        proc.exec("chroot /mnt/antiX touch /etc/sv/smbd/down");
+        proc.exec("chroot /mnt/antiX touch /etc/sv/nmbd/down");
+        proc.exec("chroot /mnt/antiX touch /etc/sv/samba-ad-dc/down");
+    }
+
     //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
     const QString &compname = computerNameEdit->text();
     QString cmd("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost"
@@ -1544,22 +1556,34 @@ void MInstall::setServices()
             QString service = (*it)->text(0);
             qDebug() << "Service: " << service;
             if (!oem && (*it)->checkState(0) == Qt::Checked) {
-                proc.exec(chroot + "update-rc.d " + service + " enable");
+                proc.exec(chroot + "update-rc.d " + service + " defaults");
                 if (containsSystemD) {
                     proc.exec(chroot + "systemctl enable " + service);
                 }
-            } else { // In OEM mode, disable the services for the OOBE.
-                proc.exec(chroot + "update-rc.d " + service + " disable");
-                if (containsSystemD) {
-                    proc.exec(chroot + "systemctl disable " + service);
-                    proc.exec(chroot + "systemctl mask " + service);
+                if (containsRunit) {
+                    if ( QFileInfo("/etc/sv/" + service + "/down").exists() ){
+                        proc.exec(chroot + "rm /etc/sv/" + service + "/down");
+                    }
+
+                } else { // In OEM mode, disable the services for the OOBE.
+                    proc.exec(chroot + "update-rc.d " + service + " remove");
+                    if (containsSystemD) {
+                        proc.exec(chroot + "systemctl disable " + service);
+                        proc.exec(chroot + "systemctl mask " + service);
+                    }
+
+                    if (containsRunit) {
+                        if ( ! QFileInfo("/etc/sv/" + service).exists() ) {
+                            proc.exec(chroot + "mkdir -p /etc/sv/" + service);
+                        }
+                        proc.exec(chroot + "touch " + "/etc/sv/" + service + "/down");
+                    }
                 }
             }
+            ++it;
         }
-        ++it;
     }
 }
-
 void MInstall::failUI(const QString &msg)
 {
     if (phase >= 0) {
