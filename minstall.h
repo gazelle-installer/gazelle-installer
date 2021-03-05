@@ -143,6 +143,7 @@ private:
     bool uefi = false;
     bool mactest = false;
     bool containsSystemD = false;
+    bool containsRunit = false;
     bool isRemasteredDemoPresent = false;
 
     // source medium
