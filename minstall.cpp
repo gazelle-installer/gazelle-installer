@@ -137,7 +137,7 @@ void MInstall::startup()
 
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
-        if ( QFileInfo("/etc/service").exists() && QFileInfo("/sbin/runit").exists() ){
+        if ( QFileInfo("/etc/service").exists() && QFileInfo("/lib/runit/runit-init").exists() ){
             containsRunit = true;
         }
         saveDesktopCheckBox->hide();
