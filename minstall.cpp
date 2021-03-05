@@ -225,7 +225,6 @@ void MInstall::startup()
         partman.defaultLabels["/"] = "root" + PROJECTSHORTNAME + PROJECTVERSION;
         partman.defaultLabels["/home"] = "home" + PROJECTSHORTNAME;
         partman.defaultLabels["SWAP"] = "swap" + PROJECTSHORTNAME;
-        leaveLabel->hide(); freeSpaceEdit->hide(); freeLabel->hide(); // FIXME: This is a test.
 
         // advanced encryption settings page defaults
         on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());

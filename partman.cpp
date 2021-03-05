@@ -801,10 +801,6 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
         drivetree->setData(Device, Qt::UserRole, QVariant(false));
     }
     // Drive geometry basics.
-    bool ok = true;
-    const QString &fsText = gui.freeSpaceEdit->text().trimmed();
-    int free = fsText.isEmpty() ? 0 : fsText.toInt(&ok,10);
-    if (!ok) return 0;
     const long long driveSize = twitSize(drivetree);
     int rootFormatSize = driveSize-PARTMAN_SAFETY_MB;
     // Boot partitions.
@@ -835,10 +831,6 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     if(swapMaxMB > 8192) swapMaxMB = 8192; // 8GB cap for the whole calculation.
     if(swapFormatSize > swapMaxMB) swapFormatSize = swapMaxMB;
     rootFormatSize -= swapFormatSize;
-    if (free > 0 && rootFormatSize > 8192) {
-        if (free > (rootFormatSize - 8192)) free = rootFormatSize - 8192;
-        rootFormatSize -= free;
-    }
     // Home
     int homeFormatSize = rootFormatSize;
     rootFormatSize = (rootFormatSize * rootPercent) / 100;
