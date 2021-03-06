@@ -2420,7 +2420,11 @@ void MInstall::on_buttonSetKeyboard_clicked()
 
 void MInstall::on_sliderPart_sliderPressed()
 {
-    QToolTip::showText(QCursor::pos(), tr("%1% root").arg(sliderPart->value()), nullptr);
+    QString valText(tr("%1% root") + '\n' + tr("%2% home"));
+    const int val = sliderPart->value();
+    if(val<1) valText = valText.arg(">0", "<100");
+    else valText = valText.arg(val).arg(100-val);
+    QToolTip::showText(QCursor::pos(), valText, nullptr);
 }
 void MInstall::on_sliderPart_valueChanged(int value)
 {
