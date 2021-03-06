@@ -22,6 +22,7 @@
 #include <sys/sysinfo.h>
 #include <sys/stat.h>
 #include <QDebug>
+#include <QDir>
 #include <QTimer>
 #include <QLocale>
 #include <QMessageBox>
@@ -93,6 +94,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
+    comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
 }
@@ -234,6 +236,9 @@ void PartMan::labelParts(QTreeWidgetItem *drive)
     for(int ixi = drive->childCount() - 1; ixi >= 0; --ixi) {
         drive->child(ixi)->setText(Device, BlockDeviceInfo::join(drv, ixi+1));
     }
+    for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
+        if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
+    }
 }
 
 QString PartMan::translateUse(const QString &alias)
@@ -290,7 +295,7 @@ void PartMan::comboUseTextChange(const QString &text)
     if(!combo) return;
     QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
     if(!item) return;
-    QLineEdit *editLabel = static_cast<QLineEdit *>(gui.treePartitions->itemWidget(item, Label));
+    QLineEdit *editLabel = twitLineEdit(item, Label);
 
     const QString &usetext = translateUse(text);
     int useClass = -1;
@@ -344,7 +349,7 @@ void PartMan::comboUseTextChange(const QString &text)
         gui.treePartitions->itemWidget(item, Options)->setEnabled(useClass!=0);
         combo->setProperty("class", QVariant(useClass));
     }
-    editLabel->setText(defaultLabels.value(usetext));
+    if(useClass!=0) editLabel->setText(defaultLabels.value(usetext));
     gui.treePartitions->blockSignals(false);
     treeItemChange(item, UseFor);
 }
@@ -434,31 +439,50 @@ void PartMan::treeMenu(const QPoint &)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit) return;
+    QMenu menu(gui.treePartitions);
+    QAction *action = nullptr;
+    QAction *actAdd = menu.addAction(tr("&Add partition"));
+    actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
     if(twit->parent()) {
-        if(twitComboBox(twit, Type)->currentText() != "btrfs") return;
-        QMenu menu(gui.treePartitions);
-        const QAction *actBtrfsZlib = menu.addAction(tr("Template: BTRFS compression (ZLIB)"));
-        const QAction *actBtrfsLzo = menu.addAction(tr("Template: BTRFS compression (LZO)"));
-        const QAction *action = menu.exec(QCursor::pos());
-        QLineEdit *editOpts = twitLineEdit(twit, Options);
-        if(action==actBtrfsZlib) editOpts->setText("defaults,noatime,compress-force=zlib");
-        else if(action==actBtrfsLzo) editOpts->setText("defaults,noatime,compress-force=lzo");
-    } else {
-        QMenu menu(gui.treePartitions);
-        menu.addAction(tr("&Reset to on-disk layout"));
+        QComboBox *comboFormat = twitComboBox(twit, Type);
+        const int ixBTRFS = comboFormat->findData("btrfs");
+        QAction *actRemove = menu.addAction(tr("&Remove partition"));
+        actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
         menu.addSeparator();
-        const QAction *actBasic = menu.addAction(tr("Template: &Standard install"));
-        const QAction *actCrypto = menu.addAction(tr("Template: &Encrypted system"));
-        const QAction *action = menu.exec(QCursor::pos());
-        if(action) {
-            if(action==actBasic) layoutDefault(twit, -1, false);
-            else if(action==actCrypto) layoutDefault(twit, -1, true);
-            else { // Reset
-                while(twit->childCount()) twit->removeChild(twit->child(0));
-                populate(twit);
-            }
+        QMenu *menuTemplates = menu.addMenu("&Templates");
+        QAction *actBtrfsZlib = menuTemplates->addAction(tr("BTRFS compression (&ZLIB)"));
+        QAction *actBtrfsLzo = menuTemplates->addAction(tr("BTRFS compression (&LZO)"));
+        if(ixBTRFS<0) {
+            actBtrfsZlib->setEnabled(false);
+            actBtrfsLzo->setEnabled(false);
+        }
+        action = menu.exec(QCursor::pos());
+        if(action==actRemove) partRemoveClick(true);
+        else if(action) {
+            QLineEdit *editOpts = twitLineEdit(twit, Options);
+            comboFormat->setCurrentIndex(ixBTRFS);
+            if(action==actBtrfsZlib) editOpts->setText("defaults,noatime,compress-force=zlib");
+            else if(action==actBtrfsLzo) editOpts->setText("defaults,noatime,compress-force=lzo");
+        }
+    } else {
+        menu.addSeparator();
+        const QAction *actClear = menu.addAction(tr("New &layout"));
+        QAction *actReset = menu.addAction(tr("&Reset layout"));
+        actReset->setDisabled(twitIsOldLayout(twit, false));
+        QMenu *menuTemplates = menu.addMenu("&Templates");
+        const QAction *actBasic = menuTemplates->addAction(tr("&Standard install"));
+        QAction *actCrypto = menuTemplates->addAction(tr("&Encrypted system"));
+        actCrypto->setVisible(gui.gbEncrPass->isVisible());
+        action = menu.exec(QCursor::pos());
+        if(action==actClear) partClearClick(true);
+        else if(action==actBasic) layoutDefault(twit, -1, false);
+        else if(action==actCrypto) layoutDefault(twit, -1, true);
+        else if(action==actReset) {
+            while(twit->childCount()) twit->removeChild(twit->child(0));
+            populate(twit);
         }
     }
+    if(action==actAdd) partAddClick(true);
 }
 
 // Partition manager list buttons
@@ -468,6 +492,7 @@ void PartMan::partClearClick(bool)
     if(!twit || twit->parent()) return;
     while(twit->childCount()) twit->removeChild(twit->child(0));
     twit->setData(Device, Qt::UserRole, QVariant(false));
+    comboTypeTextChange(QString()); // For the badblocks checkbox.
     treeSelChange();
 }
 void PartMan::partAddClick(bool)
@@ -1159,7 +1184,7 @@ bool PartMan::mountPartitions()
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = twitMappedDevice(it.second, true);
         proc.status(tr("Mounting: %1").arg(dev));
-        mkdir(point.toUtf8(), 0755);
+        if(!QDir().mkpath(point)) return false;
         if(it.first=="/boot") {
              // needed to run fsck because sfdisk --part-type can mess up the partition
             if(!proc.exec("fsck.ext4 -y " + dev)) return false;

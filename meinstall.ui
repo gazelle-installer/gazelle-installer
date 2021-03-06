@@ -699,6 +699,9 @@
               </item>
               <item row="12" column="0">
                <widget class="QCheckBox" name="badblocksCheck">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -706,7 +709,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Check for badblocks (takes longer)</string>
+                 <string>Check for bad sectors (takes longer)</string>
                 </property>
                </widget>
               </item>
