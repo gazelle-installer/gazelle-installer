@@ -31,7 +31,6 @@ private:
     bool lastValid = false;
     QProgressBar *meter = nullptr;
     void generate();
-    void menuGenText();
     void masterTextChanged();
     void slaveTextChanged(const QString &slaveText);
 protected:

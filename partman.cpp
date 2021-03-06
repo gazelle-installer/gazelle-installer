@@ -234,6 +234,9 @@ void PartMan::labelParts(QTreeWidgetItem *drive)
     for(int ixi = drive->childCount() - 1; ixi >= 0; --ixi) {
         drive->child(ixi)->setText(Device, BlockDeviceInfo::join(drv, ixi+1));
     }
+    for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
+        if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
+    }
 }
 
 QString PartMan::translateUse(const QString &alias)
@@ -290,7 +293,7 @@ void PartMan::comboUseTextChange(const QString &text)
     if(!combo) return;
     QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
     if(!item) return;
-    QLineEdit *editLabel = static_cast<QLineEdit *>(gui.treePartitions->itemWidget(item, Label));
+    QLineEdit *editLabel = twitLineEdit(item, Label);
 
     const QString &usetext = translateUse(text);
     int useClass = -1;
@@ -344,7 +347,7 @@ void PartMan::comboUseTextChange(const QString &text)
         gui.treePartitions->itemWidget(item, Options)->setEnabled(useClass!=0);
         combo->setProperty("class", QVariant(useClass));
     }
-    editLabel->setText(defaultLabels.value(usetext));
+    if(useClass!=0) editLabel->setText(defaultLabels.value(usetext));
     gui.treePartitions->blockSignals(false);
     treeItemChange(item, UseFor);
 }
@@ -444,8 +447,9 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actRemove = menu.addAction(tr("&Remove partition"));
         actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
         menu.addSeparator();
-        QAction *actBtrfsZlib = menu.addAction(tr("Template: BTRFS compression (ZLIB)"));
-        QAction *actBtrfsLzo = menu.addAction(tr("Template: BTRFS compression (LZO)"));
+        QMenu *menuTemplates = menu.addMenu("&Templates");
+        QAction *actBtrfsZlib = menuTemplates->addAction(tr("BTRFS compression (&ZLIB)"));
+        QAction *actBtrfsLzo = menuTemplates->addAction(tr("BTRFS compression (&LZO)"));
         if(ixBTRFS<0) {
             actBtrfsZlib->setEnabled(false);
             actBtrfsLzo->setEnabled(false);
@@ -461,10 +465,11 @@ void PartMan::treeMenu(const QPoint &)
     } else {
         menu.addSeparator();
         const QAction *actClear = menu.addAction(tr("New &layout"));
-        const QAction *actReset = menu.addAction(tr("&Reset to on-disk layout"));
-        menu.addSeparator();
-        const QAction *actBasic = menu.addAction(tr("Template: &Standard install"));
-        const QAction *actCrypto = menu.addAction(tr("Template: &Encrypted system"));
+        QAction *actReset = menu.addAction(tr("&Reset layout"));
+        actReset->setDisabled(twitIsOldLayout(twit, false));
+        QMenu *menuTemplates = menu.addMenu("&Templates");
+        const QAction *actBasic = menuTemplates->addAction(tr("&Standard install"));
+        const QAction *actCrypto = menuTemplates->addAction(tr("&Encrypted system"));
         action = menu.exec(QCursor::pos());
         if(action==actClear) partClearClick(true);
         else if(action==actBasic) layoutDefault(twit, -1, false);
