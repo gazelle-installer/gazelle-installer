@@ -1555,8 +1555,11 @@ void MInstall::setServices()
     proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return;
 
-    QString chroot;
-    if (!oobe) chroot = "chroot /mnt/antiX ";
+    QString chroot, rootpath;
+    if (!oobe) {
+        chroot = "chroot /mnt/antiX ";
+        rootpath = "/mnt/antiX";
+    }
     QTreeWidgetItemIterator it(csView);
     for(; *it; ++it) {
         if ((*it)->parent() == nullptr) continue;
@@ -1568,10 +1571,8 @@ void MInstall::setServices()
                 proc.exec(chroot + "systemctl enable " + service);
             }
             if (containsRunit) {
-                if (QFile::exists("/etc/sv/" + service + "/down")){
-                    proc.exec(chroot + "rm /etc/sv/" + service + "/down");
-                }
-                if (!QFile::exists("/etc/sv/" + service)) {
+                QFile::remove(rootpath+"/etc/sv/" + service + "/down");
+                if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
                     proc.exec(chroot + "mkdir -p /etc/sv/" + service);
                     proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
                 }
@@ -1583,11 +1584,11 @@ void MInstall::setServices()
                 proc.exec(chroot + "systemctl mask " + service);
             }
             if (containsRunit) {
-                if (!QFile::exists("/etc/sv/" + service)) {
+                if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
                     proc.exec(chroot + "mkdir -p /etc/sv/" + service);
                     proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
                 }
-                proc.exec(chroot + "touch " + "/etc/sv/" + service + "/down");
+                proc.exec(chroot + "touch /etc/sv/" + service + "/down");
             }
         }
     }
