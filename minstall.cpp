@@ -1390,56 +1390,56 @@ bool MInstall::setComputerName()
     if (haveSamba) {
         //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
         replaceStringInFile("WORKGROUP", computerGroupEdit->text(), etcpath + "/samba/smb.conf");
-    }
-    if (sambaCheckBox->isChecked()) {
-        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*smbd " + etcpath + "/rc5.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*smbd " + etcpath + "/rc4.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*smbd " + etcpath + "/rc3.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/K*smbd " + etcpath + "/rc2.d/S06smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*samba-ad-dc " + etcpath + "/rc5.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*samba-ad-dc " + etcpath + "/rc4.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*samba-ad-dc " + etcpath + "/rc3.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/K*samba-ad-dc " + etcpath + "/rc2.d/S01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*nmbd " + etcpath + "/rc5.d/S01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*nmbd " + etcpath + "/rc4.d/S01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*nmbd " + etcpath + "/rc3.d/S01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/K*nmbd " + etcpath + "/rc2.d/S01nmbd >/dev/null 2>&1", false);
-    } else {
-        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/S*smbd " + etcpath + "/rc5.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/S*smbd " + etcpath + "/rc4.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/S*smbd " + etcpath + "/rc3.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*smbd " + etcpath + "/rc2.d/K01smbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/S*samba-ad-dc " + etcpath + "/rc5.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/S*samba-ad-dc " + etcpath + "/rc4.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/S*samba-ad-dc " + etcpath + "/rc3.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*samba-ad-dc " + etcpath + "/rc2.d/K01samba-ad-dc >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc5.d/S*nmbd " + etcpath + "/rc5.d/K01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc4.d/S*nmbd " + etcpath + "/rc4.d/K01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc3.d/S*nmbd " + etcpath + "/rc3.d/K01nmbd >/dev/null 2>&1", false);
-        proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*nmbd " + etcpath + "/rc2.d/K01nmbd >/dev/null 2>&1", false);
-    }
 
-    if (containsSystemD && !sambaCheckBox->isChecked()) {
-        proc.exec("chroot /mnt/antiX systemctl disable smbd");
-        proc.exec("chroot /mnt/antiX systemctl disable nmbd");
-        proc.exec("chroot /mnt/antiX systemctl disable samba-ad-dc");
-        proc.exec("chroot /mnt/antiX systemctl mask smbd");
-        proc.exec("chroot /mnt/antiX systemctl mask nmbd");
-        proc.exec("chroot /mnt/antiX systemctl mask samba-ad-dc");
-    }
+        if (sambaCheckBox->isChecked()) {
+            proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*smbd " + etcpath + "/rc5.d/S06smbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*smbd " + etcpath + "/rc4.d/S06smbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*smbd " + etcpath + "/rc3.d/S06smbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc2.d/K*smbd " + etcpath + "/rc2.d/S06smbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*samba-ad-dc " + etcpath + "/rc5.d/S01samba-ad-dc >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*samba-ad-dc " + etcpath + "/rc4.d/S01samba-ad-dc >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*samba-ad-dc " + etcpath + "/rc3.d/S01samba-ad-dc >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc2.d/K*samba-ad-dc " + etcpath + "/rc2.d/S01samba-ad-dc >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*nmbd " + etcpath + "/rc5.d/S01nmbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*nmbd " + etcpath + "/rc4.d/S01nmbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*nmbd " + etcpath + "/rc3.d/S01nmbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc2.d/K*nmbd " + etcpath + "/rc2.d/S01nmbd >/dev/null 2>&1", false);
+        } else {
+            proc.exec("/bin/mv -f " + etcpath + "/rc5.d/S*smbd " + etcpath + "/rc5.d/K01smbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc4.d/S*smbd " + etcpath + "/rc4.d/K01smbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc3.d/S*smbd " + etcpath + "/rc3.d/K01smbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*smbd " + etcpath + "/rc2.d/K01smbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc5.d/S*samba-ad-dc " + etcpath + "/rc5.d/K01samba-ad-dc >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc4.d/S*samba-ad-dc " + etcpath + "/rc4.d/K01samba-ad-dc >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc3.d/S*samba-ad-dc " + etcpath + "/rc3.d/K01samba-ad-dc >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*samba-ad-dc " + etcpath + "/rc2.d/K01samba-ad-dc >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc5.d/S*nmbd " + etcpath + "/rc5.d/K01nmbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc4.d/S*nmbd " + etcpath + "/rc4.d/K01nmbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc3.d/S*nmbd " + etcpath + "/rc3.d/K01nmbd >/dev/null 2>&1", false);
+            proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*nmbd " + etcpath + "/rc2.d/K01nmbd >/dev/null 2>&1", false);
+        }
 
-    if (containsRunit && !sambaCheckBox->isChecked()){
-        proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/smbd");
-        proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/nmbd");
-        proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/samba-ad-dc");
-        proc.exec("chroot /mnt/antiX ln -fs/etc/sv/smbd /etc/service/");
-        proc.exec("chroot /mnt/antiX ln -fs /etc/sv/nmbd /etc/service/");
-        proc.exec("chroot /mnt/antiX ln -fs /etc/sv/samba-ad-dc /etc/service/");
-        proc.exec("chroot /mnt/antiX touch /etc/sv/smbd/down");
-        proc.exec("chroot /mnt/antiX touch /etc/sv/nmbd/down");
-        proc.exec("chroot /mnt/antiX touch /etc/sv/samba-ad-dc/down");
-    }
+        if (containsSystemD && !sambaCheckBox->isChecked()) {
+            proc.exec("chroot /mnt/antiX systemctl disable smbd");
+            proc.exec("chroot /mnt/antiX systemctl disable nmbd");
+            proc.exec("chroot /mnt/antiX systemctl disable samba-ad-dc");
+            proc.exec("chroot /mnt/antiX systemctl mask smbd");
+            proc.exec("chroot /mnt/antiX systemctl mask nmbd");
+            proc.exec("chroot /mnt/antiX systemctl mask samba-ad-dc");
+        }
 
+        if (containsRunit && !sambaCheckBox->isChecked()){
+            proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/smbd");
+            proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/nmbd");
+            proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/samba-ad-dc");
+            proc.exec("chroot /mnt/antiX ln -fs/etc/sv/smbd /etc/service/");
+            proc.exec("chroot /mnt/antiX ln -fs /etc/sv/nmbd /etc/service/");
+            proc.exec("chroot /mnt/antiX ln -fs /etc/sv/samba-ad-dc /etc/service/");
+            proc.exec("chroot /mnt/antiX touch /etc/sv/smbd/down");
+            proc.exec("chroot /mnt/antiX touch /etc/sv/nmbd/down");
+            proc.exec("chroot /mnt/antiX touch /etc/sv/samba-ad-dc/down");
+        }
+    }
     //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
     const QString &compname = computerNameEdit->text();
     QString cmd("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost"
