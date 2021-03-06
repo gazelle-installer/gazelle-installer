@@ -470,7 +470,8 @@ void PartMan::treeMenu(const QPoint &)
         actReset->setDisabled(twitIsOldLayout(twit, false));
         QMenu *menuTemplates = menu.addMenu("&Templates");
         const QAction *actBasic = menuTemplates->addAction(tr("&Standard install"));
-        const QAction *actCrypto = menuTemplates->addAction(tr("&Encrypted system"));
+        QAction *actCrypto = menuTemplates->addAction(tr("&Encrypted system"));
+        actCrypto->setVisible(gui.gbEncrPass->isVisible());
         action = menu.exec(QCursor::pos());
         if(action==actClear) partClearClick(true);
         else if(action==actBasic) layoutDefault(twit, -1, false);
