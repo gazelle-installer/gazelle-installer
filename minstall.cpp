@@ -2469,6 +2469,8 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
     buttonAdvancedFDE->setEnabled(checked);
     grubPbrButton->setDisabled(checked);
     if (checked) FDEpassword->setFocus();
+    // Account for addition/removal of the boot partition.
+    on_sliderPart_valueChanged(sliderPart->value());
 }
 
 void MInstall::on_customPartButton_clicked(bool checked)
