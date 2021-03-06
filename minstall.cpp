@@ -2464,7 +2464,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
         valstr += "\n" + tr("Home");
     }
     labelSliderHome->setText(valstr);
-    on_sliderPart_sliderPressed(); // For the tool tip.
+    if(sliderPart->isEnabled()) on_sliderPart_sliderPressed(); // For the tool tip.
 }
 
 void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
