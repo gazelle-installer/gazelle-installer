@@ -2122,7 +2122,7 @@ void MInstall::buildServiceList()
         category = list.at(0);
         description = list.at(1);
 
-        if (QFile("/etc/init.d/" + service).exists()) {
+        if (QFile::exists("/etc/init.d/"+service) || QFile::exists("/etc/sv/"+service)) {
             QList<QTreeWidgetItem *> found_items = csView->findItems(category, Qt::MatchExactly, 0);
             QTreeWidgetItem *top_item;
             QTreeWidgetItem *item;
