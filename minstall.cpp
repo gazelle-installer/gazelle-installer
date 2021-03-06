@@ -24,6 +24,7 @@
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QTimeZone>
+#include <QToolTip>
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
@@ -2417,6 +2418,10 @@ void MInstall::on_buttonSetKeyboard_clicked()
     setupkeyboardbutton();
 }
 
+void MInstall::on_sliderPart_sliderPressed()
+{
+    QToolTip::showText(QCursor::pos(), tr("%1% root").arg(sliderPart->value()), nullptr);
+}
 void MInstall::on_sliderPart_valueChanged(int value)
 {
     const bool crypto = checkBoxEncryptAuto->isChecked();
@@ -2455,6 +2460,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
         valstr += "\n" + tr("Home");
     }
     labelSliderHome->setText(valstr);
+    on_sliderPart_sliderPressed(); // For the tool tip.
 }
 
 void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
