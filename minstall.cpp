@@ -1701,12 +1701,19 @@ void MInstall::pageDisplayed(int next)
     }
 
     switch (next) {
-    case 2: // choose disk
+    case 1: // terms and keyboard selection
         mainHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
-                          + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
-                          "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
-                                     " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
-                          "<p>" + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
+            + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
+            "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
+                       " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
+            + "<p><b>" + tr("Limitations") + "</b><br/>"
+            + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
+                 " It is solely your responsibility to backup your data before proceeding.") + "</p>");
+        nextButton->setDefault(true);
+        break;
+    case 2: // choose disk
+        mainHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
+                          + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
                           "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
                           "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
                           "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
@@ -1735,10 +1742,7 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 3:  // choose partition
-        mainHelp->setText("<p><b>" + tr("Limitations") + "</b><br/>"
-                          + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
-                               " It is solely your responsibility to backup your data before proceeding.") + "</p>"
-                          "<p><b>" + tr("Choose Partitions") + "</b><br/>"
+        mainHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
                           + tr("%1 requires a root partition. The swap partition is optional but highly recommended."
                                " If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.").arg(PROJECTNAME) + "</p>"
                           "<p>" + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future,"
@@ -1932,8 +1936,7 @@ void MInstall::pageDisplayed(int next)
                              "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME));
         break;
 
-    default:
-        // case 1 or any other
+    default: // other
         mainHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n "
                           + tr("<p><b>Support %1</b><br/>"
                                "%1 is supported by people like you. Some help others at the "
