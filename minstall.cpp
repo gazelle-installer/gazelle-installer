@@ -1558,41 +1558,37 @@ void MInstall::setServices()
     QString chroot;
     if (!oobe) chroot = "chroot /mnt/antiX ";
     QTreeWidgetItemIterator it(csView);
-    while (*it) {
-        if ((*it)->parent() != nullptr) {
-            QString service = (*it)->text(0);
-            qDebug() << "Service: " << service;
-            if (!oem && (*it)->checkState(0) == Qt::Checked) {
-                proc.exec(chroot + "update-rc.d " + service + " defaults");
-                if (containsSystemD) {
-                    proc.exec(chroot + "systemctl enable " + service);
+    for(; *it; ++it) {
+        if ((*it)->parent() == nullptr) continue;
+        QString service = (*it)->text(0);
+        qDebug() << "Service: " << service;
+        if (!oem && (*it)->checkState(0) == Qt::Checked) {
+            proc.exec(chroot + "update-rc.d " + service + " defaults");
+            if (containsSystemD) {
+                proc.exec(chroot + "systemctl enable " + service);
+            }
+            if (containsRunit) {
+                if (QFile::exists("/etc/sv/" + service + "/down")){
+                    proc.exec(chroot + "rm /etc/sv/" + service + "/down");
                 }
-                if (containsRunit) {
-                    if ( QFileInfo("/etc/sv/" + service + "/down").exists() ){
-                        proc.exec(chroot + "rm /etc/sv/" + service + "/down");
-                    }
-                    if ( ! QFileInfo("/etc/sv/" + service).exists()) {
-                        proc.exec(chroot + "mkdir -p /etc/sv/" + service);
-                        proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
-                    }
-
-                } else { // In OEM mode, disable the services for the OOBE.
-                    proc.exec(chroot + "update-rc.d " + service + " remove");
-                    if (containsSystemD) {
-                        proc.exec(chroot + "systemctl disable " + service);
-                        proc.exec(chroot + "systemctl mask " + service);
-                    }
-
-                    if (containsRunit) {
-                        if ( ! QFileInfo("/etc/sv/" + service).exists() ) {
-                            proc.exec(chroot + "mkdir -p /etc/sv/" + service);
-                            proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
-                        }
-                        proc.exec(chroot + "touch " + "/etc/sv/" + service + "/down");
-                    }
+                if (!QFile::exists("/etc/sv/" + service)) {
+                    proc.exec(chroot + "mkdir -p /etc/sv/" + service);
+                    proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
                 }
             }
-            ++it;
+        } else { // In OEM mode, disable the services for the OOBE.
+            proc.exec(chroot + "update-rc.d " + service + " remove");
+            if (containsSystemD) {
+                proc.exec(chroot + "systemctl disable " + service);
+                proc.exec(chroot + "systemctl mask " + service);
+            }
+            if (containsRunit) {
+                if (!QFile::exists("/etc/sv/" + service)) {
+                    proc.exec(chroot + "mkdir -p /etc/sv/" + service);
+                    proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
+                }
+                proc.exec(chroot + "touch " + "/etc/sv/" + service + "/down");
+            }
         }
     }
 }
