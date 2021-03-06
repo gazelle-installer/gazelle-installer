@@ -93,6 +93,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
+    comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
 }
@@ -489,6 +490,7 @@ void PartMan::partClearClick(bool)
     if(!twit || twit->parent()) return;
     while(twit->childCount()) twit->removeChild(twit->child(0));
     twit->setData(Device, Qt::UserRole, QVariant(false));
+    comboTypeTextChange(QString()); // For the badblocks checkbox.
     treeSelChange();
 }
 void PartMan::partAddClick(bool)
