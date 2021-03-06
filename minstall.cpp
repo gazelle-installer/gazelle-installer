@@ -24,6 +24,7 @@
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QTimeZone>
+#include <QToolTip>
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
@@ -1554,44 +1555,41 @@ void MInstall::setServices()
     proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return;
 
-    QString chroot;
-    if (!oobe) chroot = "chroot /mnt/antiX ";
+    QString chroot, rootpath;
+    if (!oobe) {
+        chroot = "chroot /mnt/antiX ";
+        rootpath = "/mnt/antiX";
+    }
     QTreeWidgetItemIterator it(csView);
-    while (*it) {
-        if ((*it)->parent() != nullptr) {
-            QString service = (*it)->text(0);
-            qDebug() << "Service: " << service;
-            if (!oem && (*it)->checkState(0) == Qt::Checked) {
-                proc.exec(chroot + "update-rc.d " + service + " defaults");
-                if (containsSystemD) {
-                    proc.exec(chroot + "systemctl enable " + service);
-                }
-                if (containsRunit) {
-                    if ( QFileInfo("/etc/sv/" + service + "/down").exists() ){
-                        proc.exec(chroot + "rm /etc/sv/" + service + "/down");
-                    }
-                    if ( ! QFileInfo("/etc/sv/" + service).exists()) {
-                        proc.exec(chroot + "mkdir -p /etc/sv/" + service);
-                        proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
-                    }
-
-                } else { // In OEM mode, disable the services for the OOBE.
-                    proc.exec(chroot + "update-rc.d " + service + " remove");
-                    if (containsSystemD) {
-                        proc.exec(chroot + "systemctl disable " + service);
-                        proc.exec(chroot + "systemctl mask " + service);
-                    }
-
-                    if (containsRunit) {
-                        if ( ! QFileInfo("/etc/sv/" + service).exists() ) {
-                            proc.exec(chroot + "mkdir -p /etc/sv/" + service);
-                            proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
-                        }
-                        proc.exec(chroot + "touch " + "/etc/sv/" + service + "/down");
-                    }
+    for(; *it; ++it) {
+        if ((*it)->parent() == nullptr) continue;
+        QString service = (*it)->text(0);
+        qDebug() << "Service: " << service;
+        if (!oem && (*it)->checkState(0) == Qt::Checked) {
+            proc.exec(chroot + "update-rc.d " + service + " defaults");
+            if (containsSystemD) {
+                proc.exec(chroot + "systemctl enable " + service);
+            }
+            if (containsRunit) {
+                QFile::remove(rootpath+"/etc/sv/" + service + "/down");
+                if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
+                    proc.exec(chroot + "mkdir -p /etc/sv/" + service);
+                    proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
                 }
             }
-            ++it;
+        } else { // In OEM mode, disable the services for the OOBE.
+            proc.exec(chroot + "update-rc.d " + service + " remove");
+            if (containsSystemD) {
+                proc.exec(chroot + "systemctl disable " + service);
+                proc.exec(chroot + "systemctl mask " + service);
+            }
+            if (containsRunit) {
+                if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
+                    proc.exec(chroot + "mkdir -p /etc/sv/" + service);
+                    proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
+                }
+                proc.exec(chroot + "touch /etc/sv/" + service + "/down");
+            }
         }
     }
 }
@@ -1701,19 +1699,30 @@ void MInstall::pageDisplayed(int next)
     }
 
     switch (next) {
-    case 2: // choose disk
+    case 1: // terms and keyboard selection
         mainHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
-                          + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
-                          "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
-                                     " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
-                          "<p>" + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
+            + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
+            "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
+                       " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
+            + "<p><b>" + tr("Limitations") + "</b><br/>"
+            + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
+                 " It is solely your responsibility to backup your data before proceeding.") + "</p>");
+        nextButton->setDefault(true);
+        break;
+    case 2: // choose disk
+        mainHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
+                          + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
                           "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
                           "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
                           "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
-                          + tr("By default, the automatic install results in separate root and home partitions."
+                          + tr("On large drives, the default regular install results in separate root and home partitions."
                                " The slider allows you to control how much space is allocated to each partition.") + "</p>"
-                          "<p>" + tr("Move the slider to the left to increase the space for <b>home</b>. Move it to the right to increase the space for <b>root</b>."
-                                     " Move the slider all the way to the right if you want both root and home on the same partition; <b>this is not recommended.</b>") + "</p>"
+                          "<p>" + tr("Move the slider to the right to increase the space for <b>root</b>. Move it to the left to increase the space for <b>home</b>.") + "<br/>"
+                          + tr("Move the slider all the way to the right if you want both root and home on the same partition.") + "</p>"
+                          "<p>" + tr("If you plan to install many applications, or large applications such as graphics, audio"
+                                     " and video editing packages, you probably want a larger <b>root</b> partition.") + "<br/>"
+                          + tr("If you are storing large quantity of data, or this computer is being"
+                                     " used by many users, you may want a larger <b>home</b> partition.") + "</p>"
                           "<p>" + tr("Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier."
                                      " This can also improve overall performance by constraining the system files to a defined portion of the drive.") + "</p>"
                           "<p><b>" + tr("Encryption") + "</b><br/>"
@@ -1735,10 +1744,13 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 3:  // choose partition
-        mainHelp->setText("<p><b>" + tr("Limitations") + "</b><br/>"
-                          + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
-                               " It is solely your responsibility to backup your data before proceeding.") + "</p>"
-                          "<p><b>" + tr("Choose Partitions") + "</b><br/>"
+        mainHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
+                          + tr("A variety of actions are available by right-clicking any drive or partition item in the list.") + "<br/>"
+                          + tr("The buttons to the right of the list can also be used to manipulate the entries.") + "</p>"
+                          "<p>" + tr("The installer cannot modify the layout already on the drive."
+                                     " To create a custom layout, mark the drive for a new layout with the <b>New layout</b> menu action"
+                                     " or button (%1). This clears the existing layout.").arg("<img src=':/edit-clear-all'/>") + "</p>"
+                          "<p><b>" + tr("Basic layout requirements") + "</b><br/>"
                           + tr("%1 requires a root partition. The swap partition is optional but highly recommended."
                                " If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.").arg(PROJECTNAME) + "</p>"
                           "<p>" + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future,"
@@ -1758,9 +1770,10 @@ void MInstall::pageDisplayed(int next)
                           "<p><b>" + tr("Bad Blocks") + "</b><br/>"
                           + tr("If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive."
                                " The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"
-                          "<p><b>" + tr("System drive management tool") + "</b><br/>"
-                          + tr("If you want more control over the drive layouts than what can be provided on this page, click the button to the bottom-right of the list."
-                               " This will run the drive management tool provided with the operating system, which will allow you to create the exact layout you need.") + "</p>"
+                          "<p><b>" + tr("System partition management tool") + "</b><br/>"
+                          + tr("For more control over the drive layouts (such as modifying the existing layout on a disk), click the"
+                               " partition management button (%1). This will run the operating system's partition management tool,"
+                               " which will allow you to create the exact layout you need.").arg("<img src=':/partitionmanager'/>") + "</p>"
                           "<p><b>" + tr("Encryption") + "</b><br/>"
                           + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
                           "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
@@ -1932,8 +1945,7 @@ void MInstall::pageDisplayed(int next)
                              "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME));
         break;
 
-    default:
-        // case 1 or any other
+    default: // other
         mainHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n "
                           + tr("<p><b>Support %1</b><br/>"
                                "%1 is supported by people like you. Some help others at the "
@@ -2107,7 +2119,7 @@ void MInstall::buildServiceList()
         category = list.at(0);
         description = list.at(1);
 
-        if (QFile("/etc/init.d/" + service).exists()) {
+        if (QFile::exists("/etc/init.d/"+service) || QFile::exists("/etc/sv/"+service)) {
             QList<QTreeWidgetItem *> found_items = csView->findItems(category, Qt::MatchExactly, 0);
             QTreeWidgetItem *top_item;
             QTreeWidgetItem *item;
@@ -2414,6 +2426,14 @@ void MInstall::on_buttonSetKeyboard_clicked()
     setupkeyboardbutton();
 }
 
+void MInstall::on_sliderPart_sliderPressed()
+{
+    QString valText(tr("%1% root") + '\n' + tr("%2% home"));
+    const int val = sliderPart->value();
+    if(val<1) valText = valText.arg(">0", "<100");
+    else valText = valText.arg(val).arg(100-val);
+    QToolTip::showText(QCursor::pos(), valText, nullptr);
+}
 void MInstall::on_sliderPart_valueChanged(int value)
 {
     const bool crypto = checkBoxEncryptAuto->isChecked();
@@ -2430,8 +2450,13 @@ void MInstall::on_sliderPart_valueChanged(int value)
         // 64GB cap on the default slider value, rounded to nearest percentage.
         const int rootPortionMax = ((65536*100) + (available/2)) / available;
         if(value > rootPortionMax) value = rootPortionMax;
-    }
-    if(value<minPercent) {
+        // Recommended root size.
+        int recPercent = ((rootMinMB+4096)*100) / available; // TODO: Make configurable.
+        if(value < recPercent) value = recPercent;
+        // If the resulting home is too small, just make it all root.
+        recPercent = 100 - ((1024*100) / available); // TODO: Make configurable.
+        if(value>=recPercent) value = 100;
+    } else if(value<minPercent) {
         if(value>=0) qApp->beep();
         value = minPercent;
     }
@@ -2452,6 +2477,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
         valstr += "\n" + tr("Home");
     }
     labelSliderHome->setText(valstr);
+    if(sliderPart->isEnabled()) on_sliderPart_sliderPressed(); // For the tool tip.
 }
 
 void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
@@ -2466,6 +2492,8 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
     buttonAdvancedFDE->setEnabled(checked);
     grubPbrButton->setDisabled(checked);
     if (checked) FDEpassword->setFocus();
+    // Account for addition/removal of the boot partition.
+    on_sliderPart_valueChanged(sliderPart->value());
 }
 
 void MInstall::on_customPartButton_clicked(bool checked)

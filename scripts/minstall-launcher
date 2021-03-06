@@ -5,34 +5,23 @@
 #        mx-installer-launcher (formerly minstall-pkexec)
 # based on mx-pkexec wrapper
 
+#exit early if not live or parameter given
+
+if [ -n "$1" ] || ! grep -sq '^overlay /live/aufs' /proc/mounts; then
+    echo ""
+    echo "INFORMATION: Non-live enviroment or options not supported"
+    echo "             use alternate authentication to launch installer"
+    echo "             sudo minstall [OPTIONS]"
+    echo ""
+    exit 1
+fi
+
 ##launch installer
 
-if test "$EUID" != 0; then
+if [ "$EUID" != 0 ]; then
     # normal user
-	##exit early if arguments present
-	exitearly=false
 
-	if [ -n "$1" ]; then
-		exitearly=true
-	fi
-
-	#exit early if not live
-
-	if ! grep -sq '^overlay /live/aufs' /proc/mounts; then
-		exitearly=true
-	fi  
-	
-	
-	if [ "$exitearly" = "true" ]; then
-		echo ""
-		echo "INFORMATION: Non-live enviroment or options not supported"
-		echo "             use alternate authentication to launch installer"
-		echo "             sudo minstall [OPTIONS]"
-		echo ""
-		exit 0
-	fi
-
-	##disable Xfce automount features
+    ##disable Xfce automount features
 
     INITIALAUTOMOUNT=false
     if command -v xfconf-query >/dev/null && \
@@ -48,32 +37,15 @@ if test "$EUID" != 0; then
     ###end Xfce automount feature
     # wayland fix (chkboom)
     if [ x"$WAYLAND_DISPLAY" != "x" ] && [ -n "${WAYLAND_DISPLAY##/*}" ]; then
-      WAYLAND_DISPLAY=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
+      export WAYLAND_DISPLAY=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
     fi
-    
-    QTENV="${XDG_RUNTIME_DIR:-/tmp}/mx-installer-qtenv.$EUID.$PPID.$$.$RANDOM$RANDOM"
-    if [ -f "$QTENV" ] ; then
-        rm  $QTENV
-    fi
-    umask 0022
-    touch "$QTENV"
-    while IFS=$'\n' read -r ENV; do 
-        IFS='=' read PAR VAL < <(echo $ENV); 
-        echo "export $PAR=${VAL@Q}" >> $QTENV 
-    done < <(printenv | grep -E '^DESKTOP_SESSION|^KDE_FULL_SESSION=|^LANG=|^LANGUAGE=|^LC_|^QT_|^XDG_SESSION_TYPE|^WAYLAND_')
 
-    echo "CURRENT_WORK_DIR='$PWD'" >> "$QTENV"
-    chmod +r "$QTENV"
-    
     AUTHENTICATION="$(grep AUTHENTICATION /usr/share/gazelle-installer-data/installer.conf |cut -d= -f2)"
     if [ -z "$AUTHENTICATION" ]; then
-		AUTHENTICATION="su-to-root -X -c"
+        AUTHENTICATION="su-to-root -X -c"
    fi
     
-    $AUTHENTICATION /usr/bin/minstall-launcher "--qtenv" "$QTENV"
-    if [ -f "$QTENV" ] ; then
-       rm  $QTENV
-    fi
+    $AUTHENTICATION /usr/bin/minstall-launcher
 
     ##renable Xfce automount feature, if it was enabled in the first place
     if [ -e "/tmp/minstall-auto" ]; then
@@ -85,36 +57,57 @@ if test "$EUID" != 0; then
     fi
 
     ##end Xfce automount feaure
-fi
 
-if test "$EUID" == 0; then
+else
     # root user
-    # set XDG_RUNTIME_DIR - do nothing if already set
 
-    if [ x"$XDG_RUNTIME_DIR" = "x" ]; then
+    # set XDG_RUNTIME_DIR - create a valid runtime dir
+    if [ "$XDG_RUNTIME_DIR" != "/run/user/0" ]; then
       XDG_RUNTIME_DIR=/run/user/0
       export XDG_RUNTIME_DIR
       [ -d $XDG_RUNTIME_DIR ] || mkdir -p $XDG_RUNTIME_DIR
       chmod 700 $XDG_RUNTIME_DIR
       chown 0:0 $XDG_RUNTIME_DIR
     fi
-    if  [ "x$1" = "x--qtenv" ]; then
-        QTENV="$2"
-        shift
-        shift
-        if [ -f "$QTENV" -a  "x$QTENV" != "x${QTENV#*/mx-installer-qtenv.}" ] ; then 
-            . "$QTENV"
-            rm  "$QTENV"
-            cd "${CURRENT_WORK_DIR}" 
-            unset CURRENT_WORK_DIR
-        fi
-        PATH="/usr/local/bin:$PATH"
-    fi
+    # add /usr/local/bin as first entry if not already
+    [ -z "${PATH##/usr/local/bin:*}" ] || PATH="/usr/local/bin:$PATH"
+
+    # put pattern list of environment variables we want get from users environment into array
+    __ENVIRONEMENT_PATTERN__=(
+        DESKTOP_SESSION
+        KDE_FULL_SESSION=
+        LANG=
+        LANGUAGE=
+        LC_
+        PWD=
+        QT_
+        XDG_CURRENT_DESKTOP=
+        XDG_SESSION_TYPE
+        WAYLAND_
+        )
+
+    # combine array into a string of space separated entries 
+    __ENVIRONEMENT_PATTERN__="${__ENVIRONEMENT_PATTERN__[*]}"
+    # replace spaces with pipe-symbole as pattern alternative
+    __ENVIRONEMENT_PATTERN__="^(${__ENVIRONEMENT_PATTERN__// /|})"
+    # read environment variables from users process environement table
+    while read -r; do  
+        IFS='=' read -r  k v  <<<"$REPLY" 
+        # remove any 'bad' special char's like back-quotes and dollar sign
+        v="${v//[\`\$]/}"
+        # change to user working dir
+        [ -z "${k##PWD*}" ] && cd "$v" && continue
+        export $k="$v"  
+    done < <( xargs -0 -L1 -a /proc/$PPID/environ \
+            | grep -E "${__ENVIRONEMENT_PATTERN__}")
+
+    unset k v
+    unset __ENVIRONEMENT_PATTERN__
 
     RUN="/sbin/minstall"
-    echo Starting  "$RUN" "${@}"
+    echo Starting  "$RUN" 
     command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
-    exec "$RUN" "${@}"
+    exec "$RUN" 
 fi
 
 exit

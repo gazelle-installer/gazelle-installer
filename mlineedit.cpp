@@ -88,20 +88,18 @@ void MLineEdit::generate()
 void MLineEdit::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = createStandardContextMenu();
-    if(slave) {
+    QAction *actGenPass = nullptr;
+    if(slave != nullptr) {
         generate();
         menu->addSeparator();
-        QAction *action = menu->addAction(tr("Use password") + ": " + genText);
-        connect(action, &QAction::triggered, this, &MLineEdit::menuGenText);
+        actGenPass = menu->addAction(tr("Use password") + ": " + genText);
     }
-    menu->exec(event->globalPos());
+    const QAction *action = menu->exec(event->globalPos());
+    if(actGenPass && action==actGenPass) {
+        setText(genText);
+        slave->setText(genText);
+    }
     delete menu;
-}
-
-void MLineEdit::menuGenText()
-{
-    setText(genText);
-    slave->setText(genText);
 }
 
 void MLineEdit::masterTextChanged()
