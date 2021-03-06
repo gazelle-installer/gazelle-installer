@@ -1718,10 +1718,14 @@ void MInstall::pageDisplayed(int next)
                           "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
                           "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
                           "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
-                          + tr("By default, the automatic install results in separate root and home partitions."
+                          + tr("On large drives, the default regular install results in separate root and home partitions."
                                " The slider allows you to control how much space is allocated to each partition.") + "</p>"
-                          "<p>" + tr("Move the slider to the left to increase the space for <b>home</b>. Move it to the right to increase the space for <b>root</b>."
-                                     " Move the slider all the way to the right if you want both root and home on the same partition; <b>this is not recommended.</b>") + "</p>"
+                          "<p>" + tr("Move the slider to the right to increase the space for <b>root</b>. Move it to the left to increase the space for <b>home</b>.") + "<br/>"
+                          + tr("Move the slider all the way to the right if you want both root and home on the same partition.") + "</p>"
+                          "<p>" + tr("If you plan to install many applications, or large applications such as graphics, audio"
+                                     " and video editing packages, you probably want a larger <b>root</b> partition.") + "<br/>"
+                          + tr("If you are storing large quantity of data, or this computer is being"
+                                     " used by many users, you may want a larger <b>home</b> partition.") + "</p>"
                           "<p>" + tr("Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier."
                                      " This can also improve overall performance by constraining the system files to a defined portion of the drive.") + "</p>"
                           "<p><b>" + tr("Encryption") + "</b><br/>"
@@ -2449,8 +2453,13 @@ void MInstall::on_sliderPart_valueChanged(int value)
         // 64GB cap on the default slider value, rounded to nearest percentage.
         const int rootPortionMax = ((65536*100) + (available/2)) / available;
         if(value > rootPortionMax) value = rootPortionMax;
-    }
-    if(value<minPercent) {
+        // Recommended root size.
+        int recPercent = ((rootMinMB+4096)*100) / available; // TODO: Make configurable.
+        if(value < recPercent) value = recPercent;
+        // If the resulting home is too small, just make it all root.
+        recPercent = 100 - ((1024*100) / available); // TODO: Make configurable.
+        if(value>=recPercent) value = 100;
+    } else if(value<minPercent) {
         if(value>=0) qApp->beep();
         value = minPercent;
     }
