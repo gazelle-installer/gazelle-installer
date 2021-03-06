@@ -434,31 +434,47 @@ void PartMan::treeMenu(const QPoint &)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit) return;
+    QMenu menu(gui.treePartitions);
+    QAction *action = nullptr;
+    QAction *actAdd = menu.addAction(tr("&Add partition"));
+    actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
     if(twit->parent()) {
-        if(twitComboBox(twit, Type)->currentText() != "btrfs") return;
-        QMenu menu(gui.treePartitions);
-        const QAction *actBtrfsZlib = menu.addAction(tr("Template: BTRFS compression (ZLIB)"));
-        const QAction *actBtrfsLzo = menu.addAction(tr("Template: BTRFS compression (LZO)"));
-        const QAction *action = menu.exec(QCursor::pos());
-        QLineEdit *editOpts = twitLineEdit(twit, Options);
-        if(action==actBtrfsZlib) editOpts->setText("defaults,noatime,compress-force=zlib");
-        else if(action==actBtrfsLzo) editOpts->setText("defaults,noatime,compress-force=lzo");
+        QComboBox *comboFormat = twitComboBox(twit, Type);
+        const int ixBTRFS = comboFormat->findData("btrfs");
+        QAction *actRemove = menu.addAction(tr("&Remove partition"));
+        actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
+        menu.addSeparator();
+        QAction *actBtrfsZlib = menu.addAction(tr("Template: BTRFS compression (ZLIB)"));
+        QAction *actBtrfsLzo = menu.addAction(tr("Template: BTRFS compression (LZO)"));
+        if(ixBTRFS<0) {
+            actBtrfsZlib->setEnabled(false);
+            actBtrfsLzo->setEnabled(false);
+        }
+        action = menu.exec(QCursor::pos());
+        if(action==actRemove) partRemoveClick(true);
+        else if(action) {
+            QLineEdit *editOpts = twitLineEdit(twit, Options);
+            comboFormat->setCurrentIndex(ixBTRFS);
+            if(action==actBtrfsZlib) editOpts->setText("defaults,noatime,compress-force=zlib");
+            else if(action==actBtrfsLzo) editOpts->setText("defaults,noatime,compress-force=lzo");
+        }
     } else {
-        QMenu menu(gui.treePartitions);
-        menu.addAction(tr("&Reset to on-disk layout"));
+        menu.addSeparator();
+        const QAction *actClear = menu.addAction(tr("New &layout"));
+        const QAction *actReset = menu.addAction(tr("&Reset to on-disk layout"));
         menu.addSeparator();
         const QAction *actBasic = menu.addAction(tr("Template: &Standard install"));
         const QAction *actCrypto = menu.addAction(tr("Template: &Encrypted system"));
-        const QAction *action = menu.exec(QCursor::pos());
-        if(action) {
-            if(action==actBasic) layoutDefault(twit, -1, false);
-            else if(action==actCrypto) layoutDefault(twit, -1, true);
-            else { // Reset
-                while(twit->childCount()) twit->removeChild(twit->child(0));
-                populate(twit);
-            }
+        action = menu.exec(QCursor::pos());
+        if(action==actClear) partClearClick(true);
+        else if(action==actBasic) layoutDefault(twit, -1, false);
+        else if(action==actCrypto) layoutDefault(twit, -1, true);
+        else if(action==actReset) {
+            while(twit->childCount()) twit->removeChild(twit->child(0));
+            populate(twit);
         }
     }
+    if(action==actAdd) partAddClick(true);
 }
 
 // Partition manager list buttons
