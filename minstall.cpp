@@ -2455,19 +2455,18 @@ void MInstall::on_sliderPart_valueChanged(int value)
     if(!available) return;
     const int rootMinMB = partman.rootSpaceNeeded / 1048576;
     const int minPercent = (rootMinMB*100) / available;
+    const int recPercentMin = ((rootMinMB+4096)*100) / available; // Recommended root size. TODO: Make configurable.
+    const int recPercentMax = 99 - ((1024*100) / available); // Recommended minimum home. TODO: Make configurable.
     int origValue = value;
     if(value<0) { // Internal setup.
         origValue = value = sliderPart->value();
         frameSliderPart->setEnabled(true);
         // 64GB cap on the default slider value, rounded to nearest percentage.
         const int rootPortionMax = ((65536*100) + (available/2)) / available;
+        // Caps based on disk capacity and recommendations.
         if(value > rootPortionMax) value = rootPortionMax;
-        // Recommended root size.
-        int recPercent = ((rootMinMB+4096)*100) / available; // TODO: Make configurable.
-        if(value < recPercent) value = recPercent;
-        // If the resulting home is too small, just make it all root.
-        recPercent = 100 - ((1024*100) / available); // TODO: Make configurable.
-        if(value>=recPercent) value = 100;
+        if(value < recPercentMin) value = recPercentMin;
+        if(value > recPercentMax) value = 100;
     } else if(value<minPercent) {
         if(value>=0) qApp->beep();
         value = minPercent;
@@ -2483,12 +2482,19 @@ void MInstall::on_sliderPart_valueChanged(int value)
     available -= availRoot;
     labelSliderRoot->setText(valstr + "\n" + tr("Root"));
 
+    QPalette palRoot = QApplication::palette();
+    QPalette palHome = QApplication::palette();
+    static const QColor Red(255,0,0);
+    if(value < recPercentMin) palRoot.setColor(QPalette::WindowText, Red);
     if(value==100) valstr = tr("----");
     else {
         valstr = sliderSizeString(available*1048576);
         valstr += "\n" + tr("Home");
+        if(value > recPercentMax) palHome.setColor(QPalette::WindowText, Red);
     }
     labelSliderHome->setText(valstr);
+    labelSliderRoot->setPalette(palRoot);
+    labelSliderHome->setPalette(palHome);
     if(sliderPart->isEnabled()) on_sliderPart_sliderPressed(); // For the tool tip.
 }
 
