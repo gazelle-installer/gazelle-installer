@@ -1745,6 +1745,18 @@ void MInstall::pageDisplayed(int next)
 
     case 3:  // choose partition
         mainHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
+                          + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"
+                          "<p>" + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"
+                          "<p>" + tr("<i>Size</i> - The size of the partition. This can only be changed on a new layout.") + "</p>"
+                          "<p>" + tr("<i>Label</i> - The label that is assigned to the partition once it has been formatted.") + "</p>"
+                          "<p>" + tr("<i>Use For</i> - To use this partition in an installation, you must select something here."
+                                     " You can also type your own mount point, which must start with a slash (\"/\").") + "</p>"
+                          "<p>" + tr("<i>Encrypt</i> - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption."
+                                     " To preserve the format of an existing encrypted partition, you must use the same passphrase that it was originally encrypted with.") + "</p>"
+                          "<p>" + tr("<i>Format</i> - This is the partition's format. Available formats depend on what the partition is used for."
+                                     " When working with an existing layout, you may be able to preserve the format of the partition by selecting <b>Preserve</b>.") + "</p>"
+                          "<p>" + tr("<i>Mount Options</i> - This specifies mounting options that will be used for this partition.") + "</p>"
+                          "<p><b>" + tr("Menus and actions") + "</b><br/>"
                           + tr("A variety of actions are available by right-clicking any drive or partition item in the list.") + "<br/>"
                           + tr("The buttons to the right of the list can also be used to manipulate the entries.") + "</p>"
                           "<p>" + tr("The installer cannot modify the layout already on the drive."

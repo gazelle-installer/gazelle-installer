@@ -677,7 +677,7 @@
                 </column>
                 <column>
                  <property name="text">
-                  <string>Type</string>
+                  <string>Format</string>
                  </property>
                 </column>
                 <column>

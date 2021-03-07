@@ -142,7 +142,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 if(totalMB > maxMB) config.markBadWidget(spinSize);
             }
             config.manageComboBox("UseFor", twitComboBox(twit, UseFor), false);
-            config.manageComboBox("Format", twitComboBox(twit, Type), true);
+            config.manageComboBox("Format", twitComboBox(twit, Format), true);
             if(!save && config.contains("Encrypt")) {
                 const bool crypto = config.value("Encrypt").toBool();
                 twit->setCheckState(Encrypt, crypto ? Qt::Checked : Qt::Unchecked);
@@ -213,10 +213,10 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     // Type
     QComboBox *comboType = new QComboBox(gui.treePartitions);
     comboType->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(twit, Type, comboType);
+    gui.treePartitions->setItemWidget(twit, Format, comboType);
     comboType->setEnabled(false);
     if(bdinfo) {
-        twit->setText(Type, bdinfo->fs);
+        twit->setText(Format, bdinfo->fs);
         comboType->addItem(bdinfo->fs);
     }
     connect(comboType, &QComboBox::currentTextChanged, this, &PartMan::comboTypeTextChange);
@@ -307,9 +307,9 @@ void PartMan::comboUseTextChange(const QString &text)
     else useClass = 5;
     int oldUseClass = combo->property("class").toInt();
     if(useClass != oldUseClass) {
-        QComboBox *comboType = twitComboBox(item, Type);
+        QComboBox *comboType = twitComboBox(item, Format);
         comboType->clear();
-        const QString &curtype = item->text(Type);
+        const QString &curtype = item->text(Format);
         switch(useClass) {
         case 0:
             editLabel->setText(item->text(Label));
@@ -359,14 +359,14 @@ void PartMan::comboTypeTextChange(const QString &)
     bool canCheckBlocks = false;
     for(; *it; ++it) {
         if(twitUseFor(*it).isEmpty()) continue;
-        QComboBox *comboType = twitComboBox(*it, Type);
+        QComboBox *comboType = twitComboBox(*it, Format);
         QLineEdit *editOpts = twitLineEdit(*it, Options);
         if(!comboType || !editOpts) return;
         const QString &type = comboType->currentText();
         const Qt::ItemFlags itflags = (*it)->flags();
         if(comboType->currentData(Qt::UserRole)=="PRESERVE") {
             if((*it)->data(Encrypt, Qt::CheckStateRole).isValid()) {
-                const bool luks = ((*it)->text(Type)=="crypto_LUKS");
+                const bool luks = ((*it)->text(Format)=="crypto_LUKS");
                 (*it)->setCheckState(Encrypt, luks ? Qt::Checked : Qt::Unchecked);
             }
             (*it)->setFlags(itflags & ~Qt::ItemIsUserCheckable);
@@ -444,7 +444,7 @@ void PartMan::treeMenu(const QPoint &)
     QAction *actAdd = menu.addAction(tr("&Add partition"));
     actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
     if(twit->parent()) {
-        QComboBox *comboFormat = twitComboBox(twit, Type);
+        QComboBox *comboFormat = twitComboBox(twit, Format);
         const int ixBTRFS = comboFormat->findData("btrfs");
         QAction *actRemove = menu.addAction(tr("&Remove partition"));
         actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
@@ -692,7 +692,7 @@ bool PartMan::calculatePartBD()
             if(useFor.isEmpty()) continue;
             QString bdFS;
             if(twit->checkState(Encrypt) == Qt::Checked) bdFS = QStringLiteral("crypto_LUKS");
-            else bdFS = twitComboBox(twit, Type)->currentText();
+            else bdFS = twitComboBox(twit, Format)->currentText();
             if(useExist) {
                 BlockDeviceInfo &bdinfo = listBlkDevs[ixPartBD];
                 listToUnmount << bdinfo.name;
@@ -877,7 +877,7 @@ int PartMan::countPrepSteps()
     // Creation of new partitions
     for(int ixi = gui.treePartitions->topLevelItemCount(); ixi>=0; --ixi) {
         QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
-        if(twitComboBox(drvit, Type)) pcount += drvit->childCount() + 1; // Partition table creation included.
+        if(twitComboBox(drvit, Format)) pcount += drvit->childCount() + 1; // Partition table creation included.
     }
     // Formatting partitions
     pcount += mounts.count();
@@ -1030,7 +1030,7 @@ bool PartMan::formatPartitions()
             if(!label.isEmpty()) cmd.append(" -L \"" + label + "\"");
             if(!proc.exec(cmd, true)) return false;
         } else {
-            if(!formatLinuxPartition(dev, twitComboBox(twit, Type)->currentText(),
+            if(!formatLinuxPartition(dev, twitComboBox(twit, Format)->currentText(),
                 badblocks, twitLineEdit(twit, Label)->text())) return false;
         }
         proc.sleep(1000);
@@ -1279,7 +1279,7 @@ inline long long PartMan::twitSize(QTreeWidgetItem *twit, bool bytes)
 }
 inline bool PartMan::twitWillFormat(QTreeWidgetItem *twit)
 {
-    QComboBox *combo = twitComboBox(twit, Type);
+    QComboBox *combo = twitComboBox(twit, Format);
     return (combo->currentData(Qt::UserRole) != "PRESERVE");
 }
 inline QString PartMan::twitUseFor(QTreeWidgetItem *twit)
