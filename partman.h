@@ -37,7 +37,7 @@ class PartMan : public QObject
         Label,
         UseFor,
         Encrypt,
-        Type,
+        Format,
         Options
     };
     MProcess &proc;
