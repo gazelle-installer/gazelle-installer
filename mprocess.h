@@ -50,6 +50,7 @@ public:
     void status(const QString &text, int progress = -1);
     // Common functions that are traditionally carried out by processes.
     void sleep(const int msec, const bool silent = false);
+    bool mkpath(const QString &path);
 };
 
 #endif // MPROCESS_H
