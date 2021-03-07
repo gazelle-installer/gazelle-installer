@@ -44,7 +44,7 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     qDebug().nospace() << "Exec #" << execount << ": " << cmd;
     QListWidgetItem *logEntry = log(cmd, Exec);
     QEventLoop eloop;
-    connect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), &eloop, &QEventLoop::quit);
+    connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (rawexec) start(cmd);
     else start("/bin/bash", QStringList() << "-c" << cmd);
     if (!debugUnusedOutput) {
@@ -54,7 +54,7 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     if (input && !(input->isEmpty())) write(*input);
     closeWriteChannel();
     eloop.exec();
-    disconnect(this, static_cast<void (QProcess::*)(int)>(&QProcess::finished), nullptr, nullptr);
+    disconnect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
     if (debugUnusedOutput) {
         bool hasOut = false;
         if (!needRead) {
@@ -97,20 +97,6 @@ QStringList MProcess::execOutLines(const QString &cmd, const bool rawexec)
     return QString(readAllStandardOutput().trimmed()).split('\n', QString::SkipEmptyParts);
 }
 
-void MProcess::sleep(const int msec, const bool silent)
-{
-    if(!silent) {
-        ++sleepcount;
-        qDebug().nospace() << "Sleep #" << sleepcount << ": " << msec << "ms";
-    }
-    QTimer cstimer(this);
-    QEventLoop eloop(this);
-    connect(&cstimer, &QTimer::timeout, &eloop, &QEventLoop::quit);
-    cstimer.start(msec);
-    int rc = eloop.exec();
-    if(!silent) qDebug().nospace() << "Sleep #" << sleepcount << ": exit " << rc;
-}
-
 void MProcess::halt()
 {
     halting = true;
@@ -140,7 +126,7 @@ QListWidgetItem *MProcess::log(const QString &text, const LogType type)
     if(!logView) return nullptr;
     QListWidgetItem *entry = new QListWidgetItem(text, logView);
     logView->addItem(entry);
-    if(type == Exec) entry->setTextColor(Qt::cyan);
+    if(type == Exec) entry->setForeground(Qt::cyan);
     else if(type != Standard) {
         QFont font(entry->font());
         if(type == Section) font.setBold(true);
@@ -153,9 +139,9 @@ QListWidgetItem *MProcess::log(const QString &text, const LogType type)
 void MProcess::log(QListWidgetItem *entry, const int status)
 {
     if(!entry) return;
-    if(status > 0) entry->setTextColor(Qt::green);
-    else if(status < 0) entry->setTextColor(Qt::red);
-    else entry->setTextColor(Qt::yellow);
+    if(status > 0) entry->setForeground(Qt::green);
+    else if(status < 0) entry->setForeground(Qt::red);
+    else entry->setForeground(Qt::yellow);
 }
 
 void MProcess::status(const QString &text, int progress)
@@ -170,5 +156,27 @@ void MProcess::status(const QString &text, int progress)
         if(progress < 0) progress = progBar->value() + 1;
         progBar->setValue(progress);
         qApp->processEvents();
+    }
+}
+
+// Common functions that are traditionally carried out by processes.
+
+void MProcess::sleep(const int msec, const bool silent)
+{
+    if(halting) return;
+    QListWidgetItem *logEntry = nullptr;
+    if(!silent) {
+        ++sleepcount;
+        logEntry = log(QString("SLEEP: %1ms").arg(msec), Exec);
+        qDebug().nospace() << "Sleep #" << sleepcount << ": " << msec << "ms";
+    }
+    QTimer cstimer(this);
+    QEventLoop eloop(this);
+    connect(&cstimer, &QTimer::timeout, &eloop, &QEventLoop::quit);
+    cstimer.start(msec);
+    const int rc = eloop.exec();
+    if(!silent) {
+        qDebug().nospace() << "Sleep #" << sleepcount << ": exit " << rc;
+        log(logEntry, rc==0);
     }
 }
