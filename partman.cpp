@@ -22,7 +22,6 @@
 #include <sys/sysinfo.h>
 #include <sys/stat.h>
 #include <QDebug>
-#include <QDir>
 #include <QTimer>
 #include <QLocale>
 #include <QMessageBox>
@@ -1184,7 +1183,7 @@ bool PartMan::mountPartitions()
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = twitMappedDevice(it.second, true);
         proc.status(tr("Mounting: %1").arg(dev));
-        if(!QDir().mkpath(point)) return false;
+        if(!proc.mkpath(point)) return false;
         if(it.first=="/boot") {
              // needed to run fsck because sfdisk --part-type can mess up the partition
             if(!proc.exec("fsck.ext4 -y " + dev)) return false;

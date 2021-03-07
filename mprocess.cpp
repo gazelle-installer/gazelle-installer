@@ -19,6 +19,7 @@
 #include <QDebug>
 #include <QEventLoop>
 #include <QTimer>
+#include <QDir>
 
 #include "mprocess.h"
 
@@ -177,6 +178,14 @@ void MProcess::sleep(const int msec, const bool silent)
     const int rc = eloop.exec();
     if(!silent) {
         qDebug().nospace() << "Sleep #" << sleepcount << ": exit " << rc;
-        log(logEntry, rc==0);
+        log(logEntry, rc==0?1:-1);
     }
+}
+bool MProcess::mkpath(const QString &path)
+{
+    QListWidgetItem *logEntry = log("MKPATH: "+path, Exec);
+    const bool rc = QDir().mkpath(path);
+    qDebug() << (rc?"MkPath(SUCCESS):":"MkPath(FAILURE):") << path;
+    log(logEntry, rc?1:-1);
+    return rc;
 }
