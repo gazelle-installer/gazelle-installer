@@ -103,6 +103,7 @@ private slots:
     void on_buttonRunParted_clicked();
     void on_viewServicesButton_clicked();
 
+    void on_diskCombo_currentIndexChanged(int);
     void on_sliderPart_sliderPressed();
     void on_sliderPart_valueChanged(int value);
     void on_checkBoxEncryptAuto_toggled(bool checked);
