@@ -2490,13 +2490,12 @@ void MInstall::on_sliderPart_valueChanged(int value)
 
     QPalette palRoot = QApplication::palette();
     QPalette palHome = QApplication::palette();
-    static const QColor Red(255,0,0);
-    if(value < recPercentMin) palRoot.setColor(QPalette::WindowText, Red);
+    if(value < recPercentMin) palRoot.setColor(QPalette::WindowText, Qt::red);
     if(value==100) valstr = tr("----");
     else {
         valstr = sliderSizeString(available*1048576);
         valstr += "\n" + tr("Home");
-        if(value > recPercentMax) palHome.setColor(QPalette::WindowText, Red);
+        if(value > recPercentMax) palHome.setColor(QPalette::WindowText, Qt::red);
     }
     labelSliderHome->setText(valstr);
     labelSliderRoot->setPalette(palRoot);
