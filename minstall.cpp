@@ -2438,13 +2438,19 @@ void MInstall::on_buttonSetKeyboard_clicked()
     setupkeyboardbutton();
 }
 
+void MInstall::on_diskCombo_currentIndexChanged(int)
+{
+    on_sliderPart_valueChanged(sliderPart->value());
+}
+
 void MInstall::on_sliderPart_sliderPressed()
 {
-    QString valText(tr("%1% root") + '\n' + tr("%2% home"));
+    QString tipText(tr("%1% root") + '\n' + tr("%2% home"));
     const int val = sliderPart->value();
-    if(val<1) valText = valText.arg(">0", "<100");
-    else valText = valText.arg(val).arg(100-val);
-    QToolTip::showText(QCursor::pos(), valText, nullptr);
+    if(val<1) tipText = tipText.arg(">0", "<100");
+    else tipText = tipText.arg(val).arg(100-val);
+    sliderPart->setToolTip(tipText);
+    if(sliderPart->isSliderDown()) QToolTip::showText(QCursor::pos(), tipText, sliderPart);
 }
 void MInstall::on_sliderPart_valueChanged(int value)
 {
@@ -2495,7 +2501,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
     labelSliderHome->setText(valstr);
     labelSliderRoot->setPalette(palRoot);
     labelSliderHome->setPalette(palHome);
-    if(sliderPart->isEnabled()) on_sliderPart_sliderPressed(); // For the tool tip.
+    on_sliderPart_sliderPressed(); // For the tool tip.
 }
 
 void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
