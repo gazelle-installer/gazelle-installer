@@ -156,7 +156,9 @@ void MInstall::startup()
         //load some live variables
         QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
         SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
-        isRemasteredDemoPresent = checkForRemaster();
+        // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
+        isRemasteredDemoPresent = QFileInfo("/live/linux/home/demo").isDir();
+        qDebug() << "check for remastered home demo folder:" << isRemasteredDemoPresent;
 
         // calculate required disk space
         bootSource = "/live/aufs/boot";
@@ -262,7 +264,11 @@ void MInstall::startup()
         }
 
         // Detect snapshot-backup account(s)
-        haveSnapshotUserAccounts = checkForSnapshot();
+        // test if there's another user other than demo in /home,
+        // indicating a possible snapshot or complicated live-usb
+        haveSnapshotUserAccounts = proc.exec("/bin/ls -1 /home"
+            " | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false);
+        qDebug() << "check for possible snapshot:" << haveSnapshotUserAccounts;
     }
 
     // Password box setup
@@ -395,7 +401,7 @@ void MInstall::setupAutoMount(bool enabled)
         }
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
-        proc.exec("mkdir -p /run/udev/rules.d");
+        proc.mkpath("/run/udev/rules.d");
         for (const QString &rule : udev_temp_mdadm_rules) {
             proc.exec("touch " + rule);
         }
@@ -1258,9 +1264,7 @@ bool MInstall::setUserInfo()
             }
         }
         //now that directory is moved or deleted, make new one
-        if (!QFileInfo::exists(dpath.toUtf8())) {
-            proc.exec("/usr/bin/mkdir -p " + dpath, true);
-        }
+        if (!QFileInfo::exists(dpath.toUtf8())) proc.mkpath(dpath);
         // clean up directory
         proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
         proc.exec("/bin/cp -n " + skelpath + "/.bashrc " + dpath, true);
@@ -1429,9 +1433,9 @@ bool MInstall::setComputerName()
         }
 
         if (containsRunit && !sambaCheckBox->isChecked()){
-            proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/smbd");
-            proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/nmbd");
-            proc.exec("chroot /mnt/antiX mkdir -p /etc/sv/samba-ad-dc");
+            proc.mkpath(etcpath+"/sv/smbd");
+            proc.mkpath(etcpath+"/sv/nmbd");
+            proc.mkpath(etcpath+"/sv/samba-ad-dc");
             proc.exec("chroot /mnt/antiX ln -fs/etc/sv/smbd /etc/service/");
             proc.exec("chroot /mnt/antiX ln -fs /etc/sv/nmbd /etc/service/");
             proc.exec("chroot /mnt/antiX ln -fs /etc/sv/samba-ad-dc /etc/service/");
@@ -1573,7 +1577,7 @@ void MInstall::setServices()
             if (containsRunit) {
                 QFile::remove(rootpath+"/etc/sv/" + service + "/down");
                 if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
-                    proc.exec(chroot + "mkdir -p /etc/sv/" + service);
+                    proc.mkpath(rootpath+"/etc/sv/" + service);
                     proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
                 }
             }
@@ -1585,7 +1589,7 @@ void MInstall::setServices()
             }
             if (containsRunit) {
                 if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
-                    proc.exec(chroot + "mkdir -p /etc/sv/" + service);
+                    proc.mkpath(rootpath+"/etc/sv/" + service);
                     proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
                 }
                 proc.exec(chroot + "touch /etc/sv/" + service + "/down");
@@ -2747,20 +2751,6 @@ void MInstall::on_radioOldHomeSave_toggled(bool)
 void MInstall::on_radioOldHomeDelete_toggled(bool)
 {
     on_radioOldHomeUse_toggled(false);
-}
-
-bool MInstall::checkForSnapshot()
-{
-    // test if there's another user than demo in /home, indicating a possible snapshot or complicated live-usb
-    qDebug() << "check for possible snapshot";
-    return proc.exec("/bin/ls -1 /home | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false);
-}
-
-bool MInstall::checkForRemaster()
-{
-    // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
-    qDebug() << "check for remastered home demo folder";
-    return proc.exec("test -d /live/linux/home/demo", true);
 }
 
 void MInstall::rsynchomefolder(QString dpath)
