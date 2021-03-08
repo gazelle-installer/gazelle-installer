@@ -222,7 +222,7 @@ void MInstall::startup()
             if (ans != QMessageBox::Yes) exit(EXIT_FAILURE);
             uefi = false;
         } else {
-            uefi = proc.exec("test -d /sys/firmware/efi", true);
+            uefi = QFileInfo("/sys/firmware/efi").isDir();
         }
         partman.uefi = uefi;
         qDebug() << "uefi =" << uefi;
