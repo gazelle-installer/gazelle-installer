@@ -68,22 +68,22 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     QTreeWidgetItem *curdrv = nullptr;
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if(bdinfo.isBoot && !brave) continue;
-        QTreeWidgetItem *curdev;
+        QTreeWidgetItem *curdev = nullptr;
         if (bdinfo.isDrive) {
             if(!drvstart) curdrv = new QTreeWidgetItem(gui.treePartitions);
             else if(bdinfo.name == drvstart->text(Device)) curdrv = drvstart;
             else if(!curdrv) continue; // Skip until the drive is drvstart.
             else break; // Exit the loop early if the drive isn't drvstart.
+            drvitMarkLayout(curdrv, true);
             curdev = curdrv;
-            curdrv->setData(Device, Qt::UserRole, QVariant(false)); // drive starts off "unused"
             // Model
             curdev->setText(Label, bdinfo.model);
         } else {
             if(!curdrv) continue;
             curdev = new QTreeWidgetItem(curdrv);
             setupItem(curdev, &bdinfo);
-            curdrv->setData(Device, Qt::UserRole, QVariant(true)); // drive is now "used"
         }
+        assert(curdev!=nullptr);
         // Device name and size
         curdev->setText(Device, bdinfo.name);
         curdev->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
@@ -96,6 +96,11 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
+}
+void PartMan::clearLayout(QTreeWidgetItem *drvit)
+{
+    while(drvit->childCount()) drvit->removeChild(drvit->child(0));
+    drvitMarkLayout(drvit, false);
 }
 
 bool PartMan::manageConfig(MSettings &config, bool save)
@@ -112,8 +117,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             if(!drvPreserve) config.setValue(configNewLayout, partCount);
         } else if(config.contains(configNewLayout)) {
             drvPreserve = false;
-            while(drvit->childCount()) drvit->removeChild(drvit->child(0));
-            drvit->setData(Device, Qt::UserRole, QVariant(false));
+            clearLayout(drvit);
             partCount = config.value(configNewLayout).toInt();
         }
         // Partition configuration.
@@ -305,6 +309,7 @@ void PartMan::comboUseTextChange(const QString &text)
     else if(usetext == "SWAP") useClass = 4;
     else useClass = 5;
     int oldUseClass = combo->property("class").toInt();
+    bool selPreserve = false;
     if(useClass != oldUseClass) {
         QComboBox *comboType = twitComboBox(item, Format);
         comboType->clear();
@@ -314,10 +319,16 @@ void PartMan::comboUseTextChange(const QString &text)
             editLabel->setText(item->text(Label));
             comboType->addItem(curtype);
             break;
-        case 1: comboType->addItem("FAT32", "FAT32"); break;
+        case 1:
+            comboType->addItem("FAT32", "FAT32");
+            selPreserve = true;
+            break;
         case 2: comboType->addItem("GRUB", "GRUB"); break;
         case 3: comboType->addItem("ext4", "ext4"); break;
-        case 4: comboType->addItem("SWAP", "SWAP"); break;
+        case 4:
+            comboType->addItem("SWAP", "SWAP");
+            selPreserve = true;
+            break;
         default:
             comboType->addItem("ext4", "ext4");
             comboType->addItem("ext3", "ext3");
@@ -341,6 +352,7 @@ void PartMan::comboUseTextChange(const QString &text)
             // Add an item at the start to allow preserving the existing format.
             comboType->insertItem(0, tr("Preserve (%1)").arg(curtype), "PRESERVE");
             comboType->insertSeparator(1);
+            if(selPreserve) comboType->setCurrentIndex(0);
         }
         comboType->setEnabled(comboType->count()>1);
         // Label and options
@@ -418,9 +430,9 @@ void PartMan::treeSelChange()
         gui.buttonPartClear->setEnabled(!drvit);
         gui.buttonPartRemove->setEnabled(!used && drvit);
         // Only allow adding partitions if there is enough space.
-        if(used) gui.buttonPartAdd->setEnabled(false);
+        if(!drvit) drvit = twit;
+        if(used && drvit->childCount()>0) gui.buttonPartAdd->setEnabled(false);
         else {
-            if(!drvit) drvit = twit;
             long long maxMB = twitSize(drvit)-PARTMAN_SAFETY_MB;
             for(int ixi = drvit->childCount()-1; ixi >= 0; --ixi) {
                 maxMB -= twitSize(drvit->child(ixi));
@@ -489,8 +501,7 @@ void PartMan::partClearClick(bool)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit || twit->parent()) return;
-    while(twit->childCount()) twit->removeChild(twit->child(0));
-    twit->setData(Device, Qt::UserRole, QVariant(false));
+    clearLayout(twit);
     comboTypeTextChange(QString()); // For the badblocks checkbox.
     treeSelChange();
 }
@@ -507,6 +518,7 @@ void PartMan::partAddClick(bool)
     setupItem(part, nullptr);
 
     labelParts(drive);
+    drvitMarkLayout(drive, false);
     part->setSelected(true);
     twit->setSelected(false);
 }
@@ -818,12 +830,7 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     int rootPercent, bool crypto, bool updateTree)
 {
     if(rootPercent<0) rootPercent = gui.sliderPart->value();
-    if(updateTree) {
-        // Clear the existing layout from the target device.
-        while(drivetree->childCount()) drivetree->removeChild(drivetree->child(0));
-        // Mark the drive as "unused" as its layout will be replaced.
-        drivetree->setData(Device, Qt::UserRole, QVariant(false));
-    }
+    if(updateTree) clearLayout(drivetree);
     // Drive geometry basics.
     const long long driveSize = twitSize(drivetree);
     int rootFormatSize = driveSize-PARTMAN_SAFETY_MB;
@@ -963,7 +970,7 @@ bool PartMan::preparePartitions()
             for(int ixdev=0; ixdev<devCount; ++ixdev) {
                 QTreeWidgetItem *twit = drvitem->child(ixdev);
                 if(twitUseFor(twit).isEmpty()) continue;
-                const QStringList devsplit(BlockDeviceInfo::split("/dev/" + twit->text(Device)));
+                const QStringList &devsplit = BlockDeviceInfo::split("/dev/" + twit->text(Device));
                 if(!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1)))) return false;
                 proc.sleep(1000);
             }
@@ -1022,7 +1029,9 @@ bool PartMan::formatPartitions()
         if(useFor=="ESP") {
             if (!proc.exec("mkfs.msdos -F 32 " + dev)) return false;
             // Sets boot flag and ESP flag.
-            proc.exec("parted -s /dev/" + BlockDeviceInfo::split(dev).at(0) + " set 1 esp on");
+            const QStringList &devsplit = BlockDeviceInfo::split(dev);
+            proc.exec("parted -s /dev/" + devsplit.at(0)
+                + " set " + devsplit.at(1) + " esp on");
         } else if(useFor.startsWith("SWAP")) {
             QString cmd("/sbin/mkswap " + twitMappedDevice(twit, true));
             const QString &label = twitLineEdit(twit, Label)->text();
@@ -1255,13 +1264,19 @@ int PartMan::isEncrypt(const QString &point)
 }
 
 // Helpers
+inline void PartMan::drvitMarkLayout(QTreeWidgetItem *drvit, const bool old)
+{
+    if(old) drvit->setIcon(Device, QIcon());
+    else drvit->setIcon(Device, QIcon(":/appointment-soon"));
+    gui.treePartitions->resizeColumnToContents(Device);
+}
 inline bool PartMan::twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp) const
 {
     if(chkUp) {
         const QTreeWidgetItem *drvit = twit->parent();
-        if(drvit) return drvit->data(Device, Qt::UserRole).toBool();
+        if(drvit) return drvit->icon(Device).isNull();
     }
-    return twit->data(Device, Qt::UserRole).toBool();
+    return twit->icon(Device).isNull();
 }
 inline long long PartMan::twitSize(QTreeWidgetItem *twit, bool bytes)
 {
