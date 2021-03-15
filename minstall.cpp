@@ -963,6 +963,21 @@ bool MInstall::installLoader()
         proc.exec("/bin/rm -f /mnt/antiX/boot/" + val);
     }
 
+    // Mount EFI variables if present
+    bool efivarfs = QFileInfo("/sys/firmware/efi/efivars").isDir();
+    if(!efivarfs) {
+        QFile file("/proc/self/mounts");
+        if (file.open(QFile::ReadOnly | QFile::Text)) {
+            while(!file.atEnd() && !efivarfs) {
+                if(file.readLine().startsWith("efivarfs")) efivarfs = true;
+            }
+            file.close();
+        }
+    }
+    if(efivarfs) {
+        proc.exec("mount -t efivarfs efivarfs /sys/firmware/efi/efivars", true);
+    }
+
     if (!grubCheckBox->isChecked()) {
         // skip it
         proc.status(tr("Updating initramfs"));
