@@ -571,9 +571,7 @@ bool MInstall::processNextPhase()
             manageConfig(ConfigSave);
             config->dumpDebug();
             proc.exec("/bin/sync", true); // the sync(2) system call will block the GUI
-            if(grubCheckBox->isChecked()) {
-                if (!installLoader()) return false;
-            }
+            if (!installLoader()) return false;
         } else if (!pretendToInstall(progPhase23, 99)){
             return false;
         }
@@ -957,8 +955,6 @@ bool MInstall::installLoader()
     proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
 
-    const QString &statup = tr("Installing GRUB");
-    proc.status(statup);
     QString cmd;
     QString val = proc.execOut("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
@@ -969,15 +965,18 @@ bool MInstall::installLoader()
 
     if (!grubCheckBox->isChecked()) {
         // skip it
+        proc.status(tr("Updating initramfs"));
         //if useing f2fs, then add modules to /etc/initramfs-tools/modules
         qDebug() << "Update initramfs";
         //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
             //proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
             //proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
         //}
-        proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
-        return true;
+        return proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
     }
+
+    const QString &statup = tr("Installing GRUB");
+    proc.status(statup);
 
     //add switch to change root partition info
     QString boot = grubBootCombo->currentData().toString();
