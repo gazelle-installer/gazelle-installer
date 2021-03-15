@@ -309,7 +309,7 @@ void PartMan::comboUseTextChange(const QString &text)
     else if(usetext == "SWAP") useClass = 4;
     else useClass = 5;
     int oldUseClass = combo->property("class").toInt();
-    bool selPreserve = false;
+    bool allowPreserve = false, selPreserve = false;
     if(useClass != oldUseClass) {
         QComboBox *comboType = twitComboBox(item, Format);
         comboType->clear();
@@ -321,6 +321,10 @@ void PartMan::comboUseTextChange(const QString &text)
             break;
         case 1:
             comboType->addItem("FAT32", "FAT32");
+            comboType->addItem("FAT16", "FAT16");
+            comboType->addItem("FAT12", "FAT12");
+            if(comboType->findData(curtype, Qt::MatchFixedString)>=0
+                || !curtype.compare("VFAT", Qt::CaseInsensitive)) allowPreserve = true;
             selPreserve = true;
             break;
         case 2: comboType->addItem("GRUB", "GRUB"); break;
@@ -328,6 +332,8 @@ void PartMan::comboUseTextChange(const QString &text)
         case 4:
             comboType->addItem("SWAP", "SWAP");
             selPreserve = true;
+            if(!curtype.compare("SWAP", Qt::CaseInsensitive)
+                || curtype == "crypto_LUKS") allowPreserve = true;
             break;
         default:
             comboType->addItem("ext4", "ext4");
@@ -339,6 +345,8 @@ void PartMan::comboUseTextChange(const QString &text)
             comboType->addItem("btrfs", "btrfs");
             comboType->addItem("reiserfs", "reiserfs");
             comboType->addItem("reiser4", "reiser4");
+            if(comboType->findData(curtype, Qt::MatchFixedString)>=0
+                || curtype == "crypto_LUKS") allowPreserve = true;
         }
         // Changing to and from a mount/use that support encryption.
         if(useClass >= 0 && useClass <= 3) {
@@ -347,8 +355,7 @@ void PartMan::comboUseTextChange(const QString &text)
             // Qt::PartiallyChecked tells treeItemChange() to include this item in the refresh.
             item->setCheckState(Encrypt, Qt::PartiallyChecked);
         }
-        if(useClass > 3 && (curtype == "crypto_LUKS"
-            || comboType->findText(curtype, Qt::MatchFixedString) >= 0)) {
+        if(allowPreserve) {
             // Add an item at the start to allow preserving the existing format.
             comboType->insertItem(0, tr("Preserve (%1)").arg(curtype), "PRESERVE");
             comboType->insertSeparator(1);
@@ -1027,7 +1034,8 @@ bool PartMan::formatPartitions()
         const QString &dev = twitMappedDevice(twit, true);
         const QString &useFor = translateUse(twitComboBox(twit, UseFor)->currentText());
         if(useFor=="ESP") {
-            if (!proc.exec("mkfs.msdos -F 32 " + dev)) return false;
+            const QString &fmt = twitComboBox(twit, Format)->currentText();
+            if (!proc.exec("mkfs.msdos -F "+fmt.mid(4)+' '+dev)) return false;
             // Sets boot flag and ESP flag.
             const QStringList &devsplit = BlockDeviceInfo::split(dev);
             proc.exec("parted -s /dev/" + devsplit.at(0)
@@ -1035,7 +1043,7 @@ bool PartMan::formatPartitions()
         } else if(useFor.startsWith("SWAP")) {
             QString cmd("/sbin/mkswap " + twitMappedDevice(twit, true));
             const QString &label = twitLineEdit(twit, Label)->text();
-            if(!label.isEmpty()) cmd.append(" -L \"" + label + "\"");
+            if(!label.isEmpty()) cmd.append(" -L \"" + label + '"');
             if(!proc.exec(cmd, true)) return false;
         } else {
             if(!formatLinuxPartition(dev, twitComboBox(twit, Format)->currentText(),
