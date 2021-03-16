@@ -28,16 +28,13 @@
   <layout class="QHBoxLayout">
    <item>
     <widget class="QSplitter" name="splitter">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
      <property name="opaqueResize">
       <bool>false</bool>
      </property>
      <widget class="QTabWidget" name="mainTabs">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-        <horstretch>3</horstretch>
+        <horstretch>1</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
@@ -124,7 +121,7 @@
      <widget class="QFrame" name="mainFrame">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>8</horstretch>
+        <horstretch>2</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
