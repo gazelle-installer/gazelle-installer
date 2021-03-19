@@ -1035,7 +1035,7 @@ bool PartMan::formatPartitions()
         const QString &useFor = translateUse(twitComboBox(twit, UseFor)->currentText());
         if(useFor=="ESP") {
             const QString &fmt = twitComboBox(twit, Format)->currentText();
-            if (!proc.exec("mkfs.msdos -F "+fmt.mid(4)+' '+dev)) return false;
+            if (!proc.exec("mkfs.msdos -F "+fmt.mid(3)+' '+dev)) return false;
             // Sets boot flag and ESP flag.
             const QStringList &devsplit = BlockDeviceInfo::split(dev);
             proc.exec("parted -s /dev/" + devsplit.at(0)
