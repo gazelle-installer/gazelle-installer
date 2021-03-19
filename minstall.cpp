@@ -2296,7 +2296,8 @@ void MInstall::on_buttonRunParted_clicked()
 {
     updateCursor(Qt::WaitCursor);
     mainFrame->setEnabled(false);
-    proc.exec("[ -f /usr/sbin/gparted ] && /usr/sbin/gparted || /usr/bin/partitionmanager", false);
+    if(QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted", true);
+    else proc.exec("/usr/bin/partitionmanager", true);
     updatePartitionWidgets(false);
     mainFrame->setEnabled(true);
     updateCursor();
