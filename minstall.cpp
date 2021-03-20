@@ -962,19 +962,19 @@ bool MInstall::installLoader()
     if (!val.isEmpty()) {
         proc.exec("/bin/rm -f /mnt/antiX/boot/" + val);
     }
-
-    // Mount EFI variables if present
+ 
     bool efivarfs = QFileInfo("/sys/firmware/efi/efivars").isDir();
-    if(!efivarfs) {
+    bool efivarfs_mounted = false;
+    if(efivarfs) {
         QFile file("/proc/self/mounts");
         if (file.open(QFile::ReadOnly | QFile::Text)) {
-            while(!file.atEnd() && !efivarfs) {
-                if(file.readLine().startsWith("efivarfs")) efivarfs = true;
+            while(!file.atEnd() && !efivarfs_mounted) {
+                if(file.readLine().startsWith("efivarfs")) efivarfs_mounted = true;
             }
             file.close();
         }
     }
-    if(efivarfs) {
+    if(efivarfs && !efivarfs_mounted) {
         proc.exec("mount -t efivarfs efivarfs /sys/firmware/efi/efivars", true);
     }
 
@@ -1027,10 +1027,10 @@ bool MInstall::installLoader()
     proc.sleep(1000);
 
     // set mounts for chroot
-    proc.exec("/bin/mount -o bind /dev /mnt/antiX/dev", true);
-    proc.exec("/bin/mount -o bind /sys /mnt/antiX/sys", true);
-    proc.exec("/bin/mount -o bind /proc /mnt/antiX/proc", true);
-    proc.exec("/bin/mount -o bind /run /mnt/antiX/run", true);
+    proc.exec("/bin/mount --rbind --make-rslave /dev /mnt/antiX/dev", true);
+    proc.exec("/bin/mount --rbind --make-rslave /sys /mnt/antiX/sys", true);
+    proc.exec("/bin/mount --rbind /proc /mnt/antiX/proc", true);
+    proc.exec("/bin/mount -t tmpfs -o size=100m,nodev,mode=755 tmpfs /mnt/antiX/run", true);
 
     QString arch;
 
@@ -1049,7 +1049,7 @@ bool MInstall::installLoader()
             arch = "x86_64";
         }
 
-        cmd = QString("chroot /mnt/antiX grub-install --no-nvram --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
+        cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
     }
 
     qDebug() << "Installing Grub";
@@ -1057,23 +1057,14 @@ bool MInstall::installLoader()
         // error
         QMessageBox::critical(this, windowTitle(),
                               tr("GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
-        proc.exec("/bin/umount /mnt/antiX/proc", true);
-        proc.exec("/bin/umount /mnt/antiX/sys", true);
-        proc.exec("/bin/umount /mnt/antiX/dev", true);
-        proc.exec("/bin/umount /mnt/antiX/run", true);
+        proc.exec("/bin/umount -R /mnt/antiX/run", true);
+        proc.exec("/bin/umount -R /mnt/antiX/proc", true);
+        proc.exec("/bin/umount -R /mnt/antiX/sys", true);
+        proc.exec("/bin/umount -R /mnt/antiX/dev", true);
         if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
             proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
         }
         return false;
-    }
-
-    // update NVRAM boot entries (only if installing on ESP)
-    proc.status(statup);
-    if (grubEspButton->isChecked()) {
-        cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
-        if (!proc.exec(cmd)) {
-            QMessageBox::warning(this, windowTitle(), tr("NVRAM boot variable update failure. The system may not boot, but it can be repaired with the GRUB Rescue boot menu."));
-        }
     }
 
     //added non-live boot codes to those in /etc/default/grub, remove duplicates
@@ -1145,10 +1136,11 @@ bool MInstall::installLoader()
     proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
     proc.status(statup);
     qDebug() << "clear chroot env";
-    proc.exec("/bin/umount /mnt/antiX/proc", true);
-    proc.exec("/bin/umount /mnt/antiX/sys", true);
-    proc.exec("/bin/umount /mnt/antiX/dev", true);
-    proc.exec("/bin/umount /mnt/antiX/run", true);
+    proc.exec("/bin/umount -R /mnt/antiX/run", true);
+    proc.exec("/bin/umount -R /mnt/antiX/proc", true);
+    proc.exec("/bin/umount -R /mnt/antiX/sys", true);
+    proc.exec("/bin/umount -R /mnt/antiX/dev", true);
+
     if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
         proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
     }
