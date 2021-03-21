@@ -975,7 +975,7 @@ bool MInstall::installLoader()
         }
     }
     if(efivarfs && !efivarfs_mounted) {
-        proc.exec("mount -t efivarfs efivarfs /sys/firmware/efi/efivars", true);
+        proc.exec("/bin/mount -t efivarfs efivarfs /sys/firmware/efi/efivars", true);
     }
 
     if (!grubCheckBox->isChecked()) {
@@ -1031,6 +1031,8 @@ bool MInstall::installLoader()
     proc.exec("/bin/mount --rbind --make-rslave /sys /mnt/antiX/sys", true);
     proc.exec("/bin/mount --rbind /proc /mnt/antiX/proc", true);
     proc.exec("/bin/mount -t tmpfs -o size=100m,nodev,mode=755 tmpfs /mnt/antiX/run", true);
+    proc.exec("/bin/mkdir /mnt/antiX/run/udev", true);
+    proc.exec("/bin/mount --rbind /run/udev /mnt/antiX/run/udev", true);
 
     QString arch;
 
