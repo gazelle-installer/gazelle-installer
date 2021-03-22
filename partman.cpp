@@ -228,7 +228,7 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     editOptions->setAutoFillBackground(true);
     gui.treePartitions->setItemWidget(twit, Options, editOptions);
     editOptions->setEnabled(false);
-    editOptions->setText("defaults");
+    editOptions->setText("noatime");
 
     if(!defaultUse.isEmpty()) comboUse->setCurrentText(defaultUse);
 }
@@ -479,8 +479,8 @@ void PartMan::treeMenu(const QPoint &)
         else if(action) {
             QLineEdit *editOpts = twitLineEdit(twit, Options);
             comboFormat->setCurrentIndex(ixBTRFS);
-            if(action==actBtrfsZlib) editOpts->setText("defaults,noatime,compress-force=zlib");
-            else if(action==actBtrfsLzo) editOpts->setText("defaults,noatime,compress-force=lzo");
+            if(action==actBtrfsZlib) editOpts->setText("noatime,compress-force=zlib");
+            else if(action==actBtrfsLzo) editOpts->setText("noatime,compress-force=lzo");
         }
     } else {
         menu.addSeparator();
@@ -1167,7 +1167,9 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         if(fstype=="swap") out << " swap swap";
         else out << ' ' << it.first << ' ' << fstype;
         // Options
-        out << ' ' << twitLineEdit(it.second, Options)->text();
+        const QString &mountopts = twitLineEdit(it.second, Options)->text();
+        if(mountopts.isEmpty()) out << " defaults";
+        else out << ' ' << mountopts;
         // Dump, pass
         if(fstype=="swap") out << " 0 0\n";
         else if(fstype.startsWith("reiser")) out << " 0 0\n";
@@ -1182,7 +1184,7 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         const QString espdev = "/dev/" + gui.grubBootCombo->currentData().toString();
         const QString espdevUUID = "UUID=" + proc.execOut(cmdBlkID + espdev);
         qDebug() << "espdev" << espdev << espdevUUID;
-        out << espdevUUID + " /boot/efi vfat defaults,noatime,dmask=0002,fmask=0113 0 0\n";
+        out << espdevUUID + " /boot/efi vfat noatime,dmask=0002,fmask=0113 0 0\n";
     }
     file.close();
     if (populateMediaMounts) {
@@ -1205,8 +1207,13 @@ bool PartMan::mountPartitions()
              // needed to run fsck because sfdisk --part-type can mess up the partition
             if(!proc.exec("fsck.ext4 -y " + dev)) return false;
         }
-        const QString &cmd = QString("/bin/mount %1 %2 -o %3").arg(dev,
-            point, twitLineEdit(it.second, Options)->text());
+        // Use noatime to speed up the installation.
+        QStringList opts = twitLineEdit(it.second, Options)->text().split(',');
+        opts.removeAll("defaults");
+        opts.removeAll("atime");
+        opts.removeAll("relatime");
+        if(!opts.contains("ro") && !opts.contains("noatime")) opts << "noatime";
+        const QString &cmd = QString("/bin/mount %1 %2 -o %3").arg(dev, point, opts.join(','));
         if(!proc.exec(cmd)) return false;
     }
     return true;
