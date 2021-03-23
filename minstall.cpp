@@ -436,7 +436,7 @@ void MInstall::setupAutoMount(bool enabled)
 // Check if running inside VirtualBox
 bool MInstall::isInsideVB()
 {
-    return proc.exec("lspci -d 80ee:beef  | grep -q .", false);
+    return proc.exec("lspci -n | grep -qE '80ee:beef|80ee:cafe'", false);
 }
 
 bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
