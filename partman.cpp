@@ -532,8 +532,10 @@ void PartMan::partAddClick(bool)
 void PartMan::partRemoveClick(bool)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
-    if(!twit || !(twit->parent())) return;
+    QTreeWidgetItem *drvit = twit->parent();
+    if(!twit || !drvit) return;
     twit->parent()->removeChild(twit);
+    labelParts(drvit);
     treeSelChange();
 }
 
