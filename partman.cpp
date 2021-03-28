@@ -323,7 +323,7 @@ void PartMan::comboUseTextChange(const QString &text)
             comboType->addItem("FAT32", "FAT32");
             comboType->addItem("FAT16", "FAT16");
             comboType->addItem("FAT12", "FAT12");
-            if(comboType->findData(curtype, Qt::MatchFixedString)>=0
+            if(comboType->findData(curtype, Qt::UserRole, Qt::MatchFixedString)>=0
                 || !curtype.compare("VFAT", Qt::CaseInsensitive)) allowPreserve = true;
             selPreserve = true;
             break;
@@ -345,7 +345,7 @@ void PartMan::comboUseTextChange(const QString &text)
             comboType->addItem("btrfs", "btrfs");
             comboType->addItem("reiserfs", "reiserfs");
             comboType->addItem("reiser4", "reiser4");
-            if(comboType->findData(curtype, Qt::MatchFixedString)>=0
+            if(comboType->findData(curtype, Qt::UserRole, Qt::MatchFixedString)>=0
                 || curtype == "crypto_LUKS") allowPreserve = true;
         }
         // Changing to and from a mount/use that support encryption.
