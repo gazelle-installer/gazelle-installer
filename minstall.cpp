@@ -1247,15 +1247,12 @@ bool MInstall::setUserInfo()
     QString rootpath;
     if (!oobe) rootpath = "/mnt/antiX";
     QString skelpath = rootpath + "/etc/skel";
-    QString cmd;
-
     QString dpath = rootpath + "/home/" + userNameEdit->text();
 
-    if (QFileInfo::exists(dpath.toUtf8())) {
+    if(QFileInfo::exists(dpath)) {
         if (radioOldHomeSave->isChecked()) {
-            // save the old directory
             bool ok = false;
-            cmd = QString("/bin/mv -f %1 %1.00%2").arg(dpath);
+            QString cmd = QString("/bin/mv -f %1 %1.00%2").arg(dpath);
             for (int ixi = 1; ixi < 10 && !ok; ++ixi) {
                 ok = proc.exec(cmd.arg(ixi));
             }
@@ -1264,16 +1261,15 @@ bool MInstall::setUserInfo()
                 return false;
             }
         } else if (radioOldHomeDelete->isChecked()) {
-            // delete the directory
-            cmd = QString("/bin/rm -rf %1").arg(dpath);
-            if (!proc.exec(cmd)) {
+            if (!proc.exec("/bin/rm -rf " + dpath)) {
                 failUI(tr("Failed to delete old home directory."));
                 return false;
             }
         }
-        //now that directory is moved or deleted, make new one
-        if (!QFileInfo::exists(dpath.toUtf8())) proc.mkpath(dpath);
-        // clean up directory
+        proc.exec("/bin/sync", true); // The sync(2) system call will block the GUI.
+    }
+
+    if(QFileInfo::exists(dpath.toUtf8())) { // Still exists.
         proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
         proc.exec("/bin/cp -n " + skelpath + "/.bashrc " + dpath, true);
         proc.exec("/bin/cp -n " + skelpath + "/.gtkrc " + dpath, true);
@@ -1281,20 +1277,17 @@ bool MInstall::setUserInfo()
         proc.exec("/bin/cp -Rn " + skelpath + "/.config " + dpath, true);
         proc.exec("/bin/cp -Rn " + skelpath + "/.local " + dpath, true);
     } else { // dir does not exist, must create it
-        // copy skel to demo
-        // don't copy skel to demo if found demo folder in remastered linuxfs
+        // Copy skel to demo, unless demo folder exists in remastered linuxfs.
         if (!isRemasteredDemoPresent) {
-            if (!proc.exec("/bin/cp -a " + skelpath + " " + rootpath + "/home")) {
+            if (!proc.exec("/bin/cp -a " + skelpath + ' ' + dpath)) {
                 failUI(tr("Sorry, failed to create user directory."));
                 return false;
             }
-            cmd = QString("/bin/mv -f " + rootpath + "/home/skel %1").arg(dpath);
         } else { // still rename the demo directory even if remastered demo home folder is detected
-            cmd = QString("/bin/mv -f " + rootpath + "/home/demo %1").arg(dpath);
-        }
-        if (!proc.exec(cmd)) {
-            failUI(tr("Sorry, failed to name user directory."));
-            return false;
+            if (!proc.exec("/bin/mv -f " + rootpath + "/home/demo " + dpath)) {
+                failUI(tr("Sorry, failed to name user directory."));
+                return false;
+            }
         }
     }
 
@@ -1312,8 +1305,7 @@ bool MInstall::setUserInfo()
     }
 
     // fix the ownership, demo=newuser
-    cmd = QString("chown -R demo:demo %1").arg(dpath);
-    if (!proc.exec(cmd)) {
+    if (!proc.exec("chown -R demo:demo " + dpath)) {
         failUI(tr("Sorry, failed to set ownership of user directory."));
         return false;
     }
@@ -1338,8 +1330,7 @@ bool MInstall::setUserInfo()
         replaceStringInFile("autologin-user=", "#autologin-user=", rootpath + "/etc/lightdm/lightdm.conf");
         replaceStringInFile("User=.*", "User=", rootpath + "/etc/sddm.conf");
     }
-    cmd = QString("touch " + rootpath + "/var/mail/%1").arg(userNameEdit->text());
-    proc.exec(cmd);
+    proc.exec("touch " + rootpath + "/var/mail/" + userNameEdit->text());
 
     // FIX for MX-19 and earlier: Ensure graphical sudo works with password-free root.
     if(rootPass.isEmpty()) {
