@@ -176,21 +176,21 @@ void MInstall::startup()
         long long compression_factor;
         QString linuxfs_compression_type = "xz"; //default conservative
         if (QFileInfo::exists(SQFILE_FULL)) {
-            linuxfs_compression_type = proc.execOut("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none 2>/dev/null| od -An -tdI");
+            linuxfs_compression_type = proc.execOut("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none 2>/dev/null | od -An -tdI");
         }
-        //gzip, xz, or lz4
-        if ( linuxfs_compression_type == "1") {
-            compression_factor = 30; // gzip
-        } else if (linuxfs_compression_type == "2") {
-            compression_factor = 42; //lzo, not used by antiX
-        } else if (linuxfs_compression_type == "3") {
-            compression_factor = 42;  //lzma, not used by antiX
-        } else if (linuxfs_compression_type == "4") {
-            compression_factor = 25; //xz
-        } else if (linuxfs_compression_type == "5") {
-            compression_factor = 42; // lz4
-        } else {
-            compression_factor = 25; //anythng else or linuxfs not reachable (toram), should be pretty conservative
+        // gzip, xz, or lz4
+        switch (linuxfs_compression_type.toInt()) {
+            case 1: // gzip
+                compression_factor = 30;
+                break;
+            case 2: // lzo, not used by antiX
+            case 3: // lzma, not used by antiX
+            case 5: // lz4
+                compression_factor = 42;
+                break;
+            case 4: // xz
+            default: // anythng else or linuxfs not reachable (toram), should be pretty conservative
+                compression_factor = 25;
         }
 
         qDebug() << "linuxfs compression type is " << linuxfs_compression_type << "compression factor is " << compression_factor;
