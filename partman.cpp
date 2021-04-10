@@ -572,7 +572,7 @@ QWidget *PartMan::composeValidate(bool automatic,
             return comboUse;
         } else {
             if(!mount.isEmpty()) mounts.insert(mount, *it);
-            if(twitIsOldLayout(*it)) {
+            if(twitIsOldLayout(*it) && twitWillFormat(*it)) {
                 // Warn if using a non-Linux partition (potential install of another OS).
                 const int bdindex = listBlkDevs.findDevice(devname);
                 if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
