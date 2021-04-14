@@ -93,6 +93,8 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
+    // Pad the column to work around a Buster Qt bug where combo box bleeds out of column.
+    gui.treePartitions->setColumnWidth(UseFor, gui.treePartitions->columnWidth(UseFor)+16);
     comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
@@ -242,6 +244,8 @@ void PartMan::labelParts(QTreeWidgetItem *drive)
     for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
+    // Pad the column to work around a Buster Qt bug where combo box bleeds out of column.
+    gui.treePartitions->setColumnWidth(UseFor, gui.treePartitions->columnWidth(UseFor)+16);
 }
 
 QString PartMan::translateUse(const QString &alias)
