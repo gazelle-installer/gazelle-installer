@@ -32,12 +32,12 @@ class PartMan : public QObject
 {
     Q_OBJECT
     enum TreeColumns {
-        Device,
-        Size,
-        Label,
+        Device, // Data: destination mapped device (encryption)
+        Size, // Data: size of existing device (bytes)
+        Label, // Text: existing label (not QLineEdit text)
         UseFor,
         Encrypt,
-        Format,
+        Format, // Text: existing format (not QLineEdit text)
         Options
     };
     MProcess &proc;
