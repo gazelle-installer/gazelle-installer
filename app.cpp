@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
                                                            "The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.\n"\
                                                            "The installer will not write any passwords or ignored settings to the new configuration file.\n"\
                                                            "Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.")},
-                       {"gpt-overwride", QApplication::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"\
+                       {"gpt-override", QApplication::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"\
                                                           "Without this option, GPT will only be used on drives with at least 2TB capacity.\n"\
                                                           "GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.")},
                        {{"n", "nocopy"}, QApplication::tr("Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.")},
@@ -105,52 +105,6 @@ int main(int argc, char *argv[])
     QTranslator appTran;
     if (appTran.load(QString("gazelle-installer_") + QLocale::system().name(), "/usr/share/gazelle-installer/locale"))
         a.installTranslator(&appTran);
-
-    // SECURITY BODGE for MX Linux: users can run the installer
-    // on the installed system without root authentication.
-    // The new sudo config and scripts now only allow unauthenticated
-    // root access to the installer with zero command line arguments.
-    // This code ensures that "minstall" with zero arguments only works
-    // on the live system and not on the installed system.
-    // Below is a bodge. Ideally, the sudo config and scripts responsible for
-    // the installer exemption should only be present in a live environment.
-    if (!(parser.isSet("pretend") || parser.isSet("oobe"))) {
-        QStringList liveTests;
-        liveTests << "/live/linux" << "/live/aufs" << "/live/aufs/boot"
-            << "/live/aufs/dev" << "/live/aufs/etc" << "/live/aufs/var"
-            << "/live/aufs/usr" << "/live/aufs/root" << "/live/aufs/home";
-        for(const QString &test : liveTests) {
-            if(!QDir(test).exists()) {
-                QApplication::beep();
-                QMessageBox::critical(nullptr, QString(),
-                     QApplication::tr("This operation requires a live environment."));
-                qDebug() << "Live directory not found: " << test;
-                return EXIT_FAILURE;
-            }
-        }
-    }
-    // END OF SECURITY BODGE for MX Linux.
-
-    // exit if "minstall" is already running
-    if (system("ps -C minstall | sed '0,/minstall/{s/minstall//}' | grep minstall") == 0) {
-        QMessageBox::critical(nullptr, QString(),
-                              QApplication::tr("The installer won't launch because it appears to be running already in the background.\n\n"
-                                               "Please close it if possible, or run 'pkill minstall' in terminal."));
-        return EXIT_FAILURE;
-    }
-
-    // check if 32bit on 64 bit UEFI
-    if (system("uname -m | grep -q i686") == 0 && system("grep -q 64 /sys/firmware/efi/fw_platform_size") == 0)
-    {
-        int ans = QMessageBox::question(nullptr, QString(), QApplication::tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot"
-                                                                           " unless you select Legacy Boot or similar at restart.\n"
-                                                                           "We recommend you quit now and restart in Legacy Boot\n\n"
-                                                                           "Do you want to continue the installation?"),
-                                    QMessageBox::Yes, QMessageBox::No);
-        if (ans != QMessageBox::Yes) {
-            return EXIT_FAILURE;
-        }
-    }
 
     // alert the user if not running as root
     if (!parser.isSet("pretend") && getuid()!=0) {
