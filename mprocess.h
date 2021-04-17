@@ -43,12 +43,14 @@ public:
     bool exec(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
     QString execOut(const QString &cmd, bool everything = false);
     QStringList execOutLines(const QString &cmd, const bool rawexec = false);
-    void sleep(const int msec, const bool silent = false);
     void halt();
     void unhalt();
     QListWidgetItem *log(const QString &text, const enum LogType type = Section);
     void log(QListWidgetItem *entry, const int status = 1);
     void status(const QString &text, int progress = -1);
+    // Common functions that are traditionally carried out by processes.
+    void sleep(const int msec, const bool silent = false);
+    bool mkpath(const QString &path);
 };
 
 #endif // MPROCESS_H
