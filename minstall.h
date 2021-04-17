@@ -103,6 +103,7 @@ private slots:
     void on_buttonRunParted_clicked();
     void on_viewServicesButton_clicked();
 
+    void on_diskCombo_currentIndexChanged(int);
     void on_sliderPart_sliderPressed();
     void on_sliderPart_valueChanged(int value);
     void on_checkBoxEncryptAuto_toggled(bool checked);
@@ -205,9 +206,6 @@ private:
     void stashServices(bool save);
     void stashAdvancedFDE(bool save);
     int selectTimeZone(const QString &zone);
-    void clearpartitiontables(const QString &dev);
-    bool checkForSnapshot();
-    bool checkForRemaster();
     void rsynchomefolder(const QString dpath);
     void changeRemasterdemoToNewUser(const QString dpath);
     void resetBlueman();
