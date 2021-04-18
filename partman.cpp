@@ -175,6 +175,8 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
         spinSize->setAutoFillBackground(true);
         gui.treePartitions->setItemWidget(twit, Size, spinSize);
+        spinSize->setFocusPolicy(Qt::StrongFocus);
+        spinSize->installEventFilter(this);
         const int maxMB = (int)twitSize(twit->parent())-PARTMAN_SAFETY_MB;
         spinSize->setRange(1, maxMB);
         spinSize->setProperty("row", QVariant::fromValue<void *>(twit));
@@ -197,6 +199,8 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     QComboBox *comboUse = new QComboBox(gui.treePartitions);
     comboUse->setAutoFillBackground(true);
     gui.treePartitions->setItemWidget(twit, UseFor, comboUse);
+    comboUse->setFocusPolicy(Qt::StrongFocus);
+    comboUse->installEventFilter(this);
     comboUse->setEditable(true);
     comboUse->setInsertPolicy(QComboBox::NoInsert);
     comboUse->addItem("");
@@ -215,6 +219,8 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     QComboBox *comboType = new QComboBox(gui.treePartitions);
     comboType->setAutoFillBackground(true);
     gui.treePartitions->setItemWidget(twit, Format, comboType);
+    comboType->setFocusPolicy(Qt::StrongFocus);
+    comboType->installEventFilter(this);
     comboType->setEnabled(false);
     if(bdinfo) {
         twit->setText(Format, bdinfo->fs);
@@ -549,6 +555,16 @@ void PartMan::partRemoveClick(bool)
     twit->parent()->removeChild(twit);
     labelParts(drvit);
     treeSelChange();
+}
+
+// Mouse wheel event filter for partition tree objects
+bool PartMan::eventFilter(QObject *object, QEvent *event)
+{
+    if(event->type() == QEvent::Wheel) {
+        QWidget *widget = static_cast<QWidget *>(object);
+        if(widget && !(widget->hasFocus())) return true;
+    }
+    return false;
 }
 
 QWidget *PartMan::composeValidate(bool automatic,
