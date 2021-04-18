@@ -962,7 +962,7 @@ bool MInstall::installLoader()
     if (!val.isEmpty()) {
         proc.exec("/bin/rm -f /mnt/antiX/boot/" + val);
     }
- 
+
     bool efivarfs = QFileInfo("/sys/firmware/efi/efivars").isDir();
     bool efivarfs_mounted = false;
     if(efivarfs) {

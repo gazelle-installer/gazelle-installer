@@ -53,6 +53,7 @@ class PartMan : public QObject
     void setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
         int defaultMB = 0, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drive);
+    void resizeColumnsToFit();
     static QString translateUse(const QString &alias);
     static QString describeUse(const QString &use);
     void clearPartitionTables(const QString &dev);
@@ -78,7 +79,7 @@ class PartMan : public QObject
     void partClearClick(bool);
     void partAddClick(bool);
     void partRemoveClick(bool);
-    void partDefaultClick(bool);
+    bool eventFilter(QObject *object, QEvent *event);
 public:
     bool gptoverride=false, uefi=false, brave=false;
     long long rootSpaceNeeded = 0;
