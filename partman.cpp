@@ -90,9 +90,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
         curdev->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
     }
     gui.treePartitions->expandAll();
-    for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
-        if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
-    }
+    resizeColumnsToFit();
     comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
@@ -177,6 +175,8 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
         spinSize->setAutoFillBackground(true);
         gui.treePartitions->setItemWidget(twit, Size, spinSize);
+        spinSize->setFocusPolicy(Qt::StrongFocus);
+        spinSize->installEventFilter(this);
         const int maxMB = (int)twitSize(twit->parent())-PARTMAN_SAFETY_MB;
         spinSize->setRange(1, maxMB);
         spinSize->setProperty("row", QVariant::fromValue<void *>(twit));
@@ -199,6 +199,8 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     QComboBox *comboUse = new QComboBox(gui.treePartitions);
     comboUse->setAutoFillBackground(true);
     gui.treePartitions->setItemWidget(twit, UseFor, comboUse);
+    comboUse->setFocusPolicy(Qt::StrongFocus);
+    comboUse->installEventFilter(this);
     comboUse->setEditable(true);
     comboUse->setInsertPolicy(QComboBox::NoInsert);
     comboUse->addItem("");
@@ -217,6 +219,8 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     QComboBox *comboType = new QComboBox(gui.treePartitions);
     comboType->setAutoFillBackground(true);
     gui.treePartitions->setItemWidget(twit, Format, comboType);
+    comboType->setFocusPolicy(Qt::StrongFocus);
+    comboType->installEventFilter(this);
     comboType->setEnabled(false);
     if(bdinfo) {
         twit->setText(Format, bdinfo->fs);
@@ -239,8 +243,22 @@ void PartMan::labelParts(QTreeWidgetItem *drive)
     for(int ixi = drive->childCount() - 1; ixi >= 0; --ixi) {
         drive->child(ixi)->setText(Device, BlockDeviceInfo::join(drv, ixi+1));
     }
+    resizeColumnsToFit();
+}
+
+void PartMan::resizeColumnsToFit()
+{
     for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
+    }
+    // Pad the column to work around a Buster Qt bug where combo box bleeds out of column.
+    QFile file("/etc/debian_version");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        const int ver = file.readLine().split('.').at(0).toInt();
+        if (ver==10) {
+            gui.treePartitions->setColumnWidth(UseFor,
+                gui.treePartitions->columnWidth(UseFor)+16);
+        }
     }
 }
 
@@ -537,6 +555,16 @@ void PartMan::partRemoveClick(bool)
     twit->parent()->removeChild(twit);
     labelParts(drvit);
     treeSelChange();
+}
+
+// Mouse wheel event filter for partition tree objects
+bool PartMan::eventFilter(QObject *object, QEvent *event)
+{
+    if(event->type() == QEvent::Wheel) {
+        QWidget *widget = static_cast<QWidget *>(object);
+        if(widget && !(widget->hasFocus())) return true;
+    }
+    return false;
 }
 
 QWidget *PartMan::composeValidate(bool automatic,
