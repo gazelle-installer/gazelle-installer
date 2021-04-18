@@ -90,11 +90,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
         curdev->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
     }
     gui.treePartitions->expandAll();
-    for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
-        if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
-    }
-    // Pad the column to work around a Buster Qt bug where combo box bleeds out of column.
-    gui.treePartitions->setColumnWidth(UseFor, gui.treePartitions->columnWidth(UseFor)+16);
+    resizeColumnsToFit();
     comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
@@ -241,11 +237,23 @@ void PartMan::labelParts(QTreeWidgetItem *drive)
     for(int ixi = drive->childCount() - 1; ixi >= 0; --ixi) {
         drive->child(ixi)->setText(Device, BlockDeviceInfo::join(drv, ixi+1));
     }
+    resizeColumnsToFit();
+}
+
+void PartMan::resizeColumnsToFit()
+{
     for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
         if(ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
     // Pad the column to work around a Buster Qt bug where combo box bleeds out of column.
-    gui.treePartitions->setColumnWidth(UseFor, gui.treePartitions->columnWidth(UseFor)+16);
+    QFile file("/etc/debian_version");
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        const int ver = file.readLine().split('.').at(0).toInt();
+        if (ver==10) {
+            gui.treePartitions->setColumnWidth(UseFor,
+                gui.treePartitions->columnWidth(UseFor)+16);
+        }
+    }
 }
 
 QString PartMan::translateUse(const QString &alias)
