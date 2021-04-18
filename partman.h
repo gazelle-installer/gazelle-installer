@@ -79,7 +79,7 @@ class PartMan : public QObject
     void partClearClick(bool);
     void partAddClick(bool);
     void partRemoveClick(bool);
-    void partDefaultClick(bool);
+    bool eventFilter(QObject *object, QEvent *event);
 public:
     bool gptoverride=false, uefi=false, brave=false;
     long long rootSpaceNeeded = 0;
