@@ -120,7 +120,7 @@ void PartMan::populateMapper(QTreeWidgetItem *mapit)
         mapit->setFont(0, font);
         mapit->setFirstColumnSpanned(true);
     }
-    assert(mapit!=nullptr);
+    if(!mapit) return;
     for(const QJsonValue &jsonDev : jsonBD) {
         BlockDeviceInfo bdinfo;
         bdinfo.isDrive = false;
