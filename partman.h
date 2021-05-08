@@ -61,7 +61,6 @@ class PartMan : public QObject
     void setEncryptChecks(const QString &use,
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
     bool calculatePartBD();
-    void populateMapper(QTreeWidgetItem *mapit);
     inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
     inline bool drvitIsMapperList(const QTreeWidgetItem *drvit) const;
     inline bool twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp=true) const;

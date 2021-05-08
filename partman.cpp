@@ -92,51 +92,43 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
         curdev->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
         curdev->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
     }
-    if(!drvstart) populateMapper(nullptr);
+    if(!drvstart) {
+        // Virtual devices
+        const QString &bdRaw = proc.execOut("lsblk -T -bJo"
+            " TYPE,NAME,UUID,SIZE,FSTYPE,LABEL"
+            " /dev/mapper/* 2>/dev/null", true);
+        const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
+        const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
+        if(!jsonBD.empty()) {
+            QTreeWidgetItem *mapit = new QTreeWidgetItem(gui.treePartitions);
+            mapit->setText(0, tr("Virtual Devices"));
+            QFont font = mapit->font(0);
+            font.setItalic(true);
+            mapit->setFont(0, font);
+            mapit->setFirstColumnSpanned(true);
+            for(const QJsonValue &jsonDev : jsonBD) {
+                BlockDeviceInfo bdinfo;
+                bdinfo.isDrive = false;
+                bdinfo.name = jsonDev["name"].toString();
+                bdinfo.size = jsonDev["size"].toVariant().toLongLong();
+                bdinfo.label = jsonDev["label"].toString();
+                bdinfo.fs = jsonDev["fstype"].toString();
+                QTreeWidgetItem *devit = new QTreeWidgetItem(mapit);
+                setupItem(devit, &bdinfo);
+                // Device name and size
+                devit->setText(Device, bdinfo.name);
+                devit->setData(Device, Qt::UserRole, bdinfo.name);
+                devit->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
+                devit->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
+            }
+            drvitMarkLayout(mapit, true);
+        }
+    }
     gui.treePartitions->expandAll();
     resizeColumnsToFit();
     comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
-}
-void PartMan::populateMapper(QTreeWidgetItem *mapit)
-{
-    const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,FSTYPE,LABEL"
-        " /dev/mapper/* 2>/dev/null", true);
-    const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
-    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
-    if(mapit) {
-        clearLayout(mapit);
-        if(jsonBD.empty()) {
-            delete mapit;
-            return;
-        }
-    } else if(!jsonBD.empty()) {
-        mapit = new QTreeWidgetItem(gui.treePartitions);
-        mapit->setText(0, tr("Virtual Devices"));
-        QFont font = mapit->font(0);
-        font.setItalic(true);
-        mapit->setFont(0, font);
-        mapit->setFirstColumnSpanned(true);
-    }
-    if(!mapit) return;
-    for(const QJsonValue &jsonDev : jsonBD) {
-        BlockDeviceInfo bdinfo;
-        bdinfo.isDrive = false;
-        bdinfo.name = jsonDev["name"].toString();
-        bdinfo.size = jsonDev["size"].toVariant().toLongLong();
-        bdinfo.label = jsonDev["label"].toString();
-        bdinfo.fs = jsonDev["fstype"].toString();
-        QTreeWidgetItem *devit = new QTreeWidgetItem(mapit);
-        setupItem(devit, &bdinfo);
-        // Device name and size
-        devit->setText(Device, bdinfo.name);
-        devit->setData(Device, Qt::UserRole, bdinfo.name);
-        devit->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
-        devit->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
-    }
-    drvitMarkLayout(mapit, true);
 }
 void PartMan::clearLayout(QTreeWidgetItem *drvit)
 {
@@ -519,7 +511,7 @@ void PartMan::treeMenu(const QPoint &)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit) return;
-    const bool isMapList = drvitIsMapperList(twit);
+    if(drvitIsMapperList(twit)) return;
     QMenu menu(gui.treePartitions);
     QAction *action = nullptr;
     QAction *actAdd = menu.addAction(tr("&Add partition"));
@@ -544,16 +536,15 @@ void PartMan::treeMenu(const QPoint &)
             actBtrfsLzo->setEnabled(false);
         }
         action = menu.exec(QCursor::pos());
-        if(action) {
-            if(action==actRemove) partRemoveClick(true);
-            else {
-                QLineEdit *editOpts = twitLineEdit(twit, Options);
-                comboFormat->setCurrentIndex(ixBTRFS);
-                if(action==actBtrfsZlib) editOpts->setText("noatime,compress-force=zlib");
-                else if(action==actBtrfsLzo) editOpts->setText("noatime,compress-force=lzo");
-            }
+        if(!action) return;
+        else if(action==actRemove) partRemoveClick(true);
+        else {
+            QLineEdit *editOpts = twitLineEdit(twit, Options);
+            comboFormat->setCurrentIndex(ixBTRFS);
+            if(action==actBtrfsZlib) editOpts->setText("noatime,compress-force=zlib");
+            else if(action==actBtrfsLzo) editOpts->setText("noatime,compress-force=lzo");
         }
-    } else if(!isMapList){
+    } else {
         menu.addSeparator();
         const QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
@@ -570,20 +561,8 @@ void PartMan::treeMenu(const QPoint &)
             while(twit->childCount()) twit->removeChild(twit->child(0));
             populate(twit);
         }
-    } else {
-        menu.clear();
-        actAdd = nullptr;
-        const QAction *actReset = menu.addAction(tr("&Reset virtual device list"));
-        if(menu.exec(QCursor::pos()) == actReset){
-            gui.treePartitions->blockSignals(true);
-            populateMapper(twit);
-            resizeColumnsToFit();
-            comboTypeTextChange(QString()); // For the badblocks checkbox.
-            gui.treePartitions->blockSignals(false);
-            treeSelChange();
-        }
     }
-    if(action && action==actAdd) partAddClick(true);
+    if(action==actAdd) partAddClick(true);
 }
 
 // Partition manager list buttons
