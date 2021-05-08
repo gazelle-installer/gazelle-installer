@@ -137,7 +137,7 @@ private:
 
     // command line options
     bool brave, pretend, automatic, nocopy, sync;
-    bool oem, oobe;
+    bool oem, oobe, mountkeep;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
