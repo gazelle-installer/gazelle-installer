@@ -2345,7 +2345,7 @@ void MInstall::cleanup(bool endclean)
     proc.exec("/bin/umount -l /mnt/antiX/sys", true);
     proc.exec("/bin/umount -l /mnt/antiX/dev/shm", true);
     proc.exec("/bin/umount -l /mnt/antiX/dev", true);
-    partman.unmount(true);
+    partman.unmount();
 }
 
 void MInstall::on_progressBar_valueChanged(int value)

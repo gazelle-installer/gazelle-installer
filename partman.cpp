@@ -30,6 +30,9 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 #include "msettings.h"
 #include "partman.h"
@@ -89,11 +92,51 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
         curdev->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
         curdev->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
     }
+    if(!drvstart) populateMapper(nullptr);
     gui.treePartitions->expandAll();
     resizeColumnsToFit();
     comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
+}
+void PartMan::populateMapper(QTreeWidgetItem *mapit)
+{
+    const QString &bdRaw = proc.execOut("lsblk -T -bJo"
+        " TYPE,NAME,UUID,SIZE,FSTYPE,LABEL"
+        " /dev/mapper/* 2>/dev/null", true);
+    const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
+    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
+    if(mapit) {
+        clearLayout(mapit);
+        if(jsonBD.empty()) {
+            delete mapit;
+            return;
+        }
+    } else if(!jsonBD.empty()) {
+        mapit = new QTreeWidgetItem(gui.treePartitions);
+        mapit->setText(0, tr("Virtual Devices"));
+        QFont font = mapit->font(0);
+        font.setItalic(true);
+        mapit->setFont(0, font);
+        mapit->setFirstColumnSpanned(true);
+    }
+    assert(mapit!=nullptr);
+    for(const QJsonValue &jsonDev : jsonBD) {
+        BlockDeviceInfo bdinfo;
+        bdinfo.isDrive = false;
+        bdinfo.name = jsonDev["name"].toString();
+        bdinfo.size = jsonDev["size"].toVariant().toLongLong();
+        bdinfo.label = jsonDev["label"].toString();
+        bdinfo.fs = jsonDev["fstype"].toString();
+        QTreeWidgetItem *devit = new QTreeWidgetItem(mapit);
+        setupItem(devit, &bdinfo);
+        // Device name and size
+        devit->setText(Device, bdinfo.name);
+        devit->setData(Device, Qt::UserRole, bdinfo.name);
+        devit->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
+        devit->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
+    }
+    drvitMarkLayout(mapit, true);
 }
 void PartMan::clearLayout(QTreeWidgetItem *drvit)
 {
@@ -373,6 +416,7 @@ void PartMan::comboUseTextChange(const QString &text)
             // Qt::PartiallyChecked tells treeItemChange() to include this item in the refresh.
             item->setCheckState(Encrypt, Qt::PartiallyChecked);
         }
+        if(twitIsMapped(item)) item->setData(Encrypt, Qt::CheckStateRole, QVariant());
         if(allowPreserve) {
             // Add an item at the start to allow preserving the existing format.
             comboType->insertItem(0, tr("Preserve (%1)").arg(curtype), "PRESERVE");
@@ -475,6 +519,7 @@ void PartMan::treeMenu(const QPoint &)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit) return;
+    const bool isMapList = drvitIsMapperList(twit);
     QMenu menu(gui.treePartitions);
     QAction *action = nullptr;
     QAction *actAdd = menu.addAction(tr("&Add partition"));
@@ -482,9 +527,15 @@ void PartMan::treeMenu(const QPoint &)
     if(twit->parent()) {
         QComboBox *comboFormat = twitComboBox(twit, Format);
         const int ixBTRFS = comboFormat->findData("btrfs");
-        QAction *actRemove = menu.addAction(tr("&Remove partition"));
-        actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
-        menu.addSeparator();
+        QAction *actRemove = nullptr;
+        if(twitIsMapped(twit)) {
+            menu.clear();
+            actAdd = nullptr;
+        } else {
+            actRemove = menu.addAction(tr("&Remove partition"));
+            actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
+            menu.addSeparator();
+        }
         QMenu *menuTemplates = menu.addMenu("&Templates");
         QAction *actBtrfsZlib = menuTemplates->addAction(tr("BTRFS compression (&ZLIB)"));
         QAction *actBtrfsLzo = menuTemplates->addAction(tr("BTRFS compression (&LZO)"));
@@ -493,14 +544,16 @@ void PartMan::treeMenu(const QPoint &)
             actBtrfsLzo->setEnabled(false);
         }
         action = menu.exec(QCursor::pos());
-        if(action==actRemove) partRemoveClick(true);
-        else if(action) {
-            QLineEdit *editOpts = twitLineEdit(twit, Options);
-            comboFormat->setCurrentIndex(ixBTRFS);
-            if(action==actBtrfsZlib) editOpts->setText("noatime,compress-force=zlib");
-            else if(action==actBtrfsLzo) editOpts->setText("noatime,compress-force=lzo");
+        if(action) {
+            if(action==actRemove) partRemoveClick(true);
+            else {
+                QLineEdit *editOpts = twitLineEdit(twit, Options);
+                comboFormat->setCurrentIndex(ixBTRFS);
+                if(action==actBtrfsZlib) editOpts->setText("noatime,compress-force=zlib");
+                else if(action==actBtrfsLzo) editOpts->setText("noatime,compress-force=lzo");
+            }
         }
-    } else {
+    } else if(!isMapList){
         menu.addSeparator();
         const QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
@@ -517,8 +570,20 @@ void PartMan::treeMenu(const QPoint &)
             while(twit->childCount()) twit->removeChild(twit->child(0));
             populate(twit);
         }
+    } else {
+        menu.clear();
+        actAdd = nullptr;
+        const QAction *actReset = menu.addAction(tr("&Reset virtual device list"));
+        if(menu.exec(QCursor::pos()) == actReset){
+            gui.treePartitions->blockSignals(true);
+            populateMapper(twit);
+            resizeColumnsToFit();
+            comboTypeTextChange(QString()); // For the badblocks checkbox.
+            gui.treePartitions->blockSignals(false);
+            treeSelChange();
+        }
     }
-    if(action==actAdd) partAddClick(true);
+    if(action && action==actAdd) partAddClick(true);
 }
 
 // Partition manager list buttons
@@ -608,17 +673,19 @@ QWidget *PartMan::composeValidate(bool automatic,
                 }
             }
         }
-        QVariant mapperData;
-        if((*it)->checkState(Encrypt) == Qt::Checked) {
-            if(mount == "/") mapperData = "root.fsm";
-            else if(mount.isEmpty()) mapperData = mount.toLower();
-            else {
-                mapperData = QString::number(++mapnum)
-                    + mount.replace('/','.') + ".fsm";
+        if(!twitIsMapped(*it)) {
+            QVariant mapperData;
+            if((*it)->checkState(Encrypt) == Qt::Checked) {
+                if(mount == "/") mapperData = "root.fsm";
+                else if(mount.isEmpty()) mapperData = mount.toLower();
+                else {
+                    mapperData = QString::number(++mapnum)
+                        + mount.replace('/','.') + ".fsm";
+                }
+                encryptAny = true;
             }
-            encryptAny = true;
+            (*it)->setData(Device, Qt::UserRole, mapperData);
         }
-        (*it)->setData(Device, Qt::UserRole, mapperData);
     }
     qDebug() << "Mount points:";
     for(const auto &it : mounts.toStdMap()) {
@@ -771,15 +838,16 @@ bool PartMan::checkTargetDrivesOK()
 {
     QString smartFail, smartWarn;
     for(int ixi = 0; ixi < gui.treePartitions->topLevelItemCount(); ++ixi) {
+        QTreeWidgetItem *drvit =  gui.treePartitions->topLevelItem(ixi);
+        if(drvitIsMapperList(drvit)) continue;
         QStringList purposes;
-        QTreeWidgetItem *tlit =  gui.treePartitions->topLevelItem(ixi);
-        for(int oxo = 0; oxo < tlit->childCount(); ++oxo) {
-            const QString &useFor = twitUseFor(tlit->child(oxo));
+        for(int oxo = 0; oxo < drvit->childCount(); ++oxo) {
+            const QString &useFor = twitUseFor(drvit->child(oxo));
             if(!useFor.isEmpty()) purposes << useFor;
         }
         // If any partitions are selected run the SMART tests.
         if (!purposes.isEmpty()) {
-            const QString &drive = tlit->text(Device);
+            const QString &drive = drvit->text(Device);
             QString smartMsg = drive + " (" + purposes.join(", ") + ")";
             proc.exec("smartctl -H /dev/" + drive, true);
             if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & 8) {
@@ -992,6 +1060,7 @@ bool PartMan::preparePartitions()
     proc.status(tr("Preparing required partitions"));
     for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
         QTreeWidgetItem *drvitem = gui.treePartitions->topLevelItem(ixi);
+        if(drvitIsMapperList(drvitem)) continue;
         const QString &drvdev = drvitem->text(Device);
         const int devCount = drvitem->childCount();
         if(twitIsOldLayout(drvitem, true)) {
@@ -1190,7 +1259,7 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         const QString &dev = twitMappedDevice(it.second, true);
         qDebug() << "Creating fstab entry for:" << it.first << dev;
         // Device ID or UUID
-        if(twitIsMapped(it.second)) out << dev;
+        if(twitWillMap(it.second)) out << dev;
         else out << "UUID=" + proc.execOut(cmdBlkID + dev);
         // Mount point, file system
         QString fstype = proc.execOut("blkid " + dev + " -o value -s TYPE");
@@ -1249,7 +1318,7 @@ bool PartMan::mountPartitions()
     return true;
 }
 
-void PartMan::unmount(bool all)
+void PartMan::unmount()
 {
     QMapIterator<QString, QTreeWidgetItem *> it(mounts);
     it.toBack();
@@ -1261,9 +1330,10 @@ void PartMan::unmount(bool all)
         }
         proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
         QTreeWidgetItem *twit = it.value();
-        if(!(all || twit->checkState(Encrypt)==Qt::Checked)) continue;
-        QString cmd("cryptsetup close %1");
-        proc.exec(cmd.arg(twitMappedDevice(twit)), true);
+        if(twit->checkState(Encrypt)==Qt::Checked) {
+            QString cmd("cryptsetup close %1");
+            proc.exec(cmd.arg(twitMappedDevice(twit)), true);
+        }
     }
 }
 
@@ -1315,6 +1385,10 @@ inline void PartMan::drvitMarkLayout(QTreeWidgetItem *drvit, const bool old)
     else drvit->setIcon(Device, QIcon(":/appointment-soon"));
     gui.treePartitions->resizeColumnToContents(Device);
 }
+inline bool PartMan::drvitIsMapperList(const QTreeWidgetItem *drvit) const
+{
+    return drvit->isFirstColumnSpanned();
+}
 inline bool PartMan::twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp) const
 {
     if(chkUp) {
@@ -1347,7 +1421,13 @@ inline QString PartMan::twitUseFor(QTreeWidgetItem *twit)
     if(!combo) return QString();
     return translateUse(combo->currentText());
 }
-inline bool PartMan::twitIsMapped(const QTreeWidgetItem * twit)
+inline bool PartMan::twitIsMapped(const QTreeWidgetItem *twit) const
+{
+    const QTreeWidgetItem *drvit = twit->parent();
+    if(drvit) return drvitIsMapperList(drvit);
+    return false;
+}
+inline bool PartMan::twitWillMap(const QTreeWidgetItem *twit) const
 {
     if(twit->parent()==nullptr) return false;
     return !(twit->data(Device, Qt::UserRole).isNull());
