@@ -1795,7 +1795,10 @@ void MInstall::pageDisplayed(int next)
                           + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
                           "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
                           "<p><b>" + tr("Other partitions") + "</b><br/>"
-                          + tr("The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.") + "</p>");
+                          + tr("The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.") + "</p>"
+                          "<p><b>" + tr("Virtual Devices") + "</b><br/>"
+                          + tr("If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
+                          "<p>" + tr("The use of virtual devices is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
         backButton->setEnabled(true);
         nextButton->setEnabled(!(gbEncrPass->isEnabledTo(gbEncrPass->parentWidget())) || FDEpassCust->isValid());
         return; // avoid the end that enables both Back and Next buttons
