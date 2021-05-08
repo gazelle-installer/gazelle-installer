@@ -2467,9 +2467,10 @@ void MInstall::on_sliderPart_valueChanged(int value)
     if(!drvitem) return;
     long long available = partman.layoutDefault(drvitem, 100, crypto, false);
     if(!available) return;
-    const int rootMinMB = partman.rootSpaceNeeded / 1048576;
-    const int minPercent = (rootMinMB*100) / available;
-    const int recPercentMin = ((rootMinMB+4096)*100) / available; // Recommended root size. TODO: Make configurable.
+    const long long roundUp = available - 1;
+    const long long rootMinMB = (partman.rootSpaceNeeded+1048575) / 1048576;
+    const int minPercent = ((rootMinMB*100)+roundUp) / available;
+    const int recPercentMin = (((rootMinMB+4096)*100)+roundUp) / available; // Recommended root size. TODO: Make configurable.
     const int recPercentMax = 99 - ((1024*100) / available); // Recommended minimum home. TODO: Make configurable.
     int origValue = value;
     if(value<0) { // Internal setup.
