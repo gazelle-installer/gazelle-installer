@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
                        {"gpt-override", QApplication::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"\
                                                           "Without this option, GPT will only be used on drives with at least 2TB capacity.\n"\
                                                           "GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.")},
+                       {{"m", "mount-keep"}, QApplication::tr("Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.")},
                        {{"n", "nocopy"}, QApplication::tr("Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.")},
                        {{"o", "oem"}, QApplication::tr("Install the operating system, delaying prompts for user-specific options until the first reboot.\n"\
                                                        "Upon rebooting, the installer will be run with --oobe so that the user can provide these details.\n"\

@@ -51,6 +51,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
         automatic = args.isSet("auto");
         oem = args.isSet("oem");
         partman.gptoverride = args.isSet("gpt-override");
+        mountkeep = args.isSet("mount-keep");
     } else {
         brave = automatic = oem = false;
         closeButton->setText(tr("Shutdown"));
@@ -2348,7 +2349,7 @@ void MInstall::cleanup(bool endclean)
     proc.exec("/bin/umount -l /mnt/antiX/sys", true);
     proc.exec("/bin/umount -l /mnt/antiX/dev/shm", true);
     proc.exec("/bin/umount -l /mnt/antiX/dev", true);
-    partman.unmount();
+    if(!mountkeep) partman.unmount();
 }
 
 void MInstall::on_progressBar_valueChanged(int value)
