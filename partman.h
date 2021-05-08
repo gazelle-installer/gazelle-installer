@@ -61,12 +61,15 @@ class PartMan : public QObject
     void setEncryptChecks(const QString &use,
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
     bool calculatePartBD();
+    void populateMapper(QTreeWidgetItem *mapit);
     inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
+    inline bool drvitIsMapperList(const QTreeWidgetItem *drvit) const;
     inline bool twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp=true) const;
     inline long long twitSize(QTreeWidgetItem *twit, bool bytes=false);
     inline bool twitWillFormat(QTreeWidgetItem *twit);
     inline QString twitUseFor(QTreeWidgetItem *twit);
-    inline bool twitIsMapped(const QTreeWidgetItem * twit);
+    inline bool twitIsMapped(const QTreeWidgetItem *twit) const;
+    inline bool twitWillMap(const QTreeWidgetItem *twit) const;
     inline QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
     inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column);
     inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column);
@@ -103,7 +106,7 @@ public:
     bool fixCryptoSetup(const QString &keyfile, bool isNewKey);
     bool makeFstab(bool populateMediaMounts);
     bool mountPartitions();
-    void unmount(bool all = false);
+    void unmount();
     bool willFormat(const QString &point);
     QString getMountDev(const QString &point, const bool mapped=true);
     int swapCount();
