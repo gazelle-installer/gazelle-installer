@@ -109,6 +109,7 @@ private slots:
     void on_checkBoxEncryptAuto_toggled(bool checked);
     void on_customPartButton_clicked(bool checked);
 
+    void on_buttonLoadKey_clicked();
     void on_buttonBenchmarkFDE_clicked();
     void on_buttonAdvancedFDE_clicked();
     void on_buttonAdvancedFDECust_clicked();
