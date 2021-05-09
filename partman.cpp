@@ -148,7 +148,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         bdinfo.size = jsonDev["size"].toVariant().toLongLong();
         bdinfo.label = jsonDev["label"].toString();
         bdinfo.fs = jsonDev["fstype"].toString();
-        const bool crypto = jsonDev["type"]=="crypt";
+        const bool crypto = jsonDev["type"].toString()=="crypt";
         // Check if the device is already in the list.
         QTreeWidgetItem *devit = listed.value(bdinfo.name);
         if(devit) {
@@ -569,16 +569,15 @@ void PartMan::treeMenu(const QPoint &)
     if(isPart) {
         QComboBox *comboFormat = twitComboBox(twit, Format);
         const int ixBTRFS = comboFormat->findData("btrfs");
-        QAction *actRemove = nullptr;
+        QAction *actRemove = menu.addAction(tr("&Remove partition"));
         QAction *actLock = nullptr;
         QAction *actUnlock = nullptr;
+        actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
+        menu.addSeparator();
         if(twitIsMapped(twit)) {
-            menu.clear();
+            actRemove->setEnabled(false);
             if(!(twit->icon(Device).isNull())) actLock = menu.addAction(tr("&Lock"));
         } else {
-            actRemove = menu.addAction(tr("&Remove partition"));
-            actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
-            menu.addSeparator();
             if(twitIsOldLayout(twit, true) && twit->text(Format)=="crypto_LUKS") {
                 actUnlock = menu.addAction(tr("&Unlock"));
             }
@@ -677,7 +676,7 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
 
     if(dialog.exec()==QDialog::Accepted) {
         const QString &mapdev = editVDev->text();
-        if(luksOpen(twit->text(Device), mapdev, editPass->text().toUtf8())) {
+        if(luksOpen("/dev/" + twit->text(Device), mapdev, editPass->text().toUtf8())) {
             twit->setIcon(Device, QIcon::fromTheme("lock"));
             QComboBox *comboUseFor = twitComboBox(twit, UseFor);
             comboUseFor->setCurrentIndex(0);
