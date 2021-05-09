@@ -30,6 +30,9 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QFormLayout>
+#include <QDialogButtonBox>
+#include <QInputDialog>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -91,44 +94,89 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
         curdev->setText(Device, bdinfo.name);
         curdev->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
         curdev->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
-    }
-    if(!drvstart) {
-        // Virtual devices
-        const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-            " TYPE,NAME,UUID,SIZE,FSTYPE,LABEL"
-            " /dev/mapper/* 2>/dev/null", true);
-        const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
-        const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
-        if(!jsonBD.empty()) {
-            QTreeWidgetItem *mapit = new QTreeWidgetItem(gui.treePartitions);
-            mapit->setText(0, tr("Virtual Devices"));
-            QFont font = mapit->font(0);
-            font.setItalic(true);
-            mapit->setFont(0, font);
-            mapit->setFirstColumnSpanned(true);
-            for(const QJsonValue &jsonDev : jsonBD) {
-                BlockDeviceInfo bdinfo;
-                bdinfo.isDrive = false;
-                bdinfo.name = jsonDev["name"].toString();
-                bdinfo.size = jsonDev["size"].toVariant().toLongLong();
-                bdinfo.label = jsonDev["label"].toString();
-                bdinfo.fs = jsonDev["fstype"].toString();
-                QTreeWidgetItem *devit = new QTreeWidgetItem(mapit);
-                setupItem(devit, &bdinfo);
-                // Device name and size
-                devit->setText(Device, bdinfo.name);
-                devit->setData(Device, Qt::UserRole, bdinfo.name);
-                devit->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
-                devit->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
-            }
-            drvitMarkLayout(mapit, true);
+        if(bdinfo.mapCount > 0) {
+            twitComboBox(curdev, UseFor)->setDisabled(true);
+            curdev->setIcon(0, QIcon::fromTheme("lock"));
         }
     }
+    if(!drvstart) scanVirtualDevices(false);
     gui.treePartitions->expandAll();
     resizeColumnsToFit();
     comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
+}
+void PartMan::scanVirtualDevices(bool rescan)
+{
+    QTreeWidgetItem *vdlit = nullptr;
+    QMap<QString, QTreeWidgetItem *> listed;
+    if(rescan) {
+        for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
+            QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
+            if(drvitIsMapperList(drvit)) {
+                vdlit = drvit;
+                const int vdcount = vdlit->childCount();
+                for(int ixVD = 0; ixVD < vdcount; ++ixVD) {
+                    QTreeWidgetItem *devit = vdlit->child(ixVD);
+                    listed.insert(devit->text(Device), devit);
+                }
+                break;
+            }
+        }
+    }
+    const QString &bdRaw = proc.execOut("lsblk -T -bJo"
+        " TYPE,NAME,UUID,SIZE,FSTYPE,LABEL"
+        " /dev/mapper/* 2>/dev/null", true);
+    const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
+    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
+    if(jsonBD.empty()) {
+        if(vdlit) delete vdlit;
+        return;
+    } else if(!vdlit) {
+        vdlit = new QTreeWidgetItem(gui.treePartitions);
+        vdlit->setText(0, tr("Virtual Devices"));
+        QFont font = vdlit->font(0);
+        font.setItalic(true);
+        vdlit->setFont(0, font);
+        vdlit->setFirstColumnSpanned(true);
+    }
+    assert(vdlit!=nullptr);
+    for(const QJsonValue &jsonDev : jsonBD) {
+        BlockDeviceInfo bdinfo;
+        bdinfo.isDrive = false;
+        bdinfo.name = jsonDev["name"].toString();
+        bdinfo.size = jsonDev["size"].toVariant().toLongLong();
+        bdinfo.label = jsonDev["label"].toString();
+        bdinfo.fs = jsonDev["fstype"].toString();
+        const bool crypto = jsonDev["type"]=="crypt";
+        // Check if the device is already in the list.
+        QTreeWidgetItem *devit = listed.value(bdinfo.name);
+        if(devit) {
+            if(bdinfo.size != devit->data(Size, Qt::UserRole).toLongLong()
+                || bdinfo.label != devit->data(Label, Qt::UserRole).toString()
+                || crypto == devit->icon(0).isNull()) {
+                // List entry is different to the device, so refresh it.
+                delete devit;
+                devit = nullptr;
+            }
+            listed.remove(bdinfo.name);
+        }
+        // Create a new list entry if needed.
+        if(!devit) {
+            devit = new QTreeWidgetItem(vdlit);
+            setupItem(devit, &bdinfo);
+            devit->setText(Device, bdinfo.name);
+            devit->setData(Device, Qt::UserRole, bdinfo.name);
+            const QString &tsize = QLocale::system().formattedDataSize(bdinfo.size,
+                1, QLocale::DataSizeTraditionalFormat);
+            devit->setText(Size, tsize);
+            devit->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
+            if(crypto) devit->setIcon(0, QIcon::fromTheme("unlock"));
+        }
+    }
+    for(const auto &it : listed.toStdMap()) delete it.second;
+    drvitMarkLayout(vdlit, true);
+    vdlit->sortChildren(Device, Qt::AscendingOrder);
 }
 void PartMan::clearLayout(QTreeWidgetItem *drvit)
 {
@@ -512,21 +560,28 @@ void PartMan::treeMenu(const QPoint &)
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit) return;
     if(drvitIsMapperList(twit)) return;
+    const bool isPart = twit->parent()!=nullptr;
+    if(isPart && !twitCanUse(twit)) return;
     QMenu menu(gui.treePartitions);
     QAction *action = nullptr;
     QAction *actAdd = menu.addAction(tr("&Add partition"));
     actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
-    if(twit->parent()) {
+    if(isPart) {
         QComboBox *comboFormat = twitComboBox(twit, Format);
         const int ixBTRFS = comboFormat->findData("btrfs");
         QAction *actRemove = nullptr;
+        QAction *actLock = nullptr;
+        QAction *actUnlock = nullptr;
         if(twitIsMapped(twit)) {
             menu.clear();
-            actAdd = nullptr;
+            if(!(twit->icon(Device).isNull())) actLock = menu.addAction(tr("&Lock"));
         } else {
             actRemove = menu.addAction(tr("&Remove partition"));
             actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
             menu.addSeparator();
+            if(twitIsOldLayout(twit, true) && twit->text(Format)=="crypto_LUKS") {
+                actUnlock = menu.addAction(tr("&Unlock"));
+            }
         }
         QMenu *menuTemplates = menu.addMenu("&Templates");
         QAction *actBtrfsZlib = menuTemplates->addAction(tr("BTRFS compression (&ZLIB)"));
@@ -538,6 +593,8 @@ void PartMan::treeMenu(const QPoint &)
         action = menu.exec(QCursor::pos());
         if(!action) return;
         else if(action==actRemove) partRemoveClick(true);
+        else if(action==actUnlock) partMenuUnlock(twit);
+        else if(action==actLock) partMenuLock(twit);
         else {
             QLineEdit *editOpts = twitLineEdit(twit, Options);
             comboFormat->setCurrentIndex(ixBTRFS);
@@ -598,6 +655,56 @@ void PartMan::partRemoveClick(bool)
     if(!twit || !drvit) return;
     twit->parent()->removeChild(twit);
     labelParts(drvit);
+    treeSelChange();
+}
+
+// Partition menu items
+void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
+{
+    QDialog dialog(master);
+    QFormLayout layout(&dialog);
+    layout.addRow(new QLabel(tr("Unlock Drive")));
+    QLineEdit *editVDev = new QLineEdit(&dialog);
+    QLineEdit *editPass = new QLineEdit(&dialog);
+    editPass->setEchoMode(QLineEdit::Password);
+    layout.addRow("Virtual Device", editVDev);
+    layout.addRow("Password", editPass);
+    QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+        Qt::Horizontal, &dialog);
+    layout.addRow(&buttons);
+    connect(&buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+    if(dialog.exec()==QDialog::Accepted) {
+        const QString &mapdev = editVDev->text();
+        if(luksOpen(twit->text(Device), mapdev, editPass->text().toUtf8())) {
+            twit->setIcon(Device, QIcon::fromTheme("lock"));
+            QComboBox *comboUseFor = twitComboBox(twit, UseFor);
+            comboUseFor->setCurrentIndex(0);
+            comboUseFor->setEnabled(false);
+            // Refreshing the drive will not necessarily re-scan block devices.
+            // This updates the device list manually to keep the tree accurate.
+            const int ixBD = listBlkDevs.findDevice(twit->text(Device));
+            if(ixBD >= 0) listBlkDevs[ixBD].mapCount++;
+            // Update virtual device list.
+            gui.treePartitions->blockSignals(true);
+            scanVirtualDevices(true);
+            comboTypeTextChange(QString()); // For the badblocks checkbox.
+            gui.treePartitions->blockSignals(false);
+            treeSelChange();
+        } else {
+            QMessageBox::warning(master, master->windowTitle(),
+                tr("Could not unlock device. Possible incorrect password."));
+        }
+    }
+}
+void PartMan::partMenuLock(QTreeWidgetItem *twit)
+{
+    proc.exec("cryptsetup close " + twitMappedDevice(twit), true);
+    gui.treePartitions->blockSignals(true);
+    scanVirtualDevices(true);
+    comboTypeTextChange(QString()); // For the badblocks checkbox.
+    gui.treePartitions->blockSignals(false);
     treeSelChange();
 }
 
@@ -1367,6 +1474,11 @@ inline void PartMan::drvitMarkLayout(QTreeWidgetItem *drvit, const bool old)
 inline bool PartMan::drvitIsMapperList(const QTreeWidgetItem *drvit) const
 {
     return drvit->isFirstColumnSpanned();
+}
+inline bool PartMan::twitCanUse(QTreeWidgetItem *twit)
+{
+    QComboBox *combo = twitComboBox(twit, UseFor);
+    return combo ? combo->isEnabled() : false;
 }
 inline bool PartMan::twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp) const
 {

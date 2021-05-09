@@ -46,7 +46,9 @@ class PartMan : public QObject
     QWidget *master;
     QMap<QString, QTreeWidgetItem *> mounts;
     QStringList listToUnmount;
+    QStringList unlocked;
     void setup();
+    void scanVirtualDevices(bool rescan);
     void clearLayout(QTreeWidgetItem *drvit);
     inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
         const QString &defaultUse, bool crypto);
@@ -63,6 +65,7 @@ class PartMan : public QObject
     bool calculatePartBD();
     inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
     inline bool drvitIsMapperList(const QTreeWidgetItem *drvit) const;
+    inline bool twitCanUse(QTreeWidgetItem *twit);
     inline bool twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp=true) const;
     inline long long twitSize(QTreeWidgetItem *twit, bool bytes=false);
     inline bool twitWillFormat(QTreeWidgetItem *twit);
@@ -81,6 +84,8 @@ class PartMan : public QObject
     void partClearClick(bool);
     void partAddClick(bool);
     void partRemoveClick(bool);
+    void partMenuUnlock(QTreeWidgetItem *twit);
+    void partMenuLock(QTreeWidgetItem *twit);
     bool eventFilter(QObject *object, QEvent *event);
 public:
     bool gptoverride=false, uefi=false, brave=false;

@@ -109,6 +109,7 @@ void BlockDeviceList::build(MProcess &proc)
             bdinfo.size = jsonPart["size"].toVariant().toLongLong();
             bdinfo.label = jsonPart["label"].toString();
             bdinfo.model = jsonPart["model"].toString();
+            bdinfo.mapCount = jsonPart["children"].toArray().count();
 
             const QString &partType = jsonPart["parttype"].toString();
             if(partType.isEmpty()) bdinfo.isESP = bdinfo.isNative = false;
