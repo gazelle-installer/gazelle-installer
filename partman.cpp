@@ -433,8 +433,7 @@ void PartMan::comboUseTextChange(const QString &text)
         case 4:
             comboType->addItem("SWAP", "SWAP");
             selPreserve = true;
-            if(!curtype.compare("SWAP", Qt::CaseInsensitive)
-                || curtype == "crypto_LUKS") allowPreserve = true;
+            if(!curtype.compare("SWAP", Qt::CaseInsensitive)) allowPreserve = true;
             break;
         default:
             comboType->addItem("ext4", "ext4");
@@ -446,8 +445,8 @@ void PartMan::comboUseTextChange(const QString &text)
             comboType->addItem("btrfs", "btrfs");
             comboType->addItem("reiserfs", "reiserfs");
             comboType->addItem("reiser4", "reiser4");
-            if(comboType->findData(curtype, Qt::UserRole, Qt::MatchFixedString)>=0
-                || curtype == "crypto_LUKS") allowPreserve = true;
+            if(comboType->findData(curtype, Qt::UserRole,
+                Qt::MatchFixedString)>=0) allowPreserve = true;
         }
         // Changing to and from a mount/use that support encryption.
         if(useClass >= 0 && useClass <= 3) {
@@ -485,10 +484,6 @@ void PartMan::comboTypeTextChange(const QString &)
         const QString &type = comboType->currentText();
         const Qt::ItemFlags itflags = (*it)->flags();
         if(comboType->currentData(Qt::UserRole)=="PRESERVE") {
-            if((*it)->data(Encrypt, Qt::CheckStateRole).isValid()) {
-                const bool luks = ((*it)->text(Format)=="crypto_LUKS");
-                (*it)->setCheckState(Encrypt, luks ? Qt::Checked : Qt::Unchecked);
-            }
             (*it)->setFlags(itflags & ~Qt::ItemIsUserCheckable);
         } else {
             if(type.startsWith("ext") || type == "jfs") canCheckBlocks = true;
@@ -701,22 +696,19 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
 {
     const QString &dev = twitMappedDevice(twit);
     QStringList lines = proc.execOutLines("cryptsetup status " + dev, true);
-    const bool ok = proc.exec("cryptsetup close " + dev, true);
-    if(!ok || lines.isEmpty()) {
-        QMessageBox::critical(master, master->windowTitle(),
-            tr("Failed to close %1").arg(dev));
-        return;
-    }
+    bool ok = false;
     // Find the associated partition and decrement its reference count if found.
     for(const QString &line : lines) {
         const QString &trline = line.trimmed();
         if(trline.startsWith("device:")) {
-            const QString &trleft = trline.left(trline.lastIndexOf('/')+1);
+            ok = proc.exec("cryptsetup close " + dev, true);
+            if(!ok) break;
+            const QString &trdev = trline.mid(trline.lastIndexOf('/')+1);
             QTreeWidgetItemIterator it(gui.treePartitions,
                 QTreeWidgetItemIterator::NoChildren);
             for(; *it; ++it) {
-                if((*it)->text(Device) == trleft) {
-                    const int ixBD = listBlkDevs.findDevice(trleft);
+                if((*it)->text(Device) == trdev) {
+                    const int ixBD = listBlkDevs.findDevice(trdev);
                     const int oMapCount = listBlkDevs.at(ixBD).mapCount;
                     if(oMapCount > 0) listBlkDevs[ixBD].mapCount--;
                     if(oMapCount <= 1) {
@@ -728,6 +720,12 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
             }
             break;
         }
+    }
+    // If not OK then a command failed, or trying to close a non-LUKS device.
+    if(!ok) {
+        QMessageBox::critical(master, master->windowTitle(),
+            tr("Failed to close %1").arg(dev));
+        return;
     }
     // Refresh virtual devices list.
     gui.treePartitions->blockSignals(true);
