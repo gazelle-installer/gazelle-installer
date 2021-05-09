@@ -173,6 +173,8 @@ void PartMan::scanVirtualDevices(bool rescan)
                 devit->setIcon(0, QIcon::fromTheme("unlock"));
             }
         }
+        QTreeWidgetItem *orit = findOrigin(bdinfo.name);
+        if(orit) orit->setData(Device, Qt::UserRole, bdinfo.name);
     }
     for(const auto &it : listed.toStdMap()) delete it.second;
     drvitMarkLayout(vdlit, true);
@@ -556,7 +558,6 @@ void PartMan::treeMenu(const QPoint &)
     if(!twit) return;
     if(twitFlag(twit, TwitFlag::VirtualDevices)) return;
     const bool isPart = twit->parent()!=nullptr;
-    if(isPart && !twitCanUse(twit)) return;
     QMenu menu(gui.treePartitions);
     QAction *action = nullptr;
     QAction *actAdd = menu.addAction(tr("&Add partition"));
@@ -567,6 +568,7 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actRemove = menu.addAction(tr("&Remove partition"));
         QAction *actLock = nullptr;
         QAction *actUnlock = nullptr;
+        QAction *actAddCrypttab = nullptr;
         actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
         menu.addSeparator();
         if(twitIsMapped(twit)) {
@@ -575,6 +577,10 @@ void PartMan::treeMenu(const QPoint &)
         } else {
             if(twitIsOldLayout(twit, true) && twit->text(Format)=="crypto_LUKS") {
                 actUnlock = menu.addAction(tr("&Unlock"));
+                actAddCrypttab = menu.addAction(tr("Add to crypttab"));
+                actAddCrypttab->setCheckable(true);
+                actAddCrypttab->setChecked(twitFlag(twit, TwitFlag::AutoCrypto));
+                actAddCrypttab->setEnabled(twitIsMapped(twit));
             }
         }
         QMenu *menuTemplates = menu.addMenu("&Templates");
@@ -584,11 +590,16 @@ void PartMan::treeMenu(const QPoint &)
             actBtrfsZlib->setEnabled(false);
             actBtrfsLzo->setEnabled(false);
         }
+        if(!twitCanUse(twit)) {
+            if(actUnlock) actUnlock->setEnabled(false);
+            menuTemplates->setEnabled(false);
+        }
         action = menu.exec(QCursor::pos());
         if(!action) return;
         else if(action==actRemove) partRemoveClick(true);
         else if(action==actUnlock) partMenuUnlock(twit);
         else if(action==actLock) partMenuLock(twit);
+        else if(action==actAddCrypttab) twitSetFlag(twit, TwitFlag::AutoCrypto, action->isChecked());
         else {
             QLineEdit *editOpts = twitLineEdit(twit, Options);
             comboFormat->setCurrentIndex(ixBTRFS);
@@ -704,31 +715,18 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
     qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
     gui.mainFrame->setEnabled(false);
     const QString &dev = twitMappedDevice(twit);
-    QStringList lines = proc.execOutLines("cryptsetup status " + dev, true);
     bool ok = false;
     // Find the associated partition and decrement its reference count if found.
-    for(const QString &line : lines) {
-        const QString &trline = line.trimmed();
-        if(trline.startsWith("device:")) {
-            ok = proc.exec("cryptsetup close " + dev, true);
-            if(!ok) break;
-            const QString &trdev = trline.mid(trline.lastIndexOf('/')+1);
-            QTreeWidgetItemIterator it(gui.treePartitions,
-                QTreeWidgetItemIterator::NoChildren);
-            for(; *it; ++it) {
-                if((*it)->text(Device) == trdev) {
-                    const int ixBD = listBlkDevs.findDevice(trdev);
-                    const int oMapCount = listBlkDevs.at(ixBD).mapCount;
-                    if(oMapCount > 0) listBlkDevs[ixBD].mapCount--;
-                    if(oMapCount <= 1) {
-                        (*it)->setIcon(Device, QIcon());
-                        twitComboBox(*it, UseFor)->setEnabled(true);
-                    }
-                    break;
-                }
-            }
-            break;
+    QTreeWidgetItem *twitOrigin = findOrigin(dev);
+    if(twitOrigin) {
+        const int ixBD = listBlkDevs.findDevice(twitOrigin->text(Device));
+        const int oMapCount = listBlkDevs.at(ixBD).mapCount;
+        if(oMapCount > 0) listBlkDevs[ixBD].mapCount--;
+        if(oMapCount <= 1) {
+            twitOrigin->setIcon(Device, QIcon());
+            twitComboBox(twitOrigin, UseFor)->setEnabled(true);
         }
+        twitOrigin->setData(Device, Qt::UserRole, QVariant());
     }
     // Refresh virtual devices list.
     gui.treePartitions->blockSignals(true);
@@ -1344,6 +1342,14 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
             if(keyfile.startsWith(it.first+'/')) keyMount = it.first;
         }
     }
+    // Find extra devices
+    QMap<QString, QString> extraAdd;
+    QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+    for(; *it; ++it) {
+        if(twitUseFor(*it).isEmpty() && twitFlag(*it, TwitFlag::AutoCrypto)) {
+            extraAdd.insert((*it)->text(Device), twitMappedDevice(*it));
+        }
+    }
     // File systems
     for(auto &it : mounts.toStdMap()) {
         if(it.second->checkState(Encrypt)!=Qt::Checked) continue;
@@ -1359,6 +1365,20 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         }
         if(!it.first.startsWith("SWAP")) out << " luks \n";
         else out << " luks,nofail \n";
+        extraAdd.remove(dev);
+    }
+    // Extra devices
+    for(auto &it : extraAdd.toStdMap()) {
+        QString uuid = proc.execOut(cmdBlkID + it.first);
+        out << it.second << " /dev/disk/by-uuid/" << uuid;
+        if(noKey) out << " none";
+        else {
+            if(isNewKey) {
+                if(!proc.exec(cmdAddKey.arg(it.first), true, &password)) return false;
+            }
+            out << ' ' << keyfile;
+        }
+        out << " luks,nofail \n";
     }
     // Update cryptdisks if the key is not in the root file system.
     if(keyMount!='/') {
@@ -1500,6 +1520,25 @@ int PartMan::isEncrypt(const QString &point)
         if(twit && twit->checkState(Encrypt)==Qt::Checked) ++count;
     }
     return count;
+}
+
+QTreeWidgetItem *PartMan::findOrigin(const QString &vdev)
+{
+    QStringList lines = proc.execOutLines("cryptsetup status " + vdev, true);
+    // Find the associated partition and decrement its reference count if found.
+    for(const QString &line : lines) {
+        const QString &trline = line.trimmed();
+        if(trline.startsWith("device:")) {
+            const QString &trdev = trline.mid(trline.lastIndexOf('/')+1);
+            QTreeWidgetItemIterator it(gui.treePartitions,
+                QTreeWidgetItemIterator::NoChildren);
+            for(; *it; ++it) {
+                if((*it)->text(Device) == trdev) return *it;
+            }
+            return nullptr;
+        }
+    }
+    return nullptr;
 }
 
 // Helpers
