@@ -25,6 +25,7 @@
 #include <QProcessEnvironment>
 #include <QTimeZone>
 #include <QToolTip>
+#include <QFileDialog>
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
@@ -2521,6 +2522,38 @@ void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
 void MInstall::on_customPartButton_clicked(bool checked)
 {
     checkBoxEncryptAuto->setChecked(!checked);
+}
+
+void MInstall::on_buttonLoadKey_clicked()
+{
+    buttonLoadKey->setEnabled(false);
+    if(key.length()<=0) {
+        QFileDialog dialog(this, "Select Key File", "/mnt/antiX/root");
+        dialog.setAcceptMode(QFileDialog::AcceptOpen);
+        dialog.setFileMode(QFileDialog::ExistingFile);
+        const int rc = dialog.exec();
+        updateCursor(Qt::BusyCursor);
+        if(rc) {
+            const QStringList &files = dialog.selectedFiles();
+            if(files.count()==1) key.load(files.at(0).toUtf8().constData(), -1);
+        }
+    } else {
+        const int ans = QMessageBox::question(this, windowTitle(),
+            tr("Are you sure you want to unload the current key?"),
+            QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+        updateCursor(Qt::BusyCursor);
+        if(ans == QMessageBox::Yes) {
+            key.erase();
+            proc.sleep(100, true);
+            qApp->processEvents();
+            key.resize(0);
+        }
+    }
+    const int keylen = key.length(); // This might have changed above.
+    if(keylen<=0) buttonLoadKey->setText(tr("Load key from file..."));
+    else buttonLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
+    buttonLoadKey->setEnabled(true);
+    updateCursor();
 }
 
 void MInstall::on_buttonAdvancedFDE_clicked()

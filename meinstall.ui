@@ -28,6 +28,9 @@
   <layout class="QHBoxLayout">
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
      <property name="opaqueResize">
       <bool>false</bool>
      </property>
@@ -138,7 +141,8 @@
           <string>Close</string>
          </property>
          <property name="icon">
-          <iconset theme="window-close"/>
+          <iconset theme="window-close">
+           <normaloff>.</normaloff>.</iconset>
          </property>
         </widget>
        </item>
@@ -148,7 +152,8 @@
           <string>Next</string>
          </property>
          <property name="icon">
-          <iconset theme="go-next"/>
+          <iconset theme="go-next">
+           <normaloff>.</normaloff>.</iconset>
          </property>
          <property name="shortcut">
           <string>Alt+N</string>
@@ -622,6 +627,33 @@
               <property name="spacing">
                <number>0</number>
               </property>
+              <item row="12" column="0">
+               <widget class="QCheckBox" name="badblocksCheck">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Check for bad sectors (takes longer)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="QToolButton" name="buttonPartRemove">
+                <property name="toolTip">
+                 <string>Remove an existing entry from the layout. This only works with entries to a new layout.</string>
+                </property>
+                <property name="icon">
+                 <iconset theme=":/list-remove">
+                  <normaloff>.</normaloff>.</iconset>
+                </property>
+               </widget>
+              </item>
               <item row="7" column="2">
                <spacer name="verticalSpacer_5">
                 <property name="orientation">
@@ -635,13 +667,14 @@
                 </property>
                </spacer>
               </item>
-              <item row="2" column="2">
-               <widget class="QToolButton" name="buttonPartAdd">
+              <item row="10" column="2">
+               <widget class="QToolButton" name="buttonPartReload">
                 <property name="toolTip">
-                 <string>Add a new partition entry. This only works with a new layout.</string>
+                 <string>Query the operating system and reload the layouts of all drives.</string>
                 </property>
                 <property name="icon">
-                 <iconset theme=":/list-add"/>
+                 <iconset theme=":/view-refresh">
+                  <normaloff>.</normaloff>.</iconset>
                 </property>
                </widget>
               </item>
@@ -684,39 +717,14 @@
                 </column>
                </widget>
               </item>
-              <item row="10" column="2">
-               <widget class="QToolButton" name="buttonPartReload">
+              <item row="2" column="2">
+               <widget class="QToolButton" name="buttonPartAdd">
                 <property name="toolTip">
-                 <string>Query the operating system and reload the layouts of all drives.</string>
+                 <string>Add a new partition entry. This only works with a new layout.</string>
                 </property>
                 <property name="icon">
-                 <iconset theme=":/view-refresh"/>
-                </property>
-               </widget>
-              </item>
-              <item row="12" column="0">
-               <widget class="QCheckBox" name="badblocksCheck">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Check for bad sectors (takes longer)</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="2">
-               <widget class="QToolButton" name="buttonPartRemove">
-                <property name="toolTip">
-                 <string>Remove an existing entry from the layout. This only works with entries to a new layout.</string>
-                </property>
-                <property name="icon">
-                 <iconset theme=":/list-remove"/>
+                 <iconset theme=":/list-add">
+                  <normaloff>.</normaloff>.</iconset>
                 </property>
                </widget>
               </item>
@@ -726,7 +734,8 @@
                  <string>Mark the selected drive to be cleared for a new layout.</string>
                 </property>
                 <property name="icon">
-                 <iconset theme=":/edit-clear-all"/>
+                 <iconset theme=":/edit-clear-all">
+                  <normaloff>.</normaloff>.</iconset>
                 </property>
                </widget>
               </item>
@@ -736,7 +745,15 @@
                  <string>Run the partition management application of this operating system.</string>
                 </property>
                 <property name="icon">
-                 <iconset theme=":/partitionmanager"/>
+                 <iconset theme=":/partitionmanager">
+                  <normaloff>.</normaloff>.</iconset>
+                </property>
+               </widget>
+              </item>
+              <item row="12" column="1">
+               <widget class="QPushButton" name="buttonLoadKey">
+                <property name="text">
+                 <string>Load key from file...</string>
                 </property>
                </widget>
               </item>
@@ -2359,7 +2376,8 @@
           <string>Back</string>
          </property>
          <property name="icon">
-          <iconset theme="go-previous"/>
+          <iconset theme="go-previous">
+           <normaloff>.</normaloff>.</iconset>
          </property>
          <property name="shortcut">
           <string>Alt+K</string>
