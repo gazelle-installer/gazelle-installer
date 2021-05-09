@@ -671,9 +671,12 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
     dialog.setWindowTitle(tr("Unlock Drive"));
     QLineEdit *editVDev = new QLineEdit(&dialog);
     QLineEdit *editPass = new QLineEdit(&dialog);
+    QCheckBox *checkCrypttab = new QCheckBox(tr("Add to crypttab"), &dialog);
     editPass->setEchoMode(QLineEdit::Password);
+    checkCrypttab->setChecked(true);
     layout.addRow(tr("Virtual Device:"), editVDev);
     layout.addRow(tr("Password:"), editPass);
+    layout.addRow(checkCrypttab);
     QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         Qt::Horizontal, &dialog);
     layout.addRow(&buttons);
@@ -691,6 +694,7 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
             QComboBox *comboUseFor = twitComboBox(twit, UseFor);
             comboUseFor->setCurrentIndex(0);
             comboUseFor->setEnabled(false);
+            twitSetFlag(twit, TwitFlag::AutoCrypto, checkCrypttab->isChecked());
             // Refreshing the drive will not necessarily re-scan block devices.
             // This updates the device list manually to keep the tree accurate.
             const int ixBD = listBlkDevs.findDevice(twit->text(Device));
