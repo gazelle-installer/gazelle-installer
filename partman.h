@@ -40,6 +40,11 @@ class PartMan : public QObject
         Format, // Text: existing format (not QLineEdit text)
         Options
     };
+    enum TwitFlag {
+        OldLayout,
+        VirtualDevices,
+        CryptoV
+    };
     MProcess &proc;
     BlockDeviceList &listBlkDevs;
     Ui::MeInstall &gui;
@@ -63,10 +68,11 @@ class PartMan : public QObject
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
     bool calculatePartBD();
     inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
-    inline bool drvitIsMapperList(const QTreeWidgetItem *drvit) const;
+    inline bool twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const;
+    inline void twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value);
     inline bool twitCanUse(QTreeWidgetItem *twit);
     inline bool twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp=true) const;
-    inline long long twitSize(QTreeWidgetItem *twit, bool bytes=false);
+    inline long long twitSize(QTreeWidgetItem *twit, const bool bytes=false);
     inline bool twitWillFormat(QTreeWidgetItem *twit);
     inline QString twitUseFor(QTreeWidgetItem *twit);
     inline bool twitIsMapped(const QTreeWidgetItem *twit) const;

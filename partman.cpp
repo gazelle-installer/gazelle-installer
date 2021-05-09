@@ -32,7 +32,6 @@
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
-#include <QInputDialog>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -113,7 +112,7 @@ void PartMan::scanVirtualDevices(bool rescan)
     if(rescan) {
         for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
             QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
-            if(drvitIsMapperList(drvit)) {
+            if(twitFlag(drvit, TwitFlag::VirtualDevices)) {
                 vdlit = drvit;
                 const int vdcount = vdlit->childCount();
                 for(int ixVD = 0; ixVD < vdcount; ++ixVD) {
@@ -135,10 +134,8 @@ void PartMan::scanVirtualDevices(bool rescan)
     } else if(!vdlit) {
         vdlit = new QTreeWidgetItem(gui.treePartitions);
         vdlit->setText(0, tr("Virtual Devices"));
-        QFont font = vdlit->font(0);
-        font.setItalic(true);
-        vdlit->setFont(0, font);
         vdlit->setFirstColumnSpanned(true);
+        twitSetFlag(vdlit, TwitFlag::VirtualDevices, true);
     }
     assert(vdlit!=nullptr);
     for(const QJsonValue &jsonDev : jsonBD) {
@@ -154,7 +151,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         if(devit) {
             if(bdinfo.size != devit->data(Size, Qt::UserRole).toLongLong()
                 || bdinfo.label != devit->data(Label, Qt::UserRole).toString()
-                || crypto == devit->icon(0).isNull()) {
+                || crypto != twitFlag(devit, TwitFlag::CryptoV)) {
                 // List entry is different to the device, so refresh it.
                 delete devit;
                 devit = nullptr;
@@ -171,7 +168,10 @@ void PartMan::scanVirtualDevices(bool rescan)
                 1, QLocale::DataSizeTraditionalFormat);
             devit->setText(Size, tsize);
             devit->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
-            if(crypto) devit->setIcon(0, QIcon::fromTheme("unlock"));
+            if(crypto) {
+                twitSetFlag(devit, TwitFlag::CryptoV, true);
+                devit->setIcon(0, QIcon::fromTheme("unlock"));
+            }
         }
     }
     for(const auto &it : listed.toStdMap()) delete it.second;
@@ -530,7 +530,7 @@ void PartMan::treeSelChange()
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(twit) {
         QTreeWidgetItem *drvit = twit->parent();
-        const bool used = twitIsOldLayout(twit);
+        const bool used = twitIsOldLayout(twit, true);
         gui.buttonPartClear->setEnabled(!drvit);
         gui.buttonPartRemove->setEnabled(!used && drvit);
         // Only allow adding partitions if there is enough space.
@@ -554,7 +554,7 @@ void PartMan::treeMenu(const QPoint &)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit) return;
-    if(drvitIsMapperList(twit)) return;
+    if(twitFlag(twit, TwitFlag::VirtualDevices)) return;
     const bool isPart = twit->parent()!=nullptr;
     if(isPart && !twitCanUse(twit)) return;
     QMenu menu(gui.treePartitions);
@@ -571,7 +571,7 @@ void PartMan::treeMenu(const QPoint &)
         menu.addSeparator();
         if(twitIsMapped(twit)) {
             actRemove->setEnabled(false);
-            if(!(twit->icon(Device).isNull())) actLock = menu.addAction(tr("&Lock"));
+            if(twitFlag(twit, TwitFlag::CryptoV)) actLock = menu.addAction(tr("&Lock"));
         } else {
             if(twitIsOldLayout(twit, true) && twit->text(Format)=="crypto_LUKS") {
                 actUnlock = menu.addAction(tr("&Unlock"));
@@ -657,12 +657,12 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
 {
     QDialog dialog(master);
     QFormLayout layout(&dialog);
-    layout.addRow(new QLabel(tr("Unlock Drive")));
+    dialog.setWindowTitle(tr("Unlock Drive"));
     QLineEdit *editVDev = new QLineEdit(&dialog);
     QLineEdit *editPass = new QLineEdit(&dialog);
     editPass->setEchoMode(QLineEdit::Password);
-    layout.addRow("Virtual Device", editVDev);
-    layout.addRow("Password", editPass);
+    layout.addRow(tr("Virtual Device:"), editVDev);
+    layout.addRow(tr("Password:"), editPass);
     QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         Qt::Horizontal, &dialog);
     layout.addRow(&buttons);
@@ -670,8 +670,12 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
     connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     if(dialog.exec()==QDialog::Accepted) {
+        qApp->setOverrideCursor(Qt::WaitCursor);
+        gui.mainFrame->setEnabled(false);
         const QString &mapdev = editVDev->text();
-        if(luksOpen("/dev/" + twit->text(Device), mapdev, editPass->text().toUtf8())) {
+        const bool ok = luksOpen("/dev/" + twit->text(Device),
+            mapdev, editPass->text().toUtf8());
+        if(ok) {
             twit->setIcon(Device, QIcon::fromTheme("lock"));
             QComboBox *comboUseFor = twitComboBox(twit, UseFor);
             comboUseFor->setCurrentIndex(0);
@@ -686,7 +690,10 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
             comboTypeTextChange(QString()); // For the badblocks checkbox.
             gui.treePartitions->blockSignals(false);
             treeSelChange();
-        } else {
+        }
+        gui.mainFrame->setEnabled(true);
+        qApp->restoreOverrideCursor();
+        if(!ok) {
             QMessageBox::warning(master, master->windowTitle(),
                 tr("Could not unlock device. Possible incorrect password."));
         }
@@ -694,6 +701,8 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
 }
 void PartMan::partMenuLock(QTreeWidgetItem *twit)
 {
+    qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
+    gui.mainFrame->setEnabled(false);
     const QString &dev = twitMappedDevice(twit);
     QStringList lines = proc.execOutLines("cryptsetup status " + dev, true);
     bool ok = false;
@@ -721,18 +730,20 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
             break;
         }
     }
-    // If not OK then a command failed, or trying to close a non-LUKS device.
-    if(!ok) {
-        QMessageBox::critical(master, master->windowTitle(),
-            tr("Failed to close %1").arg(dev));
-        return;
-    }
     // Refresh virtual devices list.
     gui.treePartitions->blockSignals(true);
     scanVirtualDevices(true);
     comboTypeTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
+
+    gui.mainFrame->setEnabled(true);
+    qApp->restoreOverrideCursor();
+    // If not OK then a command failed, or trying to close a non-LUKS device.
+    if(!ok) {
+        QMessageBox::critical(master, master->windowTitle(),
+            tr("Failed to close %1").arg(dev));
+    }
 }
 
 // Mouse wheel event filter for partition tree objects
@@ -778,7 +789,7 @@ QWidget *PartMan::composeValidate(bool automatic,
             return comboUse;
         } else {
             if(!mount.isEmpty()) mounts.insert(mount, *it);
-            if(twitIsOldLayout(*it) && twitWillFormat(*it)) {
+            if(twitIsOldLayout(*it, true) && twitWillFormat(*it)) {
                 // Warn if using a non-Linux partition (potential install of another OS).
                 const int bdindex = listBlkDevs.findDevice(devname);
                 if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
@@ -952,7 +963,7 @@ bool PartMan::checkTargetDrivesOK()
     QString smartFail, smartWarn;
     for(int ixi = 0; ixi < gui.treePartitions->topLevelItemCount(); ++ixi) {
         QTreeWidgetItem *drvit =  gui.treePartitions->topLevelItem(ixi);
-        if(drvitIsMapperList(drvit)) continue;
+        if(twitFlag(drvit, TwitFlag::VirtualDevices)) continue;
         QStringList purposes;
         for(int oxo = 0; oxo < drvit->childCount(); ++oxo) {
             const QString &useFor = twitUseFor(drvit->child(oxo));
@@ -1173,10 +1184,10 @@ bool PartMan::preparePartitions()
     proc.status(tr("Preparing required partitions"));
     for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
         QTreeWidgetItem *drvitem = gui.treePartitions->topLevelItem(ixi);
-        if(drvitIsMapperList(drvitem)) continue;
+        if(twitFlag(drvitem, TwitFlag::VirtualDevices)) continue;
         const QString &drvdev = drvitem->text(Device);
         const int devCount = drvitem->childCount();
-        if(twitIsOldLayout(drvitem, true)) {
+        if(twitIsOldLayout(drvitem, false)) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
             const int ixBlkDev = listBlkDevs.findDevice(drvdev);
@@ -1496,11 +1507,22 @@ inline void PartMan::drvitMarkLayout(QTreeWidgetItem *drvit, const bool old)
 {
     if(old) drvit->setIcon(Device, QIcon());
     else drvit->setIcon(Device, QIcon(":/appointment-soon"));
+    twitSetFlag(drvit, TwitFlag::OldLayout, old);
     gui.treePartitions->resizeColumnToContents(Device);
 }
-inline bool PartMan::drvitIsMapperList(const QTreeWidgetItem *drvit) const
+inline bool PartMan::twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const
 {
-    return drvit->isFirstColumnSpanned();
+    return !!(twit->data(Options, Qt::UserRole).toUInt() & (1 << flag));
+}
+inline void PartMan::twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value)
+{
+    unsigned int newFlags = twit->data(Options, Qt::UserRole).toUInt();
+    const unsigned int bit = 1 << flag;
+    if(value != !!(newFlags & bit)) {
+        if(value) newFlags |= bit;
+        else newFlags &= ~bit;
+        twit->setData(Options, Qt::UserRole, QVariant(newFlags));
+    }
 }
 inline bool PartMan::twitCanUse(QTreeWidgetItem *twit)
 {
@@ -1511,11 +1533,11 @@ inline bool PartMan::twitIsOldLayout(const QTreeWidgetItem *twit, const bool chk
 {
     if(chkUp) {
         const QTreeWidgetItem *drvit = twit->parent();
-        if(drvit) return drvit->icon(Device).isNull();
+        if(drvit) return twitFlag(drvit, TwitFlag::OldLayout);
     }
-    return twit->icon(Device).isNull();
+    return twitFlag(twit, TwitFlag::OldLayout);
 }
-inline long long PartMan::twitSize(QTreeWidgetItem *twit, bool bytes)
+inline long long PartMan::twitSize(QTreeWidgetItem *twit, const bool bytes)
 {
     QWidget *spin = gui.treePartitions->itemWidget(twit, Size);
     long long size = 0;
@@ -1542,7 +1564,7 @@ inline QString PartMan::twitUseFor(QTreeWidgetItem *twit)
 inline bool PartMan::twitIsMapped(const QTreeWidgetItem *twit) const
 {
     const QTreeWidgetItem *drvit = twit->parent();
-    if(drvit) return drvitIsMapperList(drvit);
+    if(drvit) return twitFlag(drvit, TwitFlag::VirtualDevices);
     return false;
 }
 inline bool PartMan::twitWillMap(const QTreeWidgetItem *twit) const
