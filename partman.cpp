@@ -580,7 +580,7 @@ void PartMan::treeMenu(const QPoint &)
                 actAddCrypttab = menu.addAction(tr("Add to crypttab"));
                 actAddCrypttab->setCheckable(true);
                 actAddCrypttab->setChecked(twitFlag(twit, TwitFlag::AutoCrypto));
-                actAddCrypttab->setEnabled(twitIsMapped(twit));
+                actAddCrypttab->setEnabled(twitWillMap(twit));
             }
         }
         QMenu *menuTemplates = menu.addMenu("&Templates");
@@ -718,7 +718,8 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
     bool ok = false;
     // Find the associated partition and decrement its reference count if found.
     QTreeWidgetItem *twitOrigin = findOrigin(dev);
-    if(twitOrigin) {
+    if(twitOrigin) ok = proc.exec("cryptsetup close " + dev, true);
+    if(ok) {
         const int ixBD = listBlkDevs.findDevice(twitOrigin->text(Device));
         const int oMapCount = listBlkDevs.at(ixBD).mapCount;
         if(oMapCount > 0) listBlkDevs[ixBD].mapCount--;
@@ -727,6 +728,7 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
             twitComboBox(twitOrigin, UseFor)->setEnabled(true);
         }
         twitOrigin->setData(Device, Qt::UserRole, QVariant());
+        twitSetFlag(twitOrigin, TwitFlag::AutoCrypto, false);
     }
     // Refresh virtual devices list.
     gui.treePartitions->blockSignals(true);
