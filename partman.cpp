@@ -700,7 +700,37 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
 }
 void PartMan::partMenuLock(QTreeWidgetItem *twit)
 {
-    proc.exec("cryptsetup close " + twitMappedDevice(twit), true);
+    const QString &dev = twitMappedDevice(twit);
+    QStringList lines = proc.execOutLines("cryptsetup status " + dev, true);
+    const bool ok = proc.exec("cryptsetup close " + dev, true);
+    if(!ok || lines.isEmpty()) {
+        QMessageBox::critical(master, master->windowTitle(),
+            tr("Failed to close %1").arg(dev));
+        return;
+    }
+    // Find the associated partition and decrement its reference count if found.
+    for(const QString &line : lines) {
+        const QString &trline = line.trimmed();
+        if(trline.startsWith("device:")) {
+            const QString &trleft = trline.left(trline.lastIndexOf('/')+1);
+            QTreeWidgetItemIterator it(gui.treePartitions,
+                QTreeWidgetItemIterator::NoChildren);
+            for(; *it; ++it) {
+                if((*it)->text(Device) == trleft) {
+                    const int ixBD = listBlkDevs.findDevice(trleft);
+                    const int oMapCount = listBlkDevs.at(ixBD).mapCount;
+                    if(oMapCount > 0) listBlkDevs[ixBD].mapCount--;
+                    if(oMapCount <= 1) {
+                        (*it)->setIcon(Device, QIcon());
+                        twitComboBox(*it, UseFor)->setEnabled(true);
+                    }
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    // Refresh virtual devices list.
     gui.treePartitions->blockSignals(true);
     scanVirtualDevices(true);
     comboTypeTextChange(QString()); // For the badblocks checkbox.
