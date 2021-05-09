@@ -46,7 +46,6 @@ class PartMan : public QObject
     QWidget *master;
     QMap<QString, QTreeWidgetItem *> mounts;
     QStringList listToUnmount;
-    QStringList unlocked;
     void setup();
     void scanVirtualDevices(bool rescan);
     void clearLayout(QTreeWidgetItem *drvit);
