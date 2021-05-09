@@ -43,6 +43,7 @@ class PartMan : public QObject
     enum TwitFlag {
         OldLayout,
         VirtualDevices,
+        AutoCrypto,
         CryptoV
     };
     MProcess &proc;
@@ -67,6 +68,7 @@ class PartMan : public QObject
     void setEncryptChecks(const QString &use,
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
     bool calculatePartBD();
+    QTreeWidgetItem *findOrigin(const QString &vdev);
     inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
     inline bool twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const;
     inline void twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value);
