@@ -768,52 +768,37 @@ void MInstall::stashAdvancedFDE(bool save)
 bool MInstall::saveHomeBasic()
 {
     proc.log(__PRETTY_FUNCTION__);
-    QString rootdev = partman.getMountDev("/", false);
-    QString homedev = partman.getMountDev("/home", false);
+    const QString &rootdev = partman.getMountDev("/", false);
+    const QString &homedev = partman.getMountDev("/home", false);
     if(partman.willFormat("/") && homedev.isEmpty()) return true;
     else if(partman.willFormat("/home")) return true;
 
     cleanup(false); // cleanup previous mounts
     // if preserving /home, obtain some basic information
     bool ok = false;
-    const bool isRootEncrypt = partman.isEncrypt("/");
-    const bool isHomeEncrypt = partman.isEncrypt("/home");
-    const QByteArray &pass = FDEpassCust->text().toUtf8();
     const QString cmdMount("/bin/mount %1 %2 -o ro");
 
     // mount the root partition
-    if (isRootEncrypt) {
-        if (!partman.luksOpen(rootdev, "rootfs", pass, "--readonly")) return false;
-        rootdev = "/dev/mapper/rootfs";
-    }
     mkdir("/mnt/antiX", 0755);
     if(!proc.exec(cmdMount.arg(rootdev, "/mnt/antiX"))) goto ending2;
     // mount the home partition
     if(!homedev.isEmpty()) {
-        if (isHomeEncrypt) {
-            if (!partman.luksOpen(homedev, "homefs", pass, "--readonly")) goto ending2;
-            homedev = "/dev/mapper/homefs";
-        }
         mkdir("/mnt/home-tmp", 0755);
         if (!proc.exec(cmdMount.arg(homedev, "/mnt/home-tmp"))) goto ending1;
     }
 
     // store a listing of /home to compare with the user name given later
     listHomes = proc.execOutLines("/bin/ls -1 /mnt/home-tmp/");
-    // recycle the old key for /home if possible
-    key.load("/mnt/antiX/root/keyfile", -1);
 
     ok = true;
  ending1:
     // unmount partitions
     if (!homedev.isEmpty()) {
         proc.exec("/bin/umount -l /mnt/home-tmp", false);
-        if (isHomeEncrypt) proc.exec("cryptsetup close homefs", true);
         proc.exec("rmdir /mnt/home-tmp");
     }
  ending2:
     proc.exec("/bin/umount -l /mnt/antiX", false);
-    if (isRootEncrypt) proc.exec("cryptsetup close rootfs", true);
     return ok;
 }
 
@@ -1756,8 +1741,7 @@ void MInstall::pageDisplayed(int next)
                           "<p>" + tr("<i>Label</i> - The label that is assigned to the partition once it has been formatted.") + "</p>"
                           "<p>" + tr("<i>Use For</i> - To use this partition in an installation, you must select something here."
                                      " You can also type your own mount point, which must start with a slash (\"/\").") + "</p>"
-                          "<p>" + tr("<i>Encrypt</i> - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption."
-                                     " To preserve the format of an existing encrypted partition, you must use the same passphrase that it was originally encrypted with.") + "</p>"
+                          "<p>" + tr("<i>Encrypt</i> - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.") + "</p>"
                           "<p>" + tr("<i>Format</i> - This is the partition's format. Available formats depend on what the partition is used for."
                                      " When working with an existing layout, you may be able to preserve the format of the partition by selecting <b>Preserve</b>.") + "</p>"
                           "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
@@ -1794,12 +1778,14 @@ void MInstall::pageDisplayed(int next)
                                " which will allow you to create the exact layout you need.").arg("<img src=':/partitionmanager'/>") + "</p>"
                           "<p><b>" + tr("Encryption") + "</b><br/>"
                           + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
-                          "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
+                          "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p><p>"
+                          + tr("To preserve an encrypted partition, right-click on it and select <b>Unlock</b>. In the dialog that appears, enter a name for the virtual device and the password."
+                               " When the device is unlocked, the name you chose will appear under <i>Virtual Devices</i>, with similar options to that of a regular partition.") + "</p>"
                           "<p><b>" + tr("Other partitions") + "</b><br/>"
                           + tr("The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.") + "</p>"
                           "<p><b>" + tr("Virtual Devices") + "</b><br/>"
                           + tr("If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
-                          "<p>" + tr("The use of virtual devices is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
+                          "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
         backButton->setEnabled(true);
         nextButton->setEnabled(!(gbEncrPass->isEnabledTo(gbEncrPass->parentWidget())) || FDEpassCust->isValid());
         return; // avoid the end that enables both Back and Next buttons
