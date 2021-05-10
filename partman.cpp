@@ -1501,7 +1501,9 @@ QString PartMan::getMountDev(const QString &point, const bool mapped)
     const QTreeWidgetItem *twit = mounts.value(point);
     if(!twit) return QString();
     if(mapped) return twitMappedDevice(twit, true);
-    return QString("/dev/" + twit->text(Device));
+    QString rstr("/dev/");
+    if(twitFlag(twit, TwitFlag::VirtualBD)) rstr.append("mapper/");
+    return rstr.append(twit->text(Device));
 }
 int PartMan::swapCount()
 {
