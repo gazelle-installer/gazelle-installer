@@ -43,6 +43,7 @@ class PartMan : public QObject
     enum TwitFlag {
         OldLayout,
         VirtualDevices,
+        VirtualBD,
         AutoCrypto,
         CryptoV
     };
@@ -73,11 +74,9 @@ class PartMan : public QObject
     inline bool twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const;
     inline void twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value);
     inline bool twitCanUse(QTreeWidgetItem *twit);
-    inline bool twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp=true) const;
     inline long long twitSize(QTreeWidgetItem *twit, const bool bytes=false);
     inline bool twitWillFormat(QTreeWidgetItem *twit);
     inline QString twitUseFor(QTreeWidgetItem *twit);
-    inline bool twitIsMapped(const QTreeWidgetItem *twit) const;
     inline bool twitWillMap(const QTreeWidgetItem *twit) const;
     inline QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
     inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column);
