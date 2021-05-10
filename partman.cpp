@@ -30,6 +30,7 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QStandardItemModel>
 #include <QFormLayout>
 #include <QDialogButtonBox>
 #include <QJsonDocument>
@@ -161,6 +162,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         // Create a new list entry if needed.
         if(!devit) {
             devit = new QTreeWidgetItem(vdlit);
+            twitSetFlag(devit, TwitFlag::VirtualBD, true);
             setupItem(devit, &bdinfo);
             devit->setText(Device, bdinfo.name);
             devit->setData(Device, Qt::UserRole, bdinfo.name);
@@ -172,7 +174,6 @@ void PartMan::scanVirtualDevices(bool rescan)
                 twitSetFlag(devit, TwitFlag::CryptoV, true);
                 devit->setIcon(0, QIcon::fromTheme("unlock"));
             }
-            twitSetFlag(devit, TwitFlag::VirtualBD, true);
         }
         QTreeWidgetItem *orit = findOrigin(bdinfo.name);
         if(orit) orit->setData(Device, Qt::UserRole, bdinfo.name);
@@ -291,10 +292,12 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     comboUse->setEditable(true);
     comboUse->setInsertPolicy(QComboBox::NoInsert);
     comboUse->addItem("");
-    if(!bdinfo || bdinfo->size <= 16) comboUse->addItem("bios_grub");
-    if(!bdinfo || bdinfo->size <= 4294967296) {
-        comboUse->addItem("ESP");
-        comboUse->addItem("boot");
+    if(!twitFlag(twit, TwitFlag::VirtualBD)) {
+        if(!bdinfo || bdinfo->size <= 16) comboUse->addItem("bios_grub");
+        if(!bdinfo || bdinfo->size <= 4294967296) {
+            comboUse->addItem("ESP");
+            comboUse->addItem("boot");
+        }
     }
     comboUse->addItem("root");
     comboUse->addItem("swap");
@@ -373,7 +376,9 @@ void PartMan::setEncryptChecks(const QString &use,
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
     for(; *it; ++it) {
         if(*it == exclude) continue;
-        if(twitUseFor(*it) == use) (*it)->setCheckState(Encrypt, state);
+        if(twitUseFor(*it)==use && (*it)->data(Encrypt, Qt::CheckStateRole).isValid()) {
+            (*it)->setCheckState(Encrypt, state);
+        }
     }
 }
 
@@ -486,14 +491,10 @@ void PartMan::comboTypeTextChange(const QString &)
         QLineEdit *editOpts = twitLineEdit(*it, Options);
         if(!comboType || !editOpts) return;
         const QString &type = comboType->currentText();
-        const Qt::ItemFlags itflags = (*it)->flags();
-        if(comboType->currentData(Qt::UserRole)=="PRESERVE") {
-            (*it)->setFlags(itflags & ~Qt::ItemIsUserCheckable);
-        } else {
+        if(comboType->currentData(Qt::UserRole)!="PRESERVE") {
             if(type.startsWith("ext") || type == "jfs") canCheckBlocks = true;
             else if(type.startsWith("reiser")) editOpts->setText("defaults,notail");
             else editOpts->setText("defaults");
-            (*it)->setFlags(itflags | Qt::ItemIsUserCheckable);
         }
     }
     gui.badblocksCheck->setEnabled(canCheckBlocks);
@@ -502,7 +503,6 @@ void PartMan::comboTypeTextChange(const QString &)
 void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
 {
     if(column==Encrypt || column==UseFor) {
-        gui.treePartitions->blockSignals(true);
         // Check all items in the tree for those marked for encryption.
         bool cryptoAny=false;
         QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
@@ -525,8 +525,22 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
             }
             if(csCrypto==Qt::PartiallyChecked) item->setCheckState(Encrypt, Qt::Unchecked);
         }
-        // Make the tree responsive again.
-        gui.treePartitions->blockSignals(false);
+        // Cannot preserve if encrypting.
+        QComboBox *combo = twitComboBox(item, Format);
+        const int ixPres = combo->findData("PRESERVE");
+        if(ixPres>=0) {
+            const bool cryptoThis = item->checkState(Encrypt)==Qt::Checked;
+            auto *model = qobject_cast<QStandardItemModel*>(combo->model());
+            model->item(ixPres)->setEnabled(!cryptoThis);
+            // Select the next non-separator item if preserving is not possible.
+            int ixCur = combo->currentIndex();
+            if(cryptoThis && ixCur==ixPres) {
+                const int count = combo->count();
+                ++ixCur;
+                while(ixCur<count && combo->itemText(ixCur).isEmpty()) ++ixCur;
+                combo->setCurrentIndex(ixCur);
+            }
+        }
     }
 }
 void PartMan::treeSelChange()
