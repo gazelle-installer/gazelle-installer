@@ -172,6 +172,7 @@ void PartMan::scanVirtualDevices(bool rescan)
                 twitSetFlag(devit, TwitFlag::CryptoV, true);
                 devit->setIcon(0, QIcon::fromTheme("unlock"));
             }
+            twitSetFlag(devit, TwitFlag::VirtualBD, true);
         }
         QTreeWidgetItem *orit = findOrigin(bdinfo.name);
         if(orit) orit->setData(Device, Qt::UserRole, bdinfo.name);
@@ -194,7 +195,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         const QString &drvDevice = drvit->text(Device);
         // Check if the drive is to be cleared and formatted.
         int partCount = drvit->childCount();
-        bool drvPreserve = twitIsOldLayout(drvit, false);
+        bool drvPreserve = twitFlag(drvit, TwitFlag::OldLayout);
         const QString &configNewLayout = "Storage/NewLayout."+drvDevice;
         if(save) {
             if(!drvPreserve) config.setValue(configNewLayout, partCount);
@@ -208,9 +209,10 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         long long totalMB = 0;
         for(int ixPart = 0; ixPart < partCount; ++ixPart) {
             QTreeWidgetItem *twit = nullptr;
-            // Obtain the partition device name.
-            if(save || drvPreserve) twit = drvit->child(ixPart);
-            else {
+            if(save || drvPreserve) {
+                twit = drvit->child(ixPart);
+                twitSetFlag(twit, TwitFlag::OldLayout, drvPreserve);
+            } else {
                 twit = new QTreeWidgetItem(drvit);
                 setupItem(twit, nullptr);
                 twit->setText(Device, BlockDeviceInfo::join(drvDevice, ixPart+1));
@@ -457,7 +459,7 @@ void PartMan::comboUseTextChange(const QString &text)
             // Qt::PartiallyChecked tells treeItemChange() to include this item in the refresh.
             item->setCheckState(Encrypt, Qt::PartiallyChecked);
         }
-        if(twitIsMapped(item)) item->setData(Encrypt, Qt::CheckStateRole, QVariant());
+        if(twitFlag(item, TwitFlag::VirtualBD)) item->setData(Encrypt, Qt::CheckStateRole, QVariant());
         if(allowPreserve) {
             // Add an item at the start to allow preserving the existing format.
             comboType->insertItem(0, tr("Preserve (%1)").arg(curtype), "PRESERVE");
@@ -532,7 +534,7 @@ void PartMan::treeSelChange()
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(twit) {
         QTreeWidgetItem *drvit = twit->parent();
-        const bool used = twitIsOldLayout(twit, true);
+        const bool used = twitFlag(twit, TwitFlag::OldLayout);
         gui.buttonPartClear->setEnabled(!drvit);
         gui.buttonPartRemove->setEnabled(!used && drvit);
         // Only allow adding partitions if there is enough space.
@@ -571,11 +573,11 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actAddCrypttab = nullptr;
         actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
         menu.addSeparator();
-        if(twitIsMapped(twit)) {
+        if(twitFlag(twit, TwitFlag::VirtualBD)) {
             actRemove->setEnabled(false);
             if(twitFlag(twit, TwitFlag::CryptoV)) actLock = menu.addAction(tr("&Lock"));
         } else {
-            if(twitIsOldLayout(twit, true) && twit->text(Format)=="crypto_LUKS") {
+            if(twitFlag(twit, TwitFlag::OldLayout) && twit->text(Format)=="crypto_LUKS") {
                 actUnlock = menu.addAction(tr("&Unlock"));
                 actAddCrypttab = menu.addAction(tr("Add to crypttab"));
                 actAddCrypttab->setCheckable(true);
@@ -610,7 +612,7 @@ void PartMan::treeMenu(const QPoint &)
         menu.addSeparator();
         const QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
-        actReset->setDisabled(twitIsOldLayout(twit, false));
+        actReset->setDisabled(twitFlag(twit, TwitFlag::OldLayout));
         QMenu *menuTemplates = menu.addMenu("&Templates");
         const QAction *actBasic = menuTemplates->addAction(tr("&Standard install"));
         QAction *actCrypto = menuTemplates->addAction(tr("&Encrypted system"));
@@ -793,7 +795,7 @@ QWidget *PartMan::composeValidate(bool automatic,
             return comboUse;
         } else {
             if(!mount.isEmpty()) mounts.insert(mount, *it);
-            if(twitIsOldLayout(*it, true) && twitWillFormat(*it)) {
+            if(twitFlag(*it, TwitFlag::OldLayout) && twitWillFormat(*it)) {
                 // Warn if using a non-Linux partition (potential install of another OS).
                 const int bdindex = listBlkDevs.findDevice(devname);
                 if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
@@ -801,7 +803,7 @@ QWidget *PartMan::composeValidate(bool automatic,
                 }
             }
         }
-        if(!twitIsMapped(*it)) {
+        if(!twitFlag(*it, TwitFlag::VirtualBD)) {
             QVariant mapperData;
             if((*it)->checkState(Encrypt) == Qt::Checked) {
                 if(mount == "/") mapperData = "root.fsm";
@@ -910,7 +912,7 @@ bool PartMan::calculatePartBD()
     const int driveCount = gui.treePartitions->topLevelItemCount();
     for(int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
         QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
-        const bool useExist = twitIsOldLayout(drvit, false);
+        const bool useExist = twitFlag(drvit, TwitFlag::OldLayout);
         QString drv = drvit->text(Device);
         int ixDriveBD = listBlkDevs.findDevice(drv);
         const int partCount = drvit->childCount();
@@ -1175,7 +1177,7 @@ bool PartMan::preparePartitions()
     // Clear the existing partition tables on devices which will have a new layout.
     for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
         QTreeWidgetItem *twit = gui.treePartitions->topLevelItem(ixi);
-        if(twitIsOldLayout(twit, false)) continue;
+        if(twitFlag(twit, TwitFlag::OldLayout)) continue;
         const QString &drv = twit->text(Device);
         proc.status(tr("Clearing existing partition tables"));
         clearPartitionTables(drv);
@@ -1191,7 +1193,7 @@ bool PartMan::preparePartitions()
         if(twitFlag(drvitem, TwitFlag::VirtualDevices)) continue;
         const QString &drvdev = drvitem->text(Device);
         const int devCount = drvitem->childCount();
-        if(twitIsOldLayout(drvitem, false)) {
+        if(twitFlag(drvitem, TwitFlag::OldLayout)) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
             const int ixBlkDev = listBlkDevs.findDevice(drvdev);
@@ -1574,14 +1576,6 @@ inline bool PartMan::twitCanUse(QTreeWidgetItem *twit)
     QComboBox *combo = twitComboBox(twit, UseFor);
     return combo ? combo->isEnabled() : false;
 }
-inline bool PartMan::twitIsOldLayout(const QTreeWidgetItem *twit, const bool chkUp) const
-{
-    if(chkUp) {
-        const QTreeWidgetItem *drvit = twit->parent();
-        if(drvit) return twitFlag(drvit, TwitFlag::OldLayout);
-    }
-    return twitFlag(twit, TwitFlag::OldLayout);
-}
 inline long long PartMan::twitSize(QTreeWidgetItem *twit, const bool bytes)
 {
     QWidget *spin = gui.treePartitions->itemWidget(twit, Size);
@@ -1605,12 +1599,6 @@ inline QString PartMan::twitUseFor(QTreeWidgetItem *twit)
     QComboBox *combo = twitComboBox(twit, UseFor);
     if(!combo) return QString();
     return translateUse(combo->currentText());
-}
-inline bool PartMan::twitIsMapped(const QTreeWidgetItem *twit) const
-{
-    const QTreeWidgetItem *drvit = twit->parent();
-    if(drvit) return twitFlag(drvit, TwitFlag::VirtualDevices);
-    return false;
 }
 inline bool PartMan::twitWillMap(const QTreeWidgetItem *twit) const
 {
