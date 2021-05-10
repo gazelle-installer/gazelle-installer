@@ -1632,10 +1632,9 @@ int MInstall::showPage(int curr, int next)
             return curr;
         }
         if (!pretend && !saveHomeBasic()) {
-            const QString &msg = tr("The data in /home cannot be preserved because the required information could not be obtained.") + "\n"
-                    + tr("If the partition containing /home is encrypted, please ensure the correct \"Encrypt\" boxes are selected, and that the entered password is correct.") + "\n"
-                    + tr("The installer cannot encrypt an existing /home directory or partition.");
-            QMessageBox::critical(this, windowTitle(), msg);
+            QMessageBox::critical(this, windowTitle(),
+                tr("The data in /home cannot be preserved because"
+                    " the required information could not be obtained."));
             return curr;
         }
         return 5; // Go to Step_Boot
