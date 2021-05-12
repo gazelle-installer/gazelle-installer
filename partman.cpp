@@ -102,7 +102,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     if(!drvstart) scanVirtualDevices(false);
     gui.treePartitions->expandAll();
     resizeColumnsToFit();
-    comboTypeTextChange(QString()); // For the badblocks checkbox.
+    comboFormatTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
 }
@@ -305,18 +305,18 @@ void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     comboUse->setProperty("row", QVariant::fromValue<void *>(twit));
     comboUse->lineEdit()->setPlaceholderText("----");
     connect(comboUse, &QComboBox::currentTextChanged, this, &PartMan::comboUseTextChange);
-    // Type
-    QComboBox *comboType = new QComboBox(gui.treePartitions);
-    comboType->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(twit, Format, comboType);
-    comboType->setFocusPolicy(Qt::StrongFocus);
-    comboType->installEventFilter(this);
-    comboType->setEnabled(false);
+    // Format
+    QComboBox *comboFormat = new QComboBox(gui.treePartitions);
+    comboFormat->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(twit, Format, comboFormat);
+    comboFormat->setFocusPolicy(Qt::StrongFocus);
+    comboFormat->installEventFilter(this);
+    comboFormat->setEnabled(false);
     if(bdinfo) {
         twit->setText(Format, bdinfo->fs);
-        comboType->addItem(bdinfo->fs);
+        comboFormat->addItem(bdinfo->fs);
     }
-    connect(comboType, &QComboBox::currentTextChanged, this, &PartMan::comboTypeTextChange);
+    connect(comboFormat, &QComboBox::currentTextChanged, this, &PartMan::comboFormatTextChange);
     // Mount options
     QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
     editOptions->setAutoFillBackground(true);
@@ -421,40 +421,40 @@ void PartMan::comboUseTextChange(const QString &text)
     int oldUseClass = combo->property("class").toInt();
     bool allowPreserve = false, selPreserve = false;
     if(useClass != oldUseClass) {
-        QComboBox *comboType = twitComboBox(item, Format);
-        comboType->clear();
-        const QString &curtype = item->text(Format);
+        QComboBox *comboFormat = twitComboBox(item, Format);
+        comboFormat->clear();
+        const QString &curfmt = item->text(Format);
         switch(useClass) {
         case 0:
             editLabel->setText(item->text(Label));
-            comboType->addItem(curtype);
+            comboFormat->addItem(curfmt);
             break;
         case 1:
-            comboType->addItem("FAT32", "FAT32");
-            comboType->addItem("FAT16", "FAT16");
-            comboType->addItem("FAT12", "FAT12");
-            if(comboType->findData(curtype, Qt::UserRole, Qt::MatchFixedString)>=0
-                || !curtype.compare("VFAT", Qt::CaseInsensitive)) allowPreserve = true;
+            comboFormat->addItem("FAT32", "FAT32");
+            comboFormat->addItem("FAT16", "FAT16");
+            comboFormat->addItem("FAT12", "FAT12");
+            if(comboFormat->findData(curfmt, Qt::UserRole, Qt::MatchFixedString)>=0
+                || !curfmt.compare("VFAT", Qt::CaseInsensitive)) allowPreserve = true;
             selPreserve = true;
             break;
-        case 2: comboType->addItem("GRUB", "GRUB"); break;
-        case 3: comboType->addItem("ext4", "ext4"); break;
+        case 2: comboFormat->addItem("GRUB", "GRUB"); break;
+        case 3: comboFormat->addItem("ext4", "ext4"); break;
         case 4:
-            comboType->addItem("SWAP", "SWAP");
+            comboFormat->addItem("SWAP", "SWAP");
             selPreserve = true;
-            if(!curtype.compare("SWAP", Qt::CaseInsensitive)) allowPreserve = true;
+            if(!curfmt.compare("SWAP", Qt::CaseInsensitive)) allowPreserve = true;
             break;
         default:
-            comboType->addItem("ext4", "ext4");
-            comboType->addItem("ext3", "ext3");
-            comboType->addItem("ext2", "ext2");
-            comboType->addItem("f2fs", "f2fs");
-            comboType->addItem("jfs", "jfs");
-            comboType->addItem("xfs", "xfs");
-            comboType->addItem("btrfs", "btrfs");
-            comboType->addItem("reiserfs", "reiserfs");
-            comboType->addItem("reiser4", "reiser4");
-            if(comboType->findData(curtype, Qt::UserRole,
+            comboFormat->addItem("ext4", "ext4");
+            comboFormat->addItem("ext3", "ext3");
+            comboFormat->addItem("ext2", "ext2");
+            comboFormat->addItem("f2fs", "f2fs");
+            comboFormat->addItem("jfs", "jfs");
+            comboFormat->addItem("xfs", "xfs");
+            comboFormat->addItem("btrfs", "btrfs");
+            comboFormat->addItem("reiserfs", "reiserfs");
+            comboFormat->addItem("reiser4", "reiser4");
+            if(comboFormat->findData(curfmt, Qt::UserRole,
                 Qt::MatchFixedString)>=0) allowPreserve = true;
         }
         // Changing to and from a mount/use that support encryption.
@@ -467,11 +467,12 @@ void PartMan::comboUseTextChange(const QString &text)
         if(twitFlag(item, TwitFlag::VirtualBD)) item->setData(Encrypt, Qt::CheckStateRole, QVariant());
         if(allowPreserve) {
             // Add an item at the start to allow preserving the existing format.
-            comboType->insertItem(0, tr("Preserve (%1)").arg(curtype), "PRESERVE");
-            comboType->insertSeparator(1);
-            if(selPreserve) comboType->setCurrentIndex(0);
+            const QString &prestext = (usetext!="/") ? tr("Preserve (%1)") : tr("Preserve /home (%1)");
+            comboFormat->insertItem(0, prestext.arg(curfmt), "PRESERVE");
+            comboFormat->insertSeparator(1);
+            if(selPreserve) comboFormat->setCurrentIndex(0);
         }
-        comboType->setEnabled(comboType->count()>1);
+        comboFormat->setEnabled(comboFormat->count()>1);
         // Label and options
         editLabel->setEnabled(useClass!=0);
         gui.treePartitions->itemWidget(item, Options)->setEnabled(useClass!=0);
@@ -481,19 +482,19 @@ void PartMan::comboUseTextChange(const QString &text)
     gui.treePartitions->blockSignals(false);
     treeItemChange(item, UseFor);
 }
-void PartMan::comboTypeTextChange(const QString &)
+void PartMan::comboFormatTextChange(const QString &)
 {
     QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
     bool canCheckBlocks = false;
     for(; *it; ++it) {
         if(twitUseFor(*it).isEmpty()) continue;
-        QComboBox *comboType = twitComboBox(*it, Format);
+        QComboBox *comboFormat = twitComboBox(*it, Format);
         QLineEdit *editOpts = twitLineEdit(*it, Options);
-        if(!comboType || !editOpts) return;
-        const QString &type = comboType->currentText();
-        if(comboType->currentData(Qt::UserRole)!="PRESERVE") {
-            if(type.startsWith("ext") || type == "jfs") canCheckBlocks = true;
-            else if(type.startsWith("reiser")) editOpts->setText("defaults,notail");
+        if(!comboFormat || !editOpts) return;
+        const QString &format = comboFormat->currentText();
+        if(comboFormat->currentData(Qt::UserRole)!="PRESERVE") {
+            if(format.startsWith("ext") || format == "jfs") canCheckBlocks = true;
+            else if(format.startsWith("reiser")) editOpts->setText("defaults,notail");
             else editOpts->setText("defaults");
         }
     }
@@ -649,7 +650,7 @@ void PartMan::partClearClick(bool)
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit || twit->parent()) return;
     clearLayout(twit);
-    comboTypeTextChange(QString()); // For the badblocks checkbox.
+    comboFormatTextChange(QString()); // For the badblocks checkbox.
     treeSelChange();
 }
 void PartMan::partAddClick(bool)
@@ -718,7 +719,7 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
             // Update virtual device list.
             gui.treePartitions->blockSignals(true);
             scanVirtualDevices(true);
-            comboTypeTextChange(QString()); // For the badblocks checkbox.
+            comboFormatTextChange(QString()); // For the badblocks checkbox.
             gui.treePartitions->blockSignals(false);
             treeSelChange();
         }
@@ -753,7 +754,7 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
     // Refresh virtual devices list.
     gui.treePartitions->blockSignals(true);
     scanVirtualDevices(true);
-    comboTypeTextChange(QString()); // For the badblocks checkbox.
+    comboFormatTextChange(QString()); // For the badblocks checkbox.
     gui.treePartitions->blockSignals(false);
     treeSelChange();
 
@@ -1299,16 +1300,16 @@ bool PartMan::formatPartitions()
 }
 
 // Transplanted straight from minstall.cpp
-bool PartMan::formatLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label)
+bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bool chkBadBlocks, const QString &label)
 {
     proc.log(__PRETTY_FUNCTION__);
 
     QString cmd;
-    if (type == "reiserfs") {
+    if (format == "reiserfs") {
         cmd = "mkfs.reiserfs -q";
-    } else if (type == "reiser4") {
+    } else if (format == "reiser4") {
         cmd = "mkfs.reiser4 -f -y";
-    } else if (type.startsWith("btrfs")) {
+    } else if (format.startsWith("btrfs")) {
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
@@ -1321,24 +1322,24 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &type, bool
         } else {
             cmd = "mkfs.btrfs -f";
         }
-    } else if (type == "xfs" || type == "f2fs") {
-        cmd = "mkfs." + type + " -f";
+    } else if (format == "xfs" || format == "f2fs") {
+        cmd = "mkfs." + format + " -f";
     } else { // jfs, ext2, ext3, ext4
-        cmd = "mkfs." + type;
-        if (type == "jfs") cmd.append(" -q");
+        cmd = "mkfs." + format;
+        if (format == "jfs") cmd.append(" -q");
         else cmd.append(" -F");
         if (chkBadBlocks) cmd.append(" -c");
     }
 
     cmd.append(" " + dev);
     if (!label.isEmpty()) {
-        if (type == "reiserfs" || type == "f2fs") cmd.append(" -l \"");
+        if (format == "reiserfs" || format == "f2fs") cmd.append(" -l \"");
         else cmd.append(" -L \"");
         cmd.append(label + "\"");
     }
     if (!proc.exec(cmd)) return false;
 
-    if (type.startsWith("ext")) {
+    if (format.startsWith("ext")) {
         // ext4 tuning
         proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
     }
@@ -1428,19 +1429,19 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         if(twitWillMap(it.second)) out << dev;
         else out << "UUID=" + proc.execOut(cmdBlkID + dev);
         // Mount point, file system
-        QString fstype = proc.execOut("blkid " + dev + " -o value -s TYPE");
-        if(fstype=="swap") out << " swap swap";
-        else out << ' ' << it.first << ' ' << fstype;
+        QString fsfmt = proc.execOut("blkid " + dev + " -o value -s TYPE");
+        if(fsfmt=="swap") out << " swap swap";
+        else out << ' ' << it.first << ' ' << fsfmt;
         // Options
         const QString &mountopts = twitLineEdit(it.second, Options)->text();
         if(mountopts.isEmpty()) out << " defaults";
         else out << ' ' << mountopts;
         // Dump, pass
-        if(fstype=="swap") out << " 0 0\n";
-        else if(fstype.startsWith("reiser")) out << " 0 0\n";
+        if(fsfmt=="swap") out << " 0 0\n";
+        else if(fsfmt.startsWith("reiser")) out << " 0 0\n";
         else if(it.first=="/boot") out << " 1 1\n";
         else if(it.first=="/") {
-            if(fstype.startsWith("btrfs")) out << " 1 0\n";
+            if(fsfmt.startsWith("btrfs")) out << " 1 0\n";
             else out << " 1 1\n";
         } else out << " 1 2\n";
     }
