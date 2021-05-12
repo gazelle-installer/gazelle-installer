@@ -65,7 +65,7 @@ class PartMan : public QObject
     static QString translateUse(const QString &alias);
     static QString describeUse(const QString &use);
     void clearPartitionTables(const QString &dev);
-    bool formatLinuxPartition(const QString &dev, const QString &type, bool chkBadBlocks, const QString &label);
+    bool formatLinuxPartition(const QString &dev, const QString &format, bool chkBadBlocks, const QString &label);
     void setEncryptChecks(const QString &use,
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
     bool calculatePartBD();
@@ -83,7 +83,7 @@ class PartMan : public QObject
     inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column);
     void spinSizeValueChange(int i);
     void comboUseTextChange(const QString &text);
-    void comboTypeTextChange(const QString &);
+    void comboFormatTextChange(const QString &);
     void treeItemChange(QTreeWidgetItem *item, int column);
     void treeSelChange();
     void treeMenu(const QPoint &);
