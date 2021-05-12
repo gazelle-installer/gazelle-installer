@@ -769,36 +769,18 @@ void MInstall::stashAdvancedFDE(bool save)
 bool MInstall::saveHomeBasic()
 {
     proc.log(__PRETTY_FUNCTION__);
-    const QString &rootdev = partman.getMountDev("/", false);
-    const QString &homedev = partman.getMountDev("/home", false);
-    if(partman.willFormat("/") && homedev.isEmpty()) return true;
-    else if(partman.willFormat("/home")) return true;
+    QString homedir("/");
+    QString homedev = partman.getMountDev("/home", true);
+    if(homedev.isEmpty() || partman.willFormat("/home")) {
+        if(partman.willFormat("/")) return true;
+        homedev = partman.getMountDev("/", true);
+        homedir = "/home";
+    }
 
-    cleanup(false); // cleanup previous mounts
-    // if preserving /home, obtain some basic information
-    bool ok = false;
-    const QString cmdMount("/bin/mount %1 %2 -o ro");
-
-    // mount the root partition
     mkdir("/mnt/antiX", 0755);
-    if(!proc.exec(cmdMount.arg(rootdev, "/mnt/antiX"))) goto ending2;
-    // mount the home partition
-    if(!homedev.isEmpty()) {
-        mkdir("/mnt/home-tmp", 0755);
-        if (!proc.exec(cmdMount.arg(homedev, "/mnt/home-tmp"))) goto ending1;
-    }
-
-    // store a listing of /home to compare with the user name given later
-    listHomes = proc.execOutLines("/bin/ls -1 /mnt/home-tmp/");
-
-    ok = true;
- ending1:
-    // unmount partitions
-    if (!homedev.isEmpty()) {
-        proc.exec("/bin/umount -l /mnt/home-tmp", false);
-        proc.exec("rmdir /mnt/home-tmp");
-    }
- ending2:
+    const bool ok = proc.exec("/bin/mount -o ro " + homedev + " /mnt/antiX");
+    // Store a listing of /home to compare with the user name given later.
+    if(ok) listHomes = proc.execOutLines("/bin/ls -1 /mnt/antiX" + homedir);
     proc.exec("/bin/umount -l /mnt/antiX", false);
     return ok;
 }
