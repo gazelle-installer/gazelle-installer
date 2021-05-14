@@ -453,7 +453,6 @@ void PartMan::comboUseTextChange(const QString &text)
             comboFormat->addItem("xfs", "xfs");
             comboFormat->addItem("btrfs", "btrfs");
             comboFormat->addItem("reiserfs", "reiserfs");
-            comboFormat->addItem("reiser4", "reiser4");
             if(comboFormat->findData(curfmt, Qt::UserRole,
                 Qt::MatchFixedString)>=0) allowPreserve = true;
         }
@@ -1307,8 +1306,6 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
     QString cmd;
     if (format == "reiserfs") {
         cmd = "mkfs.reiserfs -q";
-    } else if (format == "reiser4") {
-        cmd = "mkfs.reiser4 -f -y";
     } else if (format.startsWith("btrfs")) {
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
