@@ -71,7 +71,7 @@ void BlockDeviceList::build(MProcess &proc)
                                       "|933ac7e1-2eb4-4f13-b844-0e14e2aef915)$"); // Linux /home
     const QRegularExpression rxWinLDM("^(0x42|5808c8aa-7e8f-42e0-85d2-e1e90434cfb3"
                                       "|af9b60a0-1431-4f62-bc68-3311714a69ad)$"); // Windows LDM
-    const QRegularExpression rxNativeFS("^(btrfs|ext2|ext3|ext4|jfs|nilfs2|reiser4|reiserfs|ufs|xfs)$");
+    const QRegularExpression rxNativeFS("^(btrfs|ext2|ext3|ext4|jfs|nilfs2|reiserfs|ufs|xfs)$");
 
     QString bootUUID;
     if (QFile::exists("/live/config/initrd.out")) {
@@ -90,9 +90,9 @@ void BlockDeviceList::build(MProcess &proc)
 
     clear();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
-    for(const QJsonValue &jsonDrive : jsonBD) {
+    for (const QJsonValue &jsonDrive : jsonBD) {
         int driveIndex = count(); // For propagating the nasty flag to the drive.
-        if(jsonDrive["type"] != "disk") continue;
+        if (jsonDrive["type"] != "disk") continue;
         BlockDeviceInfo bdinfo;
         bdinfo.name = jsonDrive["name"].toString();
         bdinfo.isDrive = true;
@@ -103,7 +103,7 @@ void BlockDeviceList::build(MProcess &proc)
         append(bdinfo);
 
         const QJsonArray &jsonParts = jsonDrive["children"].toArray();
-        for(const QJsonValue &jsonPart : jsonParts) {
+        for (const QJsonValue &jsonPart : jsonParts) {
             bdinfo.isDrive = false;
             bdinfo.name = jsonPart["name"].toString();
             bdinfo.size = jsonPart["size"].toVariant().toLongLong();
@@ -112,7 +112,7 @@ void BlockDeviceList::build(MProcess &proc)
             bdinfo.mapCount = jsonPart["children"].toArray().count();
 
             const QString &partType = jsonPart["parttype"].toString();
-            if(partType.isEmpty()) bdinfo.isESP = bdinfo.isNative = false;
+            if (partType.isEmpty()) bdinfo.isESP = bdinfo.isNative = false;
             else {
                 bdinfo.isESP = (partType.count(rxESP) >= 1);
                 bdinfo.isNative = (partType.count(rxNative) >= 1);
@@ -120,7 +120,7 @@ void BlockDeviceList::build(MProcess &proc)
             }
             if (!bdinfo.isESP) {
                 // Backup detection for drives that don't have UUID for ESP.
-                if(!backup_checked) {
+                if (!backup_checked) {
                     backup_list = proc.execOutLines("fdisk -l -o DEVICE,TYPE"
                         " | grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
                     backup_checked = true;
@@ -130,7 +130,7 @@ void BlockDeviceList::build(MProcess &proc)
 
             bdinfo.isBoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
             bdinfo.fs = jsonPart["fstype"].toString();
-            if(bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
+            if (bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
             append(bdinfo);
             // Propagate the boot and nasty flags up to the drive.
             if (bdinfo.isBoot) operator[](driveIndex).isBoot = true;

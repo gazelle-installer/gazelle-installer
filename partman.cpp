@@ -455,7 +455,6 @@ void PartMan::comboUseTextChange(const QString &text)
             comboFormat->addItem("xfs", "xfs");
             comboFormat->addItem("btrfs", "btrfs");
             comboFormat->addItem("reiserfs", "reiserfs");
-            comboFormat->addItem("reiser4", "reiser4");
             if(comboFormat->findData(curfmt, Qt::UserRole,
                 Qt::MatchFixedString)>=0) allowPreserve = true;
         }
@@ -621,8 +620,10 @@ void PartMan::treeMenu(const QPoint &)
         else if(action==actUnlock) partMenuUnlock(twit);
         else if(action==actLock) partMenuLock(twit);
         else if(action==actAddCrypttab) twitSetFlag(twit, TwitFlag::AutoCrypto, action->isChecked());
-        else if(action==actAddSubvolume) addSubvolumeItem(twit, QString());
-        else {
+        else if(action==actAddSubvolume) {
+            addSubvolumeItem(twit, QString());
+            twit->setExpanded(true);
+        } else {
             QLineEdit *editOpts = twitLineEdit(twit, Options);
             comboFormat->setCurrentIndex(ixBTRFS);
             if(action==actBtrfsZlib) editOpts->setText("noatime,compress-force=zlib");
@@ -828,8 +829,9 @@ QWidget *PartMan::composeValidate(bool automatic,
     mounts.clear();
     // Partition use and other validation
     int mapnum=0, swapnum=0;
-    QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+    QTreeWidgetItemIterator it(gui.treePartitions);
     for(; *it; ++it) {
+        if(twitFlag(*it, TwitFlag::Drive) || twitFlag(*it, TwitFlag::VirtualDevices)) continue;
         QComboBox *comboUse = twitComboBox(*it, UseFor);
         if(!comboUse || comboUse->currentText().isEmpty()) continue;
         QString mount = translateUse(comboUse->currentText());
@@ -885,8 +887,7 @@ QWidget *PartMan::composeValidate(bool automatic,
     }
     QTreeWidgetItem *rootitem = mounts.value("/");
     if(rootitem) {
-        const bool formatRoot = twitWillFormat(rootitem);
-        if(!formatRoot && mounts.contains("/home")) {
+        if(!twitWillFormat(rootitem) && mounts.contains("/home")) {
             const QString errmsg = tr("Cannot preserve /home inside root (/) if"
                 " a separate /home partition is also mounted.");
             QMessageBox::critical(master, master->windowTitle(), errmsg);
@@ -1319,6 +1320,7 @@ bool PartMan::formatPartitions()
         proc.status(tr("Formatting: %1").arg(describeUse(it.first)));
         const QString &dev = twitMappedDevice(twit, true);
         const QString &useFor = translateUse(twitComboBox(twit, UseFor)->currentText());
+        bool prepBtrfsSubvols = false;
         if(useFor=="ESP") {
             const QString &fmt = twitComboBox(twit, Format)->currentText();
             if (!proc.exec("mkfs.msdos -F "+fmt.mid(3)+' '+dev)) return false;
@@ -1332,10 +1334,15 @@ bool PartMan::formatPartitions()
             if(!label.isEmpty()) cmd.append(" -L \"" + label + '"');
             if(!proc.exec(cmd, true)) return false;
         } else {
-            if(!formatLinuxPartition(dev, twitComboBox(twit, Format)->currentText(),
-                badblocks, twitLineEdit(twit, Label)->text())) return false;
+            const QString &format = twitComboBox(twit, Format)->currentText();
+            if(!formatLinuxPartition(dev, format, badblocks,
+                twitLineEdit(twit, Label)->text())) return false;
+            if(format == "btrfs") prepBtrfsSubvols = true;
         }
         proc.sleep(1000);
+        if(prepBtrfsSubvols) {
+            if(!prepareSubvolumes(twit)) return false;
+        }
     }
 
     return true;
@@ -1349,9 +1356,7 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
     QString cmd;
     if (format == "reiserfs") {
         cmd = "mkfs.reiserfs -q";
-    } else if (format == "reiser4") {
-        cmd = "mkfs.reiser4 -f -y";
-    } else if (format.startsWith("btrfs")) {
+    } else if (format == "btrfs") {
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
@@ -1384,6 +1389,28 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
     if (format.startsWith("ext")) {
         // ext4 tuning
         proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
+    }
+    return true;
+}
+
+bool PartMan::prepareSubvolumes(QTreeWidgetItem *partit)
+{
+    const int svcount = partit->childCount();
+    if(svcount>0) {
+        mkdir("/mnt/btrfs-scratch", 0755);
+        if(!proc.exec("mount -o ro " + twitMappedDevice(partit)
+            + " /mnt/btrfs-scratch", true)) return false;
+    }
+    for(int ixi = 0; ixi < svcount; ++ixi) {
+        QTreeWidgetItem *svit = partit->child(ixi);
+        if(twitWillFormat(svit)) {
+            QComboBox *comboLabel = twitComboBox(svit, Label);
+            if(!proc.exec("btrfs subvolume create /mnt/btrfs-scratch/"
+                + comboLabel->currentText(), true)) return false;
+        }
+    }
+    if(svcount>0) {
+        if(!proc.exec("umount /mnt/btrfs-scratch", true)) return false;
     }
     return true;
 }
@@ -1476,14 +1503,19 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         else out << ' ' << it.first << ' ' << fsfmt;
         // Options
         const QString &mountopts = twitLineEdit(it.second, Options)->text();
-        if(mountopts.isEmpty()) out << " defaults";
-        else out << ' ' << mountopts;
+        if(!twitFlag(it.second, TwitFlag::Subvolume)) {
+            if(mountopts.isEmpty()) out << " defaults";
+            else out << ' ' << mountopts;
+        } else {
+            out << " subvol=" << twitLineEdit(it.second, Label)->text();
+            if(!mountopts.isEmpty()) out << ',' << mountopts;
+        }
         // Dump, pass
         if(fsfmt=="swap") out << " 0 0\n";
         else if(fsfmt.startsWith("reiser")) out << " 0 0\n";
         else if(it.first=="/boot") out << " 1 1\n";
         else if(it.first=="/") {
-            if(fsfmt.startsWith("btrfs")) out << " 1 0\n";
+            if(fsfmt=="btrfs") out << " 1 0\n";
             else out << " 1 1\n";
         } else out << " 1 2\n";
     }
@@ -1651,6 +1683,7 @@ inline long long PartMan::twitSize(QTreeWidgetItem *twit, const bool bytes)
 inline bool PartMan::twitWillFormat(QTreeWidgetItem *twit)
 {
     QComboBox *combo = twitComboBox(twit, Format);
+    if(!combo) return true;
     return (combo->currentData(Qt::UserRole) != "PRESERVE");
 }
 inline QString PartMan::twitUseFor(QTreeWidgetItem *twit)
@@ -1666,7 +1699,8 @@ inline bool PartMan::twitWillMap(const QTreeWidgetItem *twit) const
 }
 inline QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool full) const
 {
-    if(twit->parent()!=nullptr) {
+    if(twitFlag(twit, TwitFlag::Subvolume)) twit = twit->parent();
+    if(twitFlag(twit, TwitFlag::Partition)) {
         const QVariant &d = twit->data(Device, Qt::UserRole);
         if(!d.isNull()) {
             if(full) return "/dev/mapper/" + d.toString();
