@@ -88,6 +88,7 @@ class PartMan : public QObject
     void spinSizeValueChange(int i);
     void comboUseTextChange(const QString &text);
     void comboFormatTextChange(const QString &);
+    void comboSubvolUseTextChange(const QString &text);
     void treeItemChange(QTreeWidgetItem *item, int column);
     void treeSelChange();
     void treeMenu(const QPoint &);
