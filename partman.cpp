@@ -81,13 +81,14 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
             else if(!curdrv) continue; // Skip until the drive is drvstart.
             else break; // Exit the loop early if the drive isn't drvstart.
             drvitMarkLayout(curdrv, true);
+            twitSetFlag(curdrv, TwitFlag::Drive, true);
             curdev = curdrv;
             // Model
             curdev->setText(Label, bdinfo.model);
         } else {
             if(!curdrv) continue;
             curdev = new QTreeWidgetItem(curdrv);
-            setupItem(curdev, &bdinfo);
+            setupPartitionItem(curdev, &bdinfo);
         }
         assert(curdev!=nullptr);
         // Device name and size
@@ -163,7 +164,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         if(!devit) {
             devit = new QTreeWidgetItem(vdlit);
             twitSetFlag(devit, TwitFlag::VirtualBD, true);
-            setupItem(devit, &bdinfo);
+            setupPartitionItem(devit, &bdinfo);
             devit->setText(Device, bdinfo.name);
             devit->setData(Device, Qt::UserRole, bdinfo.name);
             const QString &tsize = QLocale::system().formattedDataSize(bdinfo.size,
@@ -215,7 +216,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 twitSetFlag(twit, TwitFlag::OldLayout, drvPreserve);
             } else {
                 twit = new QTreeWidgetItem(drvit);
-                setupItem(twit, nullptr);
+                setupPartitionItem(twit, nullptr);
                 twit->setText(Device, BlockDeviceInfo::join(drvDevice, ixPart+1));
             }
             // Configuration management, accounting for automatic control correction order.
@@ -248,16 +249,17 @@ bool PartMan::manageConfig(MSettings &config, bool save)
 inline QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent,
     int defaultMB, const QString &defaultUse, bool crypto) {
     QTreeWidgetItem *twit = new QTreeWidgetItem(parent);
-    setupItem(twit, nullptr, defaultMB, defaultUse);
+    setupPartitionItem(twit, nullptr, defaultMB, defaultUse);
     // If the layout needs crypto and it is supported, check the box.
     if(twit->data(Encrypt, Qt::CheckStateRole).isValid()) {
         twit->setCheckState(Encrypt, (crypto ? Qt::Checked : Qt::Unchecked));
     }
     return twit;
 }
-void PartMan::setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
+void PartMan::setupPartitionItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
     int defaultMB, const QString &defaultUse)
 {
+    twitSetFlag(twit, TwitFlag::Partition, true);
     // Size
     if(!bdinfo) {
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
@@ -547,7 +549,7 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
 void PartMan::treeSelChange()
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
-    if(twit) {
+    if(twit && !twitFlag(twit, TwitFlag::Subvolume)) {
         QTreeWidgetItem *drvit = twit->parent();
         const bool used = twitFlag(twit, TwitFlag::OldLayout);
         gui.buttonPartClear->setEnabled(!drvit);
@@ -574,18 +576,18 @@ void PartMan::treeMenu(const QPoint &)
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(!twit) return;
     if(twitFlag(twit, TwitFlag::VirtualDevices)) return;
-    const bool isPart = twit->parent()!=nullptr;
     QMenu menu(gui.treePartitions);
     QAction *action = nullptr;
     QAction *actAdd = menu.addAction(tr("&Add partition"));
     actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
-    if(isPart) {
+    if(twitFlag(twit, TwitFlag::Partition)) {
         QComboBox *comboFormat = twitComboBox(twit, Format);
         const int ixBTRFS = comboFormat->findData("btrfs");
         QAction *actRemove = menu.addAction(tr("&Remove partition"));
         QAction *actLock = nullptr;
         QAction *actUnlock = nullptr;
         QAction *actAddCrypttab = nullptr;
+        QAction *actAddSubvolume = nullptr;
         actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
         menu.addSeparator();
         if(twitFlag(twit, TwitFlag::VirtualBD)) {
@@ -606,6 +608,8 @@ void PartMan::treeMenu(const QPoint &)
         if(ixBTRFS<0) {
             actBtrfsZlib->setEnabled(false);
             actBtrfsLzo->setEnabled(false);
+        } else if(comboFormat->currentIndex()==ixBTRFS) {
+            actAddSubvolume = menu.addAction(tr("Add Subvolume"));
         }
         if(!twitCanUse(twit)) {
             if(actUnlock) actUnlock->setEnabled(false);
@@ -617,6 +621,7 @@ void PartMan::treeMenu(const QPoint &)
         else if(action==actUnlock) partMenuUnlock(twit);
         else if(action==actLock) partMenuLock(twit);
         else if(action==actAddCrypttab) twitSetFlag(twit, TwitFlag::AutoCrypto, action->isChecked());
+        else if(action==actAddSubvolume) addSubvolumeItem(twit, QString());
         else {
             QLineEdit *editOpts = twitLineEdit(twit, Options);
             comboFormat->setCurrentIndex(ixBTRFS);
@@ -663,7 +668,7 @@ void PartMan::partAddClick(bool)
     else preceeding = twit;
 
     QTreeWidgetItem *part = new QTreeWidgetItem(drive, preceeding);
-    setupItem(part, nullptr);
+    setupPartitionItem(part, nullptr);
 
     labelParts(drive);
     drvitMarkLayout(drive, false);
@@ -765,6 +770,43 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
         QMessageBox::critical(master, master->windowTitle(),
             tr("Failed to close %1").arg(dev));
     }
+}
+void PartMan::addSubvolumeItem(QTreeWidgetItem *twit, const QString &defaultUse)
+{
+    QTreeWidgetItem *svit = new QTreeWidgetItem(twit);
+    twitSetFlag(svit, TwitFlag::Subvolume, true);
+    // Device
+    svit->setText(Device, "-");
+    // Size
+    svit->setText(Size, "----");
+    // Label
+    QLineEdit *editLabel = new QLineEdit(gui.treePartitions);
+    editLabel->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(svit, Label, editLabel);
+    // Use For
+    QComboBox *comboUse = new QComboBox(gui.treePartitions);
+    comboUse->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(svit, UseFor, comboUse);
+    comboUse->setFocusPolicy(Qt::StrongFocus);
+    comboUse->installEventFilter(this);
+    comboUse->setEditable(true);
+    comboUse->setInsertPolicy(QComboBox::NoInsert);
+    comboUse->addItem("");
+    comboUse->addItem("root");
+    // comboUse->addItem("swap"); - requires Linux 5.0 or later
+    comboUse->addItem("home");
+    comboUse->setProperty("row", QVariant::fromValue<void *>(svit));
+    comboUse->lineEdit()->setPlaceholderText("----");
+    // Format
+    svit->setText(Format, tr("Subvolume"));
+    // Mount options
+    QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
+    editOptions->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(svit, Options, editOptions);
+    editOptions->setEnabled(false);
+    editOptions->setText("noatime");
+
+    if(!defaultUse.isEmpty()) comboUse->setCurrentText(defaultUse);
 }
 
 // Mouse wheel event filter for partition tree objects

@@ -38,14 +38,17 @@ class PartMan : public QObject
         UseFor,
         Encrypt,
         Format, // Text: existing format (not QLineEdit text)
-        Options
+        Options // Data: tree widget item flags (see below)
     };
     enum TwitFlag {
+        Drive,
+        Partition,
         OldLayout,
         VirtualDevices,
         VirtualBD,
         AutoCrypto,
-        CryptoV
+        CryptoV,
+        Subvolume
     };
     MProcess &proc;
     BlockDeviceList &listBlkDevs;
@@ -58,7 +61,7 @@ class PartMan : public QObject
     void clearLayout(QTreeWidgetItem *drvit);
     inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
         const QString &defaultUse, bool crypto);
-    void setupItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
+    void setupPartitionItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
         int defaultMB = 0, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drive);
     void resizeColumnsToFit();
@@ -92,6 +95,7 @@ class PartMan : public QObject
     void partRemoveClick(bool);
     void partMenuUnlock(QTreeWidgetItem *twit);
     void partMenuLock(QTreeWidgetItem *twit);
+    void addSubvolumeItem(QTreeWidgetItem *twit, const QString &defaultUse);
     bool eventFilter(QObject *object, QEvent *event);
 public:
     bool gptoverride=false, uefi=false, brave=false;
