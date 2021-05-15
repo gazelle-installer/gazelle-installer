@@ -504,6 +504,35 @@ void PartMan::comboFormatTextChange(const QString &)
     }
     gui.badblocksCheck->setEnabled(canCheckBlocks);
 }
+void PartMan::comboSubvolUseTextChange(const QString &text)
+{
+    gui.treePartitions->blockSignals(true);
+    QComboBox *combo = static_cast<QComboBox *>(sender());
+    if(!combo) return;
+    QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
+    if(!item) return;
+    const QString &usetext = translateUse(text);
+    gui.treePartitions->itemWidget(item, Options)->setEnabled(!usetext.isEmpty());
+    QLineEdit *editLabel = twitLineEdit(item, Label);
+    if(!usetext.startsWith('/')) editLabel->clear();
+    else if(usetext=='/') editLabel->setText("root");
+    else {
+        QStringList chklist;
+        QTreeWidgetItem *pit = item->parent();
+        const int count = pit->childCount();
+        const int index = pit->indexOfChild(item);
+        for(int ixi = 0; ixi < count; ++ixi) {
+            if(ixi==index) continue;
+            chklist << twitLineEdit(pit->child(ixi), Label)->text().trimmed();
+        }
+        int ixnum = 0;
+        const QString base = usetext.mid(1).replace('/','.');
+        QString newLabel = base;
+        while(chklist.contains(newLabel, Qt::CaseInsensitive)) newLabel = QString::number(++ixnum) + '.' + base;
+        editLabel->setText(newLabel);
+    }
+    gui.treePartitions->blockSignals(false);
+}
 
 void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
 {
@@ -813,6 +842,7 @@ void PartMan::addSubvolumeItem(QTreeWidgetItem *twit, const QString &defaultUse)
     comboUse->addItem("home");
     comboUse->setProperty("row", QVariant::fromValue<void *>(svit));
     comboUse->lineEdit()->setPlaceholderText("----");
+    connect(comboUse, &QComboBox::currentTextChanged, this, &PartMan::comboSubvolUseTextChange);
     // Format
     svit->setText(Format, tr("Subvolume"));
     // Mount options
@@ -850,9 +880,22 @@ QWidget *PartMan::composeValidate(bool automatic,
         QComboBox *comboUse = twitComboBox(*it, UseFor);
         QLineEdit *editLabel = twitLineEdit(*it, Label);
         if(!comboUse || !editLabel || comboUse->currentText().isEmpty()) continue;
-        if(twitFlag(*it, TwitFlag::Subvolume) && editLabel->text().isEmpty()) {
-            QMessageBox::critical(master, master->windowTitle(), tr("Invalid subvolume label"));
-            return editLabel;
+        if(twitFlag(*it, TwitFlag::Subvolume)) {
+            bool ok = true;
+            const QString &cmptext = editLabel->text().trimmed().toUpper();
+            if(cmptext.isEmpty()) ok = false;
+            QStringList check;
+            QTreeWidgetItem *pit = (*it)->parent();
+            const int count = pit->childCount();
+            const int index = pit->indexOfChild(*it);
+            for(int ixi = 0; ixi < count; ++ixi) {
+                if(ixi==index) continue;
+                if(twitLineEdit(pit->child(ixi), Label)->text().trimmed().toUpper() == cmptext) ok = false;
+            }
+            if(!ok) {
+                QMessageBox::critical(master, master->windowTitle(), tr("Invalid subvolume label"));
+                return editLabel;
+            }
         }
         QString mount = translateUse(comboUse->currentText());
         const QString &devname = (*it)->text(Device);
