@@ -72,6 +72,7 @@ class PartMan : public QObject
     void setEncryptChecks(const QString &use,
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
     bool calculatePartBD();
+    bool prepareSubvolumes(QTreeWidgetItem *partit);
     QTreeWidgetItem *findOrigin(const QString &vdev);
     inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
     inline bool twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const;
