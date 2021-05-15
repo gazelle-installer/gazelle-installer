@@ -294,6 +294,7 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *twit, const BlockDeviceInfo *b
     comboUse->setEditable(true);
     comboUse->setInsertPolicy(QComboBox::NoInsert);
     comboUse->addItem("");
+    comboUse->addItem("Format");
     if(!twitFlag(twit, TwitFlag::VirtualBD)) {
         if(!bdinfo || bdinfo->size <= 16) comboUse->addItem("bios_grub");
         if(!bdinfo || bdinfo->size <= 4294967296) {
@@ -359,8 +360,7 @@ QString PartMan::translateUse(const QString &alias)
     if(alias == "root") return QStringLiteral("/");
     else if(alias == "boot") return QStringLiteral("/boot");
     else if(alias == "home") return QStringLiteral("/home");
-    else if(!alias.compare("ESP", Qt::CaseInsensitive)) return QStringLiteral("ESP");
-    else if(!alias.compare("SWAP", Qt::CaseInsensitive)) return QStringLiteral("SWAP");
+    else if(!alias.startsWith('/')) return alias.toUpper();
     else return alias;
 }
 QString PartMan::describeUse(const QString &use)
@@ -369,6 +369,7 @@ QString PartMan::describeUse(const QString &use)
     else if(use == "ESP") return tr("EFI System Partition");
     else if(use == "SWAP") return tr("swap space");
     else if(use.startsWith("SWAP")) return tr("swap space #%1").arg(use.mid(4));
+    else if(use.startsWith("FORMAT")) return tr("format only");
     return use;
 }
 
@@ -419,6 +420,7 @@ void PartMan::comboUseTextChange(const QString &text)
     else if(usetext == "bios_grub") useClass = 2;
     else if(usetext == "/boot") useClass = 3;
     else if(usetext == "SWAP") useClass = 4;
+    else if(usetext == "FORMAT") useClass = 100;
     else useClass = 5;
     int oldUseClass = combo->property("class").toInt();
     bool allowPreserve = false, selPreserve = false;
@@ -455,7 +457,7 @@ void PartMan::comboUseTextChange(const QString &text)
             comboFormat->addItem("xfs", "xfs");
             comboFormat->addItem("btrfs", "btrfs");
             comboFormat->addItem("reiserfs", "reiserfs");
-            if(comboFormat->findData(curfmt, Qt::UserRole,
+            if(useClass<100 && comboFormat->findData(curfmt, Qt::UserRole,
                 Qt::MatchFixedString)>=0) allowPreserve = true;
         }
         // Changing to and from a mount/use that support encryption.
@@ -476,7 +478,7 @@ void PartMan::comboUseTextChange(const QString &text)
         comboFormat->setEnabled(comboFormat->count()>1);
         // Label and options
         editLabel->setEnabled(useClass!=0);
-        gui.treePartitions->itemWidget(item, Options)->setEnabled(useClass!=0);
+        gui.treePartitions->itemWidget(item, Options)->setEnabled(useClass!=0 && useClass<100);
         combo->setProperty("class", QVariant(useClass));
     }
     if(useClass!=0) editLabel->setText(defaultLabels.value(usetext));
@@ -495,8 +497,9 @@ void PartMan::comboFormatTextChange(const QString &)
         const QString &format = comboFormat->currentText();
         if(comboFormat->currentData(Qt::UserRole)!="PRESERVE") {
             if(format.startsWith("ext") || format == "jfs") canCheckBlocks = true;
-            else if(format.startsWith("reiser")) editOpts->setText("defaults,notail");
-            else editOpts->setText("defaults");
+            if(format=="reiser") editOpts->setText("noatime,notail");
+            else if(format=="SWAP") editOpts->setText("defaults");
+            else editOpts->setText("noatime");
         }
     }
     gui.badblocksCheck->setEnabled(canCheckBlocks);
@@ -593,8 +596,15 @@ void PartMan::treeMenu(const QPoint &)
             actRemove->setEnabled(false);
             if(twitFlag(twit, TwitFlag::CryptoV)) actLock = menu.addAction(tr("&Lock"));
         } else {
+            bool allowCryptTab = false;
             if(twitFlag(twit, TwitFlag::OldLayout) && twit->text(Format)=="crypto_LUKS") {
                 actUnlock = menu.addAction(tr("&Unlock"));
+                allowCryptTab = true;
+            }
+            if(twitUseFor(twit)=="FORMAT" && twit->data(Encrypt, Qt::CheckStateRole).isValid()) {
+                allowCryptTab = true;
+            }
+            if(allowCryptTab) {
                 actAddCrypttab = menu.addAction(tr("Add to crypttab"));
                 actAddCrypttab->setCheckable(true);
                 actAddCrypttab->setChecked(twitFlag(twit, TwitFlag::AutoCrypto));
@@ -828,7 +838,7 @@ QWidget *PartMan::composeValidate(bool automatic,
     bool encryptAny = false, encryptRoot = false;
     mounts.clear();
     // Partition use and other validation
-    int mapnum=0, swapnum=0;
+    int mapnum=0, swapnum=0, formatnum=0;
     QTreeWidgetItemIterator it(gui.treePartitions);
     for(; *it; ++it) {
         if(twitFlag(*it, TwitFlag::Drive) || twitFlag(*it, TwitFlag::VirtualDevices)) continue;
@@ -841,7 +851,8 @@ QWidget *PartMan::composeValidate(bool automatic,
                 tr("Invalid use for %1: %2").arg(devname, mount));
             return comboUse;
         }
-        if(mount=="SWAP") {
+        if(mount=="FORMAT") mount += QString::number(++formatnum);
+        else if(mount=="SWAP") {
             ++swapnum;
             if(swapnum>1) mount+=QString::number(swapnum);
         }
@@ -1317,8 +1328,10 @@ bool PartMan::formatPartitions()
     for(const auto &it : mounts.toStdMap()) {
         QTreeWidgetItem *twit = it.second;
         if(!twitWillFormat(twit)) continue;
-        proc.status(tr("Formatting: %1").arg(describeUse(it.first)));
         const QString &dev = twitMappedDevice(twit, true);
+        const QString &fmtstatus = tr("Formatting: %1");
+        if(it.first.startsWith("FORMAT")) proc.status(fmtstatus.arg(dev));
+        else proc.status(fmtstatus.arg(describeUse(it.first)));
         const QString &useFor = translateUse(twitComboBox(twit, UseFor)->currentText());
         bool prepBtrfsSubvols = false;
         if(useFor=="ESP") {
@@ -1329,7 +1342,7 @@ bool PartMan::formatPartitions()
             proc.exec("parted -s /dev/" + devsplit.at(0)
                 + " set " + devsplit.at(1) + " esp on");
         } else if(useFor.startsWith("SWAP")) {
-            QString cmd("/sbin/mkswap " + twitMappedDevice(twit, true));
+            QString cmd("/sbin/mkswap " + dev);
             const QString &label = twitLineEdit(twit, Label)->text();
             if(!label.isEmpty()) cmd.append(" -L \"" + label + '"');
             if(!proc.exec(cmd, true)) return false;
@@ -1445,6 +1458,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     // File systems
     for(auto &it : mounts.toStdMap()) {
         if(it.second->checkState(Encrypt)!=Qt::Checked) continue;
+        if(it.first.startsWith("FORMAT") && !twitFlag(it.second, TwitFlag::AutoCrypto)) continue;
         const QString &dev = it.second->text(Device);
         QString uuid = proc.execOut(cmdBlkID + dev);
         out << twitMappedDevice(it.second, false) << " /dev/disk/by-uuid/" << uuid;
@@ -1491,6 +1505,7 @@ bool PartMan::makeFstab(bool populateMediaMounts)
     const QString cmdBlkID("blkid -o value UUID -s UUID ");
     // File systems and swap space.
     for(auto &it : mounts.toStdMap()) {
+        if(it.first.startsWith("FORMAT")) continue; // Format without mounting.
         if(it.first == "ESP") continue; // EFI will be dealt with later.
         const QString &dev = twitMappedDevice(it.second, true);
         qDebug() << "Creating fstab entry for:" << it.first << dev;
