@@ -376,7 +376,7 @@ QString PartMan::describeUse(const QString &use)
 void PartMan::setEncryptChecks(const QString &use,
     enum Qt::CheckState state, QTreeWidgetItem *exclude)
 {
-    QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+    QTreeWidgetItemIterator it(gui.treePartitions);
     for(; *it; ++it) {
         if(*it == exclude) continue;
         if(twitUseFor(*it)==use && (*it)->data(Encrypt, Qt::CheckStateRole).isValid()) {
@@ -487,10 +487,10 @@ void PartMan::comboUseTextChange(const QString &text)
 }
 void PartMan::comboFormatTextChange(const QString &)
 {
-    QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+    QTreeWidgetItemIterator it(gui.treePartitions);
     bool canCheckBlocks = false;
     for(; *it; ++it) {
-        if(twitUseFor(*it).isEmpty()) continue;
+        if(twitUseFor(*it).isEmpty() || !twitFlag(*it, TwitFlag::Partition)) continue;
         QComboBox *comboFormat = twitComboBox(*it, Format);
         QLineEdit *editOpts = twitLineEdit(*it, Options);
         if(!comboFormat || !editOpts) return;
@@ -510,7 +510,7 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
     if(column==Encrypt || column==UseFor) {
         // Check all items in the tree for those marked for encryption.
         bool cryptoAny=false;
-        QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+        QTreeWidgetItemIterator it(gui.treePartitions);
         for(; *it && !cryptoAny; ++it) {
             if((*it)->checkState(Encrypt)==Qt::Checked) cryptoAny = true;
         }
@@ -618,7 +618,7 @@ void PartMan::treeMenu(const QPoint &)
             actBtrfsZlib->setEnabled(false);
             actBtrfsLzo->setEnabled(false);
         } else if(comboFormat->currentIndex()==ixBTRFS) {
-            actAddSubvolume = menu.addAction(tr("Add Subvolume"));
+            actAddSubvolume = menu.addAction(tr("Add subvolume"));
         }
         if(!twitCanUse(twit)) {
             if(actUnlock) actUnlock->setEnabled(false);
@@ -639,7 +639,7 @@ void PartMan::treeMenu(const QPoint &)
             if(action==actBtrfsZlib) editOpts->setText("noatime,compress-force=zlib");
             else if(action==actBtrfsLzo) editOpts->setText("noatime,compress-force=lzo");
         }
-    } else {
+    } else if(twitFlag(twit, TwitFlag::Drive)) {
         menu.addSeparator();
         const QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
@@ -656,6 +656,11 @@ void PartMan::treeMenu(const QPoint &)
             while(twit->childCount()) twit->removeChild(twit->child(0));
             populate(twit);
         }
+    } else if(twitFlag(twit, TwitFlag::Subvolume)) {
+        menu.clear();
+        QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
+        action = menu.exec(QCursor::pos());
+        if(action == actRemSubvolume) twit->parent()->removeChild(twit);
     }
     if(action==actAdd) partAddClick(true);
 }
@@ -843,7 +848,12 @@ QWidget *PartMan::composeValidate(bool automatic,
     for(; *it; ++it) {
         if(twitFlag(*it, TwitFlag::Drive) || twitFlag(*it, TwitFlag::VirtualDevices)) continue;
         QComboBox *comboUse = twitComboBox(*it, UseFor);
-        if(!comboUse || comboUse->currentText().isEmpty()) continue;
+        QLineEdit *editLabel = twitLineEdit(*it, Label);
+        if(!comboUse || !editLabel || comboUse->currentText().isEmpty()) continue;
+        if(twitFlag(*it, TwitFlag::Subvolume) && editLabel->text().isEmpty()) {
+            QMessageBox::critical(master, master->windowTitle(), tr("Invalid subvolume label"));
+            return editLabel;
+        }
         QString mount = translateUse(comboUse->currentText());
         const QString &devname = (*it)->text(Device);
         if(!mount.startsWith("/") && comboUse->findText(mount, Qt::MatchFixedString)<0) {
@@ -1327,12 +1337,13 @@ bool PartMan::formatPartitions()
     const bool badblocks = gui.badblocksCheck->isChecked();
     for(const auto &it : mounts.toStdMap()) {
         QTreeWidgetItem *twit = it.second;
+        if(twitFlag(twit, TwitFlag::Subvolume)) continue;
         if(!twitWillFormat(twit)) continue;
         const QString &dev = twitMappedDevice(twit, true);
-        const QString &fmtstatus = tr("Formatting: %1");
-        if(it.first.startsWith("FORMAT")) proc.status(fmtstatus.arg(dev));
-        else proc.status(fmtstatus.arg(describeUse(it.first)));
         const QString &useFor = translateUse(twitComboBox(twit, UseFor)->currentText());
+        const QString &fmtstatus = tr("Formatting: %1");
+        if(useFor=="FORMAT") proc.status(fmtstatus.arg(dev));
+        else proc.status(fmtstatus.arg(describeUse(it.first)));
         bool prepBtrfsSubvols = false;
         if(useFor=="ESP") {
             const QString &fmt = twitComboBox(twit, Format)->currentText();
@@ -1411,21 +1422,21 @@ bool PartMan::prepareSubvolumes(QTreeWidgetItem *partit)
     const int svcount = partit->childCount();
     if(svcount>0) {
         mkdir("/mnt/btrfs-scratch", 0755);
-        if(!proc.exec("mount -o ro " + twitMappedDevice(partit)
+        if(!proc.exec("mount -o noatime " + twitMappedDevice(partit, true)
             + " /mnt/btrfs-scratch", true)) return false;
     }
-    for(int ixi = 0; ixi < svcount; ++ixi) {
+    bool ok = true;
+    for(int ixi = 0; ok && ixi < svcount; ++ixi) {
         QTreeWidgetItem *svit = partit->child(ixi);
         if(twitWillFormat(svit)) {
-            QComboBox *comboLabel = twitComboBox(svit, Label);
             if(!proc.exec("btrfs subvolume create /mnt/btrfs-scratch/"
-                + comboLabel->currentText(), true)) return false;
+                + twitLineEdit(svit, Label)->text(), true)) ok = false;
         }
     }
     if(svcount>0) {
         if(!proc.exec("umount /mnt/btrfs-scratch", true)) return false;
     }
-    return true;
+    return ok;
 }
 
 // write out crypttab if encrypting for auto-opening
@@ -1449,7 +1460,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     }
     // Find extra devices
     QMap<QString, QString> extraAdd;
-    QTreeWidgetItemIterator it(gui.treePartitions, QTreeWidgetItemIterator::NoChildren);
+    QTreeWidgetItemIterator it(gui.treePartitions);
     for(; *it; ++it) {
         if(twitUseFor(*it).isEmpty() && twitFlag(*it, TwitFlag::AutoCrypto)) {
             extraAdd.insert((*it)->text(Device), twitMappedDevice(*it));
@@ -1562,12 +1573,17 @@ bool PartMan::mountPartitions()
              // needed to run fsck because sfdisk --part-type can mess up the partition
             if(!proc.exec("fsck.ext4 -y " + dev)) return false;
         }
+        QStringList opts;
+        if(twitFlag(it.second, TwitFlag::Subvolume)) {
+            opts.append("subvol=" + twitLineEdit(it.second, Label)->text());
+        }
         // Use noatime to speed up the installation.
-        QStringList opts = twitLineEdit(it.second, Options)->text().split(',');
+        opts.append(twitLineEdit(it.second, Options)->text().split(','));
+        opts.removeAll("ro");
         opts.removeAll("defaults");
         opts.removeAll("atime");
         opts.removeAll("relatime");
-        if(!opts.contains("ro") && !opts.contains("noatime")) opts << "noatime";
+        if(!opts.contains("noatime")) opts << "noatime";
         const QString &cmd = QString("/bin/mount %1 %2 -o %3").arg(dev, point, opts.join(','));
         if(!proc.exec(cmd)) return false;
     }
@@ -1644,8 +1660,7 @@ QTreeWidgetItem *PartMan::findOrigin(const QString &vdev)
         const QString &trline = line.trimmed();
         if(trline.startsWith("device:")) {
             const QString &trdev = trline.mid(trline.lastIndexOf('/')+1);
-            QTreeWidgetItemIterator it(gui.treePartitions,
-                QTreeWidgetItemIterator::NoChildren);
+            QTreeWidgetItemIterator it(gui.treePartitions);
             for(; *it; ++it) {
                 if((*it)->text(Device) == trdev) return *it;
             }
