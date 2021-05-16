@@ -185,7 +185,7 @@ void PartMan::scanVirtualDevices(bool rescan)
 }
 void PartMan::clearLayout(QTreeWidgetItem *drvit)
 {
-    while(drvit->childCount()) drvit->removeChild(drvit->child(0));
+    while(drvit->childCount()) delete drvit->child(0);
     drvitMarkLayout(drvit, false);
 }
 
@@ -426,6 +426,8 @@ void PartMan::comboUseTextChange(const QString &text)
     bool allowPreserve = false, selPreserve = false;
     if(useClass != oldUseClass) {
         QComboBox *comboFormat = twitComboBox(item, Format);
+        comboFormat->blockSignals(true);
+        const QVariant oldFormat = comboFormat->currentData(Qt::UserRole);
         comboFormat->clear();
         const QString &curfmt = item->text(Format);
         switch(useClass) {
@@ -439,14 +441,14 @@ void PartMan::comboUseTextChange(const QString &text)
             comboFormat->addItem("FAT12", "FAT12");
             if(comboFormat->findData(curfmt, Qt::UserRole, Qt::MatchFixedString)>=0
                 || !curfmt.compare("VFAT", Qt::CaseInsensitive)) allowPreserve = true;
-            selPreserve = true;
+            selPreserve = allowPreserve;
             break;
         case 2: comboFormat->addItem("GRUB", "GRUB"); break;
         case 3: comboFormat->addItem("ext4", "ext4"); break;
         case 4:
             comboFormat->addItem("SWAP", "SWAP");
-            selPreserve = true;
             if(!curfmt.compare("SWAP", Qt::CaseInsensitive)) allowPreserve = true;
+            selPreserve = allowPreserve;
             break;
         default:
             comboFormat->addItem("ext4", "ext4");
@@ -473,8 +475,14 @@ void PartMan::comboUseTextChange(const QString &text)
             const QString &prestext = (usetext!="/") ? tr("Preserve (%1)") : tr("Preserve /home (%1)");
             comboFormat->insertItem(0, prestext.arg(curfmt), "PRESERVE");
             comboFormat->insertSeparator(1);
-            if(selPreserve) comboFormat->setCurrentIndex(0);
         }
+        if(selPreserve) comboFormat->setCurrentIndex(0);
+        else {
+            const int ixOldFmt = comboFormat->findData(oldFormat);
+            if(ixOldFmt>=0) comboFormat->setCurrentIndex(ixOldFmt);
+        }
+        if(comboFormat->currentData() != oldFormat) comboFormatTextChange(comboFormat->currentText());
+        comboFormat->blockSignals(false);
         comboFormat->setEnabled(comboFormat->count()>1);
         // Label and options
         editLabel->setEnabled(useClass!=0);
@@ -490,16 +498,22 @@ void PartMan::comboFormatTextChange(const QString &)
     QTreeWidgetItemIterator it(gui.treePartitions);
     bool canCheckBlocks = false;
     for(; *it; ++it) {
-        if(twitUseFor(*it).isEmpty() || !twitFlag(*it, TwitFlag::Partition)) continue;
+        if(!twitFlag(*it, TwitFlag::Partition)) continue;
         QComboBox *comboFormat = twitComboBox(*it, Format);
         QLineEdit *editOpts = twitLineEdit(*it, Options);
         if(!comboFormat || !editOpts) return;
         const QString &format = comboFormat->currentText();
         if(comboFormat->currentData(Qt::UserRole)!="PRESERVE") {
-            if(format.startsWith("ext") || format == "jfs") canCheckBlocks = true;
-            if(format=="reiser") editOpts->setText("noatime,notail");
-            else if(format=="SWAP") editOpts->setText("defaults");
-            else editOpts->setText("noatime");
+            if(format!="btrfs") {
+                // Clear all subvolumes if not supported.
+                while((*it)->childCount()) delete (*it)->child(0);
+            }
+            if(!twitUseFor(*it).isEmpty()) {
+                if(format.startsWith("ext") || format == "jfs") canCheckBlocks = true;
+                if(format=="reiser") editOpts->setText("noatime,notail");
+                else if(format=="SWAP") editOpts->setText("defaults");
+                else editOpts->setText("noatime");
+            }
         }
     }
     gui.badblocksCheck->setEnabled(canCheckBlocks);
@@ -608,12 +622,11 @@ void PartMan::treeMenu(const QPoint &)
     if(!twit) return;
     if(twitFlag(twit, TwitFlag::VirtualDevices)) return;
     QMenu menu(gui.treePartitions);
-    QAction *action = nullptr;
-    QAction *actAdd = menu.addAction(tr("&Add partition"));
-    actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
     if(twitFlag(twit, TwitFlag::Partition)) {
         QComboBox *comboFormat = twitComboBox(twit, Format);
         const int ixBTRFS = comboFormat->findData("btrfs");
+        QAction *actAdd = menu.addAction(tr("&Add partition"));
+        actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
         QAction *actRemove = menu.addAction(tr("&Remove partition"));
         QAction *actLock = nullptr;
         QAction *actUnlock = nullptr;
@@ -653,8 +666,9 @@ void PartMan::treeMenu(const QPoint &)
             if(actUnlock) actUnlock->setEnabled(false);
             menuTemplates->setEnabled(false);
         }
-        action = menu.exec(QCursor::pos());
+        QAction *action = menu.exec(QCursor::pos());
         if(!action) return;
+        else if(action==actAdd) partAddClick(true);
         else if(action==actRemove) partRemoveClick(true);
         else if(action==actUnlock) partMenuUnlock(twit);
         else if(action==actLock) partMenuLock(twit);
@@ -669,6 +683,8 @@ void PartMan::treeMenu(const QPoint &)
             else if(action==actBtrfsLzo) editOpts->setText("noatime,compress-force=lzo");
         }
     } else if(twitFlag(twit, TwitFlag::Drive)) {
+        QAction *actAdd = menu.addAction(tr("&Add partition"));
+        actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
         menu.addSeparator();
         const QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
@@ -677,21 +693,19 @@ void PartMan::treeMenu(const QPoint &)
         const QAction *actBasic = menuTemplates->addAction(tr("&Standard install"));
         QAction *actCrypto = menuTemplates->addAction(tr("&Encrypted system"));
         actCrypto->setVisible(gui.gbEncrPass->isVisible());
-        action = menu.exec(QCursor::pos());
-        if(action==actClear) partClearClick(true);
+        QAction *action = menu.exec(QCursor::pos());
+        if(action==actAdd) partAddClick(true);
+        else if(action==actClear) partClearClick(true);
         else if(action==actBasic) layoutDefault(twit, -1, false);
         else if(action==actCrypto) layoutDefault(twit, -1, true);
         else if(action==actReset) {
-            while(twit->childCount()) twit->removeChild(twit->child(0));
+            while(twit->childCount()) delete twit->child(0);
             populate(twit);
         }
     } else if(twitFlag(twit, TwitFlag::Subvolume)) {
-        menu.clear();
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
-        action = menu.exec(QCursor::pos());
-        if(action == actRemSubvolume) twit->parent()->removeChild(twit);
+        if(menu.exec(QCursor::pos()) == actRemSubvolume) delete twit;
     }
-    if(action==actAdd) partAddClick(true);
 }
 
 // Partition manager list buttons
@@ -725,7 +739,7 @@ void PartMan::partRemoveClick(bool)
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     QTreeWidgetItem *drvit = twit->parent();
     if(!twit || !drvit) return;
-    twit->parent()->removeChild(twit);
+    delete twit;
     labelParts(drvit);
     treeSelChange();
 }
