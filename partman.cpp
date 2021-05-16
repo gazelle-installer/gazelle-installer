@@ -991,7 +991,7 @@ QWidget *PartMan::composeValidate(bool automatic,
             QVariant mapperData;
             if((*it)->checkState(Encrypt) == Qt::Checked) {
                 if(mount == "/") mapperData = "root.fsm";
-                else if(mount.isEmpty()) mapperData = mount.toLower();
+                else if(mount.startsWith("SWAP")) mapperData = mount.toLower();
                 else {
                     mapperData = QString::number(++mapnum)
                         + mount.replace('/','.') + ".fsm";
