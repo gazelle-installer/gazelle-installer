@@ -84,7 +84,7 @@ void BlockDeviceList::build(MProcess &proc)
     bool backup_checked = false;
     // Collect information and populate the block device list.
     const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL", true);
+        " TYPE,NAME,UUID,SIZE,PARTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QString cmdTestGPT("blkid /dev/%1 | grep -q PTTYPE=\\\"gpt\\\"");
 
@@ -104,6 +104,7 @@ void BlockDeviceList::build(MProcess &proc)
 
         const QJsonArray &jsonParts = jsonDrive["children"].toArray();
         for (const QJsonValue &jsonPart : jsonParts) {
+            if(jsonPart["parttypename"]=="Extended") continue;
             bdinfo.isDrive = false;
             bdinfo.name = jsonPart["name"].toString();
             bdinfo.size = jsonPart["size"].toVariant().toLongLong();
