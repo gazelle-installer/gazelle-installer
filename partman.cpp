@@ -317,7 +317,7 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *twit, const BlockDeviceInfo *b
     comboFormat->setEnabled(false);
     if(bdinfo) {
         twit->setText(Format, bdinfo->fs);
-        comboFormat->addItem(bdinfo->fs);
+        comboFormat->addItem(bdinfo->fs, bdinfo->fs);
     }
     connect(comboFormat, &QComboBox::currentTextChanged, this, &PartMan::comboFormatTextChange);
     // Mount options
@@ -433,7 +433,7 @@ void PartMan::comboUseTextChange(const QString &text)
         switch(useClass) {
         case 0:
             editLabel->setText(item->text(Label));
-            comboFormat->addItem(curfmt);
+            comboFormat->addItem(curfmt, curfmt);
             break;
         case 1:
             comboFormat->addItem("FAT32", "FAT32");
@@ -481,7 +481,7 @@ void PartMan::comboUseTextChange(const QString &text)
             const int ixOldFmt = comboFormat->findData(oldFormat);
             if(ixOldFmt>=0) comboFormat->setCurrentIndex(ixOldFmt);
         }
-        if(comboFormat->currentData() != oldFormat) comboFormatTextChange(comboFormat->currentText());
+        comboFormatTextChange(comboFormat->currentText());
         comboFormat->blockSignals(false);
         comboFormat->setEnabled(comboFormat->count()>1);
         // Label and options
@@ -507,6 +507,15 @@ void PartMan::comboFormatTextChange(const QString &)
             if(format!="btrfs") {
                 // Clear all subvolumes if not supported.
                 while((*it)->childCount()) delete (*it)->child(0);
+            } else {
+                // Remove preserve option from all subvolumes.
+                const int svcount = (*it)->childCount();
+                for(int ixi = 0; ixi < svcount; ++ixi) {
+                    QComboBox *comboSubvolFmt = twitComboBox((*it)->child(ixi), Format);
+                    comboSubvolFmt->clear();
+                    comboSubvolFmt->addItem(tr("Create"));
+                    comboSubvolFmt->setEnabled(false);
+                }
             }
             if(!twitUseFor(*it).isEmpty()) {
                 if(format.startsWith("ext") || format == "jfs") canCheckBlocks = true;
@@ -631,7 +640,7 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actLock = nullptr;
         QAction *actUnlock = nullptr;
         QAction *actAddCrypttab = nullptr;
-        QAction *actAddSubvolume = nullptr;
+        QAction *actNewSubvolume = nullptr, *actScanSubvols = nullptr;
         actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
         menu.addSeparator();
         if(twitFlag(twit, TwitFlag::VirtualBD)) {
@@ -660,7 +669,10 @@ void PartMan::treeMenu(const QPoint &)
             actBtrfsZlib->setEnabled(false);
             actBtrfsLzo->setEnabled(false);
         } else if(comboFormat->currentIndex()==ixBTRFS) {
-            actAddSubvolume = menu.addAction(tr("Add subvolume"));
+            menu.addSeparator();
+            actNewSubvolume = menu.addAction(tr("New subvolume"));
+            actScanSubvols = menu.addAction(tr("Scan subvolumes"));
+            actScanSubvols->setDisabled(twitWillFormat(twit));
         }
         if(!twitCanUse(twit)) {
             if(actUnlock) actUnlock->setEnabled(false);
@@ -673,8 +685,11 @@ void PartMan::treeMenu(const QPoint &)
         else if(action==actUnlock) partMenuUnlock(twit);
         else if(action==actLock) partMenuLock(twit);
         else if(action==actAddCrypttab) twitSetFlag(twit, TwitFlag::AutoCrypto, action->isChecked());
-        else if(action==actAddSubvolume) {
-            addSubvolumeItem(twit, QString());
+        else if(action==actNewSubvolume) {
+            addSubvolumeItem(twit);
+            twit->setExpanded(true);
+        } else if(action==actScanSubvols) {
+            scanSubvolumes(twit);
             twit->setExpanded(true);
         } else {
             QLineEdit *editOpts = twitLineEdit(twit, Options);
@@ -830,7 +845,8 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
             tr("Failed to close %1").arg(dev));
     }
 }
-void PartMan::addSubvolumeItem(QTreeWidgetItem *twit, const QString &defaultUse)
+
+QTreeWidgetItem *PartMan::addSubvolumeItem(QTreeWidgetItem *twit)
 {
     QTreeWidgetItem *svit = new QTreeWidgetItem(twit);
     twitSetFlag(svit, TwitFlag::Subvolume, true);
@@ -858,7 +874,13 @@ void PartMan::addSubvolumeItem(QTreeWidgetItem *twit, const QString &defaultUse)
     comboUse->lineEdit()->setPlaceholderText("----");
     connect(comboUse, &QComboBox::currentTextChanged, this, &PartMan::comboSubvolUseTextChange);
     // Format
-    svit->setText(Format, tr("Subvolume"));
+    QComboBox *comboFormat = new QComboBox(gui.treePartitions);
+    comboFormat->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(svit, Format, comboFormat);
+    comboFormat->setFocusPolicy(Qt::StrongFocus);
+    comboFormat->installEventFilter(this);
+    comboFormat->setEnabled(false);
+    comboFormat->addItem(tr("Create"));
     // Mount options
     QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
     editOptions->setAutoFillBackground(true);
@@ -866,7 +888,32 @@ void PartMan::addSubvolumeItem(QTreeWidgetItem *twit, const QString &defaultUse)
     editOptions->setEnabled(false);
     editOptions->setText("noatime");
 
-    if(!defaultUse.isEmpty()) comboUse->setCurrentText(defaultUse);
+    return svit;
+}
+void PartMan::scanSubvolumes(QTreeWidgetItem *partit)
+{
+    qApp->setOverrideCursor(Qt::WaitCursor);
+    gui.mainFrame->setEnabled(false);
+    while(partit->childCount()) delete partit->child(0);
+    mkdir("/mnt/btrfs-scratch", 0755);
+    if(!proc.exec("mount -o noatime " + twitMappedDevice(partit, true)
+        + " /mnt/btrfs-scratch", true)) return;
+    QStringList lines = proc.execOutLines("btrfs subvolume list /mnt/btrfs-scratch", true);
+    proc.exec("umount /mnt/btrfs-scratch", true);
+    for(const QString &line : lines) {
+        const int start = line.indexOf("path") + 5;
+        if(line.length() <= start) return;
+        QTreeWidgetItem *svit = addSubvolumeItem(partit);
+        const QString &label = line.mid(start);
+        twitLineEdit(svit, Label)->setText(label);
+        svit->setText(Label, label);
+        QComboBox *comboFormat = twitComboBox(svit, Format);
+        comboFormat->insertItem(0, tr("Preserve"), "PRESERVE");
+        comboFormat->insertSeparator(1);
+        comboFormat->setEnabled(true);
+    }
+    gui.mainFrame->setEnabled(true);
+    qApp->restoreOverrideCursor();
 }
 
 // Mouse wheel event filter for partition tree objects
@@ -1486,8 +1533,9 @@ bool PartMan::prepareSubvolumes(QTreeWidgetItem *partit)
     for(int ixi = 0; ok && ixi < svcount; ++ixi) {
         QTreeWidgetItem *svit = partit->child(ixi);
         if(twitWillFormat(svit)) {
-            if(!proc.exec("btrfs subvolume create /mnt/btrfs-scratch/"
-                + twitLineEdit(svit, Label)->text(), true)) ok = false;
+            const QString &subvol = twitLineEdit(svit, Label)->text();
+            proc.exec("btrfs subvolume delete " + subvol + " /mnt/btrfs-scratch/", true);
+            if(!proc.exec("btrfs subvolume create /mnt/btrfs-scratch/" + subvol, true)) ok = false;
         }
     }
     if(svcount>0) {
@@ -1771,7 +1819,7 @@ inline bool PartMan::twitWillFormat(QTreeWidgetItem *twit)
 {
     QComboBox *combo = twitComboBox(twit, Format);
     if(!combo) return true;
-    return (combo->currentData(Qt::UserRole) != "PRESERVE");
+    return (combo->currentData(Qt::UserRole)!="PRESERVE" && !twitUseFor(twit).isEmpty());
 }
 inline QString PartMan::twitUseFor(QTreeWidgetItem *twit)
 {

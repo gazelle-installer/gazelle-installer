@@ -97,7 +97,8 @@ class PartMan : public QObject
     void partRemoveClick(bool);
     void partMenuUnlock(QTreeWidgetItem *twit);
     void partMenuLock(QTreeWidgetItem *twit);
-    void addSubvolumeItem(QTreeWidgetItem *twit, const QString &defaultUse);
+    QTreeWidgetItem *addSubvolumeItem(QTreeWidgetItem *twit);
+    void scanSubvolumes(QTreeWidgetItem *partit);
     bool eventFilter(QObject *object, QEvent *event);
 public:
     bool gptoverride=false, uefi=false, brave=false;
