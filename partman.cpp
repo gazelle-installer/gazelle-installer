@@ -220,7 +220,8 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 twit->setText(Device, BlockDeviceInfo::join(drvDevice, ixPart+1));
             }
             // Configuration management, accounting for automatic control correction order.
-            config.beginGroup("Storage." + twit->text(Device));
+            const QString &groupPart = "Storage." + twit->text(Device);
+            config.beginGroup(groupPart);
             if(save) {
                 config.setValue("Size", twitSize(twit, true));
                 config.setValue("Encrypt", twit->checkState(Encrypt)==Qt::Checked);
@@ -239,7 +240,28 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             }
             config.manageLineEdit("Label", twitLineEdit(twit, Label));
             config.manageLineEdit("Options", twitLineEdit(twit, Options));
+            int subvolCount = 0;
+            if(twitComboBox(twit, Format)->currentData() == "btrfs") {
+                if(!save) subvolCount = config.value("Subvolumes").toInt();
+                else {
+                    subvolCount = twit->childCount();
+                    config.setValue("Subvolumes", subvolCount);
+                }
+            }
             config.endGroup();
+            // Btrfs subvolume configuration.
+            for(int ixSV=0; ixSV<subvolCount; ++ixSV) {
+                QTreeWidgetItem *svit = nullptr;
+                if(save) svit = twit->child(ixSV);
+                else svit = addSubvolumeItem(twit);
+                if(!svit) return false;
+                config.beginGroup(groupPart + ".Subvolume" + QString::number(ixSV+1));
+                config.manageComboBox("UseFor", twitComboBox(svit, UseFor), false);
+                config.manageLineEdit("Label", twitLineEdit(svit, Label));
+                config.manageLineEdit("Options", twitLineEdit(svit, Options));
+                config.endGroup();
+            }
+            if(!save) twit->setExpanded(true);
         }
     }
     treeSelChange();
@@ -489,7 +511,9 @@ void PartMan::comboUseTextChange(const QString &text)
         gui.treePartitions->itemWidget(item, Options)->setEnabled(useClass!=0 && useClass<100);
         combo->setProperty("class", QVariant(useClass));
     }
-    if(useClass!=0) editLabel->setText(defaultLabels.value(usetext));
+    if(useClass!=0 && (!(editLabel->isModified()) || editLabel->text().isEmpty())) {
+        editLabel->setText(defaultLabels.value(usetext));
+    }
     gui.treePartitions->blockSignals(false);
     treeItemChange(item, UseFor);
 }
@@ -537,24 +561,39 @@ void PartMan::comboSubvolUseTextChange(const QString &text)
     const QString &usetext = translateUse(text);
     gui.treePartitions->itemWidget(item, Options)->setEnabled(!usetext.isEmpty());
     QLineEdit *editLabel = twitLineEdit(item, Label);
-    if(!usetext.startsWith('/')) editLabel->clear();
-    else if(usetext=='/') editLabel->setText("root");
-    else {
-        QStringList chklist;
-        QTreeWidgetItem *pit = item->parent();
-        const int count = pit->childCount();
-        const int index = pit->indexOfChild(item);
-        for(int ixi = 0; ixi < count; ++ixi) {
-            if(ixi==index) continue;
-            chklist << twitLineEdit(pit->child(ixi), Label)->text().trimmed();
+    if(editLabel->isEnabled() && (!(editLabel->isModified()) || editLabel->text().isEmpty())) {
+        if(!usetext.startsWith('/')) editLabel->clear();
+        else if(usetext=='/') editLabel->setText("root");
+        else {
+            QStringList chklist;
+            QTreeWidgetItem *pit = item->parent();
+            const int count = pit->childCount();
+            const int index = pit->indexOfChild(item);
+            for(int ixi = 0; ixi < count; ++ixi) {
+                if(ixi==index) continue;
+                chklist << twitLineEdit(pit->child(ixi), Label)->text().trimmed();
+            }
+            int ixnum = 0;
+            const QString base = usetext.mid(1).replace('/','.');
+            QString newLabel = base;
+            while(chklist.contains(newLabel, Qt::CaseInsensitive)) newLabel = QString::number(++ixnum) + '.' + base;
+            editLabel->setText(newLabel);
         }
-        int ixnum = 0;
-        const QString base = usetext.mid(1).replace('/','.');
-        QString newLabel = base;
-        while(chklist.contains(newLabel, Qt::CaseInsensitive)) newLabel = QString::number(++ixnum) + '.' + base;
-        editLabel->setText(newLabel);
     }
     gui.treePartitions->blockSignals(false);
+}
+void PartMan::comboSubvolFormatTextChange(const QString &)
+{
+    QComboBox *combo = static_cast<QComboBox *>(sender());
+    if(!combo) return;
+    QTreeWidgetItem *svit = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
+    if(!svit) return;
+    QLineEdit *editLabel = twitLineEdit(svit, Label);
+    if(combo->currentData()!="PRESERVE") editLabel->setEnabled(true);
+    else {
+        editLabel->setText(svit->text(Label));
+        editLabel->setEnabled(false);
+    }
 }
 
 void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
@@ -881,6 +920,8 @@ QTreeWidgetItem *PartMan::addSubvolumeItem(QTreeWidgetItem *twit)
     comboFormat->installEventFilter(this);
     comboFormat->setEnabled(false);
     comboFormat->addItem(tr("Create"));
+    comboFormat->setProperty("row", QVariant::fromValue<void *>(svit));
+    connect(comboFormat, &QComboBox::currentTextChanged, this, &PartMan::comboSubvolFormatTextChange);
     // Mount options
     QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
     editOptions->setAutoFillBackground(true);

@@ -89,6 +89,7 @@ class PartMan : public QObject
     void comboUseTextChange(const QString &text);
     void comboFormatTextChange(const QString &);
     void comboSubvolUseTextChange(const QString &text);
+    void comboSubvolFormatTextChange(const QString &);
     void treeItemChange(QTreeWidgetItem *item, int column);
     void treeSelChange();
     void treeMenu(const QPoint &);
