@@ -210,41 +210,41 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         const long long maxMB = twitSize(drvit) - PARTMAN_SAFETY_MB;
         long long totalMB = 0;
         for(int ixPart = 0; ixPart < partCount; ++ixPart) {
-            QTreeWidgetItem *twit = nullptr;
+            QTreeWidgetItem *partit = nullptr;
             if(save || drvPreserve) {
-                twit = drvit->child(ixPart);
-                twitSetFlag(twit, TwitFlag::OldLayout, drvPreserve);
+                partit = drvit->child(ixPart);
+                twitSetFlag(partit, TwitFlag::OldLayout, drvPreserve);
             } else {
-                twit = new QTreeWidgetItem(drvit);
-                setupPartitionItem(twit, nullptr);
-                twit->setText(Device, BlockDeviceInfo::join(drvDevice, ixPart+1));
+                partit = new QTreeWidgetItem(drvit);
+                setupPartitionItem(partit, nullptr);
+                partit->setText(Device, BlockDeviceInfo::join(drvDevice, ixPart+1));
             }
             // Configuration management, accounting for automatic control correction order.
-            const QString &groupPart = "Storage." + twit->text(Device);
+            const QString &groupPart = "Storage." + partit->text(Device);
             config.beginGroup(groupPart);
             if(save) {
-                config.setValue("Size", twitSize(twit, true));
-                config.setValue("Encrypt", twit->checkState(Encrypt)==Qt::Checked);
+                config.setValue("Size", twitSize(partit, true));
+                config.setValue("Encrypt", partit->checkState(Encrypt)==Qt::Checked);
             } else if(!drvPreserve && config.contains("Size")) {
                 const int size = config.value("Size").toLongLong() / 1048576;
                 totalMB += size;
-                QWidget *spinSize = gui.treePartitions->itemWidget(twit, Size);
+                QWidget *spinSize = gui.treePartitions->itemWidget(partit, Size);
                 static_cast<QSpinBox *>(spinSize)->setValue(size);
                 if(totalMB > maxMB) config.markBadWidget(spinSize);
             }
-            config.manageComboBox("UseFor", twitComboBox(twit, UseFor), false);
-            config.manageComboBox("Format", twitComboBox(twit, Format), true);
+            config.manageComboBox("UseFor", twitComboBox(partit, UseFor), false);
+            config.manageComboBox("Format", twitComboBox(partit, Format), true);
             if(!save && config.contains("Encrypt")) {
                 const bool crypto = config.value("Encrypt").toBool();
-                twit->setCheckState(Encrypt, crypto ? Qt::Checked : Qt::Unchecked);
+                partit->setCheckState(Encrypt, crypto ? Qt::Checked : Qt::Unchecked);
             }
-            config.manageLineEdit("Label", twitLineEdit(twit, Label));
-            config.manageLineEdit("Options", twitLineEdit(twit, Options));
+            config.manageLineEdit("Label", twitLineEdit(partit, Label));
+            config.manageLineEdit("Options", twitLineEdit(partit, Options));
             int subvolCount = 0;
-            if(twitComboBox(twit, Format)->currentData() == "btrfs") {
+            if(twitComboBox(partit, Format)->currentData() == "btrfs") {
                 if(!save) subvolCount = config.value("Subvolumes").toInt();
                 else {
-                    subvolCount = twit->childCount();
+                    subvolCount = partit->childCount();
                     config.setValue("Subvolumes", subvolCount);
                 }
             }
@@ -252,8 +252,8 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             // Btrfs subvolume configuration.
             for(int ixSV=0; ixSV<subvolCount; ++ixSV) {
                 QTreeWidgetItem *svit = nullptr;
-                if(save) svit = twit->child(ixSV);
-                else svit = addSubvolumeItem(twit);
+                if(save) svit = partit->child(ixSV);
+                else svit = addSubvolumeItem(partit);
                 if(!svit) return false;
                 config.beginGroup(groupPart + ".Subvolume" + QString::number(ixSV+1));
                 config.manageComboBox("UseFor", twitComboBox(svit, UseFor), false);
@@ -261,7 +261,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 config.manageLineEdit("Options", twitLineEdit(svit, Options));
                 config.endGroup();
             }
-            if(!save) twit->setExpanded(true);
+            if(!save) partit->setExpanded(true);
         }
     }
     treeSelChange();
@@ -270,28 +270,28 @@ bool PartMan::manageConfig(MSettings &config, bool save)
 
 inline QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent,
     int defaultMB, const QString &defaultUse, bool crypto) {
-    QTreeWidgetItem *twit = new QTreeWidgetItem(parent);
-    setupPartitionItem(twit, nullptr, defaultMB, defaultUse);
+    QTreeWidgetItem *partit = new QTreeWidgetItem(parent);
+    setupPartitionItem(partit, nullptr, defaultMB, defaultUse);
     // If the layout needs crypto and it is supported, check the box.
-    if(twit->data(Encrypt, Qt::CheckStateRole).isValid()) {
-        twit->setCheckState(Encrypt, (crypto ? Qt::Checked : Qt::Unchecked));
+    if(partit->data(Encrypt, Qt::CheckStateRole).isValid()) {
+        partit->setCheckState(Encrypt, (crypto ? Qt::Checked : Qt::Unchecked));
     }
-    return twit;
+    return partit;
 }
-void PartMan::setupPartitionItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
+void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo,
     int defaultMB, const QString &defaultUse)
 {
-    twitSetFlag(twit, TwitFlag::Partition, true);
+    twitSetFlag(partit, TwitFlag::Partition, true);
     // Size
     if(!bdinfo) {
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
         spinSize->setAutoFillBackground(true);
-        gui.treePartitions->setItemWidget(twit, Size, spinSize);
+        gui.treePartitions->setItemWidget(partit, Size, spinSize);
         spinSize->setFocusPolicy(Qt::StrongFocus);
         spinSize->installEventFilter(this);
-        const int maxMB = (int)twitSize(twit->parent())-PARTMAN_SAFETY_MB;
+        const int maxMB = (int)twitSize(partit->parent())-PARTMAN_SAFETY_MB;
         spinSize->setRange(1, maxMB);
-        spinSize->setProperty("row", QVariant::fromValue<void *>(twit));
+        spinSize->setProperty("row", QVariant::fromValue<void *>(partit));
         spinSize->setSuffix("MB");
         connect(spinSize, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &PartMan::spinSizeValueChange);
@@ -301,23 +301,23 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *twit, const BlockDeviceInfo *b
     // Label
     QLineEdit *editLabel = new QLineEdit(gui.treePartitions);
     editLabel->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(twit, Label, editLabel);
+    gui.treePartitions->setItemWidget(partit, Label, editLabel);
     editLabel->setEnabled(false);
     if(bdinfo) {
-        twit->setText(Label, bdinfo->label);
+        partit->setText(Label, bdinfo->label);
         editLabel->setText(bdinfo->label);
     }
     // Use For
     QComboBox *comboUse = new QComboBox(gui.treePartitions);
     comboUse->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(twit, UseFor, comboUse);
+    gui.treePartitions->setItemWidget(partit, UseFor, comboUse);
     comboUse->setFocusPolicy(Qt::StrongFocus);
     comboUse->installEventFilter(this);
     comboUse->setEditable(true);
     comboUse->setInsertPolicy(QComboBox::NoInsert);
     comboUse->addItem("");
     comboUse->addItem("Format");
-    if(!twitFlag(twit, TwitFlag::VirtualBD)) {
+    if(!twitFlag(partit, TwitFlag::VirtualBD)) {
         if(!bdinfo || bdinfo->size <= 16) comboUse->addItem("bios_grub");
         if(!bdinfo || bdinfo->size <= 4294967296) {
             comboUse->addItem("ESP");
@@ -327,36 +327,36 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *twit, const BlockDeviceInfo *b
     comboUse->addItem("root");
     comboUse->addItem("swap");
     comboUse->addItem("home");
-    comboUse->setProperty("row", QVariant::fromValue<void *>(twit));
+    comboUse->setProperty("row", QVariant::fromValue<void *>(partit));
     comboUse->lineEdit()->setPlaceholderText("----");
     connect(comboUse, &QComboBox::currentTextChanged, this, &PartMan::comboUseTextChange);
     // Format
     QComboBox *comboFormat = new QComboBox(gui.treePartitions);
     comboFormat->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(twit, Format, comboFormat);
+    gui.treePartitions->setItemWidget(partit, Format, comboFormat);
     comboFormat->setFocusPolicy(Qt::StrongFocus);
     comboFormat->installEventFilter(this);
     comboFormat->setEnabled(false);
     if(bdinfo) {
-        twit->setText(Format, bdinfo->fs);
+        partit->setText(Format, bdinfo->fs);
         comboFormat->addItem(bdinfo->fs, bdinfo->fs);
     }
     connect(comboFormat, &QComboBox::currentTextChanged, this, &PartMan::comboFormatTextChange);
     // Mount options
     QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
     editOptions->setAutoFillBackground(true);
-    gui.treePartitions->setItemWidget(twit, Options, editOptions);
+    gui.treePartitions->setItemWidget(partit, Options, editOptions);
     editOptions->setEnabled(false);
     editOptions->setText("noatime");
 
     if(!defaultUse.isEmpty()) comboUse->setCurrentText(defaultUse);
 }
 
-void PartMan::labelParts(QTreeWidgetItem *drive)
+void PartMan::labelParts(QTreeWidgetItem *drvit)
 {
-    const QString &drv = drive->text(Device);
-    for(int ixi = drive->childCount() - 1; ixi >= 0; --ixi) {
-        drive->child(ixi)->setText(Device, BlockDeviceInfo::join(drv, ixi+1));
+    const QString &drv = drvit->text(Device);
+    for(int ixi = drvit->childCount() - 1; ixi >= 0; --ixi) {
+        drvit->child(ixi)->setText(Device, BlockDeviceInfo::join(drv, ixi+1));
     }
     resizeColumnsToFit();
 }
@@ -411,16 +411,16 @@ void PartMan::spinSizeValueChange(int i)
 {
     QSpinBox *spin = static_cast<QSpinBox *>(sender());
     if(!spin) return;
-    QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(spin->property("row").value<void *>());
-    if(!item) return;
-    QTreeWidgetItem *drvit = item->parent();
+    QTreeWidgetItem *partit = static_cast<QTreeWidgetItem *>(spin->property("row").value<void *>());
+    if(!partit) return;
+    QTreeWidgetItem *drvit = partit->parent();
     if(!drvit) return;
     // Partition size validation
     spin->blockSignals(true);
     long long maxMB = twitSize(drvit)-PARTMAN_SAFETY_MB;
     for(int ixi = drvit->childCount()-1; ixi >= 0; --ixi) {
         QTreeWidgetItem *twit = drvit->child(ixi);
-        if(twit!=item) maxMB -= twitSize(twit);
+        if(twit!=partit) maxMB -= twitSize(twit);
     }
     if(i > maxMB) spin->setValue(maxMB);
     gui.buttonPartAdd->setEnabled(i < maxMB);
@@ -431,9 +431,9 @@ void PartMan::comboUseTextChange(const QString &text)
     gui.treePartitions->blockSignals(true);
     QComboBox *combo = static_cast<QComboBox *>(sender());
     if(!combo) return;
-    QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
-    if(!item) return;
-    QLineEdit *editLabel = twitLineEdit(item, Label);
+    QTreeWidgetItem *partit = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
+    if(!partit) return;
+    QLineEdit *editLabel = twitLineEdit(partit, Label);
 
     const QString &usetext = translateUse(text);
     int useClass = -1;
@@ -447,14 +447,14 @@ void PartMan::comboUseTextChange(const QString &text)
     int oldUseClass = combo->property("class").toInt();
     bool allowPreserve = false, selPreserve = false;
     if(useClass != oldUseClass) {
-        QComboBox *comboFormat = twitComboBox(item, Format);
+        QComboBox *comboFormat = twitComboBox(partit, Format);
         comboFormat->blockSignals(true);
         const QVariant oldFormat = comboFormat->currentData(Qt::UserRole);
         comboFormat->clear();
-        const QString &curfmt = item->text(Format);
+        const QString &curfmt = partit->text(Format);
         switch(useClass) {
         case 0:
-            editLabel->setText(item->text(Label));
+            editLabel->setText(partit->text(Label));
             comboFormat->addItem(curfmt, curfmt);
             break;
         case 1:
@@ -486,12 +486,12 @@ void PartMan::comboUseTextChange(const QString &text)
         }
         // Changing to and from a mount/use that support encryption.
         if(useClass >= 0 && useClass <= 3) {
-            item->setData(Encrypt, Qt::CheckStateRole, QVariant());
+            partit->setData(Encrypt, Qt::CheckStateRole, QVariant());
         } else if(oldUseClass >= 0 && oldUseClass <= 3) {
             // Qt::PartiallyChecked tells treeItemChange() to include this item in the refresh.
-            item->setCheckState(Encrypt, Qt::PartiallyChecked);
+            partit->setCheckState(Encrypt, Qt::PartiallyChecked);
         }
-        if(twitFlag(item, TwitFlag::VirtualBD)) item->setData(Encrypt, Qt::CheckStateRole, QVariant());
+        if(twitFlag(partit, TwitFlag::VirtualBD)) partit->setData(Encrypt, Qt::CheckStateRole, QVariant());
         if(allowPreserve) {
             // Add an item at the start to allow preserving the existing format.
             const QString &prestext = (usetext!="/") ? tr("Preserve (%1)") : tr("Preserve /home (%1)");
@@ -508,14 +508,14 @@ void PartMan::comboUseTextChange(const QString &text)
         comboFormat->setEnabled(comboFormat->count()>1);
         // Label and options
         editLabel->setEnabled(useClass!=0);
-        gui.treePartitions->itemWidget(item, Options)->setEnabled(useClass!=0 && useClass<100);
+        gui.treePartitions->itemWidget(partit, Options)->setEnabled(useClass!=0 && useClass<100);
         combo->setProperty("class", QVariant(useClass));
     }
     if(useClass!=0 && (!(editLabel->isModified()) || editLabel->text().isEmpty())) {
         editLabel->setText(defaultLabels.value(usetext));
     }
     gui.treePartitions->blockSignals(false);
-    treeItemChange(item, UseFor);
+    treeItemChange(partit, UseFor);
 }
 void PartMan::comboFormatTextChange(const QString &)
 {
@@ -556,22 +556,22 @@ void PartMan::comboSubvolUseTextChange(const QString &text)
     gui.treePartitions->blockSignals(true);
     QComboBox *combo = static_cast<QComboBox *>(sender());
     if(!combo) return;
-    QTreeWidgetItem *item = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
-    if(!item) return;
+    QTreeWidgetItem *svit = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
+    if(!svit) return;
     const QString &usetext = translateUse(text);
-    gui.treePartitions->itemWidget(item, Options)->setEnabled(!usetext.isEmpty());
-    QLineEdit *editLabel = twitLineEdit(item, Label);
+    gui.treePartitions->itemWidget(svit, Options)->setEnabled(!usetext.isEmpty());
+    QLineEdit *editLabel = twitLineEdit(svit, Label);
     if(editLabel->isEnabled() && (!(editLabel->isModified()) || editLabel->text().isEmpty())) {
         if(!usetext.startsWith('/')) editLabel->clear();
         else if(usetext=='/') editLabel->setText("root");
         else {
             QStringList chklist;
-            QTreeWidgetItem *pit = item->parent();
-            const int count = pit->childCount();
-            const int index = pit->indexOfChild(item);
+            QTreeWidgetItem *partit = svit->parent();
+            const int count = partit->childCount();
+            const int index = partit->indexOfChild(svit);
             for(int ixi = 0; ixi < count; ++ixi) {
                 if(ixi==index) continue;
-                chklist << twitLineEdit(pit->child(ixi), Label)->text().trimmed();
+                chklist << twitLineEdit(partit->child(ixi), Label)->text().trimmed();
             }
             int ixnum = 0;
             const QString base = usetext.mid(1).replace('/','.');
@@ -596,7 +596,7 @@ void PartMan::comboSubvolFormatTextChange(const QString &)
     }
 }
 
-void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
+void PartMan::treeItemChange(QTreeWidgetItem *twit, int column)
 {
     if(column==Encrypt || column==UseFor) {
         // Check all items in the tree for those marked for encryption.
@@ -610,22 +610,22 @@ void PartMan::treeItemChange(QTreeWidgetItem *item, int column)
             gui.nextButton->setDisabled(cryptoAny);
             gui.gbEncrPass->setEnabled(cryptoAny);
         }
-        const Qt::CheckState csCrypto = item->checkState(Encrypt);
+        const Qt::CheckState csCrypto = twit->checkState(Encrypt);
         if(csCrypto!=Qt::Unchecked) {
             // New items are pre-set with Qt::PartiallyChecked and cannot be excluded.
-            QTreeWidgetItem *exclude = (csCrypto==Qt::PartiallyChecked) ? nullptr : item;
+            QTreeWidgetItem *exclude = (csCrypto==Qt::PartiallyChecked) ? nullptr : twit;
             // Set checkboxes and enable the crypto password controls as needed.
             if(cryptoAny) setEncryptChecks("SWAP", Qt::Checked, exclude);
-            if(twitUseFor(item)=="/" && csCrypto==Qt::Checked) {
+            if(twitUseFor(twit)=="/" && csCrypto==Qt::Checked) {
                 setEncryptChecks("/home", Qt::Checked, exclude);
             }
-            if(csCrypto==Qt::PartiallyChecked) item->setCheckState(Encrypt, Qt::Unchecked);
+            if(csCrypto==Qt::PartiallyChecked) twit->setCheckState(Encrypt, Qt::Unchecked);
         }
         // Cannot preserve if encrypting.
-        QComboBox *combo = twitComboBox(item, Format);
+        QComboBox *combo = twitComboBox(twit, Format);
         const int ixPres = combo->findData("PRESERVE");
         if(ixPres>=0) {
-            const bool cryptoThis = item->checkState(Encrypt)==Qt::Checked;
+            const bool cryptoThis = twit->checkState(Encrypt)==Qt::Checked;
             auto *model = qobject_cast<QStandardItemModel*>(combo->model());
             model->item(ixPres)->setEnabled(!cryptoThis);
             // Select the next non-separator item if preserving is not possible.
@@ -765,9 +765,9 @@ void PartMan::treeMenu(const QPoint &)
 // Partition manager list buttons
 void PartMan::partClearClick(bool)
 {
-    QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
-    if(!twit || twit->parent()) return;
-    clearLayout(twit);
+    QTreeWidgetItem *drvit = gui.treePartitions->selectedItems().value(0);
+    if(!drvit || !twitFlag(drvit, TwitFlag::Drive)) return;
+    clearLayout(drvit);
     comboFormatTextChange(QString()); // For the badblocks checkbox.
     treeSelChange();
 }
@@ -790,10 +790,10 @@ void PartMan::partAddClick(bool)
 }
 void PartMan::partRemoveClick(bool)
 {
-    QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
-    QTreeWidgetItem *drvit = twit->parent();
-    if(!twit || !drvit) return;
-    delete twit;
+    QTreeWidgetItem *partit = gui.treePartitions->selectedItems().value(0);
+    QTreeWidgetItem *drvit = partit->parent();
+    if(!partit || !drvit) return;
+    delete partit;
     labelParts(drvit);
     treeSelChange();
 }
@@ -1280,25 +1280,25 @@ QTreeWidgetItem *PartMan::selectedDriveAuto()
     int bdindex = listBlkDevs.findDevice(drv);
     if (bdindex<0) return nullptr;
     for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
-        QTreeWidgetItem *twit = gui.treePartitions->topLevelItem(ixi);
-        if(twit->text(Device) == drv) return twit;
+        QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
+        if(drvit->text(Device) == drv) return drvit;
     }
     return nullptr;
 }
-int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
+int PartMan::layoutDefault(QTreeWidgetItem *drvit,
     int rootPercent, bool crypto, bool updateTree)
 {
     if(rootPercent<0) rootPercent = gui.sliderPart->value();
-    if(updateTree) clearLayout(drivetree);
+    if(updateTree) clearLayout(drvit);
     // Drive geometry basics.
-    const long long driveSize = twitSize(drivetree);
+    const long long driveSize = twitSize(drvit);
     int rootFormatSize = driveSize-PARTMAN_SAFETY_MB;
     // Boot partitions.
     if(uefi) {
-        if(updateTree) addItem(drivetree, 256, "ESP", crypto);
+        if(updateTree) addItem(drvit, 256, "ESP", crypto);
         rootFormatSize -= 256;
     } else if(driveSize >= 2097152 || gptoverride) {
-        if(updateTree) addItem(drivetree, 1, "bios_grub", crypto);
+        if(updateTree) addItem(drvit, 1, "bios_grub", crypto);
         rootFormatSize -= 1;
     }
     int rootMinMB = rootSpaceNeeded / 1048576;
@@ -1307,7 +1307,7 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     else {
         int bootFormatSize = 512;
         if(bootFormatSize < bootMinMB) bootFormatSize = bootSpaceNeeded;
-        if(updateTree) addItem(drivetree, bootFormatSize, "boot", crypto);
+        if(updateTree) addItem(drvit, bootFormatSize, "boot", crypto);
         rootFormatSize -= bootFormatSize;
     }
     // Swap space.
@@ -1327,10 +1327,10 @@ int PartMan::layoutDefault(QTreeWidgetItem *drivetree,
     if(rootFormatSize < rootMinMB) rootFormatSize = rootMinMB;
     homeFormatSize -= rootFormatSize;
     if(updateTree) {
-        addItem(drivetree, rootFormatSize, "root", crypto);
-        if(swapFormatSize>0) addItem(drivetree, swapFormatSize, "swap", crypto);
-        if(homeFormatSize>0) addItem(drivetree, homeFormatSize, "home", crypto);
-        labelParts(drivetree);
+        addItem(drvit, rootFormatSize, "root", crypto);
+        if(swapFormatSize>0) addItem(drvit, swapFormatSize, "swap", crypto);
+        if(homeFormatSize>0) addItem(drvit, homeFormatSize, "home", crypto);
+        labelParts(drvit);
         treeSelChange();
     }
     return rootFormatSize;
@@ -1349,8 +1349,8 @@ int PartMan::countPrepSteps()
     QMapIterator<QString, QTreeWidgetItem *> mi(mounts);
     while(mi.hasNext()) {
         mi.next();
-        QTreeWidgetItem *twit = mi.value();
-        if(twit->checkState(Encrypt)==Qt::Checked) ++pcount; //LUKS format.
+        QTreeWidgetItem *partit = mi.value();
+        if(partit->checkState(Encrypt)==Qt::Checked) ++pcount; //LUKS format.
     }
     // Final count
     return pcount;
@@ -1413,11 +1413,11 @@ bool PartMan::preparePartitions()
     // Prepare partition tables, creating tables and partitions when needed.
     proc.status(tr("Preparing required partitions"));
     for(int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
-        QTreeWidgetItem *drvitem = gui.treePartitions->topLevelItem(ixi);
-        if(twitFlag(drvitem, TwitFlag::VirtualDevices)) continue;
-        const QString &drvdev = drvitem->text(Device);
-        const int devCount = drvitem->childCount();
-        if(twitFlag(drvitem, TwitFlag::OldLayout)) {
+        QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
+        if(twitFlag(drvit, TwitFlag::VirtualDevices)) continue;
+        const QString &drvdev = drvit->text(Device);
+        const int devCount = drvit->childCount();
+        if(twitFlag(drvit, TwitFlag::OldLayout)) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
             const int ixBlkDev = listBlkDevs.findDevice(drvdev);
@@ -1428,7 +1428,7 @@ bool PartMan::preparePartitions()
             }
             // Set the type for partitions that will be used in this installation.
             for(int ixdev=0; ixdev<devCount; ++ixdev) {
-                QTreeWidgetItem *twit = drvitem->child(ixdev);
+                QTreeWidgetItem *twit = drvit->child(ixdev);
                 if(twitUseFor(twit).isEmpty()) continue;
                 const QStringList &devsplit = BlockDeviceInfo::split("/dev/" + twit->text(Device));
                 if(!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1)))) return false;
@@ -1439,7 +1439,7 @@ bool PartMan::preparePartitions()
             const QString cmdParted("parted -s --align optimal /dev/" + drvdev);
             long long start = 1; // start with 1 MB to aid alignment
             for(int ixdev=0; ixdev<devCount; ++ixdev) {
-                QTreeWidgetItem *twit = drvitem->child(ixdev);
+                QTreeWidgetItem *twit = drvit->child(ixdev);
                 const QString &useFor = twitUseFor(twit);
                 if(useFor.isEmpty()) continue;
                 const QString type(useFor!="ESP" ? " mkpart primary " : " mkpart ESP ");
