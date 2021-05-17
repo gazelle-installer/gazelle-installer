@@ -75,6 +75,7 @@ class PartMan : public QObject
     bool prepareSubvolumes(QTreeWidgetItem *partit);
     QTreeWidgetItem *findOrigin(const QString &vdev);
     inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
+    inline bool drvitIsLocked(const QTreeWidgetItem *drvit);
     inline bool twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const;
     inline void twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value);
     inline bool twitCanUse(QTreeWidgetItem *twit);
