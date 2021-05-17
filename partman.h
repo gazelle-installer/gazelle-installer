@@ -61,9 +61,9 @@ class PartMan : public QObject
     void clearLayout(QTreeWidgetItem *drvit);
     inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
         const QString &defaultUse, bool crypto);
-    void setupPartitionItem(QTreeWidgetItem *twit, const BlockDeviceInfo *bdinfo,
+    void setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo,
         int defaultMB = 0, const QString &defaultUse = QString());
-    void labelParts(QTreeWidgetItem *drive);
+    void labelParts(QTreeWidgetItem *drvit);
     void resizeColumnsToFit();
     static QString translateUse(const QString &alias);
     static QString describeUse(const QString &use);
@@ -90,7 +90,7 @@ class PartMan : public QObject
     void comboFormatTextChange(const QString &);
     void comboSubvolUseTextChange(const QString &text);
     void comboSubvolFormatTextChange(const QString &);
-    void treeItemChange(QTreeWidgetItem *item, int column);
+    void treeItemChange(QTreeWidgetItem *twit, int column);
     void treeSelChange();
     void treeMenu(const QPoint &);
     void partClearClick(bool);
@@ -116,7 +116,7 @@ public:
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
     QTreeWidgetItem *selectedDriveAuto();
-    int layoutDefault(QTreeWidgetItem *driveitem,
+    int layoutDefault(QTreeWidgetItem *drvit,
         int rootPercent, bool crypto, bool updateTree=true);
     int countPrepSteps();
     bool preparePartitions();
