@@ -43,6 +43,7 @@ struct BlockDeviceInfo
 
 class BlockDeviceList : public QList<BlockDeviceInfo>
 {
+    void buildBuster(MProcess &proc);
 public:
     void build(MProcess &proc);
     int findDevice(const QString &devname) const;
