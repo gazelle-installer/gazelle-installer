@@ -297,6 +297,8 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
             this, &PartMan::spinSizeValueChange);
         if(!defaultMB) defaultMB = maxMB;
         spinSize->setValue(defaultMB);
+        spinSize->setStepType(QSpinBox::AdaptiveDecimalStepType);
+        spinSize->setAccelerated(true);
     }
     // Label
     QLineEdit *editLabel = new QLineEdit(gui.treePartitions);
