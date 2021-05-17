@@ -645,13 +645,16 @@ void PartMan::treeSelChange()
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if(twit && !twitFlag(twit, TwitFlag::Subvolume)) {
-        QTreeWidgetItem *drvit = twit->parent();
-        const bool used = twitFlag(twit, TwitFlag::OldLayout);
-        gui.buttonPartClear->setEnabled(!drvit);
-        gui.buttonPartRemove->setEnabled(!used && drvit);
+        const bool isold = twitFlag(twit, TwitFlag::OldLayout);
+        const bool isdrive = twitFlag(twit, TwitFlag::Drive);
+        bool islocked = true;
+        if(isdrive) islocked = drvitIsLocked(twit);
+        gui.buttonPartClear->setEnabled(!islocked);
+        gui.buttonPartRemove->setEnabled(!isold && !isdrive);
         // Only allow adding partitions if there is enough space.
+        QTreeWidgetItem *drvit = twit->parent();
         if(!drvit) drvit = twit;
-        if(used && drvit->childCount()>0) gui.buttonPartAdd->setEnabled(false);
+        if(!islocked && isold && isdrive) gui.buttonPartAdd->setEnabled(false);
         else {
             long long maxMB = twitSize(drvit)-PARTMAN_SAFETY_MB;
             for(int ixi = drvit->childCount()-1; ixi >= 0; --ixi) {
@@ -742,13 +745,18 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
         menu.addSeparator();
-        const QAction *actClear = menu.addAction(tr("New &layout"));
+        QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
-        actReset->setDisabled(twitFlag(twit, TwitFlag::OldLayout));
         QMenu *menuTemplates = menu.addMenu("&Templates");
         const QAction *actBasic = menuTemplates->addAction(tr("&Standard install"));
         QAction *actCrypto = menuTemplates->addAction(tr("&Encrypted system"));
+
+        const bool locked = drvitIsLocked(twit);
+        actClear->setDisabled(locked);
+        actReset->setDisabled(locked || twitFlag(twit, TwitFlag::OldLayout));
+        menuTemplates->setDisabled(locked);
         actCrypto->setVisible(gui.gbEncrPass->isVisible());
+
         QAction *action = menu.exec(QCursor::pos());
         if(action==actAdd) partAddClick(true);
         else if(action==actClear) partClearClick(true);
@@ -1825,6 +1833,14 @@ inline void PartMan::drvitMarkLayout(QTreeWidgetItem *drvit, const bool old)
     else drvit->setIcon(Device, QIcon(":/appointment-soon"));
     twitSetFlag(drvit, TwitFlag::OldLayout, old);
     gui.treePartitions->resizeColumnToContents(Device);
+}
+inline bool PartMan::drvitIsLocked(const QTreeWidgetItem *drvit)
+{
+    const int partCount = drvit->childCount();
+    for(int ixPart=0; ixPart<partCount; ++ixPart) {
+        if(!(twitComboBox(drvit->child(ixPart), UseFor)->isEnabled())) return true;
+    }
+    return false;
 }
 inline bool PartMan::twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const
 {
