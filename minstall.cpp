@@ -2509,7 +2509,7 @@ void MInstall::on_buttonLoadKey_clicked()
 {
     buttonLoadKey->setEnabled(false);
     if(key.length()<=0) {
-        QFileDialog dialog(this, "Select Key File", "/mnt/antiX/root");
+        QFileDialog dialog(this, "Select Key Material", "/mnt/antiX/root");
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
         dialog.setFileMode(QFileDialog::ExistingFile);
         const int rc = dialog.exec();
@@ -2531,7 +2531,7 @@ void MInstall::on_buttonLoadKey_clicked()
         }
     }
     const int keylen = key.length(); // This might have changed above.
-    if(keylen<=0) buttonLoadKey->setText(tr("Load key from file..."));
+    if(keylen<=0) buttonLoadKey->setText(tr("Load key material..."));
     else buttonLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
     buttonLoadKey->setEnabled(true);
     updateCursor();
