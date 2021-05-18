@@ -1079,7 +1079,7 @@
               <item row="7" column="0" colspan="2">
                <widget class="QPushButton" name="buttonLoadKey">
                 <property name="text">
-                 <string>Load key from file...</string>
+                 <string>Load key material...</string>
                 </property>
                </widget>
               </item>
