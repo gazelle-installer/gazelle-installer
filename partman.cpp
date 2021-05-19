@@ -1522,7 +1522,6 @@ bool PartMan::formatPartitions()
         const QString &fmtstatus = tr("Formatting: %1");
         if(useFor=="FORMAT") proc.status(fmtstatus.arg(dev));
         else proc.status(fmtstatus.arg(describeUse(it.first)));
-        bool prepBtrfsSubvols = false;
         if(useFor=="ESP") {
             const QString &fmt = twitComboBox(twit, Format)->currentText();
             if (!proc.exec("mkfs.msdos -F "+fmt.mid(3)+' '+dev)) return false;
@@ -1539,12 +1538,14 @@ bool PartMan::formatPartitions()
             const QString &format = twitComboBox(twit, Format)->currentText();
             if(!formatLinuxPartition(dev, format, badblocks,
                 twitLineEdit(twit, Label)->text())) return false;
-            if(format == "btrfs") prepBtrfsSubvols = true;
         }
         proc.sleep(1000);
-        if(prepBtrfsSubvols) {
-            if(!prepareSubvolumes(twit)) return false;
-        }
+    }
+    // Prepare subvolumes on all that (are to) contain them.
+    QTreeWidgetItemIterator it(gui.treePartitions);
+    for(; *it; ++it) {
+        if(!twitFlag(*it, TwitFlag::Partition)) continue;
+        else if(!prepareSubvolumes(*it)) return false;
     }
 
     return true;
@@ -1598,23 +1599,21 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
 bool PartMan::prepareSubvolumes(QTreeWidgetItem *partit)
 {
     const int svcount = partit->childCount();
-    if(svcount>0) {
-        mkdir("/mnt/btrfs-scratch", 0755);
-        if(!proc.exec("mount -o noatime " + twitMappedDevice(partit, true)
-            + " /mnt/btrfs-scratch", true)) return false;
-    }
+    if(svcount<=0) return true;
+    proc.status(tr("Preparing subvolumes"));
+    mkdir("/mnt/btrfs-scratch", 0755);
+    if(!proc.exec("mount -o noatime " + twitMappedDevice(partit, true)
+        + " /mnt/btrfs-scratch", true)) return false;
     bool ok = true;
     for(int ixi = 0; ok && ixi < svcount; ++ixi) {
         QTreeWidgetItem *svit = partit->child(ixi);
         if(twitWillFormat(svit)) {
             const QString &subvol = twitLineEdit(svit, Label)->text();
-            proc.exec("btrfs subvolume delete " + subvol + " /mnt/btrfs-scratch/", true);
+            proc.exec("btrfs subvolume delete /mnt/btrfs-scratch/" + subvol, true);
             if(!proc.exec("btrfs subvolume create /mnt/btrfs-scratch/" + subvol, true)) ok = false;
         }
     }
-    if(svcount>0) {
-        if(!proc.exec("umount /mnt/btrfs-scratch", true)) return false;
-    }
+    if(!proc.exec("umount /mnt/btrfs-scratch", true)) return false;
     return ok;
 }
 
