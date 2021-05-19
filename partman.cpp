@@ -351,6 +351,9 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
     gui.treePartitions->setItemWidget(partit, Options, editOptions);
     editOptions->setEnabled(false);
     editOptions->setText("noatime");
+    editOptions->setProperty("row", QVariant::fromValue<void *>(partit));
+    editOptions->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(editOptions, &QLineEdit::customContextMenuRequested, this, &PartMan::partOptionsMenu);
 
     if(!defaultUse.isEmpty()) comboUse->setCurrentText(defaultUse);
 }
@@ -683,7 +686,6 @@ void PartMan::treeMenu(const QPoint &)
     QMenu menu(gui.treePartitions);
     if(twitFlag(twit, TwitFlag::Partition)) {
         QComboBox *comboFormat = twitComboBox(twit, Format);
-        const int ixBTRFS = comboFormat->findData("btrfs");
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
         QAction *actRemove = menu.addAction(tr("&Remove partition"));
@@ -712,22 +714,14 @@ void PartMan::treeMenu(const QPoint &)
                 actAddCrypttab->setEnabled(twitWillMap(twit));
             }
         }
-        QMenu *menuTemplates = menu.addMenu("&Templates");
-        QAction *actBtrfsZlib = menuTemplates->addAction(tr("BTRFS compression (&ZLIB)"));
-        QAction *actBtrfsLzo = menuTemplates->addAction(tr("BTRFS compression (&LZO)"));
-        if(ixBTRFS<0) {
-            actBtrfsZlib->setEnabled(false);
-            actBtrfsLzo->setEnabled(false);
-        } else if(comboFormat->currentIndex()==ixBTRFS) {
+        const int ixBTRFS = comboFormat->findData("btrfs");
+        if(ixBTRFS>=0 && comboFormat->currentIndex()==ixBTRFS) {
             menu.addSeparator();
             actNewSubvolume = menu.addAction(tr("New subvolume"));
             actScanSubvols = menu.addAction(tr("Scan subvolumes"));
             actScanSubvols->setDisabled(twitWillFormat(twit));
         }
-        if(!twitCanUse(twit)) {
-            if(actUnlock) actUnlock->setEnabled(false);
-            menuTemplates->setEnabled(false);
-        }
+        if(!twitCanUse(twit) && actUnlock) actUnlock->setEnabled(false);
         QAction *action = menu.exec(QCursor::pos());
         if(!action) return;
         else if(action==actAdd) partAddClick(true);
@@ -741,11 +735,6 @@ void PartMan::treeMenu(const QPoint &)
         } else if(action==actScanSubvols) {
             scanSubvolumes(twit);
             twit->setExpanded(true);
-        } else {
-            QLineEdit *editOpts = twitLineEdit(twit, Options);
-            comboFormat->setCurrentIndex(ixBTRFS);
-            if(action==actBtrfsZlib) editOpts->setText("noatime,compress-force=zlib");
-            else if(action==actBtrfsLzo) editOpts->setText("noatime,compress-force=lzo");
         }
     } else if(twitFlag(twit, TwitFlag::Drive)) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
@@ -753,7 +742,7 @@ void PartMan::treeMenu(const QPoint &)
         menu.addSeparator();
         QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
-        QMenu *menuTemplates = menu.addMenu("&Templates");
+        QMenu *menuTemplates = menu.addMenu(tr("&Templates"));
         const QAction *actBasic = menuTemplates->addAction(tr("&Standard install"));
         QAction *actCrypto = menuTemplates->addAction(tr("&Encrypted system"));
 
@@ -776,6 +765,29 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
         if(menu.exec(QCursor::pos()) == actRemSubvolume) delete twit;
     }
+}
+
+void PartMan::partOptionsMenu(const QPoint &)
+{
+    QLineEdit *edit = static_cast<QLineEdit *>(sender());
+    if(!edit) return;
+    QTreeWidgetItem *partit = static_cast<QTreeWidgetItem *>(edit->property("row").value<void *>());
+    if(!partit) return;
+    QString selFS = twitComboBox(partit, Format)->currentData().toString();
+    QMenu *menu = edit->createStandardContextMenu();
+    menu->addSeparator();
+    QMenu *menuTemplates = menu->addMenu(tr("&Templates"));
+    if(selFS=="PRESERVE") selFS = partit->text(Format);
+    if((twitFlag(partit, TwitFlag::Partition) && selFS == "btrfs") || twitFlag(partit, TwitFlag::Subvolume)) {
+        QAction *action = menuTemplates->addAction(tr("Compression (&ZLIB)"));
+        action->setData("noatime,compress-force=zlib");
+        action = menuTemplates->addAction(tr("Compression (&LZO)"));
+        action->setData("noatime,compress-force=lzo");
+    }
+    menuTemplates->setDisabled(menuTemplates->isEmpty());
+    QAction *action = menu->exec(QCursor::pos());
+    if(menuTemplates->actions().contains(action)) edit->setText(action->data().toString());
+    delete menu;
 }
 
 // Partition manager list buttons
@@ -944,6 +956,9 @@ QTreeWidgetItem *PartMan::addSubvolumeItem(QTreeWidgetItem *twit)
     gui.treePartitions->setItemWidget(svit, Options, editOptions);
     editOptions->setEnabled(false);
     editOptions->setText("noatime");
+    editOptions->setProperty("row", QVariant::fromValue<void *>(svit));
+    editOptions->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(editOptions, &QLineEdit::customContextMenuRequested, this, &PartMan::partOptionsMenu);
 
     return svit;
 }
