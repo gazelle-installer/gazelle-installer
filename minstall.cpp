@@ -637,6 +637,12 @@ void MInstall::manageConfig(enum ConfigAction mode)
                 FDEpassCust->setText(epass);
                 FDEpassCust2->setText(epass);
             }
+            const QString &keyfile = config->value("KeyMaterial").toString();
+            if(!keyfile.isEmpty()) {
+                key.load(keyfile.toUtf8().constData(), -1);
+                const int keylen = key.length();
+                if(keylen>0) buttonLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
+            }
         }
         config->manageComboBox("Cipher", comboFDEcipher, false);
         config->manageComboBox("ChainMode", comboFDEchain, false);
