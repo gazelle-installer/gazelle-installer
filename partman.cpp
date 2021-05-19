@@ -297,7 +297,8 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
             this, &PartMan::spinSizeValueChange);
         if(!defaultMB) defaultMB = maxMB;
         spinSize->setValue(defaultMB);
-        spinSize->setStepType(QSpinBox::AdaptiveDecimalStepType);
+        // TODO: re-enable when Debian Bullseye is about to be released.
+        //spinSize->setStepType(QSpinBox::AdaptiveDecimalStepType);
         spinSize->setAccelerated(true);
     }
     // Label
@@ -425,6 +426,11 @@ void PartMan::spinSizeValueChange(int i)
         if(twit!=partit) maxMB -= twitSize(twit);
     }
     if(i > maxMB) spin->setValue(maxMB);
+    // TODO: Remove when Bullseye is about to be released.
+    int stepval = 1;
+    for(int ixi=1; ixi<=(i/10); ixi*=10) stepval = ixi;
+    spin->setSingleStep(stepval);
+    // End of setStepType() replacement.
     gui.buttonPartAdd->setEnabled(i < maxMB);
     spin->blockSignals(false);
 }
