@@ -968,13 +968,14 @@ void PartMan::scanSubvolumes(QTreeWidgetItem *partit)
     gui.mainFrame->setEnabled(false);
     while(partit->childCount()) delete partit->child(0);
     mkdir("/mnt/btrfs-scratch", 0755);
+    QStringList lines;
     if(!proc.exec("mount -o noatime " + twitMappedDevice(partit, true)
-        + " /mnt/btrfs-scratch", true)) return;
-    QStringList lines = proc.execOutLines("btrfs subvolume list /mnt/btrfs-scratch", true);
+        + " /mnt/btrfs-scratch", true)) goto END;
+    lines = proc.execOutLines("btrfs subvolume list /mnt/btrfs-scratch", true);
     proc.exec("umount /mnt/btrfs-scratch", true);
     for(const QString &line : lines) {
         const int start = line.indexOf("path") + 5;
-        if(line.length() <= start) return;
+        if(line.length() <= start) goto END;
         QTreeWidgetItem *svit = addSubvolumeItem(partit);
         const QString &label = line.mid(start);
         twitLineEdit(svit, Label)->setText(label);
@@ -984,6 +985,7 @@ void PartMan::scanSubvolumes(QTreeWidgetItem *partit)
         comboFormat->insertSeparator(1);
         comboFormat->setEnabled(true);
     }
+ END:
     gui.mainFrame->setEnabled(true);
     qApp->restoreOverrideCursor();
 }

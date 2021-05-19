@@ -2026,11 +2026,12 @@ void MInstall::gotoPage(int next)
                 labelSplash->setText(tr("Could not complete configuration."));
                 closeButton->show();
             }
-            updateCursor();
         } else if (!processNextPhase() && phase > -2) {
             cleanup(false);
             gotoPage(2);
+            mainFrame->setEnabled(true);
         }
+        updateCursor();
     }
 }
 
