@@ -573,23 +573,28 @@ void PartMan::comboSubvolUseTextChange(const QString &text)
     gui.treePartitions->itemWidget(svit, Options)->setEnabled(!usetext.isEmpty());
     QLineEdit *editLabel = twitLineEdit(svit, Label);
     if(editLabel->isEnabled() && (!(editLabel->isModified()) || editLabel->text().isEmpty())) {
-        if(!usetext.startsWith('/')) editLabel->clear();
-        else if(usetext=='/') editLabel->setText("root");
-        else {
-            QStringList chklist;
-            QTreeWidgetItem *partit = svit->parent();
-            const int count = partit->childCount();
-            const int index = partit->indexOfChild(svit);
-            for(int ixi = 0; ixi < count; ++ixi) {
-                if(ixi==index) continue;
-                chklist << twitLineEdit(partit->child(ixi), Label)->text().trimmed();
-            }
-            int ixnum = 0;
-            const QString base = usetext.mid(1).replace('/','.');
-            QString newLabel = base;
-            while(chklist.contains(newLabel, Qt::CaseInsensitive)) newLabel = QString::number(++ixnum) + '.' + base;
-            editLabel->setText(newLabel);
+        QStringList chklist;
+        QTreeWidgetItem *partit = svit->parent();
+        const int count = partit->childCount();
+        const int index = partit->indexOfChild(svit);
+        for(int ixi = 0; ixi < count; ++ixi) {
+            if(ixi==index) continue;
+            chklist << twitLineEdit(partit->child(ixi), Label)->text().trimmed();
         }
+        QString newLabel;
+        if(usetext.startsWith('/')) {
+            const QString base = usetext.mid(1).replace('/','.');
+            newLabel = '@' + base;
+            for(int ixi=2; chklist.contains(newLabel, Qt::CaseInsensitive); ++ixi) {
+                newLabel = QString::number(ixi) + '@' + base;
+            }
+        } else {
+            newLabel = usetext;
+            for(int ixi=2; chklist.contains(newLabel, Qt::CaseInsensitive); ++ixi) {
+                newLabel = usetext + QString::number(ixi);
+            }
+        }
+        editLabel->setText(newLabel);
     }
     gui.treePartitions->blockSignals(false);
 }
