@@ -94,6 +94,7 @@ class PartMan : public QObject
     void treeItemChange(QTreeWidgetItem *twit, int column);
     void treeSelChange();
     void treeMenu(const QPoint &);
+    void partOptionsMenu(const QPoint &);
     void partClearClick(bool);
     void partAddClick(bool);
     void partRemoveClick(bool);
