@@ -47,7 +47,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     pretend = args.isSet("pretend");
     nocopy = args.isSet("nocopy");
     sync = args.isSet("sync");
-    if(!oobe) {
+    if (!oobe) {
         partman.brave = brave = args.isSet("brave");
         automatic = args.isSet("auto");
         oem = args.isSet("oem");
@@ -370,7 +370,7 @@ void MInstall::setupAutoMount(bool enabled)
     // check if the systemctl program is present
     bool have_sysctl = false;
     const QStringList &envpath = QProcessEnvironment::systemEnvironment().value("PATH").split(':');
-    for(const QString &path : envpath) {
+    for (const QString &path : envpath) {
         finfo.setFile(path + "/systemctl");
         if (finfo.isExecutable()) {
             have_sysctl = true;
@@ -450,7 +450,7 @@ bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtex
 QString MInstall::sliderSizeString(long long size)
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
-    if(strout.length()>6) {
+    if (strout.length()>6) {
         return QLocale::system().formattedDataSize(size, 0, QLocale::DataSizeTraditionalFormat);
     }
     return strout;
@@ -490,7 +490,7 @@ void MInstall::writeKeyFile()
     if (partman.isEncrypt("/")) { // if encrypting root
         newkey = (key.length() == 0);
         keyfile = "/mnt/antiX/root/keyfile";
-        if(newkey) key.load(rngfile.toUtf8(), keylength);
+        if (newkey) key.load(rngfile.toUtf8(), keylength);
         key.save(keyfile, 0400);
     } else if (partman.isEncrypt("/home") && partman.isEncrypt(QString())>1) {
         // if encrypting /home without encrypting root
@@ -569,7 +569,7 @@ bool MInstall::processNextPhase()
                 proc.exec("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1", false);
             }
             if (oem) enableOOBE();
-            else if(!processOOBE()) return false;
+            else if (!processOOBE()) return false;
             manageConfig(ConfigSave);
             config->dumpDebug();
             proc.exec("/bin/sync", true); // the sync(2) system call will block the GUI
@@ -610,17 +610,17 @@ void MInstall::manageConfig(enum ConfigAction mode)
         if (targetDrive || mode!=ConfigSave) {
             config->manageComboBox("Drive", diskCombo, true);
             config->manageCheckBox("DriveEncrypt", checkBoxEncryptAuto);
-            if(mode==ConfigSave) config->setValue("RootPortion", sliderPart->value());
-            else if(config->contains("RootPortion")) {
+            if (mode==ConfigSave) config->setValue("RootPortion", sliderPart->value());
+            else if (config->contains("RootPortion")) {
                  const int sliderVal = config->value("RootPortion").toInt();
                  sliderPart->setValue(sliderVal);
                  on_sliderPart_valueChanged(sliderVal);
-                 if(sliderPart->value() != sliderVal) config->markBadWidget(sliderPart);
+                 if (sliderPart->value() != sliderVal) config->markBadWidget(sliderPart);
             }
         }
         config->endGroup();
         // Custom partitions step. PartMan handles its config groups automatically.
-        if(!targetDrive || mode!=ConfigSave) {
+        if (!targetDrive || mode!=ConfigSave) {
             config->setGroupWidget(Step_Partitions);
             config->manageCheckBox("Storage/BadBlocksCheck", badblocksCheck);
             partman.manageConfig(*config, mode==ConfigSave);
@@ -638,10 +638,10 @@ void MInstall::manageConfig(enum ConfigAction mode)
                 FDEpassCust2->setText(epass);
             }
             const QString &keyfile = config->value("KeyMaterial").toString();
-            if(!keyfile.isEmpty()) {
+            if (!keyfile.isEmpty()) {
                 key.load(keyfile.toUtf8().constData(), -1);
                 const int keylen = key.length();
-                if(keylen>0) buttonLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
+                if (keylen>0) buttonLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
             }
         }
         config->manageComboBox("Cipher", comboFDEcipher, false);
@@ -664,7 +664,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         if (!oobe) {
             // GRUB step
             config->startGroup("GRUB", Step_Boot);
-            if(grubCheckBox->isChecked()) {
+            if (grubCheckBox->isChecked()) {
                 const char *grubChoices[] = {"MBR", "PBR", "ESP"};
                 QRadioButton *grubRadios[] = {grubMbrButton, grubPbrButton, grubEspButton};
                 config->manageRadios("Install", 3, grubChoices, grubRadios);
@@ -721,7 +721,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->manageLineEdit("Username", userNameEdit);
         config->manageCheckBox("Autologin", autologinCheckBox);
         config->manageCheckBox("SaveDesktop", saveDesktopCheckBox);
-        if(oobe) saveDesktopCheckBox->setCheckState(Qt::Unchecked);
+        if (oobe) saveDesktopCheckBox->setCheckState(Qt::Unchecked);
         const char *oldHomeActions[] = {"Use", "Save", "Delete"};
         QRadioButton *oldHomeRadios[] = {radioOldHomeUse, radioOldHomeSave, radioOldHomeDelete};
         config->manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
@@ -777,8 +777,8 @@ bool MInstall::saveHomeBasic()
     proc.log(__PRETTY_FUNCTION__);
     QString homedir("/");
     QString homedev = partman.getMountDev("/home", true);
-    if(homedev.isEmpty() || partman.willFormat("/home")) {
-        if(partman.willFormat("/")) return true;
+    if (homedev.isEmpty() || partman.willFormat("/home")) {
+        if (partman.willFormat("/")) return true;
         homedev = partman.getMountDev("/", true);
         homedir = "/home";
     }
@@ -786,7 +786,7 @@ bool MInstall::saveHomeBasic()
     mkdir("/mnt/antiX", 0755);
     const bool ok = proc.exec("/bin/mount -o ro " + homedev + " /mnt/antiX");
     // Store a listing of /home to compare with the user name given later.
-    if(ok) listHomes = proc.execOutLines("/bin/ls -1 /mnt/antiX" + homedir);
+    if (ok) listHomes = proc.execOutLines("/bin/ls -1 /mnt/antiX" + homedir);
     proc.exec("/bin/umount -l /mnt/antiX", false);
     return ok;
 }
@@ -796,8 +796,8 @@ bool MInstall::installLinux(const int progend)
     proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
 
-    if(!partman.mountPartitions()) return false;
-    if(!partman.willFormat("/")) {
+    if (!partman.mountPartitions()) return false;
+    if (!partman.willFormat("/")) {
         // if root was not formatted and not using --sync option then re-use it
         // remove all folders in root except for /home
         proc.status(tr("Deleting old system"));
@@ -819,7 +819,7 @@ bool MInstall::installLinux(const int progend)
     mkdir("/mnt/antiX/run", 0755);
 
     setupAutoMount(true);
-    if(!copyLinux(progend - 1)) return false;
+    if (!copyLinux(progend - 1)) return false;
 
     proc.status(tr("Fixing configuration"), progend);
     mkdir("/mnt/antiX/tmp", 01777);
@@ -879,7 +879,7 @@ bool MInstall::copyLinux(const int progend)
     fsfilcnt_t targetInodes = 1;
     if (statvfs("/live/linux", &svfs) == 0) {
         sourceInodes = svfs.f_files - svfs.f_ffree;
-        if(statvfs("/mnt/antiX", &svfs) == 0) {
+        if (statvfs("/mnt/antiX", &svfs) == 0) {
             targetInodes = svfs.f_files - svfs.f_ffree;
         }
     }
@@ -898,7 +898,7 @@ bool MInstall::copyLinux(const int progend)
         while (proc.state() != QProcess::NotRunning) {
             eloop.exec();
             proc.readAllStandardOutput();
-            if(statvfs("/mnt/antiX", &svfs) == 0 && progdiv != 0) {
+            if (statvfs("/mnt/antiX", &svfs) == 0 && progdiv != 0) {
                 int i = (svfs.f_files - svfs.f_ffree - targetInodes) / progdiv;
                 if (i > progspace) i = progspace;
                 progressBar->setValue(i + progstart);
@@ -940,16 +940,16 @@ bool MInstall::installLoader()
 
     bool efivarfs = QFileInfo("/sys/firmware/efi/efivars").isDir();
     bool efivarfs_mounted = false;
-    if(efivarfs) {
+    if (efivarfs) {
         QFile file("/proc/self/mounts");
         if (file.open(QFile::ReadOnly | QFile::Text)) {
-            while(!file.atEnd() && !efivarfs_mounted) {
-                if(file.readLine().startsWith("efivarfs")) efivarfs_mounted = true;
+            while (!file.atEnd() && !efivarfs_mounted) {
+                if (file.readLine().startsWith("efivarfs")) efivarfs_mounted = true;
             }
             file.close();
         }
     }
-    if(efivarfs && !efivarfs_mounted) {
+    if (efivarfs && !efivarfs_mounted) {
         proc.exec("/bin/mount -t efivarfs efivarfs /sys/firmware/efi/efivars", true);
     }
 
@@ -1142,7 +1142,7 @@ bool MInstall::processOOBE()
     } else {
         if (!setUserInfo()) return false;
     }
-    if(oobe) proc.exec("update-rc.d oobe disable", false);
+    if (oobe) proc.exec("update-rc.d oobe disable", false);
     return true;
 }
 
@@ -1202,19 +1202,19 @@ bool MInstall::setUserInfo()
     // set the user passwords first
     bool ok = true;
     QString cmdChRoot;
-    if(!oobe) cmdChRoot = "chroot /mnt/antiX ";
+    if (!oobe) cmdChRoot = "chroot /mnt/antiX ";
     const QString &userPass = userPasswordEdit->text();
     const QString &rootPass = rootPasswordEdit->text();
     QByteArray userinfo;
-    if(rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
+    if (rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
     else userinfo.append(QString("root:" + rootPass).toUtf8());
-    if(ok && userPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d demo", true);
+    if (ok && userPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d demo", true);
     else {
-        if(!userinfo.isEmpty()) userinfo.append('\n');
+        if (!userinfo.isEmpty()) userinfo.append('\n');
         userinfo.append(QString("demo:" + userPass).toUtf8());
     }
-    if(ok && !userinfo.isEmpty()) ok = proc.exec(cmdChRoot + "chpasswd", true, &userinfo);
-    if(!ok) {
+    if (ok && !userinfo.isEmpty()) ok = proc.exec(cmdChRoot + "chpasswd", true, &userinfo);
+    if (!ok) {
         failUI(tr("Failed to set user account passwords."));
         return false;
     }
@@ -1224,7 +1224,7 @@ bool MInstall::setUserInfo()
     QString skelpath = rootpath + "/etc/skel";
     QString dpath = rootpath + "/home/" + userNameEdit->text();
 
-    if(QFileInfo::exists(dpath)) {
+    if (QFileInfo::exists(dpath)) {
         if (radioOldHomeSave->isChecked()) {
             bool ok = false;
             QString cmd = QString("/bin/mv -f %1 %1.00%2").arg(dpath);
@@ -1244,7 +1244,7 @@ bool MInstall::setUserInfo()
         proc.exec("/bin/sync", true); // The sync(2) system call will block the GUI.
     }
 
-    if(QFileInfo::exists(dpath.toUtf8())) { // Still exists.
+    if (QFileInfo::exists(dpath.toUtf8())) { // Still exists.
         proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
         proc.exec("/bin/cp -n " + skelpath + "/.bashrc " + dpath, true);
         proc.exec("/bin/cp -n " + skelpath + "/.gtkrc " + dpath, true);
@@ -1308,7 +1308,7 @@ bool MInstall::setUserInfo()
     proc.exec("touch " + rootpath + "/var/mail/" + userNameEdit->text());
 
     // FIX for MX-19 and earlier: Ensure graphical sudo works with password-free root.
-    if(rootPass.isEmpty()) {
+    if (rootPass.isEmpty()) {
         QFile file(rootpath + "/etc/polkit-1/localauthority.conf.d/55-tweak-override.conf");
         if (file.open(QIODevice::WriteOnly)) {
             QTextStream(&file) << "[Configuration]\nAdminIdentities=unix-group:sudo";
@@ -1539,7 +1539,7 @@ void MInstall::setServices()
         rootpath = "/mnt/antiX";
     }
     QTreeWidgetItemIterator it(csView);
-    for(; *it; ++it) {
+    for (; *it; ++it) {
         if ((*it)->parent() == nullptr) continue;
         QString service = (*it)->text(0);
         qDebug() << "Service: " << service;
@@ -1672,7 +1672,7 @@ void MInstall::pageDisplayed(int next)
         // progress bar shown only for install and configuration pages.
         installBox->setVisible(next >= widgetStack->indexOf(Step_Boot) && next <= ixProgress);
         // save the last tip and stop it updating when the progress page is hidden.
-        if(next != ixProgress) ixTipStart = ixTip;
+        if (next != ixProgress) ixTipStart = ixTip;
     }
 
     switch (next) {
@@ -1846,7 +1846,7 @@ void MInstall::pageDisplayed(int next)
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
-        if(oobe) {
+        if (oobe) {
             backButton->setEnabled(false);
             nextButton->setEnabled(true);
             return; // avoid the end that enables both Back and Next buttons
@@ -1906,14 +1906,14 @@ void MInstall::pageDisplayed(int next)
         // disable the Next button if none of the old home options are selected
         on_radioOldHomeUse_toggled(false);
         // if the Next button is disabled, avoid enabling both Back and Next at the end
-        if(nextButton->isEnabled() == false) {
+        if (nextButton->isEnabled() == false) {
             backButton->setEnabled(true);
             return;
         }
         break;
 
     case 11: // installation step
-        if(ixTipStart >= 0) {
+        if (ixTipStart >= 0) {
             iLastProgress = progressBar->value();
             on_progressBar_valueChanged(iLastProgress);
         }
@@ -2009,7 +2009,7 @@ void MInstall::gotoPage(int next)
     if (automatic) {
         if (!MSettings::isBadWidget(widgetStack->currentWidget())
             && next > curr) nextButton->click();
-        else if(curr!=0) automatic = false; // failed validation
+        else if (curr!=0) automatic = false; // failed validation
     }
 
     // process next installation phase
@@ -2018,7 +2018,7 @@ void MInstall::gotoPage(int next)
             updateCursor(Qt::BusyCursor);
             labelSplash->setText(tr("Configuring sytem. Please wait."));
             gotoPage(0);
-            if(processOOBE()) {
+            if (processOOBE()) {
                 labelSplash->setText(tr("Configuration complete. Restarting system."));
                 proc.exec("/usr/sbin/reboot", true);
                 qApp->exit(EXIT_SUCCESS);
@@ -2060,7 +2060,7 @@ void MInstall::updatePartitionWidgets(bool all)
     diskCombo->setCurrentIndex(0);
     diskCombo->setEnabled(true);
 
-    if(all) {
+    if (all) {
         // whole-disk vs custom-partition radio buttons
         entireDiskButton->setChecked(true);
         for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
@@ -2201,7 +2201,7 @@ void MInstall::on_splitter_splitterMoved(int, int)
 void MInstall::on_mainTabs_currentChanged(int index)
 {
     // Make the help widgets the correct size.
-    if(index == 0) resizeEvent(nullptr);
+    if (index == 0) resizeEvent(nullptr);
 }
 
 void MInstall::diskPassValidationChanged(bool valid)
@@ -2264,7 +2264,7 @@ void MInstall::on_buttonRunParted_clicked()
 {
     updateCursor(Qt::WaitCursor);
     mainFrame->setEnabled(false);
-    if(QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted", true);
+    if (QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted", true);
     else proc.exec("/usr/bin/partitionmanager", true);
     updatePartitionWidgets(false);
     mainFrame->setEnabled(true);
@@ -2287,7 +2287,7 @@ bool MInstall::abort(bool onclose)
             tr("Confirmation"), tr("The installation and configuration"
                 " is incomplete.\nDo you really want to stop now?"),
             QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if(rc == QMessageBox::No) {
+        if (rc == QMessageBox::No) {
             mainFrame->setEnabled(true);
             return false;
         }
@@ -2324,7 +2324,7 @@ void MInstall::cleanup(bool endclean)
     proc.exec("/bin/umount -l /mnt/antiX/sys", true);
     proc.exec("/bin/umount -l /mnt/antiX/dev/shm", true);
     proc.exec("/bin/umount -l /mnt/antiX/dev", true);
-    if(!mountkeep) partman.unmount();
+    if (!mountkeep) partman.unmount();
 }
 
 void MInstall::on_progressBar_valueChanged(int value)
@@ -2434,38 +2434,38 @@ void MInstall::on_sliderPart_sliderPressed()
 {
     QString tipText(tr("%1% root") + '\n' + tr("%2% home"));
     const int val = sliderPart->value();
-    if(val<1) tipText = tipText.arg(">0", "<100");
+    if (val<1) tipText = tipText.arg(">0", "<100");
     else tipText = tipText.arg(val).arg(100-val);
     sliderPart->setToolTip(tipText);
-    if(sliderPart->isSliderDown()) QToolTip::showText(QCursor::pos(), tipText, sliderPart);
+    if (sliderPart->isSliderDown()) QToolTip::showText(QCursor::pos(), tipText, sliderPart);
 }
 void MInstall::on_sliderPart_valueChanged(int value)
 {
     const bool crypto = checkBoxEncryptAuto->isChecked();
     QTreeWidgetItem *drvitem = partman.selectedDriveAuto();
-    if(!drvitem) return;
+    if (!drvitem) return;
     long long available = partman.layoutDefault(drvitem, 100, crypto, false);
-    if(!available) return;
+    if (!available) return;
     const long long roundUp = available - 1;
     const long long rootMinMB = (partman.rootSpaceNeeded+1048575) / 1048576;
     const int minPercent = ((rootMinMB*100)+roundUp) / available;
     const int recPercentMin = (((rootMinMB+4096)*100)+roundUp) / available; // Recommended root size. TODO: Make configurable.
     const int recPercentMax = 99 - ((1024*100) / available); // Recommended minimum home. TODO: Make configurable.
     int origValue = value;
-    if(value<0) { // Internal setup.
+    if (value<0) { // Internal setup.
         origValue = value = sliderPart->value();
         frameSliderPart->setEnabled(true);
         // 64GB cap on the default slider value, rounded to nearest percentage.
         const int rootPortionMax = ((65536*100) + (available/2)) / available;
         // Caps based on disk capacity and recommendations.
-        if(value > rootPortionMax) value = rootPortionMax;
-        if(value < recPercentMin) value = recPercentMin;
-        if(value > recPercentMax) value = 100;
-    } else if(value<minPercent) {
-        if(value>=0) qApp->beep();
+        if (value > rootPortionMax) value = rootPortionMax;
+        if (value < recPercentMin) value = recPercentMin;
+        if (value > recPercentMax) value = 100;
+    } else if (value<minPercent) {
+        if (value>=0) qApp->beep();
         value = minPercent;
     }
-    if(value != origValue) {
+    if (value != origValue) {
         sliderPart->blockSignals(true);
         sliderPart->setValue(value);
         sliderPart->blockSignals(false);
@@ -2478,12 +2478,12 @@ void MInstall::on_sliderPart_valueChanged(int value)
 
     QPalette palRoot = QApplication::palette();
     QPalette palHome = QApplication::palette();
-    if(value < recPercentMin) palRoot.setColor(QPalette::WindowText, Qt::red);
-    if(value==100) valstr = tr("----");
+    if (value < recPercentMin) palRoot.setColor(QPalette::WindowText, Qt::red);
+    if (value==100) valstr = tr("----");
     else {
         valstr = sliderSizeString(available*1048576);
         valstr += "\n" + tr("Home");
-        if(value > recPercentMax) palHome.setColor(QPalette::WindowText, Qt::red);
+        if (value > recPercentMax) palHome.setColor(QPalette::WindowText, Qt::red);
     }
     labelSliderHome->setText(valstr);
     labelSliderRoot->setPalette(palRoot);
@@ -2515,22 +2515,22 @@ void MInstall::on_customPartButton_clicked(bool checked)
 void MInstall::on_buttonLoadKey_clicked()
 {
     buttonLoadKey->setEnabled(false);
-    if(key.length()<=0) {
+    if (key.length()<=0) {
         QFileDialog dialog(this, "Select Key Material", "/mnt/antiX/root");
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
         dialog.setFileMode(QFileDialog::ExistingFile);
         const int rc = dialog.exec();
         updateCursor(Qt::BusyCursor);
-        if(rc) {
+        if (rc) {
             const QStringList &files = dialog.selectedFiles();
-            if(files.count()==1) key.load(files.at(0).toUtf8().constData(), -1);
+            if (files.count()==1) key.load(files.at(0).toUtf8().constData(), -1);
         }
     } else {
         const int ans = QMessageBox::question(this, windowTitle(),
             tr("Are you sure you want to unload the current key?"),
             QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
         updateCursor(Qt::BusyCursor);
-        if(ans == QMessageBox::Yes) {
+        if (ans == QMessageBox::Yes) {
             key.erase();
             proc.sleep(100, true);
             qApp->processEvents();
@@ -2538,7 +2538,7 @@ void MInstall::on_buttonLoadKey_clicked()
         }
     }
     const int keylen = key.length(); // This might have changed above.
-    if(keylen<=0) buttonLoadKey->setText(tr("Load key material..."));
+    if (keylen<=0) buttonLoadKey->setText(tr("Load key material..."));
     else buttonLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
     buttonLoadKey->setEnabled(true);
     updateCursor();
