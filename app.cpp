@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
     qDebug() << "Installer version:" << VERSION;
     MInstall minstall(parser, cfgfile);
     const QRect &geo = a.desktop()->availableGeometry(&minstall);
-    if(parser.isSet("oobe")) minstall.setGeometry(geo);
+    if (parser.isSet("oobe")) minstall.setGeometry(geo);
     else minstall.move((geo.width()-minstall.width())/2, (geo.height()-minstall.height())/2);
     minstall.show();
     return a.exec();
