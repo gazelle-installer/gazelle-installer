@@ -85,7 +85,7 @@ void MSettings::manageComboBox(const QString &key, QComboBox *combo, const bool 
 {
     const QVariant &comboval = useData ? combo->currentData() : QVariant(combo->currentText());
     if (saving) setValue(key, comboval);
-    else if(contains(key)) {
+    else if (contains(key)) {
         const QVariant &val = value(key, comboval);
         const int icombo = useData ? combo->findData(val, Qt::UserRole, Qt::MatchFixedString)
                          : combo->findText(val.toString(), Qt::MatchFixedString);
@@ -98,21 +98,21 @@ void MSettings::manageCheckBox(const QString &key, QCheckBox *checkbox)
 {
     const QVariant state(checkbox->isChecked());
     if (saving) setValue(key, state);
-    else if(contains(key)) checkbox->setChecked(value(key, state).toBool());
+    else if (contains(key)) checkbox->setChecked(value(key, state).toBool());
 }
 
 void MSettings::manageLineEdit(const QString &key, QLineEdit *lineedit)
 {
     const QString &text = lineedit->text();
     if (saving) setValue(key, text);
-    else if(contains(key)) lineedit->setText(value(key, text).toString());
+    else if (contains(key)) lineedit->setText(value(key, text).toString());
 }
 
 void MSettings::manageSpinBox(const QString &key, QSpinBox *spinbox)
 {
     const QVariant spinval(spinbox->value());
     if (saving) setValue(key, spinval);
-    else if(contains(key)) {
+    else if (contains(key)) {
         const int val = value(key, spinval).toInt();
         spinbox->setValue(val);
         if (val != spinbox->value()) markBadWidget(spinbox);

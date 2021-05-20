@@ -70,7 +70,7 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
             qDebug().nospace() << "SErr #" << execount << ": " << StdErr;
             hasOut = 1;
         }
-        if(hasOut) {
+        if (hasOut) {
             QFont logFont = logEntry->font();
             logFont.setItalic(true);
             logEntry->setFont(logFont);
@@ -78,8 +78,8 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     }
     qDebug().nospace() << "Exit #" << execount << ": " << exitCode() << " " << exitStatus();
     int status = 1;
-    if(exitStatus() != QProcess::NormalExit) status = -1;
-    else if(exitCode() != 0) status = 0;
+    if (exitStatus() != QProcess::NormalExit) status = -1;
+    else if (exitCode() != 0) status = 0;
     log(logEntry, status);
     return (status > 0);
 }
@@ -121,17 +121,17 @@ void MProcess::unhalt()
 
 QListWidgetItem *MProcess::log(const QString &text, const LogType type)
 {
-    if(type == Standard) qDebug().noquote() << text;
-    if(type == Section) qDebug().noquote() << "+++" << text << "+++";
-    else if(type == Status) qDebug().noquote() << "-" << text << "-";
-    if(!logView) return nullptr;
+    if (type == Standard) qDebug().noquote() << text;
+    if (type == Section) qDebug().noquote() << "+++" << text << "+++";
+    else if (type == Status) qDebug().noquote() << "-" << text << "-";
+    if (!logView) return nullptr;
     QListWidgetItem *entry = new QListWidgetItem(text, logView);
     logView->addItem(entry);
-    if(type == Exec) entry->setForeground(Qt::cyan);
-    else if(type != Standard) {
+    if (type == Exec) entry->setForeground(Qt::cyan);
+    else if (type != Standard) {
         QFont font(entry->font());
-        if(type == Section) font.setBold(true);
-        else if(type == Status) font.setItalic(true);
+        if (type == Section) font.setBold(true);
+        else if (type == Status) font.setItalic(true);
         entry->setFont(font);
     }
     logView->scrollToBottom();
@@ -139,22 +139,22 @@ QListWidgetItem *MProcess::log(const QString &text, const LogType type)
 }
 void MProcess::log(QListWidgetItem *entry, const int status)
 {
-    if(!entry) return;
-    if(status > 0) entry->setForeground(Qt::green);
-    else if(status < 0) entry->setForeground(Qt::red);
+    if (!entry) return;
+    if (status > 0) entry->setForeground(Qt::green);
+    else if (status < 0) entry->setForeground(Qt::red);
     else entry->setForeground(Qt::yellow);
 }
 
 void MProcess::status(const QString &text, int progress)
 {
-    if(!progBar) log(text, Status);
+    if (!progBar) log(text, Status);
     else {
         QString fmt = "%p% - " + text;
-        if(progBar->format() != fmt) {
+        if (progBar->format() != fmt) {
             log(text, Status);
             progBar->setFormat(fmt);
         }
-        if(progress < 0) progress = progBar->value() + 1;
+        if (progress < 0) progress = progBar->value() + 1;
         progBar->setValue(progress);
         qApp->processEvents();
     }
@@ -164,9 +164,9 @@ void MProcess::status(const QString &text, int progress)
 
 void MProcess::sleep(const int msec, const bool silent)
 {
-    if(halting) return;
+    if (halting) return;
     QListWidgetItem *logEntry = nullptr;
-    if(!silent) {
+    if (!silent) {
         ++sleepcount;
         logEntry = log(QString("SLEEP: %1ms").arg(msec), Exec);
         qDebug().nospace() << "Sleep #" << sleepcount << ": " << msec << "ms";
@@ -176,7 +176,7 @@ void MProcess::sleep(const int msec, const bool silent)
     connect(&cstimer, &QTimer::timeout, &eloop, &QEventLoop::quit);
     cstimer.start(msec);
     const int rc = eloop.exec();
-    if(!silent) {
+    if (!silent) {
         qDebug().nospace() << "Sleep #" << sleepcount << ": exit " << rc;
         log(logEntry, rc==0?1:-1);
     }
