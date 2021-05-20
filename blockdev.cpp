@@ -102,7 +102,7 @@ void BlockDeviceList::build(MProcess &proc)
         const QJsonArray &jsonParts = jsonDrive["children"].toArray();
         for (const QJsonValue &jsonPart : jsonParts) {
             const QString &partTypeName = jsonPart["parttypename"].toString();
-            if(partTypeName=="Extended") continue;
+            if (partTypeName=="Extended") continue;
             bdinfo.isDrive = false;
             bdinfo.name = jsonPart["name"].toString();
             bdinfo.size = jsonPart["size"].toVariant().toLongLong();
@@ -212,7 +212,7 @@ void BlockDeviceList::buildBuster(MProcess &proc)
             else {
                 bdinfo.isESP = (partType.count(rxESP) >= 1);
                 bdinfo.isNative = (partType.count(rxNative) >= 1);
-                if(!bdinfo.isNasty) bdinfo.isNasty = (partType.count(rxWinLDM) >= 1);
+                if (!bdinfo.isNasty) bdinfo.isNasty = (partType.count(rxWinLDM) >= 1);
             }
             if (!bdinfo.isESP) {
                 // Backup detection for drives that don't have UUID for ESP.
