@@ -81,9 +81,8 @@ void BlockDeviceList::build(MProcess &proc)
 
     // Collect information and populate the block device list.
     const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,PARTTYPENAME,FSTYPE,LABEL,MODEL", true);
+        " TYPE,NAME,UUID,SIZE,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
-    const QString cmdTestGPT("blkid /dev/%1 | grep -q PTTYPE=\\\"gpt\\\"");
 
     clear();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
@@ -93,7 +92,7 @@ void BlockDeviceList::build(MProcess &proc)
         BlockDeviceInfo bdinfo;
         bdinfo.name = jsonDrive["name"].toString();
         bdinfo.isDrive = true;
-        bdinfo.isGPT = proc.exec(cmdTestGPT.arg(bdinfo.name), false);
+        bdinfo.isGPT = (jsonDrive["pttype"]=="gpt");
         bdinfo.size = jsonDrive["size"].toVariant().toLongLong();
         bdinfo.label = jsonDrive["label"].toString();
         bdinfo.model = jsonDrive["model"].toString();
@@ -180,9 +179,8 @@ void BlockDeviceList::buildBuster(MProcess &proc)
     bool backup_checked = false;
     // Collect information and populate the block device list.
     const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL", true);
+        " TYPE,NAME,UUID,SIZE,PTTYPE,PARTTYPE,FSTYPE,LABEL,MODEL", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
-    const QString cmdTestGPT("blkid /dev/%1 | grep -q PTTYPE=\\\"gpt\\\"");
 
     clear();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
@@ -192,7 +190,7 @@ void BlockDeviceList::buildBuster(MProcess &proc)
         BlockDeviceInfo bdinfo;
         bdinfo.name = jsonDrive["name"].toString();
         bdinfo.isDrive = true;
-        bdinfo.isGPT = proc.exec(cmdTestGPT.arg(bdinfo.name), false);
+        bdinfo.isGPT = (jsonDrive["pttype"]=="gpt");
         bdinfo.size = jsonDrive["size"].toVariant().toLongLong();
         bdinfo.label = jsonDrive["label"].toString();
         bdinfo.model = jsonDrive["model"].toString();
