@@ -27,8 +27,8 @@
 // static function to split a device name into its drive and partition
 QStringList BlockDeviceInfo::split(const QString &devname)
 {
-    const QRegularExpression rxdev1("^(?:/dev/)+(mmcblk.*|nvme.*)p([0-9]*)$");
-    const QRegularExpression rxdev2("^(?:/dev/)+([a-z]*)([0-9]*)$");
+    const QRegularExpression rxdev1("^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$");
+    const QRegularExpression rxdev2("^(?:\\/dev\\/)*([a-z]*)([0-9]*)$");
     QRegularExpressionMatch rxmatch(rxdev1.match(devname));
     if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
     QStringList list(rxmatch.capturedTexts());

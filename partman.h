@@ -46,6 +46,7 @@ class PartMan : public QObject
         OldLayout,
         VirtualDevices,
         VirtualBD,
+        SetBoot,
         AutoCrypto,
         CryptoV,
         Subvolume
@@ -58,7 +59,6 @@ class PartMan : public QObject
     QStringList listToUnmount;
     void setup();
     void scanVirtualDevices(bool rescan);
-    void clearLayout(QTreeWidgetItem *drvit);
     inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
         const QString &defaultUse, bool crypto);
     void setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo,
@@ -74,8 +74,11 @@ class PartMan : public QObject
     bool calculatePartBD();
     bool prepareSubvolumes(QTreeWidgetItem *partit);
     QTreeWidgetItem *findOrigin(const QString &vdev);
+    void drvitClear(QTreeWidgetItem *drvit);
     inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
     inline bool drvitIsLocked(const QTreeWidgetItem *drvit);
+    void drvitAutoSetBoot(QTreeWidgetItem *drvit);
+    void partitSetBoot(QTreeWidgetItem *partit, bool boot);
     inline bool twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const;
     inline void twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value);
     inline bool twitCanUse(QTreeWidgetItem *twit);
