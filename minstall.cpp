@@ -1648,36 +1648,36 @@ void MInstall::pageDisplayed(int next)
         mainHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
             + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
             "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
-                       " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
+                " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
             + "<p><b>" + tr("Limitations") + "</b><br/>"
             + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
-                 " It is solely your responsibility to backup your data before proceeding.") + "</p>");
+                " It is solely your responsibility to backup your data before proceeding.") + "</p>");
         nextButton->setDefault(true);
         break;
     case 2: // choose disk
         mainHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
-                          + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
-                          "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
-                          "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
-                          + tr("On large drives, the default regular install results in separate root and home partitions."
-                               " The slider allows you to control how much space is allocated to each partition.") + "</p>"
-                          "<p>" + tr("Move the slider to the right to increase the space for <b>root</b>. Move it to the left to increase the space for <b>home</b>.") + "<br/>"
-                          + tr("Move the slider all the way to the right if you want both root and home on the same partition.") + "</p>"
-                          "<p>" + tr("If you plan to install many applications, or large applications such as graphics, audio"
-                                     " and video editing packages, you probably want a larger <b>root</b> partition.") + "<br/>"
-                          + tr("If you are storing large quantity of data, or this computer is being"
-                                     " used by many users, you may want a larger <b>home</b> partition.") + "</p>"
-                          "<p>" + tr("Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier."
-                                     " This can also improve overall performance by constraining the system files to a defined portion of the drive.") + "</p>"
-                          "<p><b>" + tr("Encryption") + "</b><br/>"
-                          + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
-                          "<p>" + tr("A separate unencrypted boot partition is required."
-                                     " For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
-                          "<p>" + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>"
-                          "<p><b>" + tr("Using a custom disk layout") + "</b><br/>"
-                          + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
-                                " On the next page, you will then be able to select and configure the storage devices and"
-                                " partitions you need.").arg(PROJECTNAME, customPartButton->text().remove('&')) + "</p>");
+            + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
+            "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
+            "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
+            + tr("On large drives, the default regular install results in separate root and home partitions."
+                " The slider allows you to control how much space is allocated to each partition.") + "</p>"
+            "<p>" + tr("Move the slider to the right to increase the space for <b>root</b>. Move it to the left to increase the space for <b>home</b>.") + "<br/>"
+            + tr("Move the slider all the way to the right if you want both root and home on the same partition.") + "</p>"
+            "<p>" + tr("If you plan to install many applications, or large applications such as graphics, audio"
+                " and video editing packages, you probably want a larger <b>root</b> partition.") + "<br/>"
+            + tr("If you are storing large quantity of data, or this computer is being"
+                " used by many users, you may want a larger <b>home</b> partition.") + "</p>"
+            "<p>" + tr("Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier."
+                " This can also improve overall performance by constraining the system files to a defined portion of the drive.") + "</p>"
+            "<p><b>" + tr("Encryption") + "</b><br/>"
+            + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
+            "<p>" + tr("A separate unencrypted boot partition is required."
+                " For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
+            "<p>" + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>"
+            "<p><b>" + tr("Using a custom disk layout") + "</b><br/>"
+            + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
+                " On the next page, you will then be able to select and configure the storage devices and"
+                " partitions you need.").arg(PROJECTNAME, customPartButton->text().remove('&')) + "</p>");
         if (phase < 0) {
             updateCursor(Qt::WaitCursor);
             phase = 0;
@@ -1691,113 +1691,113 @@ void MInstall::pageDisplayed(int next)
 
     case 3:  // choose partition
         mainHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
-                          + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"
-                          "<p>" + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"
-                          "<p>" + tr("<i>Size</i> - The size of the partition. This can only be changed on a new layout.") + "</p>"
-                          "<p>" + tr("<i>Label</i> - The label that is assigned to the partition once it has been formatted.") + "</p>"
-                          "<p>" + tr("<i>Use For</i> - To use this partition in an installation, you must select something here."
-                                     " You can also type your own mount point, which must start with a slash (\"/\").") + "</p>"
-                          "<p>" + tr("<i>Encrypt</i> - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.") + "</p>"
-                          "<p>" + tr("<i>Format</i> - This is the partition's format. Available formats depend on what the partition is used for."
-                                     " When working with an existing layout, you may be able to preserve the format of the partition by selecting <b>Preserve</b>.") + "</p>"
-                          "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
-                          "<p>" + tr("<i>Mount Options</i> - This specifies mounting options that will be used for this partition.") + "</p>"
-                          "<p><b>" + tr("Menus and actions") + "</b><br/>"
-                          + tr("A variety of actions are available by right-clicking any drive or partition item in the list.") + "<br/>"
-                          + tr("The buttons to the right of the list can also be used to manipulate the entries.") + "</p>"
-                          "<p>" + tr("The installer cannot modify the layout already on the drive."
-                                     " To create a custom layout, mark the drive for a new layout with the <b>New layout</b> menu action"
-                                     " or button (%1). This clears the existing layout.").arg("<img src=':/edit-clear-all'/>") + "</p>"
-                          "<p><b>" + tr("Basic layout requirements") + "</b><br/>"
-                          + tr("%1 requires a root partition. The swap partition is optional but highly recommended."
-                               " If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.").arg(PROJECTNAME) + "</p>"
-                          "<p>" + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future,"
-                                     " but this will not be possible if you are upgrading from an installation that does not have a separate home partition.") + "</p>"
-                          "<p><b>" + tr("Partition boot flag") + "</b><br/>"
-                          + tr("For the installed operating system to boot, the boot flag must be set on the appropriate partition."
-                               " This is usually the boot or root partition. The flag can be changed using the <b>Set boot flag</b> menu action.") + "<br/>"
-                          + tr("A partition whose boot flag will be set is shown with its device name in <i>italic</i> type.") + "</p>"
-                          "<p><b>" + tr("Need help creating a layout?") + "</b><br/>"
-                          + tr("Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.") + "</p>"
-                          "<p>" + tr("<i>Standard install</i> - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.") + "</p>"
-                          "<p>" + tr("<i>Encrypted system</i> - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.") + "</p>"
-                          "<p><b>" + tr("Upgrading") + "</b><br/>"
-                          + tr("To upgrade from an existing Linux installation, select the same home partition as before and select <b>Preserve</b> as the format.") + "</p>"
-                          "<p>" + tr("If you do not use a separate home partition, select <b>Preserve /home</b> on the root file system entry to preserve the existing /home directory located on your root partition."
-                                     " The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.") + "</p>"
-                          "<p><b>" + tr("Preferred Filesystem Type") + "</b><br/>"
-                          + tr("For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.").arg(PROJECTNAME) + "</p>"
-                          "<p>" + tr("Additional compression options are available for drives using btrfs."
-                                     " Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.") + "</p>"
-                          "<p><b>" + tr("Bad Blocks") + "</b><br/>"
-                          + tr("If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive."
-                               " The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"
-                          "<p><b>" + tr("System partition management tool") + "</b><br/>"
-                          + tr("For more control over the drive layouts (such as modifying the existing layout on a disk), click the"
-                               " partition management button (%1). This will run the operating system's partition management tool,"
-                               " which will allow you to create the exact layout you need.").arg("<img src=':/partitionmanager'/>") + "</p>"
-                          "<p><b>" + tr("Encryption") + "</b><br/>"
-                          + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
-                          "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p><p>"
-                          + tr("To preserve an encrypted partition, right-click on it and select <b>Unlock</b>. In the dialog that appears, enter a name for the virtual device and the password."
-                               " When the device is unlocked, the name you chose will appear under <i>Virtual Devices</i>, with similar options to that of a regular partition.") + "</p><p>"
-                          + tr("For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the <b>Add to crypttab</b> menu action to do this.") + "</p>"
-                          "<p><b>" + tr("Other partitions") + "</b><br/>"
-                          + tr("The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.") + "</p>"
-                          "<p><b>" + tr("Subvolumes") + "</b><br/>"
-                          + tr("Some file systems, such as Btrfs, support multiple subvolumes in a single partition."
-                               " These are not physical subdivisions, and so their order does not matter.") + "<br/>"
-                          + tr("Use the <b>Scan subvolumes</b> menu action to search an existing Btrfs partition for subvolumes."
-                               " To create a new subvolume, use the <b>New subvolume</b> menu action.") + "</p><p>"
-                          + tr("Existing subvolumes can be preserved, however the name must remain the same.") + "</p>"
-                          "<p><b>" + tr("Virtual Devices") + "</b><br/>"
-                          + tr("If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
-                          "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
+            + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"
+            "<p>" + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"
+            "<p>" + tr("<i>Size</i> - The size of the partition. This can only be changed on a new layout.") + "</p>"
+            "<p>" + tr("<i>Label</i> - The label that is assigned to the partition once it has been formatted.") + "</p>"
+            "<p>" + tr("<i>Use For</i> - To use this partition in an installation, you must select something here."
+                " You can also type your own mount point, which must start with a slash (\"/\").") + "</p>"
+            "<p>" + tr("<i>Encrypt</i> - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.") + "</p>"
+            "<p>" + tr("<i>Format</i> - This is the partition's format. Available formats depend on what the partition is used for."
+                " When working with an existing layout, you may be able to preserve the format of the partition by selecting <b>Preserve</b>.") + "</p>"
+            "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
+            "<p>" + tr("<i>Mount Options</i> - This specifies mounting options that will be used for this partition.") + "</p>"
+            "<p><b>" + tr("Menus and actions") + "</b><br/>"
+            + tr("A variety of actions are available by right-clicking any drive or partition item in the list.") + "<br/>"
+            + tr("The buttons to the right of the list can also be used to manipulate the entries.") + "</p>"
+            "<p>" + tr("The installer cannot modify the layout already on the drive."
+                " To create a custom layout, mark the drive for a new layout with the <b>New layout</b> menu action"
+                " or button (%1). This clears the existing layout.").arg("<img src=':/edit-clear-all'/>") + "</p>"
+            "<p><b>" + tr("Basic layout requirements") + "</b><br/>"
+            + tr("%1 requires a root partition. The swap partition is optional but highly recommended."
+                " If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.").arg(PROJECTNAME) + "</p>"
+            "<p>" + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future,"
+                " but this will not be possible if you are upgrading from an installation that does not have a separate home partition.") + "</p>"
+            "<p><b>" + tr("Partition boot flag") + "</b><br/>"
+            + tr("For the installed operating system to boot, the boot flag must be set on the appropriate partition."
+                " This is usually the boot or root partition. The flag can be changed using the <b>Set boot flag</b> menu action.") + "<br/>"
+            + tr("A partition whose boot flag will be set is shown with its device name in <i>italic</i> type.") + "</p>"
+            "<p><b>" + tr("Need help creating a layout?") + "</b><br/>"
+            + tr("Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.") + "</p>"
+            "<p>" + tr("<i>Standard install</i> - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.") + "</p>"
+            "<p>" + tr("<i>Encrypted system</i> - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.") + "</p>"
+            "<p><b>" + tr("Upgrading") + "</b><br/>"
+            + tr("To upgrade from an existing Linux installation, select the same home partition as before and select <b>Preserve</b> as the format.") + "</p>"
+            "<p>" + tr("If you do not use a separate home partition, select <b>Preserve /home</b> on the root file system entry to preserve the existing /home directory located on your root partition."
+                " The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.") + "</p>"
+            "<p><b>" + tr("Preferred Filesystem Type") + "</b><br/>"
+            + tr("For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.").arg(PROJECTNAME) + "</p>"
+            "<p>" + tr("Additional compression options are available for drives using btrfs."
+                " Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.") + "</p>"
+            "<p><b>" + tr("Bad Blocks") + "</b><br/>"
+            + tr("If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive."
+                " The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"
+            "<p><b>" + tr("System partition management tool") + "</b><br/>"
+            + tr("For more control over the drive layouts (such as modifying the existing layout on a disk), click the"
+                " partition management button (%1). This will run the operating system's partition management tool,"
+                " which will allow you to create the exact layout you need.").arg("<img src=':/partitionmanager'/>") + "</p>"
+            "<p><b>" + tr("Encryption") + "</b><br/>"
+            + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
+            "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p><p>"
+            + tr("To preserve an encrypted partition, right-click on it and select <b>Unlock</b>. In the dialog that appears, enter a name for the virtual device and the password."
+                " When the device is unlocked, the name you chose will appear under <i>Virtual Devices</i>, with similar options to that of a regular partition.") + "</p><p>"
+            + tr("For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the <b>Add to crypttab</b> menu action to do this.") + "</p>"
+            "<p><b>" + tr("Other partitions") + "</b><br/>"
+            + tr("The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.") + "</p>"
+            "<p><b>" + tr("Subvolumes") + "</b><br/>"
+            + tr("Some file systems, such as Btrfs, support multiple subvolumes in a single partition."
+                " These are not physical subdivisions, and so their order does not matter.") + "<br/>"
+            + tr("Use the <b>Scan subvolumes</b> menu action to search an existing Btrfs partition for subvolumes."
+                " To create a new subvolume, use the <b>New subvolume</b> menu action.") + "</p><p>"
+            + tr("Existing subvolumes can be preserved, however the name must remain the same.") + "</p>"
+            "<p><b>" + tr("Virtual Devices") + "</b><br/>"
+            + tr("If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
+            "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
         backButton->setEnabled(true);
         nextButton->setEnabled(!(gbEncrPass->isEnabledTo(gbEncrPass->parentWidget())) || FDEpassCust->isValid());
         return; // avoid the end that enables both Back and Next buttons
 
     case 4: // advanced encryption settings
         mainHelp->setText("<p><b>"
-                          + tr("Advanced Encryption Settings") + "</b><br/>" + tr("This page allows fine-tuning of LUKS encrypted partitions.") + "<br/>"
-                          + tr("In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.")
-                          + "</p><p>"
-                          + tr("This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.") + "<br/>"
-                          + tr("Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.") + "<br/>"
-                          + tr("Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.") + "<br/>"
-                          + tr("Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.")
-                          + "</p><p>"
-                          + tr("You can use the <b>Benchmark</b> button (which runs <i>cryptsetup benchmark</i> in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.") + "<br/>"
-                          + tr("Please note that <i>cryptsetup benchmark</i> does not cover all the combinations or selections possible, and generally covers the most commonly used selections.")
-                          + "</p><p>"
-                          + "<b>" + tr("Cipher") + "</b><br/>" + tr("A variety of ciphers are available.") + "<br/>"
-                          + "<b>Serpent</b> " + tr("was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.") + "<br/>"
-                          + "<b>AES</b> " + tr("(also known as <i>Rijndael</i>) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.") + "<br/>"
-                          + "<b>Twofish</b> " + tr("is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.") + "<br/>"
-                          + "<b>CAST6</b> " + tr("(CAST-256) was a candidate in the AES contest, however it did not become a finalist.") + "<br/>"
-                          + "<b>Blowfish</b> " + tr("is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.")
-                          + "</p><p>"
-                          + "<b>" + tr("Chain mode") + "</b><br/>" + tr("If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.") + "<br />"
-                          + "<b>XTS</b> " + tr("XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.") + "<br />"
-                          + "<b>CBC</b> " + tr("(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.") + "<br />"
-                          + "<b>ECB</b> " + tr("(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.")
-                          + "</p><p>"
-                          + "<b>" + tr("IV generator") + "</b><br/>" + tr("For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.") + "<br/>"
-                          + tr("ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.")
-                          + "</p><p>"
-                          + "<b>" + tr("Key size") + "</b><br/>" + tr("Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.") + "<br/>"
-                          + tr("The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).")
-                          + "</p><p>"
-                          + "<b>" + tr("LUKS key hash") + "</b><br/>" + tr("The hash used for PBKDF2 and for the AF splitter.") + " <br/>"
-                          + tr("SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.")
-                          + "</p><p>"
-                          + "<b>" + tr("Kernel RNG") + "</b><br/>" + tr("Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).") + "<br/>"
-                          + tr("Two options are available: /dev/<b>random</b> which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/<b>urandom</b> which will not block even if there is insufficient entropy (possibly weaker keys).")
-                          + "</p><p>"
-                          + "<b>" + tr("KDF round time</b><br/>The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.") + "<br/>"
-                          + tr("A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).") + "<br/>"
-                          + tr("If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.")
-                          + "</p>");
+            + tr("Advanced Encryption Settings") + "</b><br/>" + tr("This page allows fine-tuning of LUKS encrypted partitions.") + "<br/>"
+            + tr("In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.")
+            + "</p><p>"
+            + tr("This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.") + "<br/>"
+            + tr("Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.") + "<br/>"
+            + tr("Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.") + "<br/>"
+            + tr("Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.")
+            + "</p><p>"
+            + tr("You can use the <b>Benchmark</b> button (which runs <i>cryptsetup benchmark</i> in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.") + "<br/>"
+            + tr("Please note that <i>cryptsetup benchmark</i> does not cover all the combinations or selections possible, and generally covers the most commonly used selections.")
+            + "</p><p>"
+            + "<b>" + tr("Cipher") + "</b><br/>" + tr("A variety of ciphers are available.") + "<br/>"
+            + "<b>Serpent</b> " + tr("was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.") + "<br/>"
+            + "<b>AES</b> " + tr("(also known as <i>Rijndael</i>) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.") + "<br/>"
+            + "<b>Twofish</b> " + tr("is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.") + "<br/>"
+            + "<b>CAST6</b> " + tr("(CAST-256) was a candidate in the AES contest, however it did not become a finalist.") + "<br/>"
+            + "<b>Blowfish</b> " + tr("is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.")
+            + "</p><p>"
+            + "<b>" + tr("Chain mode") + "</b><br/>" + tr("If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.") + "<br />"
+            + "<b>XTS</b> " + tr("XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.") + "<br />"
+            + "<b>CBC</b> " + tr("(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.") + "<br />"
+            + "<b>ECB</b> " + tr("(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.")
+            + "</p><p>"
+            + "<b>" + tr("IV generator") + "</b><br/>" + tr("For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.") + "<br/>"
+            + tr("ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.")
+            + "</p><p>"
+            + "<b>" + tr("Key size") + "</b><br/>" + tr("Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.") + "<br/>"
+            + tr("The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).")
+            + "</p><p>"
+            + "<b>" + tr("LUKS key hash") + "</b><br/>" + tr("The hash used for PBKDF2 and for the AF splitter.") + " <br/>"
+            + tr("SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.")
+            + "</p><p>"
+            + "<b>" + tr("Kernel RNG") + "</b><br/>" + tr("Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).") + "<br/>"
+            + tr("Two options are available: /dev/<b>random</b> which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/<b>urandom</b> which will not block even if there is insufficient entropy (possibly weaker keys).")
+            + "</p><p>"
+            + "<b>" + tr("KDF round time</b><br/>The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.") + "<br/>"
+            + tr("A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).") + "<br/>"
+            + tr("If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.")
+            + "</p>");
         break;
 
     case 5: // set bootloader (start of installation)
@@ -1834,32 +1834,32 @@ void MInstall::pageDisplayed(int next)
 
     case 8: // set localization, clock, services button
         mainHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
-                          + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"
-                          "<p><b>" + tr("Configure Clock") + "</b><br/>"
-                          + tr("If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC)."
-                               " To change this, check the \"<b>System clock uses local time</b>\" box.") + "</p>"
-                          "<p>" + tr("The system boots with the timezone preset to GMT/UTC."
-                               " To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.") + "</p>"
-                          "<p><b>" + tr("Service Settings") + "</b><br/>"
-                          + tr("Most users should not change the defaults."
-                               " Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible."
-                               " Make sure you know what you are doing!"));
+            + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"
+            "<p><b>" + tr("Configure Clock") + "</b><br/>"
+            + tr("If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC)."
+                " To change this, check the \"<b>System clock uses local time</b>\" box.") + "</p>"
+            "<p>" + tr("The system boots with the timezone preset to GMT/UTC."
+                " To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.") + "</p>"
+            "<p><b>" + tr("Service Settings") + "</b><br/>"
+            + tr("Most users should not change the defaults."
+                " Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible."
+                " Make sure you know what you are doing!"));
         break;
 
     case 9: // set username and passwords
         mainHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
-                          + tr("The root user is similar to the Administrator user in some other operating systems."
-                               " You should not use the root user as your daily user account."
-                               " Please enter the name for a new (default) user account that you will use on a daily basis."
-                               " If needed, you can add other user accounts later with %1 User Manager.").arg(PROJECTNAME) + "</p>"
-                          "<p><b>" + tr("Passwords") + "</b><br/>"
-                          + tr("Enter a new password for your default user account and for the root account."
-                               " Each password must be entered twice.") + "</p>"
-                          "<p><b>" + tr("No passwords") + "</b><br/>"
-                          + tr("If you want the default user account to have no password, leave its password fields empty."
-                               " This allows you to log in without requiring a password.") + "<br/>"
-                          + tr("Obviously, this should only be done in situations where the user account"
-                               " does not need to be secure, such as a public terminal.") + "</p>");
+        + tr("The root user is similar to the Administrator user in some other operating systems."
+            " You should not use the root user as your daily user account."
+            " Please enter the name for a new (default) user account that you will use on a daily basis."
+            " If needed, you can add other user accounts later with %1 User Manager.").arg(PROJECTNAME) + "</p>"
+        "<p><b>" + tr("Passwords") + "</b><br/>"
+        + tr("Enter a new password for your default user account and for the root account."
+            " Each password must be entered twice.") + "</p>"
+        "<p><b>" + tr("No passwords") + "</b><br/>"
+        + tr("If you want the default user account to have no password, leave its password fields empty."
+            " This allows you to log in without requiring a password.") + "<br/>"
+        + tr("Obviously, this should only be done in situations where the user account"
+            " does not need to be secure, such as a public terminal.") + "</p>");
         if (!nextFocus) nextFocus = userNameEdit;
         backButton->setEnabled(true);
         userPassValidationChanged();
@@ -1868,20 +1868,20 @@ void MInstall::pageDisplayed(int next)
 
     case 10: // deal with an old home directory
         mainHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
-                          + tr("A home directory already exists for the user name you have chosen."
-                               " This screen allows you to choose what happens to this directory.") + "</p>"
-                          "<p><b>" + tr("Re-use it for this installation") + "</b><br/>"
-                          + tr("The old home directory will be used for this user account."
-                               " This is a good choice when upgrading, and your files and settings will be readily available.") + "</p>"
-                          "<p><b>" + tr("Rename it and create a new directory") + "</b><br/>"
-                          + tr("A new home directory will be created for the user, but the old home directory will be renamed."
-                               " Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.") + "</p>"
-                          "<p>" + tr("The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.") + "</p>"
-                          "<p><b>" + tr("Delete it and create a new directory") + +"</b><br/>"
-                          + tr("The old home directory will be deleted, and a new one will be created from scratch.") + "<br/>"
-                          "<b>" + tr("Warning") + "</b>: "
-                          + tr("All files and settings will be deleted permanently if this option is selected."
-                               " Your chances of recovering them are low.") + "</p>");
+            + tr("A home directory already exists for the user name you have chosen."
+                " This screen allows you to choose what happens to this directory.") + "</p>"
+            "<p><b>" + tr("Re-use it for this installation") + "</b><br/>"
+            + tr("The old home directory will be used for this user account."
+                " This is a good choice when upgrading, and your files and settings will be readily available.") + "</p>"
+            "<p><b>" + tr("Rename it and create a new directory") + "</b><br/>"
+            + tr("A new home directory will be created for the user, but the old home directory will be renamed."
+                " Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.") + "</p>"
+            "<p>" + tr("The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.") + "</p>"
+            "<p><b>" + tr("Delete it and create a new directory") + +"</b><br/>"
+            + tr("The old home directory will be deleted, and a new one will be created from scratch.") + "<br/>"
+            "<b>" + tr("Warning") + "</b>: "
+            + tr("All files and settings will be deleted permanently if this option is selected."
+                " Your chances of recovering them are low.") + "</p>");
         // disable the Next button if none of the old home options are selected
         on_radioOldHomeUse_toggled(false);
         // if the Next button is disabled, avoid enabling both Back and Next at the end
@@ -1897,15 +1897,15 @@ void MInstall::pageDisplayed(int next)
             on_progressBar_valueChanged(iLastProgress);
         }
         mainHelp->setText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
-                          + tr("%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
-                          + "</p><p>"
-                          + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
-                          + "</p><p>"
-                          + "<b>" + tr("Change settings while you wait") + "</b><br/>"
-                          + tr("While %1 is being installed, you can click on the <b>Next</b> or <b>Back</b> buttons to enter other information required for the installation.").arg(PROJECTNAME)
-                          + "</p><p>"
-                          + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
-                          + "</p>");
+            + tr("%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
+            + "</p><p>"
+            + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
+            + "</p><p>"
+            + "<b>" + tr("Change settings while you wait") + "</b><br/>"
+            + tr("While %1 is being installed, you can click on the <b>Next</b> or <b>Back</b> buttons to enter other information required for the installation.").arg(PROJECTNAME)
+            + "</p><p>"
+            + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
+            + "</p>");
         backButton->setEnabled(true);
         nextButton->setEnabled(false);
         return; // avoid enabling both Back and Next buttons at the end
@@ -1923,10 +1923,10 @@ void MInstall::pageDisplayed(int next)
 
     default: // other
         mainHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n "
-                          + tr("<p><b>Support %1</b><br/>"
-                               "%1 is supported by people like you. Some help others at the "
-                               "support forum - %2 - or translate help files into different "
-                               "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
+        + tr("<p><b>Support %1</b><br/>"
+            "%1 is supported by people like you. Some help others at the "
+            "support forum - %2 - or translate help files into different "
+            "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
         nextButton->setDefault(true);
         break;
     }
