@@ -51,28 +51,28 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription(QApplication::tr("Customizable GUI installer for MX Linux and antiX Linux"));
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addOptions({{"auto", QApplication::tr("Installs automatically using the configuration file (more information below).\n"\
+    parser.addOptions({{"auto", QApplication::tr("Installs automatically using the configuration file (more information below).\n"
                                                  "-- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.")},
-                       {"brave", QApplication::tr("Overrules sanity checks on partitions and drives, causing them to be displayed.\n"\
+                       {"brave", QApplication::tr("Overrules sanity checks on partitions and drives, causing them to be displayed.\n"
                                                   "-- WARNING: this can break things, use it only if you don't care about data on drive.")},
-                       {{"c" , "config"}, QApplication::tr("Load a configuration file as specified by <config-file>.\n"\
-                                                           "By default /etc/minstall.conf is used.\n"\
-                                                           "This configuration can be used with --auto for an unattended installation.\n"\
-                                                           "The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.\n"\
-                                                           "The installer will not write any passwords or ignored settings to the new configuration file.\n"\
+                       {{"c" , "config"}, QApplication::tr("Load a configuration file as specified by <config-file>.\n"
+                                                           "By default /etc/minstall.conf is used.\n"
+                                                           "This configuration can be used with --auto for an unattended installation.\n"
+                                                           "The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.\n"
+                                                           "The installer will not write any passwords or ignored settings to the new configuration file.\n"
                                                            "Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.")},
-                       {"gpt-override", QApplication::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"\
-                                                          "Without this option, GPT will only be used on drives with at least 2TB capacity.\n"\
+                       {"gpt-override", QApplication::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"
+                                                          "Without this option, GPT will only be used on drives with at least 2TB capacity.\n"
                                                           "GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.")},
                        {{"m", "mount-keep"}, QApplication::tr("Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.")},
                        {{"n", "nocopy"}, QApplication::tr("Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.")},
-                       {{"o", "oem"}, QApplication::tr("Install the operating system, delaying prompts for user-specific options until the first reboot.\n"\
-                                                       "Upon rebooting, the installer will be run with --oobe so that the user can provide these details.\n"\
+                       {{"o", "oem"}, QApplication::tr("Install the operating system, delaying prompts for user-specific options until the first reboot.\n"
+                                                       "Upon rebooting, the installer will be run with --oobe so that the user can provide these details.\n"
                                                        "This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.")},
-                       {"oobe", QApplication::tr("Out Of the Box Experience option.\n"\
+                       {"oobe", QApplication::tr("Out Of the Box Experience option.\n"
                                                  "This will start automatically if installed with --oem option.")},
                        {{"p", "pretend"}, QApplication::tr("Test mode for GUI, you can advance to different screens without actially installing.")},
-                       {{"s", "sync"}, QApplication::tr("Installing with rsync instead of cp on custom partitioning.\n"\
+                       {{"s", "sync"}, QApplication::tr("Installing with rsync instead of cp on custom partitioning.\n"
                                                         "-- doesn't format /root and it doesn't work with encryption.")}});
     parser.addPositionalArgument("config-file", QApplication::tr("Load a configuration file as specified by <config-file>."), "<config-file>");
     parser.process(a);
