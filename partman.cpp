@@ -299,8 +299,7 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
             this, &PartMan::spinSizeValueChange);
         if (!defaultMB) defaultMB = maxMB;
         spinSize->setValue(defaultMB);
-        // TODO: re-enable when Debian Bullseye is about to be released.
-        //spinSize->setStepType(QSpinBox::AdaptiveDecimalStepType);
+        spinSize->setStepType(QSpinBox::AdaptiveDecimalStepType);
         spinSize->setAccelerated(true);
     }
     // Label
@@ -381,15 +380,6 @@ void PartMan::resizeColumnsToFit()
     for (int ixi = gui.treePartitions->columnCount() - 1; ixi >= 0; --ixi) {
         if (ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
     }
-    // Pad the column to work around a Buster Qt bug where combo box bleeds out of column.
-    QFile file("/etc/debian_version");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        const int ver = file.readLine().split('.').at(0).toInt();
-        if (ver==10) {
-            gui.treePartitions->setColumnWidth(UseFor,
-                gui.treePartitions->columnWidth(UseFor)+16);
-        }
-    }
 }
 
 QString PartMan::translateUse(const QString &alias)
@@ -438,11 +428,6 @@ void PartMan::spinSizeValueChange(int i)
         if (twit!=partit) maxMB -= twitSize(twit);
     }
     if (i > maxMB) spin->setValue(maxMB);
-    // TODO: Remove when Bullseye is about to be released.
-    int stepval = 1;
-    for (int ixi=1; ixi<=(i/10); ixi*=10) stepval = ixi;
-    spin->setSingleStep(stepval);
-    // End of setStepType() replacement.
     gui.buttonPartAdd->setEnabled(i < maxMB);
     spin->blockSignals(false);
 }
