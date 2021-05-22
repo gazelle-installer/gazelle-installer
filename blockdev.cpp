@@ -60,99 +60,6 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
 void BlockDeviceList::build(MProcess &proc)
 {
     proc.log(__PRETTY_FUNCTION__);
-    // TODO: Remove when MX-21 is released.
-    QFile file("/etc/debian_version");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        const int ver = file.readLine().split('.').at(0).toInt();
-        if (ver==10) {
-            buildBuster(proc);
-            return;
-        }
-    }
-
-    proc.exec("partprobe -s", true);
-    proc.exec("blkid -c /dev/null", true);
-
-    QString bootUUID;
-    if (QFile::exists("/live/config/initrd.out")) {
-        QSettings livecfg("/live/config/initrd.out", QSettings::NativeFormat);
-        bootUUID = livecfg.value("BOOT_UUID").toString();
-    }
-
-    // Collect information and populate the block device list.
-    const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL", true);
-    const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
-
-    clear();
-    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
-    for (const QJsonValue &jsonDrive : jsonBD) {
-        int driveIndex = count(); // For propagating the nasty flag to the drive.
-        if (jsonDrive["type"] != "disk") continue;
-        BlockDeviceInfo bdinfo;
-        bdinfo.name = jsonDrive["name"].toString();
-        bdinfo.isDrive = true;
-        bdinfo.isGPT = (jsonDrive["pttype"]=="gpt");
-        bdinfo.size = jsonDrive["size"].toVariant().toLongLong();
-        bdinfo.label = jsonDrive["label"].toString();
-        bdinfo.model = jsonDrive["model"].toString();
-        append(bdinfo);
-
-        const QJsonArray &jsonParts = jsonDrive["children"].toArray();
-        for (const QJsonValue &jsonPart : jsonParts) {
-            const QString &partTypeName = jsonPart["parttypename"].toString();
-            if (partTypeName=="Extended") continue;
-            bdinfo.isDrive = false;
-            bdinfo.name = jsonPart["name"].toString();
-            bdinfo.size = jsonPart["size"].toVariant().toLongLong();
-            bdinfo.label = jsonPart["label"].toString();
-            bdinfo.model = jsonPart["model"].toString();
-            bdinfo.mapCount = jsonPart["children"].toArray().count();
-            bdinfo.isNative = partTypeName.startsWith("Linux");
-            bdinfo.isESP = (partTypeName=="EFI System");
-            if (!bdinfo.isNasty) bdinfo.isNasty = partTypeName.startsWith("Microsoft LDM");
-            bdinfo.isBoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
-            bdinfo.fs = jsonPart["fstype"].toString();
-            append(bdinfo);
-            // Propagate the boot and nasty flags up to the drive.
-            if (bdinfo.isBoot) operator[](driveIndex).isBoot = true;
-            if (bdinfo.isNasty) operator[](driveIndex).isNasty = true;
-        }
-    }
-    // propagate the boot flag across the entire drive
-    bool driveBoot = false;
-    for (BlockDeviceInfo &bdinfo : *this) {
-        if (bdinfo.isDrive) driveBoot = bdinfo.isBoot;
-        bdinfo.isBoot = driveBoot;
-    }
-
-    // debug
-    qDebug() << "Name Size Model FS | isDisk isGPT isBoot isESP isNative isNasty";
-    for (const BlockDeviceInfo &bdi : *this) {
-        qDebug() << bdi.name << bdi.size << bdi.model << bdi.fs << "|"
-                 << bdi.isDrive << bdi.isGPT << bdi.isBoot << bdi.isESP
-                 << bdi.isNative << bdi.isNasty;
-    }
-}
-
-int BlockDeviceList::findDevice(const QString &devname) const
-{
-    const int cnt = count();
-    for (int ixi = 0; ixi < cnt; ++ixi) {
-        const BlockDeviceInfo &bdinfo = at(ixi);
-        if (bdinfo.name == devname) return ixi;
-    }
-    return -1;
-}
-
-/////////////////////////////////////////
-// Grafted from earlier build function //
-// TODO: Remove when MX-21 is released //
-/////////////////////////////////////////
-
-void BlockDeviceList::buildBuster(MProcess &proc)
-{
-    proc.log(__PRETTY_FUNCTION__);
 
     proc.exec("partprobe -s", true);
     proc.exec("blkid -c /dev/null", true);
@@ -239,10 +146,20 @@ void BlockDeviceList::buildBuster(MProcess &proc)
     }
 
     // debug
-    qDebug() << "Name Size Model FS | isDisk isGPT isBoot isESP isNative";
+    qDebug() << "Name Size Model FS | isDisk isGPT isBoot isESP isNative isNasty";
     for (const BlockDeviceInfo &bdi : *this) {
         qDebug() << bdi.name << bdi.size << bdi.model << bdi.fs << "|"
                  << bdi.isDrive << bdi.isGPT << bdi.isBoot << bdi.isESP
-                 << bdi.isNative;
+                 << bdi.isNative << bdi.isNasty;
     }
+}
+
+int BlockDeviceList::findDevice(const QString &devname) const
+{
+    const int cnt = count();
+    for (int ixi = 0; ixi < cnt; ++ixi) {
+        const BlockDeviceInfo &bdinfo = at(ixi);
+        if (bdinfo.name == devname) return ixi;
+    }
+    return -1;
 }
