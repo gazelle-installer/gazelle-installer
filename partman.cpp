@@ -64,7 +64,7 @@ void PartMan::setup()
     gui.buttonPartRemove->setEnabled(false);
     gui.buttonPartClear->setEnabled(false);
     defaultLabels["ESP"] = "EFI System";
-    defaultLabels["bios_grub"] = "BIOS GRUB";
+    defaultLabels["BIOS-GRUB"] = "BIOS GRUB";
 }
 
 void PartMan::populate(QTreeWidgetItem *drvstart)
@@ -322,7 +322,7 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
     comboUse->addItem("");
     comboUse->addItem("Format");
     if (!twitFlag(partit, TwitFlag::VirtualBD)) {
-        if (!bdinfo || bdinfo->size <= 16) comboUse->addItem("bios_grub");
+        if (!bdinfo || bdinfo->size <= 16) comboUse->addItem("BIOS-GRUB");
         if (!bdinfo || bdinfo->size <= 4294967296) {
             comboUse->addItem("ESP");
             comboUse->addItem("boot");
@@ -444,7 +444,7 @@ void PartMan::comboUseTextChange(const QString &text)
     int useClass = -1;
     if (usetext.isEmpty()) useClass = 0;
     else if (usetext == "ESP") useClass = 1;
-    else if (usetext == "bios_grub") useClass = 2;
+    else if (usetext == "BIOS-GRUB") useClass = 2;
     else if (usetext == "/boot") useClass = 3;
     else if (usetext == "SWAP") useClass = 4;
     else if (usetext == "FORMAT") useClass = 100;
@@ -517,7 +517,7 @@ void PartMan::comboUseTextChange(const QString &text)
         comboFormat->setEnabled(comboFormat->count()>1);
         // Label and options
         editLabel->setEnabled(useClass!=0);
-        gui.treePartitions->itemWidget(partit, Options)->setEnabled(useClass!=0 && useClass<100);
+        gui.treePartitions->itemWidget(partit, Options)->setEnabled(useClass!=0 && useClass!=2 && useClass<100);
         combo->setProperty("class", QVariant(useClass));
     }
     if (useClass!=0 && (!(editLabel->isModified()) || editLabel->text().isEmpty())) {
@@ -1345,7 +1345,7 @@ int PartMan::layoutDefault(QTreeWidgetItem *drvit,
         if (updateTree) addItem(drvit, 256, "ESP", crypto);
         rootFormatSize -= 256;
     } else if (driveSize >= 2097152 || gptoverride) {
-        if (updateTree) addItem(drvit, 1, "bios_grub", crypto);
+        if (updateTree) addItem(drvit, 1, "BIOS-GRUB", crypto);
         rootFormatSize -= 1;
     }
     int rootMinMB = rootSpaceNeeded / 1048576;
@@ -1506,7 +1506,7 @@ bool PartMan::preparePartitions()
             QStringList devsplit(BlockDeviceInfo::split(twit->text(Device)));
             QString cmd = "parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1);
             bool ok = true;
-            if (useFor == "bios_grub") ok = proc.exec(cmd + " bios_grub on");
+            if (useFor == "BIOS-GRUB") ok = proc.exec(cmd + " bios_grub on");
             if (twitFlag(twit, SetBoot)) {
                 if(!useGPT) ok = proc.exec(cmd + " boot on");
                 else ok = proc.exec(cmd + " legacy_boot on");
