@@ -968,39 +968,6 @@ bool MInstall::installLoader()
     const QString &statup = tr("Installing GRUB");
     proc.status(statup);
 
-    //add switch to change root partition info
-    QString boot = grubBootCombo->currentData().toString();
-    const int ixboot = listBlkDevs.findDevice(boot);
-    boot.insert(0, "/dev/");
-
-    if (grubMbrButton->isChecked() && ixboot >= 0) {
-        const QString &bootDevice = partman.getMountDev("/boot", false);
-        const QString &rootDevice = partman.getMountDev("/", false);
-        const QString &homeDevice = partman.getMountDev("/home", false);
-        QString part_num;
-        if (bootDevice.startsWith(boot)) part_num = bootDevice;
-        else if (rootDevice.startsWith(boot)) part_num = rootDevice;
-        else if (homeDevice.startsWith(boot)) part_num = homeDevice;
-        if (!part_num.isEmpty()) {
-            // remove the non-digit part to get the number of the root partition
-            part_num.remove(QRegularExpression("\\D+\\d*\\D+"));
-        }
-        const char *bootflag = nullptr;
-        if (listBlkDevs.at(ixboot).isGPT) {
-            if (!part_num.isEmpty()) bootflag = " legacy_boot on";
-            const QString &biosGrubDevice = partman.getMountDev("bios_grub", false);
-            if (!biosGrubDevice.isEmpty()) {
-                QStringList devsplit(BlockDeviceInfo::split(biosGrubDevice));
-                proc.exec("parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1) + " bios_grub on", true);
-            }
-        } else if (entireDiskButton->isChecked()) {
-            if (!part_num.isEmpty()) bootflag = " boot on";
-        }
-        if (bootflag) proc.exec("parted -s " + boot + " set " + part_num + bootflag, true);
-    }
-
-    proc.sleep(1000);
-
     // set mounts for chroot
     proc.exec("/bin/mount --rbind --make-rslave /dev /mnt/antiX/dev", true);
     proc.exec("/bin/mount --rbind --make-rslave /sys /mnt/antiX/sys", true);
@@ -1012,6 +979,7 @@ bool MInstall::installLoader()
     QString arch;
 
     // install new Grub now
+    const QString &boot = "/dev/" + grubBootCombo->currentData().toString();
     if (!grubEspButton->isChecked()) {
         cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot %1").arg(boot);
     } else {
