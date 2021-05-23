@@ -1506,12 +1506,10 @@ bool PartMan::preparePartitions()
         // Partition flags.
         for(int ixdev=0; ixdev<devCount; ++ixdev) {
             QTreeWidgetItem *twit = drvit->child(ixdev);
-            const QString &useFor = twitUseFor(twit);
-            if (useFor.isEmpty()) continue;
+            if (twitUseFor(twit).isEmpty()) continue;
             QStringList devsplit(BlockDeviceInfo::split(twit->text(Device)));
             QString cmd = "parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1);
             bool ok = true;
-            if (useFor == "BIOS-GRUB") ok = proc.exec(cmd + " bios_grub on");
             if (twitFlag(twit, SetBoot)) {
                 if(!useGPT) ok = proc.exec(cmd + " boot on");
                 else ok = proc.exec(cmd + " legacy_boot on");
@@ -1562,9 +1560,13 @@ bool PartMan::formatPartitions()
             if (!proc.exec("mkfs.msdos -F "+fmt.mid(3)+' '+dev)) return false;
             // Sets boot flag and ESP flag.
             const QStringList &devsplit = BlockDeviceInfo::split(dev);
-            proc.exec("parted -s /dev/" + devsplit.at(0)
-                + " set " + devsplit.at(1) + " esp on");
-        } else if (useFor.startsWith("SWAP")) {
+            if(!proc.exec("parted -s /dev/" + devsplit.at(0)
+                + " set " + devsplit.at(1) + " esp on")) return false;
+        } else if (useFor=="BIOS-GRUB") {
+            const QStringList &devsplit = BlockDeviceInfo::split(dev);
+            if(!proc.exec("parted -s /dev/" + devsplit.at(0)
+                + " set " + devsplit.at(1) + " bios_grub on")) return false;
+        } else if (useFor=="SWAP") {
             QString cmd("/sbin/mkswap " + dev);
             const QString &label = twitLineEdit(twit, Label)->text();
             if (!label.isEmpty()) cmd.append(" -L \"" + label + '"');
