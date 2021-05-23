@@ -1408,31 +1408,6 @@ int PartMan::countPrepSteps()
     return nstep;
 }
 
-// Transplanted straight from minstall.cpp
-void PartMan::clearPartitionTables(const QString &dev)
-{
-    //setup block size and offsets info
-    QString bytes = proc.execOut("parted --script /dev/" + dev + " unit B print 2>/dev/null | sed -rn 's/^Disk.*: ([0-9]+)B$/\\1/ip\'");
-    qDebug() << "bytes is " << bytes;
-    int block_size = 512;
-    int pt_size = 17 * 1024;
-    int pt_count = pt_size / block_size;
-    int total_blocks = bytes.toLongLong() / block_size;
-    qDebug() << "total blocks is " << total_blocks;
-
-    //clear primary partition table
-    proc.exec("dd if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count));
-
-    // Clear out sneaky iso-hybrid partition table
-    proc.exec("dd if=/dev/zero of=/dev/" + dev +" bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=64");
-
-    // clear secondary partition table
-    if ( ! bytes.isEmpty()) {
-        int offset = total_blocks - pt_count;
-        proc.exec("dd conv=notrunc if=/dev/zero of=/dev/" + dev + " bs=" + QString::number(block_size) + " count=" + QString::number(pt_count) + " seek=" + QString::number(offset));
-    }
-}
-
 bool PartMan::preparePartitions()
 {
     proc.log(__PRETTY_FUNCTION__);
@@ -1456,8 +1431,21 @@ bool PartMan::preparePartitions()
         if (twitFlag(twit, TwitFlag::OldLayout)) continue;
         const QString &drv = twit->text(Device);
         proc.status(tr("Preparing partition tables"));
-        clearPartitionTables(drv);
-        const bool useGPT = listBlkDevs.at(listBlkDevs.findDevice(drv)).isGPT;
+        const int index = listBlkDevs.findDevice(drv);
+        assert (index >= 0);
+
+        // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
+        const long long bytes = listBlkDevs.at(index).size;
+        const long long offset = (bytes / 65536) - 63; // Account for integer rounding.
+        qDebug() << "Clearing:" << drv << " - bytes:" << bytes << " - last:" << offset;
+        const QString &cmd = QStringLiteral("dd conv=notrunc bs=64K count=64 if=/dev/zero of=/dev/") + drv;
+        // First 17KB = primary partition table (accounts for both MBR and GPT disks).
+        // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
+        proc.exec(cmd);
+        // Last 17KB = secondary partition table (for GPT disks).
+        proc.exec(cmd + " seek=" + QString::number(offset));
+
+        const bool useGPT = listBlkDevs.at(index).isGPT;
         if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
     }
     proc.sleep(1000);
