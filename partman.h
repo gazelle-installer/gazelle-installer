@@ -66,7 +66,6 @@ class PartMan : public QObject
     void resizeColumnsToFit();
     static QString translateUse(const QString &alias);
     static QString describeUse(const QString &use);
-    void clearPartitionTables(const QString &dev);
     bool formatLinuxPartition(const QString &dev, const QString &format, bool chkBadBlocks, const QString &label);
     void setEncryptChecks(const QString &use,
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
