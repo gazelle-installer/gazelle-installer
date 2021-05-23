@@ -1629,6 +1629,7 @@ void MInstall::pageDisplayed(int next)
         if (next != ixProgress) ixTipStart = ixTip;
     }
 
+    // These calculations are only for display text, and do not affect the installation.
     const QLocale &sysloc = QLocale::system();
     long long rootMin = partman.rootSpaceNeeded + 1048575;
     const QString &tminroot = sysloc.formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
