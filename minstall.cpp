@@ -95,6 +95,8 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     MIN_INSTALL_SIZE = settings.value("MIN_INSTALL_SIZE").toString();
     PREFERRED_MIN_INSTALL_SIZE = settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
     REMOVE_NOSPLASH = settings.value("REMOVE_NOSPLASH", "false").toBool();
+    ROOT_BUFFER = settings.value("ROOT_BUFFER", 5000).toInt();
+    HOME_BUFFER = settings.value("HOME_BUFFER", 2000).toInt();
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
     gotoPage(0);
@@ -2423,8 +2425,8 @@ void MInstall::on_sliderPart_valueChanged(int value)
     const long long roundUp = available - 1;
     const long long rootMinMB = (partman.rootSpaceNeeded+1048575) / 1048576;
     const int minPercent = ((rootMinMB*100)+roundUp) / available;
-    const int recPercentMin = (((rootMinMB+4096)*100)+roundUp) / available; // Recommended root size. TODO: Make configurable.
-    const int recPercentMax = 99 - ((1024*100) / available); // Recommended minimum home. TODO: Make configurable.
+    const int recPercentMin = (((rootMinMB + ROOT_BUFFER) * 100) + roundUp) / available; // Recommended root size.
+    const int recPercentMax = 99 - (((16 + HOME_BUFFER) * 100) / available); // Recommended minimum home.
     int origValue = value;
     if (value<0) { // Internal setup.
         origValue = value = sliderPart->value();

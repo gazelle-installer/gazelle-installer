@@ -1024,7 +1024,7 @@ QWidget *PartMan::composeValidate(bool automatic,
 {
     QStringList msgForeignList;
     QString msgConfirm;
-    bool encryptAny = false, encryptRoot = false;
+    bool encryptRoot = false;
     mounts.clear();
     // Partition use and other validation
     int mapnum=0, swapnum=0, formatnum=0;
@@ -1089,7 +1089,6 @@ QWidget *PartMan::composeValidate(bool automatic,
                     mapperData = QString::number(++mapnum)
                         + mount.replace('/','.') + ".fsm";
                 }
-                encryptAny = true;
             }
             (*it)->setData(Device, Qt::UserRole, mapperData);
         }
@@ -1100,9 +1099,6 @@ QWidget *PartMan::composeValidate(bool automatic,
             << twitMappedDevice(it.second) << twitMappedDevice(it.second, true);
     }
 
-    if (encryptAny) {
-        // TODO: Validate encryption settings.
-    }
     QTreeWidgetItem *rootitem = mounts.value("/");
     if (rootitem) {
         if (!twitWillFormat(rootitem) && mounts.contains("/home")) {
