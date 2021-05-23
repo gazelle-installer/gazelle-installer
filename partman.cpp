@@ -1052,7 +1052,7 @@ QWidget *PartMan::composeValidate(bool automatic,
             }
         }
         QString mount = translateUse(comboUse->currentText());
-        const QString &devname = (*it)->text(Device);
+        const QString &devname = twitShownDevice(*it);
         if (!mount.startsWith("/") && comboUse->findText(mount, Qt::MatchFixedString)<0) {
             QMessageBox::critical(master, master->windowTitle(),
                 tr("Invalid use for %1: %2").arg(devname, mount));
@@ -1068,7 +1068,7 @@ QWidget *PartMan::composeValidate(bool automatic,
         // The mount can only be selected once.
         if (twit) {
             QMessageBox::critical(master, master->windowTitle(), tr("%1 is already"
-                " selected for: %2").arg(twit->text(Device), describeUse(mount)));
+                " selected for: %2").arg(twitShownDevice(twit), describeUse(mount)));
             return comboUse;
         } else {
             if (!mount.isEmpty()) mounts.insert(mount, *it);
@@ -1096,7 +1096,7 @@ QWidget *PartMan::composeValidate(bool automatic,
     }
     qDebug() << "Mount points:";
     for (const auto &it : mounts.toStdMap()) {
-        qDebug() << " -" << it.first << '-' << it.second->text(Device)
+        qDebug() << " -" << it.first << '-' << twitShownDevice(it.second)
             << twitMappedDevice(it.second) << twitMappedDevice(it.second, true);
     }
 
@@ -1128,7 +1128,7 @@ QWidget *PartMan::composeValidate(bool automatic,
         QStringList msgFormatList;
         // Format (vs just mounting or configuring) partitions.
         for (const auto &it : mounts.toStdMap()) {
-            const QString &dev = it.second->text(Device);
+            const QString &dev = twitShownDevice(it.second);
             if (twitWillFormat(it.second)) msgFormatList << dev << describeUse(it.first);
             else if (it.first == "/") {
                 msgConfirm += " - " + tr("Delete the data on %1"
@@ -2014,6 +2014,13 @@ inline QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool
     }
     if (!full) return twit->text(Device);
     return "/dev/" + twit->text(Device);
+}
+QString PartMan::twitShownDevice(QTreeWidgetItem *twit)
+{
+    if (twitFlag(twit, Subvolume)) {
+        return twit->parent()->text(Device) + '[' + twitLineEdit(twit, Label)->text() + ']';
+    }
+    return twit->text(Device);
 }
 inline QComboBox *PartMan::twitComboBox(QTreeWidgetItem  *twit, int column)
 {
