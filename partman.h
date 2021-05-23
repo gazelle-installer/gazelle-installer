@@ -114,8 +114,7 @@ public:
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
     void populate(QTreeWidgetItem *drvstart = nullptr);
     bool manageConfig(MSettings &config, bool save);
-    QWidget *composeValidate(bool automatic,
-        const QString &minSizeText, const QString &project);
+    QWidget *composeValidate(bool automatic, const QString &project);
     bool checkTargetDrivesOK();
     bool luksMake(const QString &dev, const QByteArray &password);
     bool luksOpen(const QString &dev, const QString &luksfs,

@@ -70,8 +70,6 @@ public:
     bool POPULATE_MEDIA_MOUNTPOINTS;
 
     QString DEFAULT_HOSTNAME;
-    QString MIN_INSTALL_SIZE;
-    QString PREFERRED_MIN_INSTALL_SIZE;
     QString PROJECTFORUM;
     QString PROJECTNAME;
     QString PROJECTSHORTNAME;
@@ -80,7 +78,7 @@ public:
     QStringList ENABLE_SERVICES;
     bool REMOVE_NOSPLASH;
     QString SQFILE_FULL;
-    int ROOT_BUFFER, HOME_BUFFER;
+    long long ROOT_BUFFER, HOME_BUFFER;
 
     int showPage(int curr, int next);
     void gotoPage(int next);
