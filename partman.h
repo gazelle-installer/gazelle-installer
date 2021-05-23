@@ -59,8 +59,7 @@ class PartMan : public QObject
     QStringList listToUnmount;
     void setup();
     void scanVirtualDevices(bool rescan);
-    inline QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB,
-        const QString &defaultUse, bool crypto);
+    QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB, const QString &defaultUse, bool crypto);
     void setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo,
         int defaultMB = 0, const QString &defaultUse = QString());
     void labelParts(QTreeWidgetItem *drvit);
@@ -76,20 +75,20 @@ class PartMan : public QObject
     QTreeWidgetItem *findOrigin(const QString &vdev);
     void drvitClear(QTreeWidgetItem *drvit);
     inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
-    inline bool drvitIsLocked(const QTreeWidgetItem *drvit);
+    inline bool drvitIsLocked(const QTreeWidgetItem *drvit) const;
     void drvitAutoSetBoot(QTreeWidgetItem *drvit);
     void partitSetBoot(QTreeWidgetItem *partit, bool boot);
     inline bool twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const;
-    inline void twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value);
-    inline bool twitCanUse(QTreeWidgetItem *twit);
-    inline long long twitSize(QTreeWidgetItem *twit, const bool bytes=false);
-    inline bool twitWillFormat(QTreeWidgetItem *twit);
-    inline QString twitUseFor(QTreeWidgetItem *twit);
+    void twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value);
+    inline bool twitCanUse(QTreeWidgetItem *twit) const;
+    long long twitSize(QTreeWidgetItem *twit, const bool bytes=false) const;
+    bool twitWillFormat(QTreeWidgetItem *twit) const;
+    inline QString twitUseFor(QTreeWidgetItem *twit) const;
     inline bool twitWillMap(const QTreeWidgetItem *twit) const;
-    inline QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
-    QString twitShownDevice(QTreeWidgetItem *twit);
-    inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column);
-    inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column);
+    QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
+    QString twitShownDevice(QTreeWidgetItem *twit) const;
+    inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column) const;
+    inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column) const;
     void spinSizeValueChange(int i);
     void comboUseTextChange(const QString &text);
     void comboFormatTextChange(const QString &);
