@@ -1387,22 +1387,23 @@ int PartMan::layoutDefault(QTreeWidgetItem *drvit,
 
 int PartMan::countPrepSteps()
 {
-    int pcount = 0;
-    // Creation of new partitions
-    for (int ixi = gui.treePartitions->topLevelItemCount(); ixi>=0; --ixi) {
-        QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
-        if (twitComboBox(drvit, Format)) pcount += drvit->childCount() + 1; // Partition table creation included.
+    int nstep = 0;
+    QTreeWidgetItemIterator it(gui.treePartitions);
+    for (; *it; ++it) {
+        if (twitFlag(*it, Drive)) {
+            if (!twitFlag(*it, OldLayout)) ++nstep; // New partition table
+        } else if (twitFlag(*it, Partition)) {
+            // Preparation
+            if (!twitFlag(*it, OldLayout)) ++nstep; // New partition
+            else if (!twitUseFor(*it).isEmpty()) ++nstep; // Existing partition
+            // Formatting
+            if ((*it)->checkState(Encrypt) == Qt::Checked) ++nstep; // LUKS Format
+            if (twitWillFormat(*it)) ++nstep; // New file system or subvolume
+            // Mounting
+            if (!twitUseFor(*it).isEmpty()) ++nstep;
+        }
     }
-    // Formatting partitions
-    pcount += mounts.count();
-    QMapIterator<QString, QTreeWidgetItem *> mi(mounts);
-    while (mi.hasNext()) {
-        mi.next();
-        QTreeWidgetItem *partit = mi.value();
-        if (partit->checkState(Encrypt)==Qt::Checked) ++pcount; //LUKS format.
-    }
-    // Final count
-    return pcount;
+    return nstep;
 }
 
 // Transplanted straight from minstall.cpp
@@ -1447,12 +1448,12 @@ bool PartMan::preparePartitions()
             << twit->text(Device) << " (" << twitSize(twit) << "MB)";
     }
 
-    // Clear the existing partition tables on devices which will have a new layout.
+    // Prepare partition tables on devices which will have a new layout.
     for (int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
         QTreeWidgetItem *twit = gui.treePartitions->topLevelItem(ixi);
         if (twitFlag(twit, TwitFlag::OldLayout)) continue;
         const QString &drv = twit->text(Device);
-        proc.status(tr("Clearing existing partition tables"));
+        proc.status(tr("Preparing partition tables"));
         clearPartitionTables(drv);
         const bool useGPT = listBlkDevs.at(listBlkDevs.findDevice(drv)).isGPT;
         if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
@@ -1480,6 +1481,7 @@ bool PartMan::preparePartitions()
                 const QStringList &devsplit = BlockDeviceInfo::split(twit->text(Device));
                 if (!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1)))) return false;
                 proc.sleep(1000);
+                proc.status();
             }
         } else {
             // Creating new partitions.
@@ -1487,15 +1489,14 @@ bool PartMan::preparePartitions()
             long long start = 1; // start with 1 MB to aid alignment
             for (int ixdev=0; ixdev<devCount; ++ixdev) {
                 QTreeWidgetItem *twit = drvit->child(ixdev);
-                const QString &useFor = twitUseFor(twit);
-                if (useFor.isEmpty()) continue;
-                const QString type(useFor!="ESP" ? " mkpart primary " : " mkpart ESP ");
+                const QString type(twitUseFor(twit)!="ESP" ? " mkpart primary " : " mkpart ESP ");
                 const long long end = start + twitSize(twit);
                 bool rc = proc.exec(cmdParted + type
                     + QString::number(start) + "MiB " + QString::number(end) + "MiB");
                 if (!rc) return false;
                 start = end;
                 proc.sleep(1000);
+                proc.status();
             }
         }
         // Partition flags.
@@ -1513,6 +1514,7 @@ bool PartMan::preparePartitions()
             }
             if(!ok) return false;
             proc.sleep(1000);
+            proc.status();
         }
     }
     proc.exec("partprobe -s", true);
@@ -1529,16 +1531,16 @@ bool PartMan::formatPartitions()
     // set up LUKS containers
     const QByteArray &encPass = (gui.entireDiskButton->isChecked()
                                  ? gui.FDEpassword : gui.FDEpassCust)->text().toUtf8();
-    const QString &statup = tr("Setting up LUKS encrypted containers");
+    proc.status(tr("Setting up LUKS encrypted containers"));
     for (QTreeWidgetItem *twit : mounts) {
         const QString dev = "/dev/" + twit->text(Device);
         if (twit->checkState(Encrypt)!=Qt::Checked) continue;
         if (twitWillFormat(twit)) {
-            proc.status(statup);
             if (!luksMake(dev, encPass)) return false;
+            proc.status();
         }
-        proc.status(statup);
         if (!luksOpen(dev, twitMappedDevice(twit), encPass)) return false;
+        proc.status();
     }
 
     // Format partitions.
@@ -1641,6 +1643,7 @@ bool PartMan::prepareSubvolumes(QTreeWidgetItem *partit)
             const QString &subvol = twitLineEdit(svit, Label)->text();
             proc.exec("btrfs subvolume delete /mnt/btrfs-scratch/" + subvol, true);
             if (!proc.exec("btrfs subvolume create /mnt/btrfs-scratch/" + subvol, true)) ok = false;
+            proc.status();
         }
     }
     if (!proc.exec("umount /mnt/btrfs-scratch", true)) return false;

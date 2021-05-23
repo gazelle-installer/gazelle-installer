@@ -468,11 +468,13 @@ void MInstall::updateCursor(const Qt::CursorShape shape)
     qApp->processEvents();
 }
 
-bool MInstall::pretendToInstall(int start, int stop)
+bool MInstall::pretendToInstall(int space, long steps)
 {
-    for (int ixi = start; ixi <= stop; ++ixi) {
-        proc.status(tr("Pretending to install %1").arg(PROJECTNAME), ixi);
-        proc.sleep(phase == 1 ? 100 : 1000, true);
+    proc.advance(space, steps);
+    proc.status(tr("Pretending to install %1").arg(PROJECTNAME));
+    for (long ixi = 0; ixi < steps; ++ixi) {
+        proc.sleep(100, true);
+        proc.status();
         if (phase < 0) return false;
     }
     return true;
@@ -521,13 +523,13 @@ void MInstall::disablehiberanteinitramfs()
 bool MInstall::processNextPhase()
 {
     widgetStack->setEnabled(true);
-    const int progPhase23 = 94; // start of Phase 2/3 progress bar space
     // Phase < 0 = install has been aborted (Phase -2 on close)
     if (phase < 0) return false;
     // Phase 0 = install not started yet, Phase 1 = install in progress
     // Phase 2 = waiting for operator input, Phase 3 = post-install steps
     if (phase == 0) { // no install started yet
-        proc.status(tr("Preparing to install %1").arg(PROJECTNAME), 0);
+        proc.advance(-1, -1);
+        proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
         if (!partman.checkTargetDrivesOK()) return false;
         phase = 1; // installation.
 
@@ -536,21 +538,24 @@ bool MInstall::processNextPhase()
 
         // the core of the installation
         if (!pretend) {
+            proc.advance(12, partman.countPrepSteps());
             bool ok = partman.preparePartitions();
             if (ok) ok = partman.formatPartitions();
+            if (ok) ok = partman.mountPartitions();
             if (!ok) {
-                failUI(tr("Failed to format required partitions."));
+                failUI(tr("Failed to prepare required partitions."));
                 return false;
             }
             //run blkid -c /dev/null to freshen UUID cache
             proc.exec("blkid -c /dev/null", true);
-            if (!installLinux(progPhase23 - 1)) return false;
-        } else if (!pretendToInstall(1, progPhase23 - 1)) {
-            return false;
+            if (!installLinux()) return false;
+        } else {
+            if (!pretendToInstall(14, 200)) return false;
+            if (!pretendToInstall(80, 500)) return false;
         }
         if (widgetStack->currentWidget() != Step_Progress) {
             progressBar->setEnabled(false);
-            proc.status(tr("Paused for required operator input"), progPhase23);
+            proc.status(tr("Paused for required operator input"));
             QApplication::beep();
         }
         phase = 2;
@@ -560,7 +565,8 @@ bool MInstall::processNextPhase()
         progressBar->setEnabled(true);
         backButton->setEnabled(false);
         if (!pretend) {
-            proc.status(tr("Setting system configuration"), progPhase23);
+            proc.advance(1, 1);
+            proc.status(tr("Setting system configuration"));
             if (!isInsideVB() && !oobe) {
                 proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
                 proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
@@ -574,13 +580,14 @@ bool MInstall::processNextPhase()
             config->dumpDebug();
             proc.exec("/bin/sync", true); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
-        } else if (!pretendToInstall(progPhase23, 99)){
+        } else if (!pretendToInstall(5, 100)) {
             return false;
         }
         phase = 4;
-        proc.status(tr("Cleaning up"), 100);
+        proc.advance(1, 1);
+        proc.status(tr("Cleaning up"));
         cleanup();
-        proc.status(tr("Finished"), 100);
+        proc.status(tr("Finished"));
         gotoPage(widgetStack->indexOf(Step_End));
     }
     return true;
@@ -791,12 +798,12 @@ bool MInstall::saveHomeBasic()
     return ok;
 }
 
-bool MInstall::installLinux(const int progend)
+bool MInstall::installLinux()
 {
     proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
+    proc.advance(1, 2);
 
-    if (!partman.mountPartitions()) return false;
     if (!partman.willFormat("/")) {
         // if root was not formatted and not using --sync option then re-use it
         // remove all folders in root except for /home
@@ -819,9 +826,10 @@ bool MInstall::installLinux(const int progend)
     mkdir("/mnt/antiX/run", 0755);
 
     setupAutoMount(true);
-    if (!copyLinux(progend - 1)) return false;
+    if (!copyLinux()) return false;
 
-    proc.status(tr("Fixing configuration"), progend);
+    proc.advance(1, 1);
+    proc.status(tr("Fixing configuration"));
     mkdir("/mnt/antiX/tmp", 01777);
     chmod("/mnt/antiX/tmp", 01777);
 
@@ -855,7 +863,7 @@ bool MInstall::installLinux(const int progend)
     return true;
 }
 
-bool MInstall::copyLinux(const int progend)
+bool MInstall::copyLinux()
 {
     proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
@@ -863,8 +871,6 @@ bool MInstall::copyLinux(const int progend)
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
-    proc.status(tr("Copying new system"));
-    int progstart = progressBar->value();
     // setup and start the process
     QString cmd;
     cmd = "/bin/cp -av";
@@ -874,15 +880,12 @@ bool MInstall::copyLinux(const int progend)
     }
     cmd.append(" " + bootSource + " " + rootSources + " /mnt/antiX");
     struct statvfs svfs;
-
     fsfilcnt_t sourceInodes = 1;
-    fsfilcnt_t targetInodes = 1;
     if (statvfs("/live/linux", &svfs) == 0) {
         sourceInodes = svfs.f_files - svfs.f_ffree;
-        if (statvfs("/mnt/antiX", &svfs) == 0) {
-            targetInodes = svfs.f_files - svfs.f_ffree;
-        }
     }
+    proc.advance(80, sourceInodes);
+    proc.status(tr("Copying new system"));
 
     if (!nocopy) {
         if (phase < 0) return false;
@@ -893,18 +896,11 @@ bool MInstall::copyLinux(const int progend)
         connect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), &eloop, &QEventLoop::quit);
         connect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
         proc.start(cmd);
-        const int progspace = progend - progstart;
-        const int progdiv = (progspace != 0) ? (sourceInodes / progspace) : 0;
+        long ncopy = 0;
         while (proc.state() != QProcess::NotRunning) {
             eloop.exec();
-            proc.readAllStandardOutput();
-            if (statvfs("/mnt/antiX", &svfs) == 0 && progdiv != 0) {
-                int i = (svfs.f_files - svfs.f_ffree - targetInodes) / progdiv;
-                if (i > progspace) i = progspace;
-                progressBar->setValue(i + progstart);
-            } else {
-                proc.status(tr("Copy progress unknown. No file system statistics."));
-            }
+            ncopy += proc.readAllStandardOutput().count('\n');
+            proc.status(ncopy);
         }
         disconnect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), nullptr, nullptr);
         disconnect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), nullptr, nullptr);
@@ -918,7 +914,7 @@ bool MInstall::copyLinux(const int progend)
         proc.log(logEntry, proc.exitCode() ? 0 : 1);
     }
 
-    return true;
+    return (phase >= 0); // Reduces domino effect if the copy is aborted.
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -929,6 +925,7 @@ bool MInstall::installLoader()
 {
     proc.log(__PRETTY_FUNCTION__);
     if (phase < 0) return false;
+    proc.advance(4, 4);
 
     QString cmd;
     QString val = proc.execOut("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
@@ -965,8 +962,7 @@ bool MInstall::installLoader()
         return proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
     }
 
-    const QString &statup = tr("Installing GRUB");
-    proc.status(statup);
+    proc.status(tr("Installing GRUB"));
 
     // set mounts for chroot
     proc.exec("/bin/mount --rbind --make-rslave /dev /mnt/antiX/dev", true);
@@ -1064,22 +1060,21 @@ bool MInstall::installLoader()
             proc.exec("/bin/cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt", true);
         }
     }
-    proc.status(statup);
+    proc.status();
 
     //update grub with new config
 
     qDebug() << "Update Grub";
     proc.exec("chroot /mnt/antiX update-grub");
-    proc.status(statup);
 
-    qDebug() << "Update initramfs";
+    proc.status(tr("Updating initramfs"));
     //if useing f2fs, then add modules to /etc/initramfs-tools/modules
     //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
         //proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
         //proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
     //}
     proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
-    proc.status(statup);
+    proc.status();
     qDebug() << "clear chroot env";
     proc.exec("/bin/umount -R /mnt/antiX/run", true);
     proc.exec("/bin/umount -R /mnt/antiX/proc", true);
