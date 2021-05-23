@@ -27,7 +27,7 @@ MLineEdit::MLineEdit(QWidget *parent)
 {
 }
 
-bool MLineEdit::isValid()
+bool MLineEdit::isValid() const
 {
     return lastValid;
 }

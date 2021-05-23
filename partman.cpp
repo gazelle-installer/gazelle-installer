@@ -270,8 +270,8 @@ bool PartMan::manageConfig(MSettings &config, bool save)
     return true;
 }
 
-inline QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent,
-    int defaultMB, const QString &defaultUse, bool crypto) {
+QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent, int defaultMB, const QString &defaultUse, bool crypto)
+{
     QTreeWidgetItem *partit = new QTreeWidgetItem(parent);
     setupPartitionItem(partit, nullptr, defaultMB, defaultUse);
     // If the layout needs crypto and it is supported, check the box.
@@ -1902,7 +1902,7 @@ inline void PartMan::drvitMarkLayout(QTreeWidgetItem *drvit, const bool old)
     twitSetFlag(drvit, TwitFlag::OldLayout, old);
     gui.treePartitions->resizeColumnToContents(Device);
 }
-inline bool PartMan::drvitIsLocked(const QTreeWidgetItem *drvit)
+inline bool PartMan::drvitIsLocked(const QTreeWidgetItem *drvit) const
 {
     const int partCount = drvit->childCount();
     for (int ixPart=0; ixPart<partCount; ++ixPart) {
@@ -1957,7 +1957,7 @@ inline bool PartMan::twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) 
 {
     return !!(twit->data(Options, Qt::UserRole).toUInt() & (1 << flag));
 }
-inline void PartMan::twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value)
+void PartMan::twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value)
 {
     unsigned int newFlags = twit->data(Options, Qt::UserRole).toUInt();
     const unsigned int bit = 1 << flag;
@@ -1967,12 +1967,12 @@ inline void PartMan::twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, con
         twit->setData(Options, Qt::UserRole, QVariant(newFlags));
     }
 }
-inline bool PartMan::twitCanUse(QTreeWidgetItem *twit)
+inline bool PartMan::twitCanUse(QTreeWidgetItem *twit) const
 {
     QComboBox *combo = twitComboBox(twit, UseFor);
     return combo ? combo->isEnabled() : false;
 }
-inline long long PartMan::twitSize(QTreeWidgetItem *twit, const bool bytes)
+long long PartMan::twitSize(QTreeWidgetItem *twit, const bool bytes) const
 {
     QWidget *spin = gui.treePartitions->itemWidget(twit, Size);
     long long size = 0;
@@ -1985,13 +1985,13 @@ inline long long PartMan::twitSize(QTreeWidgetItem *twit, const bool bytes)
     }
     return size;
 }
-inline bool PartMan::twitWillFormat(QTreeWidgetItem *twit)
+bool PartMan::twitWillFormat(QTreeWidgetItem *twit) const
 {
     QComboBox *combo = twitComboBox(twit, Format);
     if (!combo) return true;
     return (combo->currentData(Qt::UserRole)!="PRESERVE" && !twitUseFor(twit).isEmpty());
 }
-inline QString PartMan::twitUseFor(QTreeWidgetItem *twit)
+inline QString PartMan::twitUseFor(QTreeWidgetItem *twit) const
 {
     QComboBox *combo = twitComboBox(twit, UseFor);
     if (!combo) return QString();
@@ -2002,7 +2002,7 @@ inline bool PartMan::twitWillMap(const QTreeWidgetItem *twit) const
     if (twit->parent()==nullptr) return false;
     return !(twit->data(Device, Qt::UserRole).isNull());
 }
-inline QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool full) const
+QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool full) const
 {
     if (twitFlag(twit, TwitFlag::Subvolume)) twit = twit->parent();
     if (twitFlag(twit, TwitFlag::Partition)) {
@@ -2015,18 +2015,18 @@ inline QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool
     if (!full) return twit->text(Device);
     return "/dev/" + twit->text(Device);
 }
-QString PartMan::twitShownDevice(QTreeWidgetItem *twit)
+QString PartMan::twitShownDevice(QTreeWidgetItem *twit) const
 {
     if (twitFlag(twit, Subvolume)) {
         return twit->parent()->text(Device) + '[' + twitLineEdit(twit, Label)->text() + ']';
     }
     return twit->text(Device);
 }
-inline QComboBox *PartMan::twitComboBox(QTreeWidgetItem  *twit, int column)
+inline QComboBox *PartMan::twitComboBox(QTreeWidgetItem  *twit, int column) const
 {
     return static_cast<QComboBox *>(gui.treePartitions->itemWidget(twit, column));
 }
-inline QLineEdit *PartMan::twitLineEdit(QTreeWidgetItem  *twit, int column)
+inline QLineEdit *PartMan::twitLineEdit(QTreeWidgetItem  *twit, int column) const
 {
     return static_cast<QLineEdit *>(gui.treePartitions->itemWidget(twit, column));
 }
