@@ -39,7 +39,7 @@ public:
     MLineEdit(QWidget *parent = nullptr);
     void setup(MLineEdit *slave, QProgressBar *meter,
                int min=0, int genMin=16, int wordMax=5);
-    bool isValid();
+    bool isValid() const;
 signals:
     void validationChanged(bool valid);
 };
