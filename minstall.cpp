@@ -92,8 +92,6 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     DEFAULT_HOSTNAME = settings.value("DEFAULT_HOSTNAME").toString();
     ENABLE_SERVICES = settings.value("ENABLE_SERVICES").toStringList();
     POPULATE_MEDIA_MOUNTPOINTS = settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
-    MIN_INSTALL_SIZE = settings.value("MIN_INSTALL_SIZE").toString();
-    PREFERRED_MIN_INSTALL_SIZE = settings.value("PREFERRED_MIN_INSTALL_SIZE").toString();
     REMOVE_NOSPLASH = settings.value("REMOVE_NOSPLASH", "false").toBool();
     ROOT_BUFFER = settings.value("ROOT_BUFFER", 5000).toInt();
     HOME_BUFFER = settings.value("HOME_BUFFER", 2000).toInt();
@@ -1562,7 +1560,7 @@ int MInstall::showPage(int curr, int next)
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
             partman.layoutDefault(partman.selectedDriveAuto(), -1, checkBoxEncryptAuto->isChecked());
-            QWidget *nf = partman.composeValidate(true, MIN_INSTALL_SIZE, PROJECTNAME);
+            QWidget *nf = partman.composeValidate(true, PROJECTNAME);
             if (nf) {
                 nextFocus = nf;
                 return curr;
@@ -1570,7 +1568,7 @@ int MInstall::showPage(int curr, int next)
             return 5; // Go to Step_Boot
         }
     } else if (next == 4 && curr == 3) { // at Step_Partition (fwd)
-        QWidget *nf = partman.composeValidate(automatic, MIN_INSTALL_SIZE, PROJECTNAME);
+        QWidget *nf = partman.composeValidate(automatic, PROJECTNAME);
         if (nf) {
             nextFocus = nf;
             return curr;
@@ -1631,6 +1629,12 @@ void MInstall::pageDisplayed(int next)
         if (next != ixProgress) ixTipStart = ixTip;
     }
 
+    const QLocale &sysloc = QLocale::system();
+    long long rootMin = partman.rootSpaceNeeded + 1048575;
+    const QString &tminroot = sysloc.formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
+    rootMin += ROOT_BUFFER * 1048576;
+    const QString &trecroot = sysloc.formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
+
     switch (next) {
     case 1: // terms and keyboard selection
         mainHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
@@ -1644,7 +1648,7 @@ void MInstall::pageDisplayed(int next)
         break;
     case 2: // choose disk
         mainHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
-            + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(MIN_INSTALL_SIZE, PREFERRED_MIN_INSTALL_SIZE) + "</p>"
+            + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(tminroot, trecroot) + "</p>"
             "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
             "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
             + tr("On large drives, the default regular install results in separate root and home partitions."
