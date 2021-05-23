@@ -1019,8 +1019,7 @@ bool PartMan::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
-QWidget *PartMan::composeValidate(bool automatic,
-    const QString &minSizeText, const QString &project)
+QWidget *PartMan::composeValidate(bool automatic, const QString &project)
 {
     QStringList msgForeignList;
     QString msgConfirm;
@@ -1109,8 +1108,10 @@ QWidget *PartMan::composeValidate(bool automatic,
         }
         if (rootitem->checkState(Encrypt) == Qt::Checked) encryptRoot = true;
     } else {
+        const QString &tmin = QLocale::system().formattedDataSize(rootSpaceNeeded + 1048575,
+            1, QLocale::DataSizeTraditionalFormat);
         QMessageBox::critical(master, master->windowTitle(), tr("You must choose a root partition.\n"
-            "The root partition must be at least %1.").arg(minSizeText));
+            "The root partition must be at least %1.").arg(tmin));
         return gui.treePartitions;
     }
     if (encryptRoot && !mounts.contains("/boot")) {
