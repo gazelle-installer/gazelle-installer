@@ -80,7 +80,7 @@ public:
     QStringList ENABLE_SERVICES;
     bool REMOVE_NOSPLASH;
     QString SQFILE_FULL;
-
+    int ROOT_BUFFER, HOME_BUFFER;
 
     int showPage(int curr, int next);
     void gotoPage(int next);
