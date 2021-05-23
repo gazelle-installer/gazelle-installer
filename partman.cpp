@@ -321,7 +321,7 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
     comboUse->addItem("");
     comboUse->addItem("Format");
     if (!twitFlag(partit, TwitFlag::VirtualBD)) {
-        if (!bdinfo || bdinfo->size <= 16) comboUse->addItem("BIOS-GRUB");
+        if (!bdinfo || bdinfo->size <= 16777216) comboUse->addItem("BIOS-GRUB");
         if (!bdinfo || bdinfo->size <= 4294967296) {
             comboUse->addItem("ESP");
             comboUse->addItem("boot");
@@ -1565,6 +1565,7 @@ bool PartMan::formatPartitions()
             if(!proc.exec("parted -s /dev/" + devsplit.at(0)
                 + " set " + devsplit.at(1) + " esp on")) return false;
         } else if (useFor=="BIOS-GRUB") {
+            proc.exec("dd bs=64K if=/dev/zero of=" + dev);
             const QStringList &devsplit = BlockDeviceInfo::split(dev);
             if(!proc.exec("parted -s /dev/" + devsplit.at(0)
                 + " set " + devsplit.at(1) + " bios_grub on")) return false;
