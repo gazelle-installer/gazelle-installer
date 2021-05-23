@@ -145,7 +145,7 @@ void MProcess::log(QListWidgetItem *entry, const int status)
     else entry->setForeground(Qt::yellow);
 }
 
-void MProcess::status(const QString &text, int progress)
+void MProcess::status(const QString &text, long progress)
 {
     if (!progBar) log(text, Status);
     else {
@@ -154,10 +154,30 @@ void MProcess::status(const QString &text, int progress)
             log(text, Status);
             progBar->setFormat(fmt);
         }
-        if (progress < 0) progress = progBar->value() + 1;
-        progBar->setValue(progress);
-        qApp->processEvents();
+        status(progress);
     }
+}
+void MProcess::status(long progress)
+{
+    if (progress < 0) ++progSlicePos;
+    else progSlicePos = progress;
+    int slice = progSliceSpace;
+    if (progSliceSteps > 0) {
+        if (progSlicePos > progSliceSteps) progSlicePos = progSliceSteps;
+        slice = (progSlicePos * progSliceSpace) / progSliceSteps;
+    }
+    if (progBar) progBar->setValue(progSliceStart + slice);
+    qApp->processEvents();
+}
+void MProcess::advance(int space, long steps)
+{
+    if (space < 0) steps = progSliceSpace = progSliceStart = space = 0; // Reset progress
+    progSliceStart += progSliceSpace;
+    progSliceSpace = space;
+    progSliceSteps = steps;
+    progSlicePos = -1;
+    progBar->setValue(progSliceStart);
+    qApp->processEvents();
 }
 
 // Common functions that are traditionally carried out by processes.

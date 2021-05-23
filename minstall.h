@@ -198,10 +198,10 @@ private:
     void updatePartitionCombos(QComboBox *changed);
     void setupPartitionSlider();
     void setupAutoMount(bool enabled);
-    bool pretendToInstall(int start, int stop);
+    bool pretendToInstall(int space, long steps);
     bool saveHomeBasic();
-    bool installLinux(const int progend);
-    bool copyLinux(const int progend);
+    bool installLinux();
+    bool copyLinux();
     void failUI(const QString &msg);
     void manageConfig(enum ConfigAction mode);
     void stashServices(bool save);

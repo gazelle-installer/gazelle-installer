@@ -31,6 +31,8 @@ class MProcess : public QProcess
     bool debugUnusedOutput = true;
     QListWidget *logView = nullptr;
     QProgressBar *progBar = nullptr;
+    int progSliceStart = 0, progSliceSpace = 0;
+    long progSlicePos = 0, progSliceSteps = 0;
 public:
     enum LogType {
         Standard,
@@ -47,7 +49,9 @@ public:
     void unhalt();
     QListWidgetItem *log(const QString &text, const enum LogType type = Section);
     void log(QListWidgetItem *entry, const int status = 1);
-    void status(const QString &text, int progress = -1);
+    void status(const QString &text, long progress = -1);
+    void status(long progress = -1);
+    void advance(int space, long steps);
     // Common functions that are traditionally carried out by processes.
     void sleep(const int msec, const bool silent = false);
     bool mkpath(const QString &path);
