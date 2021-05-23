@@ -488,6 +488,7 @@ void PartMan::comboUseTextChange(const QString &text)
             comboFormat->addItem("reiserfs", "reiserfs");
             if (useClass<100 && comboFormat->findData(curfmt, Qt::UserRole,
                 Qt::MatchFixedString)>=0) allowPreserve = true;
+            if (usetext == "/home") selPreserve = allowPreserve;
         }
         // Changing to and from a mount/use that support encryption.
         if (useClass >= 0 && useClass <= 3) {
