@@ -1630,11 +1630,10 @@ void MInstall::pageDisplayed(int next)
     }
 
     // These calculations are only for display text, and do not affect the installation.
-    const QLocale &sysloc = QLocale::system();
     long long rootMin = partman.rootSpaceNeeded + 1048575;
-    const QString &tminroot = sysloc.formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
+    const QString &tminroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
     rootMin += ROOT_BUFFER * 1048576;
-    const QString &trecroot = sysloc.formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
+    const QString &trecroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
 
     switch (next) {
     case 1: // terms and keyboard selection
