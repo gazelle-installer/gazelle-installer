@@ -47,7 +47,7 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
     QEventLoop eloop;
     connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (rawexec) start(cmd);
-    else start("/bin/bash", QStringList() << "-c" << cmd);
+    else start("/bin/bash", {"-c", cmd});
     if (!debugUnusedOutput) {
         if (!needRead) closeReadChannel(QProcess::StandardOutput);
         closeReadChannel(QProcess::StandardError);
