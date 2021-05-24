@@ -1433,7 +1433,6 @@ bool PartMan::preparePartitions()
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
         const long long bytes = listBlkDevs.at(index).size;
         const long long offset = (bytes / 65536) - 63; // Account for integer rounding.
-        qDebug() << "Clearing:" << drv << " - bytes:" << bytes << " - last:" << offset;
         const QString &cmd = QStringLiteral("dd conv=notrunc bs=64K count=64 if=/dev/zero of=/dev/") + drv;
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
         // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
@@ -1896,8 +1895,7 @@ void PartMan::drvitAutoSetBoot(QTreeWidgetItem *drvit)
 {
     if(!drvit || drvit->data(Format, Qt::UserRole).isValid()) return;
     const int partcount = drvit->childCount();
-    const QStringList prefs({"/boot", "/"});
-    for(const QString &pref : prefs) {
+    for(const QString &pref : QStringList({"/boot", "/"})) {
         for(int ixPart=0; ixPart<partcount; ++ixPart) {
             QTreeWidgetItem *partit = drvit->child(ixPart);
             if(twitUseFor(partit) == pref) {
