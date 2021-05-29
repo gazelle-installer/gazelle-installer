@@ -81,7 +81,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
             else if (!curdrv) continue; // Skip until the drive is drvstart.
             else break; // Exit the loop early if the drive isn't drvstart.
             drvitMarkLayout(curdrv, true);
-            twitSetFlag(curdrv, TwitFlag::Drive, true);
+            twitSetFlag(curdrv, Drive, true);
             curdev = curdrv;
             // Model
             curdev->setText(Label, bdinfo.model);
@@ -114,7 +114,7 @@ void PartMan::scanVirtualDevices(bool rescan)
     if (rescan) {
         for (int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
             QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
-            if (twitFlag(drvit, TwitFlag::VirtualDevices)) {
+            if (twitFlag(drvit, VirtualDevices)) {
                 vdlit = drvit;
                 const int vdcount = vdlit->childCount();
                 for (int ixVD = 0; ixVD < vdcount; ++ixVD) {
@@ -137,7 +137,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         vdlit = new QTreeWidgetItem(gui.treePartitions);
         vdlit->setText(0, tr("Virtual Devices"));
         vdlit->setFirstColumnSpanned(true);
-        twitSetFlag(vdlit, TwitFlag::VirtualDevices, true);
+        twitSetFlag(vdlit, VirtualDevices, true);
     }
     assert(vdlit!=nullptr);
     for (const QJsonValue &jsonDev : jsonBD) {
@@ -153,7 +153,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         if (devit) {
             if (bdinfo.size != devit->data(Size, Qt::UserRole).toLongLong()
                 || bdinfo.label != devit->data(Label, Qt::UserRole).toString()
-                || crypto != twitFlag(devit, TwitFlag::CryptoV)) {
+                || crypto != twitFlag(devit, CryptoV)) {
                 // List entry is different to the device, so refresh it.
                 delete devit;
                 devit = nullptr;
@@ -163,7 +163,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         // Create a new list entry if needed.
         if (!devit) {
             devit = new QTreeWidgetItem(vdlit);
-            twitSetFlag(devit, TwitFlag::VirtualBD, true);
+            twitSetFlag(devit, VirtualBD, true);
             setupPartitionItem(devit, &bdinfo);
             devit->setText(Device, bdinfo.name);
             devit->setData(Device, Qt::UserRole, bdinfo.name);
@@ -172,7 +172,7 @@ void PartMan::scanVirtualDevices(bool rescan)
             devit->setText(Size, tsize);
             devit->setData(Size, Qt::UserRole, QVariant(bdinfo.size));
             if (crypto) {
-                twitSetFlag(devit, TwitFlag::CryptoV, true);
+                twitSetFlag(devit, CryptoV, true);
                 devit->setIcon(0, QIcon::fromTheme("unlock"));
             }
         }
@@ -192,7 +192,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         const QString &drvDevice = drvit->text(Device);
         // Check if the drive is to be cleared and formatted.
         int partCount = drvit->childCount();
-        bool drvPreserve = twitFlag(drvit, TwitFlag::OldLayout);
+        bool drvPreserve = twitFlag(drvit, OldLayout);
         const QString &configNewLayout = "Storage/NewLayout."+drvDevice;
         QVariant bootdev;
         if (save) {
@@ -212,7 +212,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             QTreeWidgetItem *partit = nullptr;
             if (save || drvPreserve) {
                 partit = drvit->child(ixPart);
-                twitSetFlag(partit, TwitFlag::OldLayout, drvPreserve);
+                twitSetFlag(partit, OldLayout, drvPreserve);
             } else {
                 partit = new QTreeWidgetItem(drvit);
                 setupPartitionItem(partit, nullptr);
@@ -283,7 +283,7 @@ QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent, int defaultMB, const 
 void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo,
     int defaultMB, const QString &defaultUse)
 {
-    twitSetFlag(partit, TwitFlag::Partition, true);
+    twitSetFlag(partit, Partition, true);
     // Size
     if (!bdinfo) {
         QSpinBox *spinSize = new QSpinBox(gui.treePartitions);
@@ -320,7 +320,7 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
     comboUse->setInsertPolicy(QComboBox::NoInsert);
     comboUse->addItem("");
     comboUse->addItem("Format");
-    if (!twitFlag(partit, TwitFlag::VirtualBD)) {
+    if (!twitFlag(partit, VirtualBD)) {
         if (!bdinfo || bdinfo->size <= 16777216) comboUse->addItem("BIOS-GRUB");
         if (!bdinfo || bdinfo->size <= 4294967296) {
             comboUse->addItem("ESP");
@@ -502,7 +502,7 @@ void PartMan::comboUseTextChange(const QString &text)
             // Qt::PartiallyChecked tells treeItemChange() to include this item in the refresh.
             partit->setCheckState(Encrypt, Qt::PartiallyChecked);
         }
-        if (twitFlag(partit, TwitFlag::VirtualBD)) {
+        if (twitFlag(partit, VirtualBD)) {
             partit->setData(Encrypt, Qt::CheckStateRole, QVariant());
         } else if (usetext=="/boot" || usetext=="/") {
             drvitAutoSetBoot(partit->parent());
@@ -537,7 +537,7 @@ void PartMan::comboFormatTextChange(const QString &)
     QTreeWidgetItemIterator it(gui.treePartitions);
     bool canCheckBlocks = false;
     for (; *it; ++it) {
-        if (!twitFlag(*it, TwitFlag::Partition)) continue;
+        if (!twitFlag(*it, Partition)) continue;
         QComboBox *comboFormat = twitComboBox(*it, Format);
         QLineEdit *editOpts = twitLineEdit(*it, Options);
         if (!comboFormat || !editOpts) return;
@@ -601,7 +601,7 @@ void PartMan::comboSubvolUseTextChange(const QString &text)
         editLabel->setText(newLabel);
     }
     QTreeWidgetItem *partit = svit->parent();
-    if(!twitFlag(partit, TwitFlag::VirtualBD) && (usetext=="/boot" || usetext=="/")) {
+    if(!twitFlag(partit, VirtualBD) && (usetext=="/boot" || usetext=="/")) {
         drvitAutoSetBoot(partit->parent());
     }
     gui.treePartitions->blockSignals(false);
@@ -666,9 +666,9 @@ void PartMan::treeItemChange(QTreeWidgetItem *twit, int column)
 void PartMan::treeSelChange()
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
-    if (twit && !twitFlag(twit, TwitFlag::Subvolume)) {
-        const bool isold = twitFlag(twit, TwitFlag::OldLayout);
-        const bool isdrive = twitFlag(twit, TwitFlag::Drive);
+    if (twit && !twitFlag(twit, Subvolume)) {
+        const bool isold = twitFlag(twit, OldLayout);
+        const bool isdrive = twitFlag(twit, Drive);
         bool islocked = true;
         if (isdrive) islocked = drvitIsLocked(twit);
         gui.buttonPartClear->setEnabled(!islocked);
@@ -695,9 +695,9 @@ void PartMan::treeMenu(const QPoint &)
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if (!twit) return;
-    if (twitFlag(twit, TwitFlag::VirtualDevices)) return;
+    if (twitFlag(twit, VirtualDevices)) return;
     QMenu menu(gui.treePartitions);
-    if (twitFlag(twit, TwitFlag::Partition)) {
+    if (twitFlag(twit, Partition)) {
         QComboBox *comboFormat = twitComboBox(twit, Format);
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
@@ -709,12 +709,12 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actSetBoot = nullptr;
         actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
         menu.addSeparator();
-        if (twitFlag(twit, TwitFlag::VirtualBD)) {
+        if (twitFlag(twit, VirtualBD)) {
             actRemove->setEnabled(false);
-            if (twitFlag(twit, TwitFlag::CryptoV)) actLock = menu.addAction(tr("&Lock"));
+            if (twitFlag(twit, CryptoV)) actLock = menu.addAction(tr("&Lock"));
         } else {
             bool allowCryptTab = false;
-            if (twitFlag(twit, TwitFlag::OldLayout) && twit->text(Format)=="crypto_LUKS") {
+            if (twitFlag(twit, OldLayout) && twit->text(Format)=="crypto_LUKS") {
                 actUnlock = menu.addAction(tr("&Unlock"));
                 allowCryptTab = true;
             }
@@ -724,7 +724,7 @@ void PartMan::treeMenu(const QPoint &)
             if (allowCryptTab) {
                 actAddCrypttab = menu.addAction(tr("Add to crypttab"));
                 actAddCrypttab->setCheckable(true);
-                actAddCrypttab->setChecked(twitFlag(twit, TwitFlag::AutoCrypto));
+                actAddCrypttab->setChecked(twitFlag(twit, AutoCrypto));
                 actAddCrypttab->setEnabled(twitWillMap(twit));
             }
             menu.addSeparator();
@@ -748,7 +748,7 @@ void PartMan::treeMenu(const QPoint &)
         else if (action==actLock) partMenuLock(twit);
         else if (action==actSetBoot) partitSetBoot(twit, action->isChecked());
         else if (action==actAddCrypttab) {
-            twitSetFlag(twit, TwitFlag::AutoCrypto, action->isChecked());
+            twitSetFlag(twit, AutoCrypto, action->isChecked());
         } else if (action==actNewSubvolume) {
             addSubvolumeItem(twit);
             twit->setExpanded(true);
@@ -756,7 +756,7 @@ void PartMan::treeMenu(const QPoint &)
             scanSubvolumes(twit);
             twit->setExpanded(true);
         }
-    } else if (twitFlag(twit, TwitFlag::Drive)) {
+    } else if (twitFlag(twit, Drive)) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
         menu.addSeparator();
@@ -768,7 +768,7 @@ void PartMan::treeMenu(const QPoint &)
 
         const bool locked = drvitIsLocked(twit);
         actClear->setDisabled(locked);
-        actReset->setDisabled(locked || twitFlag(twit, TwitFlag::OldLayout));
+        actReset->setDisabled(locked || twitFlag(twit, OldLayout));
         menuTemplates->setDisabled(locked);
         actCrypto->setVisible(gui.gbEncrPass->isVisible());
 
@@ -781,7 +781,7 @@ void PartMan::treeMenu(const QPoint &)
             while (twit->childCount()) delete twit->child(0);
             populate(twit);
         }
-    } else if (twitFlag(twit, TwitFlag::Subvolume)) {
+    } else if (twitFlag(twit, Subvolume)) {
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
         if (menu.exec(QCursor::pos()) == actRemSubvolume) delete twit;
     }
@@ -798,7 +798,7 @@ void PartMan::partOptionsMenu(const QPoint &)
     menu->addSeparator();
     QMenu *menuTemplates = menu->addMenu(tr("&Templates"));
     if (selFS=="PRESERVE") selFS = partit->text(Format);
-    if ((twitFlag(partit, TwitFlag::Partition) && selFS == "btrfs") || twitFlag(partit, TwitFlag::Subvolume)) {
+    if ((twitFlag(partit, Partition) && selFS == "btrfs") || twitFlag(partit, Subvolume)) {
         QAction *action = menuTemplates->addAction(tr("Compression (&ZLIB)"));
         action->setData("noatime,compress-force=zlib");
         action = menuTemplates->addAction(tr("Compression (&LZO)"));
@@ -814,7 +814,7 @@ void PartMan::partOptionsMenu(const QPoint &)
 void PartMan::partClearClick(bool)
 {
     QTreeWidgetItem *drvit = gui.treePartitions->selectedItems().value(0);
-    if (!drvit || !twitFlag(drvit, TwitFlag::Drive)) return;
+    if (!drvit || !twitFlag(drvit, Drive)) return;
     drvitClear(drvit);
     comboFormatTextChange(QString()); // For the badblocks checkbox.
     treeSelChange();
@@ -877,7 +877,7 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
             QComboBox *comboUseFor = twitComboBox(twit, UseFor);
             comboUseFor->setCurrentIndex(0);
             comboUseFor->setEnabled(false);
-            twitSetFlag(twit, TwitFlag::AutoCrypto, checkCrypttab->isChecked());
+            twitSetFlag(twit, AutoCrypto, checkCrypttab->isChecked());
             // Refreshing the drive will not necessarily re-scan block devices.
             // This updates the device list manually to keep the tree accurate.
             const int ixBD = listBlkDevs.findDevice(twit->text(Device));
@@ -915,7 +915,7 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
             twitComboBox(twitOrigin, UseFor)->setEnabled(true);
         }
         twitOrigin->setData(Device, Qt::UserRole, QVariant());
-        twitSetFlag(twitOrigin, TwitFlag::AutoCrypto, false);
+        twitSetFlag(twitOrigin, AutoCrypto, false);
     }
     // Refresh virtual devices list.
     gui.treePartitions->blockSignals(true);
@@ -936,7 +936,7 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
 QTreeWidgetItem *PartMan::addSubvolumeItem(QTreeWidgetItem *twit)
 {
     QTreeWidgetItem *svit = new QTreeWidgetItem(twit);
-    twitSetFlag(svit, TwitFlag::Subvolume, true);
+    twitSetFlag(svit, Subvolume, true);
     // Device
     svit->setText(Device, "-");
     // Size
@@ -1030,11 +1030,11 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
     int mapnum=0, swapnum=0, formatnum=0;
     QTreeWidgetItemIterator it(gui.treePartitions);
     for (; *it; ++it) {
-        if (twitFlag(*it, TwitFlag::Drive) || twitFlag(*it, TwitFlag::VirtualDevices)) continue;
+        if (twitFlag(*it, Drive) || twitFlag(*it, VirtualDevices)) continue;
         QComboBox *comboUse = twitComboBox(*it, UseFor);
         QLineEdit *editLabel = twitLineEdit(*it, Label);
         if (!comboUse || !editLabel || comboUse->currentText().isEmpty()) continue;
-        if (twitFlag(*it, TwitFlag::Subvolume)) {
+        if (twitFlag(*it, Subvolume)) {
             bool ok = true;
             const QString &cmptext = editLabel->text().trimmed().toUpper();
             if (cmptext.isEmpty()) ok = false;
@@ -1072,7 +1072,7 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
             return comboUse;
         } else {
             if (!mount.isEmpty()) mounts.insert(mount, *it);
-            if (twitFlag(*it, TwitFlag::OldLayout) && twitWillFormat(*it)) {
+            if (twitFlag(*it, OldLayout) && twitWillFormat(*it)) {
                 // Warn if using a non-Linux partition (potential install of another OS).
                 const int bdindex = listBlkDevs.findDevice(devname);
                 if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
@@ -1080,7 +1080,7 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
                 }
             }
         }
-        if (!twitFlag(*it, TwitFlag::VirtualBD)) {
+        if (!twitFlag(*it, VirtualBD)) {
             QVariant mapperData;
             if ((*it)->checkState(Encrypt) == Qt::Checked) {
                 if (mount == "/") mapperData = "root.fsm";
@@ -1186,7 +1186,7 @@ bool PartMan::calculatePartBD()
     const int driveCount = gui.treePartitions->topLevelItemCount();
     for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
         QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
-        const bool useExist = twitFlag(drvit, TwitFlag::OldLayout);
+        const bool useExist = twitFlag(drvit, OldLayout);
         QString drv = drvit->text(Device);
         int ixDriveBD = listBlkDevs.findDevice(drv);
         const int partCount = drvit->childCount();
@@ -1243,7 +1243,7 @@ bool PartMan::checkTargetDrivesOK()
     QString smartFail, smartWarn;
     for (int ixi = 0; ixi < gui.treePartitions->topLevelItemCount(); ++ixi) {
         QTreeWidgetItem *drvit =  gui.treePartitions->topLevelItem(ixi);
-        if (twitFlag(drvit, TwitFlag::VirtualDevices)) continue;
+        if (twitFlag(drvit, VirtualDevices)) continue;
         QStringList purposes;
         for (int oxo = 0; oxo < drvit->childCount(); ++oxo) {
             const QString &useFor = twitUseFor(drvit->child(oxo));
@@ -1429,7 +1429,7 @@ bool PartMan::preparePartitions()
     // Prepare partition tables on devices which will have a new layout.
     for (int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
         QTreeWidgetItem *twit = gui.treePartitions->topLevelItem(ixi);
-        if (twitFlag(twit, TwitFlag::OldLayout)) continue;
+        if (twitFlag(twit, OldLayout)) continue;
         const QString &drv = twit->text(Device);
         proc.status(tr("Preparing partition tables"));
         const int index = listBlkDevs.findDevice(drv);
@@ -1454,12 +1454,12 @@ bool PartMan::preparePartitions()
     proc.status(tr("Preparing required partitions"));
     for (int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
         QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
-        if (twitFlag(drvit, TwitFlag::VirtualDevices)) continue;
+        if (twitFlag(drvit, VirtualDevices)) continue;
         const QString &drvdev = drvit->text(Device);
         const int devCount = drvit->childCount();
         const int ixBlkDev = listBlkDevs.findDevice(drvdev);
         const bool useGPT = (ixBlkDev >= 0 && listBlkDevs.at(ixBlkDev).isGPT);
-        if (twitFlag(drvit, TwitFlag::OldLayout)) {
+        if (twitFlag(drvit, OldLayout)) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
             if (useGPT) cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
@@ -1535,7 +1535,7 @@ bool PartMan::formatPartitions()
     const bool badblocks = gui.badblocksCheck->isChecked();
     for (const auto &it : mounts.toStdMap()) {
         QTreeWidgetItem *twit = it.second;
-        if (twitFlag(twit, TwitFlag::Subvolume)) continue;
+        if (twitFlag(twit, Subvolume)) continue;
         if (!twitWillFormat(twit)) continue;
         const QString &dev = twitMappedDevice(twit, true);
         const QString &useFor = translateUse(twitComboBox(twit, UseFor)->currentText());
@@ -1569,7 +1569,7 @@ bool PartMan::formatPartitions()
     // Prepare subvolumes on all that (are to) contain them.
     QTreeWidgetItemIterator it(gui.treePartitions);
     for (; *it; ++it) {
-        if (!twitFlag(*it, TwitFlag::Partition)) continue;
+        if (!twitFlag(*it, Partition)) continue;
         else if (!prepareSubvolumes(*it)) return false;
     }
 
@@ -1666,14 +1666,14 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     QMap<QString, QString> extraAdd;
     QTreeWidgetItemIterator it(gui.treePartitions);
     for (; *it; ++it) {
-        if (twitUseFor(*it).isEmpty() && twitFlag(*it, TwitFlag::AutoCrypto)) {
+        if (twitUseFor(*it).isEmpty() && twitFlag(*it, AutoCrypto)) {
             extraAdd.insert((*it)->text(Device), twitMappedDevice(*it));
         }
     }
     // File systems
     for (auto &it : mounts.toStdMap()) {
         if (it.second->checkState(Encrypt)!=Qt::Checked) continue;
-        if (it.first.startsWith("FORMAT") && !twitFlag(it.second, TwitFlag::AutoCrypto)) continue;
+        if (it.first.startsWith("FORMAT") && !twitFlag(it.second, AutoCrypto)) continue;
         const QString &dev = it.second->text(Device);
         QString uuid = proc.execOut(cmdBlkID + dev);
         out << twitMappedDevice(it.second, false) << " /dev/disk/by-uuid/" << uuid;
@@ -1733,7 +1733,7 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         else out << ' ' << it.first << ' ' << fsfmt;
         // Options
         const QString &mountopts = twitLineEdit(it.second, Options)->text();
-        if (!twitFlag(it.second, TwitFlag::Subvolume)) {
+        if (!twitFlag(it.second, Subvolume)) {
             if (mountopts.isEmpty()) out << " defaults";
             else out << ' ' << mountopts;
         } else {
@@ -1778,7 +1778,7 @@ bool PartMan::mountPartitions()
             if (!proc.exec("fsck.ext4 -y " + dev)) return false;
         }
         QStringList opts;
-        if (twitFlag(it.second, TwitFlag::Subvolume)) {
+        if (twitFlag(it.second, Subvolume)) {
             opts.append("subvol=" + twitLineEdit(it.second, Label)->text());
         }
         // Use noatime to speed up the installation.
@@ -1826,7 +1826,7 @@ QString PartMan::getMountDev(const QString &point, const bool mapped)
     if (!twit) return QString();
     if (mapped) return twitMappedDevice(twit, true);
     QString rstr("/dev/");
-    if (twitFlag(twit, TwitFlag::VirtualBD)) rstr.append("mapper/");
+    if (twitFlag(twit, VirtualBD)) rstr.append("mapper/");
     return rstr.append(twit->text(Device));
 }
 int PartMan::swapCount()
@@ -1885,7 +1885,7 @@ inline void PartMan::drvitMarkLayout(QTreeWidgetItem *drvit, const bool old)
 {
     if (old) drvit->setIcon(Device, QIcon());
     else drvit->setIcon(Device, QIcon(":/appointment-soon"));
-    twitSetFlag(drvit, TwitFlag::OldLayout, old);
+    twitSetFlag(drvit, OldLayout, old);
     gui.treePartitions->resizeColumnToContents(Device);
 }
 inline bool PartMan::drvitIsLocked(const QTreeWidgetItem *drvit) const
@@ -1989,8 +1989,8 @@ inline bool PartMan::twitWillMap(const QTreeWidgetItem *twit) const
 }
 QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool full) const
 {
-    if (twitFlag(twit, TwitFlag::Subvolume)) twit = twit->parent();
-    if (twitFlag(twit, TwitFlag::Partition)) {
+    if (twitFlag(twit, Subvolume)) twit = twit->parent();
+    if (twitFlag(twit, Partition)) {
         const QVariant &d = twit->data(Device, Qt::UserRole);
         if (!d.isNull()) {
             if (full) return "/dev/mapper/" + d.toString();
