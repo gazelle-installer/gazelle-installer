@@ -390,9 +390,6 @@
               </item>
               <item row="1" column="0" colspan="2">
                <widget class="QGroupBox" name="boxAutoPart">
-                <property name="title">
-                 <string/>
-                </property>
                 <layout class="QGridLayout">
                  <item row="4" column="0" colspan="2">
                   <widget class="QLabel" name="labelCryptoPass2">
@@ -1212,84 +1209,8 @@
              <property name="title">
               <string>Select Boot Method</string>
              </property>
-             <layout class="QGridLayout" name="_8">
-              <item row="1" column="0" rowspan="3">
-               <spacer name="h_spacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>16</width>
-                  <height>12</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="1" column="4">
-               <widget class="QRadioButton" name="radioBootESP">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>EFI System Partition</string>
-                </property>
-                <property name="text">
-                 <string>ESP</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QRadioButton" name="radioBootPBR">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Partition Boot Record</string>
-                </property>
-                <property name="text">
-                 <string>PBR</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="labelBootInstall">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Location to install on:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="5">
+             <layout class="QVBoxLayout">
+              <item>
                <widget class="QCheckBox" name="checkBoot">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -1308,74 +1229,149 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="QLabel" name="labelBoot">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>System boot disk:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QRadioButton" name="radioBootMBR">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="mouseTracking">
-                 <bool>true</bool>
-                </property>
-                <property name="toolTip">
-                 <string>Master Boot Record</string>
-                </property>
-                <property name="autoFillBackground">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>MBR</string>
-                </property>
-                <property name="shortcut">
-                 <string>Alt+B</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="5">
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="2" column="2" colspan="4">
-               <widget class="QComboBox" name="comboBoot">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
+              <item>
+               <widget class="QWidget" name="boxBoot" native="true">
+                <layout class="QGridLayout">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="0" column="2">
+                  <widget class="QRadioButton" name="radioBootPBR">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Partition Boot Record</string>
+                   </property>
+                   <property name="text">
+                    <string>PBR</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="labelBoot">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>System boot disk:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="labelBootInstall">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Location to install on:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QRadioButton" name="radioBootESP">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>EFI System Partition</string>
+                   </property>
+                   <property name="text">
+                    <string>ESP</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QRadioButton" name="radioBootMBR">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="mouseTracking">
+                    <bool>true</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string>Master Boot Record</string>
+                   </property>
+                   <property name="autoFillBackground">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>MBR</string>
+                   </property>
+                   <property name="shortcut">
+                    <string>Alt+B</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <spacer name="horizontalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="1" column="1" colspan="4">
+                  <widget class="QComboBox" name="comboBoot">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
              </layout>
@@ -2467,6 +2463,7 @@
   <tabstop>radioBootMBR</tabstop>
   <tabstop>radioBootPBR</tabstop>
   <tabstop>radioBootESP</tabstop>
+  <tabstop>comboBoot</tabstop>
   <tabstop>textComputerName</tabstop>
   <tabstop>textComputerDomain</tabstop>
   <tabstop>checkSamba</tabstop>
@@ -2504,7 +2501,6 @@
   <tabstop>spinCryptoRoundTime</tabstop>
   <tabstop>pushLoadKey</tabstop>
   <tabstop>pushBenchmarkCrypto</tabstop>
-  <tabstop>comboBoot</tabstop>
   <tabstop>comboTimeArea</tabstop>
   <tabstop>radioOldHomeUse</tabstop>
   <tabstop>radioOldHomeSave</tabstop>
@@ -2519,6 +2515,12 @@
    <sender>radioEntireDisk</sender>
    <signal>toggled(bool)</signal>
    <receiver>boxAutoPart</receiver>
+   <slot>setEnabled(bool)</slot>
+  </connection>
+  <connection>
+   <sender>checkBoot</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>boxBoot</receiver>
    <slot>setEnabled(bool)</slot>
   </connection>
  </connections>
