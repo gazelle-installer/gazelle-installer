@@ -1641,7 +1641,7 @@ void MInstall::pageDisplayed(int next)
     // These calculations are only for display text, and do not affect the installation.
     long long rootMin = partman.rootSpaceNeeded + 1048575;
     const QString &tminroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
-    rootMin += ROOT_BUFFER * 1048576;
+    rootMin = (4*rootMin) + ROOT_BUFFER * 1048576; // (Root + snapshot [squashfs+ISO] + backup) + buffer.
     const QString &trecroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
 
     switch (next) {
@@ -2055,11 +2055,11 @@ void MInstall::updatePartitionWidgets(bool all)
     // Partition tree.
     partman.populate();
     // Partition slider.
-    setupPartitionSlider();
+    setupPartitionSlider(true);
 }
-void MInstall::setupPartitionSlider()
+void MInstall::setupPartitionSlider(bool initial)
 {
-    boxSliderPart->setDisabled(true);
+    if(initial) boxSliderPart->setDisabled(true);
     // Allow the slider labels to fit all possible formatted sizes.
     const QString &strMB = sliderSizeString(1072693248) + '\n'; // "1,023 GB"
     const QFontMetrics &fmetrics = labelSliderRoot->fontMetrics();
@@ -2070,7 +2070,7 @@ void MInstall::setupPartitionSlider()
     labelSliderRoot->setText("----");
     labelSliderHome->setText("----");
     // Snap the slider to the legal range.
-    on_sliderPart_valueChanged(-1);
+    on_sliderPart_valueChanged(initial ? -1 : sliderPart->value());
 }
 
 void MInstall::buildServiceList()
@@ -2134,7 +2134,7 @@ void MInstall::changeEvent(QEvent *event)
         col.setAlpha(200);
         pal.setColor(QPalette::Base, col);
         textHelp->setPalette(pal);
-        setupPartitionSlider();
+        setupPartitionSlider(false);
         resizeEvent(nullptr);
     }
 }
@@ -2427,10 +2427,12 @@ void MInstall::on_sliderPart_valueChanged(int value)
     long long available = partman.layoutDefault(drvitem, 100, crypto, false);
     if (!available) return;
     const long long roundUp = available - 1;
-    const long long rootMinMB = (partman.rootSpaceNeeded+1048575) / 1048576;
-    const int minPercent = ((rootMinMB*100)+roundUp) / available;
-    const int recPercentMin = (((rootMinMB + ROOT_BUFFER) * 100) + roundUp) / available; // Recommended root size.
-    const int recPercentMax = 99 - (((16 + HOME_BUFFER) * 100) / available); // Recommended minimum home.
+    const long long rootMinMB = (partman.rootSpaceNeeded + 1048575) / 1048576;
+    const long long rootRecMB = (4 * rootMinMB) + ROOT_BUFFER; // (Root + snapshot [squashfs+ISO] + backup) + buffer
+    const long long homeRecMB = 16 + HOME_BUFFER; // 16MB for basic profile and setup files + buffer
+    const int minPercent = ((rootMinMB * 100) + roundUp) / available;
+    const int recPercentMin = ((rootRecMB * 100) + roundUp) / available; // Recommended root size.
+    const int recPercentMax = 99 - ((homeRecMB * 100) / available); // Recommended minimum home.
     int origValue = value;
     if (value<0) { // Internal setup.
         origValue = value = sliderPart->value();
@@ -2440,6 +2442,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
         // Caps based on disk capacity and recommendations.
         if (value > rootPortionMax) value = rootPortionMax;
         if (value < recPercentMin) value = recPercentMin;
+        if (value > 50) value = 100;
         if (value > recPercentMax) value = 100;
     } else if (value<minPercent) {
         if (value>=0) qApp->beep();
