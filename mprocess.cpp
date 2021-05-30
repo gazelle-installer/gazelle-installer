@@ -108,14 +108,14 @@ void MProcess::halt()
 void MProcess::unhalt()
 {
     QEventLoop eloop;
-    connect(this, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), &eloop, &QEventLoop::quit);
+    connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (state() != QProcess::NotRunning) {
         closeReadChannel(QProcess::StandardOutput);
         closeReadChannel(QProcess::StandardError);
         closeWriteChannel();
         eloop.exec();
     }
-    disconnect(this, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), nullptr, nullptr);
+    disconnect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
     halting = false;
 }
 
