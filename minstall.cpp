@@ -893,8 +893,8 @@ bool MInstall::copyLinux()
         QListWidgetItem *logEntry = proc.log(cmd, MProcess::Exec);
 
         QEventLoop eloop;
-        connect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), &eloop, &QEventLoop::quit);
-        connect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), &eloop, &QEventLoop::quit);
+        connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
+        connect(&proc, &QProcess::readyRead, &eloop, &QEventLoop::quit);
         proc.start(cmd);
         long ncopy = 0;
         while (proc.state() != QProcess::NotRunning) {
@@ -902,8 +902,8 @@ bool MInstall::copyLinux()
             ncopy += proc.readAllStandardOutput().count('\n');
             proc.status(ncopy);
         }
-        disconnect(&proc, static_cast<void(QProcess::*)()>(&QProcess::readyRead), nullptr, nullptr);
-        disconnect(&proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), nullptr, nullptr);
+        disconnect(&proc, &QProcess::readyRead, nullptr, nullptr);
+        disconnect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
 
         qDebug() << "Exit COPY:" << proc.exitCode() << proc.exitStatus();
         if (proc.exitStatus() != QProcess::NormalExit) {
