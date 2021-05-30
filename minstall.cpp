@@ -2621,16 +2621,6 @@ void MInstall::on_spinCryptoKeySize_valueChanged(int i)
     }
 }
 
-void MInstall::on_checkBoot_toggled(bool checked)
-{
-    radioBootESP->setEnabled(checked && canESP);
-    radioBootMBR->setEnabled(checked && canMBR);
-    radioBootPBR->setEnabled(checked && canPBR);
-    labelBootInstall->setEnabled(checked);
-    labelBoot->setEnabled(checked);
-    comboBoot->setEnabled(checked);
-}
-
 void MInstall::on_radioBootMBR_toggled()
 {
     comboBoot->clear();
@@ -2670,13 +2660,13 @@ void MInstall::buildBootLists()
 {
     // refresh lists and enable or disable options according to device presence
     on_radioBootMBR_toggled();
-    canMBR = (comboBoot->count() > 0);
+    const bool canMBR = (comboBoot->count() > 0);
     radioBootMBR->setEnabled(canMBR);
     on_radioBootPBR_toggled();
-    canPBR = (comboBoot->count() > 0);
+    const bool canPBR = (comboBoot->count() > 0);
     radioBootPBR->setEnabled(canPBR);
     on_radioBootESP_toggled();
-    canESP = (uefi && comboBoot->count() > 0);
+    const bool canESP = (uefi && comboBoot->count() > 0);
     radioBootESP->setEnabled(canESP);
 
     // load one as the default in preferential order: ESP, MBR, PBR
