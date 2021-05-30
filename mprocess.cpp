@@ -28,10 +28,10 @@ MProcess::MProcess(QObject *parent)
 {
 }
 
-void MProcess::setupUI(QListWidget *listLog, QProgressBar *progressBar)
+void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall)
 {
     logView = listLog;
-    progBar = progressBar;
+    progBar = progInstall;
     QPalette pal = listLog->palette();
     pal.setColor(QPalette::Base, Qt::black);
     pal.setColor(QPalette::Text, Qt::white);

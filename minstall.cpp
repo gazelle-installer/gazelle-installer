@@ -38,10 +38,10 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
 {
     setupUi(this);
     listLog->addItem("Version " VERSION);
-    proc.setupUI(listLog, progressBar);
+    proc.setupUI(listLog, progInstall);
     updateCursor(Qt::WaitCursor);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
-    installBox->hide();
+    boxInstall->hide();
 
     oobe = args.isSet("oobe");
     pretend = args.isSet("pretend");
@@ -55,7 +55,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
         mountkeep = args.isSet("mount-keep");
     } else {
         brave = automatic = oem = false;
-        closeButton->setText(tr("Shutdown"));
+        pushClose->setText(tr("Shutdown"));
         phase = 2;
         // dark palette for the OOBE screen
         QColor charcoal(56, 56, 56);
@@ -112,7 +112,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     settings.endGroup();
 
     // set some distro-centric text
-    remindersBrowser->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
+    textReminders->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
                         + "\n" + link_block);
 
     // ensure the help widgets are displayed correctly when started
@@ -143,7 +143,7 @@ void MInstall::startup()
         if (QFile::exists("/etc/service") && QFile::exists("/lib/runit/runit-init")){
             containsRunit = true;
         }
-        saveDesktopCheckBox->hide();
+        checkSaveDesktop->hide();
     } else {
         containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
         if (QFile::exists("/live/aufs/etc/service") && QFile::exists("/live/aufs/sbin/runit")){
@@ -238,30 +238,30 @@ void MInstall::startup()
         partman.defaultLabels["SWAP"] = "swap" + PROJECTSHORTNAME;
 
         // advanced encryption settings page defaults
-        on_comboFDEcipher_currentIndexChanged(comboFDEcipher->currentText());
-        on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
-        on_comboFDEivgen_currentIndexChanged(comboFDEivgen->currentText());
+        on_comboCryptoCipher_currentIndexChanged(comboCryptoCipher->currentText());
+        on_comboCryptoChain_currentIndexChanged(comboCryptoChain->currentText());
+        on_comboCryptoIVGen_currentIndexChanged(comboCryptoIVGen->currentText());
 
-        FDEpassword->setDisabled(true);
-        FDEpassword2->setDisabled(true);
-        labelFDEpass->setDisabled(true);
-        labelFDEpass2->setDisabled(true);
-        pbFDEpassMeter->setDisabled(true);
-        buttonAdvancedFDE->setDisabled(true);
-        gbEncrPass->setDisabled(true);
+        textCryptoPass->setDisabled(true);
+        textCryptoPass2->setDisabled(true);
+        labelCryptoPass->setDisabled(true);
+        labelCryptoPass2->setDisabled(true);
+        progCryptoPassMeter->setDisabled(true);
+        pushAdvancedCrypto->setDisabled(true);
+        boxCryptoPass->setDisabled(true);
 
         //disable encryption in gui if cryptsetup not present
         QFileInfo cryptsetup("/sbin/cryptsetup");
         QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
         if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
-            checkBoxEncryptAuto->hide();
-            FDEpassword->hide();
-            FDEpassword2->hide();
-            labelFDEpass->hide();
-            labelFDEpass2->hide();
-            pbFDEpassMeter->hide();
-            buttonAdvancedFDE->hide();
-            gbEncrPass->hide();
+            checkEncryptAuto->hide();
+            textCryptoPass->hide();
+            textCryptoPass2->hide();
+            labelCryptoPass->hide();
+            labelCryptoPass2->hide();
+            progCryptoPassMeter->hide();
+            pushAdvancedCrypto->hide();
+            boxCryptoPass->hide();
             treePartitions->setColumnHidden(4, true);
         }
 
@@ -274,64 +274,64 @@ void MInstall::startup()
     }
 
     // Password box setup
-    FDEpassword->setup(FDEpassword2, pbFDEpassMeter, 1, 32, 9);
-    FDEpassCust->setup(FDEpassCust2, pbFDEpassMeterCust, 1, 32, 9);
-    userPasswordEdit->setup(userPasswordEdit2, pbUserPassMeter);
-    rootPasswordEdit->setup(rootPasswordEdit2, pbRootPassMeter);
-    connect(FDEpassword, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
-    connect(FDEpassCust, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
-    connect(userPasswordEdit, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
-    connect(rootPasswordEdit, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
+    textCryptoPass->setup(textCryptoPass2, progCryptoPassMeter, 1, 32, 9);
+    textCryptoPassCust->setup(textCryptoPassCust2, progCryptoPassMeterCust, 1, 32, 9);
+    textUserPass->setup(textUserPass2, progUserPassMeter);
+    textRootPass->setup(textRootPass2, progRootPassMeter);
+    connect(textCryptoPass, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
+    connect(textCryptoPassCust, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
+    connect(textUserPass, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
+    connect(textRootPass, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
     // User name is required
-    connect(userNameEdit, &QLineEdit::textChanged, this, &MInstall::userPassValidationChanged);
+    connect(textUserName, &QLineEdit::textChanged, this, &MInstall::userPassValidationChanged);
 
     // set default host name
-    computerNameEdit->setText(DEFAULT_HOSTNAME);
+    textComputerName->setText(DEFAULT_HOSTNAME);
 
     setupkeyboardbutton();
 
     // timezone lists
     listTimeZones = proc.execOutLines("find -L /usr/share/zoneinfo/posix -mindepth 2 -type f -printf %P\\n", true);
-    cmbTimeArea->clear();
+    comboTimeArea->clear();
     for (const QString &zone : listTimeZones) {
         const QString &area = zone.section('/', 0, 0);
-        if (cmbTimeArea->findData(QVariant(area)) < 0) {
+        if (comboTimeArea->findData(QVariant(area)) < 0) {
             QString text(area);
             if (area == "Indian" || area == "Pacific"
                 || area == "Atlantic" || area == "Arctic") text.append(" Ocean");
-            cmbTimeArea->addItem(text, area);
+            comboTimeArea->addItem(text, area);
         }
     }
-    cmbTimeArea->model()->sort(0);
+    comboTimeArea->model()->sort(0);
 
     // locale list
-    localeCombo->clear();
+    comboLocale->clear();
     QStringList loclist = proc.execOutLines("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'");
     for (QString &strloc : loclist) {
         strloc.replace("utf8", "UTF-8", Qt::CaseInsensitive);
         QLocale loc(strloc);
-        localeCombo->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
+        comboLocale->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
     }
-    localeCombo->model()->sort(0);
+    comboLocale->model()->sort(0);
     // default locale selection
-    int ixLocale = localeCombo->findData(QVariant(QLocale::system().name() + ".UTF-8"));
-    if (localeCombo->currentIndex() != ixLocale) localeCombo->setCurrentIndex(ixLocale);
-    else on_localeCombo_currentIndexChanged(ixLocale);
+    int ixLocale = comboLocale->findData(QVariant(QLocale::system().name() + ".UTF-8"));
+    if (comboLocale->currentIndex() != ixLocale) comboLocale->setCurrentIndex(ixLocale);
+    else on_comboLocale_currentIndexChanged(ixLocale);
 
     // if it looks like an apple...
     if (proc.exec("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
         mactest = true;
-        localClockCheckBox->setChecked(true);
+        checkLocalClock->setChecked(true);
     }
 
     //check for samba
     QFileInfo info("/etc/init.d/smbd");
     if (!info.exists()) {
-        computerGroupLabel->setEnabled(false);
-        computerGroupEdit->setEnabled(false);
-        computerGroupEdit->setText("");
-        sambaCheckBox->setChecked(false);
-        sambaCheckBox->setEnabled(false);
+        labelComputerGroup->setEnabled(false);
+        textComputerGroup->setEnabled(false);
+        textComputerGroup->setText("");
+        checkSamba->setChecked(false);
+        checkSamba->setEnabled(false);
     }
 
     // check for the Samba server
@@ -349,7 +349,7 @@ void MInstall::startup()
 
     if (oobe) gotoPage(7); // go to Network page
     else {
-        copyrightBrowser->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
+        textCopyright->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
             "%1 uses some components from MEPIS Linux which are released under an Apache free license."
             " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
         gotoPage(1);
@@ -357,7 +357,7 @@ void MInstall::startup()
     updateCursor();
 
     // automatic installation
-    if (automatic) nextButton->click();
+    if (automatic) pushNext->click();
 }
 
 // turn auto-mount off and on
@@ -483,9 +483,9 @@ bool MInstall::pretendToInstall(int space, long steps)
 void MInstall::writeKeyFile()
 {
     if (phase < 0) return;
-    QString rngfile = "/dev/" + comboFDErandom->currentText();
+    QString rngfile = "/dev/" + comboCryptoRandom->currentText();
     const unsigned int keylength = 4096;
-    const QLineEdit *passedit = checkBoxEncryptAuto->isChecked() ? FDEpassword : FDEpassCust;
+    const QLineEdit *passedit = checkEncryptAuto->isChecked() ? textCryptoPass : textCryptoPassCust;
     const QByteArray password(passedit->text().toUtf8());
     const char *keyfile = nullptr;
     bool newkey = true;
@@ -553,17 +553,17 @@ bool MInstall::processNextPhase()
             if (!pretendToInstall(14, 200)) return false;
             if (!pretendToInstall(80, 500)) return false;
         }
-        if (widgetStack->currentWidget() != Step_Progress) {
-            progressBar->setEnabled(false);
+        if (widgetStack->currentWidget() != pageProgress) {
+            progInstall->setEnabled(false);
             proc.status(tr("Paused for required operator input"));
             QApplication::beep();
         }
         phase = 2;
     }
-    if (phase == 2 && widgetStack->currentWidget() == Step_Progress) {
+    if (phase == 2 && widgetStack->currentWidget() == pageProgress) {
         phase = 3;
-        progressBar->setEnabled(true);
-        backButton->setEnabled(false);
+        progInstall->setEnabled(true);
+        pushBack->setEnabled(false);
         if (!pretend) {
             proc.advance(1, 1);
             proc.status(tr("Setting system configuration"));
@@ -588,7 +588,7 @@ bool MInstall::processNextPhase()
         proc.status(tr("Cleaning up"));
         cleanup();
         proc.status(tr("Finished"));
-        gotoPage(widgetStack->indexOf(Step_End));
+        gotoPage(widgetStack->indexOf(pageEnd));
     }
     return true;
 }
@@ -609,14 +609,14 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
     if ((mode == ConfigSave || mode == ConfigLoadA) && !oobe) {
-        config->startGroup("Storage", Step_Disk);
+        config->startGroup("Storage", pageDisk);
         const char *diskChoices[] = {"Drive", "Partitions"};
-        QRadioButton *diskRadios[] = {entireDiskButton, customPartButton};
+        QRadioButton *diskRadios[] = {radioEntireDisk, radioCustomPart};
         config->manageRadios("Target", 2, diskChoices, diskRadios);
-        const bool targetDrive = entireDiskButton->isChecked();
+        const bool targetDrive = radioEntireDisk->isChecked();
         if (targetDrive || mode!=ConfigSave) {
-            config->manageComboBox("Drive", diskCombo, true);
-            config->manageCheckBox("DriveEncrypt", checkBoxEncryptAuto);
+            config->manageComboBox("Drive", comboDisk, true);
+            config->manageCheckBox("DriveEncrypt", checkEncryptAuto);
             if (mode==ConfigSave) config->setValue("RootPortion", sliderPart->value());
             else if (config->contains("RootPortion")) {
                  const int sliderVal = config->value("RootPortion").toInt();
@@ -626,63 +626,63 @@ void MInstall::manageConfig(enum ConfigAction mode)
             }
         }
         config->endGroup();
-        // Custom partitions step. PartMan handles its config groups automatically.
+        // Custom partitions page. PartMan handles its config groups automatically.
         if (!targetDrive || mode!=ConfigSave) {
-            config->setGroupWidget(Step_Partitions);
-            config->manageCheckBox("Storage/BadBlocksCheck", badblocksCheck);
+            config->setGroupWidget(pagePartitions);
+            config->manageCheckBox("Storage/checkBadBlocks", checkBadBlocks);
             partman.manageConfig(*config, mode==ConfigSave);
         }
 
-        // AES step
-        config->startGroup("Encryption", Step_FDE);
+        // AES page
+        config->startGroup("Encryption", pageCrypto);
         if (mode != ConfigSave) {
             const QString &epass = config->value("Pass").toString();
-            if (entireDiskButton->isChecked()) {
-                FDEpassword->setText(epass);
-                FDEpassword2->setText(epass);
+            if (radioEntireDisk->isChecked()) {
+                textCryptoPass->setText(epass);
+                textCryptoPass2->setText(epass);
             } else {
-                FDEpassCust->setText(epass);
-                FDEpassCust2->setText(epass);
+                textCryptoPassCust->setText(epass);
+                textCryptoPassCust2->setText(epass);
             }
             const QString &keyfile = config->value("KeyMaterial").toString();
             if (!keyfile.isEmpty()) {
                 key.load(keyfile.toUtf8().constData(), -1);
                 const int keylen = key.length();
-                if (keylen>0) buttonLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
+                if (keylen>0) pushLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
             }
         }
-        config->manageComboBox("Cipher", comboFDEcipher, false);
-        config->manageComboBox("ChainMode", comboFDEchain, false);
-        config->manageComboBox("IVgenerator", comboFDEivgen, false);
-        config->manageComboBox("IVhash", comboFDEivhash, false);
-        config->manageSpinBox("KeySize", spinFDEkeysize);
-        config->manageComboBox("LUKSkeyHash", comboFDEhash, false);
-        config->manageComboBox("KernelRNG", comboFDErandom, false);
-        config->manageSpinBox("KDFroundTime", spinFDEroundtime);
+        config->manageComboBox("Cipher", comboCryptoCipher, false);
+        config->manageComboBox("ChainMode", comboCryptoChain, false);
+        config->manageComboBox("IVgenerator", comboCryptoIVGen, false);
+        config->manageComboBox("IVhash", comboCryptoIVHash, false);
+        config->manageSpinBox("KeySize", spinCryptoKeySize);
+        config->manageComboBox("LUKSkeyHash", comboCryptoHash, false);
+        config->manageComboBox("KernelRNG", comboCryptoRandom, false);
+        config->manageSpinBox("KDFroundTime", spinCryptoRoundTime);
         config->endGroup();
-        if (config->isBadWidget(Step_FDE)) {
-            config->setGroupWidget(targetDrive ? Step_Disk : Step_Partitions);
-            config->markBadWidget(buttonAdvancedFDE);
-            config->markBadWidget(buttonAdvancedFDECust);
+        if (config->isBadWidget(pageCrypto)) {
+            config->setGroupWidget(targetDrive ? pageDisk : pagePartitions);
+            config->markBadWidget(pushAdvancedCrypto);
+            config->markBadWidget(pushAdvancedCryptoCust);
         }
     }
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
         if (!oobe) {
-            // GRUB step
-            config->startGroup("GRUB", Step_Boot);
-            if (grubCheckBox->isChecked()) {
+            // GRUB page
+            config->startGroup("GRUB", pageBoot);
+            if (checkBoot->isChecked()) {
                 const char *grubChoices[] = {"MBR", "PBR", "ESP"};
-                QRadioButton *grubRadios[] = {grubMbrButton, grubPbrButton, grubEspButton};
+                QRadioButton *grubRadios[] = {radioBootMBR, radioBootPBR, radioBootESP};
                 config->manageRadios("Install", 3, grubChoices, grubRadios);
             }
-            config->manageComboBox("Location", grubBootCombo, true);
+            config->manageComboBox("Location", comboBoot, true);
             config->endGroup();
         }
 
-        // Services step
-        config->startGroup("Services", Step_Services);
-        QTreeWidgetItemIterator it(csView);
+        // Services page
+        config->startGroup("Services", pageServices);
+        QTreeWidgetItemIterator it(treeServices);
         while (*it) {
             if ((*it)->parent() != nullptr) {
                 const QString &itext = (*it)->text(0);
@@ -697,48 +697,48 @@ void MInstall::manageConfig(enum ConfigAction mode)
         }
         config->endGroup();
 
-        // Network step
-        config->startGroup("Network", Step_Network);
-        config->manageLineEdit("ComputerName", computerNameEdit);
-        config->manageLineEdit("Domain", computerDomainEdit);
-        config->manageLineEdit("Workgroup", computerGroupEdit);
-        config->manageCheckBox("Samba", sambaCheckBox);
+        // Network page
+        config->startGroup("Network", pageNetwork);
+        config->manageLineEdit("ComputerName", textComputerName);
+        config->manageLineEdit("Domain", textComputerDomain);
+        config->manageLineEdit("Workgroup", textComputerGroup);
+        config->manageCheckBox("Samba", checkSamba);
         config->endGroup();
 
-        // Localization step
-        config->startGroup("Localization", Step_Localization);
-        config->manageComboBox("Locale", localeCombo, true);
-        config->manageCheckBox("LocalClock", localClockCheckBox);
+        // Localization page
+        config->startGroup("Localization", pageLocalization);
+        config->manageComboBox("Locale", comboLocale, true);
+        config->manageCheckBox("LocalClock", checkLocalClock);
         const char *clockChoices[] = {"24", "12"};
-        QRadioButton *clockRadios[] = {radio24h, radio12h};
+        QRadioButton *clockRadios[] = {radioClock24, radioClock12};
         config->manageRadios("ClockHours", 2, clockChoices, clockRadios);
         if (mode == ConfigSave) {
-            config->setValue("Timezone", cmbTimeZone->currentData().toString());
+            config->setValue("Timezone", comboTimeZone->currentData().toString());
         } else {
             QVariant def(QString(QTimeZone::systemTimeZoneId()));
             const int rc = selectTimeZone(config->value("Timezone", def).toString());
-            if (rc == 1) config->markBadWidget(cmbTimeArea);
-            else if (rc == 2) config->markBadWidget(cmbTimeZone);
+            if (rc == 1) config->markBadWidget(comboTimeArea);
+            else if (rc == 2) config->markBadWidget(comboTimeZone);
         }
-        config->manageComboBox("Timezone", cmbTimeZone, true);
+        config->manageComboBox("Timezone", comboTimeZone, true);
         config->endGroup();
 
-        // User Accounts step
-        config->startGroup("User", Step_User_Accounts);
-        config->manageLineEdit("Username", userNameEdit);
-        config->manageCheckBox("Autologin", autologinCheckBox);
-        config->manageCheckBox("SaveDesktop", saveDesktopCheckBox);
-        if (oobe) saveDesktopCheckBox->setCheckState(Qt::Unchecked);
+        // User Accounts page
+        config->startGroup("User", pageUserAccounts);
+        config->manageLineEdit("Username", textUserName);
+        config->manageCheckBox("Autologin", checkAutoLogin);
+        config->manageCheckBox("SaveDesktop", checkSaveDesktop);
+        if (oobe) checkSaveDesktop->setCheckState(Qt::Unchecked);
         const char *oldHomeActions[] = {"Use", "Save", "Delete"};
         QRadioButton *oldHomeRadios[] = {radioOldHomeUse, radioOldHomeSave, radioOldHomeDelete};
         config->manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
         if (mode != ConfigSave) {
             const QString &upass = config->value("UserPass").toString();
-            userPasswordEdit->setText(upass);
-            userPasswordEdit2->setText(upass);
+            textUserPass->setText(upass);
+            textUserPass2->setText(upass);
             const QString &rpass = config->value("RootPass").toString();
-            rootPasswordEdit->setText(rpass);
-            rootPasswordEdit2->setText(rpass);
+            textRootPass->setText(rpass);
+            textRootPass2->setText(rpass);
         }
         config->endGroup();
     }
@@ -759,23 +759,23 @@ void MInstall::manageConfig(enum ConfigAction mode)
 void MInstall::stashAdvancedFDE(bool save)
 {
     if (save) {
-        indexFDEcipher = comboFDEcipher->currentIndex();
-        indexFDEchain = comboFDEchain->currentIndex();
-        indexFDEivgen = comboFDEivgen->currentIndex();
-        indexFDEivhash = comboFDEivhash->currentIndex();
-        iFDEkeysize = spinFDEkeysize->value();
-        indexFDEhash = comboFDEhash->currentIndex();
-        indexFDErandom = comboFDErandom->currentIndex();
-        iFDEroundtime = spinFDEroundtime->value();
+        indexCryptoCipher = comboCryptoCipher->currentIndex();
+        indexCryptoChain = comboCryptoChain->currentIndex();
+        indexCryptoIVGen = comboCryptoIVGen->currentIndex();
+        indexCryptoIVHash = comboCryptoIVHash->currentIndex();
+        iCryptoKeySize = spinCryptoKeySize->value();
+        indexCryptoHash = comboCryptoHash->currentIndex();
+        indexCryptoRandom = comboCryptoRandom->currentIndex();
+        iCryptoRoundTime = spinCryptoRoundTime->value();
     } else {
-        comboFDEcipher->setCurrentIndex(indexFDEcipher);
-        comboFDEchain->setCurrentIndex(indexFDEchain);
-        comboFDEivgen->setCurrentIndex(indexFDEivgen);
-        comboFDEivhash->setCurrentIndex(indexFDEivhash);
-        spinFDEkeysize->setValue(iFDEkeysize);
-        comboFDEhash->setCurrentIndex(indexFDEhash);
-        comboFDErandom->setCurrentIndex(indexFDErandom);
-        spinFDEroundtime->setValue(iFDEroundtime);
+        comboCryptoCipher->setCurrentIndex(indexCryptoCipher);
+        comboCryptoChain->setCurrentIndex(indexCryptoChain);
+        comboCryptoIVGen->setCurrentIndex(indexCryptoIVGen);
+        comboCryptoIVHash->setCurrentIndex(indexCryptoIVHash);
+        spinCryptoKeySize->setValue(iCryptoKeySize);
+        comboCryptoHash->setCurrentIndex(indexCryptoHash);
+        comboCryptoRandom->setCurrentIndex(indexCryptoRandom);
+        spinCryptoRoundTime->setValue(iCryptoRoundTime);
     }
 }
 
@@ -857,7 +857,7 @@ bool MInstall::installLinux()
 
     // guess localtime vs UTC
     if (proc.execOut("guess-hwclock") == "localtime") {
-        localClockCheckBox->setChecked(true);
+        checkLocalClock->setChecked(true);
     }
 
     return true;
@@ -950,7 +950,7 @@ bool MInstall::installLoader()
         proc.exec("/bin/mount -t efivarfs efivarfs /sys/firmware/efi/efivars", true);
     }
 
-    if (!grubCheckBox->isChecked()) {
+    if (!checkBoot->isChecked()) {
         // skip it
         proc.status(tr("Updating initramfs"));
         //if useing f2fs, then add modules to /etc/initramfs-tools/modules
@@ -975,8 +975,8 @@ bool MInstall::installLoader()
     QString arch;
 
     // install new Grub now
-    const QString &boot = "/dev/" + grubBootCombo->currentData().toString();
-    if (!grubEspButton->isChecked()) {
+    const QString &boot = "/dev/" + comboBoot->currentData().toString();
+    if (!radioBootESP->isChecked()) {
         cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot %1").arg(boot);
     } else {
         mkdir("/mnt/antiX/boot/efi", 0755);
@@ -1114,8 +1114,8 @@ bool MInstall::processOOBE()
 
 bool MInstall::validateUserInfo()
 {
-    const QString &userName = userNameEdit->text();
-    nextFocus = userNameEdit;
+    const QString &userName = textUserName->text();
+    nextFocus = textUserName;
     // see if username is reasonable length
     if (!userName.contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
         QMessageBox::critical(this, windowTitle(),
@@ -1137,7 +1137,7 @@ bool MInstall::validateUserInfo()
         }
     }
 
-    if (!automatic && rootPasswordEdit->text().isEmpty()) {
+    if (!automatic && textRootPass->text().isEmpty()) {
         // Confirm that an empty root password is not accidental.
         const QMessageBox::StandardButton ans = QMessageBox::warning(this,
             windowTitle(), tr("You did not provide a password for the root account."
@@ -1166,8 +1166,8 @@ bool MInstall::setUserInfo()
     bool ok = true;
     QString cmdChRoot;
     if (!oobe) cmdChRoot = "chroot /mnt/antiX ";
-    const QString &userPass = userPasswordEdit->text();
-    const QString &rootPass = rootPasswordEdit->text();
+    const QString &userPass = textUserPass->text();
+    const QString &rootPass = textRootPass->text();
     QByteArray userinfo;
     if (rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
     else userinfo.append(QString("root:" + rootPass).toUtf8());
@@ -1185,7 +1185,7 @@ bool MInstall::setUserInfo()
     QString rootpath;
     if (!oobe) rootpath = "/mnt/antiX";
     QString skelpath = rootpath + "/etc/skel";
-    QString dpath = rootpath + "/home/" + userNameEdit->text();
+    QString dpath = rootpath + "/home/" + textUserName->text();
 
     if (QFileInfo::exists(dpath)) {
         if (radioOldHomeSave->isChecked()) {
@@ -1230,13 +1230,13 @@ bool MInstall::setUserInfo()
     }
 
     // saving Desktop changes
-    if (saveDesktopCheckBox->isChecked()) {
+    if (checkSaveDesktop->isChecked()) {
         resetBlueman();
         rsynchomefolder(dpath);
     }
 
-    // check if remaster exists and saveDesktopCheckbox not checked, modify the remastered demo folder
-    if (isRemasteredDemoPresent && ! saveDesktopCheckBox->isChecked())
+    // check if remaster exists and checkSaveDesktop not checked, modify the remastered demo folder
+    if (isRemasteredDemoPresent && ! checkSaveDesktop->isChecked())
     {
         resetBlueman();
         changeRemasterdemoToNewUser(dpath);
@@ -1249,18 +1249,18 @@ bool MInstall::setUserInfo()
     }
 
     // change in files
-    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/group");
-    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/gshadow");
-    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/passwd");
-    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/shadow");
-    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/slim.conf");
-    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/etc/lightdm/lightdm.conf");
-    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/home/*/.gtkrc-2.0");
-    replaceStringInFile("demo", userNameEdit->text(), rootpath + "/root/.gtkrc-2.0");
-    if (autologinCheckBox->isChecked()) {
+    replaceStringInFile("demo", textUserName->text(), rootpath + "/etc/group");
+    replaceStringInFile("demo", textUserName->text(), rootpath + "/etc/gshadow");
+    replaceStringInFile("demo", textUserName->text(), rootpath + "/etc/passwd");
+    replaceStringInFile("demo", textUserName->text(), rootpath + "/etc/shadow");
+    replaceStringInFile("demo", textUserName->text(), rootpath + "/etc/slim.conf");
+    replaceStringInFile("demo", textUserName->text(), rootpath + "/etc/lightdm/lightdm.conf");
+    replaceStringInFile("demo", textUserName->text(), rootpath + "/home/*/.gtkrc-2.0");
+    replaceStringInFile("demo", textUserName->text(), rootpath + "/root/.gtkrc-2.0");
+    if (checkAutoLogin->isChecked()) {
         replaceStringInFile("#auto_login", "auto_login", rootpath + "/etc/slim.conf");
         replaceStringInFile("#default_user ", "default_user ", rootpath + "/etc/slim.conf");
-        replaceStringInFile("User=", "User=" + userNameEdit->text(), rootpath + "/etc/sddm.conf");
+        replaceStringInFile("User=", "User=" + textUserName->text(), rootpath + "/etc/sddm.conf");
     }
     else {
         replaceStringInFile("auto_login", "#auto_login", rootpath + "/etc/slim.conf");
@@ -1268,7 +1268,7 @@ bool MInstall::setUserInfo()
         replaceStringInFile("autologin-user=", "#autologin-user=", rootpath + "/etc/lightdm/lightdm.conf");
         replaceStringInFile("User=.*", "User=", rootpath + "/etc/sddm.conf");
     }
-    proc.exec("touch " + rootpath + "/var/mail/" + userNameEdit->text());
+    proc.exec("touch " + rootpath + "/var/mail/" + textUserName->text());
 
     return true;
 }
@@ -1279,21 +1279,21 @@ bool MInstall::setUserInfo()
 bool MInstall::validateComputerName()
 {
     // see if name is reasonable
-    nextFocus = computerNameEdit;
-    if (computerNameEdit->text().isEmpty()) {
+    nextFocus = textComputerName;
+    if (textComputerName->text().isEmpty()) {
         QMessageBox::critical(this, windowTitle(), tr("Please enter a computer name."));
         return false;
-    } else if (computerNameEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
+    } else if (textComputerName->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(this, windowTitle(),
                               tr("Sorry, your computer name contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return false;
     }
     // see if name is reasonable
-    nextFocus = computerDomainEdit;
-    if (computerDomainEdit->text().isEmpty()) {
+    nextFocus = textComputerDomain;
+    if (textComputerDomain->text().isEmpty()) {
         QMessageBox::critical(this, windowTitle(), tr("Please enter a domain name."));
         return false;
-    } else if (computerDomainEdit->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
+    } else if (textComputerDomain->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(this, windowTitle(),
                               tr("Sorry, your computer domain contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return false;
@@ -1301,13 +1301,13 @@ bool MInstall::validateComputerName()
 
     if (haveSamba) {
         // see if name is reasonable
-        if (computerGroupEdit->text().isEmpty()) {
+        if (textComputerGroup->text().isEmpty()) {
             QMessageBox::critical(this, windowTitle(), tr("Please enter a workgroup."));
-            nextFocus = computerGroupEdit;
+            nextFocus = textComputerGroup;
             return false;
         }
     } else {
-        computerGroupEdit->clear();
+        textComputerGroup->clear();
     }
 
     nextFocus = nullptr;
@@ -1320,10 +1320,10 @@ bool MInstall::setComputerName()
     if (phase < 0) return false;
     QString etcpath = oobe ? "/etc" : "/mnt/antiX/etc";
     if (haveSamba) {
-        //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/samba/smb.conf");
-        replaceStringInFile("WORKGROUP", computerGroupEdit->text(), etcpath + "/samba/smb.conf");
+        //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/samba/smb.conf");
+        replaceStringInFile("WORKGROUP", textComputerGroup->text(), etcpath + "/samba/smb.conf");
 
-        if (sambaCheckBox->isChecked()) {
+        if (checkSamba->isChecked()) {
             proc.exec("/bin/mv -f " + etcpath + "/rc5.d/K*smbd " + etcpath + "/rc5.d/S06smbd >/dev/null 2>&1", false);
             proc.exec("/bin/mv -f " + etcpath + "/rc4.d/K*smbd " + etcpath + "/rc4.d/S06smbd >/dev/null 2>&1", false);
             proc.exec("/bin/mv -f " + etcpath + "/rc3.d/K*smbd " + etcpath + "/rc3.d/S06smbd >/dev/null 2>&1", false);
@@ -1351,7 +1351,7 @@ bool MInstall::setComputerName()
             proc.exec("/bin/mv -f " + etcpath + "/rc2.d/S*nmbd " + etcpath + "/rc2.d/K01nmbd >/dev/null 2>&1", false);
         }
 
-        if (containsSystemD && !sambaCheckBox->isChecked()) {
+        if (containsSystemD && !checkSamba->isChecked()) {
             proc.exec("chroot /mnt/antiX systemctl disable smbd");
             proc.exec("chroot /mnt/antiX systemctl disable nmbd");
             proc.exec("chroot /mnt/antiX systemctl disable samba-ad-dc");
@@ -1360,7 +1360,7 @@ bool MInstall::setComputerName()
             proc.exec("chroot /mnt/antiX systemctl mask samba-ad-dc");
         }
 
-        if (containsRunit && !sambaCheckBox->isChecked()){
+        if (containsRunit && !checkSamba->isChecked()){
             proc.mkpath(etcpath+"/sv/smbd");
             proc.mkpath(etcpath+"/sv/nmbd");
             proc.mkpath(etcpath+"/sv/samba-ad-dc");
@@ -1372,8 +1372,8 @@ bool MInstall::setComputerName()
             proc.exec("chroot /mnt/antiX touch /etc/sv/samba-ad-dc/down");
         }
     }
-    //replaceStringInFile(PROJECTSHORTNAME + "1", computerNameEdit->text(), "/mnt/antiX/etc/hosts");
-    const QString &compname = computerNameEdit->text();
+    //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/hosts");
+    const QString &compname = textComputerName->text();
     QString cmd("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost"
         " | head -1 | awk '{print $2}')\"'/" + compname + "/' ");
     if (!oobe) proc.exec(cmd + "/mnt/antiX/etc/hosts", false);
@@ -1398,29 +1398,29 @@ void MInstall::setLocale()
 
     //locale
     if (!oobe) cmd = "chroot /mnt/antiX ";
-    cmd += QString("/usr/sbin/update-locale \"LANG=%1\"").arg(localeCombo->currentData().toString());
+    cmd += QString("/usr/sbin/update-locale \"LANG=%1\"").arg(comboLocale->currentData().toString());
     qDebug() << "Update locale";
     proc.exec(cmd);
-    cmd = QString("Language=%1").arg(localeCombo->currentData().toString());
+    cmd = QString("Language=%1").arg(comboLocale->currentData().toString());
 
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
     //replace with link
     if (!oobe) {
-        cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(cmbTimeZone->currentData().toString());
+        cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(comboTimeZone->currentData().toString());
         proc.exec(cmd, false);
     }
-    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(cmbTimeZone->currentData().toString());
+    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(comboTimeZone->currentData().toString());
     proc.exec(cmd, false);
     // /etc/timezone is text file with the timezone written in it. Write the user-selected timezone in it now.
     if (!oobe) {
-        cmd = QString("echo %1 > /mnt/antiX/etc/timezone").arg(cmbTimeZone->currentData().toString());
+        cmd = QString("echo %1 > /mnt/antiX/etc/timezone").arg(comboTimeZone->currentData().toString());
         proc.exec(cmd, false);
     }
-    cmd = QString("echo %1 > /etc/timezone").arg(cmbTimeZone->currentData().toString());
+    cmd = QString("echo %1 > /etc/timezone").arg(comboTimeZone->currentData().toString());
     proc.exec(cmd, false);
 
     // Set clock to use LOCAL
-    if (localClockCheckBox->isChecked()) {
+    if (checkLocalClock->isChecked()) {
         proc.exec("echo '0.0 0 0.0\n0\nLOCAL' > /etc/adjtime", false);
     } else {
         proc.exec("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime", false);
@@ -1433,7 +1433,7 @@ void MInstall::setLocale()
 
     // Set clock format
     QString skelpath = oobe ? "/etc/skel" : "/mnt/antiX/etc/skel";
-    if (radio12h->isChecked()) {
+    if (radioClock12->isChecked()) {
         //mx systems
         proc.exec("sed -i '/data0=/c\\data0=%l:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
         proc.exec("sed -i '/data0=/c\\data0=%l:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
@@ -1473,7 +1473,7 @@ void MInstall::setLocale()
 
 void MInstall::stashServices(bool save)
 {
-    QTreeWidgetItemIterator it(csView);
+    QTreeWidgetItemIterator it(treeServices);
     while (*it) {
         if ((*it)->parent() != nullptr) {
             (*it)->setCheckState(save?2:0, (*it)->checkState(save?0:2));
@@ -1492,7 +1492,7 @@ void MInstall::setServices()
         chroot = "chroot /mnt/antiX ";
         rootpath = "/mnt/antiX";
     }
-    QTreeWidgetItemIterator it(csView);
+    QTreeWidgetItemIterator it(treeServices);
     for (; *it; ++it) {
         if ((*it)->parent() == nullptr) continue;
         QString service = (*it)->text(0);
@@ -1528,7 +1528,7 @@ void MInstall::setServices()
 void MInstall::failUI(const QString &msg)
 {
     if (phase >= 0) {
-        mainFrame->setEnabled(false);
+        boxMain->setEnabled(false);
         QMessageBox::critical(this, windowTitle(), msg);
         updateCursor(Qt::WaitCursor);
     }
@@ -1538,16 +1538,16 @@ void MInstall::failUI(const QString &msg)
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
 {
-    if (next == 4 && ixPageRefAdvancedFDE != 0) { // at Step_FDE
+    if (next == 4 && ixPageRefAdvancedFDE != 0) { // at pageCrypto
         return next;
     }
 
-    if (next == 3 && curr == 2) { // at Step_Disk (forward)
-        if (entireDiskButton->isChecked()) {
+    if (next == 3 && curr == 2) { // at pageDisk (forward)
+        if (radioEntireDisk->isChecked()) {
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
                 if (!uefi) {
-                    const int bdindex = listBlkDevs.findDevice(diskCombo->currentData().toString());
+                    const int bdindex = listBlkDevs.findDevice(comboDisk->currentData().toString());
                     if (bdindex >= 0 && listBlkDevs.at(bdindex).size >= (2048LL*1073741824LL)) {
                         msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
                                            " On some systems, a GPT-formatted disk will not boot.");
@@ -1555,19 +1555,19 @@ int MInstall::showPage(int curr, int next)
                     }
                 }
                 int ans = QMessageBox::warning(this, windowTitle(),
-                                               msg.arg(diskCombo->currentData().toString(), PROJECTNAME),
+                                               msg.arg(comboDisk->currentData().toString(), PROJECTNAME),
                                                QMessageBox::Yes, QMessageBox::No);
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
-            partman.layoutDefault(partman.selectedDriveAuto(), -1, checkBoxEncryptAuto->isChecked());
+            partman.layoutDefault(partman.selectedDriveAuto(), -1, checkEncryptAuto->isChecked());
             QWidget *nf = partman.composeValidate(true, PROJECTNAME);
             if (nf) {
                 nextFocus = nf;
                 return curr;
             }
-            return 5; // Go to Step_Boot
+            return 5; // Go to pageBoot
         }
-    } else if (next == 4 && curr == 3) { // at Step_Partition (fwd)
+    } else if (next == 4 && curr == 3) { // at pagePartition (fwd)
         QWidget *nf = partman.composeValidate(automatic, PROJECTNAME);
         if (nf) {
             nextFocus = nf;
@@ -1579,40 +1579,40 @@ int MInstall::showPage(int curr, int next)
                     " the required information could not be obtained."));
             return curr;
         }
-        return 5; // Go to Step_Boot
-    } else if (curr == 4) { // at Step_FDE
+        return 5; // Go to pageBoot
+    } else if (curr == 4) { // at pageCrypto
         stashAdvancedFDE(next >= 5);
         next = ixPageRefAdvancedFDE;
         ixPageRefAdvancedFDE = 0;
         return next;
-    } else if (next == 6 && curr == 5) { // at Step_Boot (forward)
-        if (oem) return 11; // straight to Step_Progress
+    } else if (next == 6 && curr == 5) { // at pageBoot (forward)
+        if (oem) return 11; // straight to pageProgress
         return next + 1; // skip Services screen
-    } else if (next == 10 && curr == 9) { // at Step_User_Accounts (forward)
+    } else if (next == 10 && curr == 9) { // at pageUserAccounts (forward)
         if (!validateUserInfo()) return curr;
-        if (!haveOldHome) return next + 1; // skip Step_Old_Home
-    } else if (next == 8 && curr == 7) { // at Step_Network (forward)
+        if (!haveOldHome) return next + 1; // skip pageOldHome
+    } else if (next == 8 && curr == 7) { // at pageNetwork (forward)
         if (!validateComputerName()) return curr;
-    } else if (next == 6 && curr == 7) { // at Step_Network (backward)
+    } else if (next == 6 && curr == 7) { // at pageNetwork (backward)
         return next - 1; // skip Services screen
-    } else if (next == 9 && curr == 8) { // at Step_Localization (forward)
+    } else if (next == 9 && curr == 8) { // at pageLocalization (forward)
         if (!pretend && haveSnapshotUserAccounts) {
-            return 11; // skip Step_User_Accounts and go to Step_Progress
+            return 11; // skip pageUserAccounts and go to pageProgress
         }
-    } else if (next == 9 && curr == 10) { // at Step_Old_Home (backward)
+    } else if (next == 9 && curr == 10) { // at pageOldHome (backward)
         if (!pretend && haveSnapshotUserAccounts) {
-            return 8; // skip Step_User_Accounts and go to Step_Localization
+            return 8; // skip pageUserAccounts and go to pageLocalization
         }
-    } else if (next == 10 && curr == 11) { // at Step_Progress (backward)
-        if (oem) return 5; // go back to Step_Boot
+    } else if (next == 10 && curr == 11) { // at pageProgress (backward)
+        if (oem) return 5; // go back to pageBoot
         if (!haveOldHome) {
-            // skip Step_Old_Home
+            // skip pageOldHome
             if (!pretend && haveSnapshotUserAccounts) {
-                return 8; // go to Step_Localization
+                return 8; // go to pageLocalization
             }
-            return 9; // go to Step_User_Accounts
+            return 9; // go to pageUserAccounts
         }
-    } else if (curr == 6) { // at Step_Services
+    } else if (curr == 6) { // at pageServices
         stashServices(next >= 7);
         return 8; // goes back to the screen that called Services screen
     }
@@ -1622,9 +1622,9 @@ int MInstall::showPage(int curr, int next)
 void MInstall::pageDisplayed(int next)
 {
     if (!oobe) {
-        const int ixProgress = widgetStack->indexOf(Step_Progress);
+        const int ixProgress = widgetStack->indexOf(pageProgress);
         // progress bar shown only for install and configuration pages.
-        installBox->setVisible(next >= widgetStack->indexOf(Step_Boot) && next <= ixProgress);
+        boxInstall->setVisible(next >= widgetStack->indexOf(pageBoot) && next <= ixProgress);
         // save the last tip and stop it updating when the progress page is hidden.
         if (next != ixProgress) ixTipStart = ixTip;
     }
@@ -1637,17 +1637,17 @@ void MInstall::pageDisplayed(int next)
 
     switch (next) {
     case 1: // terms and keyboard selection
-        mainHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
+        textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
             + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
             "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
                 " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
             + "<p><b>" + tr("Limitations") + "</b><br/>"
             + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
                 " It is solely your responsibility to backup your data before proceeding.") + "</p>");
-        nextButton->setDefault(true);
+        pushNext->setDefault(true);
         break;
     case 2: // choose disk
-        mainHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
+        textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
             + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(tminroot, trecroot) + "</p>"
             "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
             "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
@@ -1669,7 +1669,7 @@ void MInstall::pageDisplayed(int next)
             "<p><b>" + tr("Using a custom disk layout") + "</b><br/>"
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
-                " partitions you need.").arg(PROJECTNAME, customPartButton->text().remove('&')) + "</p>");
+                " partitions you need.").arg(PROJECTNAME, radioCustomPart->text().remove('&')) + "</p>");
         if (phase < 0) {
             updateCursor(Qt::WaitCursor);
             phase = 0;
@@ -1677,12 +1677,12 @@ void MInstall::pageDisplayed(int next)
             updatePartitionWidgets(true);
             updateCursor();
         }
-        backButton->setEnabled(true);
-        nextButton->setEnabled(!(checkBoxEncryptAuto->isChecked()) || FDEpassword->isValid());
+        pushBack->setEnabled(true);
+        pushNext->setEnabled(!(checkEncryptAuto->isChecked()) || textCryptoPass->isValid());
         return; // avoid the end that enables both Back and Next buttons
 
     case 3:  // choose partition
-        mainHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
+        textHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
             + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"
             "<p>" + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"
             "<p>" + tr("<i>Size</i> - The size of the partition. This can only be changed on a new layout.") + "</p>"
@@ -1745,12 +1745,12 @@ void MInstall::pageDisplayed(int next)
             "<p><b>" + tr("Virtual Devices") + "</b><br/>"
             + tr("If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
             "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
-        backButton->setEnabled(true);
-        nextButton->setEnabled(!(gbEncrPass->isEnabledTo(gbEncrPass->parentWidget())) || FDEpassCust->isValid());
+        pushBack->setEnabled(true);
+        pushNext->setEnabled(!(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || textCryptoPassCust->isValid());
         return; // avoid the end that enables both Back and Next buttons
 
     case 4: // advanced encryption settings
-        mainHelp->setText("<p><b>"
+        textHelp->setText("<p><b>"
             + tr("Advanced Encryption Settings") + "</b><br/>" + tr("This page allows fine-tuning of LUKS encrypted partitions.") + "<br/>"
             + tr("In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.")
             + "</p><p>"
@@ -1793,13 +1793,13 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 5: // set bootloader (start of installation)
-        mainHelp->setText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
+        textHelp->setText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
                              "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
                              "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
                              "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
 
-        backButton->setEnabled(false);
-        nextButton->setEnabled(true);
+        pushBack->setEnabled(false);
+        pushNext->setEnabled(true);
         if (phase <= 0) {
             buildBootLists();
             manageConfig(ConfigLoadB);
@@ -1808,24 +1808,24 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 6: // set services
-        mainHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
+        textHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         break;
 
     case 7: // set computer name
-        mainHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
+        textHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
                              "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
         if (oobe) {
-            backButton->setEnabled(false);
-            nextButton->setEnabled(true);
+            pushBack->setEnabled(false);
+            pushNext->setEnabled(true);
             return; // avoid the end that enables both Back and Next buttons
         }
         break;
 
     case 8: // set localization, clock, services button
-        mainHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
+        textHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
             + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"
             "<p><b>" + tr("Configure Clock") + "</b><br/>"
             + tr("If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC)."
@@ -1839,7 +1839,7 @@ void MInstall::pageDisplayed(int next)
         break;
 
     case 9: // set username and passwords
-        mainHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
+        textHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
         + tr("The root user is similar to the Administrator user in some other operating systems."
             " You should not use the root user as your daily user account."
             " Please enter the name for a new (default) user account that you will use on a daily basis."
@@ -1852,14 +1852,14 @@ void MInstall::pageDisplayed(int next)
             " This allows you to log in without requiring a password.") + "<br/>"
         + tr("Obviously, this should only be done in situations where the user account"
             " does not need to be secure, such as a public terminal.") + "</p>");
-        if (!nextFocus) nextFocus = userNameEdit;
-        backButton->setEnabled(true);
+        if (!nextFocus) nextFocus = textUserName;
+        pushBack->setEnabled(true);
         userPassValidationChanged();
         return; // avoid the end that enables both Back and Next buttons
         break;
 
     case 10: // deal with an old home directory
-        mainHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
+        textHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
             + tr("A home directory already exists for the user name you have chosen."
                 " This screen allows you to choose what happens to this directory.") + "</p>"
             "<p><b>" + tr("Re-use it for this installation") + "</b><br/>"
@@ -1877,18 +1877,18 @@ void MInstall::pageDisplayed(int next)
         // disable the Next button if none of the old home options are selected
         on_radioOldHomeUse_toggled(false);
         // if the Next button is disabled, avoid enabling both Back and Next at the end
-        if (nextButton->isEnabled() == false) {
-            backButton->setEnabled(true);
+        if (pushNext->isEnabled() == false) {
+            pushBack->setEnabled(true);
             return;
         }
         break;
 
     case 11: // installation step
         if (ixTipStart >= 0) {
-            iLastProgress = progressBar->value();
-            on_progressBar_valueChanged(iLastProgress);
+            iLastProgress = progInstall->value();
+            on_progInstall_valueChanged(iLastProgress);
         }
-        mainHelp->setText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
+        textHelp->setText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
             + tr("%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
             + "</p><p>"
             + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
@@ -1898,14 +1898,14 @@ void MInstall::pageDisplayed(int next)
             + "</p><p>"
             + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
             + "</p>");
-        backButton->setEnabled(true);
-        nextButton->setEnabled(false);
+        pushBack->setEnabled(true);
+        pushNext->setEnabled(false);
         return; // avoid enabling both Back and Next buttons at the end
         break;
 
     case 12: // done
-        closeButton->setEnabled(false);
-        mainHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
+        pushClose->setEnabled(false);
+        textHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                              "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
                              "The best way to learn about them is to browse through the Menu and try them. "
                              "Many of the apps were developed specifically for the %1 project. "
@@ -1914,51 +1914,51 @@ void MInstall::pageDisplayed(int next)
         break;
 
     default: // other
-        mainHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n "
+        textHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n "
         + tr("<p><b>Support %1</b><br/>"
             "%1 is supported by people like you. Some help others at the "
             "support forum - %2 - or translate help files into different "
             "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
-        nextButton->setDefault(true);
+        pushNext->setDefault(true);
         break;
     }
 
-    backButton->setEnabled(true);
-    nextButton->setEnabled(true);
+    pushBack->setEnabled(true);
+    pushNext->setEnabled(true);
 }
 
 void MInstall::gotoPage(int next)
 {
-    backButton->setEnabled(false);
-    nextButton->setEnabled(false);
+    pushBack->setEnabled(false);
+    pushNext->setEnabled(false);
     widgetStack->setEnabled(false);
     int curr = widgetStack->currentIndex();
     next = showPage(curr, next);
 
     // modify ui for standard cases
-    closeButton->setHidden(next == 0);
-    backButton->setHidden(next <= 1);
-    nextButton->setHidden(next == 0);
+    pushClose->setHidden(next == 0);
+    pushBack->setHidden(next <= 1);
+    pushNext->setHidden(next == 0);
 
     int c = widgetStack->count();
-    QSize isize = nextButton->iconSize();
+    QSize isize = pushNext->iconSize();
     isize.setWidth(isize.height());
     if (next >= c-1) {
         // entering the last page
-        backButton->hide();
-        nextButton->setText(tr("Finish"));
+        pushBack->hide();
+        pushNext->setText(tr("Finish"));
     } else if (next == 4 || next == 6){
         // Advanced Encryption Settings and Services pages
         isize.setWidth(0);
-        nextButton->setText(tr("OK"));
+        pushNext->setText(tr("OK"));
     } else {
-        nextButton->setText(tr("Next"));
+        pushNext->setText(tr("Next"));
     }
-    nextButton->setIconSize(isize);
+    pushNext->setIconSize(isize);
     if (next > c-1) {
         // finished
         updateCursor(Qt::WaitCursor);
-        if (!pretend && checkBoxExitReboot->isChecked()) {
+        if (!pretend && checkExitReboot->isChecked()) {
             proc.exec("/usr/local/bin/persist-config --shutdown --command reboot &", false);
         }
         qApp->exit(EXIT_SUCCESS);
@@ -1979,12 +1979,12 @@ void MInstall::gotoPage(int next)
     // automatic installation
     if (automatic) {
         if (!MSettings::isBadWidget(widgetStack->currentWidget())
-            && next > curr) nextButton->click();
+            && next > curr) pushNext->click();
         else if (curr!=0) automatic = false; // failed validation
     }
 
     // process next installation phase
-    if (next == widgetStack->indexOf(Step_Boot) || next == widgetStack->indexOf(Step_Progress)) {
+    if (next == widgetStack->indexOf(pageBoot) || next == widgetStack->indexOf(pageProgress)) {
         if (oobe) {
             updateCursor(Qt::BusyCursor);
             labelSplash->setText(tr("Configuring sytem. Please wait."));
@@ -1995,12 +1995,12 @@ void MInstall::gotoPage(int next)
                 qApp->exit(EXIT_SUCCESS);
             } else {
                 labelSplash->setText(tr("Could not complete configuration."));
-                closeButton->show();
+                pushClose->show();
             }
         } else if (!processNextPhase() && phase > -2) {
             cleanup(false);
             gotoPage(2);
-            mainFrame->setEnabled(true);
+            boxMain->setEnabled(true);
         }
         updateCursor();
     }
@@ -2010,9 +2010,9 @@ void MInstall::updatePartitionWidgets(bool all)
 {
     proc.log(__PRETTY_FUNCTION__);
 
-    diskCombo->setEnabled(false);
-    diskCombo->clear();
-    diskCombo->addItem(tr("Loading..."));
+    comboDisk->setEnabled(false);
+    comboDisk->clear();
+    comboDisk->addItem(tr("Loading..."));
     listBlkDevs.build(proc);
     if (mactest) {
         for (BlockDeviceInfo &bdinfo : listBlkDevs) {
@@ -2021,23 +2021,23 @@ void MInstall::updatePartitionWidgets(bool all)
     }
 
     // disk combo box
-    diskCombo->clear();
+    comboDisk->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (bdinfo.isDrive && bdinfo.size >= partman.rootSpaceNeeded
                 && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
-            bdinfo.addToCombo(diskCombo);
+            bdinfo.addToCombo(comboDisk);
         }
     }
-    diskCombo->setCurrentIndex(0);
-    diskCombo->setEnabled(true);
+    comboDisk->setCurrentIndex(0);
+    comboDisk->setEnabled(true);
 
     if (all) {
         // whole-disk vs custom-partition radio buttons
-        entireDiskButton->setChecked(true);
+        radioEntireDisk->setChecked(true);
         for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
             if (!bdinfo.isDrive) {
                 // found at least one partition
-                customPartButton->setChecked(true);
+                radioCustomPart->setChecked(true);
                 break;
             }
         }
@@ -2050,7 +2050,7 @@ void MInstall::updatePartitionWidgets(bool all)
 }
 void MInstall::setupPartitionSlider()
 {
-    frameSliderPart->setDisabled(true);
+    boxSliderPart->setDisabled(true);
     // Allow the slider labels to fit all possible formatted sizes.
     const QString &strMB = sliderSizeString(1072693248) + '\n'; // "1,023 GB"
     const QFontMetrics &fmetrics = labelSliderRoot->fontMetrics();
@@ -2068,9 +2068,9 @@ void MInstall::buildServiceList()
 {
     proc.log(__PRETTY_FUNCTION__);
 
-    //setup csView
-    csView->header()->setMinimumSectionSize(150);
-    csView->header()->resizeSection(0,150);
+    //setup treeServices
+    treeServices->header()->setMinimumSectionSize(150);
+    treeServices->header()->resizeSection(0,150);
 
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
 
@@ -2089,12 +2089,12 @@ void MInstall::buildServiceList()
         description = list.at(1);
 
         if (QFile::exists("/etc/init.d/"+service) || QFile::exists("/etc/sv/"+service)) {
-            QList<QTreeWidgetItem *> found_items = csView->findItems(category, Qt::MatchExactly, 0);
+            QList<QTreeWidgetItem *> found_items = treeServices->findItems(category, Qt::MatchExactly, 0);
             QTreeWidgetItem *top_item;
             QTreeWidgetItem *item;
             QTreeWidgetItem *parent;
             if (found_items.size() == 0) { // add top item if no top items found
-                top_item = new QTreeWidgetItem(csView);
+                top_item = new QTreeWidgetItem(treeServices);
                 top_item->setText(0, category);
                 parent = top_item;
             } else {
@@ -2106,9 +2106,9 @@ void MInstall::buildServiceList()
             item->setCheckState(0, Qt::Checked);
         }
     }
-    csView->expandAll();
-    csView->resizeColumnToContents(0);
-    csView->resizeColumnToContents(1);
+    treeServices->expandAll();
+    treeServices->resizeColumnToContents(0);
+    treeServices->resizeColumnToContents(1);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -2120,11 +2120,11 @@ void MInstall::changeEvent(QEvent *event)
     if (etype == QEvent::ApplicationPaletteChange
         || etype == QEvent::PaletteChange || etype == QEvent::StyleChange)
     {
-        QPalette pal = qApp->palette(mainHelp);
+        QPalette pal = qApp->palette(textHelp);
         QColor col = pal.color(QPalette::Base);
         col.setAlpha(200);
         pal.setColor(QPalette::Base, col);
-        mainHelp->setPalette(pal);
+        textHelp->setPalette(pal);
         setupPartitionSlider();
         resizeEvent(nullptr);
     }
@@ -2132,8 +2132,8 @@ void MInstall::changeEvent(QEvent *event)
 
 void MInstall::resizeEvent(QResizeEvent *)
 {
-    mainHelp->resize(tabHelp->size());
-    helpbackdrop->resize(mainHelp->size());
+    textHelp->resize(tabHelp->size());
+    labelHelpBackdrop->resize(textHelp->size());
 }
 
 void MInstall::closeEvent(QCloseEvent *event)
@@ -2146,7 +2146,7 @@ void MInstall::closeEvent(QCloseEvent *event)
             proc.exec("/usr/sbin/shutdown -hP now");
         }
         QWidget::closeEvent(event);
-        if (widgetStack->currentWidget() != Step_End) {
+        if (widgetStack->currentWidget() != pageEnd) {
             qApp->exit(EXIT_FAILURE);
         } else {
             proc.waitForFinished();
@@ -2169,7 +2169,7 @@ void MInstall::on_splitter_splitterMoved(int, int)
 {
     resizeEvent(nullptr);
 }
-void MInstall::on_mainTabs_currentChanged(int index)
+void MInstall::on_tabsMain_currentChanged(int index)
 {
     // Make the help widgets the correct size.
     if (index == 0) resizeEvent(nullptr);
@@ -2177,72 +2177,72 @@ void MInstall::on_mainTabs_currentChanged(int index)
 
 void MInstall::diskPassValidationChanged(bool valid)
 {
-    nextButton->setEnabled(valid);
+    pushNext->setEnabled(valid);
 }
 void MInstall::userPassValidationChanged()
 {
-    nextButton->setEnabled(!(userNameEdit->text().isEmpty())
-        && userPasswordEdit->isValid() && rootPasswordEdit->isValid());
+    pushNext->setEnabled(!(textUserName->text().isEmpty())
+        && textUserPass->isValid() && textRootPass->isValid());
 }
 
-void MInstall::on_passwordCheckBox_stateChanged(int state)
+void MInstall::on_checkShowPass_stateChanged(int state)
 {
     if (state == Qt::Unchecked) {
         // don't show
-        userPasswordEdit->setEchoMode(QLineEdit::Password);
-        userPasswordEdit2->setEchoMode(QLineEdit::Password);
-        rootPasswordEdit->setEchoMode(QLineEdit::Password);
-        rootPasswordEdit2->setEchoMode(QLineEdit::Password);
+        textUserPass->setEchoMode(QLineEdit::Password);
+        textUserPass2->setEchoMode(QLineEdit::Password);
+        textRootPass->setEchoMode(QLineEdit::Password);
+        textRootPass2->setEchoMode(QLineEdit::Password);
     } else {
         // show
-        userPasswordEdit->setEchoMode(QLineEdit::Normal);
-        userPasswordEdit2->setEchoMode(QLineEdit::Normal);
-        rootPasswordEdit->setEchoMode(QLineEdit::Normal);
-        rootPasswordEdit2->setEchoMode(QLineEdit::Normal);
+        textUserPass->setEchoMode(QLineEdit::Normal);
+        textUserPass2->setEchoMode(QLineEdit::Normal);
+        textRootPass->setEchoMode(QLineEdit::Normal);
+        textRootPass2->setEchoMode(QLineEdit::Normal);
     }
 }
 
-void MInstall::on_nextButton_clicked()
+void MInstall::on_pushNext_clicked()
 {
     gotoPage(widgetStack->currentIndex() + 1);
 }
-void MInstall::on_backButton_clicked()
+void MInstall::on_pushBack_clicked()
 {
     gotoPage(widgetStack->currentIndex() - 1);
 }
 
-void MInstall::on_abortInstallButton_clicked()
+void MInstall::on_pushAbort_clicked()
 {
     abort(false);
     QApplication::beep();
 }
 
 // clicking advanced button to go to Services page
-void MInstall::on_viewServicesButton_clicked()
+void MInstall::on_pushServices_clicked()
 {
     gotoPage(6);
 }
 
-void MInstall::on_buttonPartReload_clicked()
+void MInstall::on_pushPartReload_clicked()
 {
     updateCursor(Qt::WaitCursor);
-    mainFrame->setEnabled(false);
+    boxMain->setEnabled(false);
     updatePartitionWidgets(false);
-    mainFrame->setEnabled(true);
+    boxMain->setEnabled(true);
     updateCursor();
 }
-void MInstall::on_buttonRunParted_clicked()
+void MInstall::on_pushRunPartMan_clicked()
 {
     updateCursor(Qt::WaitCursor);
-    mainFrame->setEnabled(false);
+    boxMain->setEnabled(false);
     if (QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted", true);
     else proc.exec("/usr/bin/partitionmanager", true);
     updatePartitionWidgets(false);
-    mainFrame->setEnabled(true);
+    boxMain->setEnabled(true);
     updateCursor();
 }
 
-void MInstall::on_buttonBenchmarkFDE_clicked()
+void MInstall::on_pushBenchmarkCrypto_clicked()
 {
     proc.exec("x-terminal-emulator -e bash -c \"/sbin/cryptsetup benchmark"
             " && echo && read -n 1 -srp 'Press any key to close the benchmark window.'\"");
@@ -2251,7 +2251,7 @@ void MInstall::on_buttonBenchmarkFDE_clicked()
 bool MInstall::abort(bool onclose)
 {
     proc.log(__PRETTY_FUNCTION__);
-    mainFrame->setEnabled(false);
+    boxMain->setEnabled(false);
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
         const QMessageBox::StandardButton rc = QMessageBox::warning(this,
@@ -2259,7 +2259,7 @@ bool MInstall::abort(bool onclose)
                 " is incomplete.\nDo you really want to stop now?"),
             QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if (rc == QMessageBox::No) {
-            mainFrame->setEnabled(true);
+            boxMain->setEnabled(true);
             return false;
         }
     }
@@ -2268,13 +2268,13 @@ bool MInstall::abort(bool onclose)
     // help the installer if it was stuck at the config pages
     if (onclose) {
         phase = -2;
-    } else if (phase == 2 && widgetStack->currentWidget() != Step_Progress) {
+    } else if (phase == 2 && widgetStack->currentWidget() != pageProgress) {
         phase = -1;
         gotoPage(2);
     } else {
         phase = -1;
     }
-    if (!onclose) mainFrame->setEnabled(true);
+    if (!onclose) boxMain->setEnabled(true);
     return true;
 }
 
@@ -2298,16 +2298,16 @@ void MInstall::cleanup(bool endclean)
     if (!mountkeep) partman.unmount();
 }
 
-void MInstall::on_progressBar_valueChanged(int value)
+void MInstall::on_progInstall_valueChanged(int value)
 {
-    if (ixTipStart < 0 || widgetStack->currentWidget() != Step_Progress) {
+    if (ixTipStart < 0 || widgetStack->currentWidget() != pageProgress) {
         return; // no point displaying a new hint if it will be invisible
     }
 
     const int tipcount = 6;
     ixTip = tipcount;
     if (ixTipStart < tipcount) {
-        int imax = (progressBar->maximum() - iLastProgress) / (tipcount - ixTipStart);
+        int imax = (progInstall->maximum() - iLastProgress) / (tipcount - ixTipStart);
         if (imax != 0) {
             ixTip = ixTipStart + (value - iLastProgress) / imax;
         }
@@ -2316,7 +2316,7 @@ void MInstall::on_progressBar_valueChanged(int value)
     switch(ixTip)
     {
     case 0:
-        tipsEdit->setText(tr("<p><b>Getting Help</b><br/>"
+        textTips->setText(tr("<p><b>Getting Help</b><br/>"
                              "Basic information about %1 is at %2.</p><p>"
                              "There are volunteers to help you at the %3 forum, %4</p>"
                              "<p>If you ask for help, please remember to describe your problem and your computer "
@@ -2324,13 +2324,13 @@ void MInstall::on_progressBar_valueChanged(int value)
         break;
 
     case 1:
-        tipsEdit->setText(tr("<p><b>Repairing Your Installation</b><br/>"
+        textTips->setText(tr("<p><b>Repairing Your Installation</b><br/>"
                              "If %1 stops working from the hard drive, sometimes it's possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.</p>"
                              "<p>You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!</p>").arg(PROJECTNAME));
         break;
 
     case 2:
-        tipsEdit->setText(tr("<p><b>Support %1</b><br/>"
+        textTips->setText(tr("<p><b>Support %1</b><br/>"
                              "%1 is supported by people like you. Some help others at the "
                              "support forum - %2 - or translate help files into different "
                              "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
@@ -2338,7 +2338,7 @@ void MInstall::on_progressBar_valueChanged(int value)
         break;
 
     case 3:
-        tipsEdit->setText(tr("<p><b>Adjusting Your Sound Mixer</b><br/>"
+        textTips->setText(tr("<p><b>Adjusting Your Sound Mixer</b><br/>"
                              " %1 attempts to configure the sound mixer for you but sometimes it will be "
                              "necessary for you to turn up volumes and unmute channels in the mixer "
                              "in order to hear sound.</p> "
@@ -2346,19 +2346,19 @@ void MInstall::on_progressBar_valueChanged(int value)
         break;
 
     case 4:
-        tipsEdit->setText(tr("<p><b>Keep Your Copy of %1 up-to-date</b><br/>"
+        textTips->setText(tr("<p><b>Keep Your Copy of %1 up-to-date</b><br/>"
                              "For more information and updates please visit</p><p> %2</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
         break;
 
     default:
-        tipsEdit->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
+        textTips->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
                              "<p>Without you there would be no %1.</p>"
                              "<p>%2 Dev Team</p>").arg(PROJECTNAME).arg(PROJECTSHORTNAME));
         break;
     }
 }
 
-void MInstall::on_closeButton_clicked()
+void MInstall::on_pushClose_clicked()
 {
     close();
 }
@@ -2371,9 +2371,9 @@ void MInstall::setupkeyboardbutton()
         while (!file.atEnd()) {
             QString line(file.readLine().trimmed());
             QLabel *plabel = nullptr;
-            if (line.startsWith("XKBMODEL")) plabel = labelModel;
-            else if (line.startsWith("XKBLAYOUT")) plabel = labelLayout;
-            else if (line.startsWith("XKBVARIANT")) plabel = labelVariant;
+            if (line.startsWith("XKBMODEL")) plabel = labelKeyboardModel;
+            else if (line.startsWith("XKBLAYOUT")) plabel = labelKeyboardLayout;
+            else if (line.startsWith("XKBVARIANT")) plabel = labelKeyboardVariant;
             if (plabel != nullptr) {
                 line = line.section('=', 1);
                 line.replace(",", " ");
@@ -2385,7 +2385,7 @@ void MInstall::setupkeyboardbutton()
     }
 }
 
-void MInstall::on_buttonSetKeyboard_clicked()
+void MInstall::on_pushSetKeyboard_clicked()
 {
     hide();
     if (proc.exec("command -v  system-keyboard-qt >/dev/null 2>&1", false))
@@ -2396,7 +2396,7 @@ void MInstall::on_buttonSetKeyboard_clicked()
     setupkeyboardbutton();
 }
 
-void MInstall::on_diskCombo_currentIndexChanged(int)
+void MInstall::on_comboDisk_currentIndexChanged(int)
 {
     on_sliderPart_valueChanged(sliderPart->value());
 }
@@ -2412,7 +2412,7 @@ void MInstall::on_sliderPart_sliderPressed()
 }
 void MInstall::on_sliderPart_valueChanged(int value)
 {
-    const bool crypto = checkBoxEncryptAuto->isChecked();
+    const bool crypto = checkEncryptAuto->isChecked();
     QTreeWidgetItem *drvitem = partman.selectedDriveAuto();
     if (!drvitem) return;
     long long available = partman.layoutDefault(drvitem, 100, crypto, false);
@@ -2425,7 +2425,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
     int origValue = value;
     if (value<0) { // Internal setup.
         origValue = value = sliderPart->value();
-        frameSliderPart->setEnabled(true);
+        boxSliderPart->setEnabled(true);
         // 64GB cap on the default slider value, rounded to nearest percentage.
         const int rootPortionMax = ((65536*100) + (available/2)) / available;
         // Caps based on disk capacity and recommendations.
@@ -2462,30 +2462,30 @@ void MInstall::on_sliderPart_valueChanged(int value)
     on_sliderPart_sliderPressed(); // For the tool tip.
 }
 
-void MInstall::on_checkBoxEncryptAuto_toggled(bool checked)
+void MInstall::on_checkEncryptAuto_toggled(bool checked)
 {
-    FDEpassword->clear();
-    nextButton->setDisabled(checked);
-    FDEpassword->setEnabled(checked);
-    FDEpassword2->setEnabled(checked);
-    labelFDEpass->setEnabled(checked);
-    labelFDEpass2->setEnabled(checked);
-    pbFDEpassMeter->setEnabled(checked);
-    buttonAdvancedFDE->setEnabled(checked);
-    grubPbrButton->setDisabled(checked);
-    if (checked) FDEpassword->setFocus();
+    textCryptoPass->clear();
+    pushNext->setDisabled(checked);
+    textCryptoPass->setEnabled(checked);
+    textCryptoPass2->setEnabled(checked);
+    labelCryptoPass->setEnabled(checked);
+    labelCryptoPass2->setEnabled(checked);
+    progCryptoPassMeter->setEnabled(checked);
+    pushAdvancedCrypto->setEnabled(checked);
+    radioBootPBR->setDisabled(checked);
+    if (checked) textCryptoPass->setFocus();
     // Account for addition/removal of the boot partition.
     on_sliderPart_valueChanged(sliderPart->value());
 }
 
-void MInstall::on_customPartButton_clicked(bool checked)
+void MInstall::on_radioCustomPart_clicked(bool checked)
 {
-    checkBoxEncryptAuto->setChecked(!checked);
+    checkEncryptAuto->setChecked(!checked);
 }
 
-void MInstall::on_buttonLoadKey_clicked()
+void MInstall::on_pushLoadKey_clicked()
 {
-    buttonLoadKey->setEnabled(false);
+    pushLoadKey->setEnabled(false);
     if (key.length()<=0) {
         QFileDialog dialog(this, "Select Key Material", "/mnt/antiX/root");
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
@@ -2509,225 +2509,225 @@ void MInstall::on_buttonLoadKey_clicked()
         }
     }
     const int keylen = key.length(); // This might have changed above.
-    if (keylen<=0) buttonLoadKey->setText(tr("Load key material..."));
-    else buttonLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
-    buttonLoadKey->setEnabled(true);
+    if (keylen<=0) pushLoadKey->setText(tr("Load key material..."));
+    else pushLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
+    pushLoadKey->setEnabled(true);
     updateCursor();
 }
 
-void MInstall::on_buttonAdvancedFDE_clicked()
+void MInstall::on_pushAdvancedCrypto_clicked()
 {
     ixPageRefAdvancedFDE = widgetStack->currentIndex();
     gotoPage(4);
 }
 
-void MInstall::on_buttonAdvancedFDECust_clicked()
+void MInstall::on_pushAdvancedCryptoCust_clicked()
 {
     ixPageRefAdvancedFDE = widgetStack->currentIndex();
     gotoPage(4);
 }
 
-void MInstall::on_comboFDEcipher_currentIndexChanged(const QString &arg1)
+void MInstall::on_comboCryptoCipher_currentIndexChanged(const QString &arg1)
 {
     int hashgroup = 1;
     if (arg1 == "Blowfish") {
         hashgroup = 7;
-        comboFDEchain->clear();
-        comboFDEchain->addItem("CBC");
-        comboFDEchain->addItem("ECB");
+        comboCryptoChain->clear();
+        comboCryptoChain->addItem("CBC");
+        comboCryptoChain->addItem("ECB");
     } else {
         if (arg1 == "Serpent" || arg1 == "CAST6") hashgroup = 3;
-        comboFDEchain->clear();
-        comboFDEchain->addItem("XTS");
-        comboFDEchain->addItem("CBC");
-        comboFDEchain->addItem("ECB");
+        comboCryptoChain->clear();
+        comboCryptoChain->addItem("XTS");
+        comboCryptoChain->addItem("CBC");
+        comboCryptoChain->addItem("ECB");
     }
-    on_comboFDEchain_currentIndexChanged(comboFDEchain->currentText());
+    on_comboCryptoChain_currentIndexChanged(comboCryptoChain->currentText());
 
-    comboFDEivhash->clear();
-    if (hashgroup & 4) comboFDEivhash->addItem("SHA-384", QVariant("sha384"));
-    if (hashgroup & 1) comboFDEivhash->addItem("SHA-256", QVariant("sha256"));
-    if (hashgroup & 2) comboFDEivhash->addItem("SHA-224", QVariant("sha224"));
-    if (hashgroup & 4) comboFDEivhash->addItem("Whirlpool-384", QVariant("wp384"));
-    if (hashgroup & 1) comboFDEivhash->addItem("Whirlpool-256", QVariant("wp256"));
-    if (hashgroup & 1) comboFDEivhash->addItem("Tiger", QVariant("tgr192"));
-    if (hashgroup & 2) comboFDEivhash->addItem("Tiger/160", QVariant("tgr160"));
-    if (hashgroup & 1) comboFDEivhash->addItem("Tiger/128", QVariant("tgr128"));
-    if (hashgroup & 4) comboFDEivhash->addItem("RIPEMD-320", QVariant("rmd320"));
-    if (hashgroup & 1) comboFDEivhash->addItem("RIPEMD-256", QVariant("rmd256"));
-    comboFDEivhash->insertSeparator(100);
-    if (hashgroup & 2) comboFDEivhash->addItem("RIPEMD-160", QVariant("rmd160"));
-    if (hashgroup & 1) comboFDEivhash->addItem("RIPEMD-128", QVariant("rmd128"));
-    if (hashgroup & 2) comboFDEivhash->addItem("SHA-1", QVariant("sha1"));
-    if (hashgroup & 1) comboFDEivhash->addItem("MD5", QVariant("md5"));
-    if (hashgroup & 1) comboFDEivhash->addItem("MD4", QVariant("md4"));
+    comboCryptoIVHash->clear();
+    if (hashgroup & 4) comboCryptoIVHash->addItem("SHA-384", QVariant("sha384"));
+    if (hashgroup & 1) comboCryptoIVHash->addItem("SHA-256", QVariant("sha256"));
+    if (hashgroup & 2) comboCryptoIVHash->addItem("SHA-224", QVariant("sha224"));
+    if (hashgroup & 4) comboCryptoIVHash->addItem("Whirlpool-384", QVariant("wp384"));
+    if (hashgroup & 1) comboCryptoIVHash->addItem("Whirlpool-256", QVariant("wp256"));
+    if (hashgroup & 1) comboCryptoIVHash->addItem("Tiger", QVariant("tgr192"));
+    if (hashgroup & 2) comboCryptoIVHash->addItem("Tiger/160", QVariant("tgr160"));
+    if (hashgroup & 1) comboCryptoIVHash->addItem("Tiger/128", QVariant("tgr128"));
+    if (hashgroup & 4) comboCryptoIVHash->addItem("RIPEMD-320", QVariant("rmd320"));
+    if (hashgroup & 1) comboCryptoIVHash->addItem("RIPEMD-256", QVariant("rmd256"));
+    comboCryptoIVHash->insertSeparator(100);
+    if (hashgroup & 2) comboCryptoIVHash->addItem("RIPEMD-160", QVariant("rmd160"));
+    if (hashgroup & 1) comboCryptoIVHash->addItem("RIPEMD-128", QVariant("rmd128"));
+    if (hashgroup & 2) comboCryptoIVHash->addItem("SHA-1", QVariant("sha1"));
+    if (hashgroup & 1) comboCryptoIVHash->addItem("MD5", QVariant("md5"));
+    if (hashgroup & 1) comboCryptoIVHash->addItem("MD4", QVariant("md4"));
 }
 
-void MInstall::on_comboFDEchain_currentIndexChanged(const QString &arg1)
+void MInstall::on_comboCryptoChain_currentIndexChanged(const QString &arg1)
 {
     int multKey = 1; // Multiplier for key sizes.
 
     if (arg1 == "ECB") {
-        labelFDEivgen->setEnabled(false);
-        comboFDEivgen->setEnabled(false);
-        comboFDEivhash->setEnabled(false);
-        comboFDEivgen->setCurrentIndex(-1);
+        labelCryptoIVGen->setEnabled(false);
+        comboCryptoIVGen->setEnabled(false);
+        comboCryptoIVHash->setEnabled(false);
+        comboCryptoIVGen->setCurrentIndex(-1);
     } else {
         int ixIVGen = -1;
         if (arg1 == "XTS") {
             multKey = 2;
-            ixIVGen = comboFDEivgen->findText("Plain64");
+            ixIVGen = comboCryptoIVGen->findText("Plain64");
         } else if (arg1 == "CBC") {
-            ixIVGen = comboFDEivgen->findText("ESSIV");
+            ixIVGen = comboCryptoIVGen->findText("ESSIV");
         }
-        if (ixIVGen >= 0) comboFDEivgen->setCurrentIndex(ixIVGen);
-        labelFDEivgen->setEnabled(true);
-        comboFDEivgen->setEnabled(true);
-        comboFDEivhash->setEnabled(true);
+        if (ixIVGen >= 0) comboCryptoIVGen->setCurrentIndex(ixIVGen);
+        labelCryptoIVGen->setEnabled(true);
+        comboCryptoIVGen->setEnabled(true);
+        comboCryptoIVHash->setEnabled(true);
     }
 
-    const QString &strCipher = comboFDEcipher->currentText();
+    const QString &strCipher = comboCryptoCipher->currentText();
     if (strCipher == "Blowfish") {
-        spinFDEkeysize->setSingleStep(multKey*8);
-        spinFDEkeysize->setRange(multKey*64, multKey*448);
+        spinCryptoKeySize->setSingleStep(multKey*8);
+        spinCryptoKeySize->setRange(multKey*64, multKey*448);
     } else if (strCipher == "Twofish" || strCipher == "AES") {
-        spinFDEkeysize->setSingleStep(multKey*64);
-        spinFDEkeysize->setRange(multKey*128, multKey*256);
+        spinCryptoKeySize->setSingleStep(multKey*64);
+        spinCryptoKeySize->setRange(multKey*128, multKey*256);
     } else {
-        spinFDEkeysize->setSingleStep(multKey*16);
-        spinFDEkeysize->setRange(multKey*128, multKey*256);
+        spinCryptoKeySize->setSingleStep(multKey*16);
+        spinCryptoKeySize->setRange(multKey*128, multKey*256);
     }
-    spinFDEkeysize->setValue(65536);
+    spinCryptoKeySize->setValue(65536);
 }
 
-void MInstall::on_comboFDEivgen_currentIndexChanged(const QString &arg1)
+void MInstall::on_comboCryptoIVGen_currentIndexChanged(const QString &arg1)
 {
     if (arg1 == "ESSIV") {
-        comboFDEivhash->show();
-        comboFDEivhash->setCurrentIndex(0);
+        comboCryptoIVHash->show();
+        comboCryptoIVHash->setCurrentIndex(0);
     } else {
-        comboFDEivhash->hide();
+        comboCryptoIVHash->hide();
     }
 }
 
-void MInstall::on_spinFDEkeysize_valueChanged(int i)
+void MInstall::on_spinCryptoKeySize_valueChanged(int i)
 {
     bool entered = false;
     if (!entered) {
         entered = true;
-        int iSingleStep = spinFDEkeysize->singleStep();
+        int iSingleStep = spinCryptoKeySize->singleStep();
         int iMod = i % iSingleStep;
-        if (iMod) spinFDEkeysize->setValue(i + (iSingleStep-iMod));
+        if (iMod) spinCryptoKeySize->setValue(i + (iSingleStep-iMod));
     }
 }
 
-void MInstall::on_grubCheckBox_toggled(bool checked)
+void MInstall::on_checkBoot_toggled(bool checked)
 {
-    grubEspButton->setEnabled(checked && canESP);
-    grubMbrButton->setEnabled(checked && canMBR);
-    grubPbrButton->setEnabled(checked && canPBR);
-    grubInsLabel->setEnabled(checked);
-    grubBootLabel->setEnabled(checked);
-    grubBootCombo->setEnabled(checked);
+    radioBootESP->setEnabled(checked && canESP);
+    radioBootMBR->setEnabled(checked && canMBR);
+    radioBootPBR->setEnabled(checked && canPBR);
+    labelBootInstall->setEnabled(checked);
+    labelBoot->setEnabled(checked);
+    comboBoot->setEnabled(checked);
 }
 
-void MInstall::on_grubMbrButton_toggled()
+void MInstall::on_radioBootMBR_toggled()
 {
-    grubBootCombo->clear();
+    comboBoot->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (bdinfo.isDrive && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
-            if (!bdinfo.isNasty || brave) bdinfo.addToCombo(grubBootCombo, true);
+            if (!bdinfo.isNasty || brave) bdinfo.addToCombo(comboBoot, true);
         }
     }
-    grubBootLabel->setText(tr("System boot disk:"));
+    labelBoot->setText(tr("System boot disk:"));
 }
 
-void MInstall::on_grubPbrButton_toggled()
+void MInstall::on_radioBootPBR_toggled()
 {
-    grubBootCombo->clear();
+    comboBoot->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (!(bdinfo.isDrive || bdinfo.fs=="swap" || bdinfo.isESP)
             && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
             && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
             // list only Linux partitions excluding crypto_LUKS partitions
-            if (!bdinfo.isNasty || brave) bdinfo.addToCombo(grubBootCombo, true);
+            if (!bdinfo.isNasty || brave) bdinfo.addToCombo(comboBoot, true);
         }
     }
-    grubBootLabel->setText(tr("Partition to use:"));
+    labelBoot->setText(tr("Partition to use:"));
 }
 
-void MInstall::on_grubEspButton_toggled()
+void MInstall::on_radioBootESP_toggled()
 {
-    grubBootCombo->clear();
+    comboBoot->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isESP && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) bdinfo.addToCombo(grubBootCombo);
+        if (bdinfo.isESP && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) bdinfo.addToCombo(comboBoot);
     }
-    grubBootLabel->setText(tr("Partition to use:"));
+    labelBoot->setText(tr("Partition to use:"));
 }
 
 // build ESP list available to install GRUB
 void MInstall::buildBootLists()
 {
     // refresh lists and enable or disable options according to device presence
-    on_grubMbrButton_toggled();
-    canMBR = (grubBootCombo->count() > 0);
-    grubMbrButton->setEnabled(canMBR);
-    on_grubPbrButton_toggled();
-    canPBR = (grubBootCombo->count() > 0);
-    grubPbrButton->setEnabled(canPBR);
-    on_grubEspButton_toggled();
-    canESP = (uefi && grubBootCombo->count() > 0);
-    grubEspButton->setEnabled(canESP);
+    on_radioBootMBR_toggled();
+    canMBR = (comboBoot->count() > 0);
+    radioBootMBR->setEnabled(canMBR);
+    on_radioBootPBR_toggled();
+    canPBR = (comboBoot->count() > 0);
+    radioBootPBR->setEnabled(canPBR);
+    on_radioBootESP_toggled();
+    canESP = (uefi && comboBoot->count() > 0);
+    radioBootESP->setEnabled(canESP);
 
     // load one as the default in preferential order: ESP, MBR, PBR
-    if (canESP) grubEspButton->setChecked(true);
+    if (canESP) radioBootESP->setChecked(true);
     else if (canMBR) {
-        on_grubMbrButton_toggled();
-        grubMbrButton->setChecked(true);
+        on_radioBootMBR_toggled();
+        radioBootMBR->setChecked(true);
     } else if (canPBR) {
-        on_grubPbrButton_toggled();
-        grubPbrButton->setChecked(true);
+        on_radioBootPBR_toggled();
+        radioBootPBR->setChecked(true);
     }
 }
 
-void MInstall::on_localeCombo_currentIndexChanged(int index)
+void MInstall::on_comboLocale_currentIndexChanged(int index)
 {
     // riot control
-    QLocale locale(localeCombo->itemData(index).toString());
-    if (locale.timeFormat().startsWith('h')) radio12h->setChecked(true);
-    else radio24h->setChecked(true);
+    QLocale locale(comboLocale->itemData(index).toString());
+    if (locale.timeFormat().startsWith('h')) radioClock12->setChecked(true);
+    else radioClock24->setChecked(true);
 }
 
 // return 0 = success, 1 = bad area, 2 = bad zone
 int MInstall::selectTimeZone(const QString &zone)
 {
-    int index = cmbTimeArea->findData(QVariant(zone.section('/', 0, 0)));
+    int index = comboTimeArea->findData(QVariant(zone.section('/', 0, 0)));
     if (index < 0) return 1;
-    cmbTimeArea->setCurrentIndex(index);
+    comboTimeArea->setCurrentIndex(index);
     qApp->processEvents();
-    index = cmbTimeZone->findData(QVariant(zone));
+    index = comboTimeZone->findData(QVariant(zone));
     if (index < 0) return 2;
-    cmbTimeZone->setCurrentIndex(index);
+    comboTimeZone->setCurrentIndex(index);
     return 0;
 }
-void MInstall::on_cmbTimeArea_currentIndexChanged(int index)
+void MInstall::on_comboTimeArea_currentIndexChanged(int index)
 {
-    if (index < 0 || index >= cmbTimeArea->count()) return;
-    const QString &area = cmbTimeArea->itemData(index).toString();
-    cmbTimeZone->clear();
+    if (index < 0 || index >= comboTimeArea->count()) return;
+    const QString &area = comboTimeArea->itemData(index).toString();
+    comboTimeZone->clear();
     for (const QString &zone : listTimeZones) {
         if (zone.startsWith(area)) {
             QString text(QString(zone).section('/', 1));
             text.replace('_', ' ');
-            cmbTimeZone->addItem(text, QVariant(zone));
+            comboTimeZone->addItem(text, QVariant(zone));
         }
     }
-    cmbTimeZone->model()->sort(0);
+    comboTimeZone->model()->sort(0);
 }
 
 void MInstall::on_radioOldHomeUse_toggled(bool)
 {
-    nextButton->setEnabled(radioOldHomeUse->isChecked()
+    pushNext->setEnabled(radioOldHomeUse->isChecked()
                            || radioOldHomeSave->isChecked()
                            || radioOldHomeDelete->isChecked());
 }
@@ -2747,17 +2747,17 @@ void MInstall::rsynchomefolder(QString dpath)
                   " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
                   " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
                   " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
-                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + userNameEdit->text() + "|g' %1/$").arg(dpath);
+                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + textUserName->text() + "|g' %1/$").arg(dpath);
     proc.exec(cmd);
 }
 
 void MInstall::changeRemasterdemoToNewUser(QString dpath)
 {
-    QString cmd = ("find " + dpath + " -maxdepth 1 -type f -name '.*' -print0 | xargs -0 sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'").arg(dpath);
+    QString cmd = ("find " + dpath + " -maxdepth 1 -type f -name '.*' -print0 | xargs -0 sed -i 's|home/demo|home/" + textUserName->text() + "|g'").arg(dpath);
     proc.exec(cmd);
-    cmd = ("find " + dpath + "/.config -type f -print0 | xargs -0 sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'").arg(dpath);
+    cmd = ("find " + dpath + "/.config -type f -print0 | xargs -0 sed -i 's|home/demo|home/" + textUserName->text() + "|g'").arg(dpath);
     proc.exec(cmd);
-    cmd = ("find " + dpath + "/.local -type f  -print0 | xargs -0 sed -i 's|home/demo|home/" + userNameEdit->text() + "|g'").arg(dpath);
+    cmd = ("find " + dpath + "/.local -type f  -print0 | xargs -0 sed -i 's|home/demo|home/" + textUserName->text() + "|g'").arg(dpath);
     proc.exec(cmd);
 }
 
