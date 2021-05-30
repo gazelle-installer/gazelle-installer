@@ -116,7 +116,6 @@ private slots:
     void on_spinCryptoKeySize_valueChanged(int i);
     void on_comboCryptoIVGen_currentIndexChanged(const QString &arg1);
 
-    void on_checkBoot_toggled(bool checked);
     void on_radioBootMBR_toggled();
     void on_radioBootPBR_toggled();
     void on_radioBootESP_toggled();
@@ -167,7 +166,6 @@ private:
     int iLastProgress = -1;
 
     // info needed for Phase 2 of the process
-    bool canMBR, canPBR, canESP;
     bool haveSamba = false;
     bool haveSnapshotUserAccounts = false;
     bool haveOldHome = false;
