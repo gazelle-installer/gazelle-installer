@@ -50,7 +50,7 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_zh_TW.ts
 FORMS += meinstall.ui
 HEADERS += minstall.h \
-    mlineedit.h \
+    mpassedit.h \
     version.h \
     msettings.h \
     blockdev.h \
@@ -58,7 +58,7 @@ HEADERS += minstall.h \
     safecache.h \
     mprocess.h
 SOURCES += app.cpp minstall.cpp \
-    mlineedit.cpp \
+    mpassedit.cpp \
     msettings.cpp \
     blockdev.cpp \
     partman.cpp \

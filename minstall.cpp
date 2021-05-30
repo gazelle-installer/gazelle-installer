@@ -278,10 +278,10 @@ void MInstall::startup()
     textCryptoPassCust->setup(textCryptoPassCust2, progCryptoPassMeterCust, 1, 32, 9);
     textUserPass->setup(textUserPass2, progUserPassMeter);
     textRootPass->setup(textRootPass2, progRootPassMeter);
-    connect(textCryptoPass, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
-    connect(textCryptoPassCust, &MLineEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
-    connect(textUserPass, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
-    connect(textRootPass, &MLineEdit::validationChanged, this, &MInstall::userPassValidationChanged);
+    connect(textCryptoPass, &MPassEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
+    connect(textCryptoPassCust, &MPassEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
+    connect(textUserPass, &MPassEdit::validationChanged, this, &MInstall::userPassValidationChanged);
+    connect(textRootPass, &MPassEdit::validationChanged, this, &MInstall::userPassValidationChanged);
     // User name is required
     connect(textUserName, &QLineEdit::textChanged, this, &MInstall::userPassValidationChanged);
 

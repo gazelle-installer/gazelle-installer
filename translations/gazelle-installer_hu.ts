@@ -1001,9 +1001,9 @@ Biztos meg akarod állítani a folyamatot?</translation>
     </message>
 </context>
 <context>
-    <name>MLineEdit</name>
+    <name>MPassEdit</name>
     <message>
-        <location filename="mlineedit.cpp" line="95"/>
+        <location filename="mpassedit.cpp" line="95"/>
         <source>Use password</source>
         <translation type="unfinished"/>
     </message>

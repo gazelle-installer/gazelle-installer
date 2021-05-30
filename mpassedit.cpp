@@ -1,4 +1,4 @@
-// MLineEdit class - QLineEdit modified for passwords.
+// MPassEdit class - QLineEdit modified for passwords.
 //
 //   Copyright (C) 2021 by AK-47
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,19 +20,19 @@
 #include <QMenu>
 #include <QStringList>
 #include <QString>
-#include "mlineedit.h"
+#include "mpassedit.h"
 
-MLineEdit::MLineEdit(QWidget *parent)
+MPassEdit::MPassEdit(QWidget *parent)
     : QLineEdit(parent)
 {
 }
 
-bool MLineEdit::isValid() const
+bool MPassEdit::isValid() const
 {
     return lastValid;
 }
 
-void MLineEdit::setup(MLineEdit *slave, QProgressBar *meter,
+void MPassEdit::setup(MPassEdit *slave, QProgressBar *meter,
                       int min, int genMin, int wordMax)
 {
     this->slave = slave;
@@ -42,8 +42,8 @@ void MLineEdit::setup(MLineEdit *slave, QProgressBar *meter,
     this->meter = meter;
     disconnect(this);
     disconnect(slave);
-    connect(this, &QLineEdit::textChanged, this, &MLineEdit::masterTextChanged);
-    connect(slave, &QLineEdit::textChanged, this, &MLineEdit::slaveTextChanged);
+    connect(this, &QLineEdit::textChanged, this, &MPassEdit::masterTextChanged);
+    connect(slave, &QLineEdit::textChanged, this, &MPassEdit::slaveTextChanged);
     if (min==0) lastValid = true; // Control starts with no text
     generate(); // Pre-load the generator
     if (meter) {
@@ -53,7 +53,7 @@ void MLineEdit::setup(MLineEdit *slave, QProgressBar *meter,
     }
 }
 
-void MLineEdit::generate()
+void MPassEdit::generate()
 {
     static QStringList words;
     static int pos;
@@ -85,7 +85,7 @@ void MLineEdit::generate()
     genText.append(QString::number(std::rand()%10));
 }
 
-void MLineEdit::contextMenuEvent(QContextMenuEvent *event)
+void MPassEdit::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = createStandardContextMenu();
     QAction *actGenPass = nullptr;
@@ -102,7 +102,7 @@ void MLineEdit::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
-void MLineEdit::masterTextChanged()
+void MPassEdit::masterTextChanged()
 {
     slave->clear();
     setPalette(QApplication::palette());
@@ -146,7 +146,7 @@ void MLineEdit::masterTextChanged()
     }
 }
 
-void MLineEdit::slaveTextChanged(const QString &slaveText)
+void MPassEdit::slaveTextChanged(const QString &slaveText)
 {
     QPalette pal = palette();
     bool valid = true;
