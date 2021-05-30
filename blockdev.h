@@ -35,6 +35,7 @@ struct BlockDeviceInfo
     bool isBoot = false;
     bool isESP = false;
     bool isNative = false;
+    int mapCount = 0;
     void addToCombo(QComboBox *combo, bool warnNasty = false) const;
     static QStringList split(const QString &devname);
     static QString join(const QString &drive, int partnum);

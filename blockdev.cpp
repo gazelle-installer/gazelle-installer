@@ -27,8 +27,8 @@
 // static function to split a device name into its drive and partition
 QStringList BlockDeviceInfo::split(const QString &devname)
 {
-    const QRegularExpression rxdev1("^(?:/dev/)+(mmcblk.*|nvme.*)p([0-9]*)$");
-    const QRegularExpression rxdev2("^(?:/dev/)+([a-z]*)([0-9]*)$");
+    const QRegularExpression rxdev1("^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$");
+    const QRegularExpression rxdev2("^(?:\\/dev\\/)*([a-z]*)([0-9]*)$");
     QRegularExpressionMatch rxmatch(rxdev1.match(devname));
     if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
     QStringList list(rxmatch.capturedTexts());
@@ -59,19 +59,10 @@ void BlockDeviceInfo::addToCombo(QComboBox *combo, bool warnNasty) const
 
 void BlockDeviceList::build(MProcess &proc)
 {
+    proc.log(__PRETTY_FUNCTION__);
+
     proc.exec("partprobe -s", true);
     proc.exec("blkid -c /dev/null", true);
-
-    // expressions for matching various partition types
-    const QRegularExpression rxESP("^(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$");
-    const QRegularExpression rxNative("^(0x83|0fc63daf-8483-4772-8e79-3d69d8477de4" // Linux data
-                                      "|0x82|0657fd6d-a4ab-43c4-84e5-0933c84b4f4f" // Linux swap
-                                      "|44479540-f297-41b2-9af7-d131d5f0458a" // Linux /root x86
-                                      "|4f68bce3-e8cd-4db1-96e7-fbcaf984b709" // Linux /root x86-64
-                                      "|933ac7e1-2eb4-4f13-b844-0e14e2aef915)$"); // Linux /home
-    const QRegularExpression rxWinLDM("^(0x42|5808c8aa-7e8f-42e0-85d2-e1e90434cfb3"
-                                      "|af9b60a0-1431-4f62-bc68-3311714a69ad)$"); // Windows LDM
-    const QRegularExpression rxNativeFS("^(btrfs|ext2|ext3|ext4|jfs|nilfs2|reiser4|reiserfs|ufs|xfs)$");
 
     QString bootUUID;
     if (QFile::exists("/live/config/initrd.out")) {
@@ -79,57 +70,40 @@ void BlockDeviceList::build(MProcess &proc)
         bootUUID = livecfg.value("BOOT_UUID").toString();
     }
 
-    // Backup ESP detection. Populated when needed.
-    QStringList backup_list;
-    bool backup_checked = false;
     // Collect information and populate the block device list.
     const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,PARTTYPE,FSTYPE,LABEL,MODEL", true);
+        " TYPE,NAME,UUID,SIZE,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
-    const QString cmdTestGPT("blkid /dev/%1 | grep -q PTTYPE=\\\"gpt\\\"");
 
     clear();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
-    for(const QJsonValue &jsonDrive : jsonBD) {
+    for (const QJsonValue &jsonDrive : jsonBD) {
         int driveIndex = count(); // For propagating the nasty flag to the drive.
-        if(jsonDrive["type"] != "disk") continue;
+        if (jsonDrive["type"] != "disk") continue;
         BlockDeviceInfo bdinfo;
         bdinfo.name = jsonDrive["name"].toString();
         bdinfo.isDrive = true;
-        bdinfo.isGPT = proc.exec(cmdTestGPT.arg(bdinfo.name), false);
+        bdinfo.isGPT = (jsonDrive["pttype"]=="gpt");
         bdinfo.size = jsonDrive["size"].toVariant().toLongLong();
         bdinfo.label = jsonDrive["label"].toString();
         bdinfo.model = jsonDrive["model"].toString();
         append(bdinfo);
 
         const QJsonArray &jsonParts = jsonDrive["children"].toArray();
-        for(const QJsonValue &jsonPart : jsonParts) {
+        for (const QJsonValue &jsonPart : jsonParts) {
+            const QString &partTypeName = jsonPart["parttypename"].toString();
+            if (partTypeName=="Extended") continue;
             bdinfo.isDrive = false;
             bdinfo.name = jsonPart["name"].toString();
             bdinfo.size = jsonPart["size"].toVariant().toLongLong();
             bdinfo.label = jsonPart["label"].toString();
             bdinfo.model = jsonPart["model"].toString();
-
-            const QString &partType = jsonPart["parttype"].toString();
-            if(partType.isEmpty()) bdinfo.isESP = bdinfo.isNative = false;
-            else {
-                bdinfo.isESP = (partType.count(rxESP) >= 1);
-                bdinfo.isNative = (partType.count(rxNative) >= 1);
-                if(!bdinfo.isNasty) bdinfo.isNasty = (partType.count(rxWinLDM) >= 1);
-            }
-            if (!bdinfo.isESP) {
-                // Backup detection for drives that don't have UUID for ESP.
-                if(!backup_checked) {
-                    backup_list = proc.execOutLines("fdisk -l -o DEVICE,TYPE"
-                        " | grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
-                    backup_checked = true;
-                }
-                bdinfo.isESP = backup_list.contains(bdinfo.name);
-            }
-
+            bdinfo.mapCount = jsonPart["children"].toArray().count();
+            bdinfo.isNative = partTypeName.startsWith("Linux");
+            bdinfo.isESP = (partTypeName=="EFI System");
+            if (!bdinfo.isNasty) bdinfo.isNasty = partTypeName.startsWith("Microsoft LDM");
             bdinfo.isBoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
             bdinfo.fs = jsonPart["fstype"].toString();
-            if(bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
             append(bdinfo);
             // Propagate the boot and nasty flags up to the drive.
             if (bdinfo.isBoot) operator[](driveIndex).isBoot = true;
@@ -144,11 +118,11 @@ void BlockDeviceList::build(MProcess &proc)
     }
 
     // debug
-    qDebug() << "Name Size Model FS | isDisk isGPT isBoot isESP isNative";
+    qDebug() << "Name Size Model FS | isDisk isGPT isBoot isESP isNative isNasty";
     for (const BlockDeviceInfo &bdi : *this) {
         qDebug() << bdi.name << bdi.size << bdi.model << bdi.fs << "|"
                  << bdi.isDrive << bdi.isGPT << bdi.isBoot << bdi.isESP
-                 << bdi.isNative;
+                 << bdi.isNative << bdi.isNasty;
     }
 }
 

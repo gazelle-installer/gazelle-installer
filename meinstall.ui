@@ -28,10 +28,13 @@
   <layout class="QHBoxLayout">
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
      <property name="opaqueResize">
       <bool>false</bool>
      </property>
-     <widget class="QTabWidget" name="mainTabs">
+     <widget class="QTabWidget" name="tabsMain">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>1</horstretch>
@@ -42,7 +45,7 @@
        <attribute name="title">
         <string>Help</string>
        </attribute>
-       <widget class="QTextEdit" name="mainHelp">
+       <widget class="QTextEdit" name="textHelp">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -73,7 +76,7 @@
          <bool>true</bool>
         </property>
        </widget>
-       <widget class="QLabel" name="helpbackdrop">
+       <widget class="QLabel" name="labelHelpBackdrop">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -92,8 +95,8 @@
          <bool>true</bool>
         </property>
        </widget>
-       <zorder>helpbackdrop</zorder>
-       <zorder>mainHelp</zorder>
+       <zorder>labelHelpBackdrop</zorder>
+       <zorder>textHelp</zorder>
       </widget>
       <widget class="QWidget" name="tabLog">
        <attribute name="title">
@@ -118,7 +121,7 @@
        </layout>
       </widget>
      </widget>
-     <widget class="QFrame" name="mainFrame">
+     <widget class="QFrame" name="boxMain">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>2</horstretch>
@@ -133,22 +136,24 @@
       </property>
       <layout class="QGridLayout" name="_2">
        <item row="4" column="0">
-        <widget class="QPushButton" name="closeButton">
+        <widget class="QPushButton" name="pushClose">
          <property name="text">
           <string>Close</string>
          </property>
          <property name="icon">
-          <iconset theme="window-close"/>
+          <iconset theme="window-close">
+           <normaloff>.</normaloff>.</iconset>
          </property>
         </widget>
        </item>
        <item row="4" column="5">
-        <widget class="QPushButton" name="nextButton">
+        <widget class="QPushButton" name="pushNext">
          <property name="text">
           <string>Next</string>
          </property>
          <property name="icon">
-          <iconset theme="go-next"/>
+          <iconset theme="go-next">
+           <normaloff>.</normaloff>.</iconset>
          </property>
          <property name="shortcut">
           <string>Alt+N</string>
@@ -188,7 +193,7 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="Step_Splash">
+         <widget class="QWidget" name="pageSplash">
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>
             <widget class="QLabel" name="labelSplash">
@@ -210,7 +215,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_Terms">
+         <widget class="QWidget" name="pageTerms">
           <layout class="QGridLayout" name="_3">
            <property name="leftMargin">
             <number>0</number>
@@ -225,7 +230,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="copyrightBox">
+            <widget class="QGroupBox" name="boxCopyright">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                <horstretch>0</horstretch>
@@ -237,7 +242,7 @@
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
               <item row="0" column="0">
-               <widget class="QPlainTextEdit" name="copyrightBrowser">
+               <widget class="QPlainTextEdit" name="textCopyright">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                   <horstretch>0</horstretch>
@@ -255,7 +260,7 @@
               <item row="1" column="0">
                <layout class="QGridLayout" name="gridLayout_2">
                 <item row="4" column="3">
-                 <widget class="QLabel" name="labelLayout"/>
+                 <widget class="QLabel" name="labelKeyboardLayout"/>
                 </item>
                 <item row="1" column="1" rowspan="2" colspan="3">
                  <widget class="QLabel" name="labelKeyboardSettings">
@@ -265,21 +270,21 @@
                  </widget>
                 </item>
                 <item row="3" column="1">
-                 <widget class="QLabel" name="label_2">
+                 <widget class="QLabel" name="labelKeyboard1">
                   <property name="text">
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </widget>
                 </item>
                 <item row="5" column="1">
-                 <widget class="QLabel" name="label_4">
+                 <widget class="QLabel" name="labelKeyboard3">
                   <property name="text">
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </widget>
                 </item>
                 <item row="5" column="3">
-                 <widget class="QLabel" name="labelVariant"/>
+                 <widget class="QLabel" name="labelKeyboardVariant"/>
                 </item>
                 <item row="1" column="0" rowspan="2">
                  <spacer name="horizontalSpacer_8">
@@ -295,14 +300,14 @@
                  </spacer>
                 </item>
                 <item row="6" column="1" colspan="3">
-                 <widget class="QPushButton" name="buttonSetKeyboard">
+                 <widget class="QPushButton" name="pushSetKeyboard">
                   <property name="text">
                    <string>Change Keyboard Settings</string>
                   </property>
                  </widget>
                 </item>
                 <item row="4" column="1">
-                 <widget class="QLabel" name="label_3">
+                 <widget class="QLabel" name="labelKeyboard2">
                   <property name="text">
                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
@@ -322,7 +327,7 @@
                  </spacer>
                 </item>
                 <item row="3" column="3">
-                 <widget class="QLabel" name="labelModel"/>
+                 <widget class="QLabel" name="labelKeyboardModel"/>
                 </item>
                </layout>
               </item>
@@ -331,7 +336,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_Disk">
+         <widget class="QWidget" name="pageDisk">
           <layout class="QGridLayout" name="_4">
            <property name="leftMargin">
             <number>0</number>
@@ -346,7 +351,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0" colspan="2">
-            <widget class="QGroupBox" name="installationTypeBox">
+            <widget class="QGroupBox" name="boxInstallationType">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -358,7 +363,7 @@
              </property>
              <layout class="QGridLayout">
               <item row="0" column="0" colspan="2">
-               <widget class="QRadioButton" name="entireDiskButton">
+               <widget class="QRadioButton" name="radioEntireDisk">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -371,7 +376,7 @@
                </widget>
               </item>
               <item row="3" column="0" colspan="2">
-               <widget class="QRadioButton" name="customPartButton">
+               <widget class="QRadioButton" name="radioCustomPart">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -384,13 +389,10 @@
                </widget>
               </item>
               <item row="1" column="0" colspan="2">
-               <widget class="QGroupBox" name="groupAutoPart">
-                <property name="title">
-                 <string/>
-                </property>
+               <widget class="QGroupBox" name="boxAutoPart">
                 <layout class="QGridLayout">
                  <item row="4" column="0" colspan="2">
-                  <widget class="QLabel" name="labelFDEpass2">
+                  <widget class="QLabel" name="labelCryptoPass2">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -400,14 +402,14 @@
                   </widget>
                  </item>
                  <item row="3" column="0" colspan="2">
-                  <widget class="QLabel" name="labelFDEpass">
+                  <widget class="QLabel" name="labelCryptoPass">
                    <property name="text">
                     <string>Encryption password:</string>
                    </property>
                   </widget>
                  </item>
                  <item row="2" column="2" colspan="3">
-                  <widget class="QPushButton" name="buttonAdvancedFDE">
+                  <widget class="QPushButton" name="pushAdvancedCrypto">
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
@@ -423,7 +425,7 @@
                   </widget>
                  </item>
                  <item row="0" column="0" colspan="2">
-                  <widget class="QLabel" name="useDiskLabel">
+                  <widget class="QLabel" name="labelDisk">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                      <horstretch>0</horstretch>
@@ -442,7 +444,7 @@
                   </widget>
                  </item>
                  <item row="3" column="2" colspan="2">
-                  <widget class="MLineEdit" name="FDEpassword">
+                  <widget class="MPassEdit" name="textCryptoPass">
                    <property name="maxLength">
                     <number>512</number>
                    </property>
@@ -452,7 +454,7 @@
                   </widget>
                  </item>
                  <item row="2" column="0" colspan="2">
-                  <widget class="QCheckBox" name="checkBoxEncryptAuto">
+                  <widget class="QCheckBox" name="checkEncryptAuto">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -465,7 +467,7 @@
                   </widget>
                  </item>
                  <item row="0" column="2" colspan="3">
-                  <widget class="QComboBox" name="diskCombo">
+                  <widget class="QComboBox" name="comboDisk">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -475,7 +477,7 @@
                   </widget>
                  </item>
                  <item row="3" column="4" rowspan="2">
-                  <widget class="QProgressBar" name="pbFDEpassMeter">
+                  <widget class="QProgressBar" name="progCryptoPassMeter">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
                      <horstretch>0</horstretch>
@@ -488,7 +490,7 @@
                   </widget>
                  </item>
                  <item row="1" column="0" colspan="5">
-                  <widget class="QFrame" name="frameSliderPart">
+                  <widget class="QFrame" name="boxSliderPart">
                    <property name="frameShape">
                     <enum>QFrame::StyledPanel</enum>
                    </property>
@@ -563,7 +565,7 @@
                   </widget>
                  </item>
                  <item row="4" column="2" colspan="2">
-                  <widget class="MLineEdit" name="FDEpassword2">
+                  <widget class="MPassEdit" name="textCryptoPass2">
                    <property name="maxLength">
                     <number>512</number>
                    </property>
@@ -593,7 +595,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_Partitions">
+         <widget class="QWidget" name="pagePartitions">
           <layout class="QGridLayout" name="_5">
            <property name="leftMargin">
             <number>0</number>
@@ -608,7 +610,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="rootBox">
+            <widget class="QGroupBox" name="boxPartitions">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                <horstretch>0</horstretch>
@@ -622,6 +624,33 @@
               <property name="spacing">
                <number>0</number>
               </property>
+              <item row="12" column="0">
+               <widget class="QCheckBox" name="checkBadBlocks">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Check for bad sectors (takes longer)</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="QToolButton" name="pushPartRemove">
+                <property name="toolTip">
+                 <string>Remove an existing entry from the layout. This only works with entries to a new layout.</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="images.qrc">
+                  <normaloff>:/list-remove</normaloff>:/list-remove</iconset>
+                </property>
+               </widget>
+              </item>
               <item row="7" column="2">
                <spacer name="verticalSpacer_5">
                 <property name="orientation">
@@ -635,13 +664,14 @@
                 </property>
                </spacer>
               </item>
-              <item row="2" column="2">
-               <widget class="QToolButton" name="buttonPartAdd">
+              <item row="10" column="2">
+               <widget class="QToolButton" name="pushPartReload">
                 <property name="toolTip">
-                 <string>Add a new partition entry. This only works with a new layout.</string>
+                 <string>Query the operating system and reload the layouts of all drives.</string>
                 </property>
                 <property name="icon">
-                 <iconset theme=":/list-add"/>
+                 <iconset resource="images.qrc">
+                  <normaloff>:/view-refresh</normaloff>:/view-refresh</iconset>
                 </property>
                </widget>
               </item>
@@ -684,59 +714,36 @@
                 </column>
                </widget>
               </item>
-              <item row="10" column="2">
-               <widget class="QToolButton" name="buttonPartReload">
+              <item row="2" column="2">
+               <widget class="QToolButton" name="pushPartAdd">
                 <property name="toolTip">
-                 <string>Query the operating system and reload the layouts of all drives.</string>
+                 <string>Add a new partition entry. This only works with a new layout.</string>
                 </property>
                 <property name="icon">
-                 <iconset theme=":/view-refresh"/>
-                </property>
-               </widget>
-              </item>
-              <item row="12" column="0">
-               <widget class="QCheckBox" name="badblocksCheck">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Check for bad sectors (takes longer)</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="2">
-               <widget class="QToolButton" name="buttonPartRemove">
-                <property name="toolTip">
-                 <string>Remove an existing entry from the layout. This only works with entries to a new layout.</string>
-                </property>
-                <property name="icon">
-                 <iconset theme=":/list-remove"/>
+                 <iconset resource="images.qrc">
+                  <normaloff>:/list-add</normaloff>:/list-add</iconset>
                 </property>
                </widget>
               </item>
               <item row="1" column="2">
-               <widget class="QToolButton" name="buttonPartClear">
+               <widget class="QToolButton" name="pushPartClear">
                 <property name="toolTip">
                  <string>Mark the selected drive to be cleared for a new layout.</string>
                 </property>
                 <property name="icon">
-                 <iconset theme=":/edit-clear-all"/>
+                 <iconset resource="images.qrc">
+                  <normaloff>:/edit-clear-all</normaloff>:/edit-clear-all</iconset>
                 </property>
                </widget>
               </item>
               <item row="11" column="2">
-               <widget class="QToolButton" name="buttonRunParted">
+               <widget class="QToolButton" name="pushRunPartMan">
                 <property name="toolTip">
                  <string>Run the partition management application of this operating system.</string>
                 </property>
                 <property name="icon">
-                 <iconset theme=":/partitionmanager"/>
+                 <iconset resource="images.qrc">
+                  <normaloff>:/partitionmanager</normaloff>:/partitionmanager</iconset>
                 </property>
                </widget>
               </item>
@@ -744,7 +751,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QGroupBox" name="gbEncrPass">
+            <widget class="QGroupBox" name="boxCryptoPass">
              <property name="enabled">
               <bool>true</bool>
              </property>
@@ -759,7 +766,7 @@
              </property>
              <layout class="QGridLayout" name="gridLayout2c">
               <item row="1" column="2" colspan="2">
-               <widget class="MLineEdit" name="FDEpassCust2">
+               <widget class="MPassEdit" name="textCryptoPassCust2">
                 <property name="maxLength">
                  <number>512</number>
                 </property>
@@ -769,14 +776,14 @@
                </widget>
               </item>
               <item row="1" column="0" colspan="2">
-               <widget class="QLabel" name="labelFDEpassCust2">
+               <widget class="QLabel" name="labelCryptoPassCust2">
                 <property name="text">
                  <string>Confirm password:</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="2" colspan="2">
-               <widget class="MLineEdit" name="FDEpassCust">
+               <widget class="MPassEdit" name="textCryptoPassCust">
                 <property name="maxLength">
                  <number>512</number>
                 </property>
@@ -786,14 +793,14 @@
                </widget>
               </item>
               <item row="0" column="0" colspan="2">
-               <widget class="QLabel" name="labelFDEpassCust">
+               <widget class="QLabel" name="labelCryptoPassCust">
                 <property name="text">
                  <string>Encryption password:</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="4" rowspan="2">
-               <widget class="QProgressBar" name="pbFDEpassMeterCust">
+               <widget class="QProgressBar" name="progCryptoPassMeterCust">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
                   <horstretch>0</horstretch>
@@ -809,7 +816,7 @@
                </widget>
               </item>
               <item row="2" column="2" colspan="3">
-               <widget class="QPushButton" name="buttonAdvancedFDECust">
+               <widget class="QPushButton" name="pushAdvancedCryptoCust">
                 <property name="text">
                  <string>Advanced encryption settings</string>
                 </property>
@@ -820,7 +827,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_FDE">
+         <widget class="QWidget" name="pageCrypto">
           <layout class="QGridLayout" name="_6">
            <property name="leftMargin">
             <number>0</number>
@@ -835,7 +842,7 @@
             <number>0</number>
            </property>
            <item row="1" column="0">
-            <widget class="QGroupBox" name="encryptionBox">
+            <widget class="QGroupBox" name="boxCrypto">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -846,46 +853,21 @@
               <string>Advanced encryption settings</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <item row="6" column="1">
-               <widget class="QComboBox" name="comboFDEhash">
+              <item row="4" column="0">
+               <widget class="QLabel" name="labelCryptoHash">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="toolTip">
-                 <string/>
+                <property name="text">
+                 <string>LUKS key hash:</string>
                 </property>
-                <item>
-                 <property name="text">
-                  <string>SHA-512</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>SHA-256</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Whirlpool</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>SHA-1</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>RIPEMD-160</string>
-                 </property>
-                </item>
                </widget>
               </item>
-              <item row="5" column="1">
-               <widget class="QSpinBox" name="spinFDEkeysize">
+              <item row="3" column="2">
+               <widget class="QSpinBox" name="spinCryptoKeySize">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -900,111 +882,42 @@
                 </property>
                </widget>
               </item>
-              <item row="22" column="1">
-               <widget class="QSpinBox" name="spinFDEroundtime">
+              <item row="2" column="3">
+               <widget class="QComboBox" name="comboCryptoIVHash">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string/>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-                <property name="suffix">
-                 <string> mS</string>
-                </property>
-                <property name="maximum">
-                 <number>999999999</number>
-                </property>
-                <property name="singleStep">
-                 <number>1000</number>
-                </property>
-                <property name="value">
-                 <number>2000</number>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="0">
-               <widget class="QLabel" name="labelFDEhash">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>LUKS key hash:</string>
                 </property>
                </widget>
               </item>
               <item row="5" column="0">
-               <widget class="QLabel" name="labelFDEkeysize">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
+               <widget class="QLabel" name="labelCryptoRandom">
                 <property name="text">
-                 <string>Key size:</string>
+                 <string>Kernel RNG:</string>
                 </property>
                </widget>
               </item>
-              <item row="25" column="0">
-               <spacer name="verticalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="22" column="0">
-               <widget class="QLabel" name="labelFDEroundtime">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>KDF round time:</string>
-                </property>
+              <item row="5" column="2">
+               <widget class="QComboBox" name="comboCryptoRandom">
+                <item>
+                 <property name="text">
+                  <string>urandom</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>random</string>
+                 </property>
+                </item>
                </widget>
               </item>
-              <item row="3" column="1">
-               <widget class="QComboBox" name="comboFDEchain">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelFDEcipher">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Cipher:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QComboBox" name="comboFDEcipher">
+              <item row="0" column="2">
+               <widget class="QComboBox" name="comboCryptoCipher">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -1044,8 +957,18 @@
                 </item>
                </widget>
               </item>
-              <item row="24" column="1">
-               <widget class="QPushButton" name="buttonBenchmarkFDE">
+              <item row="1" column="2">
+               <widget class="QComboBox" name="comboCryptoChain">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="2">
+               <widget class="QPushButton" name="pushBenchmarkCrypto">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -1060,21 +983,60 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="2">
-               <widget class="QComboBox" name="comboFDEivhash">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
+              <item row="3" column="0">
+               <widget class="QLabel" name="labelCryptoKeySize">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="text">
+                 <string>Key size:</string>
+                </property>
                </widget>
               </item>
-              <item row="4" column="1">
-               <widget class="QComboBox" name="comboFDEivgen">
+              <item row="2" column="0">
+               <widget class="QLabel" name="labelCryptoIVGen">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>IV generator:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0">
+               <spacer name="verticalSpacer_6">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="labelCryptoChain">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Chain mode:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QComboBox" name="comboCryptoIVGen">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -1111,8 +1073,15 @@
                 </item>
                </widget>
               </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="labelFDEivgen">
+              <item row="7" column="0" colspan="2">
+               <widget class="QPushButton" name="pushLoadKey">
+                <property name="text">
+                 <string>Load key material...</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelCryptoCipher">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -1120,12 +1089,12 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>IV generator:</string>
+                 <string>Cipher:</string>
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="labelFDEchain">
+              <item row="6" column="0">
+               <widget class="QLabel" name="labelCryptoRoundTime">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -1133,11 +1102,11 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Chain mode:</string>
+                 <string>KDF round time:</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="3">
+              <item row="2" column="4">
                <spacer name="horizontalSpacer_4">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -1150,25 +1119,70 @@
                 </property>
                </spacer>
               </item>
-              <item row="21" column="0">
-               <widget class="QLabel" name="labelFDErandom">
-                <property name="text">
-                 <string>Kernel RNG:</string>
+              <item row="4" column="2">
+               <widget class="QComboBox" name="comboCryptoHash">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
+                <property name="toolTip">
+                 <string/>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>SHA-512</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>SHA-256</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Whirlpool</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>SHA-1</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>RIPEMD-160</string>
+                 </property>
+                </item>
                </widget>
               </item>
-              <item row="21" column="1">
-               <widget class="QComboBox" name="comboFDErandom">
-                <item>
-                 <property name="text">
-                  <string>urandom</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>random</string>
-                 </property>
-                </item>
+              <item row="6" column="2">
+               <widget class="QSpinBox" name="spinCryptoRoundTime">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string/>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
+                <property name="suffix">
+                 <string> mS</string>
+                </property>
+                <property name="maximum">
+                 <number>999999999</number>
+                </property>
+                <property name="singleStep">
+                 <number>1000</number>
+                </property>
+                <property name="value">
+                 <number>2000</number>
+                </property>
                </widget>
               </item>
              </layout>
@@ -1176,7 +1190,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_Boot">
+         <widget class="QWidget" name="pageBoot">
           <layout class="QGridLayout" name="_7">
            <property name="leftMargin">
             <number>0</number>
@@ -1191,89 +1205,13 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="bootMethodGroup">
+            <widget class="QGroupBox" name="boxBootMethod">
              <property name="title">
               <string>Select Boot Method</string>
              </property>
-             <layout class="QGridLayout" name="_8">
-              <item row="1" column="0" rowspan="3">
-               <spacer name="h_spacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>16</width>
-                  <height>12</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="1" column="4">
-               <widget class="QRadioButton" name="grubEspButton">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>EFI System Partition</string>
-                </property>
-                <property name="text">
-                 <string>ESP</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="3">
-               <widget class="QRadioButton" name="grubPbrButton">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Partition Boot Record</string>
-                </property>
-                <property name="text">
-                 <string>PBR</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="grubInsLabel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Location to install on:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="5">
-               <widget class="QCheckBox" name="grubCheckBox">
+             <layout class="QVBoxLayout">
+              <item>
+               <widget class="QCheckBox" name="checkBoot">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1291,74 +1229,149 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="QLabel" name="grubBootLabel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>System boot disk:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QRadioButton" name="grubMbrButton">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="mouseTracking">
-                 <bool>true</bool>
-                </property>
-                <property name="toolTip">
-                 <string>Master Boot Record</string>
-                </property>
-                <property name="autoFillBackground">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>MBR</string>
-                </property>
-                <property name="shortcut">
-                 <string>Alt+B</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="5">
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="2" column="2" colspan="4">
-               <widget class="QComboBox" name="grubBootCombo">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
+              <item>
+               <widget class="QWidget" name="boxBoot" native="true">
+                <layout class="QGridLayout">
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
+                 <item row="0" column="2">
+                  <widget class="QRadioButton" name="radioBootPBR">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>Partition Boot Record</string>
+                   </property>
+                   <property name="text">
+                    <string>PBR</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="labelBoot">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>System boot disk:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="labelBootInstall">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>Location to install on:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QRadioButton" name="radioBootESP">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>EFI System Partition</string>
+                   </property>
+                   <property name="text">
+                    <string>ESP</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QRadioButton" name="radioBootMBR">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="mouseTracking">
+                    <bool>true</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string>Master Boot Record</string>
+                   </property>
+                   <property name="autoFillBackground">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>MBR</string>
+                   </property>
+                   <property name="shortcut">
+                    <string>Alt+B</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <spacer name="horizontalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="1" column="1" colspan="4">
+                  <widget class="QComboBox" name="comboBoot">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
              </layout>
@@ -1379,7 +1392,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_Services">
+         <widget class="QWidget" name="pageServices">
           <layout class="QGridLayout" name="_9">
            <property name="leftMargin">
             <number>0</number>
@@ -1394,7 +1407,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="networkServicesBox">
+            <widget class="QGroupBox" name="boxServices">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                <horstretch>0</horstretch>
@@ -1406,7 +1419,7 @@
              </property>
              <layout class="QGridLayout" name="_10">
               <item row="0" column="0">
-               <widget class="QTreeWidget" name="csView">
+               <widget class="QTreeWidget" name="treeServices">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                   <horstretch>0</horstretch>
@@ -1436,7 +1449,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_Network">
+         <widget class="QWidget" name="pageNetwork">
           <layout class="QGridLayout" name="_11">
            <property name="leftMargin">
             <number>0</number>
@@ -1451,7 +1464,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="networkNamesBox">
+            <widget class="QGroupBox" name="boxNetworkNames">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -1478,7 +1491,7 @@
                <number>6</number>
               </property>
               <item row="3" column="2">
-               <widget class="QLineEdit" name="computerGroupEdit">
+               <widget class="QLineEdit" name="textComputerGroup">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1491,7 +1504,7 @@
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QLabel" name="computerGroupLabel">
+               <widget class="QLabel" name="labelComputerGroup">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1504,7 +1517,7 @@
                </widget>
               </item>
               <item row="2" column="0" colspan="3">
-               <widget class="QCheckBox" name="sambaCheckBox">
+               <widget class="QCheckBox" name="checkSamba">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1520,7 +1533,7 @@
                </widget>
               </item>
               <item row="1" column="2">
-               <widget class="QLineEdit" name="computerDomainEdit">
+               <widget class="QLineEdit" name="textComputerDomain">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1533,7 +1546,7 @@
                </widget>
               </item>
               <item row="1" column="0" colspan="2">
-               <widget class="QLabel" name="computerDomainLabel">
+               <widget class="QLabel" name="labelComputerDomain">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1546,7 +1559,7 @@
                </widget>
               </item>
               <item row="0" column="2">
-               <widget class="QLineEdit" name="computerNameEdit">
+               <widget class="QLineEdit" name="textComputerName">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1559,7 +1572,7 @@
                </widget>
               </item>
               <item row="0" column="0" colspan="2">
-               <widget class="QLabel" name="computerNameLabel">
+               <widget class="QLabel" name="labelComputerName">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1605,7 +1618,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_Localization">
+         <widget class="QWidget" name="pageLocalization">
           <layout class="QGridLayout" name="_13">
            <property name="leftMargin">
             <number>0</number>
@@ -1620,7 +1633,7 @@
             <number>0</number>
            </property>
            <item row="1" column="0">
-            <widget class="QGroupBox" name="setClockBox">
+            <widget class="QGroupBox" name="boxClock">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -1647,7 +1660,7 @@
                <number>6</number>
               </property>
               <item row="3" column="2">
-               <widget class="QRadioButton" name="radio12h">
+               <widget class="QRadioButton" name="radioClock12">
                 <property name="text">
                  <string notr="true">1:57 PM</string>
                 </property>
@@ -1674,7 +1687,7 @@
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QRadioButton" name="radio24h">
+               <widget class="QRadioButton" name="radioClock24">
                 <property name="text">
                  <string notr="true">13:57</string>
                 </property>
@@ -1689,7 +1702,7 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="tzLabel">
+                 <widget class="QLabel" name="labelTimezone">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                     <horstretch>0</horstretch>
@@ -1715,7 +1728,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="cmbTimeArea">
+                 <widget class="QComboBox" name="comboTimeArea">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1725,7 +1738,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="cmbTimeZone">
+                 <widget class="QComboBox" name="comboTimeZone">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1740,7 +1753,7 @@
                </layout>
               </item>
               <item row="2" column="0" colspan="4">
-               <widget class="QCheckBox" name="localClockCheckBox">
+               <widget class="QCheckBox" name="checkLocalClock">
                 <property name="text">
                  <string>System clock uses local time</string>
                 </property>
@@ -1766,7 +1779,7 @@
             </spacer>
            </item>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="localeBox">
+            <widget class="QGroupBox" name="boxLocale">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -1793,7 +1806,7 @@
                <number>6</number>
               </property>
               <item row="0" column="1">
-               <widget class="QComboBox" name="localeCombo">
+               <widget class="QComboBox" name="comboLocale">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -1803,7 +1816,7 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="localeLabel">
+               <widget class="QLabel" name="labelLocale">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1822,7 +1835,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QGroupBox" name="servicesBox">
+            <widget class="QGroupBox" name="boxServicesAdvanced">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -1840,7 +1853,7 @@
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout">
               <item>
-               <widget class="QPushButton" name="viewServicesButton">
+               <widget class="QPushButton" name="pushServices">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -1879,7 +1892,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_User_Accounts">
+         <widget class="QWidget" name="pageUserAccounts">
           <layout class="QGridLayout" name="_15">
            <property name="leftMargin">
             <number>0</number>
@@ -1907,7 +1920,7 @@
             </spacer>
            </item>
            <item row="1" column="0">
-            <widget class="QGroupBox" name="rootPasswordBox">
+            <widget class="QGroupBox" name="boxRootAccount">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -1919,7 +1932,7 @@
              </property>
              <layout class="QGridLayout">
               <item row="0" column="0">
-               <widget class="QLabel" name="rootPasswordLabel">
+               <widget class="QLabel" name="labelRootPass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1932,7 +1945,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="MLineEdit" name="rootPasswordEdit">
+               <widget class="MPassEdit" name="textRootPass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1948,7 +1961,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="MLineEdit" name="rootPasswordEdit2">
+               <widget class="MPassEdit" name="textRootPass2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1964,7 +1977,7 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="rootPasswordLabel2">
+               <widget class="QLabel" name="labelRootPass2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1977,7 +1990,7 @@
                </widget>
               </item>
               <item row="0" column="2" rowspan="2">
-               <widget class="QProgressBar" name="pbRootPassMeter">
+               <widget class="QProgressBar" name="progRootPassMeter">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
                   <horstretch>0</horstretch>
@@ -1993,7 +2006,7 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="userBox">
+            <widget class="QGroupBox" name="boxUserAccount">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -2005,7 +2018,7 @@
              </property>
              <layout class="QGridLayout">
               <item row="0" column="0">
-               <widget class="QLabel" name="userNameLabel">
+               <widget class="QLabel" name="labelUserName">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2021,7 +2034,7 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="userPasswordLabel">
+               <widget class="QLabel" name="labelUserPass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2034,7 +2047,7 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="userPasswordLabel2">
+               <widget class="QLabel" name="labelUserPass2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2047,7 +2060,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="MLineEdit" name="userPasswordEdit">
+               <widget class="MPassEdit" name="textUserPass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2063,7 +2076,7 @@
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="MLineEdit" name="userPasswordEdit2">
+               <widget class="MPassEdit" name="textUserPass2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2079,7 +2092,7 @@
                </widget>
               </item>
               <item row="1" column="2" rowspan="2">
-               <widget class="QProgressBar" name="pbUserPassMeter">
+               <widget class="QProgressBar" name="progUserPassMeter">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
                   <horstretch>0</horstretch>
@@ -2092,7 +2105,7 @@
                </widget>
               </item>
               <item row="0" column="1" colspan="2">
-               <widget class="QLineEdit" name="userNameEdit">
+               <widget class="QLineEdit" name="textUserName">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2111,7 +2124,7 @@
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QCheckBox" name="autologinCheckBox">
+            <widget class="QCheckBox" name="checkAutoLogin">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -2124,7 +2137,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QCheckBox" name="passwordCheckBox">
+            <widget class="QCheckBox" name="checkShowPass">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -2137,7 +2150,7 @@
             </widget>
            </item>
            <item row="5" column="0">
-            <widget class="QCheckBox" name="saveDesktopCheckBox">
+            <widget class="QCheckBox" name="checkSaveDesktop">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -2154,7 +2167,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_Old_Home">
+         <widget class="QWidget" name="pageOldHome">
           <layout class="QVBoxLayout" name="verticalLayout">
            <property name="leftMargin">
             <number>0</number>
@@ -2169,7 +2182,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QGroupBox" name="gbOldHome">
+            <widget class="QGroupBox" name="boxOldHome">
              <property name="title">
               <string>Existing Home Directory</string>
              </property>
@@ -2223,7 +2236,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_Progress">
+         <widget class="QWidget" name="pageProgress">
           <layout class="QGridLayout" name="_16">
            <property name="leftMargin">
             <number>0</number>
@@ -2238,7 +2251,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="tipsBox">
+            <widget class="QGroupBox" name="boxTips">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                <horstretch>0</horstretch>
@@ -2250,7 +2263,7 @@
              </property>
              <layout class="QGridLayout">
               <item row="0" column="0">
-               <widget class="QTextEdit" name="tipsEdit">
+               <widget class="QTextEdit" name="textTips">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                   <horstretch>0</horstretch>
@@ -2273,7 +2286,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Step_End">
+         <widget class="QWidget" name="pageEnd">
           <layout class="QGridLayout" name="_17">
            <property name="leftMargin">
             <number>0</number>
@@ -2288,13 +2301,13 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="exitBox">
+            <widget class="QGroupBox" name="boxEnd">
              <property name="title">
               <string>Installation complete</string>
              </property>
              <layout class="QGridLayout">
               <item row="0" column="0">
-               <widget class="QCheckBox" name="checkBoxExitReboot">
+               <widget class="QCheckBox" name="checkExitReboot">
                 <property name="text">
                  <string>Automatically reboot the system when the installer is closed</string>
                 </property>
@@ -2307,7 +2320,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QGroupBox" name="reminderBox">
+            <widget class="QGroupBox" name="boxReminders">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                <horstretch>0</horstretch>
@@ -2319,7 +2332,7 @@
              </property>
              <layout class="QGridLayout">
               <item row="1" column="0">
-               <widget class="QPlainTextEdit" name="remindersBrowser">
+               <widget class="QPlainTextEdit" name="textReminders">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                   <horstretch>0</horstretch>
@@ -2354,12 +2367,13 @@
         </widget>
        </item>
        <item row="4" column="4">
-        <widget class="QPushButton" name="backButton">
+        <widget class="QPushButton" name="pushBack">
          <property name="text">
           <string>Back</string>
          </property>
          <property name="icon">
-          <iconset theme="go-previous"/>
+          <iconset theme="go-previous">
+           <normaloff>.</normaloff>.</iconset>
          </property>
          <property name="shortcut">
           <string>Alt+K</string>
@@ -2367,7 +2381,7 @@
         </widget>
        </item>
        <item row="1" column="0" colspan="6">
-        <widget class="QGroupBox" name="installBox">
+        <widget class="QGroupBox" name="boxInstall">
          <property name="sizePolicy">
           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -2379,7 +2393,7 @@
          </property>
          <layout class="QGridLayout">
           <item row="0" column="2">
-           <widget class="QPushButton" name="abortInstallButton">
+           <widget class="QPushButton" name="pushAbort">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
               <horstretch>0</horstretch>
@@ -2398,7 +2412,7 @@
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QProgressBar" name="progressBar">
+           <widget class="QProgressBar" name="progInstall">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
               <horstretch>0</horstretch>
@@ -2419,96 +2433,95 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>MLineEdit</class>
+   <class>MPassEdit</class>
    <extends>QLineEdit</extends>
-   <header>mlineedit.h</header>
+   <header>mpassedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>buttonSetKeyboard</tabstop>
-  <tabstop>backButton</tabstop>
-  <tabstop>nextButton</tabstop>
-  <tabstop>entireDiskButton</tabstop>
-  <tabstop>diskCombo</tabstop>
+  <tabstop>pushSetKeyboard</tabstop>
+  <tabstop>pushBack</tabstop>
+  <tabstop>pushNext</tabstop>
+  <tabstop>radioEntireDisk</tabstop>
+  <tabstop>comboDisk</tabstop>
   <tabstop>sliderPart</tabstop>
-  <tabstop>checkBoxEncryptAuto</tabstop>
-  <tabstop>FDEpassword</tabstop>
-  <tabstop>FDEpassword2</tabstop>
-  <tabstop>buttonAdvancedFDE</tabstop>
-  <tabstop>customPartButton</tabstop>
+  <tabstop>checkEncryptAuto</tabstop>
+  <tabstop>textCryptoPass</tabstop>
+  <tabstop>textCryptoPass2</tabstop>
+  <tabstop>pushAdvancedCrypto</tabstop>
+  <tabstop>radioCustomPart</tabstop>
   <tabstop>treePartitions</tabstop>
-  <tabstop>buttonPartClear</tabstop>
-  <tabstop>buttonPartAdd</tabstop>
-  <tabstop>buttonPartRemove</tabstop>
-  <tabstop>buttonPartReload</tabstop>
-  <tabstop>buttonRunParted</tabstop>
-  <tabstop>badblocksCheck</tabstop>
-  <tabstop>FDEpassCust</tabstop>
-  <tabstop>FDEpassCust2</tabstop>
-  <tabstop>grubCheckBox</tabstop>
-  <tabstop>grubMbrButton</tabstop>
-  <tabstop>grubPbrButton</tabstop>
-  <tabstop>grubEspButton</tabstop>
-  <tabstop>computerNameEdit</tabstop>
-  <tabstop>computerDomainEdit</tabstop>
-  <tabstop>sambaCheckBox</tabstop>
-  <tabstop>computerGroupEdit</tabstop>
-  <tabstop>localeCombo</tabstop>
-  <tabstop>localClockCheckBox</tabstop>
-  <tabstop>radio24h</tabstop>
-  <tabstop>radio12h</tabstop>
-  <tabstop>cmbTimeZone</tabstop>
-  <tabstop>viewServicesButton</tabstop>
-  <tabstop>userNameEdit</tabstop>
-  <tabstop>userPasswordEdit</tabstop>
-  <tabstop>userPasswordEdit2</tabstop>
-  <tabstop>rootPasswordEdit</tabstop>
-  <tabstop>rootPasswordEdit2</tabstop>
-  <tabstop>passwordCheckBox</tabstop>
-  <tabstop>autologinCheckBox</tabstop>
-  <tabstop>saveDesktopCheckBox</tabstop>
-  <tabstop>remindersBrowser</tabstop>
-  <tabstop>copyrightBrowser</tabstop>
-  <tabstop>csView</tabstop>
-  <tabstop>tipsEdit</tabstop>
-  <tabstop>mainTabs</tabstop>
-  <tabstop>closeButton</tabstop>
-  <tabstop>mainHelp</tabstop>
+  <tabstop>pushPartClear</tabstop>
+  <tabstop>pushPartAdd</tabstop>
+  <tabstop>pushPartRemove</tabstop>
+  <tabstop>pushPartReload</tabstop>
+  <tabstop>pushRunPartMan</tabstop>
+  <tabstop>checkBadBlocks</tabstop>
+  <tabstop>textCryptoPassCust</tabstop>
+  <tabstop>textCryptoPassCust2</tabstop>
+  <tabstop>checkBoot</tabstop>
+  <tabstop>radioBootMBR</tabstop>
+  <tabstop>radioBootPBR</tabstop>
+  <tabstop>radioBootESP</tabstop>
+  <tabstop>comboBoot</tabstop>
+  <tabstop>textComputerName</tabstop>
+  <tabstop>textComputerDomain</tabstop>
+  <tabstop>checkSamba</tabstop>
+  <tabstop>textComputerGroup</tabstop>
+  <tabstop>comboLocale</tabstop>
+  <tabstop>checkLocalClock</tabstop>
+  <tabstop>radioClock24</tabstop>
+  <tabstop>radioClock12</tabstop>
+  <tabstop>comboTimeZone</tabstop>
+  <tabstop>pushServices</tabstop>
+  <tabstop>textUserName</tabstop>
+  <tabstop>textUserPass</tabstop>
+  <tabstop>textUserPass2</tabstop>
+  <tabstop>textRootPass</tabstop>
+  <tabstop>textRootPass2</tabstop>
+  <tabstop>checkShowPass</tabstop>
+  <tabstop>checkAutoLogin</tabstop>
+  <tabstop>checkSaveDesktop</tabstop>
+  <tabstop>textReminders</tabstop>
+  <tabstop>textCopyright</tabstop>
+  <tabstop>treeServices</tabstop>
+  <tabstop>textTips</tabstop>
+  <tabstop>tabsMain</tabstop>
+  <tabstop>pushClose</tabstop>
+  <tabstop>textHelp</tabstop>
   <tabstop>listLog</tabstop>
-  <tabstop>buttonAdvancedFDECust</tabstop>
-  <tabstop>comboFDEhash</tabstop>
-  <tabstop>spinFDEkeysize</tabstop>
-  <tabstop>spinFDEroundtime</tabstop>
-  <tabstop>comboFDEchain</tabstop>
-  <tabstop>comboFDEcipher</tabstop>
-  <tabstop>buttonBenchmarkFDE</tabstop>
-  <tabstop>comboFDEivhash</tabstop>
-  <tabstop>comboFDEivgen</tabstop>
-  <tabstop>comboFDErandom</tabstop>
-  <tabstop>grubBootCombo</tabstop>
-  <tabstop>cmbTimeArea</tabstop>
+  <tabstop>pushAdvancedCryptoCust</tabstop>
+  <tabstop>comboCryptoCipher</tabstop>
+  <tabstop>comboCryptoChain</tabstop>
+  <tabstop>comboCryptoIVGen</tabstop>
+  <tabstop>comboCryptoIVHash</tabstop>
+  <tabstop>spinCryptoKeySize</tabstop>
+  <tabstop>comboCryptoHash</tabstop>
+  <tabstop>comboCryptoRandom</tabstop>
+  <tabstop>spinCryptoRoundTime</tabstop>
+  <tabstop>pushLoadKey</tabstop>
+  <tabstop>pushBenchmarkCrypto</tabstop>
+  <tabstop>comboTimeArea</tabstop>
   <tabstop>radioOldHomeUse</tabstop>
   <tabstop>radioOldHomeSave</tabstop>
   <tabstop>radioOldHomeDelete</tabstop>
-  <tabstop>checkBoxExitReboot</tabstop>
+  <tabstop>checkExitReboot</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections>
   <connection>
-   <sender>entireDiskButton</sender>
+   <sender>radioEntireDisk</sender>
    <signal>toggled(bool)</signal>
-   <receiver>groupAutoPart</receiver>
+   <receiver>boxAutoPart</receiver>
    <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>354</x>
-     <y>145</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>354</x>
-     <y>162</y>
-    </hint>
-   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoot</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>boxBoot</receiver>
+   <slot>setEnabled(bool)</slot>
   </connection>
  </connections>
 </ui>
