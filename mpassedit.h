@@ -1,4 +1,4 @@
-// MLineEdit class - QLineEdit modified for passwords.
+// MPassEdit class - QLineEdit modified for passwords.
 //
 //   Copyright (C) 2021 by AK-47
 //   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +15,17 @@
 //
 // This file is part of the gazelle-installer.
 
-#ifndef MLINEEDIT_H
-#define MLINEEDIT_H
+#ifndef MPASSEDIT_H
+#define MPASSEDIT_H
 
 #include <QLineEdit>
 #include <QProgressBar>
 
-class MLineEdit : public QLineEdit
+class MPassEdit : public QLineEdit
 {
     Q_OBJECT
 private:
-    MLineEdit *slave = nullptr;
+    MPassEdit *slave = nullptr;
     QString genText;
     int min, genMin, wordMax;
     bool lastValid = false;
@@ -36,12 +36,12 @@ private:
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
 public:
-    MLineEdit(QWidget *parent = nullptr);
-    void setup(MLineEdit *slave, QProgressBar *meter,
+    MPassEdit(QWidget *parent = nullptr);
+    void setup(MPassEdit *slave, QProgressBar *meter,
                int min=0, int genMin=16, int wordMax=5);
-    bool isValid();
+    bool isValid() const;
 signals:
     void validationChanged(bool valid);
 };
 
-#endif // MLINEEDIT_H
+#endif // MPASSEDIT_H
