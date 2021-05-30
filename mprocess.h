@@ -41,7 +41,7 @@ public:
         Exec
     };
     MProcess(QObject *parent = Q_NULLPTR);
-    void setupUI(QListWidget *listLog, QProgressBar *progressBar);
+    void setupUI(QListWidget *listLog, QProgressBar *progInstall);
     bool exec(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
     QString execOut(const QString &cmd, bool everything = false);
     QStringList execOutLines(const QString &cmd, const bool rawexec = false);

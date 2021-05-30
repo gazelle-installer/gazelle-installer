@@ -89,46 +89,46 @@ public:
 
 private slots:
     void on_splitter_splitterMoved(int, int);
-    void on_mainTabs_currentChanged(int index);
+    void on_tabsMain_currentChanged(int index);
 
-    void on_abortInstallButton_clicked();
-    void on_backButton_clicked();
-    void on_buttonSetKeyboard_clicked();
-    void on_closeButton_clicked();
-    void on_nextButton_clicked();
-    void on_passwordCheckBox_stateChanged(int);
-    void on_buttonPartReload_clicked();
-    void on_buttonRunParted_clicked();
-    void on_viewServicesButton_clicked();
+    void on_pushAbort_clicked();
+    void on_pushBack_clicked();
+    void on_pushSetKeyboard_clicked();
+    void on_pushClose_clicked();
+    void on_pushNext_clicked();
+    void on_checkShowPass_stateChanged(int);
+    void on_pushPartReload_clicked();
+    void on_pushRunPartMan_clicked();
+    void on_pushServices_clicked();
 
-    void on_diskCombo_currentIndexChanged(int);
+    void on_comboDisk_currentIndexChanged(int);
     void on_sliderPart_sliderPressed();
     void on_sliderPart_valueChanged(int value);
-    void on_checkBoxEncryptAuto_toggled(bool checked);
-    void on_customPartButton_clicked(bool checked);
+    void on_checkEncryptAuto_toggled(bool checked);
+    void on_radioCustomPart_clicked(bool checked);
 
-    void on_buttonLoadKey_clicked();
-    void on_buttonBenchmarkFDE_clicked();
-    void on_buttonAdvancedFDE_clicked();
-    void on_buttonAdvancedFDECust_clicked();
-    void on_comboFDEcipher_currentIndexChanged(const QString &arg1);
-    void on_comboFDEchain_currentIndexChanged(const QString &arg1);
-    void on_spinFDEkeysize_valueChanged(int i);
-    void on_comboFDEivgen_currentIndexChanged(const QString &arg1);
+    void on_pushLoadKey_clicked();
+    void on_pushBenchmarkCrypto_clicked();
+    void on_pushAdvancedCrypto_clicked();
+    void on_pushAdvancedCryptoCust_clicked();
+    void on_comboCryptoCipher_currentIndexChanged(const QString &arg1);
+    void on_comboCryptoChain_currentIndexChanged(const QString &arg1);
+    void on_spinCryptoKeySize_valueChanged(int i);
+    void on_comboCryptoIVGen_currentIndexChanged(const QString &arg1);
 
-    void on_grubCheckBox_toggled(bool checked);
-    void on_grubMbrButton_toggled();
-    void on_grubPbrButton_toggled();
-    void on_grubEspButton_toggled();
+    void on_checkBoot_toggled(bool checked);
+    void on_radioBootMBR_toggled();
+    void on_radioBootPBR_toggled();
+    void on_radioBootESP_toggled();
 
-    void on_localeCombo_currentIndexChanged(int index);
-    void on_cmbTimeArea_currentIndexChanged(int index);
+    void on_comboLocale_currentIndexChanged(int index);
+    void on_comboTimeArea_currentIndexChanged(int index);
 
     void on_radioOldHomeUse_toggled(bool);
     void on_radioOldHomeSave_toggled(bool);
     void on_radioOldHomeDelete_toggled(bool);
 
-    void on_progressBar_valueChanged(int value);
+    void on_progInstall_valueChanged(int value);
 
 private:
     MProcess proc;
@@ -174,14 +174,14 @@ private:
 
     // Advanced Encryption Settings page
     int ixPageRefAdvancedFDE = 0;
-    int indexFDEcipher;
-    int indexFDEchain;
-    int indexFDEivgen;
-    int indexFDEivhash;
-    int iFDEkeysize;
-    int indexFDEhash;
-    int indexFDErandom;
-    int iFDEroundtime;
+    int indexCryptoCipher;
+    int indexCryptoChain;
+    int indexCryptoIVGen;
+    int indexCryptoIVHash;
+    int iCryptoKeySize;
+    int indexCryptoHash;
+    int indexCryptoRandom;
+    int iCryptoRoundTime;
 
     // cached time zone list
     QStringList listTimeZones;
