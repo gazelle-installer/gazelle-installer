@@ -57,12 +57,12 @@ void PartMan::setup()
     connect(gui.treePartitions, &QTreeWidget::customContextMenuRequested, this,&PartMan::treeMenu);
     connect(gui.treePartitions, &QTreeWidget::itemChanged, this, &PartMan::treeItemChange);
     connect(gui.treePartitions, &QTreeWidget::itemSelectionChanged, this, &PartMan::treeSelChange);
-    connect(gui.buttonPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
-    connect(gui.buttonPartAdd, &QToolButton::clicked, this, &PartMan::partAddClick);
-    connect(gui.buttonPartRemove, &QToolButton::clicked, this, &PartMan::partRemoveClick);
-    gui.buttonPartAdd->setEnabled(false);
-    gui.buttonPartRemove->setEnabled(false);
-    gui.buttonPartClear->setEnabled(false);
+    connect(gui.pushPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
+    connect(gui.pushPartAdd, &QToolButton::clicked, this, &PartMan::partAddClick);
+    connect(gui.pushPartRemove, &QToolButton::clicked, this, &PartMan::partRemoveClick);
+    gui.pushPartAdd->setEnabled(false);
+    gui.pushPartRemove->setEnabled(false);
+    gui.pushPartClear->setEnabled(false);
     defaultLabels["ESP"] = "EFI System";
     defaultLabels["BIOS-GRUB"] = "BIOS GRUB";
 }
@@ -428,7 +428,7 @@ void PartMan::spinSizeValueChange(int i)
         if (twit!=partit) maxMB -= twitSize(twit);
     }
     if (i > maxMB) spin->setValue(maxMB);
-    gui.buttonPartAdd->setEnabled(i < maxMB);
+    gui.pushPartAdd->setEnabled(i < maxMB);
     spin->blockSignals(false);
 }
 void PartMan::comboUseTextChange(const QString &text)
@@ -559,7 +559,7 @@ void PartMan::comboFormatTextChange(const QString &)
             }
         }
     }
-    gui.badblocksCheck->setEnabled(canCheckBlocks);
+    gui.checkBadBlocks->setEnabled(canCheckBlocks);
 }
 void PartMan::comboSubvolUseTextChange(const QString &text)
 {
@@ -624,10 +624,10 @@ void PartMan::treeItemChange(QTreeWidgetItem *twit, int column)
         for (; *it && !cryptoAny; ++it) {
             if ((*it)->checkState(Encrypt)==Qt::Checked) cryptoAny = true;
         }
-        if (gui.gbEncrPass->isEnabled() != cryptoAny) {
-            gui.FDEpassCust->clear();
-            gui.nextButton->setDisabled(cryptoAny);
-            gui.gbEncrPass->setEnabled(cryptoAny);
+        if (gui.boxCryptoPass->isEnabled() != cryptoAny) {
+            gui.textCryptoPassCust->clear();
+            gui.pushNext->setDisabled(cryptoAny);
+            gui.boxCryptoPass->setEnabled(cryptoAny);
         }
         const Qt::CheckState csCrypto = twit->checkState(Encrypt);
         if (csCrypto!=Qt::Unchecked) {
@@ -666,23 +666,23 @@ void PartMan::treeSelChange()
         const bool isdrive = twitFlag(twit, Drive);
         bool islocked = true;
         if (isdrive) islocked = drvitIsLocked(twit);
-        gui.buttonPartClear->setEnabled(!islocked);
-        gui.buttonPartRemove->setEnabled(!isold && !isdrive);
+        gui.pushPartClear->setEnabled(!islocked);
+        gui.pushPartRemove->setEnabled(!isold && !isdrive);
         // Only allow adding partitions if there is enough space.
         QTreeWidgetItem *drvit = twit->parent();
         if (!drvit) drvit = twit;
-        if (!islocked && isold && isdrive) gui.buttonPartAdd->setEnabled(false);
+        if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else {
             long long maxMB = twitSize(drvit)-PARTMAN_SAFETY_MB;
             for (int ixi = drvit->childCount()-1; ixi >= 0; --ixi) {
                 maxMB -= twitSize(drvit->child(ixi));
             }
-            gui.buttonPartAdd->setEnabled(maxMB > 0);
+            gui.pushPartAdd->setEnabled(maxMB > 0);
         }
     } else {
-        gui.buttonPartClear->setEnabled(false);
-        gui.buttonPartAdd->setEnabled(false);
-        gui.buttonPartRemove->setEnabled(false);
+        gui.pushPartClear->setEnabled(false);
+        gui.pushPartAdd->setEnabled(false);
+        gui.pushPartRemove->setEnabled(false);
     }
 }
 
@@ -695,14 +695,14 @@ void PartMan::treeMenu(const QPoint &)
     if (twitFlag(twit, Partition)) {
         QComboBox *comboFormat = twitComboBox(twit, Format);
         QAction *actAdd = menu.addAction(tr("&Add partition"));
-        actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
+        actAdd->setEnabled(gui.pushPartAdd->isEnabled());
         QAction *actRemove = menu.addAction(tr("&Remove partition"));
         QAction *actLock = nullptr;
         QAction *actUnlock = nullptr;
         QAction *actAddCrypttab = nullptr;
         QAction *actNewSubvolume = nullptr, *actScanSubvols = nullptr;
         QAction *actSetBoot = nullptr;
-        actRemove->setEnabled(gui.buttonPartRemove->isEnabled());
+        actRemove->setEnabled(gui.pushPartRemove->isEnabled());
         menu.addSeparator();
         if (twitFlag(twit, VirtualBD)) {
             actRemove->setEnabled(false);
@@ -753,7 +753,7 @@ void PartMan::treeMenu(const QPoint &)
         }
     } else if (twitFlag(twit, Drive)) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
-        actAdd->setEnabled(gui.buttonPartAdd->isEnabled());
+        actAdd->setEnabled(gui.pushPartAdd->isEnabled());
         menu.addSeparator();
         QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
@@ -765,7 +765,7 @@ void PartMan::treeMenu(const QPoint &)
         actClear->setDisabled(locked);
         actReset->setDisabled(locked || twitFlag(twit, OldLayout));
         menuTemplates->setDisabled(locked);
-        actCrypto->setVisible(gui.gbEncrPass->isVisible());
+        actCrypto->setVisible(gui.boxCryptoPass->isVisible());
 
         QAction *action = menu.exec(QCursor::pos());
         if (action==actAdd) partAddClick(true);
@@ -863,7 +863,7 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
 
     if (dialog.exec()==QDialog::Accepted) {
         qApp->setOverrideCursor(Qt::WaitCursor);
-        gui.mainFrame->setEnabled(false);
+        gui.boxMain->setEnabled(false);
         const QString &mapdev = editVDev->text();
         const bool ok = luksOpen("/dev/" + twit->text(Device),
             mapdev, editPass->text().toUtf8());
@@ -884,7 +884,7 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
             gui.treePartitions->blockSignals(false);
             treeSelChange();
         }
-        gui.mainFrame->setEnabled(true);
+        gui.boxMain->setEnabled(true);
         qApp->restoreOverrideCursor();
         if (!ok) {
             QMessageBox::warning(master, master->windowTitle(),
@@ -895,7 +895,7 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
 void PartMan::partMenuLock(QTreeWidgetItem *twit)
 {
     qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
-    gui.mainFrame->setEnabled(false);
+    gui.boxMain->setEnabled(false);
     const QString &dev = twitMappedDevice(twit);
     bool ok = false;
     // Find the associated partition and decrement its reference count if found.
@@ -919,7 +919,7 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
     gui.treePartitions->blockSignals(false);
     treeSelChange();
 
-    gui.mainFrame->setEnabled(true);
+    gui.boxMain->setEnabled(true);
     qApp->restoreOverrideCursor();
     // If not OK then a command failed, or trying to close a non-LUKS device.
     if (!ok) {
@@ -980,7 +980,7 @@ QTreeWidgetItem *PartMan::addSubvolumeItem(QTreeWidgetItem *twit)
 void PartMan::scanSubvolumes(QTreeWidgetItem *partit)
 {
     qApp->setOverrideCursor(Qt::WaitCursor);
-    gui.mainFrame->setEnabled(false);
+    gui.boxMain->setEnabled(false);
     while (partit->childCount()) delete partit->child(0);
     mkdir("/mnt/btrfs-scratch", 0755);
     QStringList lines;
@@ -1001,7 +1001,7 @@ void PartMan::scanSubvolumes(QTreeWidgetItem *partit)
         comboFormat->setEnabled(true);
     }
  END:
-    gui.mainFrame->setEnabled(true);
+    gui.boxMain->setEnabled(true);
     qApp->restoreOverrideCursor();
 }
 
@@ -1290,20 +1290,20 @@ bool PartMan::checkTargetDrivesOK()
 
 bool PartMan::luksMake(const QString &dev, const QByteArray &password)
 {
-    QString strCipherSpec = gui.comboFDEcipher->currentText()
-        + "-" + gui.comboFDEchain->currentText();
-    if (gui.comboFDEchain->currentText() != "ECB") {
-        strCipherSpec += "-" + gui.comboFDEivgen->currentText();
-        if (gui.comboFDEivgen->currentText() == "ESSIV") {
-            strCipherSpec += ":" + gui.comboFDEivhash->currentData().toString();
+    QString strCipherSpec = gui.comboCryptoCipher->currentText()
+        + "-" + gui.comboCryptoChain->currentText();
+    if (gui.comboCryptoChain->currentText() != "ECB") {
+        strCipherSpec += "-" + gui.comboCryptoIVGen->currentText();
+        if (gui.comboCryptoIVGen->currentText() == "ESSIV") {
+            strCipherSpec += ":" + gui.comboCryptoIVHash->currentData().toString();
         }
     }
     QString cmd = "cryptsetup --batch-mode"
         " --cipher " + strCipherSpec.toLower()
-        + " --key-size " + gui.spinFDEkeysize->cleanText()
-        + " --hash " + gui.comboFDEhash->currentText().toLower().remove('-')
-        + " --use-" + gui.comboFDErandom->currentText()
-        + " --iter-time " + gui.spinFDEroundtime->cleanText()
+        + " --key-size " + gui.spinCryptoKeySize->cleanText()
+        + " --hash " + gui.comboCryptoHash->currentText().toLower().remove('-')
+        + " --use-" + gui.comboCryptoRandom->currentText()
+        + " --iter-time " + gui.spinCryptoRoundTime->cleanText()
         + " luksFormat " + dev;
     if (!proc.exec(cmd, true, &password)) return false;
     proc.sleep(1000);
@@ -1321,7 +1321,7 @@ bool PartMan::luksOpen(const QString &dev, const QString &luksfs,
 
 QTreeWidgetItem *PartMan::selectedDriveAuto()
 {
-    QString drv(gui.diskCombo->currentData().toString());
+    QString drv(gui.comboDisk->currentData().toString());
     int bdindex = listBlkDevs.findDevice(drv);
     if (bdindex<0) return nullptr;
     for (int ixi = gui.treePartitions->topLevelItemCount()-1; ixi>=0; --ixi) {
@@ -1512,8 +1512,8 @@ bool PartMan::formatPartitions()
     QString homedev;
 
     // set up LUKS containers
-    const QByteArray &encPass = (gui.entireDiskButton->isChecked()
-                                 ? gui.FDEpassword : gui.FDEpassCust)->text().toUtf8();
+    const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
+                                 ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
     proc.status(tr("Setting up LUKS encrypted containers"));
     for (QTreeWidgetItem *twit : mounts) {
         const QString dev = "/dev/" + twit->text(Device);
@@ -1527,7 +1527,7 @@ bool PartMan::formatPartitions()
     }
 
     // Format partitions.
-    const bool badblocks = gui.badblocksCheck->isChecked();
+    const bool badblocks = gui.checkBadBlocks->isChecked();
     for (const auto &it : mounts.toStdMap()) {
         QTreeWidgetItem *twit = it.second;
         if (twitFlag(twit, Subvolume)) continue;
@@ -1644,8 +1644,8 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     QFile file("/mnt/antiX/etc/crypttab");
     if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
-    const QLineEdit *passedit = gui.checkBoxEncryptAuto->isChecked()
-        ? gui.FDEpassword : gui.FDEpassCust;
+    const QLineEdit *passedit = gui.checkEncryptAuto->isChecked()
+        ? gui.textCryptoPass : gui.textCryptoPassCust;
     const QByteArray password(passedit->text().toUtf8());
     const QString cmdAddKey("cryptsetup luksAddKey /dev/%1 /mnt/antiX" + keyfile);
     const QString cmdBlkID("blkid -s UUID -o value /dev/");
@@ -1745,8 +1745,8 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         } else out << " 1 2\n";
     }
     // EFI System Partition
-    if (gui.grubEspButton->isChecked()) {
-        const QString espdev = "/dev/" + gui.grubBootCombo->currentData().toString();
+    if (gui.radioBootESP->isChecked()) {
+        const QString espdev = "/dev/" + gui.comboBoot->currentData().toString();
         const QString espdevUUID = "UUID=" + proc.execOut(cmdBlkID + espdev);
         qDebug() << "espdev" << espdev << espdevUUID;
         out << espdevUUID + " /boot/efi vfat noatime,dmask=0002,fmask=0113 0 0\n";
