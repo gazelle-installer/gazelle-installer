@@ -447,7 +447,7 @@
                   </widget>
                  </item>
                  <item row="3" column="2" colspan="2">
-                  <widget class="MLineEdit" name="textCryptoPass">
+                  <widget class="MPassEdit" name="textCryptoPass">
                    <property name="maxLength">
                     <number>512</number>
                    </property>
@@ -568,7 +568,7 @@
                   </widget>
                  </item>
                  <item row="4" column="2" colspan="2">
-                  <widget class="MLineEdit" name="textCryptoPass2">
+                  <widget class="MPassEdit" name="textCryptoPass2">
                    <property name="maxLength">
                     <number>512</number>
                    </property>
@@ -769,7 +769,7 @@
              </property>
              <layout class="QGridLayout" name="gridLayout2c">
               <item row="1" column="2" colspan="2">
-               <widget class="MLineEdit" name="textCryptoPassCust2">
+               <widget class="MPassEdit" name="textCryptoPassCust2">
                 <property name="maxLength">
                  <number>512</number>
                 </property>
@@ -786,7 +786,7 @@
                </widget>
               </item>
               <item row="0" column="2" colspan="2">
-               <widget class="MLineEdit" name="textCryptoPassCust">
+               <widget class="MPassEdit" name="textCryptoPassCust">
                 <property name="maxLength">
                  <number>512</number>
                 </property>
@@ -1949,7 +1949,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="MLineEdit" name="textRootPass">
+               <widget class="MPassEdit" name="textRootPass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1965,7 +1965,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="MLineEdit" name="textRootPass2">
+               <widget class="MPassEdit" name="textRootPass2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2064,7 +2064,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="MLineEdit" name="textUserPass">
+               <widget class="MPassEdit" name="textUserPass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2080,7 +2080,7 @@
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="MLineEdit" name="textUserPass2">
+               <widget class="MPassEdit" name="textUserPass2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2437,9 +2437,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>MLineEdit</class>
+   <class>MPassEdit</class>
    <extends>QLineEdit</extends>
-   <header>mlineedit.h</header>
+   <header>mpassedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
