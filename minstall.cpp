@@ -1091,12 +1091,19 @@ bool MInstall::installLoader()
 // out-of-box experience
 void MInstall::enableOOBE()
 {
-    setServices(); // Disable services to speed up the OOBE boot.
+    QTreeWidgetItemIterator it(treeServices);
+    for (; *it; ++it) {
+        if ((*it)->parent()) setService((*it)->text(0), false); // Speed up the OOBE boot.
+    }
     proc.exec("chroot /mnt/antiX/ update-rc.d oobe defaults", true);
 }
 bool MInstall::processOOBE()
 {
-    setServices();
+    QTreeWidgetItemIterator it(treeServices);
+    for (; *it; ++it) {
+        if ((*it)->parent()) setService((*it)->text(0), (*it)->checkState(0) == Qt::Checked);
+    }
+
     if (!setComputerName()) return false;
     setLocale();
     if (haveSnapshotUserAccounts) { // skip user account creation
@@ -1322,40 +1329,10 @@ bool MInstall::setComputerName()
     if (haveSamba) {
         //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/samba/smb.conf");
         replaceStringInFile("WORKGROUP", textComputerGroup->text(), etcpath + "/samba/smb.conf");
-
-        if (checkSamba->isChecked()) {
-            proc.exec("/usr/sbin/update-rc.d smbd remove", false);
-            proc.exec("/usr/sbin/update-rc.d nmbd remove", false);
-            proc.exec("/usr/sbin/update-rc.d samba-ad-dc remove", false);
-            proc.exec("/usr/sbin/update-rc.d smbd defaults", false);
-            proc.exec("/usr/sbin/update-rc.d nmbd defaults", false);
-            proc.exec("/usr/sbin/update-rc.d samba-ad-dc defaults", false);
-        } else {
-            proc.exec("/usr/sbin/update-rc.d smbd remove", false);
-            proc.exec("/usr/sbin/update-rc.d nmbd remove", false);
-            proc.exec("/usr/sbin/update-rc.d samba-ad-dc remove", false);
-        }
-
-        if (containsSystemD && !checkSamba->isChecked()) {
-            proc.exec("chroot /mnt/antiX systemctl disable smbd");
-            proc.exec("chroot /mnt/antiX systemctl disable nmbd");
-            proc.exec("chroot /mnt/antiX systemctl disable samba-ad-dc");
-            proc.exec("chroot /mnt/antiX systemctl mask smbd");
-            proc.exec("chroot /mnt/antiX systemctl mask nmbd");
-            proc.exec("chroot /mnt/antiX systemctl mask samba-ad-dc");
-        }
-
-        if (containsRunit && !checkSamba->isChecked()){
-            proc.mkpath(etcpath+"/sv/smbd");
-            proc.mkpath(etcpath+"/sv/nmbd");
-            proc.mkpath(etcpath+"/sv/samba-ad-dc");
-            proc.exec("chroot /mnt/antiX ln -fs/etc/sv/smbd /etc/service/");
-            proc.exec("chroot /mnt/antiX ln -fs /etc/sv/nmbd /etc/service/");
-            proc.exec("chroot /mnt/antiX ln -fs /etc/sv/samba-ad-dc /etc/service/");
-            proc.exec("chroot /mnt/antiX touch /etc/sv/smbd/down");
-            proc.exec("chroot /mnt/antiX touch /etc/sv/nmbd/down");
-            proc.exec("chroot /mnt/antiX touch /etc/sv/samba-ad-dc/down");
-        }
+        const bool enable = checkSamba->isChecked();
+        setService("smbd", enable);
+        setService("nmbd", enable);
+        setService("samba-ad-dc", enable);
     }
     //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/hosts");
     const QString &compname = textComputerName->text();
@@ -1467,46 +1444,38 @@ void MInstall::stashServices(bool save)
     }
 }
 
-void MInstall::setServices()
+void MInstall::setService(const QString &service, bool enabled)
 {
-    proc.log(__PRETTY_FUNCTION__);
-    if (phase < 0) return;
-
+    qDebug() << "Set service:" << service << enabled;
     QString chroot, rootpath;
     if (!oobe) {
         chroot = "chroot /mnt/antiX ";
         rootpath = "/mnt/antiX";
     }
-    QTreeWidgetItemIterator it(treeServices);
-    for (; *it; ++it) {
-        if ((*it)->parent() == nullptr) continue;
-        QString service = (*it)->text(0);
-        qDebug() << "Service: " << service;
-        if (!oem && (*it)->checkState(0) == Qt::Checked) {
-            proc.exec(chroot + "update-rc.d " + service + " defaults");
-            if (containsSystemD) {
-                proc.exec(chroot + "systemctl enable " + service);
+    if (enabled) {
+        proc.exec(chroot + "update-rc.d " + service + " defaults");
+        if (containsSystemD) {
+            proc.exec(chroot + "systemctl enable " + service);
+        }
+        if (containsRunit) {
+            QFile::remove(rootpath+"/etc/sv/" + service + "/down");
+            if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
+                proc.mkpath(rootpath+"/etc/sv/" + service);
+                proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
             }
-            if (containsRunit) {
-                QFile::remove(rootpath+"/etc/sv/" + service + "/down");
-                if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
-                    proc.mkpath(rootpath+"/etc/sv/" + service);
-                    proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
-                }
+        }
+    } else {
+        proc.exec(chroot + "update-rc.d " + service + " remove");
+        if (containsSystemD) {
+            proc.exec(chroot + "systemctl disable " + service);
+            proc.exec(chroot + "systemctl mask " + service);
+        }
+        if (containsRunit) {
+            if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
+                proc.mkpath(rootpath+"/etc/sv/" + service);
+                proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
             }
-        } else { // In OEM mode, disable the services for the OOBE.
-            proc.exec(chroot + "update-rc.d " + service + " remove");
-            if (containsSystemD) {
-                proc.exec(chroot + "systemctl disable " + service);
-                proc.exec(chroot + "systemctl mask " + service);
-            }
-            if (containsRunit) {
-                if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
-                    proc.mkpath(rootpath+"/etc/sv/" + service);
-                    proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
-                }
-                proc.exec(chroot + "touch /etc/sv/" + service + "/down");
-            }
+            proc.exec(chroot + "touch /etc/sv/" + service + "/down");
         }
     }
 }
