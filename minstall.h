@@ -63,7 +63,7 @@ public:
     void disablehiberanteinitramfs();
     bool processNextPhase();
     void setLocale();
-    void setServices();
+    void setService(const QString &service, bool enabled);
     void writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
