@@ -1033,25 +1033,32 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
         if (twitFlag(*it, Drive) || twitFlag(*it, VirtualDevices)) continue;
         QComboBox *comboUse = twitComboBox(*it, UseFor);
         QLineEdit *editLabel = twitLineEdit(*it, Label);
-        if (!comboUse || !editLabel || comboUse->currentText().isEmpty()) continue;
+        if (!comboUse || !editLabel) continue;
         if (twitFlag(*it, Subvolume)) {
+            // Ensure the subvolume label entry is valid.
             bool ok = true;
             const QString &cmptext = editLabel->text().trimmed().toUpper();
             if (cmptext.isEmpty()) ok = false;
-            QStringList check;
+            if (cmptext.count(QRegularExpression("[^A-Z0-9\\/\\@\\.\\-\\_]|\\/\\/"))) ok = false;
+            if (cmptext.startsWith('/') || cmptext.endsWith('/')) ok = false;
+            if (!ok) {
+                QMessageBox::critical(master, master->windowTitle(), tr("Invalid subvolume label"));
+                return editLabel;
+            }
+            // Check for duplicate subvolume label entries.
             QTreeWidgetItem *pit = (*it)->parent();
             const int count = pit->childCount();
             const int index = pit->indexOfChild(*it);
             for (int ixi = 0; ixi < count; ++ixi) {
                 if (ixi==index) continue;
-                if (twitLineEdit(pit->child(ixi), Label)->text().trimmed().toUpper() == cmptext) ok = false;
-            }
-            if (!ok) {
-                QMessageBox::critical(master, master->windowTitle(), tr("Invalid subvolume label"));
-                return editLabel;
+                if (twitLineEdit(pit->child(ixi), Label)->text().trimmed().toUpper() == cmptext) {
+                    QMessageBox::critical(master, master->windowTitle(), tr("Duplicate subvolume label"));
+                    return editLabel;
+                }
             }
         }
         QString mount = translateUse(comboUse->currentText());
+        if(mount.isEmpty()) continue;
         const QString &devname = twitShownDevice(*it);
         if (!mount.startsWith("/") && comboUse->findText(mount, Qt::MatchFixedString)<0) {
             QMessageBox::critical(master, master->windowTitle(),
@@ -1624,20 +1631,24 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
 bool PartMan::prepareSubvolumes(QTreeWidgetItem *partit)
 {
     const int svcount = partit->childCount();
-    if (svcount<=0) return true;
+    QStringList svlist;
+    for (int ixi = 0; ixi < svcount; ++ixi) {
+        QTreeWidgetItem *svit = partit->child(ixi);
+        if (twitWillFormat(svit)) svlist << twitLineEdit(svit, Label)->text();
+    }
+
+    if (svlist.isEmpty()) return true;
     proc.status(tr("Preparing subvolumes"));
+    svlist.sort(); // This ensures nested subvolumes are created in the right order.
+    bool ok = true;
     mkdir("/mnt/btrfs-scratch", 0755);
     if (!proc.exec("mount -o noatime " + twitMappedDevice(partit, true)
         + " /mnt/btrfs-scratch", true)) return false;
-    bool ok = true;
-    for (int ixi = 0; ok && ixi < svcount; ++ixi) {
-        QTreeWidgetItem *svit = partit->child(ixi);
-        if (twitWillFormat(svit)) {
-            const QString &subvol = twitLineEdit(svit, Label)->text();
-            proc.exec("btrfs subvolume delete /mnt/btrfs-scratch/" + subvol, true);
-            if (!proc.exec("btrfs subvolume create /mnt/btrfs-scratch/" + subvol, true)) ok = false;
-            proc.status();
-        }
+    for (const QString &subvol : svlist) {
+        proc.exec("btrfs subvolume delete /mnt/btrfs-scratch/" + subvol, true);
+        if (!proc.exec("btrfs subvolume create /mnt/btrfs-scratch/" + subvol, true)) ok = false;
+        if (!ok) break;
+        proc.status();
     }
     if (!proc.exec("umount /mnt/btrfs-scratch", true)) return false;
     return ok;
