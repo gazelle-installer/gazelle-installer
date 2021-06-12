@@ -228,8 +228,8 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             } else if (!drvPreserve && config.contains("Size")) {
                 const int size = config.value("Size").toLongLong() / 1048576;
                 totalMB += size;
-                QWidget *spinSize = gui.treePartitions->itemWidget(partit, Size);
-                static_cast<QSpinBox *>(spinSize)->setValue(size);
+                QSpinBox *spinSize = twitSpinBox(partit, Size);
+                spinSize->setValue(size);
                 if (totalMB > maxMB) config.markBadWidget(spinSize);
                 if (config.value("Boot").toBool()) partitSetBoot(partit, true);
             }
@@ -273,15 +273,16 @@ bool PartMan::manageConfig(MSettings &config, bool save)
 QTreeWidgetItem *PartMan::addItem(QTreeWidgetItem *parent, int defaultMB, const QString &defaultUse, bool crypto)
 {
     QTreeWidgetItem *partit = new QTreeWidgetItem(parent);
-    setupPartitionItem(partit, nullptr, defaultMB, defaultUse);
+    setupPartitionItem(partit, nullptr);
+    if (!defaultUse.isEmpty()) twitComboBox(partit, UseFor)->setCurrentText(defaultUse);
+    twitSpinBox(partit, Size)->setValue(defaultMB);
     // If the layout needs crypto and it is supported, check the box.
     if (partit->data(Encrypt, Qt::CheckStateRole).isValid()) {
         partit->setCheckState(Encrypt, (crypto ? Qt::Checked : Qt::Unchecked));
     }
     return partit;
 }
-void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo,
-    int defaultMB, const QString &defaultUse)
+void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo)
 {
     twitSetFlag(partit, Partition, true);
     // Size
@@ -297,8 +298,6 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
         spinSize->setSuffix("MB");
         connect(spinSize, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &PartMan::spinSizeValueChange);
-        if (!defaultMB) defaultMB = maxMB;
-        spinSize->setValue(defaultMB);
         spinSize->setStepType(QSpinBox::AdaptiveDecimalStepType);
         spinSize->setAccelerated(true);
     }
@@ -356,7 +355,6 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
     editOptions->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(editOptions, &QLineEdit::customContextMenuRequested, this, &PartMan::partOptionsMenu);
     // Partition flags based on default usage
-    if (!defaultUse.isEmpty()) comboUse->setCurrentText(defaultUse);
     if (bdinfo) {
         if (bdinfo->isBoot) partitSetBoot(partit, true);
         if (bdinfo->isESP) {
@@ -1968,10 +1966,10 @@ inline bool PartMan::twitCanUse(QTreeWidgetItem *twit) const
 }
 long long PartMan::twitSize(QTreeWidgetItem *twit, const bool bytes) const
 {
-    QWidget *spin = gui.treePartitions->itemWidget(twit, Size);
+    const QSpinBox *spin = twitSpinBox(twit, Size);
     long long size = 0;
     if (spin) {
-        size = static_cast<QSpinBox *>(spin)->value();
+        size = spin->value();
         if (bytes) size *= 1048576;
     } else {
         size = twit->data(Size, Qt::UserRole).toLongLong();
@@ -2023,4 +2021,8 @@ inline QComboBox *PartMan::twitComboBox(QTreeWidgetItem  *twit, int column) cons
 inline QLineEdit *PartMan::twitLineEdit(QTreeWidgetItem  *twit, int column) const
 {
     return static_cast<QLineEdit *>(gui.treePartitions->itemWidget(twit, column));
+}
+inline QSpinBox *PartMan::twitSpinBox(QTreeWidgetItem  *twit, int column) const
+{
+    return static_cast<QSpinBox *>(gui.treePartitions->itemWidget(twit, column));
 }
