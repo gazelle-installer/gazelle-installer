@@ -60,8 +60,7 @@ class PartMan : public QObject
     void setup();
     void scanVirtualDevices(bool rescan);
     QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB, const QString &defaultUse, bool crypto);
-    void setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo,
-        int defaultMB = 0, const QString &defaultUse = QString());
+    void setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo);
     void labelParts(QTreeWidgetItem *drvit);
     void resizeColumnsToFit();
     static QString translateUse(const QString &alias);
@@ -88,6 +87,7 @@ class PartMan : public QObject
     QString twitShownDevice(QTreeWidgetItem *twit) const;
     inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column) const;
     inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column) const;
+    inline QSpinBox *twitSpinBox(QTreeWidgetItem  *twit, int column) const;
     void spinSizeValueChange(int i);
     void comboUseTextChange(const QString &text);
     void comboFormatTextChange(const QString &);
