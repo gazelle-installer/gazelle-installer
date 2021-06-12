@@ -667,10 +667,13 @@ void PartMan::treeSelChange()
 {
     QTreeWidgetItem *twit = gui.treePartitions->selectedItems().value(0);
     if (twit && !twitFlag(twit, Subvolume)) {
-        const bool isold = twitFlag(twit, OldLayout);
         const bool isdrive = twitFlag(twit, Drive);
+        bool isold = twitFlag(twit, OldLayout);
         bool islocked = true;
-        if (isdrive) islocked = drvitIsLocked(twit);
+        if (isdrive) {
+            islocked = drvitIsLocked(twit);
+            if (twit->childCount() <= 0) isold = false;
+        }
         gui.pushPartClear->setEnabled(!islocked);
         gui.pushPartRemove->setEnabled(!isold && !isdrive);
         // Only allow adding partitions if there is enough space.
