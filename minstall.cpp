@@ -2009,11 +2009,10 @@ void MInstall::updatePartitionWidgets(bool all)
     // Partition tree.
     partman.populate();
     // Partition slider.
-    setupPartitionSlider(true);
+    setupPartitionSlider();
 }
-void MInstall::setupPartitionSlider(bool initial)
+void MInstall::setupPartitionSlider()
 {
-    if(initial) boxSliderPart->setDisabled(true);
     // Allow the slider labels to fit all possible formatted sizes.
     const QString &strMB = sliderSizeString(1072693248) + '\n'; // "1,023 GB"
     const QFontMetrics &fmetrics = labelSliderRoot->fontMetrics();
@@ -2024,7 +2023,7 @@ void MInstall::setupPartitionSlider(bool initial)
     labelSliderRoot->setText("----");
     labelSliderHome->setText("----");
     // Snap the slider to the legal range.
-    on_sliderPart_valueChanged(initial ? -1 : sliderPart->value());
+    on_sliderPart_valueChanged(sliderPart->value());
 }
 
 void MInstall::buildServiceList()
@@ -2088,7 +2087,7 @@ void MInstall::changeEvent(QEvent *event)
         col.setAlpha(200);
         pal.setColor(QPalette::Base, col);
         textHelp->setPalette(pal);
-        setupPartitionSlider(false);
+        setupPartitionSlider();
         resizeEvent(nullptr);
     }
 }
@@ -2382,27 +2381,19 @@ void MInstall::on_sliderPart_valueChanged(int value)
     if (!available) return;
     const long long roundUp = available - 1;
     const long long rootMinMB = (partman.rootSpaceNeeded + 1048575) / 1048576;
+    const long long homeMinMB = 16; // 16MB for basic profile and setup files
     const long long rootRecMB = (4 * rootMinMB) + ROOT_BUFFER; // (Root + snapshot [squashfs+ISO] + backup) + buffer
-    const long long homeRecMB = 16 + HOME_BUFFER; // 16MB for basic profile and setup files + buffer
+    const long long homeRecMB = homeMinMB + HOME_BUFFER;
     const int minPercent = ((rootMinMB * 100) + roundUp) / available;
+    const int maxPercent = 100 - (((homeMinMB * 100) + roundUp) / available);
     const int recPercentMin = ((rootRecMB * 100) + roundUp) / available; // Recommended root size.
-    const int recPercentMax = 99 - ((homeRecMB * 100) / available); // Recommended minimum home.
-    int origValue = value;
-    if (value<0) { // Internal setup.
-        origValue = value = sliderPart->value();
-        boxSliderPart->setEnabled(true);
-        // 64GB cap on the default slider value, rounded to nearest percentage.
-        const int rootPortionMax = ((65536*100) + (available/2)) / available;
-        // Caps based on disk capacity and recommendations.
-        if (value > rootPortionMax) value = rootPortionMax;
-        if (value < recPercentMin) value = recPercentMin;
-        if (value > 50) value = 100;
-        if (value > recPercentMax) value = 100;
-    } else if (value<minPercent) {
-        if (value>=0) qApp->beep();
-        value = minPercent;
-    }
+    const int recPercentMax = 100 - (((homeRecMB * 100) + roundUp) / available); // Recommended minimum home.
+
+    const int origValue = value;
+    if (value < minPercent) value = minPercent;
+    else if (value > maxPercent) value = 100;
     if (value != origValue) {
+        qApp->beep();
         sliderPart->blockSignals(true);
         sliderPart->setValue(value);
         sliderPart->blockSignals(false);
