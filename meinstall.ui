@@ -532,7 +532,7 @@
                        <number>100</number>
                       </property>
                       <property name="sliderPosition">
-                       <number>20</number>
+                       <number>100</number>
                       </property>
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>

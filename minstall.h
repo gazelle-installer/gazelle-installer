@@ -192,7 +192,7 @@ private:
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets(bool all);
     void updatePartitionCombos(QComboBox *changed);
-    void setupPartitionSlider(bool initial);
+    void setupPartitionSlider();
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int space, long steps);
     bool saveHomeBasic();
