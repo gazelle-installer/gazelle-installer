@@ -1605,14 +1605,11 @@ void MInstall::pageDisplayed(int next)
             + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(tminroot, trecroot) + "</p>"
             "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
             "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
-            + tr("On large drives, the default regular install results in separate root and home partitions."
-                " The slider allows you to control how much space is allocated to each partition.") + "</p>"
+            + tr("The drive can be divided into separate system (root) and user data (home) partitions using the slider.") + "</p>"
+            "<p>" + tr("The <b>root</b> partition will contain the operating system and applications.") + "<br/>"
+            + tr("The <b>home</b> partition will contain the data of all users, such as their settings, files, documents, pictures, music, videos, etc.") + "</p>"
             "<p>" + tr("Move the slider to the right to increase the space for <b>root</b>. Move it to the left to increase the space for <b>home</b>.") + "<br/>"
             + tr("Move the slider all the way to the right if you want both root and home on the same partition.") + "</p>"
-            "<p>" + tr("If you plan to install many applications, or large applications such as graphics, audio"
-                " and video editing packages, you probably want a larger <b>root</b> partition.") + "<br/>"
-            + tr("If you are storing large quantity of data, or this computer is being"
-                " used by many users, you may want a larger <b>home</b> partition.") + "</p>"
             "<p>" + tr("Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier."
                 " This can also improve overall performance by constraining the system files to a defined portion of the drive.") + "</p>"
             "<p><b>" + tr("Encryption") + "</b><br/>"
@@ -1641,8 +1638,15 @@ void MInstall::pageDisplayed(int next)
             "<p>" + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"
             "<p>" + tr("<i>Size</i> - The size of the partition. This can only be changed on a new layout.") + "</p>"
             "<p>" + tr("<i>Label</i> - The label that is assigned to the partition once it has been formatted.") + "</p>"
-            "<p>" + tr("<i>Use For</i> - To use this partition in an installation, you must select something here."
-                " You can also type your own mount point, which must start with a slash (\"/\").") + "</p>"
+            "<p>" + tr("<i>Use For</i> - To use this partition in an installation, you must select something here.") + "<br/>"
+            " - " + tr("Format - Format without mounting.") + "<br/>"
+            " - " + tr("EFI - EFI System Partition.") + "<br/>"
+            " - " + tr("boot - Boot manager (/boot).") + "<br/>"
+            " - " + tr("root - System root (/).") + "<br/>"
+            " - " + tr("swap - Swap space.") + "<br/>"
+            " - " + tr("home - User data (/home).") + "<br/>"
+            + tr("In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (\"/\").") + "<br/>"
+            + tr("The installer treats \"/boot\", \"/\", and \"/home\" exactly the same as \"boot\", \"root\", and \"home\", respectively.") + "</p>"
             "<p>" + tr("<i>Encrypt</i> - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.") + "</p>"
             "<p>" + tr("<i>Format</i> - This is the partition's format. Available formats depend on what the partition is used for."
                 " When working with an existing layout, you may be able to preserve the format of the partition by selecting <b>Preserve</b>.") + "</p>"
@@ -2356,9 +2360,10 @@ void MInstall::on_comboDisk_currentIndexChanged(int)
 
 void MInstall::on_sliderPart_sliderPressed()
 {
-    QString tipText(tr("%1% root") + '\n' + tr("%2% home"));
+    QString tipText(tr("%1% root\n%2% home"));
     const int val = sliderPart->value();
-    if (val<1) tipText = tipText.arg(">0", "<100");
+    if (val==100) tipText = tr("Combined root and home");
+    else if (val<1) tipText = tipText.arg(">0", "<100");
     else tipText = tipText.arg(val).arg(100-val);
     sliderPart->setToolTip(tipText);
     if (sliderPart->isSliderDown()) QToolTip::showText(QCursor::pos(), tipText, sliderPart);
