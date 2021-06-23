@@ -710,7 +710,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         if (mode == ConfigSave) {
             config->setValue("Timezone", comboTimeZone->currentData().toString());
         } else {
-            QVariant def(QString(QTimeZone::systemTimeZoneId()));
+            QVariant def = QString(QTimeZone::systemTimeZoneId());
             const int rc = selectTimeZone(config->value("Timezone", def).toString());
             if (rc == 1) config->markBadWidget(comboTimeArea);
             else if (rc == 2) config->markBadWidget(comboTimeZone);
