@@ -1,21 +1,21 @@
-//
-//  Copyright (C) 2003-2010 by Warren Woodford
-//  Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
-//  Heavily revised by dolphin oracle, adrian, and anticaptialista 2018.
-//  additional mount and compression oftions for btrfs by rob 2018
-//  Major GUI update and user experience improvements by AK-47 2019.
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
-//
-//       http://www.apache.org/licenses/LICENSE-2.0
-//
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
-//
+/****************************************************************************
+ *  Copyright (C) 2003-2010 by Warren Woodford
+ *  Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
+ *  Heavily revised by dolphin oracle, adrian, and anticaptialista 2018.
+ *  additional mount and compression oftions for btrfs by rob 2018
+ *  Major GUI update and user experience improvements by AK-47 2019.
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ ****************************************************************************/
 
 #include <cstdlib>
 #include <QDebug>
@@ -106,9 +106,9 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     QString link_block;
     settings.beginGroup("LINKS");
     QStringList links = settings.childKeys();
-    for (const QString &link : links) {
+    for (const QString &link : links)
         link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + settings.value(link).toString();
-    }
+
     settings.endGroup();
 
     // set some distro-centric text
@@ -140,15 +140,13 @@ void MInstall::startup()
 
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
-        if (QFile::exists("/etc/service") && QFile::exists("/lib/runit/runit-init")){
+        if (QFile::exists("/etc/service") && QFile::exists("/lib/runit/runit-init"))
             containsRunit = true;
-        }
         checkSaveDesktop->hide();
     } else {
         containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
-        if (QFile::exists("/live/aufs/etc/service") && QFile::exists("/live/aufs/sbin/runit")){
+        if (QFile::exists("/live/aufs/etc/service") && QFile::exists("/live/aufs/sbin/runit"))
             containsRunit = true;
-        }
 
         rootSources = "/live/aufs/bin /live/aufs/dev"
                       " /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt"
@@ -177,9 +175,9 @@ void MInstall::startup()
         qDebug() << "linuxfs file is at : " << SQFILE_FULL;
         long long compression_factor;
         QString linuxfs_compression_type = "xz"; //default conservative
-        if (QFileInfo::exists(SQFILE_FULL)) {
+        if (QFileInfo::exists(SQFILE_FULL))
             linuxfs_compression_type = proc.execOut("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none 2>/dev/null | od -An -tdI");
-        }
+
         // gzip, xz, or lz4
         switch (linuxfs_compression_type.toInt()) {
             case 1: // gzip
@@ -397,16 +395,15 @@ void MInstall::setupAutoMount(bool enabled)
             // Use systemctl to prevent automount by masking currently unmasked mount points
             listMaskedMounts = proc.execOutLines("systemctl list-units --full --all -t mount --no-legend 2>/dev/null | grep -v masked | cut -f1 -d' '"
                 " | egrep -v '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'").join(' ');
-            if (!listMaskedMounts.isEmpty()) {
+            if (!listMaskedMounts.isEmpty())
                 proc.exec("systemctl --runtime mask --quiet -- " + listMaskedMounts);
-            }
         }
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
         proc.mkpath("/run/udev/rules.d");
-        for (const QString &rule : udev_temp_mdadm_rules) {
+        for (const QString &rule : udev_temp_mdadm_rules)
             proc.exec("touch " + rule);
-        }
+
         if (udisksd_running) {
             proc.exec("echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/91-mx-udisks-inhibit.rules");
             proc.exec("udevadm control --reload");
@@ -421,9 +418,9 @@ void MInstall::setupAutoMount(bool enabled)
             proc.sleep(1000);
         }
         // clear the rules that were temporarily overridden
-        for (const QString &rule : udev_temp_mdadm_rules) {
+        for (const QString &rule : udev_temp_mdadm_rules)
             proc.exec("rm -f " + rule);
-        }
+
         // Use systemctl to restore that status of any mount points changed above
         if (have_sysctl && !listMaskedMounts.isEmpty()) {
             proc.exec("systemctl --runtime unmask --quiet -- $MOUNTLIST");
@@ -450,9 +447,8 @@ bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtex
 QString MInstall::sliderSizeString(long long size)
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
-    if (strout.length()>6) {
+    if (strout.length() > 6)
         return QLocale::system().formattedDataSize(size, 0, QLocale::DataSizeTraditionalFormat);
-    }
     return strout;
 }
 
@@ -461,9 +457,8 @@ void MInstall::updateCursor(const Qt::CursorShape shape)
     if (shape != Qt::ArrowCursor) {
         qApp->setOverrideCursor(QCursor(shape));
     } else {
-        while (qApp->overrideCursor() != nullptr) {
+        while (qApp->overrideCursor() != nullptr)
             qApp->restoreOverrideCursor();
-        }
     }
     qApp->processEvents();
 }
@@ -844,9 +839,8 @@ bool MInstall::installLinux()
     disablehiberanteinitramfs();
 
     //remove home unless a demo home is found in remastered linuxfs
-    if (!isRemasteredDemoPresent) {
+    if (!isRemasteredDemoPresent)
         proc.exec("/bin/rm -rf /mnt/antiX/home/demo");
-    }
 
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
     // not sure if this is still needed with the live-to-installed change but OK
@@ -856,9 +850,8 @@ bool MInstall::installLinux()
     }
 
     // guess localtime vs UTC
-    if (proc.execOut("guess-hwclock") == "localtime") {
+    if (proc.execOut("guess-hwclock") == "localtime")
         checkLocalClock->setChecked(true);
-    }
 
     return true;
 }
@@ -931,9 +924,8 @@ bool MInstall::installLoader()
     QString val = proc.execOut("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
     // the old initrd is not valid for this hardware
-    if (!val.isEmpty()) {
+    if (!val.isEmpty())
         proc.exec("/bin/rm -f /mnt/antiX/boot/" + val);
-    }
 
     bool efivarfs = QFileInfo("/sys/firmware/efi/efivars").isDir();
     bool efivarfs_mounted = false;
@@ -946,9 +938,8 @@ bool MInstall::installLoader()
             file.close();
         }
     }
-    if (efivarfs && !efivarfs_mounted) {
+    if (efivarfs && !efivarfs_mounted)
         proc.exec("/bin/mount -t efivarfs efivarfs /sys/firmware/efi/efivars", true);
-    }
 
     if (!checkBoot->isChecked()) {
         // skip it
@@ -1002,9 +993,8 @@ bool MInstall::installLoader()
         proc.exec("/bin/umount -R /mnt/antiX/proc", true);
         proc.exec("/bin/umount -R /mnt/antiX/sys", true);
         proc.exec("/bin/umount -R /mnt/antiX/dev", true);
-        if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
+        if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true))
             proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
-        }
         return false;
     }
 
@@ -1054,11 +1044,10 @@ bool MInstall::installLoader()
 
     if (uefi) {
         mkdir("/mnt/antiX/boot/uefi-mt", 0755);
-        if (arch == "i386") {
+        if (arch == "i386")
             proc.exec("/bin/cp /live/boot-dev/boot/uefi-mt/mtest-32.efi /mnt/antiX/boot/uefi-mt", true);
-        } else {
+        else
             proc.exec("/bin/cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt", true);
-        }
     }
     proc.status();
 
@@ -1081,9 +1070,8 @@ bool MInstall::installLoader()
     proc.exec("/bin/umount -R /mnt/antiX/sys", true);
     proc.exec("/bin/umount -R /mnt/antiX/dev", true);
 
-    if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true)) {
+    if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true))
         proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
-    }
 
     return true;
 }
@@ -1092,17 +1080,15 @@ bool MInstall::installLoader()
 void MInstall::enableOOBE()
 {
     QTreeWidgetItemIterator it(treeServices);
-    for (; *it; ++it) {
+    for (; *it; ++it)
         if ((*it)->parent()) setService((*it)->text(0), false); // Speed up the OOBE boot.
-    }
     proc.exec("chroot /mnt/antiX/ update-rc.d oobe defaults", true);
 }
 bool MInstall::processOOBE()
 {
     QTreeWidgetItemIterator it(treeServices);
-    for (; *it; ++it) {
+    for (; *it; ++it)
         if ((*it)->parent()) setService((*it)->text(0), (*it)->checkState(0) == Qt::Checked);
-    }
 
     if (!setComputerName()) return false;
     setLocale();
@@ -1198,9 +1184,8 @@ bool MInstall::setUserInfo()
         if (radioOldHomeSave->isChecked()) {
             bool ok = false;
             QString cmd = QString("/bin/mv -f %1 %1.00%2").arg(dpath);
-            for (int ixi = 1; ixi < 10 && !ok; ++ixi) {
+            for (int ixi = 1; ixi < 10 && !ok; ++ixi)
                 ok = proc.exec(cmd.arg(ixi));
-            }
             if (!ok) {
                 failUI(tr("Failed to save old home directory."));
                 return false;
@@ -1280,9 +1265,8 @@ bool MInstall::setUserInfo()
     // FIX for MX-19 and earlier: Ensure graphical sudo works with password-free root.
     if (rootPass.isEmpty()) {
         QFile file(rootpath + "/etc/polkit-1/localauthority.conf.d/55-tweak-override.conf");
-        if (file.open(QIODevice::WriteOnly)) {
+        if (file.open(QIODevice::WriteOnly))
             QTextStream(&file) << "[Configuration]\nAdminIdentities=unix-group:sudo";
-        }
         file.close();
     }
 
@@ -1391,11 +1375,10 @@ void MInstall::setLocale()
     proc.exec(cmd, false);
 
     // Set clock to use LOCAL
-    if (checkLocalClock->isChecked()) {
+    if (checkLocalClock->isChecked())
         proc.exec("echo '0.0 0 0.0\n0\nLOCAL' > /etc/adjtime", false);
-    } else {
+    else
         proc.exec("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime", false);
-    }
     proc.exec("hwclock --hctosys");
     if (!oobe) {
         proc.exec("/bin/cp -f /etc/adjtime /mnt/antiX/etc/");
@@ -1446,9 +1429,8 @@ void MInstall::stashServices(bool save)
 {
     QTreeWidgetItemIterator it(treeServices);
     while (*it) {
-        if ((*it)->parent() != nullptr) {
+        if ((*it)->parent() != nullptr)
             (*it)->setCheckState(save?2:0, (*it)->checkState(save?0:2));
-        }
         ++it;
     }
 }
@@ -1463,9 +1445,8 @@ void MInstall::setService(const QString &service, bool enabled)
     }
     if (enabled) {
         proc.exec(chroot + "update-rc.d " + service + " defaults");
-        if (containsSystemD) {
+        if (containsSystemD)
             proc.exec(chroot + "systemctl enable " + service);
-        }
         if (containsRunit) {
             QFile::remove(rootpath+"/etc/sv/" + service + "/down");
             if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
@@ -1501,9 +1482,8 @@ void MInstall::failUI(const QString &msg)
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
 {
-    if (next == 4 && ixPageRefAdvancedFDE != 0) { // at pageCrypto
+    if (next == 4 && ixPageRefAdvancedFDE != 0) // at pageCrypto
         return next;
-    }
 
     if (next == 3 && curr == 2) { // at pageDisk (forward)
         if (radioEntireDisk->isChecked()) {
@@ -1559,20 +1539,17 @@ int MInstall::showPage(int curr, int next)
     } else if (next == 6 && curr == 7) { // at pageNetwork (backward)
         return next - 1; // skip Services screen
     } else if (next == 9 && curr == 8) { // at pageLocalization (forward)
-        if (!pretend && haveSnapshotUserAccounts) {
+        if (!pretend && haveSnapshotUserAccounts)
             return 11; // skip pageUserAccounts and go to pageProgress
-        }
     } else if (next == 9 && curr == 10) { // at pageOldHome (backward)
-        if (!pretend && haveSnapshotUserAccounts) {
+        if (!pretend && haveSnapshotUserAccounts)
             return 8; // skip pageUserAccounts and go to pageLocalization
-        }
     } else if (next == 10 && curr == 11) { // at pageProgress (backward)
         if (oem) return 5; // go back to pageBoot
         if (!haveOldHome) {
             // skip pageOldHome
-            if (!pretend && haveSnapshotUserAccounts) {
+            if (!pretend && haveSnapshotUserAccounts)
                 return 8; // go to pageLocalization
-            }
             return 9; // go to pageUserAccounts
         }
     } else if (curr == 6) { // at pageServices
@@ -1772,7 +1749,6 @@ void MInstall::pageDisplayed(int next)
             manageConfig(ConfigLoadB);
         }
         return; // avoid the end that enables both Back and Next buttons
-        break;
 
     case 6: // set services
         textHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
@@ -1823,7 +1799,6 @@ void MInstall::pageDisplayed(int next)
         pushBack->setEnabled(true);
         userPassValidationChanged();
         return; // avoid the end that enables both Back and Next buttons
-        break;
 
     case 10: // deal with an old home directory
         textHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
@@ -1868,7 +1843,6 @@ void MInstall::pageDisplayed(int next)
         pushBack->setEnabled(true);
         pushNext->setEnabled(false);
         return; // avoid enabling both Back and Next buttons at the end
-        break;
 
     case 12: // done
         pushClose->setEnabled(false);
@@ -2046,9 +2020,8 @@ void MInstall::buildServiceList()
         QStringList list = services_desc.value(service + lang_str).toStringList();
         if (list.size() != 2) {
             list = services_desc.value(service).toStringList(); // Use English definition
-            if (list.size() != 2) {
+            if (list.size() != 2)
                 continue;
-            }
         }
         QString category, description;
         category = list.at(0);
@@ -2274,9 +2247,8 @@ void MInstall::on_progInstall_valueChanged(int value)
     ixTip = tipcount;
     if (ixTipStart < tipcount) {
         int imax = (progInstall->maximum() - iLastProgress) / (tipcount - ixTipStart);
-        if (imax != 0) {
+        if (imax != 0)
             ixTip = ixTipStart + (value - iLastProgress) / imax;
-        }
     }
 
     switch(ixTip)
@@ -2448,7 +2420,7 @@ void MInstall::on_radioCustomPart_clicked(bool checked)
 void MInstall::on_pushLoadKey_clicked()
 {
     pushLoadKey->setEnabled(false);
-    if (key.length()<=0) {
+    if (key.length() <= 0) {
         QFileDialog dialog(this, "Select Key Material", "/mnt/antiX/root");
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
         dialog.setFileMode(QFileDialog::ExistingFile);
@@ -2456,7 +2428,7 @@ void MInstall::on_pushLoadKey_clicked()
         updateCursor(Qt::BusyCursor);
         if (rc) {
             const QStringList &files = dialog.selectedFiles();
-            if (files.count()==1) key.load(files.at(0).toUtf8().constData(), -1);
+            if (files.count() == 1) key.load(files.at(0).toUtf8().constData(), -1);
         }
     } else {
         const int ans = QMessageBox::question(this, windowTitle(),
