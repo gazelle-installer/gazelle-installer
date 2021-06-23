@@ -46,7 +46,7 @@ void MPassEdit::setup(MPassEdit *slave, QProgressBar *meter,
     disconnect(slave);
     connect(this, &QLineEdit::textChanged, this, &MPassEdit::masterTextChanged);
     connect(slave, &QLineEdit::textChanged, this, &MPassEdit::slaveTextChanged);
-    if (min==0) lastValid = true; // Control starts with no text
+    if (min == 0) lastValid = true; // Control starts with no text
     generate(); // Pre-load the generator
     if (meter) {
         meter->setRange(0, 100);
@@ -65,15 +65,15 @@ void MPassEdit::generate()
             while (!file.atEnd()) words.append(file.readLine().trimmed());
             file.close();
         } else {
-            words << "tuls"<<"tihs"<<"yssup"<<"ssip"<<"kcuf"<<"gaf"<<"ehcuod"<<"kcid";
-            words << "nmad"<<"tnuc"<<"parc"<<"kcoc"<<"hctib"<<"dratsab"<<"elohssa";
+            words << "tuls" << "tihs" << "yssup" << "ssip" << "kcuf" << "gaf" << "ehcuod" << "kcid";
+            words << "nmad" << "tnuc" << "parc" << "kcoc" << "hctib" << "dratsab" << "elohssa";
         }
         std::srand(unsigned(std::time(0)));
         pos = words.count();
     }
     genText.clear();
     do {
-        if (pos>=words.count()) {
+        if (pos >= words.count()) {
             std::random_shuffle(words.begin(), words.end());
             pos = 0;
         }
@@ -84,7 +84,7 @@ void MPassEdit::generate()
         }
         ++pos;
     } while (genText.length() <= genMin);
-    genText.append(QString::number(std::rand()%10));
+    genText.append(QString::number(std::rand() % 10));
 }
 
 void MPassEdit::contextMenuEvent(QContextMenuEvent *event)
@@ -97,7 +97,7 @@ void MPassEdit::contextMenuEvent(QContextMenuEvent *event)
         actGenPass = menu->addAction(tr("Use password") + ": " + genText);
     }
     const QAction *action = menu->exec(event->globalPos());
-    if (actGenPass && action==actGenPass) {
+    if (actGenPass && action == actGenPass) {
         setText(genText);
         slave->setText(genText);
     }
@@ -109,7 +109,7 @@ void MPassEdit::masterTextChanged()
     slave->clear();
     setPalette(QApplication::palette());
     slave->setPalette(QApplication::palette());
-    const bool valid = (text().isEmpty() && min==0);
+    const bool valid = (text().isEmpty() && min == 0);
     if (meter) {
         int score = 0;
         const QString &t = text();
@@ -118,28 +118,28 @@ void MPassEdit::masterTextChanged()
             unsigned int cats = 0;
             QChar oldchar = '\0';
             for (const QChar &c : t) {
-                if (oldchar!=c) {
+                if (oldchar != c) {
                     ++changes;
                     oldchar = c;
                 }
-                if (c.isUpper()) cats|=1;
-                else if (c.isLower()) cats|=2;
-                else if (c.isSpace()) cats|=4;
-                else if (c.isPunct()) cats|=8;
-                else cats|=16;
+                if (c.isUpper()) cats |= 1;
+                else if (c.isLower()) cats |= 2;
+                else if (c.isSpace()) cats |= 4;
+                else if (c.isPunct()) cats |= 8;
+                else cats |= 16;
             }
             int textLen = t.length();
-            changes = (changes*14) / textLen;
-            for (int ixi=0; ixi<5; ++ixi) {
-                score += (cats&1)*changes;
-                cats>>=1;
+            changes = (changes * 14) / textLen;
+            for (int i = 0; i < 5; ++i) {
+                score += (cats&1) * changes;
+                cats >>= 1;
             }
-            score += textLen<=30 ? textLen : 30;
+            score += textLen <= 30 ? textLen : 30;
         }
         meter->setValue(score);
         QPalette pal = meter->palette();
-        score = (255*score)/100;
-        pal.setColor(QPalette::Highlight, QColor(255-score, score, 0, 70));
+        score = (255 * score) / 100;
+        pal.setColor(QPalette::Highlight, QColor(255 - score, score, 0, 70));
         meter->setPalette(pal);
     }
     if (valid != lastValid) {
