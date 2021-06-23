@@ -298,7 +298,7 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
         gui.treePartitions->setItemWidget(partit, Size, spinSize);
         spinSize->setFocusPolicy(Qt::StrongFocus);
         spinSize->installEventFilter(this);
-        const int maxMB = (int)twitSize(partit->parent()) - PARTMAN_SAFETY_MB;
+        const int maxMB = static_cast<int>(twitSize(partit->parent()) - PARTMAN_SAFETY_MB);
         spinSize->setRange(1, maxMB);
         spinSize->setProperty("row", QVariant::fromValue<void *>(partit));
         spinSize->setSuffix("MB");
@@ -436,7 +436,7 @@ void PartMan::spinSizeValueChange(int i)
     if (i > maxMB) spin->setValue(maxMB);
     // No setStepType() in Debian Buster.
     int stepval = 1;
-    for (int ixi=1; ixi<=(i/10); ixi*=10) stepval = ixi;
+    for (int ixi = 1; ixi <= (i / 10); ixi *= 10) stepval = ixi;
     spin->setSingleStep(stepval);
     gui.pushPartAdd->setEnabled(i < maxMB);
     spin->blockSignals(false);
@@ -1365,7 +1365,7 @@ int PartMan::layoutDefault(QTreeWidgetItem *drvit,
     if (rootPercent<0) rootPercent = gui.sliderPart->value();
     if (updateTree) drvitClear(drvit);
     const long long driveSize = twitSize(drvit);
-    int rootFormatSize = driveSize - PARTMAN_SAFETY_MB;
+    int rootFormatSize = static_cast<int>(driveSize - PARTMAN_SAFETY_MB);
 
     // Boot partitions.
     if (uefi) {
@@ -1375,8 +1375,8 @@ int PartMan::layoutDefault(QTreeWidgetItem *drvit,
         if (updateTree) addItem(drvit, 1, "BIOS-GRUB", crypto);
         rootFormatSize -= 1;
     }
-    int rootMinMB = rootSpaceNeeded / 1048576;
-    const int bootMinMB = bootSpaceNeeded / 1048576;
+    int rootMinMB = static_cast<int>(rootSpaceNeeded / 1048576);
+    const int bootMinMB = static_cast<int>(bootSpaceNeeded / 1048576);
     if (!crypto) rootMinMB += bootMinMB;
     else {
         int bootFormatSize = 512;
@@ -1388,9 +1388,9 @@ int PartMan::layoutDefault(QTreeWidgetItem *drvit,
     int swapFormatSize = rootFormatSize-rootMinMB;
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) != 0) sinfo.totalram = 2048;
-    else sinfo.totalram = (sinfo.totalram / (1048576*2)) * 3; // 1.5xRAM
-    sinfo.totalram/=128; ++sinfo.totalram; sinfo.totalram*=128; // Multiple of 128MB
-    if (swapFormatSize > (int)sinfo.totalram) swapFormatSize = sinfo.totalram;
+    else sinfo.totalram = (sinfo.totalram / (1048576 * 2)) * 3; // 1.5xRAM
+    sinfo.totalram /= 128; ++sinfo.totalram; sinfo.totalram *= 128; // Multiple of 128MB
+    if (swapFormatSize > static_cast<int>(sinfo.totalram)) swapFormatSize = sinfo.totalram;
     int swapMaxMB = rootFormatSize/(20*128); ++swapMaxMB; swapMaxMB*=128; // 5% root
     if (swapMaxMB > 8192) swapMaxMB = 8192; // 8GB cap for the whole calculation.
     if (swapFormatSize > swapMaxMB) swapFormatSize = swapMaxMB;
