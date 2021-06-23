@@ -68,7 +68,7 @@ void MPassEdit::generate()
             words << "tuls" << "tihs" << "yssup" << "ssip" << "kcuf" << "gaf" << "ehcuod" << "kcid";
             words << "nmad" << "tnuc" << "parc" << "kcoc" << "hctib" << "dratsab" << "elohssa";
         }
-        std::srand(unsigned(std::time(0)));
+        std::srand(unsigned(std::time(nullptr)));
         pos = words.count();
     }
     genText.clear();
@@ -115,7 +115,7 @@ void MPassEdit::masterTextChanged()
         const QString &t = text();
         if (!t.isEmpty()) {
             int changes = 0;
-            unsigned int cats = 0;
+            int cats = 0;
             QChar oldchar = '\0';
             for (const QChar &c : t) {
                 if (oldchar != c) {
