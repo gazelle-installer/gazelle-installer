@@ -167,7 +167,7 @@ void MProcess::status(long progress)
     int slice = progSliceSpace;
     if (progSliceSteps > 0) {
         if (progSlicePos > progSliceSteps) progSlicePos = progSliceSteps;
-        slice = (progSlicePos * progSliceSpace) / progSliceSteps;
+        slice = static_cast<int>((progSlicePos * progSliceSpace) / progSliceSteps);
     }
     if (progBar) progBar->setValue(progSliceStart + slice);
     qApp->processEvents();
