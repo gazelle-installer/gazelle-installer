@@ -975,12 +975,7 @@ bool MInstall::installLoader()
         proc.exec(mount);
         // rename arch to match grub-install target
         arch = proc.execOut("cat /sys/firmware/efi/fw_platform_size");
-        if (arch == "32") {
-            arch = "i386";
-        } else if (arch == "64") {
-            arch = "x86_64";
-        }
-
+        arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
         cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
     }
 
