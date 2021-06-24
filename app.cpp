@@ -84,16 +84,12 @@ int main(int argc, char *argv[])
 
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
 
-    // Set the logging files
     const QString logFileName("/var/log/minstall.log");
     logFile.reset(new QFile(logFileName));
-    // Open the file logging
-    if (logFile.data()->open(QFile::Append | QFile::Text)) {
-        // Set handler
+    if (logFile.data()->open(QFile::Append | QFile::Text))
         qInstallMessageHandler(messageHandler);
-    } else {
+    else
         qDebug() << "Cannot write to installer log:" << logFileName;
-    }
 
     QTranslator qtTran;
     if (qtTran.load(QLocale::system(), "qt", "_", QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
@@ -135,7 +131,7 @@ int main(int argc, char *argv[])
     MInstall minstall(parser, cfgfile);
     const QRect &geo = a.desktop()->availableGeometry(&minstall);
     if (parser.isSet("oobe")) minstall.setGeometry(geo);
-    else minstall.move((geo.width()-minstall.width())/2, (geo.height()-minstall.height())/2);
+    else minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
     minstall.show();
     return a.exec();
 }

@@ -45,7 +45,7 @@ bool SafeCache::load(const char *filename, int length)
     if (fstat(fd, &statbuf) == 0) {
         if (statbuf.st_size > 0 && (length < 0 || length > statbuf.st_size)) {
             if (statbuf.st_size > capacity()) length = capacity();
-            else length = statbuf.st_size;
+            else length = static_cast<int>(statbuf.st_size);
         }
     }
     if (length >= 0) resize(length);
@@ -54,7 +54,7 @@ bool SafeCache::load(const char *filename, int length)
     length = size();
     int remain = length;
     while (remain > 0) {
-        ssize_t chunk = read(fd, data() + (length - remain), remain);
+        ssize_t chunk = read(fd, data() + (length - remain), static_cast<size_t>(remain));
         if (chunk < 0) goto ending;
         remain -= chunk;
         fsync(fd);
@@ -69,9 +69,9 @@ bool SafeCache::load(const char *filename, int length)
 bool SafeCache::save(const char *filename, mode_t mode)
 {
     bool ok = false;
-    int fd = open(filename, O_CREAT|O_TRUNC|O_WRONLY, mode);
+    int fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY, mode);
     if (fd == -1) return false;
-    if (write(fd, constData(), size()) == size()) goto ending;
+    if (write(fd, constData(), static_cast<size_t>(size())) == size()) goto ending;
     if (fchmod(fd, mode) != 0) goto ending;
     ok = true;
 
