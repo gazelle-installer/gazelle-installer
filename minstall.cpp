@@ -2226,9 +2226,8 @@ void MInstall::cleanup(bool endclean)
 
 void MInstall::on_progInstall_valueChanged(int value)
 {
-    if (ixTipStart < 0 || widgetStack->currentWidget() != pageProgress) {
+    if (ixTipStart < 0 || widgetStack->currentWidget() != pageProgress)
         return; // no point displaying a new hint if it will be invisible
-    }
 
     const int tipcount = 6;
     ixTip = tipcount;
@@ -2538,7 +2537,7 @@ void MInstall::on_spinCryptoKeySize_valueChanged(int i)
         entered = true;
         int iSingleStep = spinCryptoKeySize->singleStep();
         int iMod = i % iSingleStep;
-        if (iMod) spinCryptoKeySize->setValue(i + (iSingleStep-iMod));
+        if (iMod) spinCryptoKeySize->setValue(i + (iSingleStep - iMod));
     }
 }
 
