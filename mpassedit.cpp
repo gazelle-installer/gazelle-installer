@@ -154,7 +154,7 @@ void MPassEdit::slaveTextChanged(const QString &slaveText)
     bool valid = true;
     if (slaveText == text()) {
         QColor col(255, 255, 0, 40);
-        if (slaveText.length()>=min) col.setRgb(0, 255, 0, 40);
+        if (slaveText.length() >= min) col.setRgb(0, 255, 0, 40);
         else valid = false;
         pal.setColor(QPalette::Base, col);
     } else {
