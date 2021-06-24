@@ -37,6 +37,7 @@ QStringList BlockDeviceInfo::split(const QString &devname)
     if (!list.isEmpty()) list.removeFirst();
     return list;
 }
+
 QString BlockDeviceInfo::join(const QString &drive, int partnum)
 {
     QString name = drive;

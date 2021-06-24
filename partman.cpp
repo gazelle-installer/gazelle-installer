@@ -231,7 +231,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 config.setValue("Encrypt", partit->checkState(Encrypt) == Qt::Checked);
                 if (twitFlag(partit, SetBoot)) config.setValue("Boot", true);
             } else if (!drvPreserve && config.contains("Size")) {
-                const int size = config.value("Size").toLongLong() / 1048576;
+                const int size = static_cast<int>(config.value("Size").toLongLong() / 1048576);
                 totalMB += size;
                 QSpinBox *spinSize = twitSpinBox(partit, Size);
                 spinSize->setValue(size);
@@ -608,9 +608,8 @@ void PartMan::comboSubvolUseTextChange(const QString &text)
         editLabel->setText(newLabel);
     }
     QTreeWidgetItem *partit = svit->parent();
-    if (!twitFlag(partit, VirtualBD) && (usetext == "/boot" || usetext == "/")) {
+    if (!twitFlag(partit, VirtualBD) && (usetext == "/boot" || usetext == "/"))
         drvitAutoSetBoot(partit->parent());
-    }
     gui.treePartitions->blockSignals(false);
 }
 
@@ -648,9 +647,8 @@ void PartMan::treeItemChange(QTreeWidgetItem *twit, int column)
             QTreeWidgetItem *exclude = (csCrypto == Qt::PartiallyChecked) ? nullptr : twit;
             // Set checkboxes and enable the crypto password controls as needed.
             if (cryptoAny) setEncryptChecks("SWAP", Qt::Checked, exclude);
-            if (twitUseFor(twit) == "/" && csCrypto == Qt::Checked) {
+            if (twitUseFor(twit) == "/" && csCrypto == Qt::Checked)
                 setEncryptChecks("/home", Qt::Checked, exclude);
-            }
             if (csCrypto == Qt::PartiallyChecked) twit->setCheckState(Encrypt, Qt::Unchecked);
         }
         // Cannot preserve if encrypting.
@@ -730,9 +728,8 @@ void PartMan::treeMenu(const QPoint &)
                 actUnlock = menu.addAction(tr("&Unlock"));
                 allowCryptTab = true;
             }
-            if (twitUseFor(twit) == "FORMAT" && twit->data(Encrypt, Qt::CheckStateRole).isValid()) {
+            if (twitUseFor(twit) == "FORMAT" && twit->data(Encrypt, Qt::CheckStateRole).isValid())
                 allowCryptTab = true;
-            }
             if (allowCryptTab) {
                 actAddCrypttab = menu.addAction(tr("Add to crypttab"));
                 actAddCrypttab->setCheckable(true);
@@ -905,10 +902,8 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
         }
         gui.boxMain->setEnabled(true);
         qApp->restoreOverrideCursor();
-        if (!ok) {
-            QMessageBox::warning(master, master->windowTitle(),
+        if (!ok) QMessageBox::warning(master, master->windowTitle(),
                 tr("Could not unlock device. Possible incorrect password."));
-        }
     }
 }
 
@@ -942,10 +937,8 @@ void PartMan::partMenuLock(QTreeWidgetItem *twit)
     gui.boxMain->setEnabled(true);
     qApp->restoreOverrideCursor();
     // If not OK then a command failed, or trying to close a non-LUKS device.
-    if (!ok) {
-        QMessageBox::critical(master, master->windowTitle(),
+    if (!ok) QMessageBox::critical(master, master->windowTitle(),
             tr("Failed to close %1").arg(dev));
-    }
 }
 
 QTreeWidgetItem *PartMan::addSubvolumeItem(QTreeWidgetItem *twit)
@@ -1043,7 +1036,7 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
     bool encryptRoot = false;
     mounts.clear();
     // Partition use and other validation
-    int mapnum=0, swapnum=0, formatnum=0;
+    int mapnum = 0, swapnum = 0, formatnum = 0;
     QTreeWidgetItemIterator it(gui.treePartitions);
     for (; *it; ++it) {
         if (twitFlag(*it, Drive) || twitFlag(*it, VirtualDevices)) continue;
@@ -1108,10 +1101,8 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
             if ((*it)->checkState(Encrypt) == Qt::Checked) {
                 if (mount == "/") mapperData = "root.fsm";
                 else if (mount.startsWith("SWAP")) mapperData = mount.toLower();
-                else {
-                    mapperData = QString::number(++mapnum)
+                else mapperData = QString::number(++mapnum)
                         + mount.replace('/','.') + ".fsm";
-                }
             }
             (*it)->setData(Device, Qt::UserRole, mapperData);
         }
@@ -1322,9 +1313,8 @@ bool PartMan::luksMake(const QString &dev, const QByteArray &password)
         + "-" + gui.comboCryptoChain->currentText();
     if (gui.comboCryptoChain->currentText() != "ECB") {
         strCipherSpec += "-" + gui.comboCryptoIVGen->currentText();
-        if (gui.comboCryptoIVGen->currentText() == "ESSIV") {
+        if (gui.comboCryptoIVGen->currentText() == "ESSIV")
             strCipherSpec += ":" + gui.comboCryptoIVHash->currentData().toString();
-        }
     }
     QString cmd = "cryptsetup --batch-mode"
         " --cipher " + strCipherSpec.toLower()
@@ -1380,7 +1370,7 @@ int PartMan::layoutDefault(QTreeWidgetItem *drvit,
     if (!crypto) rootMinMB += bootMinMB;
     else {
         int bootFormatSize = 512;
-        if (bootFormatSize < bootMinMB) bootFormatSize = bootSpaceNeeded;
+        if (bootFormatSize < bootMinMB) bootFormatSize = static_cast<int>(bootSpaceNeeded);
         if (updateTree) addItem(drvit, bootFormatSize, "boot", crypto);
         rootFormatSize -= bootFormatSize;
     }
@@ -1390,8 +1380,8 @@ int PartMan::layoutDefault(QTreeWidgetItem *drvit,
     if (sysinfo(&sinfo) != 0) sinfo.totalram = 2048;
     else sinfo.totalram = (sinfo.totalram / (1048576 * 2)) * 3; // 1.5xRAM
     sinfo.totalram /= 128; ++sinfo.totalram; sinfo.totalram *= 128; // Multiple of 128MB
-    if (swapFormatSize > static_cast<int>(sinfo.totalram)) swapFormatSize = sinfo.totalram;
-    int swapMaxMB = rootFormatSize/(20*128); ++swapMaxMB; swapMaxMB*=128; // 5% root
+    if (swapFormatSize > static_cast<int>(sinfo.totalram)) swapFormatSize = static_cast<int>(sinfo.totalram);
+    int swapMaxMB = rootFormatSize / (20 * 128); ++swapMaxMB; swapMaxMB *= 128; // 5% root
     if (swapMaxMB > 8192) swapMaxMB = 8192; // 8GB cap for the whole calculation.
     if (swapFormatSize > swapMaxMB) swapFormatSize = swapMaxMB;
     rootFormatSize -= swapFormatSize;
@@ -1569,7 +1559,7 @@ bool PartMan::formatPartitions()
         else proc.status(fmtstatus.arg(describeUse(it.first)));
         if (useFor == "ESP") {
             const QString &fmt = twitComboBox(twit, Format)->currentText();
-            if (!proc.exec("mkfs.msdos -F "+fmt.mid(3)+' '+dev)) return false;
+            if (!proc.exec("mkfs.msdos -F " + fmt.mid(3)+' '+dev)) return false;
             // Sets boot flag and ESP flag.
             const QStringList &devsplit = BlockDeviceInfo::split(dev);
             if (!proc.exec("parted -s /dev/" + devsplit.at(0)
@@ -1695,9 +1685,8 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     QMap<QString, QString> extraAdd;
     QTreeWidgetItemIterator it(gui.treePartitions);
     for (; *it; ++it) {
-        if (twitUseFor(*it).isEmpty() && twitFlag(*it, AutoCrypto)) {
+        if (twitUseFor(*it).isEmpty() && twitFlag(*it, AutoCrypto))
             extraAdd.insert((*it)->text(Device), twitMappedDevice(*it));
-        }
     }
     // File systems
     for (auto &it : mounts.toStdMap()) {
@@ -1708,9 +1697,8 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         out << twitMappedDevice(it.second, false) << " /dev/disk/by-uuid/" << uuid;
         if (noKey || it.first == keyMount) out << " none";
         else {
-            if (isNewKey) {
+            if (isNewKey)
                 if (!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
-            }
             out << ' ' << keyfile;
         }
         if (!it.first.startsWith("SWAP")) out << " luks \n";
@@ -1723,9 +1711,8 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         out << it.second << " /dev/disk/by-uuid/" << uuid;
         if (noKey) out << " none";
         else {
-            if (isNewKey) {
+            if (isNewKey)
                 if (!proc.exec(cmdAddKey.arg(it.first), true, &password)) return false;
-            }
             out << ' ' << keyfile;
         }
         out << " luks,nofail \n";
@@ -1830,9 +1817,8 @@ void PartMan::unmount()
     while (it.hasPrevious()) {
         it.previous();
         if (it.key().at(0) != '/') continue;
-        if (!it.key().startsWith("SWAP")) {
+        if (!it.key().startsWith("SWAP"))
             proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
-        }
         proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
         QTreeWidgetItem *twit = it.value();
         if (twit->checkState(Encrypt) == Qt::Checked) {
@@ -2047,9 +2033,8 @@ QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool full) 
 
 QString PartMan::twitShownDevice(QTreeWidgetItem *twit) const
 {
-    if (twitFlag(twit, Subvolume)) {
+    if (twitFlag(twit, Subvolume))
         return twit->parent()->text(Device) + '[' + twitLineEdit(twit, Label)->text() + ']';
-    }
     return twit->text(Device);
 }
 
