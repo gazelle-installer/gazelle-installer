@@ -1129,7 +1129,7 @@ bool MInstall::validateUserInfo()
         // Confirm that an empty root password is not accidental.
         const QMessageBox::StandardButton ans = QMessageBox::warning(this,
             windowTitle(), tr("You did not provide a password for the root account."
-                " Do you want to continue?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+                " Do you want to continue?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if (ans!=QMessageBox::Yes) return false;
     }
 
@@ -1567,7 +1567,7 @@ void MInstall::pageDisplayed(int next)
     // These calculations are only for display text, and do not affect the installation.
     long long rootMin = partman.rootSpaceNeeded + 1048575;
     const QString &tminroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
-    rootMin = (4*rootMin) + ROOT_BUFFER * 1048576; // (Root + snapshot [squashfs+ISO] + backup) + buffer.
+    rootMin = (4 * rootMin) + ROOT_BUFFER * 1048576; // (Root + snapshot [squashfs + ISO] + backup) + buffer.
     const QString &trecroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
 
     switch (next) {
@@ -1989,9 +1989,9 @@ void MInstall::setupPartitionSlider()
     // Allow the slider labels to fit all possible formatted sizes.
     const QString &strMB = sliderSizeString(1072693248) + '\n'; // "1,023 GB"
     const QFontMetrics &fmetrics = labelSliderRoot->fontMetrics();
-    int mwidth = fmetrics.boundingRect(QRect(), Qt::AlignCenter, strMB+tr("Root")).width();
+    int mwidth = fmetrics.boundingRect(QRect(), Qt::AlignCenter, strMB + tr("Root")).width();
     labelSliderRoot->setMinimumWidth(mwidth);
-    mwidth = fmetrics.boundingRect(QRect(), Qt::AlignCenter, strMB+tr("Home")).width();
+    mwidth = fmetrics.boundingRect(QRect(), Qt::AlignCenter, strMB + tr("Home")).width();
     labelSliderHome->setMinimumWidth(mwidth);
     labelSliderRoot->setText("----");
     labelSliderHome->setText("----");
@@ -2353,7 +2353,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
     const long long roundUp = available - 1;
     const long long rootMinMB = (partman.rootSpaceNeeded + 1048575) / 1048576;
     const long long homeMinMB = 16; // 16MB for basic profile and setup files
-    const long long rootRecMB = (4 * rootMinMB) + ROOT_BUFFER; // (Root + snapshot [squashfs+ISO] + backup) + buffer
+    const long long rootRecMB = (4 * rootMinMB) + ROOT_BUFFER; // (Root + snapshot [squashfs + ISO] + backup) + buffer
     const long long homeRecMB = homeMinMB + HOME_BUFFER;
     const int minPercent = ((rootMinMB * 100) + roundUp) / available;
     const int maxPercent = 100 - (((homeMinMB * 100) + roundUp) / available);
@@ -2427,7 +2427,7 @@ void MInstall::on_pushLoadKey_clicked()
     } else {
         const int ans = QMessageBox::question(this, windowTitle(),
             tr("Are you sure you want to unload the current key?"),
-            QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         updateCursor(Qt::BusyCursor);
         if (ans == QMessageBox::Yes) {
             key.erase();
