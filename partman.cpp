@@ -1680,8 +1680,9 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     QMap<QString, QString> extraAdd;
     QTreeWidgetItemIterator it(gui.treePartitions);
     for (; *it; ++it) {
-        if (twitUseFor(*it).isEmpty() && twitFlag(*it, AutoCrypto))
+        if (twitUseFor(*it).isEmpty() && twitFlag(*it, AutoCrypto)) {
             extraAdd.insert((*it)->text(Device), twitMappedDevice(*it));
+        }
     }
     // File systems
     for (auto &it : mounts.toStdMap()) {
@@ -1692,8 +1693,9 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         out << twitMappedDevice(it.second, false) << " /dev/disk/by-uuid/" << uuid;
         if (noKey || it.first == keyMount) out << " none";
         else {
-            if (isNewKey)
+            if (isNewKey) {
                 if (!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
+            }
             out << ' ' << keyfile;
         }
         if (!it.first.startsWith("SWAP")) out << " luks \n";
@@ -1706,8 +1708,9 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         out << it.second << " /dev/disk/by-uuid/" << uuid;
         if (noKey) out << " none";
         else {
-            if (isNewKey)
+            if (isNewKey) {
                 if (!proc.exec(cmdAddKey.arg(it.first), true, &password)) return false;
+            }
             out << ' ' << keyfile;
         }
         out << " luks,nofail \n";
@@ -1812,8 +1815,9 @@ void PartMan::unmount()
     while (it.hasPrevious()) {
         it.previous();
         if (it.key().at(0) != '/') continue;
-        if (!it.key().startsWith("SWAP"))
+        if (!it.key().startsWith("SWAP")) {
             proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
+        }
         proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
         QTreeWidgetItem *twit = it.value();
         if (twit->checkState(Encrypt) == Qt::Checked) {
