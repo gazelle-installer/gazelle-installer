@@ -141,7 +141,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 {
     // Write to terminal
     QTextStream term_out(stdout);
-    term_out << msg << endl;
+    term_out << msg << Qt::endl;
 
     // Open stream file writes
     QTextStream out(logFile.data());
@@ -158,5 +158,5 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     case QtFatalMsg:    out << "FTL "; break;
     }
     // Write to the output category of the message and the message itself
-    out << context.category << ": " << msg << endl;
+    out << context.category << ": " << msg << Qt::endl;
 }

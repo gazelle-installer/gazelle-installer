@@ -1685,8 +1685,9 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     QMap<QString, QString> extraAdd;
     QTreeWidgetItemIterator it(gui.treePartitions);
     for (; *it; ++it) {
-        if (twitUseFor(*it).isEmpty() && twitFlag(*it, AutoCrypto))
+        if (twitUseFor(*it).isEmpty() && twitFlag(*it, AutoCrypto)) {
             extraAdd.insert((*it)->text(Device), twitMappedDevice(*it));
+        }
     }
     // File systems
     for (auto &it : mounts.toStdMap()) {
@@ -1817,8 +1818,9 @@ void PartMan::unmount()
     while (it.hasPrevious()) {
         it.previous();
         if (it.key().at(0) != '/') continue;
-        if (!it.key().startsWith("SWAP"))
+        if (!it.key().startsWith("SWAP")) {
             proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
+        }
         proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
         QTreeWidgetItem *twit = it.value();
         if (twit->checkState(Encrypt) == Qt::Checked) {

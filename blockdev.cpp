@@ -78,12 +78,6 @@ void BlockDeviceList::build(MProcess &proc)
                                       "|af9b60a0-1431-4f62-bc68-3311714a69ad)$"); // Windows LDM
     const QRegularExpression rxNativeFS("^(btrfs|ext2|ext3|ext4|jfs|nilfs2|reiserfs|ufs|xfs)$");
 
-    QString bootUUID;
-    if (QFile::exists("/live/config/initrd.out")) {
-        QSettings livecfg("/live/config/initrd.out", QSettings::NativeFormat);
-        bootUUID = livecfg.value("BOOT_UUID").toString();
-    }
-
     // Backup ESP detection. Populated when needed.
     QStringList backup_list;
     bool backup_checked = false;
