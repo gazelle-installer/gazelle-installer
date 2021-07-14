@@ -126,6 +126,7 @@ public:
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
     QTreeWidgetItem *selectedDriveAuto();
+    void clearAllUses();
     int layoutDefault(QTreeWidgetItem *drvit,
         int rootPercent, bool crypto, bool updateTree=true);
     int countPrepSteps();
