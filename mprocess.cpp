@@ -98,7 +98,7 @@ QString MProcess::execOut(const QString &cmd, bool everything)
 QStringList MProcess::execOutLines(const QString &cmd, const bool rawexec)
 {
     exec(cmd, rawexec, nullptr, true);
-    return QString(readAllStandardOutput().trimmed()).split('\n', Qt::SkipEmptyParts);
+    return QString(readAllStandardOutput().trimmed()).split('\n', QString::SkipEmptyParts);
 }
 
 void MProcess::halt()

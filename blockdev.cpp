@@ -126,7 +126,7 @@ void BlockDeviceList::build(MProcess &proc)
                 bdinfo.isESP = backup_list.contains(bdinfo.name);
             }
 
-            bdinfo.isBoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
+            bdinfo.isBoot = (!bootUUID.isEmpty() && jsonPart["uuid"] == bootUUID);
             bdinfo.fs = jsonPart["fstype"].toString();
             if (bdinfo.fs.count(rxNativeFS) >= 1) bdinfo.isNative = true;
             append(bdinfo);
