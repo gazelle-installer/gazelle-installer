@@ -67,6 +67,12 @@ void BlockDeviceList::build(MProcess &proc)
     proc.exec("partprobe -s", true);
     proc.exec("blkid -c /dev/null", true);
 
+    QString bootUUID;
+    if (QFile::exists("/live/config/initrd.out")) {
+        QSettings livecfg("/live/config/initrd.out", QSettings::NativeFormat);
+        bootUUID = livecfg.value("BOOT_UUID").toString();
+    }
+
     // expressions for matching various partition types
     const QRegularExpression rxESP("^(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$");
     const QRegularExpression rxNative("^(0x83|0fc63daf-8483-4772-8e79-3d69d8477de4" // Linux data
