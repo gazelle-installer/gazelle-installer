@@ -1344,6 +1344,16 @@ QTreeWidgetItem *PartMan::selectedDriveAuto()
     return nullptr;
 }
 
+void PartMan::clearAllUses()
+{
+    QTreeWidgetItemIterator it(gui.treePartitions);
+    for (; *it; ++it) {
+        QComboBox *comboUse = twitComboBox(*it, UseFor);
+        if (comboUse) comboUse->clearEditText();
+        if (twitFlag(*it, Partition)) partitSetBoot(*it, false);
+    }
+}
+
 int PartMan::layoutDefault(QTreeWidgetItem *drvit,
     int rootPercent, bool crypto, bool updateTree)
 {

@@ -1489,6 +1489,7 @@ int MInstall::showPage(int curr, int next)
                                                QMessageBox::Yes, QMessageBox::No);
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
+            partman.clearAllUses();
             partman.layoutDefault(partman.selectedDriveAuto(), -1, checkEncryptAuto->isChecked());
             QWidget *nf = partman.composeValidate(true, PROJECTNAME);
             if (nf) {
