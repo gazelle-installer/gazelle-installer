@@ -1486,27 +1486,28 @@ bool PartMan::preparePartitions()
         if (twitFlag(drvit, OldLayout)) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
-            if (useGPT) cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:8303";
-            else cmd = "/sbin/sfdisk /dev/%1 --part-type %2 83";
+            if (useGPT) cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:%3";
+            else cmd = "/sbin/sfdisk /dev/%1 --part-type %2 %3";
             // Set the type for partitions that will be used in this installation.
             for (int ixdev = 0; ixdev < devCount; ++ixdev) {
                 QTreeWidgetItem *twit = drvit->child(ixdev);
-                if (twitUseFor(twit).isEmpty()) continue;
+                const QString &useFor = twitUseFor(twit);
+                const char *ptype = useGPT ? "8303" : "83";
+                if (useFor.isEmpty()) continue;
+                else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
                 const QStringList &devsplit = BlockDeviceInfo::split(twit->text(Device));
-                if (!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1)))) return false;
+                if (!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1), ptype))) return false;
                 proc.sleep(1000);
                 proc.status();
             }
         } else {
             // Creating new partitions.
-            const QString cmdParted("parted -s --align optimal /dev/" + drvdev);
+            const QString cmdParted("parted -s --align optimal /dev/" + drvdev + " mkpart primary %1MiB %2MiB");
             long long start = 1; // start with 1 MB to aid alignment
             for (int ixdev = 0; ixdev<devCount; ++ixdev) {
                 QTreeWidgetItem *twit = drvit->child(ixdev);
-                const QString type(twitUseFor(twit) != "ESP" ? " mkpart primary " : " mkpart ESP ");
                 const long long end = start + twitSize(twit);
-                bool rc = proc.exec(cmdParted + type
-                    + QString::number(start) + "MiB " + QString::number(end) + "MiB");
+                const bool rc = proc.exec(cmdParted.arg(QString::number(start), QString::number(end)));
                 if (!rc) return false;
                 start = end;
                 proc.sleep(1000);
