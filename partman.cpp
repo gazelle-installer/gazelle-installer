@@ -131,7 +131,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         }
     }
     const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,FSTYPE,LABEL"
+        " TYPE,NAME,UUID,SIZE,PHY-SEC,FSTYPE,LABEL"
         " /dev/mapper/* 2>/dev/null", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
@@ -150,6 +150,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         bdinfo.isDrive = false;
         bdinfo.name = jsonDev["name"].toString();
         bdinfo.size = jsonDev["size"].toVariant().toLongLong();
+        bdinfo.physec = jsonDev["phy-sec"].toInt();
         bdinfo.label = jsonDev["label"].toString();
         bdinfo.fs = jsonDev["fstype"].toString();
         const bool crypto = jsonDev["type"].toString() == "crypt";
@@ -876,8 +877,7 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
         const QString &mapdev = editVDev->text();
-        const bool ok = luksOpen("/dev/" + twit->text(Device),
-            mapdev, editPass->text().toUtf8());
+        const bool ok = luksOpen(twit->text(Device), mapdev, editPass->text().toUtf8());
         if (ok) {
             twit->setIcon(Device, QIcon::fromTheme("lock"));
             QComboBox *comboUseFor = twitComboBox(twit, UseFor);
@@ -1213,7 +1213,7 @@ bool PartMan::calculatePartBD()
             listBlkDevs[ixDriveBD].isGPT = gptoverride || uefi
                 || driveSize >= 2097152 || partCount>4 || gptoverride;
         }
-        // code for adding future partitions to the list
+        // Add (or mark) future partitions to the list.
         for (int ixPart=0, ixPartBD=ixDriveBD+1; ixPart < partCount; ++ixPart, ++ixPartBD) {
             QTreeWidgetItem *twit = drvit->child(ixPart);
             const QString &useFor = twitUseFor(twit);
@@ -1231,12 +1231,14 @@ bool PartMan::calculatePartBD()
                 bdinfo.isFuture = bdinfo.isNative = true;
                 bdinfo.isESP = (useFor == "ESP");
             } else {
+                const BlockDeviceInfo &drvbd = listBlkDevs.at(ixDriveBD);
                 BlockDeviceInfo bdinfo;
                 bdinfo.name = twit->text(Device);
                 bdinfo.fs = bdFS;
-                bdinfo.size = twitSize(twit, true); // back into bytes
+                bdinfo.size = twitSize(twit, true);
+                bdinfo.physec = drvbd.physec;
                 bdinfo.isFuture = bdinfo.isNative = true;
-                bdinfo.isGPT = listBlkDevs.at(ixDriveBD).isGPT;
+                bdinfo.isGPT = drvbd.isGPT;
                 bdinfo.isESP = (useFor == "ESP");
                 listBlkDevs.insert(ixPartBD, bdinfo);
             }
@@ -1302,22 +1304,34 @@ bool PartMan::checkTargetDrivesOK()
     return true;
 }
 
-bool PartMan::luksMake(const QString &dev, const QByteArray &password)
+bool PartMan::luksFormat(const QString &dev, const QByteArray &password)
 {
     QString strCipherSpec = gui.comboCryptoCipher->currentText()
         + "-" + gui.comboCryptoChain->currentText();
     if (gui.comboCryptoChain->currentText() != "ECB") {
         strCipherSpec += "-" + gui.comboCryptoIVGen->currentText();
-        if (gui.comboCryptoIVGen->currentText() == "ESSIV")
+        if (gui.comboCryptoIVGen->currentText() == "ESSIV") {
             strCipherSpec += ":" + gui.comboCryptoIVHash->currentData().toString();
+        }
     }
-    QString cmd = "cryptsetup --batch-mode"
+    const int ixdev = listBlkDevs.findDevice(dev);
+    assert(ixdev >= 0);
+    const int physec = listBlkDevs.at(ixdev).physec;
+    QString cmd = "cryptsetup --batch-mode --type=luks2"
         " --cipher " + strCipherSpec.toLower()
         + " --key-size " + gui.spinCryptoKeySize->cleanText()
         + " --hash " + gui.comboCryptoHash->currentText().toLower().remove('-')
         + " --use-" + gui.comboCryptoRandom->currentText()
-        + " --iter-time " + gui.spinCryptoRoundTime->cleanText()
-        + " luksFormat " + dev;
+        + " --pbkdf " + gui.comboCryptoKDF->currentText().toLower();
+    if(gui.spinCryptoKDFTime->value() != 0) {
+        cmd += " --iter-time " + gui.spinCryptoKDFTime->cleanText();
+    }
+    if (gui.comboCryptoKDF->isEnabledTo(gui.comboCryptoKDF->parentWidget())) {
+        const int kdfmem = 1024 * gui.spinCryptoKDFMemory->value();
+        if (kdfmem > 0) cmd += " --pbkdf-memory=" + QString::number(kdfmem);
+    }
+    if (physec > 0) cmd += " --sector-size=" + QString::number(physec);
+    cmd += " luksFormat /dev/" + dev;
     if (!proc.exec(cmd, true, &password)) return false;
     proc.sleep(1000);
     return true;
@@ -1326,7 +1340,7 @@ bool PartMan::luksMake(const QString &dev, const QByteArray &password)
 bool PartMan::luksOpen(const QString &dev, const QString &luksfs,
     const QByteArray &password, const QString &options)
 {
-    QString cmd = "cryptsetup luksOpen " + dev;
+    QString cmd = "cryptsetup luksOpen /dev/" + dev;
     if (!luksfs.isEmpty()) cmd += " " + luksfs;
     if (!options.isEmpty()) cmd += " " + options;
     return proc.exec(cmd, true, &password);
@@ -1542,10 +1556,10 @@ bool PartMan::formatPartitions()
                                  ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
     proc.status(tr("Setting up LUKS encrypted containers"));
     for (QTreeWidgetItem *twit : mounts) {
-        const QString dev = "/dev/" + twit->text(Device);
+        const QString &dev = twit->text(Device);
         if (twit->checkState(Encrypt) != Qt::Checked) continue;
         if (twitWillFormat(twit)) {
-            if (!luksMake(dev, encPass)) return false;
+            if (!luksFormat(dev, encPass)) return false;
             proc.status();
         }
         if (!luksOpen(dev, twitMappedDevice(twit), encPass)) return false;
@@ -1598,7 +1612,7 @@ bool PartMan::formatPartitions()
 }
 
 // Transplanted straight from minstall.cpp
-bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bool chkBadBlocks, const QString &label)
+bool PartMan::formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label)
 {
     proc.log(__PRETTY_FUNCTION__);
 
@@ -1609,7 +1623,7 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
-        QString size_str = proc.execOut("/sbin/sfdisk -s " + dev);
+        QString size_str = proc.execOut("/sbin/sfdisk -s " + devpath);
         long long size = size_str.toLongLong();
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
@@ -1627,7 +1641,7 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
         if (chkBadBlocks) cmd.append(" -c");
     }
 
-    cmd.append(" " + dev);
+    cmd.append(" " + devpath);
     if (!label.isEmpty()) {
         if (format == "reiserfs" || format == "f2fs") cmd.append(" -l \"");
         else cmd.append(" -L \"");
@@ -1637,7 +1651,7 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
 
     if (format.startsWith("ext")) {
         // ext4 tuning
-        proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
+        proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + devpath);
     }
     return true;
 }
