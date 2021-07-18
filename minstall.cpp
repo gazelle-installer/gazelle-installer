@@ -653,7 +653,9 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->manageSpinBox("KeySize", spinCryptoKeySize);
         config->manageComboBox("LUKSkeyHash", comboCryptoHash, false);
         config->manageComboBox("KernelRNG", comboCryptoRandom, false);
-        config->manageSpinBox("KDFroundTime", spinCryptoRoundTime);
+        config->manageComboBox("KDF", comboCryptoKDF, false);
+        config->manageSpinBox("KDFTime", spinCryptoKDFTime);
+        config->manageSpinBox("KDFMemory", spinCryptoKDFMemory);
         config->endGroup();
         if (config->isBadWidget(pageCrypto)) {
             config->setGroupWidget(targetDrive ? pageDisk : pagePartitions);
@@ -761,7 +763,9 @@ void MInstall::stashAdvancedFDE(bool save)
         iCryptoKeySize = spinCryptoKeySize->value();
         indexCryptoHash = comboCryptoHash->currentIndex();
         indexCryptoRandom = comboCryptoRandom->currentIndex();
-        iCryptoRoundTime = spinCryptoRoundTime->value();
+        indexCryptoKDF = comboCryptoKDF->currentIndex();
+        iCryptoKDFTime = spinCryptoKDFTime->value();
+        iCryptoKDFMemory = spinCryptoKDFMemory->value();
     } else {
         comboCryptoCipher->setCurrentIndex(indexCryptoCipher);
         comboCryptoChain->setCurrentIndex(indexCryptoChain);
@@ -770,7 +774,9 @@ void MInstall::stashAdvancedFDE(bool save)
         spinCryptoKeySize->setValue(iCryptoKeySize);
         comboCryptoHash->setCurrentIndex(indexCryptoHash);
         comboCryptoRandom->setCurrentIndex(indexCryptoRandom);
-        spinCryptoRoundTime->setValue(iCryptoRoundTime);
+        comboCryptoKDF->setCurrentIndex(indexCryptoKDF);
+        spinCryptoKDFTime->setValue(iCryptoKDFTime);
+        spinCryptoKDFMemory->setValue(iCryptoKDFMemory);
     }
 }
 
@@ -1694,33 +1700,38 @@ void MInstall::pageDisplayed(int next)
             + tr("You can use the <b>Benchmark</b> button (which runs <i>cryptsetup benchmark</i> in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.") + "<br/>"
             + tr("Please note that <i>cryptsetup benchmark</i> does not cover all the combinations or selections possible, and generally covers the most commonly used selections.")
             + "</p><p>"
-            + "<b>" + tr("Cipher") + "</b><br/>" + tr("A variety of ciphers are available.") + "<br/>"
+            "<b>" + tr("Cipher") + "</b><br/>" + tr("A variety of ciphers are available.") + "<br/>"
             + "<b>Serpent</b> " + tr("was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.") + "<br/>"
             + "<b>AES</b> " + tr("(also known as <i>Rijndael</i>) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.") + "<br/>"
             + "<b>Twofish</b> " + tr("is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.") + "<br/>"
             + "<b>CAST6</b> " + tr("(CAST-256) was a candidate in the AES contest, however it did not become a finalist.") + "<br/>"
             + "<b>Blowfish</b> " + tr("is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.")
             + "</p><p>"
-            + "<b>" + tr("Chain mode") + "</b><br/>" + tr("If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.") + "<br />"
+            "<b>" + tr("Chain mode") + "</b><br/>" + tr("If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.") + "<br />"
             + "<b>XTS</b> " + tr("XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.") + "<br />"
             + "<b>CBC</b> " + tr("(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.") + "<br />"
             + "<b>ECB</b> " + tr("(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.")
             + "</p><p>"
-            + "<b>" + tr("IV generator") + "</b><br/>" + tr("For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.") + "<br/>"
+            "<b>" + tr("IV generator") + "</b><br/>" + tr("For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.") + "<br/>"
             + tr("ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.")
             + "</p><p>"
-            + "<b>" + tr("Key size") + "</b><br/>" + tr("Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.") + "<br/>"
+            "<b>" + tr("Key size") + "</b><br/>" + tr("Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.") + "<br/>"
             + tr("The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).")
             + "</p><p>"
-            + "<b>" + tr("LUKS key hash") + "</b><br/>" + tr("The hash used for PBKDF2 and for the AF splitter.") + " <br/>"
+            "<b>" + tr("LUKS key hash") + "</b><br/>" + tr("The hash used for PBKDF2 and for the AF splitter.") + " <br/>"
             + tr("SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.")
             + "</p><p>"
             + "<b>" + tr("Kernel RNG") + "</b><br/>" + tr("Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).") + "<br/>"
             + tr("Two options are available: /dev/<b>random</b> which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/<b>urandom</b> which will not block even if there is insufficient entropy (possibly weaker keys).")
             + "</p><p>"
-            + "<b>" + tr("KDF round time</b><br/>The amount of time (in milliseconds) to spend with PBKDF2 passphrase processing.") + "<br/>"
+            "<b>" + tr("KDF type") + "</b><br/>" + tr("The password-based key derivation function to be used.") + "<br/>"
+            "<b>" + tr("KDF round time") + "</b><br/>" + tr("The amount of time (in milliseconds) the KDF will use.") + "<br/>"
             + tr("A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).") + "<br/>"
-            + tr("If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.")
+            + tr("If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.") + "<br/>"
+            "<b>" + tr("KDF memory limit") + "</b><br/>" + tr("The maximum amount of memory (in megabytes) the KDF will use.") + "<br/>"
+            + tr("A value of 0 selects the compiled-in default. This value can be changed to suit systems with constrained amounts of RAM.") + "<br/>"
+            + tr("It is better to upgrade your machine to at least 2GB of RAM instead of changing this parameter, wherever possible.") + "<br/>"
+            + tr("This value is not used for PBKDF2.")
             + "</p>");
         break;
 
@@ -2540,6 +2551,11 @@ void MInstall::on_spinCryptoKeySize_valueChanged(int i)
         int iMod = i % iSingleStep;
         if (iMod) spinCryptoKeySize->setValue(i + (iSingleStep - iMod));
     }
+}
+
+void MInstall::on_comboCryptoKDF_currentIndexChanged(const QString &arg1)
+{
+    spinCryptoKDFMemory->setEnabled(arg1 != "PBKDF2");
 }
 
 void MInstall::on_radioBootMBR_toggled()

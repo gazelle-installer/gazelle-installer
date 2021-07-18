@@ -72,7 +72,7 @@ class PartMan : public QObject
     void resizeColumnsToFit();
     static QString translateUse(const QString &alias);
     static QString describeUse(const QString &use);
-    bool formatLinuxPartition(const QString &dev, const QString &format, bool chkBadBlocks, const QString &label);
+    bool formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label);
     void setEncryptChecks(const QString &use,
         enum Qt::CheckState state, QTreeWidgetItem *exclude);
     bool calculatePartBD();
@@ -112,6 +112,9 @@ class PartMan : public QObject
     QTreeWidgetItem *addSubvolumeItem(QTreeWidgetItem *twit);
     void scanSubvolumes(QTreeWidgetItem *partit);
     bool eventFilter(QObject *object, QEvent *event);
+    bool luksFormat(const QString &dev, const QByteArray &password);
+    bool luksOpen(const QString &dev, const QString &luksfs,
+        const QByteArray &password, const QString &options = QString());
 public:
     bool gptoverride=false, uefi=false, brave=false;
     long long rootSpaceNeeded = 0;
@@ -122,9 +125,6 @@ public:
     bool manageConfig(MSettings &config, bool save);
     QWidget *composeValidate(bool automatic, const QString &project);
     bool checkTargetDrivesOK();
-    bool luksMake(const QString &dev, const QByteArray &password);
-    bool luksOpen(const QString &dev, const QString &luksfs,
-        const QByteArray &password, const QString &options = QString());
     QTreeWidgetItem *selectedDriveAuto();
     void clearAllUses();
     int layoutDefault(QTreeWidgetItem *drvit,
