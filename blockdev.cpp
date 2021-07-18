@@ -75,7 +75,7 @@ void BlockDeviceList::build(MProcess &proc)
 
     // Collect information and populate the block device list.
     const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL", true);
+        " TYPE,NAME,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
 
     clear();
@@ -88,6 +88,7 @@ void BlockDeviceList::build(MProcess &proc)
         bdinfo.isDrive = true;
         bdinfo.isGPT = (jsonDrive["pttype"]=="gpt");
         bdinfo.size = jsonDrive["size"].toVariant().toLongLong();
+        bdinfo.physec = jsonDrive["phy-sec"].toInt();
         bdinfo.label = jsonDrive["label"].toString();
         bdinfo.model = jsonDrive["model"].toString();
         append(bdinfo);
@@ -99,6 +100,7 @@ void BlockDeviceList::build(MProcess &proc)
             bdinfo.isDrive = false;
             bdinfo.name = jsonPart["name"].toString();
             bdinfo.size = jsonPart["size"].toVariant().toLongLong();
+            bdinfo.physec = jsonPart["phy-sec"].toInt();
             bdinfo.label = jsonPart["label"].toString();
             bdinfo.model = jsonPart["model"].toString();
             bdinfo.mapCount = jsonPart["children"].toArray().count();
@@ -121,9 +123,9 @@ void BlockDeviceList::build(MProcess &proc)
     }
 
     // debug
-    qDebug() << "Name Size Model FS | isDisk isGPT isBoot isESP isNative isNasty";
+    qDebug() << "Name Size PhySec Model FS | isDisk isGPT isBoot isESP isNative isNasty";
     for (const BlockDeviceInfo &bdi : *this) {
-        qDebug() << bdi.name << bdi.size << bdi.model << bdi.fs << "|"
+        qDebug() << bdi.name << bdi.size << bdi.physec << bdi.model << bdi.fs << "|"
                  << bdi.isDrive << bdi.isGPT << bdi.isBoot << bdi.isESP
                  << bdi.isNative << bdi.isNasty;
     }

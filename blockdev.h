@@ -30,6 +30,7 @@ struct BlockDeviceInfo
     QString label;
     QString model;
     long long size;
+    int physec;
     bool isFuture = false;
     bool isNasty = false;
     bool isDrive = false;

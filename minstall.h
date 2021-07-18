@@ -117,6 +117,7 @@ private slots:
     void on_comboCryptoChain_currentIndexChanged(const QString &arg1);
     void on_spinCryptoKeySize_valueChanged(int i);
     void on_comboCryptoIVGen_currentIndexChanged(const QString &arg1);
+    void on_comboCryptoKDF_currentIndexChanged(const QString &arg1);
 
     void on_radioBootMBR_toggled();
     void on_radioBootPBR_toggled();
@@ -181,7 +182,9 @@ private:
     int iCryptoKeySize;
     int indexCryptoHash;
     int indexCryptoRandom;
-    int iCryptoRoundTime;
+    int indexCryptoKDF;
+    int iCryptoKDFTime;
+    int iCryptoKDFMemory;
 
     // cached time zone list
     QStringList listTimeZones;
