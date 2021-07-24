@@ -1468,6 +1468,8 @@ void MInstall::setService(const QString &service, bool enabled)
 }
 void MInstall::failUI(const QString &msg)
 {
+    proc.log(__PRETTY_FUNCTION__);
+    qDebug() << "Phase" << phase << '-' << msg;
     if (phase >= 0) {
         boxMain->setEnabled(false);
         QMessageBox::critical(this, windowTitle(), msg);
