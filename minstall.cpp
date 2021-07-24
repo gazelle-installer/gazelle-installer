@@ -263,6 +263,10 @@ void MInstall::startup()
             treePartitions->setColumnHidden(4, true);
         }
 
+        // The future of Advanced Encryption Settings is under review.
+        pushAdvancedCrypto->hide();
+        pushAdvancedCryptoCust->hide();
+
         // Detect snapshot-backup account(s)
         // test if there's another user other than demo in /home,
         // indicating a possible snapshot or complicated live-usb
@@ -1596,8 +1600,8 @@ void MInstall::pageDisplayed(int next)
                 " This can also improve overall performance by constraining the system files to a defined portion of the drive.") + "</p>"
             "<p><b>" + tr("Encryption") + "</b><br/>"
             + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
-            "<p>" + tr("A separate unencrypted boot partition is required."
-                " For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
+            "<p>" + tr("A separate unencrypted boot partition is required.") + "</p>"
+            // + tr(" For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
             "<p>" + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>"
             "<p><b>" + tr("Using a custom disk layout") + "</b><br/>"
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
@@ -1670,8 +1674,9 @@ void MInstall::pageDisplayed(int next)
                 " which will allow you to create the exact layout you need.").arg("<img src=':/partitionmanager'/>") + "</p>"
             "<p><b>" + tr("Encryption") + "</b><br/>"
             + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
-            "<p>" + tr("A separate unencrypted boot partition is required. For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p><p>"
-            + tr("To preserve an encrypted partition, right-click on it and select <b>Unlock</b>. In the dialog that appears, enter a name for the virtual device and the password."
+            "<p>" + tr("A separate unencrypted boot partition is required.") + "</p>"
+            // + tr("For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p><p>"
+            "<p>" + tr("To preserve an encrypted partition, right-click on it and select <b>Unlock</b>. In the dialog that appears, enter a name for the virtual device and the password."
                 " When the device is unlocked, the name you chose will appear under <i>Virtual Devices</i>, with similar options to that of a regular partition.") + "</p><p>"
             + tr("For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the <b>Add to crypttab</b> menu action to do this.") + "</p>"
             "<p><b>" + tr("Other partitions") + "</b><br/>"
