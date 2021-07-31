@@ -1306,34 +1306,13 @@ bool PartMan::checkTargetDrivesOK()
 
 bool PartMan::luksFormat(const QString &dev, const QByteArray &password)
 {
-    QString strCipherSpec = gui.comboCryptoCipher->currentText()
-        + "-" + gui.comboCryptoChain->currentText();
-    if (gui.comboCryptoChain->currentText() != "ECB") {
-        strCipherSpec += "-" + gui.comboCryptoIVGen->currentText();
-        if (gui.comboCryptoIVGen->currentText() == "ESSIV") {
-            strCipherSpec += ":" + gui.comboCryptoIVHash->currentData().toString();
-        }
-    }
     const int ixdev = listBlkDevs.findDevice(dev);
     assert(ixdev >= 0);
     const int physec = listBlkDevs.at(ixdev).physec;
-    QString cmd = "cryptsetup --batch-mode --type=luks2"
-        " --cipher " + strCipherSpec.toLower()
-        + " --key-size " + gui.spinCryptoKeySize->cleanText()
-        + " --hash " + gui.comboCryptoHash->currentText().toLower().remove('-')
-        + " --use-" + gui.comboCryptoRandom->currentText()
-        + " --pbkdf " + gui.comboCryptoKDF->currentText().toLower();
-    if(gui.spinCryptoKDFTime->value() != 0) {
-        cmd += " --iter-time " + gui.spinCryptoKDFTime->cleanText();
-    }
-    if (gui.comboCryptoKDF->isEnabledTo(gui.comboCryptoKDF->parentWidget())) {
-        const int kdfmem = 1024 * gui.spinCryptoKDFMemory->value();
-        if (kdfmem > 0) cmd += " --pbkdf-memory=" + QString::number(kdfmem);
-    }
+    QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512";
     if (physec > 0) cmd += " --sector-size=" + QString::number(physec);
     cmd += " luksFormat /dev/" + dev;
     if (!proc.exec(cmd, true, &password)) return false;
-    proc.sleep(1000);
     return true;
 }
 
