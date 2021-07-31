@@ -109,16 +109,6 @@ private slots:
     void on_checkEncryptAuto_toggled(bool checked);
     void on_radioCustomPart_clicked(bool checked);
 
-    void on_pushLoadKey_clicked();
-    void on_pushBenchmarkCrypto_clicked();
-    void on_pushAdvancedCrypto_clicked();
-    void on_pushAdvancedCryptoCust_clicked();
-    void on_comboCryptoCipher_currentIndexChanged(const QString &arg1);
-    void on_comboCryptoChain_currentIndexChanged(const QString &arg1);
-    void on_spinCryptoKeySize_valueChanged(int i);
-    void on_comboCryptoIVGen_currentIndexChanged(const QString &arg1);
-    void on_comboCryptoKDF_currentIndexChanged(const QString &arg1);
-
     void on_radioBootMBR_toggled();
     void on_radioBootPBR_toggled();
     void on_radioBootESP_toggled();
@@ -173,19 +163,6 @@ private:
     bool haveSnapshotUserAccounts = false;
     bool haveOldHome = false;
 
-    // Advanced Encryption Settings page
-    int ixPageRefAdvancedFDE = 0;
-    int indexCryptoCipher;
-    int indexCryptoChain;
-    int indexCryptoIVGen;
-    int indexCryptoIVHash;
-    int iCryptoKeySize;
-    int indexCryptoHash;
-    int indexCryptoRandom;
-    int indexCryptoKDF;
-    int iCryptoKDFTime;
-    int iCryptoKDFMemory;
-
     // cached time zone list
     QStringList listTimeZones;
 
@@ -206,7 +183,6 @@ private:
     void failUI(const QString &msg);
     void manageConfig(enum ConfigAction mode);
     void stashServices(bool save);
-    void stashAdvancedFDE(bool save);
     int selectTimeZone(const QString &zone);
     void rsynchomefolder(const QString dpath);
     void changeRemasterdemoToNewUser(const QString dpath);

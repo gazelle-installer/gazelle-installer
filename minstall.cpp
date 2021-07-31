@@ -25,13 +25,27 @@
 #include <QProcessEnvironment>
 #include <QTimeZone>
 #include <QToolTip>
-#include <QFileDialog>
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #include <sys/stat.h>
 
 #include "version.h"
 #include "minstall.h"
+
+enum Step {
+    Splash,
+    Terms,
+    Disk,
+    Partitions,
+    Boot,
+    Services,
+    Network,
+    Localization,
+    UserAccounts,
+    OldHome,
+    Progress,
+    End
+};
 
 MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     : proc(this), partman(proc, listBlkDevs, *this, this)
@@ -97,7 +111,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     HOME_BUFFER = settings.value("HOME_BUFFER", 2000).toInt();
     setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
 
-    gotoPage(0);
+    gotoPage(Step::Splash);
 
     // config file
     config = new MSettings(cfgfile, this);
@@ -235,17 +249,11 @@ void MInstall::startup()
         partman.defaultLabels["/home"] = "home" + PROJECTSHORTNAME;
         partman.defaultLabels["SWAP"] = "swap" + PROJECTSHORTNAME;
 
-        // advanced encryption settings page defaults
-        on_comboCryptoCipher_currentIndexChanged(comboCryptoCipher->currentText());
-        on_comboCryptoChain_currentIndexChanged(comboCryptoChain->currentText());
-        on_comboCryptoIVGen_currentIndexChanged(comboCryptoIVGen->currentText());
-
         textCryptoPass->setDisabled(true);
         textCryptoPass2->setDisabled(true);
         labelCryptoPass->setDisabled(true);
         labelCryptoPass2->setDisabled(true);
         progCryptoPassMeter->setDisabled(true);
-        pushAdvancedCrypto->setDisabled(true);
         boxCryptoPass->setDisabled(true);
 
         //disable encryption in gui if cryptsetup not present
@@ -258,14 +266,9 @@ void MInstall::startup()
             labelCryptoPass->hide();
             labelCryptoPass2->hide();
             progCryptoPassMeter->hide();
-            pushAdvancedCrypto->hide();
             boxCryptoPass->hide();
             treePartitions->setColumnHidden(4, true);
         }
-
-        // The future of Advanced Encryption Settings is under review.
-        pushAdvancedCrypto->hide();
-        pushAdvancedCryptoCust->hide();
 
         // Detect snapshot-backup account(s)
         // test if there's another user other than demo in /home,
@@ -345,16 +348,15 @@ void MInstall::startup()
     else {
         updatePartitionWidgets(true);
         manageConfig(ConfigLoadA);
-        stashAdvancedFDE(true);
     }
     stashServices(true);
 
-    if (oobe) gotoPage(7); // go to Network page
+    if (oobe) gotoPage(Step::Network);
     else {
         textCopyright->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
             "%1 uses some components from MEPIS Linux which are released under an Apache free license."
             " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
-        gotoPage(1);
+        gotoPage(Step::Terms);
     }
     updateCursor();
 
@@ -482,7 +484,7 @@ bool MInstall::pretendToInstall(int space, long steps)
 void MInstall::writeKeyFile()
 {
     if (phase < 0) return;
-    QString rngfile = "/dev/" + comboCryptoRandom->currentText();
+    static const char *const rngfile = "/dev/urandom";
     const unsigned int keylength = 4096;
     const QLineEdit *passedit = checkEncryptAuto->isChecked() ? textCryptoPass : textCryptoPassCust;
     const QByteArray password(passedit->text().toUtf8());
@@ -491,12 +493,12 @@ void MInstall::writeKeyFile()
     if (partman.isEncrypt("/")) { // if encrypting root
         newkey = (key.length() == 0);
         keyfile = "/mnt/antiX/root/keyfile";
-        if (newkey) key.load(rngfile.toUtf8(), keylength);
+        if (newkey) key.load(rngfile, keylength);
         key.save(keyfile, 0400);
     } else if (partman.isEncrypt("/home") && partman.isEncrypt(QString())>1) {
         // if encrypting /home without encrypting root
         keyfile = "/mnt/antiX/home/.keyfileDONOTdelete";
-        key.load(rngfile.toUtf8(), keylength);
+        key.load(rngfile, keylength);
         key.save(keyfile, 0400);
         key.erase();
     }
@@ -587,7 +589,7 @@ bool MInstall::processNextPhase()
         proc.status(tr("Cleaning up"));
         cleanup();
         proc.status(tr("Finished"));
-        gotoPage(widgetStack->indexOf(pageEnd));
+        gotoPage(Step::End);
     }
     return true;
 }
@@ -632,11 +634,11 @@ void MInstall::manageConfig(enum ConfigAction mode)
             partman.manageConfig(*config, mode==ConfigSave);
         }
 
-        // AES page
-        config->startGroup("Encryption", pageCrypto);
+        // Encryption
+        config->startGroup("Encryption", targetDrive ? pageDisk : pagePartitions);
         if (mode != ConfigSave) {
             const QString &epass = config->value("Pass").toString();
-            if (radioEntireDisk->isChecked()) {
+            if (targetDrive) {
                 textCryptoPass->setText(epass);
                 textCryptoPass2->setText(epass);
             } else {
@@ -647,25 +649,13 @@ void MInstall::manageConfig(enum ConfigAction mode)
             if (!keyfile.isEmpty()) {
                 key.load(keyfile.toUtf8().constData(), -1);
                 const int keylen = key.length();
-                if (keylen>0) pushLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
+                if (keylen>0) {
+                    proc.log(QStringLiteral("Loaded %1-byte key material: ").arg(keylen)
+                        + keyfile, MProcess::Standard);
+                }
             }
         }
-        config->manageComboBox("Cipher", comboCryptoCipher, false);
-        config->manageComboBox("ChainMode", comboCryptoChain, false);
-        config->manageComboBox("IVgenerator", comboCryptoIVGen, false);
-        config->manageComboBox("IVhash", comboCryptoIVHash, false);
-        config->manageSpinBox("KeySize", spinCryptoKeySize);
-        config->manageComboBox("LUKSkeyHash", comboCryptoHash, false);
-        config->manageComboBox("KernelRNG", comboCryptoRandom, false);
-        config->manageComboBox("KDF", comboCryptoKDF, false);
-        config->manageSpinBox("KDFTime", spinCryptoKDFTime);
-        config->manageSpinBox("KDFMemory", spinCryptoKDFMemory);
         config->endGroup();
-        if (config->isBadWidget(pageCrypto)) {
-            config->setGroupWidget(targetDrive ? pageDisk : pagePartitions);
-            config->markBadWidget(pushAdvancedCrypto);
-            config->markBadWidget(pushAdvancedCryptoCust);
-        }
     }
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
@@ -754,33 +744,6 @@ void MInstall::manageConfig(enum ConfigAction mode)
         QMessageBox::critical(this, windowTitle(),
             tr("Invalid settings found in configuration file (%1)."
                " Please review marked fields as you encounter them.").arg(config->fileName()));
-    }
-}
-
-void MInstall::stashAdvancedFDE(bool save)
-{
-    if (save) {
-        indexCryptoCipher = comboCryptoCipher->currentIndex();
-        indexCryptoChain = comboCryptoChain->currentIndex();
-        indexCryptoIVGen = comboCryptoIVGen->currentIndex();
-        indexCryptoIVHash = comboCryptoIVHash->currentIndex();
-        iCryptoKeySize = spinCryptoKeySize->value();
-        indexCryptoHash = comboCryptoHash->currentIndex();
-        indexCryptoRandom = comboCryptoRandom->currentIndex();
-        indexCryptoKDF = comboCryptoKDF->currentIndex();
-        iCryptoKDFTime = spinCryptoKDFTime->value();
-        iCryptoKDFMemory = spinCryptoKDFMemory->value();
-    } else {
-        comboCryptoCipher->setCurrentIndex(indexCryptoCipher);
-        comboCryptoChain->setCurrentIndex(indexCryptoChain);
-        comboCryptoIVGen->setCurrentIndex(indexCryptoIVGen);
-        comboCryptoIVHash->setCurrentIndex(indexCryptoIVHash);
-        spinCryptoKeySize->setValue(iCryptoKeySize);
-        comboCryptoHash->setCurrentIndex(indexCryptoHash);
-        comboCryptoRandom->setCurrentIndex(indexCryptoRandom);
-        comboCryptoKDF->setCurrentIndex(indexCryptoKDF);
-        spinCryptoKDFTime->setValue(iCryptoKDFTime);
-        spinCryptoKDFMemory->setValue(iCryptoKDFMemory);
     }
 }
 
@@ -1481,10 +1444,7 @@ void MInstall::failUI(const QString &msg)
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
 {
-    if (next == 4 && ixPageRefAdvancedFDE != 0) // at pageCrypto
-        return next;
-
-    if (next == 3 && curr == 2) { // at pageDisk (forward)
+    if (curr == Step::Disk && next > curr) {
         if (radioEntireDisk->isChecked()) {
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
@@ -1508,9 +1468,9 @@ int MInstall::showPage(int curr, int next)
                 nextFocus = nf;
                 return curr;
             }
-            return 5; // Go to pageBoot
+            return Step::Boot;
         }
-    } else if (next == 4 && curr == 3) { // at pagePartition (fwd)
+    } else if (curr == Step::Partitions && next > curr) {
         QWidget *nf = partman.composeValidate(automatic, PROJECTNAME);
         if (nf) {
             nextFocus = nf;
@@ -1522,39 +1482,35 @@ int MInstall::showPage(int curr, int next)
                     " the required information could not be obtained."));
             return curr;
         }
-        return 5; // Go to pageBoot
-    } else if (curr == 4) { // at pageCrypto
-        stashAdvancedFDE(next >= 5);
-        next = ixPageRefAdvancedFDE;
-        ixPageRefAdvancedFDE = 0;
-        return next;
-    } else if (next == 6 && curr == 5) { // at pageBoot (forward)
-        if (oem) return 11; // straight to pageProgress
-        return next + 1; // skip Services screen
-    } else if (next == 10 && curr == 9) { // at pageUserAccounts (forward)
+        return Step::Boot;
+    } else if (curr == Step::Boot && next > curr) {
+        if (oem) return Step::Progress;
+        return Step::Services + 1;
+    } else if (curr == Step::UserAccounts && next > curr) {
         if (!validateUserInfo()) return curr;
-        if (!haveOldHome) return next + 1; // skip pageOldHome
-    } else if (next == 8 && curr == 7) { // at pageNetwork (forward)
+        if (!haveOldHome) return Step::Progress; // Skip pageOldHome
+    } else if (curr == Step::Network && next > curr) {
         if (!validateComputerName()) return curr;
-    } else if (next == 6 && curr == 7) { // at pageNetwork (backward)
-        return next - 1; // skip Services screen
-    } else if (next == 9 && curr == 8) { // at pageLocalization (forward)
-        if (!pretend && haveSnapshotUserAccounts)
-            return 11; // skip pageUserAccounts and go to pageProgress
-    } else if (next == 9 && curr == 10) { // at pageOldHome (backward)
-        if (!pretend && haveSnapshotUserAccounts)
-            return 8; // skip pageUserAccounts and go to pageLocalization
-    } else if (next == 10 && curr == 11) { // at pageProgress (backward)
-        if (oem) return 5; // go back to pageBoot
+    } else if (curr == Step::Network && next < curr) { // Backward
+        return Step::Boot; // Skip pageServices
+    } else if (curr == Step::Localization && next > curr) {
+        if (!pretend && haveSnapshotUserAccounts) {
+            return Step::Progress; // Skip pageUserAccounts and pageOldHome
+        }
+    } else if (curr == Step::OldHome && next < curr) { // Backward
+        if (!pretend && haveSnapshotUserAccounts) {
+            return Step::Localization; // Skip pageUserAccounts and pageOldHome
+        }
+    } else if (curr == Step::Progress && next < curr) { // Backward
+        if (oem) return Step::Boot;
         if (!haveOldHome) {
             // skip pageOldHome
-            if (!pretend && haveSnapshotUserAccounts)
-                return 8; // go to pageLocalization
-            return 9; // go to pageUserAccounts
+            if (!pretend && haveSnapshotUserAccounts) return Step::Localization;
+            return Step::UserAccounts;
         }
-    } else if (curr == 6) { // at pageServices
-        stashServices(next >= 7);
-        return 8; // goes back to the screen that called Services screen
+    } else if (curr == Step::Services) { // Backward or forward
+        stashServices(next > curr);
+        return Step::Localization; // The page that called pageServices
     }
     return next;
 }
@@ -1576,7 +1532,7 @@ void MInstall::pageDisplayed(int next)
     const QString &trecroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
 
     switch (next) {
-    case 1: // terms and keyboard selection
+    case Step::Terms:
         textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
             + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
             "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
@@ -1586,7 +1542,7 @@ void MInstall::pageDisplayed(int next)
                 " It is solely your responsibility to backup your data before proceeding.") + "</p>");
         pushNext->setDefault(true);
         break;
-    case 2: // choose disk
+    case Step::Disk:
         textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
             + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(tminroot, trecroot) + "</p>"
             "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
@@ -1601,7 +1557,6 @@ void MInstall::pageDisplayed(int next)
             "<p><b>" + tr("Encryption") + "</b><br/>"
             + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
             "<p>" + tr("A separate unencrypted boot partition is required.") + "</p>"
-            // + tr(" For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p>"
             "<p>" + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>"
             "<p><b>" + tr("Using a custom disk layout") + "</b><br/>"
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
@@ -1618,7 +1573,7 @@ void MInstall::pageDisplayed(int next)
         pushNext->setEnabled(!(checkEncryptAuto->isChecked()) || textCryptoPass->isValid());
         return; // avoid the end that enables both Back and Next buttons
 
-    case 3:  // choose partition
+    case Step::Partitions:
         textHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
             + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"
             "<p>" + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"
@@ -1675,7 +1630,6 @@ void MInstall::pageDisplayed(int next)
             "<p><b>" + tr("Encryption") + "</b><br/>"
             + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
             "<p>" + tr("A separate unencrypted boot partition is required.") + "</p>"
-            // + tr("For additional settings including cipher selection, use the <b>Advanced encryption settings</b> button.") + "</p><p>"
             "<p>" + tr("To preserve an encrypted partition, right-click on it and select <b>Unlock</b>. In the dialog that appears, enter a name for the virtual device and the password."
                 " When the device is unlocked, the name you chose will appear under <i>Virtual Devices</i>, with similar options to that of a regular partition.") + "</p><p>"
             + tr("For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the <b>Add to crypttab</b> menu action to do this.") + "</p>"
@@ -1694,55 +1648,7 @@ void MInstall::pageDisplayed(int next)
         pushNext->setEnabled(!(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || textCryptoPassCust->isValid());
         return; // avoid the end that enables both Back and Next buttons
 
-    case 4: // advanced encryption settings
-        textHelp->setText("<p><b>"
-            + tr("Advanced Encryption Settings") + "</b><br/>" + tr("This page allows fine-tuning of LUKS encrypted partitions.") + "<br/>"
-            + tr("In most cases, the defaults provide a practical balance between security and performance that is suitable for sensitive applications.")
-            + "</p><p>"
-            + tr("This text covers the basics of the parameters used with LUKS, but is not meant to be a comprehensive guide to cryptography.") + "<br/>"
-            + tr("Altering any of these settings without a sound knowledge in cryptography may result in weak encryption being used.") + "<br/>"
-            + tr("Editing a field will often affect the available options below it. The fields below may be automatically changed to recommended values.") + "<br/>"
-            + tr("Whilst better performance or higher security may be obtained by changing settings from their recommended values, you do so entirely at your own risk.")
-            + "</p><p>"
-            + tr("You can use the <b>Benchmark</b> button (which runs <i>cryptsetup benchmark</i> in its own terminal window) to compare the performance of common combinations of hashes, ciphers and chain modes.") + "<br/>"
-            + tr("Please note that <i>cryptsetup benchmark</i> does not cover all the combinations or selections possible, and generally covers the most commonly used selections.")
-            + "</p><p>"
-            "<b>" + tr("Cipher") + "</b><br/>" + tr("A variety of ciphers are available.") + "<br/>"
-            + "<b>Serpent</b> " + tr("was one of the five AES finalists. It is considered to have a higher security margin than Rijndael and all the other AES finalists. It performs better on some 64-bit CPUs.") + "<br/>"
-            + "<b>AES</b> " + tr("(also known as <i>Rijndael</i>) is a very common cipher, and many modern CPUs include instructions specifically for AES, due to its ubiquity. Although Rijndael was selected over Serpent for its performance, no attacks are currently expected to be practical.") + "<br/>"
-            + "<b>Twofish</b> " + tr("is the successor to Blowfish. It became one of the five AES finalists, although it was not selected for the standard.") + "<br/>"
-            + "<b>CAST6</b> " + tr("(CAST-256) was a candidate in the AES contest, however it did not become a finalist.") + "<br/>"
-            + "<b>Blowfish</b> " + tr("is a 64-bit block cipher created by Bruce Schneier. It is not recommended for sensitive applications as only CBC and ECB modes are supported. Blowfish supports key sizes between 32 and 448 bits that are multiples of 8.")
-            + "</p><p>"
-            "<b>" + tr("Chain mode") + "</b><br/>" + tr("If blocks were all encrypted using the same key, a pattern may emerge and be able to predict the plain text.") + "<br />"
-            + "<b>XTS</b> " + tr("XEX-based Tweaked codebook with ciphertext Stealing) is a modern chain mode, which supersedes CBC and EBC. It is the default (and recommended) chain mode. Using ESSIV over Plain64 will incur a performance penalty, with negligible known security gain.") + "<br />"
-            + "<b>CBC</b> " + tr("(Cipher Block Chaining) is simpler than XTS, but vulnerable to a padding oracle attack (somewhat mitigated by ESSIV) and is not recommended for sensitive applications.") + "<br />"
-            + "<b>ECB</b> " + tr("(Electronic CodeBook) is less secure than CBC and should not be used for sensitive applications.")
-            + "</p><p>"
-            "<b>" + tr("IV generator") + "</b><br/>" + tr("For XTS and CBC, this selects how the <b>i</b>nitialisation <b>v</b>ector is generated. <b>ESSIV</b> requires a hash function, and for that reason, a second drop-down box will be available if this is selected. The hashes available depend on the selected cipher.") + "<br/>"
-            + tr("ECB mode does not use an IV, so these fields will all be disabled if ECB is selected for the chain mode.")
-            + "</p><p>"
-            "<b>" + tr("Key size") + "</b><br/>" + tr("Sets the key size in bits. Available key sizes are limited by the cipher and chain mode.") + "<br/>"
-            + tr("The XTS cipher chain mode splits the key in half (for example, AES-256 in XTS mode requires a 512-bit key size).")
-            + "</p><p>"
-            "<b>" + tr("LUKS key hash") + "</b><br/>" + tr("The hash used for PBKDF2 and for the AF splitter.") + " <br/>"
-            + tr("SHA-1 and RIPEMD-160 are no longer recommended for sensitive applications as they have been found to be broken.")
-            + "</p><p>"
-            + "<b>" + tr("Kernel RNG") + "</b><br/>" + tr("Sets which kernel random number generator will be used to create the master key volume key (which is a long-term key).") + "<br/>"
-            + tr("Two options are available: /dev/<b>random</b> which blocks until sufficient entropy is obtained (can take a long time in low-entropy situations), and /dev/<b>urandom</b> which will not block even if there is insufficient entropy (possibly weaker keys).")
-            + "</p><p>"
-            "<b>" + tr("KDF type") + "</b><br/>" + tr("The password-based key derivation function to be used.") + "<br/>"
-            "<b>" + tr("KDF round time") + "</b><br/>" + tr("The amount of time (in milliseconds) the KDF will use.") + "<br/>"
-            + tr("A value of 0 selects the compiled-in default (run <i>cryptsetup --help</i> for details).") + "<br/>"
-            + tr("If you have a slow machine, you may wish to increase this value for extra security, in exchange for time taken to unlock a volume after a passphrase is entered.") + "<br/>"
-            "<b>" + tr("KDF memory limit") + "</b><br/>" + tr("The maximum amount of memory (in megabytes) the KDF will use.") + "<br/>"
-            + tr("A value of 0 selects the compiled-in default. This value can be changed to suit systems with constrained amounts of RAM.") + "<br/>"
-            + tr("It is better to upgrade your machine to at least 2GB of RAM instead of changing this parameter, wherever possible.") + "<br/>"
-            + tr("This value is not used for PBKDF2.")
-            + "</p>");
-        break;
-
-    case 5: // set bootloader (start of installation)
+    case Step::Boot: // Start of installation.
         textHelp->setText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
                              "<p>By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</p>"
                              "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
@@ -1756,11 +1662,11 @@ void MInstall::pageDisplayed(int next)
         }
         return; // avoid the end that enables both Back and Next buttons
 
-    case 6: // set services
+    case Step::Services:
         textHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         break;
 
-    case 7: // set computer name
+    case Step::Network:
         textHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
                              "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
@@ -1773,7 +1679,7 @@ void MInstall::pageDisplayed(int next)
         }
         break;
 
-    case 8: // set localization, clock, services button
+    case Step::Localization:
         textHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
             + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"
             "<p><b>" + tr("Configure Clock") + "</b><br/>"
@@ -1787,7 +1693,7 @@ void MInstall::pageDisplayed(int next)
                 " Make sure you know what you are doing!"));
         break;
 
-    case 9: // set username and passwords
+    case Step::UserAccounts:
         textHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
         + tr("The root user is similar to the Administrator user in some other operating systems."
             " You should not use the root user as your daily user account."
@@ -1806,7 +1712,7 @@ void MInstall::pageDisplayed(int next)
         userPassValidationChanged();
         return; // avoid the end that enables both Back and Next buttons
 
-    case 10: // deal with an old home directory
+    case Step::OldHome:
         textHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
             + tr("A home directory already exists for the user name you have chosen."
                 " This screen allows you to choose what happens to this directory.") + "</p>"
@@ -1831,7 +1737,7 @@ void MInstall::pageDisplayed(int next)
         }
         break;
 
-    case 11: // installation step
+    case Step::Progress:
         if (ixTipStart >= 0) {
             iLastProgress = progInstall->value();
             on_progInstall_valueChanged(iLastProgress);
@@ -1850,7 +1756,7 @@ void MInstall::pageDisplayed(int next)
         pushNext->setEnabled(false);
         return; // avoid enabling both Back and Next buttons at the end
 
-    case 12: // done
+    case Step::End:
         pushClose->setEnabled(false);
         textHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                              "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -1887,22 +1793,20 @@ void MInstall::gotoPage(int next)
     pushBack->setHidden(next <= 1);
     pushNext->setHidden(next == 0);
 
-    int c = widgetStack->count();
     QSize isize = pushNext->iconSize();
     isize.setWidth(isize.height());
-    if (next >= c-1) {
+    if (next >= Step::End) {
         // entering the last page
         pushBack->hide();
         pushNext->setText(tr("Finish"));
-    } else if (next == 4 || next == 6){
-        // Advanced Encryption Settings and Services pages
+    } else if (next == Step::Services){
         isize.setWidth(0);
         pushNext->setText(tr("OK"));
     } else {
         pushNext->setText(tr("Next"));
     }
     pushNext->setIconSize(isize);
-    if (next > c-1) {
+    if (next > Step::End) {
         // finished
         updateCursor(Qt::WaitCursor);
         if (!pretend && checkExitReboot->isChecked()) {
@@ -1935,7 +1839,7 @@ void MInstall::gotoPage(int next)
         if (oobe) {
             updateCursor(Qt::BusyCursor);
             labelSplash->setText(tr("Configuring sytem. Please wait."));
-            gotoPage(0);
+            gotoPage(Step::Splash);
             if (processOOBE()) {
                 labelSplash->setText(tr("Configuration complete. Restarting system."));
                 proc.exec("/usr/sbin/reboot", true);
@@ -1946,7 +1850,7 @@ void MInstall::gotoPage(int next)
             }
         } else if (!processNextPhase() && phase > -2) {
             cleanup(false);
-            gotoPage(2);
+            gotoPage(Step::Disk);
             boxMain->setEnabled(true);
         }
         updateCursor();
@@ -2165,7 +2069,7 @@ void MInstall::on_pushAbort_clicked()
 // clicking advanced button to go to Services page
 void MInstall::on_pushServices_clicked()
 {
-    gotoPage(6);
+    gotoPage(Step::Services);
 }
 
 void MInstall::on_pushPartReload_clicked()
@@ -2185,12 +2089,6 @@ void MInstall::on_pushRunPartMan_clicked()
     updatePartitionWidgets(false);
     boxMain->setEnabled(true);
     updateCursor();
-}
-
-void MInstall::on_pushBenchmarkCrypto_clicked()
-{
-    proc.exec("x-terminal-emulator -e bash -c \"/sbin/cryptsetup benchmark"
-            " && echo && read -n 1 -srp 'Press any key to close the benchmark window.'\"");
 }
 
 bool MInstall::abort(bool onclose)
@@ -2215,7 +2113,7 @@ bool MInstall::abort(bool onclose)
         phase = -2;
     } else if (phase == 2 && widgetStack->currentWidget() != pageProgress) {
         phase = -1;
-        gotoPage(2);
+        gotoPage(Step::Disk);
     } else {
         phase = -1;
     }
@@ -2410,7 +2308,6 @@ void MInstall::on_checkEncryptAuto_toggled(bool checked)
     labelCryptoPass->setEnabled(checked);
     labelCryptoPass2->setEnabled(checked);
     progCryptoPassMeter->setEnabled(checked);
-    pushAdvancedCrypto->setEnabled(checked);
     radioBootPBR->setDisabled(checked);
     if (checked) textCryptoPass->setFocus();
     // Account for addition/removal of the boot partition.
@@ -2420,149 +2317,6 @@ void MInstall::on_checkEncryptAuto_toggled(bool checked)
 void MInstall::on_radioCustomPart_clicked(bool checked)
 {
     checkEncryptAuto->setChecked(!checked);
-}
-
-void MInstall::on_pushLoadKey_clicked()
-{
-    pushLoadKey->setEnabled(false);
-    if (key.length() <= 0) {
-        QFileDialog dialog(this, "Select Key Material", "/mnt/antiX/root");
-        dialog.setAcceptMode(QFileDialog::AcceptOpen);
-        dialog.setFileMode(QFileDialog::ExistingFile);
-        const int rc = dialog.exec();
-        updateCursor(Qt::BusyCursor);
-        if (rc) {
-            const QStringList &files = dialog.selectedFiles();
-            if (files.count() == 1) key.load(files.at(0).toUtf8().constData(), -1);
-        }
-    } else {
-        const int ans = QMessageBox::question(this, windowTitle(),
-            tr("Are you sure you want to unload the current key?"),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        updateCursor(Qt::BusyCursor);
-        if (ans == QMessageBox::Yes) {
-            key.erase();
-            proc.sleep(100, true);
-            qApp->processEvents();
-            key.resize(0);
-        }
-    }
-    const int keylen = key.length(); // This might have changed above.
-    if (keylen<=0) pushLoadKey->setText(tr("Load key material..."));
-    else pushLoadKey->setText(tr("Unload %1-byte key").arg(keylen));
-    pushLoadKey->setEnabled(true);
-    updateCursor();
-}
-
-void MInstall::on_pushAdvancedCrypto_clicked()
-{
-    ixPageRefAdvancedFDE = widgetStack->currentIndex();
-    gotoPage(4);
-}
-
-void MInstall::on_pushAdvancedCryptoCust_clicked()
-{
-    ixPageRefAdvancedFDE = widgetStack->currentIndex();
-    gotoPage(4);
-}
-
-void MInstall::on_comboCryptoCipher_currentIndexChanged(const QString &arg1)
-{
-    int hashgroup = 1;
-    if (arg1 == "Blowfish") {
-        hashgroup = 7;
-        comboCryptoChain->clear();
-        comboCryptoChain->addItem("CBC");
-        comboCryptoChain->addItem("ECB");
-    } else {
-        if (arg1 == "Serpent" || arg1 == "CAST6") hashgroup = 3;
-        comboCryptoChain->clear();
-        comboCryptoChain->addItem("XTS");
-        comboCryptoChain->addItem("CBC");
-        comboCryptoChain->addItem("ECB");
-    }
-    on_comboCryptoChain_currentIndexChanged(comboCryptoChain->currentText());
-
-    comboCryptoIVHash->clear();
-    if (hashgroup & 4) comboCryptoIVHash->addItem("SHA-384", QVariant("sha384"));
-    if (hashgroup & 1) comboCryptoIVHash->addItem("SHA-256", QVariant("sha256"));
-    if (hashgroup & 2) comboCryptoIVHash->addItem("SHA-224", QVariant("sha224"));
-    if (hashgroup & 4) comboCryptoIVHash->addItem("Whirlpool-384", QVariant("wp384"));
-    if (hashgroup & 1) comboCryptoIVHash->addItem("Whirlpool-256", QVariant("wp256"));
-    if (hashgroup & 1) comboCryptoIVHash->addItem("Tiger", QVariant("tgr192"));
-    if (hashgroup & 2) comboCryptoIVHash->addItem("Tiger/160", QVariant("tgr160"));
-    if (hashgroup & 1) comboCryptoIVHash->addItem("Tiger/128", QVariant("tgr128"));
-    if (hashgroup & 4) comboCryptoIVHash->addItem("RIPEMD-320", QVariant("rmd320"));
-    if (hashgroup & 1) comboCryptoIVHash->addItem("RIPEMD-256", QVariant("rmd256"));
-    comboCryptoIVHash->insertSeparator(100);
-    if (hashgroup & 2) comboCryptoIVHash->addItem("RIPEMD-160", QVariant("rmd160"));
-    if (hashgroup & 1) comboCryptoIVHash->addItem("RIPEMD-128", QVariant("rmd128"));
-    if (hashgroup & 2) comboCryptoIVHash->addItem("SHA-1", QVariant("sha1"));
-    if (hashgroup & 1) comboCryptoIVHash->addItem("MD5", QVariant("md5"));
-    if (hashgroup & 1) comboCryptoIVHash->addItem("MD4", QVariant("md4"));
-}
-
-void MInstall::on_comboCryptoChain_currentIndexChanged(const QString &arg1)
-{
-    int multKey = 1; // Multiplier for key sizes.
-
-    if (arg1 == "ECB") {
-        labelCryptoIVGen->setEnabled(false);
-        comboCryptoIVGen->setEnabled(false);
-        comboCryptoIVHash->setEnabled(false);
-        comboCryptoIVGen->setCurrentIndex(-1);
-    } else {
-        int ixIVGen = -1;
-        if (arg1 == "XTS") {
-            multKey = 2;
-            ixIVGen = comboCryptoIVGen->findText("Plain64");
-        } else if (arg1 == "CBC") {
-            ixIVGen = comboCryptoIVGen->findText("ESSIV");
-        }
-        if (ixIVGen >= 0) comboCryptoIVGen->setCurrentIndex(ixIVGen);
-        labelCryptoIVGen->setEnabled(true);
-        comboCryptoIVGen->setEnabled(true);
-        comboCryptoIVHash->setEnabled(true);
-    }
-
-    const QString &strCipher = comboCryptoCipher->currentText();
-    if (strCipher == "Blowfish") {
-        spinCryptoKeySize->setSingleStep(multKey*8);
-        spinCryptoKeySize->setRange(multKey*64, multKey*448);
-    } else if (strCipher == "Twofish" || strCipher == "AES") {
-        spinCryptoKeySize->setSingleStep(multKey*64);
-        spinCryptoKeySize->setRange(multKey*128, multKey*256);
-    } else {
-        spinCryptoKeySize->setSingleStep(multKey*16);
-        spinCryptoKeySize->setRange(multKey*128, multKey*256);
-    }
-    spinCryptoKeySize->setValue(65536);
-}
-
-void MInstall::on_comboCryptoIVGen_currentIndexChanged(const QString &arg1)
-{
-    if (arg1 == "ESSIV") {
-        comboCryptoIVHash->show();
-        comboCryptoIVHash->setCurrentIndex(0);
-    } else {
-        comboCryptoIVHash->hide();
-    }
-}
-
-void MInstall::on_spinCryptoKeySize_valueChanged(int i)
-{
-    bool entered = false;
-    if (!entered) {
-        entered = true;
-        int iSingleStep = spinCryptoKeySize->singleStep();
-        int iMod = i % iSingleStep;
-        if (iMod) spinCryptoKeySize->setValue(i + (iSingleStep - iMod));
-    }
-}
-
-void MInstall::on_comboCryptoKDF_currentIndexChanged(const QString &arg1)
-{
-    spinCryptoKDFMemory->setEnabled(arg1 != "PBKDF2");
 }
 
 void MInstall::on_radioBootMBR_toggled()
