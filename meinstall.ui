@@ -408,22 +408,6 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="2" colspan="3">
-                  <widget class="QPushButton" name="pushAdvancedCrypto">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Advanced encryption settings</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="0" column="0" colspan="2">
                   <widget class="QLabel" name="labelDisk">
                    <property name="sizePolicy">
@@ -765,23 +749,6 @@
               <string>Encryption options</string>
              </property>
              <layout class="QGridLayout" name="gridLayout2c">
-              <item row="1" column="2" colspan="2">
-               <widget class="MPassEdit" name="textCryptoPassCust2">
-                <property name="maxLength">
-                 <number>512</number>
-                </property>
-                <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="2">
-               <widget class="QLabel" name="labelCryptoPassCust2">
-                <property name="text">
-                 <string>Confirm password:</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="2" colspan="2">
                <widget class="MPassEdit" name="textCryptoPassCust">
                 <property name="maxLength">
@@ -815,373 +782,20 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="2" colspan="3">
-               <widget class="QPushButton" name="pushAdvancedCryptoCust">
+              <item row="1" column="2" colspan="2">
+               <widget class="MPassEdit" name="textCryptoPassCust2">
+                <property name="maxLength">
+                 <number>512</number>
+                </property>
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QLabel" name="labelCryptoPassCust2">
                 <property name="text">
-                 <string>Advanced encryption settings</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="pageCrypto">
-          <layout class="QGridLayout" name="_6">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item row="1" column="0">
-            <widget class="QGroupBox" name="boxCrypto">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="title">
-              <string>Advanced encryption settings</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_5">
-              <item row="4" column="0">
-               <widget class="QLabel" name="labelCryptoHash">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>LUKS key hash:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="2">
-               <widget class="QSpinBox" name="spinCryptoKeySize">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-                <property name="suffix">
-                 <string>-bit</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="3">
-               <widget class="QComboBox" name="comboCryptoIVHash">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="labelCryptoRandom">
-                <property name="text">
-                 <string>Kernel RNG:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="2">
-               <widget class="QComboBox" name="comboCryptoRandom">
-                <item>
-                 <property name="text">
-                  <string>urandom</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>random</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QComboBox" name="comboCryptoCipher">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string/>
-                </property>
-                <property name="currentIndex">
-                 <number>1</number>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>Serpent</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>AES</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Twofish</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>CAST6</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Blowfish</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QComboBox" name="comboCryptoChain">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-               </widget>
-              </item>
-              <item row="7" column="2">
-               <widget class="QPushButton" name="pushBenchmarkCrypto">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string/>
-                </property>
-                <property name="text">
-                 <string>Benchmark...</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="labelCryptoKeySize">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Key size:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="labelCryptoIVGen">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>IV generator:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="8" column="0">
-               <spacer name="verticalSpacer_6">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="labelCryptoChain">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Chain mode:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
-               <widget class="QComboBox" name="comboCryptoIVGen">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="currentIndex">
-                 <number>1</number>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>ESSIV</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Plain64</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Plain64BE</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Plain</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>BENBI</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="7" column="0" colspan="2">
-               <widget class="QPushButton" name="pushLoadKey">
-                <property name="text">
-                 <string>Load key material...</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="labelCryptoCipher">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Cipher:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="0">
-               <widget class="QLabel" name="labelCryptoRoundTime">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>KDF round time:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="4">
-               <spacer name="horizontalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="4" column="2">
-               <widget class="QComboBox" name="comboCryptoHash">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string/>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>SHA-512</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>SHA-256</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Whirlpool</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>SHA-1</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>RIPEMD-160</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item row="6" column="2">
-               <widget class="QSpinBox" name="spinCryptoRoundTime">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string/>
-                </property>
-                <property name="alignment">
-                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                </property>
-                <property name="suffix">
-                 <string> mS</string>
-                </property>
-                <property name="maximum">
-                 <number>999999999</number>
-                </property>
-                <property name="singleStep">
-                 <number>1000</number>
-                </property>
-                <property name="value">
-                 <number>2000</number>
+                 <string>Confirm password:</string>
                 </property>
                </widget>
               </item>
@@ -2448,7 +2062,6 @@
   <tabstop>checkEncryptAuto</tabstop>
   <tabstop>textCryptoPass</tabstop>
   <tabstop>textCryptoPass2</tabstop>
-  <tabstop>pushAdvancedCrypto</tabstop>
   <tabstop>radioCustomPart</tabstop>
   <tabstop>treePartitions</tabstop>
   <tabstop>pushPartClear</tabstop>
@@ -2490,17 +2103,6 @@
   <tabstop>pushClose</tabstop>
   <tabstop>textHelp</tabstop>
   <tabstop>listLog</tabstop>
-  <tabstop>pushAdvancedCryptoCust</tabstop>
-  <tabstop>comboCryptoCipher</tabstop>
-  <tabstop>comboCryptoChain</tabstop>
-  <tabstop>comboCryptoIVGen</tabstop>
-  <tabstop>comboCryptoIVHash</tabstop>
-  <tabstop>spinCryptoKeySize</tabstop>
-  <tabstop>comboCryptoHash</tabstop>
-  <tabstop>comboCryptoRandom</tabstop>
-  <tabstop>spinCryptoRoundTime</tabstop>
-  <tabstop>pushLoadKey</tabstop>
-  <tabstop>pushBenchmarkCrypto</tabstop>
   <tabstop>comboTimeArea</tabstop>
   <tabstop>radioOldHomeUse</tabstop>
   <tabstop>radioOldHomeSave</tabstop>

@@ -1309,22 +1309,8 @@ bool PartMan::checkTargetDrivesOK()
 
 bool PartMan::luksMake(const QString &dev, const QByteArray &password)
 {
-    QString strCipherSpec = gui.comboCryptoCipher->currentText()
-        + "-" + gui.comboCryptoChain->currentText();
-    if (gui.comboCryptoChain->currentText() != "ECB") {
-        strCipherSpec += "-" + gui.comboCryptoIVGen->currentText();
-        if (gui.comboCryptoIVGen->currentText() == "ESSIV")
-            strCipherSpec += ":" + gui.comboCryptoIVHash->currentData().toString();
-    }
-    QString cmd = "cryptsetup --batch-mode"
-        " --cipher " + strCipherSpec.toLower()
-        + " --key-size " + gui.spinCryptoKeySize->cleanText()
-        + " --hash " + gui.comboCryptoHash->currentText().toLower().remove('-')
-        + " --use-" + gui.comboCryptoRandom->currentText()
-        + " --iter-time " + gui.spinCryptoRoundTime->cleanText()
-        + " luksFormat " + dev;
-    if (!proc.exec(cmd, true, &password)) return false;
-    proc.sleep(1000);
+    const QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512 luksFormat ";
+    if (!proc.exec(cmd + dev, true, &password)) return false;
     return true;
 }
 
