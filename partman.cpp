@@ -458,8 +458,9 @@ void PartMan::comboUseTextChange(const QString &text)
     else if (usetext == "BIOS-GRUB") useClass = 2;
     else if (usetext == "/boot") useClass = 3;
     else if (usetext == "SWAP") useClass = 4;
+    else if (usetext == "/") useClass = 5;
     else if (usetext == "FORMAT") useClass = 100;
-    else useClass = 5;
+    else useClass = 6;
     int oldUseClass = combo->property("class").toInt();
     bool allowPreserve = false, selPreserve = false;
     if (useClass != oldUseClass) {
@@ -546,8 +547,9 @@ void PartMan::comboFormatTextChange(const QString &)
     for (; *it; ++it) {
         if (!twitFlag(*it, Partition)) continue;
         QComboBox *comboFormat = twitComboBox(*it, Format);
+        QLineEdit *editLabel = twitLineEdit(*it, Label);
         QLineEdit *editOpts = twitLineEdit(*it, Options);
-        if (!comboFormat || !editOpts) return;
+        if (!comboFormat || !editLabel || !editOpts) return;
         const QString &format = comboFormat->currentText();
         if (comboFormat->currentData(Qt::UserRole) != "PRESERVE") {
             if (format != "btrfs") {
@@ -568,7 +570,14 @@ void PartMan::comboFormatTextChange(const QString &)
                 if (format == "reiser") editOpts->setText("noatime,notail");
                 else if (format == "SWAP") editOpts->setText("defaults");
                 else editOpts->setText("noatime");
+                editLabel->setEnabled(true);
+                if(!(editLabel->isModified()) || editLabel->text().isEmpty()) {
+                    editLabel->setText(defaultLabels.value(twitUseFor(*it)));
+                }
             }
+        } else {
+            editLabel->setEnabled(false);
+            editLabel->setText((*it)->text(Label));
         }
     }
     gui.checkBadBlocks->setEnabled(canCheckBlocks);
@@ -1229,7 +1238,7 @@ bool PartMan::calculatePartBD()
             if (useExist) {
                 BlockDeviceInfo &bdinfo = listBlkDevs[ixPartBD];
                 listToUnmount << bdinfo.name;
-                QLineEdit *editLabel = static_cast<QLineEdit *>(gui.treePartitions->itemWidget(twit, Label));
+                QLineEdit *editLabel = twitLineEdit(twit, Label);
                 if (editLabel) bdinfo.label = editLabel->text();
                 if (twitWillFormat(twit) && !bdFS.isEmpty()) bdinfo.fs = bdFS;
                 bdinfo.isNasty = false; // future partitions are safe
