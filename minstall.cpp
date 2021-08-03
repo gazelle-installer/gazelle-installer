@@ -17,20 +17,24 @@
  *   limitations under the License.
  ****************************************************************************/
 
-#include <cstdlib>
 #include <QDebug>
 #include <QFileInfo>
-#include <QTimer>
+#include <QLockFile>
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QTimeZone>
+#include <QTimer>
 #include <QToolTip>
+
+#include <cstdlib>
 #include <fcntl.h>
-#include <sys/statvfs.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 
 #include "version.h"
 #include "minstall.h"
+
+static QLockFile lock_file("/var/lock/gazelle-installer.lock");
 
 enum Step {
     Splash,
@@ -144,8 +148,8 @@ void MInstall::startup()
     proc.log(__PRETTY_FUNCTION__);
     resizeEvent(nullptr);
 
-    // Exit if "minstall" is already running.
-    if (proc.exec("ps -C minstall | sed '0,/minstall/{s/minstall//}' | grep minstall")) {
+    // Set Lock or exit if lockfile is present.
+    if (!lock_file.tryLock()) {
         QMessageBox::critical(this, windowTitle(),
             tr("The installer won't launch because it appears to be running already in the background.\n\n"
                 "Please close it if possible, or run 'pkill minstall' in terminal."));
@@ -2133,6 +2137,7 @@ bool MInstall::abort(bool onclose)
 void MInstall::cleanup(bool endclean)
 {
     proc.log(__PRETTY_FUNCTION__);
+    lock_file.unlock();
     if (pretend) return;
 
     proc.unhalt();
