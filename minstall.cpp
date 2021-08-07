@@ -253,27 +253,6 @@ void MInstall::startup()
         partman.defaultLabels["/home"] = "home" + PROJECTSHORTNAME;
         partman.defaultLabels["SWAP"] = "swap" + PROJECTSHORTNAME;
 
-        textCryptoPass->setDisabled(true);
-        textCryptoPass2->setDisabled(true);
-        labelCryptoPass->setDisabled(true);
-        labelCryptoPass2->setDisabled(true);
-        progCryptoPassMeter->setDisabled(true);
-        boxCryptoPass->setDisabled(true);
-
-        //disable encryption in gui if cryptsetup not present
-        QFileInfo cryptsetup("/sbin/cryptsetup");
-        QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
-        if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
-            checkEncryptAuto->hide();
-            textCryptoPass->hide();
-            textCryptoPass2->hide();
-            labelCryptoPass->hide();
-            labelCryptoPass2->hide();
-            progCryptoPassMeter->hide();
-            boxCryptoPass->hide();
-            treePartitions->setColumnHidden(4, true);
-        }
-
         // Detect snapshot-backup account(s)
         // test if there's another user other than demo in /home,
         // indicating a possible snapshot or complicated live-usb
@@ -293,6 +272,8 @@ void MInstall::startup()
     connect(textRootPass, &MPassEdit::validationChanged, this, &MInstall::userPassValidationChanged);
     // User name is required
     connect(textUserName, &QLineEdit::textChanged, this, &MInstall::userPassValidationChanged);
+    // Root account
+    connect(boxRootAccount, &QGroupBox::toggled, this, &MInstall::userPassValidationChanged);
 
     // set default host name
     textComputerName->setText(DEFAULT_HOSTNAME);
@@ -490,7 +471,7 @@ void MInstall::writeKeyFile()
     if (phase < 0) return;
     static const char *const rngfile = "/dev/urandom";
     const unsigned int keylength = 4096;
-    const QLineEdit *passedit = checkEncryptAuto->isChecked() ? textCryptoPass : textCryptoPassCust;
+    const QLineEdit *passedit = radioEntireDisk->isChecked() ? textCryptoPass : textCryptoPassCust;
     const QByteArray password(passedit->text().toUtf8());
     const char *keyfile = nullptr;
     bool newkey = true;
@@ -621,7 +602,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         const bool targetDrive = radioEntireDisk->isChecked();
         if (targetDrive || mode!=ConfigSave) {
             config->manageComboBox("Drive", comboDisk, true);
-            config->manageCheckBox("DriveEncrypt", checkEncryptAuto);
+            config->manageGroupCheckBox("DriveEncrypt", boxEncryptAuto);
             if (mode==ConfigSave) config->setValue("RootPortion", sliderPart->value());
             else if (config->contains("RootPortion")) {
                  const int sliderVal = config->value("RootPortion").toInt();
@@ -666,11 +647,10 @@ void MInstall::manageConfig(enum ConfigAction mode)
         if (!oobe) {
             // GRUB page
             config->startGroup("GRUB", pageBoot);
-            if (checkBoot->isChecked()) {
-                const char *grubChoices[] = {"MBR", "PBR", "ESP"};
-                QRadioButton *grubRadios[] = {radioBootMBR, radioBootPBR, radioBootESP};
-                config->manageRadios("Install", 3, grubChoices, grubRadios);
-            }
+            config->manageGroupCheckBox("Install", boxBoot);
+            const char *grubChoices[] = {"MBR", "PBR", "ESP"};
+            QRadioButton *grubRadios[] = {radioBootMBR, radioBootPBR, radioBootESP};
+            config->manageRadios("TargetType", 3, grubChoices, grubRadios);
             config->manageComboBox("Location", comboBoot, true);
             config->endGroup();
         }
@@ -919,7 +899,7 @@ bool MInstall::installLoader()
     if (efivarfs && !efivarfs_mounted)
         proc.exec("/bin/mount -t efivarfs efivarfs /sys/firmware/efi/efivars", true);
 
-    if (!checkBoot->isChecked()) {
+    if (!boxBoot->isChecked()) {
         // skip it
         proc.status(tr("Updating initramfs"));
         //if useing f2fs, then add modules to /etc/initramfs-tools/modules
@@ -1470,7 +1450,7 @@ int MInstall::showPage(int curr, int next)
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
             partman.clearAllUses();
-            partman.layoutDefault(partman.selectedDriveAuto(), -1, checkEncryptAuto->isChecked());
+            partman.layoutDefault(partman.selectedDriveAuto(), -1, boxEncryptAuto->isChecked());
             QWidget *nf = partman.composeValidate(true, PROJECTNAME);
             if (nf) {
                 nextFocus = nf;
@@ -1578,7 +1558,8 @@ void MInstall::pageDisplayed(int next)
             updateCursor();
         }
         pushBack->setEnabled(true);
-        pushNext->setEnabled(!(checkEncryptAuto->isChecked()) || textCryptoPass->isValid());
+        pushNext->setEnabled(radioCustomPart->isChecked()
+            || !boxEncryptAuto->isChecked() || textCryptoPass->isValid());
         return; // avoid the end that enables both Back and Next buttons
 
     case Step::Partitions:
@@ -2038,8 +2019,12 @@ void MInstall::diskPassValidationChanged(bool valid)
 }
 void MInstall::userPassValidationChanged()
 {
-    pushNext->setEnabled(!(textUserName->text().isEmpty())
-        && textUserPass->isValid() && textRootPass->isValid());
+    bool ok = !textUserName->text().isEmpty();
+    if (ok) ok = textUserPass->isValid() || textUserName->text().isEmpty();
+    if (ok && boxRootAccount->isChecked()) {
+        ok = textRootPass->isValid() || textRootPass->text().isEmpty();
+    }
+    pushNext->setEnabled(ok);
 }
 
 void MInstall::on_checkShowPass_stateChanged(int state)
@@ -2263,7 +2248,7 @@ void MInstall::on_sliderPart_sliderPressed()
 }
 void MInstall::on_sliderPart_valueChanged(int value)
 {
-    const bool crypto = checkEncryptAuto->isChecked();
+    const bool crypto = boxEncryptAuto->isChecked();
     QTreeWidgetItem *drvitem = partman.selectedDriveAuto();
     if (!drvitem) return;
     long long available = partman.layoutDefault(drvitem, 100, crypto, false);
@@ -2308,24 +2293,18 @@ void MInstall::on_sliderPart_valueChanged(int value)
     on_sliderPart_sliderPressed(); // For the tool tip.
 }
 
-void MInstall::on_checkEncryptAuto_toggled(bool checked)
+void MInstall::on_boxEncryptAuto_toggled(bool checked)
 {
-    textCryptoPass->clear();
-    pushNext->setDisabled(checked);
-    textCryptoPass->setEnabled(checked);
-    textCryptoPass2->setEnabled(checked);
-    labelCryptoPass->setEnabled(checked);
-    labelCryptoPass2->setEnabled(checked);
-    progCryptoPassMeter->setEnabled(checked);
+    pushNext->setEnabled(!checked || textCryptoPass->isValid());
     radioBootPBR->setDisabled(checked);
-    if (checked) textCryptoPass->setFocus();
     // Account for addition/removal of the boot partition.
     on_sliderPart_valueChanged(sliderPart->value());
 }
 
-void MInstall::on_radioCustomPart_clicked(bool checked)
+void MInstall::on_radioCustomPart_toggled(bool checked)
 {
-    checkEncryptAuto->setChecked(!checked);
+    if (checked) pushNext->setEnabled(true);
+    else on_boxEncryptAuto_toggled(boxEncryptAuto->isChecked());
 }
 
 void MInstall::on_radioBootMBR_toggled()

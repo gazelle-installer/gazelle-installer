@@ -102,7 +102,7 @@
        <attribute name="title">
         <string>Live Log</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout">
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -134,7 +134,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QGridLayout" name="_2">
+      <layout class="QGridLayout">
        <item row="4" column="0">
         <widget class="QPushButton" name="pushClose">
          <property name="text">
@@ -194,7 +194,7 @@
           <number>0</number>
          </property>
          <widget class="QWidget" name="pageSplash">
-          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <layout class="QVBoxLayout">
            <item>
             <widget class="QLabel" name="labelSplash">
              <property name="font">
@@ -216,7 +216,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageTerms">
-          <layout class="QGridLayout" name="_3">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -240,7 +240,7 @@
              <property name="title">
               <string>Terms of Use</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_3">
+             <layout class="QGridLayout">
               <item row="0" column="0">
                <widget class="QPlainTextEdit" name="textCopyright">
                 <property name="sizePolicy">
@@ -258,7 +258,7 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <layout class="QGridLayout" name="gridLayout_2">
+               <layout class="QGridLayout">
                 <item row="4" column="3">
                  <widget class="QLabel" name="labelKeyboardLayout"/>
                 </item>
@@ -337,7 +337,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageDisk">
-          <layout class="QGridLayout" name="_4">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -350,6 +350,19 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
+           <item row="2" column="0" colspan="2">
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="0" column="0" colspan="2">
             <widget class="QGroupBox" name="boxInstallationType">
              <property name="sizePolicy">
@@ -375,36 +388,16 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="0" colspan="2">
-               <widget class="QRadioButton" name="radioCustomPart">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Customize the disk layout</string>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="0" colspan="2">
                <widget class="QGroupBox" name="boxAutoPart">
                 <layout class="QGridLayout">
-                 <item row="4" column="0" colspan="2">
-                  <widget class="QLabel" name="labelCryptoPass2">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="text">
-                    <string>Confirm password:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="0" colspan="2">
-                  <widget class="QLabel" name="labelCryptoPass">
-                   <property name="text">
-                    <string>Encryption password:</string>
+                 <item row="0" column="2" colspan="2">
+                  <widget class="QComboBox" name="comboDisk">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
                    </property>
                   </widget>
                  </item>
@@ -427,53 +420,69 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="2" colspan="2">
-                  <widget class="MPassEdit" name="textCryptoPass">
-                   <property name="maxLength">
-                    <number>512</number>
-                   </property>
-                   <property name="echoMode">
-                    <enum>QLineEdit::Password</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0" colspan="2">
-                  <widget class="QCheckBox" name="checkEncryptAuto">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
+                 <item row="2" column="0" colspan="4">
+                  <widget class="QGroupBox" name="boxEncryptAuto">
+                   <property name="title">
                     <string>Encrypt</string>
                    </property>
+                   <property name="checkable">
+                    <bool>true</bool>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                   <layout class="QGridLayout">
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="labelCryptoPass">
+                      <property name="text">
+                       <string>Encryption password:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="MPassEdit" name="textCryptoPass">
+                      <property name="maxLength">
+                       <number>512</number>
+                      </property>
+                      <property name="echoMode">
+                       <enum>QLineEdit::Password</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2" rowspan="2">
+                     <widget class="QProgressBar" name="progCryptoPassMeter">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="labelCryptoPass2">
+                      <property name="text">
+                       <string>Confirm password:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="MPassEdit" name="textCryptoPass2">
+                      <property name="maxLength">
+                       <number>512</number>
+                      </property>
+                      <property name="echoMode">
+                       <enum>QLineEdit::Password</enum>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
-                 <item row="0" column="2" colspan="3">
-                  <widget class="QComboBox" name="comboDisk">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="4" rowspan="2">
-                  <widget class="QProgressBar" name="progCryptoPassMeter">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0" colspan="5">
+                 <item row="1" column="0" colspan="4">
                   <widget class="QFrame" name="boxSliderPart">
                    <property name="frameShape">
                     <enum>QFrame::StyledPanel</enum>
@@ -481,7 +490,7 @@
                    <property name="frameShadow">
                     <enum>QFrame::Sunken</enum>
                    </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_4">
+                   <layout class="QHBoxLayout">
                     <property name="leftMargin">
                      <number>0</number>
                     </property>
@@ -548,39 +557,29 @@
                    </layout>
                   </widget>
                  </item>
-                 <item row="4" column="2" colspan="2">
-                  <widget class="MPassEdit" name="textCryptoPass2">
-                   <property name="maxLength">
-                    <number>512</number>
-                   </property>
-                   <property name="echoMode">
-                    <enum>QLineEdit::Password</enum>
-                   </property>
-                  </widget>
-                 </item>
                 </layout>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QRadioButton" name="radioCustomPart">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Customize the disk layout</string>
+                </property>
                </widget>
               </item>
              </layout>
             </widget>
            </item>
-           <item row="1" column="0" colspan="2">
-            <spacer name="verticalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="pagePartitions">
-          <layout class="QGridLayout" name="_5">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -604,7 +603,7 @@
              <property name="title">
               <string>Choose partitions</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_4">
+             <layout class="QGridLayout">
               <property name="spacing">
                <number>0</number>
               </property>
@@ -748,7 +747,7 @@
              <property name="title">
               <string>Encryption options</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout2c">
+             <layout class="QGridLayout">
               <item row="0" column="2" colspan="2">
                <widget class="MPassEdit" name="textCryptoPassCust">
                 <property name="maxLength">
@@ -805,7 +804,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageBoot">
-          <layout class="QGridLayout" name="_7">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -819,173 +818,142 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="boxBootMethod">
+            <widget class="QGroupBox" name="boxBoot">
              <property name="title">
-              <string>Select Boot Method</string>
+              <string>Install GRUB for Linux and Windows</string>
              </property>
-             <layout class="QVBoxLayout">
-              <item>
-               <widget class="QCheckBox" name="checkBoot">
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <layout class="QGridLayout">
+              <item row="0" column="1">
+               <widget class="QRadioButton" name="radioBootMBR">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="mouseTracking">
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Master Boot Record</string>
+                </property>
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>MBR</string>
+                </property>
+                <property name="shortcut">
+                 <string>Alt+B</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QRadioButton" name="radioBootESP">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>EFI System Partition</string>
+                </property>
+                <property name="text">
+                 <string>ESP</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="2">
+               <widget class="QRadioButton" name="radioBootPBR">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Partition Boot Record</string>
+                </property>
+                <property name="text">
+                 <string>PBR</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="labelBoot">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Install GRUB for Linux and Windows</string>
-                </property>
-                <property name="shortcut">
-                 <string>Alt+A</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
+                 <string>System boot disk:</string>
                 </property>
                </widget>
               </item>
-              <item>
-               <widget class="QWidget" name="boxBoot" native="true">
-                <layout class="QGridLayout">
-                 <property name="topMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>0</number>
-                 </property>
-                 <item row="0" column="2">
-                  <widget class="QRadioButton" name="radioBootPBR">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>80</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="toolTip">
-                    <string>Partition Boot Record</string>
-                   </property>
-                   <property name="text">
-                    <string>PBR</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="labelBoot">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>System boot disk:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="labelBootInstall">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Location to install on:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="3">
-                  <widget class="QRadioButton" name="radioBootESP">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>80</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="toolTip">
-                    <string>EFI System Partition</string>
-                   </property>
-                   <property name="text">
-                    <string>ESP</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QRadioButton" name="radioBootMBR">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>80</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="mouseTracking">
-                    <bool>true</bool>
-                   </property>
-                   <property name="toolTip">
-                    <string>Master Boot Record</string>
-                   </property>
-                   <property name="autoFillBackground">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>MBR</string>
-                   </property>
-                   <property name="shortcut">
-                    <string>Alt+B</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="4">
-                  <spacer name="horizontalSpacer_3">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>0</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="1" column="1" colspan="4">
-                  <widget class="QComboBox" name="comboBoot">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelBootInstall">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Location to install on:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" colspan="4">
+               <widget class="QComboBox" name="comboBoot">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                </widget>
               </item>
              </layout>
@@ -1007,7 +975,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageServices">
-          <layout class="QGridLayout" name="_9">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1031,7 +999,7 @@
              <property name="title">
               <string>Common Services to Enable</string>
              </property>
-             <layout class="QGridLayout" name="_10">
+             <layout class="QGridLayout">
               <item row="0" column="0">
                <widget class="QTreeWidget" name="treeServices">
                 <property name="sizePolicy">
@@ -1064,7 +1032,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageNetwork">
-          <layout class="QGridLayout" name="_11">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1088,7 +1056,7 @@
              <property name="title">
               <string>Computer Network Names</string>
              </property>
-             <layout class="QGridLayout" name="_12">
+             <layout class="QGridLayout">
               <property name="leftMargin">
                <number>9</number>
               </property>
@@ -1233,7 +1201,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageLocalization">
-          <layout class="QGridLayout" name="_13">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1311,7 +1279,7 @@
                </widget>
               </item>
               <item row="0" column="0" colspan="4">
-               <layout class="QHBoxLayout" name="_18">
+               <layout class="QHBoxLayout">
                 <property name="spacing">
                  <number>0</number>
                 </property>
@@ -1403,7 +1371,7 @@
              <property name="title">
               <string>Localization Defaults</string>
              </property>
-             <layout class="QGridLayout" name="_14">
+             <layout class="QGridLayout">
               <property name="leftMargin">
                <number>9</number>
               </property>
@@ -1465,7 +1433,7 @@
              <property name="title">
               <string>Service Settings (advanced)</string>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout">
+             <layout class="QHBoxLayout">
               <item>
                <widget class="QPushButton" name="pushServices">
                 <property name="sizePolicy">
@@ -1507,7 +1475,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageUserAccounts">
-          <layout class="QGridLayout" name="_15">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1788,7 +1756,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageOldHome">
-          <layout class="QVBoxLayout" name="verticalLayout">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1806,7 +1774,7 @@
              <property name="title">
               <string>Existing Home Directory</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
+             <layout class="QVBoxLayout">
               <item>
                <widget class="QLabel" name="labelOldHome"/>
               </item>
@@ -1857,7 +1825,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageProgress">
-          <layout class="QGridLayout" name="_16">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -1907,7 +1875,7 @@
           </layout>
          </widget>
          <widget class="QWidget" name="pageEnd">
-          <layout class="QGridLayout" name="_17">
+          <layout class="QGridLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -2065,7 +2033,7 @@
   <tabstop>radioEntireDisk</tabstop>
   <tabstop>comboDisk</tabstop>
   <tabstop>sliderPart</tabstop>
-  <tabstop>checkEncryptAuto</tabstop>
+  <tabstop>boxEncryptAuto</tabstop>
   <tabstop>textCryptoPass</tabstop>
   <tabstop>textCryptoPass2</tabstop>
   <tabstop>radioCustomPart</tabstop>
@@ -2078,7 +2046,7 @@
   <tabstop>checkBadBlocks</tabstop>
   <tabstop>textCryptoPassCust</tabstop>
   <tabstop>textCryptoPassCust2</tabstop>
-  <tabstop>checkBoot</tabstop>
+  <tabstop>boxBoot</tabstop>
   <tabstop>radioBootMBR</tabstop>
   <tabstop>radioBootPBR</tabstop>
   <tabstop>radioBootESP</tabstop>
@@ -2096,6 +2064,7 @@
   <tabstop>textUserName</tabstop>
   <tabstop>textUserPass</tabstop>
   <tabstop>textUserPass2</tabstop>
+  <tabstop>boxRootAccount</tabstop>
   <tabstop>textRootPass</tabstop>
   <tabstop>textRootPass2</tabstop>
   <tabstop>checkShowPass</tabstop>
@@ -2123,12 +2092,6 @@
    <sender>radioEntireDisk</sender>
    <signal>toggled(bool)</signal>
    <receiver>boxAutoPart</receiver>
-   <slot>setEnabled(bool)</slot>
-  </connection>
-  <connection>
-   <sender>checkBoot</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>boxBoot</receiver>
    <slot>setEnabled(bool)</slot>
   </connection>
  </connections>
