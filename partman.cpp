@@ -36,6 +36,7 @@
 #include <QStandardItemModel>
 #include <QFormLayout>
 #include <QDialogButtonBox>
+#include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -69,6 +70,15 @@ void PartMan::setup()
     gui.pushPartClear->setEnabled(false);
     defaultLabels["ESP"] = "EFI System";
     defaultLabels["BIOS-GRUB"] = "BIOS GRUB";
+
+    // Disable encryption in GUI if cryptsetup not present.
+    QFileInfo cryptsetup("/sbin/cryptsetup");
+    QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
+    if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
+        gui.boxEncryptAuto->hide();
+        gui.boxCryptoPass->hide();
+        gui.treePartitions->setColumnHidden(Encrypt, true);
+    }
 }
 
 void PartMan::populate(QTreeWidgetItem *drvstart)
@@ -1674,7 +1684,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     QFile file("/mnt/antiX/etc/crypttab");
     if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
-    const QLineEdit *passedit = gui.checkEncryptAuto->isChecked()
+    const QLineEdit *passedit = gui.radioEntireDisk->isChecked()
         ? gui.textCryptoPass : gui.textCryptoPassCust;
     const QByteArray password(passedit->text().toUtf8());
     const QString cmdAddKey("cryptsetup luksAddKey /dev/%1 /mnt/antiX" + keyfile);
