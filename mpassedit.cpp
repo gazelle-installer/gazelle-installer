@@ -53,6 +53,10 @@ void MPassEdit::setup(MPassEdit *slave, QProgressBar *meter,
         meter->setValue(0);
         meter->setTextVisible(false);
     }
+    actionEye = addAction(QIcon(":/eye-show"), QLineEdit::TrailingPosition);
+    actionEye->setCheckable(true);
+    connect(actionEye, &QAction::toggled, this, &MPassEdit::eyeToggled);
+    eyeToggled(false); // Initialize the eye.
 }
 
 void MPassEdit::generate()
@@ -102,6 +106,15 @@ void MPassEdit::contextMenuEvent(QContextMenuEvent *event)
         slave->setText(genText);
     }
     delete menu;
+}
+
+void MPassEdit::changeEvent(QEvent *event)
+{
+    const QEvent::Type etype = event->type();
+    if(etype == QEvent::EnabledChange || etype == QEvent::Hide) {
+        if(actionEye && !(isVisible() && isEnabled())) actionEye->setChecked(false);
+    }
+    QLineEdit::changeEvent(event);
 }
 
 void MPassEdit::masterTextChanged()
@@ -167,4 +180,11 @@ void MPassEdit::slaveTextChanged(const QString &slaveText)
         lastValid = valid;
         emit validationChanged(valid);
     }
+}
+
+void MPassEdit::eyeToggled(bool checked)
+{
+    actionEye->setIcon(QIcon(checked ? ":/eye-hide" : ":/eye-show"));
+    actionEye->setToolTip(checked ? tr("Hide the password") : tr("Show the password"));
+    setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
 }
