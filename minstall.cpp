@@ -727,6 +727,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         const char *oldHomeActions[] = {"Use", "Save", "Delete"};
         QRadioButton *oldHomeRadios[] = {radioOldHomeUse, radioOldHomeSave, radioOldHomeDelete};
         config->manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
+        config->manageGroupCheckBox("EnableRoot", boxRootAccount);
         if (mode != ConfigSave) {
             const QString &upass = config->value("UserPass").toString();
             textUserPass->setText(upass);
@@ -1102,7 +1103,7 @@ bool MInstall::validateUserInfo()
         }
     }
 
-    if (!automatic && textRootPass->text().isEmpty()) {
+    if (!automatic && boxRootAccount->isChecked() && textRootPass->text().isEmpty()) {
         // Confirm that an empty root password is not accidental.
         const QMessageBox::StandardButton ans = QMessageBox::warning(this,
             windowTitle(), tr("You did not provide a password for the root account."
@@ -1132,10 +1133,13 @@ bool MInstall::setUserInfo()
     QString cmdChRoot;
     if (!oobe) cmdChRoot = "chroot /mnt/antiX ";
     const QString &userPass = textUserPass->text();
-    const QString &rootPass = textRootPass->text();
     QByteArray userinfo;
-    if (rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
-    else userinfo.append(QString("root:" + rootPass).toUtf8());
+    if (!(boxRootAccount->isChecked())) ok = proc.exec(cmdChRoot + "passwd -l root", true);
+    else {
+        const QString &rootPass = textRootPass->text();
+        if (rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
+        else userinfo.append(QString("root:" + rootPass).toUtf8());
+    }
     if (ok && userPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d demo", true);
     else {
         if (!userinfo.isEmpty()) userinfo.append('\n');
