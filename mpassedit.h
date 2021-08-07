@@ -32,11 +32,14 @@ private:
     int min, genMin, wordMax;
     bool lastValid = false;
     QProgressBar *meter = nullptr;
+    QAction *actionEye = nullptr;
     void generate();
     void masterTextChanged();
     void slaveTextChanged(const QString &slaveText);
+    void eyeToggled(bool checked);
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
+    void changeEvent(QEvent *event);
 public:
     MPassEdit(QWidget *parent = nullptr);
     void setup(MPassEdit *slave, QProgressBar *meter,

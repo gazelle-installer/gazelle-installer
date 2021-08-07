@@ -98,7 +98,6 @@ private slots:
     void on_pushSetKeyboard_clicked();
     void on_pushClose_clicked();
     void on_pushNext_clicked();
-    void on_checkShowPass_stateChanged(int);
     void on_pushPartReload_clicked();
     void on_pushRunPartMan_clicked();
     void on_pushServices_clicked();
