@@ -19,7 +19,6 @@
 
 #include <QDebug>
 #include <QFileInfo>
-#include <QLockFile>
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QTimeZone>
@@ -33,8 +32,6 @@
 
 #include "version.h"
 #include "minstall.h"
-
-static QLockFile lock_file("/var/lock/gazelle-installer.lock");
 
 enum Step {
     Splash,
@@ -147,14 +144,6 @@ void MInstall::startup()
 {
     proc.log(__PRETTY_FUNCTION__);
     resizeEvent(nullptr);
-
-    // Set Lock or exit if lockfile is present.
-    if (!lock_file.tryLock()) {
-        QMessageBox::critical(this, windowTitle(),
-            tr("The installer won't launch because it appears to be running already in the background.\n\n"
-                "Please close it if possible, or run 'pkill minstall' in terminal."));
-        exit(EXIT_FAILURE);
-    }
 
     if (oobe) {
         containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
@@ -2109,7 +2098,6 @@ bool MInstall::abort(bool onclose)
 void MInstall::cleanup(bool endclean)
 {
     proc.log(__PRETTY_FUNCTION__);
-    lock_file.unlock();
     if (pretend) return;
 
     proc.unhalt();
