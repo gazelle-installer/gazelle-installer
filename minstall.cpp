@@ -1114,9 +1114,9 @@ bool MInstall::setUserInfo()
     if (!oobe) cmdChRoot = "chroot /mnt/antiX ";
     const QString &userPass = textUserPass->text();
     QByteArray userinfo;
+    const QString &rootPass = textRootPass->text();
     if (!(boxRootAccount->isChecked())) ok = proc.exec(cmdChRoot + "passwd -l root", true);
     else {
-        const QString &rootPass = textRootPass->text();
         if (rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
         else userinfo.append(QString("root:" + rootPass).toUtf8());
     }
@@ -1218,8 +1218,8 @@ bool MInstall::setUserInfo()
     }
     proc.exec("touch " + rootpath + "/var/mail/" + textUserName->text());
 
-    // FIX for MX-19 and earlier: Ensure graphical sudo works with password-free root.
-    if (rootPass.isEmpty()) {
+    // FIX for MX-19: Ensure graphical sudo works with disabled or password-free root.
+    if (!boxRootAccount->isChecked() || rootPass.isEmpty()) {
         QFile file(rootpath + "/etc/polkit-1/localauthority.conf.d/55-tweak-override.conf");
         if (file.open(QIODevice::WriteOnly))
             QTextStream(&file) << "[Configuration]\nAdminIdentities=unix-group:sudo";
