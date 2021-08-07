@@ -106,8 +106,8 @@ private slots:
     void on_comboDisk_currentIndexChanged(int);
     void on_sliderPart_sliderPressed();
     void on_sliderPart_valueChanged(int value);
-    void on_checkEncryptAuto_toggled(bool checked);
-    void on_radioCustomPart_clicked(bool checked);
+    void on_boxEncryptAuto_toggled(bool checked);
+    void on_radioCustomPart_toggled(bool checked);
 
     void on_radioBootMBR_toggled();
     void on_radioBootPBR_toggled();
