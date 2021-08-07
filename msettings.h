@@ -20,6 +20,7 @@
 #ifndef MSETTINGS_H
 #define MSETTINGS_H
 
+#include <QGroupBox>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QRadioButton>
@@ -44,6 +45,7 @@ public:
     static bool isBadWidget(QWidget *widget);
     void manageComboBox(const QString &key, QComboBox *combo, const bool useData);
     void manageCheckBox(const QString &key, QCheckBox *checkbox);
+    void manageGroupCheckBox(const QString &key, QGroupBox *groupbox);
     void manageLineEdit(const QString &key, QLineEdit *lineedit);
     void manageSpinBox(const QString &key, QSpinBox *spinbox);
     int manageEnum(const QString &key, const int nchoices,
