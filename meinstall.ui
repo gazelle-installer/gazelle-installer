@@ -1488,109 +1488,20 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item row="6" column="0">
-            <spacer>
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="0">
-            <widget class="QGroupBox" name="boxRootAccount">
+           <item row="4" column="0">
+            <widget class="QCheckBox" name="checkSaveDesktop">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="title">
-              <string>Root (administrator) Account</string>
+             <property name="toolTip">
+              <string>Desktop modifications made in the live environment will be carried over to the installed OS</string>
              </property>
-             <property name="checkable">
-              <bool>true</bool>
+             <property name="text">
+              <string>Save live desktop changes</string>
              </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-             <layout class="QGridLayout">
-              <item row="0" column="0">
-               <widget class="QLabel" name="labelRootPass">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Root password:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="MPassEdit" name="textRootPass">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="MPassEdit" name="textRootPass2">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="labelRootPass2">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Confirm root password:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2" rowspan="2">
-               <widget class="QProgressBar" name="progRootPassMeter">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-             </layout>
             </widget>
            </item>
            <item row="0" column="0">
@@ -1711,7 +1622,99 @@
              </layout>
             </widget>
            </item>
-           <item row="4" column="0">
+           <item row="1" column="0">
+            <widget class="QGroupBox" name="boxRootAccount">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="title">
+              <string>Root (administrator) Account</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QGridLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelRootPass">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Root password:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="MPassEdit" name="textRootPass">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="MPassEdit" name="textRootPass2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="labelRootPass2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Confirm root password:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2" rowspan="2">
+               <widget class="QProgressBar" name="progRootPassMeter">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="3" column="0">
             <widget class="QCheckBox" name="checkAutoLogin">
              <property name="sizePolicy">
               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
@@ -1724,34 +1727,18 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QCheckBox" name="checkShowPass">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Show passwords</string>
-             </property>
-            </widget>
-           </item>
            <item row="5" column="0">
-            <widget class="QCheckBox" name="checkSaveDesktop">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
              </property>
-             <property name="toolTip">
-              <string>Desktop modifications made in the live environment will be carried over to the installed OS</string>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
              </property>
-             <property name="text">
-              <string>Save live desktop changes</string>
-             </property>
-            </widget>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -2067,7 +2054,6 @@
   <tabstop>boxRootAccount</tabstop>
   <tabstop>textRootPass</tabstop>
   <tabstop>textRootPass2</tabstop>
-  <tabstop>checkShowPass</tabstop>
   <tabstop>checkAutoLogin</tabstop>
   <tabstop>checkSaveDesktop</tabstop>
   <tabstop>textReminders</tabstop>

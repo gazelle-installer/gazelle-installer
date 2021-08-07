@@ -2027,23 +2027,6 @@ void MInstall::userPassValidationChanged()
     pushNext->setEnabled(ok);
 }
 
-void MInstall::on_checkShowPass_stateChanged(int state)
-{
-    if (state == Qt::Unchecked) {
-        // don't show
-        textUserPass->setEchoMode(QLineEdit::Password);
-        textUserPass2->setEchoMode(QLineEdit::Password);
-        textRootPass->setEchoMode(QLineEdit::Password);
-        textRootPass2->setEchoMode(QLineEdit::Password);
-    } else {
-        // show
-        textUserPass->setEchoMode(QLineEdit::Normal);
-        textUserPass2->setEchoMode(QLineEdit::Normal);
-        textRootPass->setEchoMode(QLineEdit::Normal);
-        textRootPass2->setEchoMode(QLineEdit::Normal);
-    }
-}
-
 void MInstall::on_pushNext_clicked()
 {
     gotoPage(widgetStack->currentIndex() + 1);
