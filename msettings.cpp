@@ -103,6 +103,13 @@ void MSettings::manageCheckBox(const QString &key, QCheckBox *checkbox)
     else if (contains(key)) checkbox->setChecked(value(key, state).toBool());
 }
 
+void MSettings::manageGroupCheckBox(const QString &key, QGroupBox *groupbox)
+{
+    const QVariant state(groupbox->isChecked());
+    if (saving) setValue(key, state);
+    else if (contains(key)) groupbox->setChecked(value(key, state).toBool());
+}
+
 void MSettings::manageLineEdit(const QString &key, QLineEdit *lineedit)
 {
     const QString &text = lineedit->text();
