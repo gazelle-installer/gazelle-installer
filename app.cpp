@@ -23,7 +23,6 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QDesktopWidget>
-#include <QDir>
 #include <QFile>
 #include <QFont>
 #include <QLibraryInfo>
@@ -34,6 +33,7 @@
 #include <QString>
 #include <QStringList>
 #include <QTranslator>
+#include <QLockFile>
 
 #include "minstall.h"
 #include "version.h"
@@ -83,6 +83,16 @@ int main(int argc, char *argv[])
     }
 
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
+
+    // The lock is released when this object is destroyed.
+    QLockFile lockfile("/var/lock/gazelle-installer.lock");
+    // Set Lock or exit if lockfile is present.
+    if (!lockfile.tryLock()) {
+        QMessageBox::critical(nullptr, QString(),
+            QApplication::tr("The installer won't launch because it appears to be running already in the background.\n\n"
+                "Please close it if possible, or run 'pkill minstall' in terminal."));
+        return EXIT_FAILURE;
+    }
 
     const QString logFileName("/var/log/minstall.log");
     logFile.reset(new QFile(logFileName));
