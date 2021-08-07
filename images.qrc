@@ -1,6 +1,8 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource>
+        <file alias="eye-show">icons/eye-show.svg</file>
+        <file alias="eye-hide">icons/eye-hide.svg</file>
         <file alias="appointment-soon">icons/appointment-soon.svg</file>
         <file alias="dialog-warning">icons/dialog-warning.svg</file>
         <file alias="list-add">icons/list-add.svg</file>
