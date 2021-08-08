@@ -197,6 +197,7 @@ void PartMan::scanVirtualDevices(bool rescan)
     for (const auto &it : listed.toStdMap()) delete it.second;
     drvitMarkLayout(vdlit, true);
     vdlit->sortChildren(Device, Qt::AscendingOrder);
+    vdlit->setExpanded(true);
 }
 
 bool PartMan::manageConfig(MSettings &config, bool save)
@@ -365,7 +366,6 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
     editOptions->setAutoFillBackground(true);
     gui.treePartitions->setItemWidget(partit, Options, editOptions);
     editOptions->setEnabled(false);
-    editOptions->setText("noatime");
     editOptions->setProperty("row", QVariant::fromValue<void *>(partit));
     editOptions->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(editOptions, &QLineEdit::customContextMenuRequested, this, &PartMan::partOptionsMenu);
@@ -540,7 +540,7 @@ void PartMan::comboUseTextChange(const QString &text)
         comboFormat->setEnabled(comboFormat->count()>1);
         // Label and options
         editLabel->setEnabled(useClass != 0);
-        gui.treePartitions->itemWidget(partit, Options)->setEnabled(useClass != 0 && useClass != 2 && useClass < 100);
+        gui.treePartitions->itemWidget(partit, Options)->setEnabled(useClass > 2 && useClass < 100);
         combo->setProperty("class", QVariant(useClass));
     }
     if (useClass != 0 && (!(editLabel->isModified()) || editLabel->text().isEmpty())) {
@@ -560,8 +560,10 @@ void PartMan::comboFormatTextChange(const QString &)
         QLineEdit *editLabel = twitLineEdit(*it, Label);
         QLineEdit *editOpts = twitLineEdit(*it, Options);
         if (!comboFormat || !editLabel || !editOpts) return;
-        const QString &format = comboFormat->currentText();
+        QString format;
+        const QString &useFor = twitUseFor(*it);
         if (comboFormat->currentData(Qt::UserRole) != "PRESERVE") {
+            format = comboFormat->currentText().toLower();
             if (format != "btrfs") {
                 // Clear all subvolumes if not supported.
                 while ((*it)->childCount()) delete (*it)->child(0);
@@ -575,19 +577,23 @@ void PartMan::comboFormatTextChange(const QString &)
                     comboSubvolFmt->setEnabled(false);
                 }
             }
-            if (!twitUseFor(*it).isEmpty()) {
+            if (!useFor.isEmpty()) {
                 if (format.startsWith("ext") || format == "jfs") canCheckBlocks = true;
-                if (format == "reiser") editOpts->setText("noatime,notail");
-                else if (format == "SWAP") editOpts->setText("defaults");
-                else editOpts->setText("noatime");
                 editLabel->setEnabled(true);
                 if(!(editLabel->isModified()) || editLabel->text().isEmpty()) {
-                    editLabel->setText(defaultLabels.value(twitUseFor(*it)));
+                    editLabel->setText(defaultLabels.value(useFor));
                 }
             }
         } else {
+            format = (*it)->text(Format).toLower();
             editLabel->setEnabled(false);
             editLabel->setText((*it)->text(Label));
+        }
+        if (useFor.isEmpty() || useFor == "FORMAT" || useFor == "ESP") editOpts->clear();
+        else {
+            if (format == "reiserfs") editOpts->setText("noatime,notail");
+            else if (format == "swap") editOpts->setText("defaults");
+            else editOpts->setText("noatime");
         }
     }
     gui.checkBadBlocks->setEnabled(canCheckBlocks);
