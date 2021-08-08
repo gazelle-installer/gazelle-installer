@@ -29,7 +29,6 @@
 #include <QLocale>
 #include <QLoggingCategory>
 #include <QMessageBox>
-#include <QScopedPointer>
 #include <QString>
 #include <QStringList>
 #include <QTranslator>
@@ -38,7 +37,7 @@
 #include "minstall.h"
 #include "version.h"
 
-static QScopedPointer<QFile> logFile;
+static QFile logFile;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
@@ -94,9 +93,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    const QString logFileName("/var/log/minstall.log");
-    logFile.reset(new QFile(logFileName));
-    if (logFile.data()->open(QFile::Append | QFile::Text))
+    const QString logFileName = "/var/log/" + qApp->applicationName() + ".log";
+    if (logFile.open(QFile::Append | QFile::Text))
         qInstallMessageHandler(messageHandler);
     else
         qDebug() << "Cannot write to installer log:" << logFileName;
@@ -154,7 +152,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     term_out << msg << Qt::endl;
 
     // Open stream file writes
-    QTextStream out(logFile.data());
+    QTextStream out(&logFile);
 
     // Write the date of recording
     out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz ");
