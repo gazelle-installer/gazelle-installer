@@ -45,7 +45,7 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
 {
     if (halting) return false;
     ++execount;
-    qDebug().nospace() << "Exec #" << execount << ": " << cmd;
+    qDebug().nospace().noquote() << "Exec #" << execount << ": " << cmd;
     QListWidgetItem *logEntry = log(cmd, Exec);
     QEventLoop eloop;
     connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
