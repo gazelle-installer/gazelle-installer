@@ -66,7 +66,7 @@ public:
     bool processNextPhase();
     void setLocale();
     void setService(const QString &service, bool enabled);
-    void writeKeyFile();
+    bool writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
     bool POPULATE_MEDIA_MOUNTPOINTS;
