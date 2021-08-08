@@ -139,7 +139,7 @@ private:
     bool isRemasteredDemoPresent = false;
 
     // source medium
-    QString rootSources;
+    QStringList rootSources;
     QString bootSource;
 
     // auto-mount setup
