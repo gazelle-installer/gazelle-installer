@@ -83,8 +83,10 @@ void BlockDeviceList::build(MProcess &proc)
     for (const QJsonValue &jsonDrive : jsonBD) {
         int driveIndex = count(); // For propagating the nasty flag to the drive.
         if (jsonDrive["type"] != "disk") continue;
+        const QString &jdName = jsonDrive["name"].toString();
+        if (jdName.startsWith("zram")) continue;
         BlockDeviceInfo bdinfo;
-        bdinfo.name = jsonDrive["name"].toString();
+        bdinfo.name = jdName;
         bdinfo.isDrive = true;
         bdinfo.isGPT = (jsonDrive["pttype"]=="gpt");
         bdinfo.size = jsonDrive["size"].toVariant().toLongLong();
