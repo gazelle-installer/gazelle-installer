@@ -155,10 +155,10 @@ void MInstall::startup()
         if (QFile::exists("/live/aufs/etc/service") && QFile::exists("/live/aufs/sbin/runit"))
             containsRunit = true;
 
-        rootSources = "/live/aufs/bin /live/aufs/dev"
-                      " /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt"
-                      " /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr"
-                      " /live/aufs/var /live/aufs/home";
+        rootSources << "/live/aufs/bin" << "/live/aufs/dev"
+            << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/lib64" << "/live/aufs/media" << "/live/aufs/mnt"
+            << "/live/aufs/opt" << "/live/aufs/root" << "/live/aufs/sbin" << "/live/aufs/selinux" << "/live/aufs/usr"
+            << "/live/aufs/var" << "/live/aufs/home";
 
         //load some live variables
         QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
@@ -816,13 +816,14 @@ bool MInstall::copyLinux()
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
     // setup and start the process
-    QString cmd;
-    cmd = "/bin/cp -av";
+    QString prog = "/bin/cp -av";
+    QStringList args("-av");
     if (sync) {
-        cmd = "rsync -av --delete";
-        if (!partman.willFormat("/")) cmd.append(" --filter 'protect home/*'");
+        prog = "rsync";
+        args << "--delete";
+        if (!partman.willFormat("/")) args << "--filter" << "protect home/*";
     }
-    cmd.append(" " + bootSource + " " + rootSources + " /mnt/antiX");
+    args << bootSource << rootSources << "/mnt/antiX";
     struct statvfs svfs;
     fsfilcnt_t sourceInodes = 1;
     if (statvfs("/live/linux", &svfs) == 0) {
@@ -833,13 +834,14 @@ bool MInstall::copyLinux()
 
     if (!nocopy) {
         if (phase < 0) return false;
-        qDebug() << "Exec COPY:" << cmd;
-        QListWidgetItem *logEntry = proc.log(cmd, MProcess::Exec);
+        const QString &joined = MProcess::joinCommand(prog, args);
+        qDebug().noquote() << "Exec COPY:" << joined;
+        QListWidgetItem *logEntry = proc.log(joined, MProcess::Exec);
 
         QEventLoop eloop;
         connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
         connect(&proc, &QProcess::readyRead, &eloop, &QEventLoop::quit);
-        proc.start(cmd);
+        proc.start(prog, args);
         long ncopy = 0;
         while (proc.state() != QProcess::NotRunning) {
             eloop.exec();
