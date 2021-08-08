@@ -1334,7 +1334,7 @@ bool PartMan::luksFormat(const QString &dev, const QByteArray &password)
     const int ixdev = listBlkDevs.findDevice(dev);
     assert(ixdev >= 0);
     const int physec = listBlkDevs.at(ixdev).physec;
-    QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512";
+    QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512 --pbkdf argon2id";
     if (physec > 0) cmd += " --sector-size=" + QString::number(physec);
     cmd += " luksFormat /dev/" + dev;
     if (!proc.exec(cmd, true, &password)) return false;
