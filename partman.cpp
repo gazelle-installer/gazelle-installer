@@ -1334,7 +1334,7 @@ bool PartMan::checkTargetDrivesOK()
 
 bool PartMan::luksMake(const QString &dev, const QByteArray &password)
 {
-    const QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512 luksFormat ";
+    const QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512 --pbkdf argon2id luksFormat ";
     if (!proc.exec(cmd + dev, true, &password)) return false;
     return true;
 }
