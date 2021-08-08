@@ -45,12 +45,16 @@ bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *in
 {
     if (halting) return false;
     ++execount;
-    qDebug().nospace() << "Exec #" << execount << ": " << cmd;
+    qDebug().nospace().noquote() << "Exec #" << execount << ": " << cmd;
     QListWidgetItem *logEntry = log(cmd, Exec);
     QEventLoop eloop;
     connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
-    if (rawexec) start(cmd);
-    else start("/bin/bash", {"-c", cmd});
+    if (!rawexec) start("/bin/bash", {"-c", cmd});
+    else {
+        QStringList args = splitCommand(cmd);
+        QString prog = args.takeFirst();
+        start(prog, args);
+    }
     if (!debugUnusedOutput) {
         if (!needRead) closeReadChannel(QProcess::StandardOutput);
         closeReadChannel(QProcess::StandardError);
@@ -120,6 +124,24 @@ void MProcess::unhalt()
     }
     disconnect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
     halting = false;
+}
+
+QString MProcess::joinCommand(const QString &program, const QStringList &arguments)
+{
+    QString text = program;
+    for(QString arg : arguments) {
+        bool wspace = false;
+        for(const auto &ch : arg) {
+            if (ch.isSpace()) {
+                wspace = true;
+                break;
+            }
+        }
+        arg.replace("\"", "\\\"");
+        if (!wspace) text += ' ' + arg;
+        else text += " \"" + arg + "\"";
+    }
+    return text;
 }
 
 QListWidgetItem *MProcess::log(const QString &text, const LogType type)

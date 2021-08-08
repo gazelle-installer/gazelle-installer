@@ -50,6 +50,7 @@ public:
     QStringList execOutLines(const QString &cmd, const bool rawexec = false);
     void halt();
     void unhalt();
+    static QString joinCommand(const QString &program, const QStringList &arguments);
     QListWidgetItem *log(const QString &text, const enum LogType type = Section);
     void log(QListWidgetItem *entry, const int status = 1);
     void status(const QString &text, long progress = -1);
