@@ -455,9 +455,9 @@ bool MInstall::pretendToInstall(int space, long steps)
     return true;
 }
 
-void MInstall::writeKeyFile()
+bool MInstall::writeKeyFile()
 {
-    if (phase < 0) return;
+    if (phase < 0) return false;
     static const char *const rngfile = "/dev/urandom";
     const unsigned int keylength = 4096;
     const QLineEdit *passedit = radioEntireDisk->isChecked() ? textCryptoPass : textCryptoPassCust;
@@ -476,7 +476,11 @@ void MInstall::writeKeyFile()
         key.save(keyfile, 0400);
         key.erase();
     }
-    partman.fixCryptoSetup(QString(keyfile).remove(0,10), newkey);
+    if (!partman.fixCryptoSetup(QString(keyfile).remove(0,10), newkey)) {
+        failUI(tr("Failed to finalize encryption setup."));
+        return false;
+    }
+    return true;
 }
 
 // disable hibernate when using encrypted swap
@@ -782,7 +786,7 @@ bool MInstall::installLinux()
 
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     partman.makeFstab(POPULATE_MEDIA_MOUNTPOINTS);
-    writeKeyFile();
+    if(!writeKeyFile()) return false;
     disablehiberanteinitramfs();
 
     //remove home unless a demo home is found in remastered linuxfs
