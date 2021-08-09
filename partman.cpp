@@ -1193,6 +1193,40 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
                 msg, QMessageBox::Yes, QMessageBox::No);
             if (ans != QMessageBox::Yes) return gui.treePartitions;
         }
+
+        // Message for potentially unbootable GPTs.
+        if (!uefi) {
+            msg.clear();
+            const int driveCount = gui.treePartitions->topLevelItemCount();
+            for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
+                QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
+                const QString &drvdev = drvit->text(Device);
+                const int partCount = drvit->childCount();
+                bool setupGPT = gptoverride || twitSize(drvit) >= 2097152 || partCount > 4;
+                if (twitFlag(drvit, OldLayout)) {
+                    setupGPT = listBlkDevs.at(listBlkDevs.findDevice(drvdev)).isGPT;
+                }
+                if (setupGPT) {
+                    bool hasBiosGrub = false;
+                    for (int ixPart=0; ixPart < partCount; ++ixPart) {
+                        QTreeWidgetItem *twit = drvit->child(ixPart);
+                        if (twitUseFor(twit) == "BIOS-GRUB") hasBiosGrub = true;
+                    }
+                    const bool hasBoot = drvit->data(Format, Qt::UserRole).isValid();
+                    if (hasBoot && !hasBiosGrub) msg += ' ' + drvdev;
+                }
+            }
+            if (!msg.isEmpty()) {
+                msg.prepend(tr("The following drives are, or will be, setup with GPT,"
+                    " but do not have a BIOS-GRUB partition:") + "\n\n");
+                msg += "\n\n" + tr("This system may not boot from GPT drives without a BIOS-GRUB partition.")
+                    + '\n' + tr("Are you sure you want to continue?");
+                ans = QMessageBox::warning(master, master->windowTitle(),
+                    msg, QMessageBox::Yes, QMessageBox::No);
+                if (ans != QMessageBox::Yes) return gui.treePartitions;
+            }
+        }
+
         // final message before the installer starts.
         msg.clear();
         if (msgFormatList.count() > 0) {
@@ -1240,8 +1274,7 @@ bool PartMan::calculatePartBD()
                 listBlkDevs.removeAt(ixRemoveBD);
             }
             // see if GPT needs to be used (either UEFI or >=2TB drive)
-            listBlkDevs[ixDriveBD].isGPT = gptoverride || uefi
-                || driveSize >= 2097152 || partCount>4 || gptoverride;
+            listBlkDevs[ixDriveBD].isGPT = gptoverride || uefi || driveSize >= 2097152 || partCount > 4;
         }
         // code for adding future partitions to the list
         for (int ixPart=0, ixPartBD=ixDriveBD+1; ixPart < partCount; ++ixPart, ++ixPartBD) {
