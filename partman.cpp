@@ -1518,7 +1518,6 @@ bool PartMan::preparePartitions()
         const bool useGPT = listBlkDevs.at(index).isGPT;
         if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
     }
-    proc.sleep(1000);
 
     // Prepare partition tables, creating tables and partitions when needed.
     proc.status(tr("Preparing required partitions"));
@@ -1543,7 +1542,6 @@ bool PartMan::preparePartitions()
                 else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
                 const QStringList &devsplit = BlockDeviceInfo::split(twit->text(Device));
                 if (!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1), ptype))) return false;
-                proc.sleep(1000);
                 proc.status();
             }
         } else {
@@ -1556,7 +1554,6 @@ bool PartMan::preparePartitions()
                 const bool rc = proc.exec(cmdParted.arg(QString::number(start), QString::number(end)));
                 if (!rc) return false;
                 start = end;
-                proc.sleep(1000);
                 proc.status();
             }
         }
@@ -1572,7 +1569,6 @@ bool PartMan::preparePartitions()
                 else ok = proc.exec(cmd + " legacy_boot on");
             }
             if (!ok) return false;
-            proc.sleep(1000);
             proc.status();
         }
     }
@@ -1628,7 +1624,6 @@ bool PartMan::formatPartitions()
             if (!formatLinuxPartition(dev, format, badblocks,
                 twitLineEdit(twit, Label)->text())) return false;
         }
-        proc.sleep(1000);
     }
     // Prepare subvolumes on all that (are to) contain them.
     QTreeWidgetItemIterator it(gui.treePartitions);
