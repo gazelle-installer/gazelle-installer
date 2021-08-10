@@ -1275,7 +1275,7 @@ bool PartMan::calculatePartBD()
             // see if GPT needs to be used (either UEFI or >=2TB drive)
             listBlkDevs[ixDriveBD].isGPT = gptoverride || uefi || driveSize >= 2097152 || partCount > 4;
         }
-        // code for adding future partitions to the list
+        // Add (or mark) future partitions to the list.
         for (int ixPart=0, ixPartBD=ixDriveBD+1; ixPart < partCount; ++ixPart, ++ixPartBD) {
             QTreeWidgetItem *twit = drvit->child(ixPart);
             const QString &useFor = twitUseFor(twit);
@@ -1638,7 +1638,7 @@ bool PartMan::formatPartitions()
 }
 
 // Transplanted straight from minstall.cpp
-bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bool chkBadBlocks, const QString &label)
+bool PartMan::formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label)
 {
     QString cmd;
     if (format == "reiserfs") {
@@ -1647,7 +1647,7 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
-        QString size_str = proc.execOut("/sbin/sfdisk -s " + dev);
+        QString size_str = proc.execOut("/sbin/sfdisk -s " + devpath);
         long long size = size_str.toLongLong();
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
@@ -1665,7 +1665,7 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
         if (chkBadBlocks) cmd.append(" -c");
     }
 
-    cmd.append(" " + dev);
+    cmd.append(" " + devpath);
     if (!label.isEmpty()) {
         if (format == "reiserfs" || format == "f2fs") cmd.append(" -l \"");
         else cmd.append(" -L \"");
@@ -1675,7 +1675,7 @@ bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bo
 
     if (format.startsWith("ext")) {
         // ext4 tuning
-        proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + dev);
+        proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + devpath);
     }
     return true;
 }
@@ -1742,8 +1742,9 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         out << twitMappedDevice(it.second, false) << " /dev/disk/by-uuid/" << uuid;
         if (noKey || it.first == keyMount) out << " none";
         else {
-            if (isNewKey)
+            if (isNewKey) {
                 if (!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
+            }
             out << ' ' << keyfile;
         }
         if (!it.first.startsWith("SWAP")) out << " luks \n";
@@ -1756,8 +1757,9 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         out << it.second << " /dev/disk/by-uuid/" << uuid;
         if (noKey) out << " none";
         else {
-            if (isNewKey)
+            if (isNewKey) {
                 if (!proc.exec(cmdAddKey.arg(it.first), true, &password)) return false;
+            }
             out << ' ' << keyfile;
         }
         out << " luks,nofail \n";
