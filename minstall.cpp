@@ -816,7 +816,7 @@ bool MInstall::copyLinux()
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
     // setup and start the process
-    QString prog = "/bin/cp -av";
+    QString prog = "/bin/cp";
     QStringList args("-av");
     if (sync) {
         prog = "rsync";
