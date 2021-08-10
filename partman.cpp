@@ -906,8 +906,7 @@ void PartMan::partMenuUnlock(QTreeWidgetItem *twit)
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
         const QString &mapdev = editVDev->text();
-        const bool ok = luksOpen("/dev/" + twit->text(Device),
-            mapdev, editPass->text().toUtf8());
+        const bool ok = luksOpen(twit->text(Device), mapdev, editPass->text().toUtf8());
         if (ok) {
             twit->setIcon(Device, QIcon::fromTheme("lock"));
             QComboBox *comboUseFor = twitComboBox(twit, UseFor);
@@ -1365,9 +1364,9 @@ bool PartMan::checkTargetDrivesOK()
     return true;
 }
 
-bool PartMan::luksMake(const QString &dev, const QByteArray &password)
+bool PartMan::luksFormat(const QString &dev, const QByteArray &password)
 {
-    const QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512 --pbkdf argon2id luksFormat ";
+    const QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512 --pbkdf argon2id luksFormat /dev/";
     if (!proc.exec(cmd + dev, true, &password)) return false;
     return true;
 }
@@ -1375,7 +1374,7 @@ bool PartMan::luksMake(const QString &dev, const QByteArray &password)
 bool PartMan::luksOpen(const QString &dev, const QString &luksfs,
     const QByteArray &password, const QString &options)
 {
-    QString cmd = "cryptsetup luksOpen " + dev;
+    QString cmd = "cryptsetup luksOpen /dev/" + dev;
     if (!luksfs.isEmpty()) cmd += " " + luksfs;
     if (!options.isEmpty()) cmd += " " + options;
     return proc.exec(cmd, true, &password);
@@ -1468,7 +1467,7 @@ int PartMan::countPrepSteps()
             if (!twitFlag(*it, OldLayout)) ++nstep; // New partition
             else if (!twitUseFor(*it).isEmpty()) ++nstep; // Existing partition
             // Formatting
-            if ((*it)->checkState(Encrypt) == Qt::Checked) ++nstep; // LUKS Format
+            if ((*it)->checkState(Encrypt) == Qt::Checked) nstep += 2; // LUKS Format
             if (twitWillFormat(*it)) ++nstep; // New file system or subvolume
             // Mounting
             if (!twitUseFor(*it).isEmpty()) ++nstep;
@@ -1582,24 +1581,9 @@ bool PartMan::preparePartitions()
 bool PartMan::formatPartitions()
 {
     proc.log(__PRETTY_FUNCTION__);
-    QString rootdev;
-    QString swapdev;
-    QString homedev;
 
-    // set up LUKS containers
     const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
-                                 ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
-    proc.status(tr("Setting up LUKS encrypted containers"));
-    for (QTreeWidgetItem *twit : mounts) {
-        const QString dev = "/dev/" + twit->text(Device);
-        if (twit->checkState(Encrypt) != Qt::Checked) continue;
-        if (twitWillFormat(twit)) {
-            if (!luksMake(dev, encPass)) return false;
-            proc.status();
-        }
-        if (!luksOpen(dev, twitMappedDevice(twit), encPass)) return false;
-        proc.status();
-    }
+        ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
 
     // Format partitions.
     const bool badblocks = gui.checkBadBlocks->isChecked();
@@ -1609,6 +1593,13 @@ bool PartMan::formatPartitions()
         if (!twitWillFormat(twit)) continue;
         const QString &dev = twitMappedDevice(twit, true);
         const QString &useFor = translateUse(twitComboBox(twit, UseFor)->currentText());
+        if (twit->checkState(Encrypt) == Qt::Checked) {
+            const QString &pdev = twit->text(Device);
+            proc.status(tr("Creating encrypted volume: %1").arg(pdev));
+            if (!luksFormat(pdev, encPass)) return false;
+            proc.status();
+            if (!luksOpen(pdev, twitMappedDevice(twit), encPass)) return false;
+        }
         const QString &fmtstatus = tr("Formatting: %1");
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(dev));
         else proc.status(fmtstatus.arg(describeUse(it.first)));
@@ -1649,8 +1640,6 @@ bool PartMan::formatPartitions()
 // Transplanted straight from minstall.cpp
 bool PartMan::formatLinuxPartition(const QString &dev, const QString &format, bool chkBadBlocks, const QString &label)
 {
-    proc.log(__PRETTY_FUNCTION__);
-
     QString cmd;
     if (format == "reiserfs") {
         cmd = "mkfs.reiserfs -q";

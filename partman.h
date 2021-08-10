@@ -122,7 +122,7 @@ public:
     bool manageConfig(MSettings &config, bool save);
     QWidget *composeValidate(bool automatic, const QString &project);
     bool checkTargetDrivesOK();
-    bool luksMake(const QString &dev, const QByteArray &password);
+    bool luksFormat(const QString &dev, const QByteArray &password);
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
     QTreeWidgetItem *selectedDriveAuto();
