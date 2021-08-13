@@ -87,7 +87,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
     if (!drvstart) gui.treePartitions->clear();
     QTreeWidgetItem *curdrv = nullptr;
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isBoot && !brave) continue;
+        if (bdinfo.isStart && !brave) continue;
         QTreeWidgetItem *curdev = nullptr;
         if (bdinfo.isDrive) {
             if (!drvstart) curdrv = new QTreeWidgetItem(gui.treePartitions);
@@ -629,8 +629,9 @@ void PartMan::comboSubvolUseTextChange(const QString &text)
         editLabel->setText(newLabel);
     }
     QTreeWidgetItem *partit = svit->parent();
-    if (!twitFlag(partit, VirtualBD) && (usetext == "/boot" || usetext == "/"))
+    if (!twitFlag(partit, VirtualBD) && (usetext == "/boot" || usetext == "/")) {
         drvitAutoSetBoot(partit->parent());
+    }
     gui.treePartitions->blockSignals(false);
 }
 
@@ -873,6 +874,7 @@ void PartMan::partRemoveClick(bool)
     QTreeWidgetItem *partit = gui.treePartitions->selectedItems().value(0);
     QTreeWidgetItem *drvit = partit->parent();
     if (!partit || !drvit) return;
+    if (twitFlag(partit, SetBoot)) partitSetBoot(partit, false);
     delete partit;
     labelParts(drvit);
     treeSelChange();

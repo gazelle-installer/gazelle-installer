@@ -75,7 +75,7 @@ void BlockDeviceList::build(MProcess &proc)
 
     // Collect information and populate the block device list.
     const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL", true);
+        " TYPE,NAME,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL,PARTFLAGS", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
 
     clear();
@@ -105,31 +105,33 @@ void BlockDeviceList::build(MProcess &proc)
             bdinfo.physec = jsonPart["phy-sec"].toInt();
             bdinfo.label = jsonPart["label"].toString();
             bdinfo.model = jsonPart["model"].toString();
+            const int partflags = jsonPart["partflags"].toString().toUInt(nullptr, 0);
+            bdinfo.isBoot = ((partflags & 0x80) || (partflags & 0x04));
             bdinfo.mapCount = jsonPart["children"].toArray().count();
             bdinfo.isNative = partTypeName.startsWith("Linux");
             bdinfo.isESP = (partTypeName=="EFI System");
             if (!bdinfo.isNasty) bdinfo.isNasty = partTypeName.startsWith("Microsoft LDM");
-            bdinfo.isBoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
+            bdinfo.isStart = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
             bdinfo.fs = jsonPart["fstype"].toString();
             append(bdinfo);
             // Propagate the boot and nasty flags up to the drive.
-            if (bdinfo.isBoot) operator[](driveIndex).isBoot = true;
+            if (bdinfo.isStart) operator[](driveIndex).isStart = true;
             if (bdinfo.isNasty) operator[](driveIndex).isNasty = true;
         }
     }
     // propagate the boot flag across the entire drive
-    bool driveBoot = false;
+    bool driveStart = false;
     for (BlockDeviceInfo &bdinfo : *this) {
-        if (bdinfo.isDrive) driveBoot = bdinfo.isBoot;
-        bdinfo.isBoot = driveBoot;
+        if (bdinfo.isDrive) driveStart = bdinfo.isStart;
+        bdinfo.isStart = driveStart;
     }
 
     // debug
-    qDebug() << "Name Size PhySec Model FS | isDisk isGPT isBoot isESP isNative isNasty";
+    qDebug() << "Name Size PhySec Model FS | isDrive isGPT isBoot isESP isNative isStart isNasty";
     for (const BlockDeviceInfo &bdi : *this) {
         qDebug() << bdi.name << bdi.size << bdi.physec << bdi.model << bdi.fs << "|"
                  << bdi.isDrive << bdi.isGPT << bdi.isBoot << bdi.isESP
-                 << bdi.isNative << bdi.isNasty;
+                 << bdi.isNative << bdi.isStart << bdi.isNasty;
     }
 }
 
