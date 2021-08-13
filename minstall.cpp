@@ -1865,7 +1865,7 @@ void MInstall::updatePartitionWidgets(bool all)
     comboDisk->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (bdinfo.isDrive && bdinfo.size >= partman.rootSpaceNeeded
-                && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
+                && (!bdinfo.isStart || INSTALL_FROM_ROOT_DEVICE)) {
             bdinfo.addToCombo(comboDisk);
         }
     }
@@ -2294,7 +2294,7 @@ void MInstall::on_radioBootMBR_toggled()
 {
     comboBoot->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDrive && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) {
+        if (bdinfo.isDrive && (!bdinfo.isStart || INSTALL_FROM_ROOT_DEVICE)) {
             if (!bdinfo.isNasty || brave) bdinfo.addToCombo(comboBoot, true);
         }
     }
@@ -2306,7 +2306,7 @@ void MInstall::on_radioBootPBR_toggled()
     comboBoot->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (!(bdinfo.isDrive || bdinfo.fs=="swap" || bdinfo.isESP)
-            && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)
+            && (!bdinfo.isStart || INSTALL_FROM_ROOT_DEVICE)
             && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
             // list only Linux partitions excluding crypto_LUKS partitions
             if (!bdinfo.isNasty || brave) bdinfo.addToCombo(comboBoot, true);
@@ -2319,7 +2319,7 @@ void MInstall::on_radioBootESP_toggled()
 {
     comboBoot->clear();
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isESP && (!bdinfo.isBoot || INSTALL_FROM_ROOT_DEVICE)) bdinfo.addToCombo(comboBoot);
+        if (bdinfo.isESP && (!bdinfo.isStart || INSTALL_FROM_ROOT_DEVICE)) bdinfo.addToCombo(comboBoot);
     }
     labelBoot->setText(tr("Partition to use:"));
 }

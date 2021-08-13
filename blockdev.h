@@ -33,6 +33,7 @@ struct BlockDeviceInfo
     bool isFuture = false;
     bool isNasty = false;
     bool isDrive = false;
+    bool isStart = false;
     bool isGPT = false;
     bool isBoot = false;
     bool isESP = false;
