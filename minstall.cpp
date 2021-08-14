@@ -2404,7 +2404,7 @@ void MInstall::rsynchomefolder(QString dpath)
     QString cmd = ("rsync -a --info=name1 /home/demo/ %1"
                   " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
                   " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
-                  " --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
+                  " --exclude '.idesktop/gazelle.lnk' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
                   " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
                   " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + textUserName->text() + "|g' %1/$").arg(dpath);
     proc.exec(cmd);
