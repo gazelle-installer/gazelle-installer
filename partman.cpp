@@ -1197,6 +1197,7 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
             const int driveCount = gui.treePartitions->topLevelItemCount();
             for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
                 QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
+                if (twitFlag(drvit, VirtualDevices)) continue;
                 const QString &drvdev = drvit->text(Device);
                 const int partCount = drvit->childCount();
                 bool setupGPT = gptoverride || twitSize(drvit) >= 2097152 || partCount > 4;
