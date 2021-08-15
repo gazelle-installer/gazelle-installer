@@ -1819,8 +1819,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
             }
             out << ' ' << keyfile;
         }
-        if (!it.first.startsWith("SWAP")) out << " luks \n";
-        else out << " luks,nofail \n";
+        out << " luks\n";
         extraAdd.remove(dev);
     }
     // Extra devices
@@ -1834,7 +1833,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
             }
             out << ' ' << keyfile;
         }
-        out << " luks,nofail \n";
+        out << " luks\n";
     }
     // Update cryptdisks if the key is not in the root file system.
     if (keyMount != '/') {
