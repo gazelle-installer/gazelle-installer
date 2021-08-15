@@ -851,6 +851,13 @@ bool MInstall::copyLinux()
         disconnect(&proc, &QProcess::readyRead, nullptr, nullptr);
         disconnect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
 
+        const QByteArray &StdErr = proc.readAllStandardError();
+        if (!StdErr.isEmpty()) {
+            qDebug() << "SErr COPY:" << StdErr;
+            QFont logFont = logEntry->font();
+            logFont.setItalic(true);
+            logEntry->setFont(logFont);
+        }
         qDebug() << "Exit COPY:" << proc.exitCode() << proc.exitStatus();
         if (proc.exitStatus() != QProcess::NormalExit) {
             proc.log(logEntry, -1);
