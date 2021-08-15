@@ -93,11 +93,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    const QString logFileName = "/var/log/" + qApp->applicationName() + ".log";
-    if (logFile.open(QFile::Append | QFile::Text))
-        qInstallMessageHandler(messageHandler);
-    else
-        qDebug() << "Cannot write to installer log:" << logFileName;
+    if (logFile.open(QFile::Append | QFile::Text)) qInstallMessageHandler(messageHandler);
+    else qDebug() << "Cannot write to installer log:" << logFile.fileName();
 
     QTranslator qtTran;
     if (qtTran.load(QLocale::system(), "qt", "_", QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
