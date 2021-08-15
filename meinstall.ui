@@ -695,6 +695,16 @@
                   <string>Mount Options</string>
                  </property>
                 </column>
+                <column>
+                 <property name="text">
+                  <string>Dump</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Pass</string>
+                 </property>
+                </column>
                </widget>
               </item>
               <item row="2" column="2">
