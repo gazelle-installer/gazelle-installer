@@ -259,6 +259,12 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             }
             config.manageLineEdit("Label", twitLineEdit(partit, Label));
             config.manageLineEdit("Options", twitLineEdit(partit, Options));
+            if (save) config.setValue("Dump", partit->checkState(Dump) == Qt::Checked);
+            else if (config.contains("Dump")) {
+                partit->setCheckState(Dump,
+                    config.value("Dump").toBool() ? Qt::Checked : Qt::Unchecked);
+            }
+            config.manageSpinBox("Pass", twitSpinBox(partit, Pass));
             int subvolCount = 0;
             if (twitComboBox(partit, Format)->currentData() == "btrfs") {
                 if (!save) subvolCount = config.value("Subvolumes").toInt();
@@ -278,6 +284,12 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 config.manageComboBox("UseFor", twitComboBox(svit, UseFor), false);
                 config.manageLineEdit("Label", twitLineEdit(svit, Label));
                 config.manageLineEdit("Options", twitLineEdit(svit, Options));
+                if (save) config.setValue("Dump", svit->checkState(Dump) == Qt::Checked);
+                else if (config.contains("Dump")) {
+                    svit->setCheckState(Dump,
+                        config.value("Dump").toBool() ? Qt::Checked : Qt::Unchecked);
+                }
+                config.manageSpinBox("Pass", twitSpinBox(svit, Pass));
                 config.endGroup();
             }
             if (!save) partit->setExpanded(true);
@@ -362,6 +374,7 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
         partit->setText(Format, bdinfo->fs);
         comboFormat->addItem(bdinfo->fs, bdinfo->fs);
     }
+    comboFormat->setProperty("row", QVariant::fromValue<void *>(partit));
     connect(comboFormat, &QComboBox::currentTextChanged, this, &PartMan::comboFormatTextChange);
     // Mount options
     QLineEdit *editOptions = new QLineEdit(gui.treePartitions);
@@ -371,6 +384,11 @@ void PartMan::setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo 
     editOptions->setProperty("row", QVariant::fromValue<void *>(partit));
     editOptions->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(editOptions, &QLineEdit::customContextMenuRequested, this, &PartMan::partOptionsMenu);
+    // Dump and Pass
+    QSpinBox *spinPass = new QSpinBox(gui.treePartitions);
+    spinPass->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(partit, Pass, spinPass);
+    spinPass->setEnabled(false);
     // Partition flags based on default usage
     if (bdinfo) {
         if (bdinfo->isBoot) partitSetBoot(partit, true);
@@ -531,7 +549,7 @@ void PartMan::comboUseTextChange(const QString &text)
             const int ixOldFmt = comboFormat->findData(oldFormat);
             if (ixOldFmt>=0) comboFormat->setCurrentIndex(ixOldFmt);
         }
-        comboFormatTextChange(comboFormat->currentText());
+        comboFormatTextChange(QString());
         comboFormat->blockSignals(false);
         comboFormat->setEnabled(comboFormat->count()>1);
         // Label and options
@@ -548,48 +566,80 @@ void PartMan::comboUseTextChange(const QString &text)
 
 void PartMan::comboFormatTextChange(const QString &)
 {
+    QComboBox *combo = static_cast<QComboBox *>(sender());
+    if (!combo) return;
+    QTreeWidgetItem *twit = static_cast<QTreeWidgetItem *>(combo->property("row").value<void *>());
+    if (!twit) return;
+    QComboBox *comboFormat = twitComboBox(twit, Format);
+    QLineEdit *editLabel = twitLineEdit(twit, Label);
+    QLineEdit *editOpts = twitLineEdit(twit, Options);
+    if (!comboFormat || !editLabel || !editOpts) return;
+    QString format;
+    const QString &useFor = twitUseFor(twit);
+    if (comboFormat->currentData(Qt::UserRole) != "PRESERVE") {
+        format = comboFormat->currentText().toLower();
+        if (format != "btrfs") {
+            // Clear all subvolumes if not supported.
+            while (twit->childCount()) delete twit->child(0);
+        } else {
+            // Remove preserve option from all subvolumes.
+            const int svcount = (twit)->childCount();
+            for (int ixi = 0; ixi < svcount; ++ixi) {
+                QComboBox *comboSubvolFmt = twitComboBox(twit->child(ixi), Format);
+                comboSubvolFmt->clear();
+                comboSubvolFmt->addItem(tr("Create"));
+                comboSubvolFmt->setEnabled(false);
+            }
+        }
+        if (!useFor.isEmpty()) {
+            editLabel->setEnabled(true);
+            if(!(editLabel->isModified()) || editLabel->text().isEmpty()) {
+                editLabel->setText(defaultLabels.value(useFor));
+            }
+        }
+    } else {
+        format = twit->text(Format).toLower();
+        editLabel->setEnabled(false);
+        editLabel->setText(twit->text(Label));
+    }
+    int pass = 2;
+    if (useFor.isEmpty() || useFor == "FORMAT" || useFor == "ESP") {
+        editOpts->clear();
+        twit->setData(Dump, Qt::CheckStateRole, QVariant());
+        pass = -1;
+    } else {
+        if (format == "reiserfs") {
+            editOpts->setText("noatime,notail");
+            twit->setCheckState(Dump, Qt::Unchecked);
+            pass = 0;
+        } else if (format == "swap") {
+            editOpts->setText("defaults");
+            twit->setData(Dump, Qt::CheckStateRole, QVariant());
+            pass = -1;
+        } else {
+            if (useFor == "/boot" || useFor == "/") {
+                pass = (format == "btrfs") ? 0 : 1;
+            }
+            editOpts->setText("noatime");
+            twit->setCheckState(Dump, Qt::Checked);
+        }
+    }
+    QSpinBox *spinPass = twitSpinBox(twit, Pass);
+    spinPass->setValue(pass>=0 ? pass : 0);
+    spinPass->setEnabled(pass>=0);
+
+    // See if it is possible to check for bad blocks.
     QTreeWidgetItemIterator it(gui.treePartitions);
     bool canCheckBlocks = false;
     for (; *it; ++it) {
         if (!twitFlag(*it, Partition)) continue;
-        QComboBox *comboFormat = twitComboBox(*it, Format);
-        QLineEdit *editLabel = twitLineEdit(*it, Label);
-        QLineEdit *editOpts = twitLineEdit(*it, Options);
-        if (!comboFormat || !editLabel || !editOpts) return;
-        QString format;
-        const QString &useFor = twitUseFor(*it);
-        if (comboFormat->currentData(Qt::UserRole) != "PRESERVE") {
-            format = comboFormat->currentText().toLower();
-            if (format != "btrfs") {
-                // Clear all subvolumes if not supported.
-                while ((*it)->childCount()) delete (*it)->child(0);
-            } else {
-                // Remove preserve option from all subvolumes.
-                const int svcount = (*it)->childCount();
-                for (int ixi = 0; ixi < svcount; ++ixi) {
-                    QComboBox *comboSubvolFmt = twitComboBox((*it)->child(ixi), Format);
-                    comboSubvolFmt->clear();
-                    comboSubvolFmt->addItem(tr("Create"));
-                    comboSubvolFmt->setEnabled(false);
-                }
-            }
-            if (!useFor.isEmpty()) {
+        QComboBox *cformat = twitComboBox(*it, Format);
+        if (!cformat) return;
+        if (cformat->currentData(Qt::UserRole) != "PRESERVE") {
+            const QString &format = cformat->currentText().toLower();
+            if (!twitUseFor(*it).isEmpty()) {
                 if (format.startsWith("ext") || format == "jfs") canCheckBlocks = true;
-                editLabel->setEnabled(true);
-                if(!(editLabel->isModified()) || editLabel->text().isEmpty()) {
-                    editLabel->setText(defaultLabels.value(useFor));
-                }
             }
-        } else {
-            format = (*it)->text(Format).toLower();
-            editLabel->setEnabled(false);
-            editLabel->setText((*it)->text(Label));
-        }
-        if (useFor.isEmpty() || useFor == "FORMAT" || useFor == "ESP") editOpts->clear();
-        else {
-            if (format == "reiserfs") editOpts->setText("noatime,notail");
-            else if (format == "swap") editOpts->setText("defaults");
-            else editOpts->setText("noatime");
         }
     }
     gui.checkBadBlocks->setEnabled(canCheckBlocks);
@@ -628,6 +678,21 @@ void PartMan::comboSubvolUseTextChange(const QString &text)
         }
         editLabel->setText(newLabel);
     }
+    // Dump and Pass.
+    bool canDump = false, canPass = false;
+    QLineEdit *editOpts = twitLineEdit(svit, Options);
+    if (usetext.isEmpty()) editOpts->clear();
+    else if (usetext == "swap") editOpts->setText("defaults");
+    else {
+        editOpts->setText("noatime");
+        canDump = canPass = true;
+    }
+    QSpinBox *spinPass = twitSpinBox(svit, Pass);
+    spinPass->setValue(0);
+    spinPass->setEnabled(canPass);
+    if (canDump) svit->setCheckState(Dump, Qt::Checked);
+    else svit->setData(Dump, Qt::CheckStateRole, QVariant());
+    // Boot flag of the parent partition.
     QTreeWidgetItem *partit = svit->parent();
     if (!twitFlag(partit, VirtualBD) && (usetext == "/boot" || usetext == "/")) {
         drvitAutoSetBoot(partit->parent());
@@ -1005,10 +1070,14 @@ QTreeWidgetItem *PartMan::addSubvolumeItem(QTreeWidgetItem *twit)
     editOptions->setAutoFillBackground(true);
     gui.treePartitions->setItemWidget(svit, Options, editOptions);
     editOptions->setEnabled(false);
-    editOptions->setText("noatime");
     editOptions->setProperty("row", QVariant::fromValue<void *>(svit));
     editOptions->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(editOptions, &QLineEdit::customContextMenuRequested, this, &PartMan::partOptionsMenu);
+    // Dump and Pass
+    QSpinBox *spinPass = new QSpinBox(gui.treePartitions);
+    spinPass->setAutoFillBackground(true);
+    gui.treePartitions->setItemWidget(svit, Pass, spinPass);
+    spinPass->setEnabled(false);
 
     return svit;
 }
@@ -1805,14 +1874,8 @@ bool PartMan::makeFstab(bool populateMediaMounts)
             out << " subvol=" << twitLineEdit(it.second, Label)->text();
             if (!mountopts.isEmpty()) out << ',' << mountopts;
         }
-        // Dump, pass
-        if (fsfmt == "swap") out << " 0 0\n";
-        else if (fsfmt.startsWith("reiser")) out << " 0 0\n";
-        else if (it.first == "/boot") out << " 1 1\n";
-        else if (it.first == "/") {
-            if (fsfmt == "btrfs") out << " 1 0\n";
-            else out << " 1 1\n";
-        } else out << " 1 2\n";
+        out << ' ' << (it.second->checkState(Dump)==Qt::Checked ? 1 : 0);
+        out << ' ' << twitSpinBox(it.second, Pass)->value() << '\n';
     }
     // EFI System Partition
     if (gui.radioBootESP->isChecked()) {
@@ -1866,11 +1929,11 @@ void PartMan::unmount()
     while (it.hasPrevious()) {
         it.previous();
         if (it.key().at(0) != '/') continue;
+        QTreeWidgetItem *twit = it.value();
         if (!it.key().startsWith("SWAP")) {
-            proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
+            proc.exec("swapoff " + twitMappedDevice(twit, true), true);
         }
         proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
-        QTreeWidgetItem *twit = it.value();
         if (twit->checkState(Encrypt) == Qt::Checked) {
             QString cmd("cryptsetup close %1");
             proc.exec(cmd.arg(twitMappedDevice(twit)), true);

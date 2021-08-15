@@ -45,7 +45,9 @@ class PartMan : public QObject
         UseFor,
         Encrypt,
         Format, // Text: existing format (not QLineEdit text)
-        Options // Data: tree widget item flags (see below)
+        Options, // Data: tree widget item flags (see below)
+        Dump,
+        Pass
     };
     enum TwitFlag {
         Drive,
