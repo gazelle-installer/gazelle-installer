@@ -1257,6 +1257,7 @@ bool PartMan::calculatePartBD()
     const int driveCount = gui.treePartitions->topLevelItemCount();
     for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
         QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
+        if (twitFlag(drvit, VirtualDevices)) continue;
         const bool useExist = twitFlag(drvit, OldLayout);
         QString drv = drvit->text(Device);
         int ixDriveBD = listBlkDevs.findDevice(drv);
@@ -1501,9 +1502,9 @@ bool PartMan::preparePartitions()
 
     // Prepare partition tables on devices which will have a new layout.
     for (int ixi = gui.treePartitions->topLevelItemCount() - 1; ixi >= 0; --ixi) {
-        QTreeWidgetItem *twit = gui.treePartitions->topLevelItem(ixi);
-        if (twitFlag(twit, OldLayout)) continue;
-        const QString &drv = twit->text(Device);
+        QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixi);
+        if (twitFlag(drvit, OldLayout) || twitFlag(drvit, VirtualDevices)) continue;
+        const QString &drv = drvit->text(Device);
         proc.status(tr("Preparing partition tables"));
         const int index = listBlkDevs.findDevice(drv);
         assert (index >= 0);
