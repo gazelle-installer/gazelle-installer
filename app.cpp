@@ -37,7 +37,7 @@
 #include "minstall.h"
 #include "version.h"
 
-static QFile logFile;
+static QFile logFile("/var/log/minstall.log");
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
