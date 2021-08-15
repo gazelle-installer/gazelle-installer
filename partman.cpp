@@ -105,6 +105,7 @@ void PartMan::populate(QTreeWidgetItem *drvstart)
             setupPartitionItem(curdev, &bdinfo);
         }
         assert(curdev != nullptr);
+        twitSetFlag(curdev, OldLayout, true);
         // Device name and size
         curdev->setText(Device, bdinfo.name);
         curdev->setText(Size, QLocale::system().formattedDataSize(bdinfo.size, 1, QLocale::DataSizeTraditionalFormat));
