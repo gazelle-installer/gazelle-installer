@@ -156,9 +156,9 @@ void MInstall::startup()
             containsRunit = true;
 
         rootSources = "/live/aufs/bin /live/aufs/dev"
-                      " /live/aufs/etc /live/aufs/lib /live/aufs/lib64 /live/aufs/media /live/aufs/mnt"
-                      " /live/aufs/opt /live/aufs/root /live/aufs/sbin /live/aufs/selinux /live/aufs/usr"
-                      " /live/aufs/var /live/aufs/home";
+                      " /live/aufs/etc /live/aufs/lib /live/aufs/libx32 /live/aufs/lib64"
+                      " /live/aufs/media /live/aufs/mnt /live/aufs/opt /live/aufs/root"
+                      " /live/aufs/sbin /live/aufs/usr /live/aufs/var /live/aufs/home";
 
         //load some live variables
         QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
