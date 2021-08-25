@@ -1048,7 +1048,9 @@ bool MInstall::processOOBE()
     if (!setComputerName()) return false;
     setLocale();
     if (haveSnapshotUserAccounts) { // skip user account creation
-        QString cmd = "rsync -a /home/ /mnt/antiX/home/ --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'";
+        QString cmd = "rsync -a /home/ /mnt/antiX/home/"
+                      " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority'"
+                      " --exclude '.ICEauthority' --exclude '.config/session'";
         proc.exec(cmd);
     } else {
         if (!setUserInfo()) return false;
@@ -2416,8 +2418,10 @@ void MInstall::rsynchomefolder(QString dpath)
                   " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
                   " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
                   " --exclude '.idesktop/gazelle.lnk' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
-                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox' --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
-                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm' | xargs -I '$' sed -i 's|home/demo|home/" + textUserName->text() + "|g' %1/$").arg(dpath);
+                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox'"
+                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
+                  " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'"
+                  " --exclude '.config/session' | xargs -I '$' sed -i 's|home/demo|home/" + textUserName->text() + "|g' %1/$").arg(dpath);
     proc.exec(cmd);
 }
 
