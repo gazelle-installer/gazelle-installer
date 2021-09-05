@@ -804,6 +804,10 @@ bool MInstall::installLinux()
     if (proc.execOut("guess-hwclock") == "localtime")
         checkLocalClock->setChecked(true);
 
+    // create a /etc/machine-id file for systems that use systemd
+    if (proc.exec("chroot command -v  systemd-machine-id-setup >/dev/null 2>&1", false))
+        proc.exec("chroot systemd-machine-id-setup", false);
+
     return true;
 }
 
