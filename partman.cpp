@@ -438,8 +438,7 @@ QString PartMan::describeUse(const QString &use)
 void PartMan::setEncryptChecks(const QString &use,
     enum Qt::CheckState state, QTreeWidgetItem *exclude)
 {
-    QTreeWidgetItemIterator it(gui.treePartitions);
-    for (; *it; ++it) {
+    for (QTreeWidgetItemIterator it(gui.treePartitions); *it; ++it) {
         if (*it == exclude) continue;
         if (twitUseFor(*it) == use && (*it)->data(Encrypt, Qt::CheckStateRole).isValid()) {
             (*it)->setCheckState(Encrypt, state);
@@ -630,9 +629,8 @@ void PartMan::comboFormatTextChange(const QString &)
     spinPass->setEnabled(pass>=0);
 
     // See if it is possible to check for bad blocks.
-    QTreeWidgetItemIterator it(gui.treePartitions);
     bool canCheckBlocks = false;
-    for (; *it; ++it) {
+    for (QTreeWidgetItemIterator it(gui.treePartitions); *it; ++it) {
         if (!twitFlag(*it, Partition)) continue;
         QComboBox *cformat = twitComboBox(*it, Format);
         if (!cformat) return;
@@ -720,8 +718,7 @@ void PartMan::treeItemChange(QTreeWidgetItem *twit, int column)
     if (column == Encrypt || column == UseFor) {
         // Check all items in the tree for those marked for encryption.
         bool cryptoAny = false;
-        QTreeWidgetItemIterator it(gui.treePartitions);
-        for (; *it && !cryptoAny; ++it) {
+        for (QTreeWidgetItemIterator it(gui.treePartitions); *it && !cryptoAny; ++it) {
             if ((*it)->checkState(Encrypt) == Qt::Checked) cryptoAny = true;
         }
         if (gui.boxCryptoPass->isEnabled() != cryptoAny) {
@@ -1123,14 +1120,11 @@ bool PartMan::eventFilter(QObject *object, QEvent *event)
 
 QWidget *PartMan::composeValidate(bool automatic, const QString &project)
 {
-    QStringList msgForeignList;
-    QString msgConfirm;
     bool encryptRoot = false;
     mounts.clear();
     // Partition use and other validation
-    int mapnum = 0, swapnum = 0, formatnum = 0;
-    QTreeWidgetItemIterator it(gui.treePartitions);
-    for (; *it; ++it) {
+    int mapnum = 0, swapnum = 0;
+    for (QTreeWidgetItemIterator it(gui.treePartitions); *it; ++it) {
         if (twitFlag(*it, Drive) || twitFlag(*it, VirtualDevices)) continue;
         QComboBox *comboUse = twitComboBox(*it, UseFor);
         QLineEdit *editLabel = twitLineEdit(*it, Label);
@@ -1166,8 +1160,7 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
                 tr("Invalid use for %1: %2").arg(devname, mount));
             return comboUse;
         }
-        if (mount == "FORMAT") mount += QString::number(++formatnum);
-        else if (mount == "SWAP") {
+        if (mount == "SWAP") {
             ++swapnum;
             if (swapnum > 1) mount+=QString::number(swapnum);
         }
@@ -1178,15 +1171,8 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
             QMessageBox::critical(master, master->windowTitle(), tr("%1 is already"
                 " selected for: %2").arg(twitShownDevice(twit), describeUse(mount)));
             return comboUse;
-        } else {
-            if (!mount.isEmpty()) mounts.insert(mount, *it);
-            if (twitFlag(*it, OldLayout) && twitWillFormat(*it)) {
-                // Warn if using a non-Linux partition (potential install of another OS).
-                const int bdindex = listBlkDevs.findDevice(devname);
-                if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
-                    msgForeignList << devname << describeUse(mount);
-                }
-            }
+        } else if(!mount.isEmpty() && mount != "FORMAT" && mount != "ESP"){
+            mounts.insert(mount, *it);
         }
         if (!twitFlag(*it, VirtualBD)) {
             QVariant mapperData;
@@ -1228,93 +1214,69 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
     }
 
     if (!automatic) {
-        QString msg;
-        QStringList msgFormatList;
-        // Format (vs just mounting or configuring) partitions.
-        for (const auto &it : mounts.toStdMap()) {
-            const QString &dev = twitShownDevice(it.second);
-            if (twitWillFormat(it.second)) msgFormatList << dev << describeUse(it.first);
-            else if (it.first == "/") {
-                msgConfirm += " - " + tr("Delete the data on %1"
-                    " except for /home").arg(dev) + "\n";
-            } else {
-                msgConfirm += " - " + tr("Reuse (no reformat) %1 as"
-                    " %2").arg(dev, describeUse(it.first)) + "\n";
+        // Final warnings before the installer starts.
+        QString details, foreign, biosgpt;
+        for (int ixdrv = 0; ixdrv < gui.treePartitions->topLevelItemCount(); ++ixdrv) {
+            QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixdrv);
+            const QString &drv = drvit->text(Device);
+            const int partCount = drvit->childCount();
+            bool setupGPT = gptoverride || twitSize(drvit) >= 2097152 || partCount > 4;
+            if (twitFlag(drvit, OldLayout)) {
+                setupGPT = listBlkDevs.at(listBlkDevs.findDevice(drv)).isGPT;
+            } else if (!twitFlag(drvit, VirtualDevices)) {
+                details += tr("Prepare %1 partition table on %2").arg(setupGPT?"GPT":"MBR", drv) + '\n';
             }
-        }
-
-        int ans;
-        const QString msgPartSel = " - " + tr("%1, to be used for %2") + "\n";
-        // message to advise of issues found.
-        if (msgForeignList.count() > 0) {
-            msg += tr("The following partitions you selected are not Linux partitions:") + "\n\n";
-            for (QStringList::Iterator it = msgForeignList.begin(); it != msgForeignList.end(); ++it) {
-                QString &s = *it;
-                msg += msgPartSel.arg(s, describeUse(*(++it)));
-            }
-            msg += "\n";
-        }
-        if (!msg.isEmpty()) {
-            msg += tr("Are you sure you want to reformat these partitions?");
-            ans = QMessageBox::warning(master, master->windowTitle(),
-                msg, QMessageBox::Yes, QMessageBox::No);
-            if (ans != QMessageBox::Yes) return gui.treePartitions;
-        }
-
-        // Message for potentially unbootable GPTs.
-        if (!uefi) {
-            msg.clear();
-            const int driveCount = gui.treePartitions->topLevelItemCount();
-            for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
-                QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixDrive);
-                if (twitFlag(drvit, VirtualDevices)) continue;
-                const QString &drvdev = drvit->text(Device);
-                const int partCount = drvit->childCount();
-                bool setupGPT = gptoverride || twitSize(drvit) >= 2097152 || partCount > 4;
-                if (twitFlag(drvit, OldLayout)) {
-                    setupGPT = listBlkDevs.at(listBlkDevs.findDevice(drvdev)).isGPT;
+            bool hasBiosGrub = false;
+            for (int ixdev = 0; ixdev < partCount; ++ixdev) {
+                QTreeWidgetItem *partit = drvit->child(ixdev);
+                const QString &dev = twitShownDevice(partit);
+                const QString &use = twitUseFor(partit);
+                if (use.isEmpty()) continue;
+                else if (use == "BIOS-GRUB") hasBiosGrub = true;
+                if (twitWillFormat(partit)) details += tr("Format %1").arg(dev);
+                else if (use == "/") {
+                    details += tr("Delete the data on %1 except for /home").arg(dev);
+                } else {
+                    details += tr("Reuse (no reformat) %1 as %2").arg(dev, describeUse(use));
                 }
-                if (setupGPT) {
-                    bool hasBiosGrub = false;
-                    for (int ixPart=0; ixPart < partCount; ++ixPart) {
-                        QTreeWidgetItem *twit = drvit->child(ixPart);
-                        if (twitUseFor(twit) == "BIOS-GRUB") hasBiosGrub = true;
+                details += '\n';
+                // Warn if using a non-Linux partition (potential install of another OS).
+                if (twitFlag(partit, OldLayout) && twitWillFormat(partit)) {
+                    const int bdindex = listBlkDevs.findDevice(dev);
+                    assert(bdindex >= 0);
+                    if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
+                        foreign += tr("%1, to be used for %2").arg(dev, describeUse(use)) + '\n';
                     }
-                    const bool hasBoot = drvit->data(Format, Qt::UserRole).isValid();
-                    if (hasBoot && !hasBiosGrub) msg += ' ' + drvdev;
                 }
             }
-            if (!msg.isEmpty()) {
-                msg.prepend(tr("The following drives are, or will be, setup with GPT,"
-                    " but do not have a BIOS-GRUB partition:") + "\n\n");
-                msg += "\n\n" + tr("This system may not boot from GPT drives without a BIOS-GRUB partition.")
-                    + '\n' + tr("Are you sure you want to continue?");
-                ans = QMessageBox::warning(master, master->windowTitle(),
-                    msg, QMessageBox::Yes, QMessageBox::No);
-                if (ans != QMessageBox::Yes) return gui.treePartitions;
-            }
+            // Potentially unbootable GPT when on a BIOS-based PC.
+            const bool hasBoot = drvit->data(Format, Qt::UserRole).isValid();
+            if (!uefi && setupGPT && hasBoot && !hasBiosGrub) biosgpt += ' ' + drv;
         }
-
-        // final message before the installer starts.
-        msg.clear();
-        if (msgFormatList.count() > 0) {
-            msg += tr("The %1 installer will now format and destroy the data on the following partitions:").arg(project) + "\n\n";
-            for (QStringList::Iterator it = msgFormatList.begin(); it != msgFormatList.end(); ++it) {
-                QString &s = *it;
-                msg += msgPartSel.arg(s, describeUse(*(++it)));
-            }
-            if (!msgConfirm.isEmpty()) msg += "\n";
+        // Warning messages
+        QMessageBox msgbox(master);
+        msgbox.setIcon(QMessageBox::Warning);
+        msgbox.setWindowTitle(master->windowTitle());
+        msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+        msgbox.setDefaultButton(QMessageBox::No);
+        if (!foreign.isEmpty()) {
+            msgbox.setText(tr("You have selected partitions that may belong to another operating system."));
+            msgbox.setInformativeText(tr("Are you sure you want to use these partitions?"));
+            msgbox.setDetailedText(foreign);
+            if (msgbox.exec() != QMessageBox::Yes) return gui.treePartitions;
         }
-        if (!msgConfirm.isEmpty()) {
-            msg += tr("The %1 installer will now perform the following actions:").arg(project);
-            msg += "\n\n" + msgConfirm;
+        if (!biosgpt.isEmpty()) {
+            biosgpt.prepend(tr("The following drives are, or will be, setup with GPT,"
+                " but do not have a BIOS-GRUB partition:") + "\n\n");
+            biosgpt += "\n\n" + tr("This system may not boot from GPT drives without a BIOS-GRUB partition.")
+                + '\n' + tr("Are you sure you want to continue?");
+            msgbox.setText(biosgpt);
+            if (msgbox.exec() != QMessageBox::Yes) return gui.treePartitions;
         }
-        if (!msg.isEmpty()) {
-            msg += "\n" + tr("These actions cannot be undone. Do you want to continue?");
-            ans = QMessageBox::warning(master, master->windowTitle(),
-                msg, QMessageBox::Yes, QMessageBox::No);
-            if (ans != QMessageBox::Yes) return gui.treePartitions;
-        }
+        msgbox.setText(tr("The %1 installer will now perform the requested actions.").arg(project));
+        msgbox.setInformativeText(tr("These actions cannot be undone. Do you want to continue?"));
+        msgbox.setDetailedText(details);
+        if (msgbox.exec() != QMessageBox::Yes) return gui.treePartitions;
     }
 
     calculatePartBD();
@@ -1471,8 +1433,7 @@ QTreeWidgetItem *PartMan::selectedDriveAuto()
 
 void PartMan::clearAllUses()
 {
-    QTreeWidgetItemIterator it(gui.treePartitions);
-    for (; *it; ++it) {
+    for (QTreeWidgetItemIterator it(gui.treePartitions); *it; ++it) {
         QComboBox *comboUse = twitComboBox(*it, UseFor);
         if (comboUse) comboUse->clearEditText();
         if (twitFlag(*it, Partition)) partitSetBoot(*it, false);
@@ -1535,8 +1496,7 @@ int PartMan::layoutDefault(QTreeWidgetItem *drvit,
 int PartMan::countPrepSteps()
 {
     int nstep = 0;
-    QTreeWidgetItemIterator it(gui.treePartitions);
-    for (; *it; ++it) {
+    for (QTreeWidgetItemIterator it(gui.treePartitions); *it; ++it) {
         if (twitFlag(*it, Drive)) {
             if (!twitFlag(*it, OldLayout)) ++nstep; // New partition table
         } else if (twitFlag(*it, Partition)) {
@@ -1561,13 +1521,6 @@ bool PartMan::preparePartitions()
     for (const QString &strdev : listToUnmount) {
         proc.exec("swapoff /dev/" + strdev, true);
         proc.exec("/bin/umount /dev/" + strdev, true);
-    }
-
-    qDebug() << " ---- PARTITION FORMAT SCHEDULE ----";
-    for (const auto &it : mounts.toStdMap()) {
-        QTreeWidgetItem *twit = it.second;
-        qDebug().nospace().noquote() << it.first << ": "
-            << twit->text(Device) << " (" << twitSize(twit) << "MB)";
     }
 
     // Prepare partition tables on devices which will have a new layout.
@@ -1660,10 +1613,10 @@ bool PartMan::formatPartitions()
 
     // Format partitions.
     const bool badblocks = gui.checkBadBlocks->isChecked();
-    for (const auto &it : mounts.toStdMap()) {
-        QTreeWidgetItem *twit = it.second;
-        if (twitFlag(twit, Subvolume)) continue;
-        if (!twitWillFormat(twit)) continue;
+
+    for (QTreeWidgetItemIterator it(gui.treePartitions); *it; ++it) {
+        QTreeWidgetItem *twit = *it;
+        if (!twitFlag(twit, Partition) || !twitWillFormat(twit)) continue;
         const QString &dev = twitMappedDevice(twit, true);
         const QString &useFor = translateUse(twitComboBox(twit, UseFor)->currentText());
         if (twit->checkState(Encrypt) == Qt::Checked) {
@@ -1675,7 +1628,7 @@ bool PartMan::formatPartitions()
         }
         const QString &fmtstatus = tr("Formatting: %1");
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(dev));
-        else proc.status(fmtstatus.arg(describeUse(it.first)));
+        else proc.status(fmtstatus.arg(describeUse(useFor)));
         if (useFor == "ESP") {
             const QString &fmt = twitComboBox(twit, Format)->currentText();
             if (!proc.exec("mkfs.msdos -F " + fmt.mid(3)+' '+dev)) return false;
@@ -1700,8 +1653,7 @@ bool PartMan::formatPartitions()
         }
     }
     // Prepare subvolumes on all that (are to) contain them.
-    QTreeWidgetItemIterator it(gui.treePartitions);
-    for (; *it; ++it) {
+    for (QTreeWidgetItemIterator it(gui.treePartitions); *it; ++it) {
         if (!twitFlag(*it, Partition)) continue;
         else if (!prepareSubvolumes(*it)) return false;
     }
@@ -1799,16 +1751,14 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     }
     // Find extra devices
     QMap<QString, QString> extraAdd;
-    QTreeWidgetItemIterator it(gui.treePartitions);
-    for (; *it; ++it) {
-        if (twitUseFor(*it).isEmpty() && twitFlag(*it, AutoCrypto)) {
+    for (QTreeWidgetItemIterator it(gui.treePartitions); *it; ++it) {
+        if (twitFlag(*it, AutoCrypto)) {
             extraAdd.insert((*it)->text(Device), twitMappedDevice(*it));
         }
     }
     // File systems
     for (auto &it : mounts.toStdMap()) {
         if (it.second->checkState(Encrypt) != Qt::Checked) continue;
-        if (it.first.startsWith("FORMAT") && !twitFlag(it.second, AutoCrypto)) continue;
         const QString &dev = it.second->text(Device);
         QString uuid = proc.execOut(cmdBlkID + dev);
         out << twitMappedDevice(it.second, false) << " /dev/disk/by-uuid/" << uuid;
@@ -1854,8 +1804,6 @@ bool PartMan::makeFstab(bool populateMediaMounts)
     const QString cmdBlkID("blkid -o value UUID -s UUID ");
     // File systems and swap space.
     for (auto &it : mounts.toStdMap()) {
-        if (it.first.startsWith("FORMAT")) continue; // Format without mounting.
-        if (it.first == "ESP") continue; // EFI will be dealt with later.
         const QString &dev = twitMappedDevice(it.second, true);
         qDebug() << "Creating fstab entry for:" << it.first << dev;
         // Device ID or UUID
@@ -1995,8 +1943,7 @@ QTreeWidgetItem *PartMan::findOrigin(const QString &vdev)
         const QString &trline = line.trimmed();
         if (trline.startsWith("device:")) {
             const QString &trdev = trline.mid(trline.lastIndexOf('/')+1);
-            QTreeWidgetItemIterator it(gui.treePartitions);
-            for (; *it; ++it) {
+            for (QTreeWidgetItemIterator it(gui.treePartitions); *it; ++it) {
                 if ((*it)->text(Device) == trdev) return *it;
             }
             return nullptr;
@@ -2146,8 +2093,9 @@ QString PartMan::twitMappedDevice(const QTreeWidgetItem *twit, const bool full) 
 
 QString PartMan::twitShownDevice(QTreeWidgetItem *twit) const
 {
-    if (twitFlag(twit, Subvolume))
+    if (twitFlag(twit, Subvolume)) {
         return twit->parent()->text(Device) + '[' + twitLineEdit(twit, Label)->text() + ']';
+    }
     return twit->text(Device);
 }
 
