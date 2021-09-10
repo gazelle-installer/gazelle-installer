@@ -1219,7 +1219,7 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
 
     if (!automatic) {
         // Final warnings before the installer starts.
-        QString details, foreign, biosgpt;
+        QString details, biosgpt;
         for (int ixdrv = 0; ixdrv < gui.treePartitions->topLevelItemCount(); ++ixdrv) {
             QTreeWidgetItem *drvit = gui.treePartitions->topLevelItem(ixdrv);
             const QString &drv = drvit->text(Device);
@@ -1244,14 +1244,6 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
                     details += tr("Reuse (no reformat) %1 as %2").arg(dev, describeUse(use));
                 }
                 details += '\n';
-                // Warn if using a non-Linux partition (potential install of another OS).
-                if (twitFlag(partit, OldLayout) && twitWillFormat(partit)) {
-                    const int bdindex = listBlkDevs.findDevice(dev);
-                    assert(bdindex >= 0);
-                    if (bdindex >= 0 && !listBlkDevs.at(bdindex).isNative) {
-                        foreign += tr("%1, to be used for %2").arg(dev, describeUse(use)) + '\n';
-                    }
-                }
             }
             // Potentially unbootable GPT when on a BIOS-based PC.
             const bool hasBoot = drvit->data(Format, Qt::UserRole).isValid();
@@ -1263,12 +1255,6 @@ QWidget *PartMan::composeValidate(bool automatic, const QString &project)
         msgbox.setWindowTitle(master->windowTitle());
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         msgbox.setDefaultButton(QMessageBox::No);
-        if (!foreign.isEmpty()) {
-            msgbox.setText(tr("You have selected partitions that may belong to another operating system."));
-            msgbox.setInformativeText(tr("Are you sure you want to use these partitions?"));
-            msgbox.setDetailedText(foreign);
-            if (msgbox.exec() != QMessageBox::Yes) return gui.treePartitions;
-        }
         if (!biosgpt.isEmpty()) {
             biosgpt.prepend(tr("The following drives are, or will be, setup with GPT,"
                 " but do not have a BIOS-GRUB partition:") + "\n\n");
