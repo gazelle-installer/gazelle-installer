@@ -1459,17 +1459,15 @@ int MInstall::showPage(int curr, int next)
             }
             partman.clearAllUses();
             partman.layoutDefault(partman.selectedDriveAuto(), -1, boxEncryptAuto->isChecked());
-            QWidget *nf = partman.composeValidate(true, PROJECTNAME);
-            if (nf) {
-                nextFocus = nf;
+            if (!partman.composeValidate(true, PROJECTNAME)) {
+                nextFocus = treePartitions;
                 return curr;
             }
             return Step::Boot;
         }
     } else if (curr == Step::Partitions && next > curr) {
-        QWidget *nf = partman.composeValidate(automatic, PROJECTNAME);
-        if (nf) {
-            nextFocus = nf;
+        if (!partman.composeValidate(automatic, PROJECTNAME)) {
+            nextFocus = treePartitions;
             return curr;
         }
         if (!pretend && !saveHomeBasic()) {
@@ -2249,7 +2247,7 @@ void MInstall::on_sliderPart_sliderPressed()
 void MInstall::on_sliderPart_valueChanged(int value)
 {
     const bool crypto = boxEncryptAuto->isChecked();
-    QTreeWidgetItem *drvitem = partman.selectedDriveAuto();
+    DeviceItem *drvitem = partman.selectedDriveAuto();
     if (!drvitem) return;
     long long available = partman.layoutDefault(drvitem, 100, crypto, false);
     if (!available) return;
