@@ -26,18 +26,100 @@
 #define PARTMAN_H
 
 #include <QObject>
-#include <QTreeWidget>
+#include <QAbstractItemModel>
+#include <QStyledItemDelegate>
 #include <QString>
 #include <QMap>
+#include <QStack>
 
 #include "mprocess.h"
 #include "blockdev.h"
 #include "ui_meinstall.h"
 #include "msettings.h"
 
-class PartMan : public QObject
+class DeviceItem
+{
+    QVector<DeviceItem *> children;
+    DeviceItem *parentItem = nullptr;
+    class PartModel *model = nullptr;
+public:
+    DeviceItem *active = nullptr;
+    enum DeviceType {
+        Unknown,
+        Drive,
+        Partition,
+        VirtualDevices,
+        VirtualBD,
+        Subvolume
+    } type;
+    struct Flags {
+        bool activated : 1;
+        bool unusable : 1;
+        bool oldLayout : 1;
+        bool cryptoV : 1;
+        bool autoCrypto : 1;
+        bool setBoot : 1;
+        bool mapLock : 1;
+    } flags = {};
+    QString device, devMapper;
+    long long size = 0;
+    QString label, curLabel;
+    QString usefor;
+    bool encrypt = false;
+    QString format, curFormat;
+    QString options;
+    bool dump = false;
+    int pass = 0;
+    DeviceItem(enum DeviceType type, DeviceItem *parent = nullptr, DeviceItem *preceding = nullptr);
+    DeviceItem(enum DeviceType type, PartModel &container, DeviceItem *preceding = nullptr);
+    ~DeviceItem();
+    void clear();
+    int row() const;
+    DeviceItem *parent() const;
+    DeviceItem *child(int row);
+    int indexOfChild(DeviceItem *child);
+    int childCount() const;
+    void sortChildren();
+    // Helpers
+    static QString realUseFor(const QString &use);
+    inline QString realUseFor() const { return realUseFor(usefor); }
+    QString shownUseFor() const;
+    void setActive(bool boot);
+    bool isLocked() const;
+    bool willFormat() const;
+    bool canEncrypt() const;
+    QString mappedDevice(const bool full = false) const;
+    bool willMap() const;
+    QString shownDevice() const;
+    QStringList allowedUsesFor(bool real = true) const;
+    QStringList allowedFormats() const;
+    QString shownFormat(const QString &fmt) const;
+    bool canMount() const;
+    /* Convenience */
+    DeviceItem *addPart(int defaultMB, const QString &defaultUse, bool crypto);
+    void driveAutoSetBoot();
+    void autoFill(unsigned int changed = 0xFFFF);
+};
+class DeviceItemIterator
+{
+    DeviceItem *pos;
+    int ixPos = 0;
+    QStack<int> ixParents;
+public:
+    DeviceItemIterator(DeviceItem *item) : pos(item) {}
+    DeviceItemIterator(PartModel &model);
+    inline DeviceItem *operator*() const { return pos; }
+    void next();
+};
+
+class PartModel : public QAbstractItemModel
 {
     Q_OBJECT
+    DeviceItem *root = nullptr;
+    DeviceItem *changing = nullptr;
+    friend class DeviceItem;
+    class PartMan &partman;
+public:
     enum TreeColumns {
         Device, // Data: destination mapped device (encryption)
         Size, // Data: size of existing device (bytes)
@@ -47,90 +129,101 @@ class PartMan : public QObject
         Format, // Text: existing format (not QLineEdit text)
         Options, // Data: tree widget item flags (see below)
         Dump,
-        Pass
+        Pass,
+        _TreeColumns_
     };
-    enum TwitFlag {
-        Drive,
-        Partition,
-        OldLayout,
-        VirtualDevices,
-        VirtualBD,
-        SetBoot,
-        AutoCrypto,
-        CryptoV,
-        Subvolume
-    };
+    PartModel(PartMan &pman, QObject *parent = nullptr);
+    ~PartModel();
+    QVariant data(const QModelIndex &index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    QVariant headerData(int section, Qt::Orientation orientation,
+                        int role = Qt::DisplayRole) const override;
+    QModelIndex index(int row, int column,
+                      const QModelIndex &parent = QModelIndex()) const override;
+    inline QModelIndex index(DeviceItem *item) const { return createIndex(item->row(), 0, item); }
+    QModelIndex parent(const QModelIndex &index) const override;
+    DeviceItem *item(const QModelIndex &index) const;
+    DeviceItem *item(int index) const;
+    int count() const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    inline int columnCount(const QModelIndex &) const override { return _TreeColumns_; }
+    void clear();
+    DeviceItem *insert(enum DeviceItem::DeviceType type, DeviceItem *parent, DeviceItem *preceeding = nullptr);
+    void remove(DeviceItem *item);
+    bool changeBegin(DeviceItem *item);
+    int changeEnd(bool notify = true);
+    void notifyChange(class DeviceItem *item, int first = -1, int last = -1);
+};
+
+class DeviceItemDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &,
+        const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    void partOptionsMenu(const QPoint &);
+    // No setStepType() in Debian Buster.
+    void spinSizeValueChange(int i);
+};
+
+class PartMan : public QObject
+{
+    Q_OBJECT
     MProcess &proc;
     BlockDeviceList &listBlkDevs;
     Ui::MeInstall &gui;
     QWidget *master;
-    QMap<QString, QTreeWidgetItem *> mounts;
+    QMap<QString, DeviceItem *> mounts;
     QStringList listToUnmount;
+    PartModel model;
     void setup();
     void scanVirtualDevices(bool rescan);
-    QTreeWidgetItem *addItem(QTreeWidgetItem *parent, int defaultMB, const QString &defaultUse, bool crypto);
-    void setupPartitionItem(QTreeWidgetItem *partit, const BlockDeviceInfo *bdinfo);
-    void labelParts(QTreeWidgetItem *drvit);
+    void labelParts(DeviceItem *drvit);
     void resizeColumnsToFit();
-    static QString translateUse(const QString &alias);
-    static QString describeUse(const QString &use);
     bool formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label);
-    void setEncryptChecks(const QString &use,
-        enum Qt::CheckState state, QTreeWidgetItem *exclude);
     bool calculatePartBD();
-    bool prepareSubvolumes(QTreeWidgetItem *partit);
-    QTreeWidgetItem *findOrigin(const QString &vdev);
-    void drvitClear(QTreeWidgetItem *drvit);
-    inline void drvitMarkLayout(QTreeWidgetItem *drvit, const bool old);
-    inline bool drvitIsLocked(const QTreeWidgetItem *drvit) const;
-    void drvitAutoSetBoot(QTreeWidgetItem *drvit);
-    void partitSetBoot(QTreeWidgetItem *partit, bool boot);
-    inline bool twitFlag(const QTreeWidgetItem *twit, const TwitFlag flag) const;
-    void twitSetFlag(QTreeWidgetItem *twit, const TwitFlag flag, const bool value);
-    inline bool twitCanUse(QTreeWidgetItem *twit) const;
-    long long twitSize(QTreeWidgetItem *twit, const bool bytes=false) const;
-    bool twitWillFormat(QTreeWidgetItem *twit) const;
-    inline QString twitUseFor(QTreeWidgetItem *twit) const;
-    inline bool twitWillMap(const QTreeWidgetItem *twit) const;
-    QString twitMappedDevice(const QTreeWidgetItem *twit, const bool full=false) const;
-    QString twitShownDevice(QTreeWidgetItem *twit) const;
-    inline QComboBox *twitComboBox(QTreeWidgetItem  *twit, int column) const;
-    inline QLineEdit *twitLineEdit(QTreeWidgetItem  *twit, int column) const;
-    inline QSpinBox *twitSpinBox(QTreeWidgetItem  *twit, int column) const;
-    void spinSizeValueChange(int i);
-    void comboUseTextChange(const QString &text);
-    void comboFormatTextChange(const QString &);
-    void comboSubvolUseTextChange(const QString &text);
-    void comboSubvolFormatTextChange(const QString &);
-    void treeItemChange(QTreeWidgetItem *twit, int column);
+    bool prepareSubvolumes(DeviceItem *partit);
+    DeviceItem *findOrigin(const QString &vdev);
+    void treeItemChange();
     void treeSelChange();
     void treeMenu(const QPoint &);
     void partOptionsMenu(const QPoint &);
     void partClearClick(bool);
     void partAddClick(bool);
     void partRemoveClick(bool);
-    void partMenuUnlock(QTreeWidgetItem *twit);
-    void partMenuLock(QTreeWidgetItem *twit);
-    QTreeWidgetItem *addSubvolumeItem(QTreeWidgetItem *twit);
-    void scanSubvolumes(QTreeWidgetItem *partit);
-    bool eventFilter(QObject *object, QEvent *event);
+    void partMenuUnlock(DeviceItem *twit);
+    void partMenuLock(DeviceItem *twit);
+    void scanSubvolumes(DeviceItem *partit);
     bool luksFormat(const QString &dev, const QByteArray &password);
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
 public:
+    enum TreeColumns {
+        Device,
+        Size,
+        Label,
+        UseFor,
+        Encrypt,
+        Format,
+        Options,
+        Dump,
+        Pass
+    };
     bool gptoverride=false, uefi=false, brave=false;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
     QMap<QString, QString> defaultLabels;
     PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
-    void populate(QTreeWidgetItem *drvstart = nullptr);
+    void populate(DeviceItem *drvstart = nullptr);
     bool manageConfig(MSettings &config, bool save);
-    QWidget *composeValidate(bool automatic, const QString &project);
+    bool composeValidate(bool automatic, const QString &project);
     bool checkTargetDrivesOK();
-    QTreeWidgetItem *selectedDriveAuto();
+    DeviceItem *selectedDriveAuto();
     void clearAllUses();
-    int layoutDefault(QTreeWidgetItem *drvit,
-        int rootPercent, bool crypto, bool updateTree=true);
+    int layoutDefault(DeviceItem *drvit, int rootPercent, bool crypto, bool updateTree=true);
     int countPrepSteps();
     bool preparePartitions();
     bool formatPartitions();
