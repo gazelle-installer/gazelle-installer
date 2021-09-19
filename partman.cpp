@@ -57,7 +57,6 @@ void PartMan::setup()
     gui.treePartitions->setItemDelegate(new DeviceItemDelegate);
     gui.treePartitions->header()->setMinimumSectionSize(5);
     gui.treePartitions->setContextMenuPolicy(Qt::CustomContextMenu);
-    gui.treePartitions->setEditTriggers(QAbstractItemView::AllEditTriggers);
     connect(gui.treePartitions, &QTreeView::customContextMenuRequested, this, &PartMan::treeMenu);
     connect(gui.treePartitions->selectionModel(), &QItemSelectionModel::selectionChanged, this, &PartMan::treeSelChange);
     connect(gui.pushPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
@@ -327,6 +326,7 @@ void PartMan::treeItemChange()
         gui.boxCryptoPass->setEnabled(cryptoAny);
     }
     gui.checkBadBlocks->setEnabled(canCheck);
+    treeSelChange();
 }
 
 void PartMan::treeSelChange()
@@ -347,10 +347,10 @@ void PartMan::treeSelChange()
         DeviceItem *drvit = twit->parent();
         if (!drvit) drvit = twit;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
-        else if (!islocked && !isold){
-            long long maxMB = (twit->size / 1048576) - PARTMAN_SAFETY_MB;
-            for (int ixi = twit->childCount() - 1; ixi >= 0; --ixi) {
-                maxMB -= twit->child(ixi)->size / 1048576;
+        else if (!isold) {
+            long long maxMB = (drvit->size / 1048576) - PARTMAN_SAFETY_MB;
+            for (int ixi = drvit->childCount() - 1; ixi >= 0; --ixi) {
+                maxMB -= drvit->child(ixi)->size / 1048576;
             }
             gui.pushPartAdd->setEnabled(maxMB > 0);
         }
@@ -386,7 +386,7 @@ void PartMan::treeMenu(const QPoint &)
             if (twit->flags.cryptoV) actLock = menu.addAction(tr("&Lock"));
         } else {
             bool allowCryptTab = false;
-            if (twit->flags.oldLayout && twit->format == "crypto_LUKS") {
+            if (twit->flags.oldLayout && twit->curFormat == "crypto_LUKS") {
                 actUnlock = menu.addAction(tr("&Unlock"));
                 allowCryptTab = true;
             }
@@ -2009,32 +2009,12 @@ void PartModel::notifyChange(class DeviceItem *item, int first, int last)
 
 void DeviceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    painter->save();
-    // Standard item features
-    QStyleOptionViewItem opt = option;
-    initStyleOption(&opt, index);
-    const QWidget *widget = opt.widget;
-    QStyle *style = widget ? widget->style() : QApplication::style();
-    style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
-    // Grid lines
-    QColor color = opt.palette.color(QPalette::Active, QPalette::Text);
-    color.setAlpha(64);
-    QPen pen = painter->pen();
-    pen.setColor(color);
-    pen.setStyle(Qt::DotLine);
-    painter->setPen(pen);
-    painter->drawRect(opt.rect);
+    QStyledItemDelegate::paint(painter, option, index);
     // Frame to indicate editable cells
     if (index.flags() & Qt::ItemIsEditable) {
-        QStyleOptionFrame frame;
-        frame.frameShape = QFrame::Panel;
-        frame.state = QStyle::State_Enabled | QStyle::State_Sunken;
-        frame.rect = opt.rect;
-        const int adj = painter->pen().width();
-        frame.rect.adjust(adj, adj, 0, 0);
-        style->drawPrimitive(QStyle::PE_Frame, &frame, painter);
+        painter->setPen(option.palette.color(QPalette::Active, QPalette::Text));
+        painter->drawRect(option.rect.adjusted(0, 0, -1, -1));
     }
-    painter->restore();
 }
 
 QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
@@ -2113,7 +2093,6 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             }
             const int ixfmt = combo->findData(item->format);
             if (ixfmt >= 0) combo->setCurrentIndex(ixfmt);
-            combo->showPopup();
             break;
         }
         case PartModel::Pass: {
