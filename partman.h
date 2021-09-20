@@ -122,8 +122,8 @@ public:
     enum TreeColumns {
         Device,
         Size,
-        Label,
         UseFor,
+        Label,
         Encrypt,
         Format,
         Options,
