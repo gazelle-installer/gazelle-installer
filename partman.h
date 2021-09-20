@@ -121,13 +121,13 @@ class PartModel : public QAbstractItemModel
     class PartMan &partman;
 public:
     enum TreeColumns {
-        Device, // Data: destination mapped device (encryption)
-        Size, // Data: size of existing device (bytes)
-        Label, // Text: existing label (not QLineEdit text)
+        Device,
+        Size,
+        Label,
         UseFor,
         Encrypt,
-        Format, // Text: existing format (not QLineEdit text)
-        Options, // Data: tree widget item flags (see below)
+        Format,
+        Options,
         Dump,
         Pass,
         _TreeColumns_
@@ -201,17 +201,6 @@ class PartMan : public QObject
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
 public:
-    enum TreeColumns {
-        Device,
-        Size,
-        Label,
-        UseFor,
-        Encrypt,
-        Format,
-        Options,
-        Dump,
-        Pass
-    };
     bool gptoverride=false, uefi=false, brave=false;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
