@@ -54,7 +54,6 @@ public:
     } type;
     struct Flags {
         bool activated : 1;
-        bool unusable : 1;
         bool oldLayout : 1;
         bool cryptoV : 1;
         bool autoCrypto : 1;
@@ -94,6 +93,7 @@ public:
     QStringList allowedUsesFor(bool real = true) const;
     QStringList allowedFormats() const;
     QString shownFormat(const QString &fmt) const;
+    bool isVolume() const;
     bool canMount() const;
     /* Convenience */
     DeviceItem *addPart(int defaultMB, const QString &defaultUse, bool crypto);

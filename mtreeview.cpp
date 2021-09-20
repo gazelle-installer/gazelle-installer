@@ -75,14 +75,17 @@ void MTreeView::drawRow(QPainter *painter, const QStyleOptionViewItem &option, c
     pen.setStyle(Qt::DashDotDotLine);
     painter->setPen(pen);
     const int x = visualRect(index).x();
-    int y = option.rect.y();
+    int y = option.rect.y() + pen.width();
+    const int y2 = option.rect.bottom() - pen.width();
     // Vertical lines
-    painter->drawLine(x, y, x, y + option.rect.height());
+    painter->drawLine(x, y, x, y2);
+    const int last = header()->count() - 1;
+    const bool spanned = isFirstColumnSpanned(index.row(), index.parent());
     painter->save();
-    painter->translate(visualRect(model()->index(0, 0)).x() - indentation() - 0.5, -0.5);
-    for (int ixi = 0; ixi < header()->count(); ++ixi) {
-        painter->translate(header()->sectionSize(ixi), 0);
-        painter->drawLine(0, y, 0, y + option.rect.height());
+    painter->translate(visualRect(model()->index(0, 0)).x() - indentation() - 0.5, 0);
+    for (int ixi = 0; ixi <= last; ++ixi) {
+        painter->translate(header()->sectionSize(header()->logicalIndex(ixi)), 0);
+        if (!spanned || ixi == last) painter->drawLine(0, y, 0, y2);
     }
     painter->restore();
     // Horizontal lines
