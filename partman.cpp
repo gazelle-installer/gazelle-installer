@@ -226,7 +226,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             if (save) {
                 config.setValue("Size", partit->size);
                 config.setValue("Encrypt", partit->encrypt);
-                if (partit->flags.setBoot) config.setValue("Boot", true);
+                if (partit->isActive()) config.setValue("Boot", true);
                 if (!partit->usefor.isEmpty()) config.setValue("UseFor", partit->usefor);
                 if (!partit->format.isEmpty()) config.setValue("Format", partit->format);
                 if (!partit->label.isEmpty()) config.setValue("Label", partit->label);
@@ -396,7 +396,7 @@ void PartMan::treeMenu(const QPoint &)
             menu.addSeparator();
             actSetBoot = menu.addAction(tr("Set boot flag"));
             actSetBoot->setCheckable(true);
-            actSetBoot->setChecked(twit->flags.setBoot);
+            actSetBoot->setChecked(twit->isActive());
         }
         if (twit->format == "btrfs") {
             menu.addSeparator();
@@ -925,7 +925,7 @@ int PartMan::layoutDefault(DeviceItem *drvit,
         if (swapFormatSize>0) drvit->addPart(swapFormatSize, "swap", crypto);
         if (homeFormatSize>0) drvit->addPart(homeFormatSize, "home", crypto);
         labelParts(drvit);
-        drvit->driveAutoSetBoot();
+        drvit->driveAutoSetActive();
         treeSelChange();
     }
     return rootFormatSize;
@@ -1033,7 +1033,7 @@ bool PartMan::preparePartitions()
             QStringList devsplit(BlockDeviceInfo::split(twit->device));
             QString cmd = "parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1);
             bool ok = true;
-            if (twit->flags.setBoot) {
+            if (twit->isActive()) {
                 if (!useGPT) ok = proc.exec(cmd + " boot on");
                 else ok = proc.exec(cmd + " legacy_boot on");
             }
@@ -1427,7 +1427,7 @@ DeviceItem::~DeviceItem()
     }
     children.clear();
     if (parentItem) {
-        if (flags.setBoot) parentItem->active = nullptr;
+        if (parentItem->active == this) parentItem->active = nullptr;
         parentItem->children.removeAll(this);
         if (model) {
             model->endRemoveRows();
@@ -1499,22 +1499,17 @@ QString DeviceItem::shownUseFor() const
 }
 void DeviceItem::setActive(bool boot)
 {
-    DeviceItem *const drvit = parent();
-    if (!drvit) return;
-    const int partCount = drvit->childCount();
-    const int ixThis = drvit->indexOfChild(this);
-    for (int ixPart = 0; ixPart < partCount; ++ixPart) {
-        if (ixPart == ixThis) continue;
-        DeviceItem *chit = drvit->child(ixPart);
-        if (chit->flags.setBoot) {
-            chit->flags.setBoot = false;
-            if (model) model->notifyChange(chit);
-        }
+    if (!parentItem) return;
+    if (model && parentItem->active != this) {
+        if (parentItem->active) model->notifyChange(parentItem->active);
     }
-    DeviceItem *const curActive = drvit->active;
-    drvit->active = boot ? this : nullptr;
-    flags.setBoot = boot;
-    if (model && curActive != drvit->active) model->notifyChange(this);
+    parentItem->active = boot ? this : nullptr;
+    if (model) model->notifyChange(this);
+}
+bool DeviceItem::isActive() const
+{
+    if (parentItem) return false;
+    return (parentItem->active == this);
 }
 bool DeviceItem::isLocked() const
 {
@@ -1636,7 +1631,7 @@ DeviceItem *DeviceItem::addPart(int defaultMB, const QString &defaultUse, bool c
     if (model) model->notifyChange(partit);
     return partit;
 }
-void DeviceItem::driveAutoSetBoot()
+void DeviceItem::driveAutoSetActive()
 {
     if (active) return;
     const int partcount = children.count();
@@ -1690,7 +1685,7 @@ void DeviceItem::autoFill(unsigned int changed)
         }
         // Automatic default boot device selection
         if ((type != VirtualBD) && (use == "/boot" || use == "/")) {
-            if (parentItem) parentItem->driveAutoSetBoot();
+            if (parentItem) parentItem->driveAutoSetActive();
         }
     }
     if (format.isEmpty()) {
@@ -1819,7 +1814,7 @@ QVariant PartModel::data(const QModelIndex &index, int role) const
         }
     } else if (role == Qt::FontRole && index.column() == Device) {
         QFont font;
-        font.setItalic(item->flags.setBoot);
+        font.setItalic(item->isActive());
         return font;
     }
     return QVariant();
