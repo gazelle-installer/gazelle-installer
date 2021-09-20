@@ -53,11 +53,9 @@ public:
         Subvolume
     } type;
     struct Flags {
-        bool activated : 1;
         bool oldLayout : 1;
         bool cryptoV : 1;
         bool autoCrypto : 1;
-        bool setBoot : 1;
         bool mapLock : 1;
     } flags = {};
     QString device, devMapper;
@@ -84,6 +82,7 @@ public:
     inline QString realUseFor() const { return realUseFor(usefor); }
     QString shownUseFor() const;
     void setActive(bool boot);
+    bool isActive() const;
     bool isLocked() const;
     bool willFormat() const;
     bool canEncrypt() const;
@@ -97,7 +96,7 @@ public:
     bool canMount() const;
     /* Convenience */
     DeviceItem *addPart(int defaultMB, const QString &defaultUse, bool crypto);
-    void driveAutoSetBoot();
+    void driveAutoSetActive();
     void autoFill(unsigned int changed = 0xFFFF);
 };
 class DeviceItemIterator
