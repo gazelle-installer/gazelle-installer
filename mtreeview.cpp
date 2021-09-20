@@ -26,7 +26,7 @@ MTreeView::MTreeView(QWidget *parent)
 {
     setTabKeyNavigation(true);
     setSelectionBehavior(SelectItems);
-    setEditTriggers(DoubleClicked | SelectedClicked | EditKeyPressed | AnyKeyPressed);
+    setEditTriggers(CurrentChanged | DoubleClicked | SelectedClicked | EditKeyPressed | AnyKeyPressed);
 }
 
 QModelIndex MTreeView::moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers)
