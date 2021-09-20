@@ -1774,8 +1774,8 @@ QVariant PartModel::data(const QModelIndex &index, int role) const
                         1, QLocale::DataSizeTraditionalFormat);
                 }
                 break;
-            case Label: return (index.flags() & Qt::ItemIsEditable) ? item->label : item->curLabel; break;
             case UseFor: return item->usefor; break;
+            case Label: return (index.flags() & Qt::ItemIsEditable) ? item->label : item->curLabel; break;
             case Format:
                 if (item->usefor.isEmpty()) return item->curFormat;
                 else return item->shownFormat(item->format);
@@ -1793,8 +1793,8 @@ QVariant PartModel::data(const QModelIndex &index, int role) const
         switch (index.column()) {
             case Device: return item->device; break;
             case Size: return item->size; break;
-            case Label: return item->label; break;
             case UseFor: return item->usefor; break;
+            case Label: return item->label; break;
             case Format: return item->format; break;
             case Options: return item->options; break;
             case Pass: return item->pass; break;
@@ -1846,15 +1846,15 @@ Qt::ItemFlags PartModel::flags(const QModelIndex &index) const
                 flagsOut |= Qt::ItemIsEditable;
             }
             break;
+        case UseFor:
+            if (item->type != DeviceItem::Drive) flagsOut |= Qt::ItemIsEditable;
+            break;
         case Label:
             if (item->type == DeviceItem::Subvolume) {
                 if (item->format != "PRESERVE") flagsOut |= Qt::ItemIsEditable;
             } else {
                 if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
             }
-            break;
-        case UseFor:
-            if (item->type != DeviceItem::Drive) flagsOut |= Qt::ItemIsEditable;
             break;
         case Encrypt:
             if (item->canEncrypt()) flagsOut |= Qt::ItemIsUserCheckable;
@@ -1881,8 +1881,8 @@ QVariant PartModel::headerData(int section, Qt::Orientation orientation, int rol
         switch (section) {
             case Device: return tr("Device"); break;
             case Size: return tr("Size"); break;
-            case Label: return tr("Label"); break;
             case UseFor: return tr("Use For"); break;
+            case Label: return tr("Label"); break;
             case Encrypt: return tr("Encrypt"); break;
             case Format: return tr("Format"); break;
             case Options: return tr("Options"); break;
@@ -1944,8 +1944,8 @@ bool PartModel::changeBegin(DeviceItem *item)
     if (changing) return false;
     root->flags = item->flags;
     root->size = item->size;
-    root->label = item->label;
     root->usefor = item->usefor;
+    root->label = item->label;
     root->encrypt = item->encrypt;
     root->format = item->format;
     root->options = item->options;

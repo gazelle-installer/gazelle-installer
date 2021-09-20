@@ -37,17 +37,18 @@ QModelIndex MTreeView::moveCursor(CursorAction cursorAction, Qt::KeyboardModifie
         QModelIndex index = currentIndex();
         const Qt::ItemFlags reqflags = Qt::ItemIsEditable | Qt::ItemIsUserCheckable;
         do {
+            const int vcol = header()->visualIndex(index.column());
             if (cursorAction == MoveNext) {
-                if ((index.column() + 1) < model()->columnCount()) {
-                    index = index.sibling(index.row(), index.column() + 1);
+                if ((vcol + 1) < model()->columnCount()) {
+                    index = index.sibling(index.row(), header()->logicalIndex(vcol + 1));
                 } else if ((index.row() + 1) < model()->rowCount(index.parent())) {
                     index = index.sibling(index.row() + 1, 0);
                 } else {
                     return QModelIndex();
                 }
             } else if (cursorAction == MovePrevious) {
-                if (index.column() > 0) {
-                    index = index.sibling(index.row(), index.column() - 1);
+                if (vcol > 0) {
+                    index = index.sibling(index.row(), header()->logicalIndex(vcol - 1));
                 } else if (index.row() > 0) {
                     index = index.sibling(index.row() - 1, model()->columnCount() - 1);
                 } else {
