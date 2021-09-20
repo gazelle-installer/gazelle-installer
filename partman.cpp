@@ -149,41 +149,37 @@ void PartMan::scanVirtualDevices(bool rescan)
     }
     assert(vdlit != nullptr);
     for (const QJsonValue &jsonDev : jsonBD) {
-        BlockDeviceInfo bdinfo;
-        bdinfo.isDrive = false;
-        bdinfo.name = jsonDev["name"].toString();
-        bdinfo.size = jsonDev["size"].toVariant().toLongLong();
-        bdinfo.physec = jsonDev["phy-sec"].toInt();
-        bdinfo.label = jsonDev["label"].toString();
-        bdinfo.fs = jsonDev["fstype"].toString();
+        const QString &bdname = jsonDev["name"].toString();
+        const long long bdsize = jsonDev["size"].toVariant().toLongLong();
+        const QString &bdlabel = jsonDev["label"].toString();
         const bool crypto = jsonDev["type"].toString() == "crypt";
         // Check if the device is already in the list.
-        DeviceItem *devit = listed.value(bdinfo.name);
+        DeviceItem *devit = listed.value(bdname);
         if (devit) {
-            if (bdinfo.size != devit->size || bdinfo.label != devit->curLabel
+            if (bdsize != devit->size || bdlabel != devit->curLabel
                 || crypto != devit->flags.cryptoV) {
                 // List entry is different to the device, so refresh it.
                 delete devit;
                 devit = nullptr;
             }
-            listed.remove(bdinfo.name);
+            listed.remove(bdname);
         }
         // Create a new list entry if needed.
         if (!devit) {
             devit = new DeviceItem(DeviceItem::VirtualBD, vdlit);
-            devit->device = devit->devMapper = bdinfo.name;
-            devit->size = bdinfo.size;
-            devit->label = devit->curLabel = bdinfo.label;
-            devit->curFormat = bdinfo.fs;
-            if (crypto) {
-                devit->flags.cryptoV = true;
-                model.notifyChange(devit);
-            }
+            devit->device = devit->devMapper = bdname;
+            devit->size = bdsize;
+            devit->curLabel = bdlabel;
+            devit->curFormat = jsonDev["fstype"].toString();
+            devit->flags.cryptoV = crypto;
             model.notifyChange(devit);
         }
-        DeviceItem *orit = findOrigin(bdinfo.name);
-        if (orit) orit->devMapper = bdinfo.name;
-        model.notifyChange(orit);
+        DeviceItem *orit = findOrigin(bdname);
+        if (orit) {
+            orit->devMapper = bdname;
+            orit->flags.mapLock = true;
+            model.notifyChange(orit);
+        }
     }
     for (const auto &it : listed.toStdMap()) delete it.second;
     vdlit->sortChildren();
@@ -296,7 +292,7 @@ void PartMan::labelParts(DeviceItem *drvit)
     for (int ixi = drvit->childCount() - 1; ixi >= 0; --ixi) {
         DeviceItem *chit = drvit->child(ixi);
         chit->device = BlockDeviceInfo::join(drvit->device, ixi + 1);
-        model.notifyChange(chit);
+        model.notifyChange(chit, PartModel::Device, PartModel::Device);
     }
     resizeColumnsToFit();
 }
@@ -368,9 +364,9 @@ void PartMan::treeMenu(const QPoint &)
     const QModelIndex &selIndex = ixlist.at(0);
     if (!selIndex.isValid()) return;
     DeviceItem *twit = model.item(selIndex);
-    if (twit->type == DeviceItem::VirtualBD) return;
+    if (twit->type == DeviceItem::VirtualDevices) return;
     QMenu menu(gui.treePartitions);
-    if (twit->type == DeviceItem::Partition) {
+    if (twit->isVolume()) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.pushPartAdd->isEnabled());
         QAction *actRemove = menu.addAction(tr("&Remove partition"));
@@ -408,7 +404,7 @@ void PartMan::treeMenu(const QPoint &)
             actScanSubvols = menu.addAction(tr("Scan subvolumes"));
             actScanSubvols->setDisabled(twit->willFormat());
         }
-        if (twit->flags.unusable && actUnlock) actUnlock->setEnabled(false);
+        if (twit->flags.mapLock && actUnlock) actUnlock->setEnabled(false);
         QAction *action = menu.exec(QCursor::pos());
         if (!action) return;
         else if (action == actAdd) partAddClick(true);
@@ -521,7 +517,7 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
         if (ok) {
             twit->usefor.clear();
             twit->flags.autoCrypto = checkCrypttab->isChecked();
-            twit->flags.unusable = true;
+            twit->flags.mapLock = true;
             model.notifyChange(twit);
             // Refreshing the drive will not necessarily re-scan block devices.
             // This updates the device list manually to keep the tree accurate.
@@ -533,8 +529,10 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
         }
         gui.boxMain->setEnabled(true);
         qApp->restoreOverrideCursor();
-        if (!ok) QMessageBox::warning(master, master->windowTitle(),
+        if (!ok) {
+            QMessageBox::warning(master, master->windowTitle(),
                 tr("Could not unlock device. Possible incorrect password."));
+        }
     }
 }
 
@@ -551,7 +549,7 @@ void PartMan::partMenuLock(DeviceItem *twit)
         const int ixBD = listBlkDevs.findDevice(origin->device);
         const int oMapCount = listBlkDevs.at(ixBD).mapCount;
         if (oMapCount > 0) listBlkDevs[ixBD].mapCount--;
-        if (oMapCount <= 1) origin->flags.unusable = false;
+        if (oMapCount <= 1) origin->flags.mapLock = false;
         origin->devMapper.clear();
         origin->flags.autoCrypto = false;
         model.notifyChange(origin);
@@ -945,7 +943,7 @@ int PartMan::countPrepSteps()
     for (DeviceItemIterator it(model); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Drive) {
             if (!item->flags.oldLayout) ++nstep; // New partition table
-        } else if (item->type == DeviceItem::Partition) {
+        } else if (item->isVolume()) {
             const QString &tuse = item->realUseFor();
             // Preparation
             if (!item->flags.oldLayout) ++nstep; // New partition
@@ -1412,19 +1410,24 @@ DeviceItem::DeviceItem(enum DeviceType type, PartModel &container, DeviceItem *p
     DeviceItem *root = container.root;
     if (root) {
         const int i = preceding ? (root->children.indexOf(preceding) + 1) : root->childCount();
-        container.beginInsertRows(container.createIndex(root->row(), 0, root), i, i);
+        container.beginInsertRows(QModelIndex(), i, i);
         root->children.insert(i, this);
         container.endInsertRows();
     }
 }
 DeviceItem::~DeviceItem()
 {
-    clear();
+    if (parentItem && model) {
+        const int r = parentItem->indexOfChild(this);
+        model->beginRemoveRows(model->createIndex(parentItem->row(), 0, parentItem), r, r);
+    }
+    for (DeviceItem *cit : children) {
+        cit->model = nullptr; // Stop unnecessary signals.
+        cit->parentItem = nullptr; // Stop double deletes.
+        delete cit;
+    }
+    children.clear();
     if (parentItem) {
-        if(model) {
-            const int r = parentItem->indexOfChild(this);
-            model->beginRemoveRows(model->createIndex(parentItem->row(), 0, parentItem), r, r);
-        }
         if (flags.setBoot) parentItem->active = nullptr;
         parentItem->children.removeAll(this);
         if (model) {
@@ -1444,10 +1447,7 @@ void DeviceItem::clear()
     children.clear();
     active = nullptr;
     flags.oldLayout = false;
-    if (model) {
-        model->endRemoveRows();
-        model->notifyChange(this);
-    }
+    if (model) model->endRemoveRows();
 }
 int DeviceItem::row() const
 {
@@ -1615,6 +1615,10 @@ QString DeviceItem::shownFormat(const QString &fmt) const
         else if (realUseFor() != "/") return qApp->tr("Preserve (%1)").arg(curFormat);
         else return qApp->tr("Preserve /home (%1)").arg(curFormat);
     }
+}
+bool DeviceItem::isVolume() const
+{
+    return (type == Partition || type == VirtualBD);
 }
 bool DeviceItem::canMount() const
 {
@@ -1811,7 +1815,7 @@ QVariant PartModel::data(const QModelIndex &index, int role) const
             return QIcon(":/appointment-soon");
         } else if (item->type == DeviceItem::VirtualBD && item->flags.cryptoV) {
             return QIcon::fromTheme("unlock");
-        } else if (item->flags.unusable) {
+        } else if (item->flags.mapLock) {
             return QIcon::fromTheme("lock");
         }
     } else if (role == Qt::FontRole && index.column() == Device) {
@@ -1839,6 +1843,7 @@ Qt::ItemFlags PartModel::flags(const QModelIndex &index) const
 {
     DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
     Qt::ItemFlags flagsOut({Qt::ItemIsSelectable, Qt::ItemIsEnabled});
+    if (item->flags.mapLock) return flagsOut;
     switch (index.column()) {
         case Device: break;
         case Size:
