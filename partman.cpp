@@ -1695,7 +1695,7 @@ void DeviceItem::autoFill(unsigned int changed)
             changed |= (1 << PartModel::Format);
         }
     }
-    if (changed & (1 << PartModel::Format)) {
+    if (changed & ((1 << PartModel::UseFor) | (1 << PartModel::Format))) {
         // Default options, dump and pass
         if (!(use.isEmpty() || use == "FORMAT" || use == "ESP")) {
             const QString &lformat = format.toLower();
