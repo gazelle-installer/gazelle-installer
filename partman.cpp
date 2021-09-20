@@ -1449,24 +1449,24 @@ void DeviceItem::clear()
     flags.oldLayout = false;
     if (model) model->endRemoveRows();
 }
-int DeviceItem::row() const
+inline int DeviceItem::row() const
 {
     return parentItem ? parentItem->children.indexOf(const_cast<DeviceItem *>(this)) : 0;
 }
-DeviceItem *DeviceItem::parent() const
+inline DeviceItem *DeviceItem::parent() const
 {
     return parentItem;
 }
-DeviceItem *DeviceItem::child(int row)
+inline DeviceItem *DeviceItem::child(int row)
 {
     if (row < 0 || row >= children.count()) return nullptr;
     return children.at(row);
 }
-int DeviceItem::indexOfChild(DeviceItem *child)
+inline int DeviceItem::indexOfChild(DeviceItem *child)
 {
     return children.indexOf(child);
 }
-int DeviceItem::childCount() const
+inline int DeviceItem::childCount() const
 {
     return children.count();
 }
@@ -1507,7 +1507,7 @@ void DeviceItem::setActive(bool boot)
     parentItem->active = boot ? this : nullptr;
     if (model) model->notifyChange(this);
 }
-bool DeviceItem::isActive() const
+inline bool DeviceItem::isActive() const
 {
     if (parentItem) return false;
     return (parentItem->active == this);
@@ -1520,7 +1520,7 @@ bool DeviceItem::isLocked() const
     }
     return flags.mapLock;
 }
-bool DeviceItem::willFormat() const
+inline bool DeviceItem::willFormat() const
 {
     return usefor != "PRESERVE" && !usefor.isEmpty();
 }
@@ -1611,7 +1611,7 @@ QString DeviceItem::shownFormat(const QString &fmt) const
         else return qApp->tr("Preserve /home (%1)").arg(curFormat);
     }
 }
-bool DeviceItem::isVolume() const
+inline bool DeviceItem::isVolume() const
 {
     return (type == Partition || type == VirtualBD);
 }
@@ -1912,17 +1912,17 @@ QModelIndex PartModel::parent(const QModelIndex &index) const
     if (!pit) return QModelIndex();
     return createIndex(pit->row(), 0, pit);
 }
-DeviceItem *PartModel::item(const QModelIndex &index) const
+inline DeviceItem *PartModel::item(const QModelIndex &index) const
 {
     return static_cast<DeviceItem *>(index.internalPointer());
 }
-DeviceItem *PartModel::item(int index) const
+inline DeviceItem *PartModel::item(int index) const
 {
     if (index < 0) return root;
     if (!root || index > root->childCount()) return nullptr;
     return root->child(index);
 }
-int PartModel::count() const
+inline int PartModel::count() const
 {
     return root->childCount();
 }
@@ -1934,7 +1934,7 @@ int PartModel::rowCount(const QModelIndex &parent) const
     }
     return root->childCount();
 }
-void PartModel::clear()
+inline void PartModel::clear()
 {
     root->clear();
 }
