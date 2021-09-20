@@ -76,7 +76,7 @@ void PartMan::setup()
     if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
         gui.boxEncryptAuto->hide();
         gui.boxCryptoPass->hide();
-        gui.treePartitions->setColumnHidden(Encrypt, true);
+        gui.treePartitions->setColumnHidden(PartModel::Encrypt, true);
     }
 }
 
@@ -93,11 +93,11 @@ void PartMan::populate(DeviceItem *drvstart)
             else if (!curdrv) continue; // Skip until the drive is drvstart.
             else break; // Exit the loop early if the drive isn't drvstart.
             curdev = curdrv;
-            curdev->label = bdinfo.model; // Model
+            curdev->curLabel = bdinfo.model; // Model
         } else {
             if (!curdrv) continue;
             curdev = new DeviceItem(DeviceItem::Partition, curdrv);
-            curdev->label = curdev->curLabel = bdinfo.label;
+            curdev->curLabel = bdinfo.label;
             curdev->curFormat = bdinfo.fs;
             if (bdinfo.isBoot) curdev->setActive(true);
             if (bdinfo.isESP) curdev->usefor = "ESP";
@@ -304,7 +304,7 @@ void PartMan::labelParts(DeviceItem *drvit)
 void PartMan::resizeColumnsToFit()
 {
     for (int ixi = PartModel::_TreeColumns_ - 1; ixi >= 0; --ixi) {
-        if (ixi != Label) gui.treePartitions->resizeColumnToContents(ixi);
+        gui.treePartitions->resizeColumnToContents(ixi);
     }
 }
 
