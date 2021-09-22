@@ -45,6 +45,19 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.setApplicationVersion(VERSION);
+    a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
+    QTranslator qtTran;
+    if (qtTran.load(QLocale::system(), "qt", "_", QLibraryInfo::location(QLibraryInfo::TranslationsPath))) {
+        a.installTranslator(&qtTran);
+    }
+    QTranslator qtBaseTran;
+    if (qtBaseTran.load("qtbase_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) {
+        a.installTranslator(&qtBaseTran);
+    }
+    QTranslator appTran;
+    if (appTran.load(QString("gazelle-installer_") + QLocale::system().name(), "/usr/share/gazelle-installer/locale")) {
+        a.installTranslator(&appTran);
+    }
 
     QCommandLineParser parser;
     parser.setApplicationDescription(QApplication::tr("Customizable GUI installer for MX Linux and antiX Linux"));
@@ -77,56 +90,42 @@ int main(int argc, char *argv[])
     parser.process(a);
 
     if (parser.positionalArguments().size() > 1) {
-        qDebug() << "Too many arguments, please check the command format by running the program with --help";
+        qDebug() << QApplication::tr("Too many arguments. Please check the command format by running the program with --help");
         return EXIT_FAILURE;
     }
 
-    a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
-
     // The lock is released when this object is destroyed.
     QLockFile lockfile("/var/lock/gazelle-installer.lock");
-    // Set Lock or exit if lockfile is present.
-    if (!lockfile.tryLock()) {
-        QMessageBox::critical(nullptr, QString(),
-            QApplication::tr("The installer won't launch because it appears to be running already in the background.\n\n"
-                "Please close it if possible, or run 'pkill minstall' in terminal."));
-        return EXIT_FAILURE;
+    if (!parser.isSet("pretend")) {
+        // Set Lock or exit if lockfile is present.
+        if (!lockfile.tryLock()) {
+            QMessageBox::critical(nullptr, QString(),
+                QApplication::tr("The installer won't launch because it appears to be running already in the background.\n\n"
+                    "Please close it if possible, or run 'pkill minstall' in terminal."));
+            return EXIT_FAILURE;
+        }
+        // Alert the user if not running as root.
+        if (getuid() != 0) {
+            QMessageBox::critical(nullptr, QString(),
+                QApplication::tr("This operation requires root access."));
+            return EXIT_FAILURE;
+        }
     }
 
     if (logFile.open(QFile::Append | QFile::Text)) qInstallMessageHandler(messageHandler);
     else qDebug() << "Cannot write to installer log:" << logFile.fileName();
 
-    QTranslator qtTran;
-    if (qtTran.load(QLocale::system(), "qt", "_", QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-        a.installTranslator(&qtTran);
-
-    QTranslator qtBaseTran;
-    if (qtBaseTran.load("qtbase_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-        a.installTranslator(&qtBaseTran);
-
-    QTranslator appTran;
-    if (appTran.load(QString("gazelle-installer_") + QLocale::system().name(), "/usr/share/gazelle-installer/locale"))
-        a.installTranslator(&appTran);
-
-    // alert the user if not running as root
-    if (!parser.isSet("pretend") && getuid()!=0) {
-        QApplication::beep();
-        QMessageBox::critical(nullptr, QString(),
-            QApplication::tr("This operation requires root access."));
-        return EXIT_FAILURE;
-    }
-
     QString cfgfile;
     if (parser.isSet("config") || parser.positionalArguments().size() == 1) {
-        if (parser.positionalArguments().size() == 1)  // use config file if passed as argument
+        if (parser.positionalArguments().size() == 1) { // use config file if passed as argument
             cfgfile = parser.positionalArguments().at(0);
-        else if (parser.isSet("config")) // use default config file if no argument
+        } else if (parser.isSet("config")) { // use default config file if no argument
             cfgfile = "/etc/minstall.conf";
-
+        }
         // give error message and exit if no config file found
         if (! QFile::exists(cfgfile)) {
             QMessageBox::warning(nullptr, QString(),
-                                 QApplication::tr("Configuration file (%1) not found.").arg(cfgfile));
+                QApplication::tr("Configuration file (%1) not found.").arg(cfgfile));
             return EXIT_FAILURE;
         }
     }
