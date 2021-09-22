@@ -1837,6 +1837,7 @@ bool PartModel::setData(const QModelIndex &index, const QVariant &value, int rol
 Qt::ItemFlags PartModel::flags(const QModelIndex &index) const
 {
     DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
+    if (item->type == DeviceItem::VirtualDevices) return Qt::ItemIsEnabled;
     Qt::ItemFlags flagsOut({Qt::ItemIsSelectable, Qt::ItemIsEnabled});
     if (item->flags.mapLock) return flagsOut;
     switch (index.column()) {
@@ -2012,8 +2013,13 @@ void DeviceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
     QStyledItemDelegate::paint(painter, option, index);
     // Frame to indicate editable cells
     if (index.flags() & Qt::ItemIsEditable) {
-        painter->setPen(option.palette.color(QPalette::Active, QPalette::Text));
-        painter->drawRect(option.rect.adjusted(0, 0, -1, -1));
+        painter->save();
+        QPen pen = painter->pen();
+        pen.setColor(option.palette.color(QPalette::Active, QPalette::Text));
+        painter->setPen(pen);
+        painter->translate(pen.widthF() / 2, pen.widthF() / 2);
+        painter->drawRect(option.rect.adjusted(0, 0, -pen.width(), -pen.width()));
+        painter->restore();
     }
 }
 
