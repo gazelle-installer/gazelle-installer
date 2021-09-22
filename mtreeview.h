@@ -25,6 +25,7 @@
 class MTreeView : public QTreeView
 {
     Q_OBJECT
+    int lastColumn = 0;
     void drawRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 public:
