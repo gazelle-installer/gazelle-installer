@@ -46,14 +46,15 @@
 #define PARTMAN_SAFETY_MB 32 // 1MB at start + Compensate for rounding errors.
 
 PartMan::PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent)
-    : QObject(parent), proc(mproc), listBlkDevs(bdlist), gui(ui), master(parent), model(*this, parent)
+    : QAbstractItemModel(parent), proc(mproc), root(DeviceItem::Unknown, *this),
+      listBlkDevs(bdlist), gui(ui), master(parent)
 {
     QTimer::singleShot(0, this, &PartMan::setup);
 }
 
 void PartMan::setup()
 {
-    gui.treePartitions->setModel(&model);
+    gui.treePartitions->setModel(this);
     gui.treePartitions->setItemDelegate(new DeviceItemDelegate);
     gui.treePartitions->header()->setMinimumSectionSize(5);
     gui.treePartitions->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -62,7 +63,7 @@ void PartMan::setup()
     connect(gui.pushPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
     connect(gui.pushPartAdd, &QToolButton::clicked, this, &PartMan::partAddClick);
     connect(gui.pushPartRemove, &QToolButton::clicked, this, &PartMan::partRemoveClick);
-    connect(&model, &PartModel::dataChanged, this, &PartMan::treeItemChange);
+    connect(this, &PartMan::dataChanged, this, &PartMan::treeItemChange);
     gui.pushPartAdd->setEnabled(false);
     gui.pushPartRemove->setEnabled(false);
     gui.pushPartClear->setEnabled(false);
@@ -76,19 +77,19 @@ void PartMan::setup()
     if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
         gui.boxEncryptAuto->hide();
         gui.boxCryptoPass->hide();
-        gui.treePartitions->setColumnHidden(PartModel::Encrypt, true);
+        gui.treePartitions->setColumnHidden(Encrypt, true);
     }
 }
 
 void PartMan::populate(DeviceItem *drvstart)
 {
-    if (!drvstart) model.clear();
+    if (!drvstart) root.clear();
     DeviceItem *curdrv = nullptr;
     for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
         if (bdinfo.isStart && !brave) continue;
         DeviceItem *curdev = nullptr;
         if (bdinfo.isDrive) {
-            if (!drvstart) curdrv = new DeviceItem(DeviceItem::Drive, model);
+            if (!drvstart) curdrv = new DeviceItem(DeviceItem::Drive, *this);
             else if (bdinfo.name == drvstart->device) curdrv = drvstart;
             else if (!curdrv) continue; // Skip until the drive is drvstart.
             else break; // Exit the loop early if the drive isn't drvstart.
@@ -107,7 +108,7 @@ void PartMan::populate(DeviceItem *drvstart)
         curdev->device = bdinfo.name;
         curdev->size = bdinfo.size;
         curdev->flags.mapLock = (bdinfo.mapCount > 0);
-        model.notifyChange(curdev);
+        notifyChange(curdev);
     }
     if (!drvstart) scanVirtualDevices(false);
     gui.treePartitions->expandAll();
@@ -120,8 +121,8 @@ void PartMan::scanVirtualDevices(bool rescan)
     DeviceItem *vdlit = nullptr;
     QMap<QString, DeviceItem *> listed;
     if (rescan) {
-        for (int ixi = model.count() - 1; ixi >= 0; --ixi) {
-            DeviceItem *twit = model.item(ixi);
+        for (int ixi = root.childCount() - 1; ixi >= 0; --ixi) {
+            DeviceItem *twit = root.child(ixi);
             if (twit->type == DeviceItem::VirtualDevices) {
                 vdlit = twit;
                 const int vdcount = vdlit->childCount();
@@ -142,7 +143,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         if (vdlit) delete vdlit;
         return;
     } else if (!vdlit) {
-        vdlit = new DeviceItem(DeviceItem::VirtualDevices, model);
+        vdlit = new DeviceItem(DeviceItem::VirtualDevices, *this);
         vdlit->device = tr("Virtual Devices");
         vdlit->flags.oldLayout = true;
         gui.treePartitions->setFirstColumnSpanned(vdlit->row(), QModelIndex(), true);
@@ -172,25 +173,25 @@ void PartMan::scanVirtualDevices(bool rescan)
             devit->curLabel = bdlabel;
             devit->curFormat = jsonDev["fstype"].toString();
             devit->flags.cryptoV = crypto;
-            model.notifyChange(devit);
+            notifyChange(devit);
         }
         DeviceItem *orit = findOrigin(bdname);
         if (orit) {
             orit->devMapper = bdname;
             orit->flags.mapLock = true;
-            model.notifyChange(orit);
+            notifyChange(orit);
         }
     }
     for (const auto &it : listed.toStdMap()) delete it.second;
     vdlit->sortChildren();
-    gui.treePartitions->expand(model.index(vdlit));
+    gui.treePartitions->expand(index(vdlit));
 }
 
 bool PartMan::manageConfig(MSettings &config, bool save)
 {
-    const int driveCount = model.count();
+    const int driveCount = root.childCount();
     for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
-        DeviceItem *drvit = model.item(ixDrive);
+        DeviceItem *drvit = root.child(ixDrive);
         // Check if the drive is to be cleared and formatted.
         int partCount = drvit->childCount();
         bool drvPreserve = drvit->flags.oldLayout;
@@ -280,7 +281,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 }
                 config.endGroup();
             }
-            if (!save) gui.treePartitions->expand(model.index(partit));
+            if (!save) gui.treePartitions->expand(index(partit));
         }
     }
     treeSelChange();
@@ -292,14 +293,14 @@ void PartMan::labelParts(DeviceItem *drvit)
     for (int ixi = drvit->childCount() - 1; ixi >= 0; --ixi) {
         DeviceItem *chit = drvit->child(ixi);
         chit->device = BlockDeviceInfo::join(drvit->device, ixi + 1);
-        model.notifyChange(chit, PartModel::Device, PartModel::Device);
+        notifyChange(chit, Device, Device);
     }
     resizeColumnsToFit();
 }
 
 void PartMan::resizeColumnsToFit()
 {
-    for (int ixi = PartModel::_TreeColumns_ - 1; ixi >= 0; --ixi) {
+    for (int ixi = _TreeColumns_ - 1; ixi >= 0; --ixi) {
         gui.treePartitions->resizeColumnToContents(ixi);
     }
 }
@@ -309,7 +310,7 @@ void PartMan::treeItemChange()
     // Encryption and bad blocks controls
     bool canCheck = false;
     bool cryptoAny = false;
-    for (DeviceItemIterator it(model); DeviceItem *item = *it; it.next()) {
+    for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         if (item->type != DeviceItem::Partition) continue;
         if (item->format != "PRESERVE" && !item->usefor.isEmpty()) {
             if (item->format.startsWith("ext") || item->format == "jfs") canCheck = true;
@@ -328,7 +329,7 @@ void PartMan::treeItemChange()
 void PartMan::treeSelChange()
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *twit = (indexes.size() > 0) ? model.item(indexes.at(0)) : nullptr;
+    DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
     if (twit && twit->type != DeviceItem::Subvolume) {
         const bool isdrive = (twit->type == DeviceItem::Drive);
         bool isold = twit->flags.oldLayout;
@@ -363,7 +364,7 @@ void PartMan::treeMenu(const QPoint &)
     if (ixlist.count() < 1) return;
     const QModelIndex &selIndex = ixlist.at(0);
     if (!selIndex.isValid()) return;
-    DeviceItem *twit = model.item(selIndex);
+    DeviceItem *twit = item(selIndex);
     if (twit->type == DeviceItem::VirtualDevices) return;
     QMenu menu(gui.treePartitions);
     if (twit->isVolume()) {
@@ -456,7 +457,7 @@ void PartMan::treeMenu(const QPoint &)
 void PartMan::partClearClick(bool)
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *twit = (indexes.size() > 0) ? model.item(indexes.at(0)) : nullptr;
+    DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
     if (!twit || twit->type != DeviceItem::Drive) return;
     twit->clear();
     treeSelChange();
@@ -465,7 +466,7 @@ void PartMan::partClearClick(bool)
 void PartMan::partAddClick(bool)
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *twit = (indexes.size() > 0) ? model.item(indexes.at(0)) : nullptr;
+    DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
     if (!twit) return;
     DeviceItem *drive = twit->parent();
     if (!drive || drive->type == DeviceItem::Unknown) drive = twit;
@@ -473,14 +474,14 @@ void PartMan::partAddClick(bool)
     DeviceItem *part = new DeviceItem(DeviceItem::Partition, drive, twit);
     labelParts(drive);
     drive->flags.oldLayout = false;
-    model.notifyChange(drive);
-    gui.treePartitions->selectionModel()->select(model.index(part), QItemSelectionModel::ClearAndSelect);
+    notifyChange(drive);
+    gui.treePartitions->selectionModel()->select(index(part), QItemSelectionModel::ClearAndSelect);
 }
 
 void PartMan::partRemoveClick(bool)
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *partit = (indexes.size() > 0) ? model.item(indexes.at(0)) : nullptr;
+    DeviceItem *partit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
     if (!partit) return;
     DeviceItem *drvit = partit->parent();
     if (!drvit) return;
@@ -518,7 +519,7 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
             twit->usefor.clear();
             twit->flags.autoCrypto = checkCrypttab->isChecked();
             twit->flags.mapLock = true;
-            model.notifyChange(twit);
+            notifyChange(twit);
             // Refreshing the drive will not necessarily re-scan block devices.
             // This updates the device list manually to keep the tree accurate.
             const int ixBD = listBlkDevs.findDevice(twit->device);
@@ -552,7 +553,7 @@ void PartMan::partMenuLock(DeviceItem *twit)
         if (oMapCount <= 1) origin->flags.mapLock = false;
         origin->devMapper.clear();
         origin->flags.autoCrypto = false;
-        model.notifyChange(origin);
+        notifyChange(origin);
     }
     // Refresh virtual devices list.
     scanVirtualDevices(true);
@@ -581,7 +582,7 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
         if (line.length() <= start) goto END;
         DeviceItem *svit = new DeviceItem(DeviceItem::Subvolume, partit);
         svit->label = line.mid(start);
-        model.notifyChange(svit);
+        notifyChange(svit);
     }
  END:
     gui.boxMain->setEnabled(true);
@@ -594,7 +595,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
     mounts.clear();
     // Partition use and other validation
     int mapnum = 0, swapnum = 0;
-    for (DeviceItemIterator it(model); DeviceItem *item = *it; it.next()) {
+    for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices) continue;
         if (item->type == DeviceItem::Subvolume) {
             // Ensure the subvolume label entry is valid.
@@ -677,8 +678,8 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
     if (!automatic) {
         // Final warnings before the installer starts.
         QString details, biosgpt;
-        for (int ixdrv = 0; ixdrv < model.count(); ++ixdrv) {
-            DeviceItem *drvit = model.item(ixdrv);
+        for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
+            DeviceItem *drvit = root.child(ixdrv);
             const int partCount = drvit->childCount();
             bool setupGPT = gptoverride || drvit->size >= 2199023255552 || partCount > 4;
             if (drvit->flags.oldLayout) {
@@ -732,9 +733,8 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
 bool PartMan::calculatePartBD()
 {
     listToUnmount.clear();
-    const int driveCount = model.count();
-    for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
-        DeviceItem *drvit = model.item(ixDrive);
+    for (int ixDrive = 0; ixDrive < root.childCount(); ++ixDrive) {
+        DeviceItem *drvit = root.child(ixDrive);
         if (drvit->type == DeviceItem::VirtualDevices) continue;
         const bool useExist = drvit->flags.oldLayout;
         QString drv = drvit->device;
@@ -790,8 +790,8 @@ bool PartMan::calculatePartBD()
 bool PartMan::checkTargetDrivesOK()
 {
     QString smartFail, smartWarn;
-    for (int ixi = 0; ixi < model.count(); ++ixi) {
-        DeviceItem *drvit =  model.item(ixi);
+    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
+        DeviceItem *drvit =  root.child(ixi);
         if (drvit->type == DeviceItem::VirtualDevices) continue;
         QStringList purposes;
         for (DeviceItemIterator it(drvit); *it; it.next()) {
@@ -868,8 +868,8 @@ DeviceItem *PartMan::selectedDriveAuto()
     QString drv(gui.comboDisk->currentData().toString());
     int bdindex = listBlkDevs.findDevice(drv);
     if (bdindex<0) return nullptr;
-    for (int ixi = 0; ixi < model.count(); ++ixi) {
-        DeviceItem *drvit = model.item(ixi);
+    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
+        DeviceItem *const drvit = root.child(ixi);
         if (drvit->device == drv) return drvit;
     }
     return nullptr;
@@ -877,10 +877,10 @@ DeviceItem *PartMan::selectedDriveAuto()
 
 void PartMan::clearAllUses()
 {
-    for (DeviceItemIterator it(model); DeviceItem *item = *it; it.next()) {
+    for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         item->usefor.clear();
         if (item->type == DeviceItem::Partition) item->setActive(false);
-        model.notifyChange(item);
+        notifyChange(item);
     }
 }
 
@@ -940,7 +940,7 @@ int PartMan::layoutDefault(DeviceItem *drvit,
 int PartMan::countPrepSteps()
 {
     int nstep = 0;
-    for (DeviceItemIterator it(model); DeviceItem *item = *it; it.next()) {
+    for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Drive) {
             if (!item->flags.oldLayout) ++nstep; // New partition table
         } else if (item->isVolume()) {
@@ -969,8 +969,8 @@ bool PartMan::preparePartitions()
     }
 
     // Prepare partition tables on devices which will have a new layout.
-    for (int ixi = 0; ixi < model.count(); ++ixi) {
-        DeviceItem *drvit = model.item(ixi);
+    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
+        DeviceItem *drvit = root.child(ixi);
         if (drvit->flags.oldLayout || drvit->type == DeviceItem::VirtualDevices) continue;
         const QString &drv = drvit->device;
         proc.status(tr("Preparing partition tables"));
@@ -993,8 +993,8 @@ bool PartMan::preparePartitions()
 
     // Prepare partition tables, creating tables and partitions when needed.
     proc.status(tr("Preparing required partitions"));
-    for (int ixi = 0; ixi < model.count(); ++ixi) {
-        DeviceItem *drvit = model.item(ixi);
+    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
+        DeviceItem *drvit = root.child(ixi);
         if (drvit->type == DeviceItem::VirtualDevices) continue;
         const QString &drvdev = drvit->device;
         const int devCount = drvit->childCount();
@@ -1059,7 +1059,7 @@ bool PartMan::formatPartitions()
     // Format partitions.
     const bool badblocks = gui.checkBadBlocks->isChecked();
 
-    for (DeviceItemIterator it(model); DeviceItem *twit = *it; it.next()) {
+    for (DeviceItemIterator it(*this); DeviceItem *twit = *it; it.next()) {
         if (twit->type != DeviceItem::Partition || !twit->willFormat()) continue;
         const QString &dev = twit->mappedDevice(true);
         const QString &useFor = twit->realUseFor();
@@ -1092,7 +1092,7 @@ bool PartMan::formatPartitions()
         }
     }
     // Prepare subvolumes on all that (are to) contain them.
-    for (DeviceItemIterator it(model); *it; it.next()) {
+    for (DeviceItemIterator it(*this); *it; it.next()) {
         if ((*it)->type != DeviceItem::Partition) continue;
         else if (!prepareSubvolumes(*it)) return false;
     }
@@ -1190,7 +1190,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     }
     // Find extra devices
     QMap<QString, QString> extraAdd;
-    for (DeviceItemIterator it(model); DeviceItem *item = *it; it.next()) {
+    for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         if (item->flags.autoCrypto) extraAdd.insert(item->device, item->mappedDevice());
     }
     // File systems
@@ -1380,7 +1380,7 @@ DeviceItem *PartMan::findOrigin(const QString &vdev)
         const QString &trline = line.trimmed();
         if (trline.startsWith("device:")) {
             const QString &trdev = trline.mid(trline.lastIndexOf('/') + 1);
-            for (DeviceItemIterator it(model); *it; it.next()) {
+            for (DeviceItemIterator it(*this); *it; it.next()) {
                 if ((*it)->device == trdev) return *it;
             }
             return nullptr;
@@ -1395,34 +1395,34 @@ DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *pre
     : parentItem(parent), type(type)
 {
     if (parent) {
-        model = parentItem->model;
+        partman = parentItem->partman;
         const int i = preceding ? (parentItem->children.indexOf(preceding) + 1) : parentItem->childCount();
-        if (model) {
-            model->beginInsertRows(model->createIndex(parentItem->row(), 0, parentItem), i, i);
+        if (partman) {
+            partman->beginInsertRows(partman->createIndex(parentItem->row(), 0, parentItem), i, i);
         }
         parentItem->children.insert(i, this);
-        if (model) model->endInsertRows();
+        if (partman) partman->endInsertRows();
     }
 }
-DeviceItem::DeviceItem(enum DeviceType type, PartModel &container, DeviceItem *preceding)
-    : parentItem(container.root), model(&container), type(type)
+DeviceItem::DeviceItem(enum DeviceType type, PartMan &partman, DeviceItem *preceding)
+    : partman(&partman), type(type)
 {
-    DeviceItem *root = container.root;
-    if (root) {
-        const int i = preceding ? (root->children.indexOf(preceding) + 1) : root->childCount();
-        container.beginInsertRows(QModelIndex(), i, i);
-        root->children.insert(i, this);
-        container.endInsertRows();
-    }
+    DeviceItem &root = partman.root;
+    if (this == &root) return;
+    parentItem = &root;
+    const int i = preceding ? (root.children.indexOf(preceding) + 1) : root.childCount();
+    partman.beginInsertRows(QModelIndex(), i, i);
+    root.children.insert(i, this);
+    partman.endInsertRows();
 }
 DeviceItem::~DeviceItem()
 {
-    if (parentItem && model) {
+    if (parentItem && partman) {
         const int r = parentItem->indexOfChild(this);
-        model->beginRemoveRows(model->createIndex(parentItem->row(), 0, parentItem), r, r);
+        partman->beginRemoveRows(partman->createIndex(parentItem->row(), 0, parentItem), r, r);
     }
     for (DeviceItem *cit : children) {
-        cit->model = nullptr; // Stop unnecessary signals.
+        cit->partman = nullptr; // Stop unnecessary signals.
         cit->parentItem = nullptr; // Stop double deletes.
         delete cit;
     }
@@ -1430,24 +1430,24 @@ DeviceItem::~DeviceItem()
     if (parentItem) {
         if (parentItem->active == this) parentItem->active = nullptr;
         parentItem->children.removeAll(this);
-        if (model) {
-            model->endRemoveRows();
-            model->notifyChange(parentItem);
+        if (partman) {
+            partman->endRemoveRows();
+            partman->notifyChange(parentItem);
         }
     }
 }
 void DeviceItem::clear()
 {
-    if (model) model->beginRemoveRows(model->createIndex(0, 0, this), 0, children.count()-1);
+    if (partman) partman->beginRemoveRows(partman->createIndex(0, 0, this), 0, children.count()-1);
     for (DeviceItem *cit : children) {
-        cit->model = nullptr; // Stop unnecessary signals.
+        cit->partman = nullptr; // Stop unnecessary signals.
         cit->parentItem = nullptr; // Stop double deletes.
         delete cit;
     }
     children.clear();
     active = nullptr;
     flags.oldLayout = false;
-    if (model) model->endRemoveRows();
+    if (partman) partman->endRemoveRows();
 }
 inline int DeviceItem::row() const
 {
@@ -1457,7 +1457,7 @@ inline DeviceItem *DeviceItem::parent() const
 {
     return parentItem;
 }
-inline DeviceItem *DeviceItem::child(int row)
+inline DeviceItem *DeviceItem::child(int row) const
 {
     if (row < 0 || row >= children.count()) return nullptr;
     return children.at(row);
@@ -1476,8 +1476,8 @@ void DeviceItem::sortChildren()
         return l->device < r->device;
     };
     std::sort(children.begin(), children.end(), cmp);
-    if (model) {
-        for (DeviceItem *c : children) model->notifyChange(c);
+    if (partman) {
+        for (DeviceItem *c : children) partman->notifyChange(c);
     }
 }
 /* Helpers */
@@ -1501,11 +1501,11 @@ QString DeviceItem::shownUseFor() const
 void DeviceItem::setActive(bool boot)
 {
     if (!parentItem) return;
-    if (model && parentItem->active != this) {
-        if (parentItem->active) model->notifyChange(parentItem->active);
+    if (partman && parentItem->active != this) {
+        if (parentItem->active) partman->notifyChange(parentItem->active);
     }
     parentItem->active = boot ? this : nullptr;
-    if (model) model->notifyChange(this);
+    if (partman) partman->notifyChange(this);
 }
 inline bool DeviceItem::isActive() const
 {
@@ -1629,7 +1629,7 @@ DeviceItem *DeviceItem::addPart(int defaultMB, const QString &defaultUse, bool c
     partit->size *= 1048576;
     partit->autoFill();
     if (partit->canEncrypt()) partit->encrypt = crypto;
-    if (model) model->notifyChange(partit);
+    if (partman) partman->notifyChange(partit);
     return partit;
 }
 void DeviceItem::driveAutoSetActive()
@@ -1657,7 +1657,7 @@ void DeviceItem::driveAutoSetActive()
 void DeviceItem::autoFill(unsigned int changed)
 {
     const QString &use = realUseFor();
-    if (changed & (1 << PartModel::UseFor)) {
+    if (changed & (1 << PartMan::UseFor)) {
         // Default labels
         if (type == Subvolume) {
             QStringList chklist;
@@ -1681,8 +1681,8 @@ void DeviceItem::autoFill(unsigned int changed)
                 }
             }
             label = newLabel;
-        } else if (model) {
-            label = model->partman.defaultLabels.value(use);
+        } else if (partman) {
+            label = partman->defaultLabels.value(use);
         }
         // Automatic default boot device selection
         if ((type != VirtualBD) && (use == "/boot" || use == "/")) {
@@ -1693,10 +1693,10 @@ void DeviceItem::autoFill(unsigned int changed)
         const QStringList &af = allowedFormats();
         if (!af.isEmpty()) {
             format = af.at(0);
-            changed |= (1 << PartModel::Format);
+            changed |= (1 << PartMan::Format);
         }
     }
-    if (changed & ((1 << PartModel::UseFor) | (1 << PartModel::Format))) {
+    if (changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format))) {
         // Default options, dump and pass
         if (!(use.isEmpty() || use == "FORMAT" || use == "ESP")) {
             const QString &lformat = format.toLower();
@@ -1717,7 +1717,7 @@ void DeviceItem::autoFill(unsigned int changed)
 }
 
 /* A very slimmed down and non-standard one-way tree iterator. */
-DeviceItemIterator::DeviceItemIterator(PartModel &model) : pos(model.item(-1))
+DeviceItemIterator::DeviceItemIterator(PartMan &partman) : pos(&partman.root)
 {
     next();
 }
@@ -1748,16 +1748,7 @@ void DeviceItemIterator::next()
 
 /* Model */
 
-PartModel::PartModel(PartMan &pman, QObject *parent)
-    : QAbstractItemModel(parent), partman(pman)
-{
-    root = new DeviceItem(DeviceItem::Unknown, *this);
-}
-PartModel::~PartModel()
-{
-    if (root) delete root;
-}
-QVariant PartModel::data(const QModelIndex &index, int role) const
+QVariant PartMan::data(const QModelIndex &index, int role) const
 {
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
     const bool isDriveOrVD = (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices);
@@ -1820,7 +1811,7 @@ QVariant PartModel::data(const QModelIndex &index, int role) const
     }
     return QVariant();
 }
-bool PartModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (role == Qt::CheckStateRole) {
         DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
@@ -1834,7 +1825,7 @@ bool PartModel::setData(const QModelIndex &index, const QVariant &value, int rol
     return true;
 }
 
-Qt::ItemFlags PartModel::flags(const QModelIndex &index) const
+Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
 {
     DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
     if (item->type == DeviceItem::VirtualDevices) return Qt::ItemIsEnabled;
@@ -1875,7 +1866,7 @@ Qt::ItemFlags PartModel::flags(const QModelIndex &index) const
     }
     return flagsOut;
 }
-QVariant PartModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role) const
 {
     assert(orientation == Qt::Horizontal);
     if (role == Qt::DisplayRole) {
@@ -1897,15 +1888,15 @@ QVariant PartModel::headerData(int section, Qt::Orientation orientation, int rol
     }
     return QVariant();
 }
-QModelIndex PartModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex PartMan::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent)) return QModelIndex();
-    DeviceItem *pit = parent.isValid() ? static_cast<DeviceItem *>(parent.internalPointer()) : root;
+    const DeviceItem *pit = parent.isValid() ? static_cast<DeviceItem *>(parent.internalPointer()) : &root;
     DeviceItem *cit = pit->child(row);
     if (cit) return createIndex(row, column, cit);
     return QModelIndex();
 }
-QModelIndex PartModel::parent(const QModelIndex &index) const
+QModelIndex PartMan::parent(const QModelIndex &index) const
 {
     if (!index.isValid()) return QModelIndex();
     DeviceItem *cit = static_cast<DeviceItem *>(index.internalPointer());
@@ -1913,69 +1904,55 @@ QModelIndex PartModel::parent(const QModelIndex &index) const
     if (!pit) return QModelIndex();
     return createIndex(pit->row(), 0, pit);
 }
-inline DeviceItem *PartModel::item(const QModelIndex &index) const
+inline DeviceItem *PartMan::item(const QModelIndex &index) const
 {
     return static_cast<DeviceItem *>(index.internalPointer());
 }
-inline DeviceItem *PartModel::item(int index) const
-{
-    if (index < 0) return root;
-    if (!root || index > root->childCount()) return nullptr;
-    return root->child(index);
-}
-inline int PartModel::count() const
-{
-    return root->childCount();
-}
-int PartModel::rowCount(const QModelIndex &parent) const
+int PartMan::rowCount(const QModelIndex &parent) const
 {
     if (parent.column() > 0) return 0;
     if (parent.isValid()) {
         return static_cast<DeviceItem *>(parent.internalPointer())->childCount();
     }
-    return root->childCount();
-}
-inline void PartModel::clear()
-{
-    root->clear();
+    return root.childCount();
 }
 
-bool PartModel::changeBegin(DeviceItem *item)
+bool PartMan::changeBegin(DeviceItem *item)
 {
     if (changing) return false;
-    root->flags = item->flags;
-    root->size = item->size;
-    root->usefor = item->usefor;
-    root->label = item->label;
-    root->encrypt = item->encrypt;
-    root->format = item->format;
-    root->options = item->options;
-    root->dump = item->dump;
-    root->pass = item->pass;
+    root.flags = item->flags;
+    root.size = item->size;
+    root.usefor = item->usefor;
+    root.label = item->label;
+    root.encrypt = item->encrypt;
+    root.format = item->format;
+    root.options = item->options;
+    root.dump = item->dump;
+    root.pass = item->pass;
     changing = item;
     return true;
 }
-int PartModel::changeEnd(bool notify)
+int PartMan::changeEnd(bool notify)
 {
     if (!changing) return false;
     int changed = 0;
-    if (changing->size != root->size) {
+    if (changing->size != root.size) {
         if (!changing->allowedUsesFor().contains(changing->realUseFor())) {
             changing->usefor.clear();
         }
         if (!changing->canEncrypt()) changing->encrypt = false;
         changed |= (1 << Size);
     }
-    if (changing->usefor != root->usefor) {
+    if (changing->usefor != root.usefor) {
         if (changing->usefor.isEmpty()) changing->format.clear();
         else changing->format = changing->allowedFormats().at(0);
         changed |= (1 << UseFor);
     }
-    if (changing->encrypt != root->encrypt) {
+    if (changing->encrypt != root.encrypt) {
         const QStringList &allowed = changing->allowedFormats();
         if (!allowed.contains(changing->format)) changing->format = allowed.at(0);
     }
-    if (changing->format != root->format || changing->usefor != root->usefor) {
+    if (changing->format != root.format || changing->usefor != root.usefor) {
         changing->dump = false;
         changing->pass = 2;
         const QString &use = changing->realUseFor();
@@ -1991,13 +1968,13 @@ int PartModel::changeEnd(bool notify)
                 notifyChange(child);
             }
         }
-        if (changing->format != root->format) changed |= (1 << Format);
+        if (changing->format != root.format) changed |= (1 << Format);
     }
     if (changed && notify) notifyChange(changing);
     changing = nullptr;
     return changed;
 }
-void PartModel::notifyChange(class DeviceItem *item, int first, int last)
+void PartMan::notifyChange(class DeviceItem *item, int first, int last)
 {
     DeviceItem *p = item->parent();
     if (first < 0) first = 0;
@@ -2027,8 +2004,8 @@ QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 {
     QWidget *widget = nullptr;
     switch (index.column()) {
-        case PartModel::Size: widget = new QSpinBox(parent); break;
-        case PartModel::UseFor: {
+        case PartMan::Size: widget = new QSpinBox(parent); break;
+        case PartMan::UseFor: {
             QComboBox *combo = new QComboBox(parent);
             combo->setEditable(true);
             combo->setInsertPolicy(QComboBox::NoInsert);
@@ -2036,9 +2013,9 @@ QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionVie
             widget = combo;
             break;
         }
-        case PartModel::Format: widget = new QComboBox(parent); break;
-        case PartModel::Pass: widget = new QSpinBox(parent); break;
-        case PartModel::Options: {
+        case PartMan::Format: widget = new QComboBox(parent); break;
+        case PartMan::Pass: widget = new QSpinBox(parent); break;
+        case PartMan::Options: {
             QLineEdit *edit = new QLineEdit(parent);
             edit->setProperty("row", QVariant::fromValue<void *>(index.internalPointer()));
             edit->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -2058,7 +2035,7 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
 {
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
     switch (index.column()) {
-        case PartModel::Size: {
+        case PartMan::Size: {
             DeviceItem *drvit = item->parent();
             assert(drvit != nullptr);
             long long max = drvit->size - (PARTMAN_SAFETY_MB*1048576);
@@ -2074,18 +2051,18 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             spin->setValue(item->size / 1048576);
             break;
         }
-        case PartModel::UseFor: {
+        case PartMan::UseFor: {
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
             combo->addItem("");
             combo->addItems(item->allowedUsesFor(false));
             combo->setCurrentText(item->usefor);
             break;
         }
-        case PartModel::Label: {
+        case PartMan::Label: {
             qobject_cast<QLineEdit *>(editor)->setText(item->label);
             break;
         }
-        case PartModel::Format: {
+        case PartMan::Format: {
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
             const QStringList &formats = item->allowedFormats();
             assert(!formats.isEmpty());
@@ -2101,12 +2078,12 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             if (ixfmt >= 0) combo->setCurrentIndex(ixfmt);
             break;
         }
-        case PartModel::Pass: {
+        case PartMan::Pass: {
             QSpinBox *spin = qobject_cast<QSpinBox *>(editor);
             spin->setValue(item->pass);
             break;
         }
-        case PartModel::Options: {
+        case PartMan::Options: {
             qobject_cast<QLineEdit *>(editor)->setText(item->options);
             break;
         }
@@ -2115,32 +2092,32 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
 void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
-    PartModel *pmodel = qobject_cast<PartModel *>(model);
-    pmodel->changeBegin(item);
+    PartMan *partman = qobject_cast<PartMan *>(model);
+    partman->changeBegin(item);
     switch (index.column()) {
-        case PartModel::Size:
+        case PartMan::Size:
             item->size = qobject_cast<QSpinBox *>(editor)->value();
             item->size *= 1048576; // Separate step to prevent int overflow.
             break;
-        case PartModel::UseFor:
+        case PartMan::UseFor:
             item->usefor = qobject_cast<QComboBox *>(editor)->currentText().trimmed();
             break;
-        case PartModel::Label:
+        case PartMan::Label:
             item->label = qobject_cast<QLineEdit *>(editor)->text().trimmed();
             break;
-        case PartModel::Format:
+        case PartMan::Format:
             item->format = qobject_cast<QComboBox *>(editor)->currentData().toString();
             break;
-        case PartModel::Pass:
+        case PartMan::Pass:
             item->pass = qobject_cast<QSpinBox *>(editor)->value();
             break;
-        case PartModel::Options:
+        case PartMan::Options:
             item->options = qobject_cast<QLineEdit *>(editor)->text().trimmed();
             break;
     }
-    const int changed = pmodel->changeEnd(false);
+    const int changed = partman->changeEnd(false);
     item->autoFill(changed);
-    if (changed) pmodel->notifyChange(item);
+    if (changed) partman->notifyChange(item);
 }
 
 void DeviceItemDelegate::partOptionsMenu(const QPoint &)
