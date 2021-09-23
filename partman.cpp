@@ -1980,11 +1980,17 @@ void DeviceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
         painter->save();
         QPen pen = painter->pen();
         pen.setColor(option.palette.color(QPalette::Active, QPalette::Text));
+        pen.setWidth(2);
         painter->setPen(pen);
         painter->translate(pen.widthF() / 2, pen.widthF() / 2);
         painter->drawRect(option.rect.adjusted(0, 0, -pen.width(), -pen.width()));
         painter->restore();
     }
+}
+QSize DeviceItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    const QSize &size = QStyledItemDelegate::sizeHint(option,  index);
+    return QSize(size.width() + 4, option.fontMetrics.height() + 4);
 }
 
 QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
