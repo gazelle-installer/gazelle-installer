@@ -38,9 +38,16 @@
 
 class DeviceItem
 {
+    friend class PartMan;
+    friend class DeviceItemIterator;
+    friend class DeviceItemDelegate;
     QVector<DeviceItem *> children;
     DeviceItem *parentItem = nullptr;
     class PartMan *partman = nullptr;
+    DeviceItem *addPart(int defaultMB, const QString &defaultUse, bool crypto);
+    void driveAutoSetActive();
+    void autoFill(unsigned int changed = 0xFFFF);
+    void labelParts();
 public:
     DeviceItem *active = nullptr;
     enum DeviceType {
@@ -67,7 +74,6 @@ public:
     bool dump = false;
     int pass = 0;
     DeviceItem(enum DeviceType type, DeviceItem *parent = nullptr, DeviceItem *preceding = nullptr);
-    DeviceItem(enum DeviceType type, PartMan &partman, DeviceItem *preceding = nullptr);
     ~DeviceItem();
     void clear();
     int row() const;
@@ -94,9 +100,7 @@ public:
     bool isVolume() const;
     bool canMount() const;
     /* Convenience */
-    DeviceItem *addPart(int defaultMB, const QString &defaultUse, bool crypto);
-    void driveAutoSetActive();
-    void autoFill(unsigned int changed = 0xFFFF);
+    int layoutDefault(int rootPercent, bool crypto, bool updateTree=true);
 };
 class DeviceItemIterator
 {
@@ -124,11 +128,11 @@ class DeviceItemDelegate : public QStyledItemDelegate
 class PartMan : public QAbstractItemModel
 {
     Q_OBJECT
+    friend class DeviceItem;
+    friend class DeviceItemIterator;
     MProcess &proc;
     DeviceItem root;
     DeviceItem *changing = nullptr;
-    friend class DeviceItem;
-    friend class DeviceItemIterator;
     BlockDeviceList &listBlkDevs;
     Ui::MeInstall &gui;
     QWidget *master;
@@ -136,7 +140,6 @@ class PartMan : public QAbstractItemModel
     QStringList listToUnmount;
     void setup();
     void scanVirtualDevices(bool rescan);
-    void labelParts(DeviceItem *drvit);
     void resizeColumnsToFit();
     bool formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label);
     bool calculatePartBD();
@@ -179,7 +182,6 @@ public:
     bool checkTargetDrivesOK();
     DeviceItem *selectedDriveAuto();
     void clearAllUses();
-    int layoutDefault(DeviceItem *drvit, int rootPercent, bool crypto, bool updateTree=true);
     int countPrepSteps();
     bool preparePartitions();
     bool formatPartitions();
