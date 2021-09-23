@@ -46,9 +46,10 @@
 #define PARTMAN_SAFETY_MB 32 // 1MB at start + Compensate for rounding errors.
 
 PartMan::PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent)
-    : QAbstractItemModel(parent), proc(mproc), root(DeviceItem::Unknown, *this),
+    : QAbstractItemModel(parent), proc(mproc), root(DeviceItem::Unknown),
       listBlkDevs(bdlist), gui(ui), master(parent)
 {
+    root.partman = this;
     QTimer::singleShot(0, this, &PartMan::setup);
 }
 
@@ -89,7 +90,7 @@ void PartMan::populate(DeviceItem *drvstart)
         if (bdinfo.isStart && !brave) continue;
         DeviceItem *curdev = nullptr;
         if (bdinfo.isDrive) {
-            if (!drvstart) curdrv = new DeviceItem(DeviceItem::Drive, *this);
+            if (!drvstart) curdrv = new DeviceItem(DeviceItem::Drive, &root);
             else if (bdinfo.name == drvstart->device) curdrv = drvstart;
             else if (!curdrv) continue; // Skip until the drive is drvstart.
             else break; // Exit the loop early if the drive isn't drvstart.
@@ -143,7 +144,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         if (vdlit) delete vdlit;
         return;
     } else if (!vdlit) {
-        vdlit = new DeviceItem(DeviceItem::VirtualDevices, *this);
+        vdlit = new DeviceItem(DeviceItem::VirtualDevices, &root);
         vdlit->device = tr("Virtual Devices");
         vdlit->flags.oldLayout = true;
         gui.treePartitions->setFirstColumnSpanned(vdlit->row(), QModelIndex(), true);
@@ -286,16 +287,6 @@ bool PartMan::manageConfig(MSettings &config, bool save)
     }
     treeSelChange();
     return true;
-}
-
-void PartMan::labelParts(DeviceItem *drvit)
-{
-    for (int ixi = drvit->childCount() - 1; ixi >= 0; --ixi) {
-        DeviceItem *chit = drvit->child(ixi);
-        chit->device = BlockDeviceInfo::join(drvit->device, ixi + 1);
-        notifyChange(chit, Device, Device);
-    }
-    resizeColumnsToFit();
 }
 
 void PartMan::resizeColumnsToFit()
@@ -441,8 +432,8 @@ void PartMan::treeMenu(const QPoint &)
         QAction *action = menu.exec(QCursor::pos());
         if (action == actAdd) partAddClick(true);
         else if (action == actClear) partClearClick(true);
-        else if (action == actBasic) layoutDefault(twit, -1, false);
-        else if (action == actCrypto) layoutDefault(twit, -1, true);
+        else if (action == actBasic) twit->layoutDefault(-1, false);
+        else if (action == actCrypto) twit->layoutDefault(-1, true);
         else if (action == actReset) {
             while (twit->childCount()) delete twit->child(0);
             populate(twit);
@@ -472,7 +463,7 @@ void PartMan::partAddClick(bool)
     if (!drive || drive->type == DeviceItem::Unknown) drive = twit;
 
     DeviceItem *part = new DeviceItem(DeviceItem::Partition, drive, twit);
-    labelParts(drive);
+    drive->labelParts();
     drive->flags.oldLayout = false;
     notifyChange(drive);
     gui.treePartitions->selectionModel()->select(index(part), QItemSelectionModel::ClearAndSelect);
@@ -486,7 +477,7 @@ void PartMan::partRemoveClick(bool)
     DeviceItem *drvit = partit->parent();
     if (!drvit) return;
     delete partit;
-    labelParts(drvit);
+    drvit->labelParts();
     treeSelChange();
 }
 
@@ -876,59 +867,6 @@ void PartMan::clearAllUses()
         if (item->type == DeviceItem::Partition) item->setActive(false);
         notifyChange(item);
     }
-}
-
-int PartMan::layoutDefault(DeviceItem *drvit,
-    int rootPercent, bool crypto, bool updateTree)
-{
-    if (rootPercent<0) rootPercent = gui.sliderPart->value();
-    if (updateTree) drvit->clear();
-    const long long driveSize = drvit->size / 1048576;
-    int rootFormatSize = static_cast<int>(driveSize - PARTMAN_SAFETY_MB);
-
-    // Boot partitions.
-    if (uefi) {
-        if (updateTree) drvit->addPart(256, "ESP", crypto);
-        rootFormatSize -= 256;
-    } else if (driveSize >= 2097152 || gptoverride) {
-        if (updateTree) drvit->addPart(1, "BIOS-GRUB", crypto);
-        rootFormatSize -= 1;
-    }
-    int rootMinMB = static_cast<int>(rootSpaceNeeded / 1048576);
-    const int bootMinMB = static_cast<int>(bootSpaceNeeded / 1048576);
-    if (!crypto) rootMinMB += bootMinMB;
-    else {
-        int bootFormatSize = 512;
-        if (bootFormatSize < bootMinMB) bootFormatSize = static_cast<int>(bootSpaceNeeded);
-        if (updateTree) drvit->addPart(bootFormatSize, "boot", crypto);
-        rootFormatSize -= bootFormatSize;
-    }
-    // Swap space.
-    int swapFormatSize = rootFormatSize-rootMinMB;
-    struct sysinfo sinfo;
-    if (sysinfo(&sinfo) != 0) sinfo.totalram = 2048;
-    else sinfo.totalram = (sinfo.totalram / (1048576 * 2)) * 3; // 1.5xRAM
-    sinfo.totalram /= 128; ++sinfo.totalram; sinfo.totalram *= 128; // Multiple of 128MB
-    if (swapFormatSize > static_cast<int>(sinfo.totalram)) swapFormatSize = static_cast<int>(sinfo.totalram);
-    int swapMaxMB = rootFormatSize / (20 * 128); ++swapMaxMB; swapMaxMB *= 128; // 5% root
-    if (swapMaxMB > 8192) swapMaxMB = 8192; // 8GB cap for the whole calculation.
-    if (swapFormatSize > swapMaxMB) swapFormatSize = swapMaxMB;
-    rootFormatSize -= swapFormatSize;
-    // Home
-    int homeFormatSize = rootFormatSize;
-    rootFormatSize = (rootFormatSize * rootPercent) / 100;
-    if (rootFormatSize < rootMinMB) rootFormatSize = rootMinMB;
-    homeFormatSize -= rootFormatSize;
-
-    if (updateTree) {
-        drvit->addPart(rootFormatSize, "root", crypto);
-        if (swapFormatSize>0) drvit->addPart(swapFormatSize, "swap", crypto);
-        if (homeFormatSize>0) drvit->addPart(homeFormatSize, "home", crypto);
-        labelParts(drvit);
-        drvit->driveAutoSetActive();
-        treeSelChange();
-    }
-    return rootFormatSize;
 }
 
 int PartMan::countPrepSteps()
@@ -1639,17 +1577,6 @@ DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *pre
         if (partman) partman->endInsertRows();
     }
 }
-DeviceItem::DeviceItem(enum DeviceType type, PartMan &partman, DeviceItem *preceding)
-    : partman(&partman), type(type)
-{
-    DeviceItem &root = partman.root;
-    if (this == &root) return;
-    parentItem = &root;
-    const int i = preceding ? (root.children.indexOf(preceding) + 1) : root.childCount();
-    partman.beginInsertRows(QModelIndex(), i, i);
-    root.children.insert(i, this);
-    partman.endInsertRows();
-}
 DeviceItem::~DeviceItem()
 {
     if (parentItem && partman) {
@@ -1949,6 +1876,68 @@ void DeviceItem::autoFill(unsigned int changed)
             }
         }
     }
+}
+void DeviceItem::labelParts()
+{
+    for (int ixi = childCount() - 1; ixi >= 0; --ixi) {
+        DeviceItem *chit = children.at(ixi);
+        chit->device = BlockDeviceInfo::join(device, ixi + 1);
+        if (partman) partman->notifyChange(chit, PartMan::Device, PartMan::Device);
+    }
+    if (partman) partman->resizeColumnsToFit();
+}
+
+int DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTree)
+{
+    assert (partman != nullptr);
+    if (rootPercent<0) rootPercent = partman->gui.sliderPart->value();
+    if (updateTree) clear();
+    const long long driveSize = size / 1048576;
+    int rootFormatSize = static_cast<int>(driveSize - PARTMAN_SAFETY_MB);
+
+    // Boot partitions.
+    if (partman->uefi) {
+        if (updateTree) addPart(256, "ESP", crypto);
+        rootFormatSize -= 256;
+    } else if (driveSize >= 2097152 || partman->gptoverride) {
+        if (updateTree) addPart(1, "BIOS-GRUB", crypto);
+        rootFormatSize -= 1;
+    }
+    int rootMinMB = static_cast<int>(partman->rootSpaceNeeded / 1048576);
+    const int bootMinMB = static_cast<int>(partman->bootSpaceNeeded / 1048576);
+    if (!crypto) rootMinMB += bootMinMB;
+    else {
+        int bootFormatSize = 512;
+        if (bootFormatSize < bootMinMB) bootFormatSize = static_cast<int>(partman->bootSpaceNeeded);
+        if (updateTree) addPart(bootFormatSize, "boot", crypto);
+        rootFormatSize -= bootFormatSize;
+    }
+    // Swap space.
+    int swapFormatSize = rootFormatSize-rootMinMB;
+    struct sysinfo sinfo;
+    if (sysinfo(&sinfo) != 0) sinfo.totalram = 2048;
+    else sinfo.totalram = (sinfo.totalram / (1048576 * 2)) * 3; // 1.5xRAM
+    sinfo.totalram /= 128; ++sinfo.totalram; sinfo.totalram *= 128; // Multiple of 128MB
+    if (swapFormatSize > static_cast<int>(sinfo.totalram)) swapFormatSize = static_cast<int>(sinfo.totalram);
+    int swapMaxMB = rootFormatSize / (20 * 128); ++swapMaxMB; swapMaxMB *= 128; // 5% root
+    if (swapMaxMB > 8192) swapMaxMB = 8192; // 8GB cap for the whole calculation.
+    if (swapFormatSize > swapMaxMB) swapFormatSize = swapMaxMB;
+    rootFormatSize -= swapFormatSize;
+    // Home
+    int homeFormatSize = rootFormatSize;
+    rootFormatSize = (rootFormatSize * rootPercent) / 100;
+    if (rootFormatSize < rootMinMB) rootFormatSize = rootMinMB;
+    homeFormatSize -= rootFormatSize;
+
+    if (updateTree) {
+        addPart(rootFormatSize, "root", crypto);
+        if (swapFormatSize>0) addPart(swapFormatSize, "swap", crypto);
+        if (homeFormatSize>0) addPart(homeFormatSize, "home", crypto);
+        labelParts();
+        driveAutoSetActive();
+        partman->treeSelChange();
+    }
+    return rootFormatSize;
 }
 
 /* A very slimmed down and non-standard one-way tree iterator. */

@@ -1460,7 +1460,7 @@ int MInstall::showPage(int curr, int next)
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
             partman.clearAllUses();
-            partman.layoutDefault(partman.selectedDriveAuto(), -1, boxEncryptAuto->isChecked());
+            partman.selectedDriveAuto()->layoutDefault(-1, boxEncryptAuto->isChecked());
             if (!partman.composeValidate(true, PROJECTNAME)) {
                 nextFocus = treePartitions;
                 return curr;
@@ -2251,7 +2251,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
     const bool crypto = boxEncryptAuto->isChecked();
     DeviceItem *drvitem = partman.selectedDriveAuto();
     if (!drvitem) return;
-    long long available = partman.layoutDefault(drvitem, 100, crypto, false);
+    long long available = drvitem->layoutDefault(100, crypto, false);
     if (!available) return;
     const long long roundUp = available - 1;
     const long long rootMinMB = (partman.rootSpaceNeeded + 1048575) / 1048576;
@@ -2273,7 +2273,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
         sliderPart->blockSignals(false);
     }
 
-    const long long availRoot = partman.layoutDefault(drvitem, value, crypto, false);
+    const long long availRoot = drvitem->layoutDefault(value, crypto, false);
     QString valstr = sliderSizeString(availRoot*1048576);
     available -= availRoot;
     labelSliderRoot->setText(valstr + "\n" + tr("Root"));
