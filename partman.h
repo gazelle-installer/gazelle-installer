@@ -25,7 +25,6 @@
 #ifndef PARTMAN_H
 #define PARTMAN_H
 
-#include <QObject>
 #include <QAbstractItemModel>
 #include <QStyledItemDelegate>
 #include <QString>
@@ -41,7 +40,7 @@ class DeviceItem
 {
     QVector<DeviceItem *> children;
     DeviceItem *parentItem = nullptr;
-    class PartModel *model = nullptr;
+    class PartMan *partman = nullptr;
 public:
     DeviceItem *active = nullptr;
     enum DeviceType {
@@ -68,12 +67,12 @@ public:
     bool dump = false;
     int pass = 0;
     DeviceItem(enum DeviceType type, DeviceItem *parent = nullptr, DeviceItem *preceding = nullptr);
-    DeviceItem(enum DeviceType type, PartModel &container, DeviceItem *preceding = nullptr);
+    DeviceItem(enum DeviceType type, PartMan &partman, DeviceItem *preceding = nullptr);
     ~DeviceItem();
     void clear();
     int row() const;
     DeviceItem *parent() const;
-    DeviceItem *child(int row);
+    DeviceItem *child(int row) const;
     int indexOfChild(DeviceItem *child);
     int childCount() const;
     void sortChildren();
@@ -106,53 +105,9 @@ class DeviceItemIterator
     QStack<int> ixParents;
 public:
     DeviceItemIterator(DeviceItem *item) : pos(item) {}
-    DeviceItemIterator(PartModel &model);
+    DeviceItemIterator(PartMan &partman);
     inline DeviceItem *operator*() const { return pos; }
     void next();
-};
-
-class PartModel : public QAbstractItemModel
-{
-    Q_OBJECT
-    DeviceItem *root = nullptr;
-    DeviceItem *changing = nullptr;
-    friend class DeviceItem;
-    class PartMan &partman;
-public:
-    enum TreeColumns {
-        Device,
-        Size,
-        UseFor,
-        Label,
-        Encrypt,
-        Format,
-        Options,
-        Dump,
-        Pass,
-        _TreeColumns_
-    };
-    PartModel(PartMan &pman, QObject *parent = nullptr);
-    ~PartModel();
-    QVariant data(const QModelIndex &index, int role) const override;
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
-    QVariant headerData(int section, Qt::Orientation orientation,
-                        int role = Qt::DisplayRole) const override;
-    QModelIndex index(int row, int column,
-                      const QModelIndex &parent = QModelIndex()) const override;
-    inline QModelIndex index(DeviceItem *item) const { return createIndex(item->row(), 0, item); }
-    QModelIndex parent(const QModelIndex &index) const override;
-    DeviceItem *item(const QModelIndex &index) const;
-    DeviceItem *item(int index) const;
-    int count() const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    inline int columnCount(const QModelIndex &) const override { return _TreeColumns_; }
-    void clear();
-    DeviceItem *insert(enum DeviceItem::DeviceType type, DeviceItem *parent, DeviceItem *preceeding = nullptr);
-    void remove(DeviceItem *item);
-    bool changeBegin(DeviceItem *item);
-    int changeEnd(bool notify = true);
-    void notifyChange(class DeviceItem *item, int first = -1, int last = -1);
 };
 
 class DeviceItemDelegate : public QStyledItemDelegate
@@ -168,16 +123,19 @@ class DeviceItemDelegate : public QStyledItemDelegate
     void spinSizeValueChange(int i);
 };
 
-class PartMan : public QObject
+class PartMan : public QAbstractItemModel
 {
     Q_OBJECT
     MProcess &proc;
+    DeviceItem root;
+    DeviceItem *changing = nullptr;
+    friend class DeviceItem;
+    friend class DeviceItemIterator;
     BlockDeviceList &listBlkDevs;
     Ui::MeInstall &gui;
     QWidget *master;
     QMap<QString, DeviceItem *> mounts;
     QStringList listToUnmount;
-    PartModel model;
     void setup();
     void scanVirtualDevices(bool rescan);
     void labelParts(DeviceItem *drvit);
@@ -200,6 +158,18 @@ class PartMan : public QObject
     bool luksOpen(const QString &dev, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
 public:
+    enum TreeColumns {
+        Device,
+        Size,
+        UseFor,
+        Label,
+        Encrypt,
+        Format,
+        Options,
+        Dump,
+        Pass,
+        _TreeColumns_
+    };
     bool gptoverride=false, uefi=false, brave=false;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
@@ -223,6 +193,21 @@ public:
     QString getMountDev(const QString &point, const bool mapped=true);
     int swapCount();
     int isEncrypt(const QString &point);
+    // Model View Controller
+    QVariant data(const QModelIndex &index, int role) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    inline QModelIndex index(DeviceItem *item) const { return createIndex(item->row(), 0, item); }
+    QModelIndex parent(const QModelIndex &index) const override;
+    DeviceItem *item(const QModelIndex &index) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    inline int columnCount(const QModelIndex &) const override { return _TreeColumns_; }
+    DeviceItem *insert(enum DeviceItem::DeviceType type, DeviceItem *parent, DeviceItem *preceeding = nullptr);
+    bool changeBegin(DeviceItem *item);
+    int changeEnd(bool notify = true);
+    void notifyChange(class DeviceItem *item, int first = -1, int last = -1);
 };
 
 #endif // PARTMAN_H
