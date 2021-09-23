@@ -1388,7 +1388,243 @@ DeviceItem *PartMan::findOrigin(const QString &vdev)
     return nullptr;
 }
 
-/* Model View Control */
+/* Model View Controller */
+
+QVariant PartMan::data(const QModelIndex &index, int role) const
+{
+    DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
+    const bool isDriveOrVD = (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices);
+    if (role == Qt::DisplayRole) {
+        switch (index.column()) {
+            case Device:
+                if (item->type == DeviceItem::Subvolume) return "----";
+                else return item->device;
+                break;
+            case Size:
+                if (item->type == DeviceItem::Subvolume) return "----";
+                else {
+                    return QLocale::system().formattedDataSize(item->size,
+                        1, QLocale::DataSizeTraditionalFormat);
+                }
+                break;
+            case UseFor: return item->usefor; break;
+            case Label: return (index.flags() & Qt::ItemIsEditable) ? item->label : item->curLabel; break;
+            case Format:
+                if (item->usefor.isEmpty()) return item->curFormat;
+                else return item->shownFormat(item->format);
+                break;
+            case Options:
+                if (item->canMount() || item->realUseFor() == "SWAP") return item->options;
+                else if (!isDriveOrVD) return "--------";
+                break;
+            case Pass:
+                if (item->canMount()) return item->pass;
+                else if (!isDriveOrVD) return "--";
+                break;
+        }
+    } else if (role == Qt::EditRole) {
+        switch (index.column()) {
+            case Device: return item->device; break;
+            case Size: return item->size; break;
+            case UseFor: return item->usefor; break;
+            case Label: return item->label; break;
+            case Format: return item->format; break;
+            case Options: return item->options; break;
+            case Pass: return item->pass; break;
+        }
+    } else if (role == Qt::CheckStateRole && !isDriveOrVD
+        && index.flags() & Qt::ItemIsUserCheckable) {
+        switch (index.column()) {
+            case Encrypt: return item->encrypt ? Qt::Checked : Qt::Unchecked; break;
+            case Dump: return item->dump ? Qt::Checked : Qt::Unchecked; break;
+        }
+    } else if (role == Qt::DecorationRole && index.column() == Device) {
+        if (item->type == DeviceItem::Drive && !item->flags.oldLayout) {
+            return QIcon(":/appointment-soon");
+        } else if (item->type == DeviceItem::VirtualBD && item->flags.cryptoV) {
+            return QIcon::fromTheme("unlock");
+        } else if (item->flags.mapLock) {
+            return QIcon::fromTheme("lock");
+        }
+    } else if (role == Qt::FontRole && index.column() == Device) {
+        QFont font;
+        font.setItalic(item->isActive());
+        return font;
+    }
+    return QVariant();
+}
+bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (role == Qt::CheckStateRole) {
+        DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
+        changeBegin(item);
+        switch (index.column()) {
+            case Encrypt: item->encrypt = (value == Qt::Checked); break;
+            case Dump: item->dump = (value == Qt::Checked); break;
+        }
+    }
+    if(!changeEnd()) emit dataChanged(index, index);
+    return true;
+}
+Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
+{
+    DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
+    if (item->type == DeviceItem::VirtualDevices) return Qt::ItemIsEnabled;
+    Qt::ItemFlags flagsOut({Qt::ItemIsSelectable, Qt::ItemIsEnabled});
+    if (item->flags.mapLock) return flagsOut;
+    switch (index.column()) {
+        case Device: break;
+        case Size:
+            if (item->type == DeviceItem::Partition && !item->flags.oldLayout) {
+                flagsOut |= Qt::ItemIsEditable;
+            }
+            break;
+        case UseFor:
+            if (item->type != DeviceItem::Drive) flagsOut |= Qt::ItemIsEditable;
+            break;
+        case Label:
+            if (item->type == DeviceItem::Subvolume) {
+                if (item->format != "PRESERVE") flagsOut |= Qt::ItemIsEditable;
+            } else {
+                if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
+            }
+            break;
+        case Encrypt:
+            if (item->canEncrypt()) flagsOut |= Qt::ItemIsUserCheckable;
+            break;
+        case Format:
+            if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
+            break;
+        case Options:
+            if (item->canMount() || item->realUseFor() == "SWAP") flagsOut |= Qt::ItemIsEditable;
+            break;
+        case Dump:
+            if (item->canMount()) flagsOut |= Qt::ItemIsUserCheckable;
+            break;
+        case Pass:
+            if (item->canMount()) flagsOut |= Qt::ItemIsEditable;
+            break;
+    }
+    return flagsOut;
+}
+QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    assert(orientation == Qt::Horizontal);
+    if (role == Qt::DisplayRole) {
+        switch (section) {
+            case Device: return tr("Device"); break;
+            case Size: return tr("Size"); break;
+            case UseFor: return tr("Use For"); break;
+            case Label: return tr("Label"); break;
+            case Encrypt: return tr("Encrypt"); break;
+            case Format: return tr("Format"); break;
+            case Options: return tr("Options"); break;
+            case Dump: return tr("Dump"); break;
+            case Pass: return tr("Pass"); break;
+        }
+    } else if (role == Qt::FontRole && section == Encrypt) {
+        QFont smallFont;
+        smallFont.setPointSizeF(smallFont.pointSizeF() * 0.6);
+        return smallFont;
+    }
+    return QVariant();
+}
+QModelIndex PartMan::index(int row, int column, const QModelIndex &parent) const
+{
+    if (!hasIndex(row, column, parent)) return QModelIndex();
+    const DeviceItem *pit = parent.isValid() ? static_cast<DeviceItem *>(parent.internalPointer()) : &root;
+    DeviceItem *cit = pit->child(row);
+    if (cit) return createIndex(row, column, cit);
+    return QModelIndex();
+}
+QModelIndex PartMan::parent(const QModelIndex &index) const
+{
+    if (!index.isValid()) return QModelIndex();
+    DeviceItem *cit = static_cast<DeviceItem *>(index.internalPointer());
+    DeviceItem *pit = cit->parent();
+    if (!pit) return QModelIndex();
+    return createIndex(pit->row(), 0, pit);
+}
+inline DeviceItem *PartMan::item(const QModelIndex &index) const
+{
+    return static_cast<DeviceItem *>(index.internalPointer());
+}
+int PartMan::rowCount(const QModelIndex &parent) const
+{
+    if (parent.column() > 0) return 0;
+    if (parent.isValid()) {
+        return static_cast<DeviceItem *>(parent.internalPointer())->childCount();
+    }
+    return root.childCount();
+}
+
+bool PartMan::changeBegin(DeviceItem *item)
+{
+    if (changing) return false;
+    root.flags = item->flags;
+    root.size = item->size;
+    root.usefor = item->usefor;
+    root.label = item->label;
+    root.encrypt = item->encrypt;
+    root.format = item->format;
+    root.options = item->options;
+    root.dump = item->dump;
+    root.pass = item->pass;
+    changing = item;
+    return true;
+}
+int PartMan::changeEnd(bool notify)
+{
+    if (!changing) return false;
+    int changed = 0;
+    if (changing->size != root.size) {
+        if (!changing->allowedUsesFor().contains(changing->realUseFor())) {
+            changing->usefor.clear();
+        }
+        if (!changing->canEncrypt()) changing->encrypt = false;
+        changed |= (1 << Size);
+    }
+    if (changing->usefor != root.usefor) {
+        if (changing->usefor.isEmpty()) changing->format.clear();
+        else changing->format = changing->allowedFormats().at(0);
+        changed |= (1 << UseFor);
+    }
+    if (changing->encrypt != root.encrypt) {
+        const QStringList &allowed = changing->allowedFormats();
+        if (!allowed.contains(changing->format)) changing->format = allowed.at(0);
+    }
+    if (changing->format != root.format || changing->usefor != root.usefor) {
+        changing->dump = false;
+        changing->pass = 2;
+        const QString &use = changing->realUseFor();
+        if (use.isEmpty() || use == "FORMAT" || use == "ESP") changing->options.clear();
+        if (changing->format != "btrfs") {
+            // Clear all subvolumes if not supported.
+            while (changing->childCount()) delete changing->child(0);
+        } else {
+            // Remove preserve option from all subvolumes.
+            for (int ixi = 0; ixi < changing->childCount(); ++ixi) {
+                DeviceItem *child = changing->child(ixi);
+                child->format = "CREATE";
+                notifyChange(child);
+            }
+        }
+        if (changing->format != root.format) changed |= (1 << Format);
+    }
+    if (changed && notify) notifyChange(changing);
+    changing = nullptr;
+    return changed;
+}
+void PartMan::notifyChange(class DeviceItem *item, int first, int last)
+{
+    DeviceItem *p = item->parent();
+    if (first < 0) first = 0;
+    if (last < 0) last = p ? p->childCount() - 1 : 0;
+    const int row = p ? p->indexOfChild(item) : 0;
+    emit dataChanged(createIndex(row, first, item), createIndex(row, last, item));
+}
+
+/* Model element */
 
 DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *preceding)
     : parentItem(parent), type(type)
@@ -1743,243 +1979,6 @@ void DeviceItemIterator::next()
         if (chnext) ++ixPos;
         pos = chnext;
     }
-}
-
-/* Model */
-
-QVariant PartMan::data(const QModelIndex &index, int role) const
-{
-    DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
-    const bool isDriveOrVD = (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices);
-    if (role == Qt::DisplayRole) {
-        switch (index.column()) {
-            case Device:
-                if (item->type == DeviceItem::Subvolume) return "----";
-                else return item->device;
-                break;
-            case Size:
-                if (item->type == DeviceItem::Subvolume) return "----";
-                else {
-                    return QLocale::system().formattedDataSize(item->size,
-                        1, QLocale::DataSizeTraditionalFormat);
-                }
-                break;
-            case UseFor: return item->usefor; break;
-            case Label: return (index.flags() & Qt::ItemIsEditable) ? item->label : item->curLabel; break;
-            case Format:
-                if (item->usefor.isEmpty()) return item->curFormat;
-                else return item->shownFormat(item->format);
-                break;
-            case Options:
-                if (item->canMount() || item->realUseFor() == "SWAP") return item->options;
-                else if (!isDriveOrVD) return "--------";
-                break;
-            case Pass:
-                if (item->canMount()) return item->pass;
-                else if (!isDriveOrVD) return "--";
-                break;
-        }
-    } else if (role == Qt::EditRole) {
-        switch (index.column()) {
-            case Device: return item->device; break;
-            case Size: return item->size; break;
-            case UseFor: return item->usefor; break;
-            case Label: return item->label; break;
-            case Format: return item->format; break;
-            case Options: return item->options; break;
-            case Pass: return item->pass; break;
-        }
-    } else if (role == Qt::CheckStateRole && !isDriveOrVD
-        && index.flags() & Qt::ItemIsUserCheckable) {
-        switch (index.column()) {
-            case Encrypt: return item->encrypt ? Qt::Checked : Qt::Unchecked; break;
-            case Dump: return item->dump ? Qt::Checked : Qt::Unchecked; break;
-        }
-    } else if (role == Qt::DecorationRole && index.column() == Device) {
-        if (item->type == DeviceItem::Drive && !item->flags.oldLayout) {
-            return QIcon(":/appointment-soon");
-        } else if (item->type == DeviceItem::VirtualBD && item->flags.cryptoV) {
-            return QIcon::fromTheme("unlock");
-        } else if (item->flags.mapLock) {
-            return QIcon::fromTheme("lock");
-        }
-    } else if (role == Qt::FontRole && index.column() == Device) {
-        QFont font;
-        font.setItalic(item->isActive());
-        return font;
-    }
-    return QVariant();
-}
-bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
-{
-    if (role == Qt::CheckStateRole) {
-        DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
-        changeBegin(item);
-        switch (index.column()) {
-            case Encrypt: item->encrypt = (value == Qt::Checked); break;
-            case Dump: item->dump = (value == Qt::Checked); break;
-        }
-    }
-    if(!changeEnd()) emit dataChanged(index, index);
-    return true;
-}
-
-Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
-{
-    DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
-    if (item->type == DeviceItem::VirtualDevices) return Qt::ItemIsEnabled;
-    Qt::ItemFlags flagsOut({Qt::ItemIsSelectable, Qt::ItemIsEnabled});
-    if (item->flags.mapLock) return flagsOut;
-    switch (index.column()) {
-        case Device: break;
-        case Size:
-            if (item->type == DeviceItem::Partition && !item->flags.oldLayout) {
-                flagsOut |= Qt::ItemIsEditable;
-            }
-            break;
-        case UseFor:
-            if (item->type != DeviceItem::Drive) flagsOut |= Qt::ItemIsEditable;
-            break;
-        case Label:
-            if (item->type == DeviceItem::Subvolume) {
-                if (item->format != "PRESERVE") flagsOut |= Qt::ItemIsEditable;
-            } else {
-                if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
-            }
-            break;
-        case Encrypt:
-            if (item->canEncrypt()) flagsOut |= Qt::ItemIsUserCheckable;
-            break;
-        case Format:
-            if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
-            break;
-        case Options:
-            if (item->canMount() || item->realUseFor() == "SWAP") flagsOut |= Qt::ItemIsEditable;
-            break;
-        case Dump:
-            if (item->canMount()) flagsOut |= Qt::ItemIsUserCheckable;
-            break;
-        case Pass:
-            if (item->canMount()) flagsOut |= Qt::ItemIsEditable;
-            break;
-    }
-    return flagsOut;
-}
-QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    assert(orientation == Qt::Horizontal);
-    if (role == Qt::DisplayRole) {
-        switch (section) {
-            case Device: return tr("Device"); break;
-            case Size: return tr("Size"); break;
-            case UseFor: return tr("Use For"); break;
-            case Label: return tr("Label"); break;
-            case Encrypt: return tr("Encrypt"); break;
-            case Format: return tr("Format"); break;
-            case Options: return tr("Options"); break;
-            case Dump: return tr("Dump"); break;
-            case Pass: return tr("Pass"); break;
-        }
-    } else if (role == Qt::FontRole && section == Encrypt) {
-        QFont smallFont;
-        smallFont.setPointSizeF(smallFont.pointSizeF() * 0.6);
-        return smallFont;
-    }
-    return QVariant();
-}
-QModelIndex PartMan::index(int row, int column, const QModelIndex &parent) const
-{
-    if (!hasIndex(row, column, parent)) return QModelIndex();
-    const DeviceItem *pit = parent.isValid() ? static_cast<DeviceItem *>(parent.internalPointer()) : &root;
-    DeviceItem *cit = pit->child(row);
-    if (cit) return createIndex(row, column, cit);
-    return QModelIndex();
-}
-QModelIndex PartMan::parent(const QModelIndex &index) const
-{
-    if (!index.isValid()) return QModelIndex();
-    DeviceItem *cit = static_cast<DeviceItem *>(index.internalPointer());
-    DeviceItem *pit = cit->parent();
-    if (!pit) return QModelIndex();
-    return createIndex(pit->row(), 0, pit);
-}
-inline DeviceItem *PartMan::item(const QModelIndex &index) const
-{
-    return static_cast<DeviceItem *>(index.internalPointer());
-}
-int PartMan::rowCount(const QModelIndex &parent) const
-{
-    if (parent.column() > 0) return 0;
-    if (parent.isValid()) {
-        return static_cast<DeviceItem *>(parent.internalPointer())->childCount();
-    }
-    return root.childCount();
-}
-
-bool PartMan::changeBegin(DeviceItem *item)
-{
-    if (changing) return false;
-    root.flags = item->flags;
-    root.size = item->size;
-    root.usefor = item->usefor;
-    root.label = item->label;
-    root.encrypt = item->encrypt;
-    root.format = item->format;
-    root.options = item->options;
-    root.dump = item->dump;
-    root.pass = item->pass;
-    changing = item;
-    return true;
-}
-int PartMan::changeEnd(bool notify)
-{
-    if (!changing) return false;
-    int changed = 0;
-    if (changing->size != root.size) {
-        if (!changing->allowedUsesFor().contains(changing->realUseFor())) {
-            changing->usefor.clear();
-        }
-        if (!changing->canEncrypt()) changing->encrypt = false;
-        changed |= (1 << Size);
-    }
-    if (changing->usefor != root.usefor) {
-        if (changing->usefor.isEmpty()) changing->format.clear();
-        else changing->format = changing->allowedFormats().at(0);
-        changed |= (1 << UseFor);
-    }
-    if (changing->encrypt != root.encrypt) {
-        const QStringList &allowed = changing->allowedFormats();
-        if (!allowed.contains(changing->format)) changing->format = allowed.at(0);
-    }
-    if (changing->format != root.format || changing->usefor != root.usefor) {
-        changing->dump = false;
-        changing->pass = 2;
-        const QString &use = changing->realUseFor();
-        if (use.isEmpty() || use == "FORMAT" || use == "ESP") changing->options.clear();
-        if (changing->format != "btrfs") {
-            // Clear all subvolumes if not supported.
-            while (changing->childCount()) delete changing->child(0);
-        } else {
-            // Remove preserve option from all subvolumes.
-            for (int ixi = 0; ixi < changing->childCount(); ++ixi) {
-                DeviceItem *child = changing->child(ixi);
-                child->format = "CREATE";
-                notifyChange(child);
-            }
-        }
-        if (changing->format != root.format) changed |= (1 << Format);
-    }
-    if (changed && notify) notifyChange(changing);
-    changing = nullptr;
-    return changed;
-}
-void PartMan::notifyChange(class DeviceItem *item, int first, int last)
-{
-    DeviceItem *p = item->parent();
-    if (first < 0) first = 0;
-    if (last < 0) last = p ? p->childCount() - 1 : 0;
-    const int row = p ? p->indexOfChild(item) : 0;
-    emit dataChanged(createIndex(row, first, item), createIndex(row, last, item));
 }
 
 /* Delegate */

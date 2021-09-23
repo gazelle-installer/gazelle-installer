@@ -204,7 +204,6 @@ public:
     DeviceItem *item(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     inline int columnCount(const QModelIndex &) const override { return _TreeColumns_; }
-    DeviceItem *insert(enum DeviceItem::DeviceType type, DeviceItem *parent, DeviceItem *preceeding = nullptr);
     bool changeBegin(DeviceItem *item);
     int changeEnd(bool notify = true);
     void notifyChange(class DeviceItem *item, int first = -1, int last = -1);
