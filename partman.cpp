@@ -1710,7 +1710,7 @@ void DeviceItem::setActive(bool boot)
 }
 inline bool DeviceItem::isActive() const
 {
-    if (parentItem) return false;
+    if (!parentItem) return false;
     return (parentItem->active == this);
 }
 bool DeviceItem::isLocked() const
