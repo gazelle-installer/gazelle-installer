@@ -1335,51 +1335,53 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
     const bool isDriveOrVD = (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices);
     if (role == Qt::DisplayRole) {
         switch (index.column()) {
-            case Device:
-                if (item->type == DeviceItem::Subvolume) return "----";
-                else return item->device;
-                break;
-            case Size:
-                if (item->type == DeviceItem::Subvolume) return "----";
-                else {
-                    return QLocale::system().formattedDataSize(item->size,
-                        1, QLocale::DataSizeTraditionalFormat);
-                }
-                break;
-            case UseFor: return item->usefor; break;
-            case Label:
-                if (item->type == DeviceItem::Drive) return item->model;
-                else if (index.flags() & Qt::ItemIsEditable) return item->label;
-                else return item->curLabel;
-                break;
-            case Format:
-                if (item->usefor.isEmpty()) return item->curFormat;
-                else return item->shownFormat(item->format);
-                break;
-            case Options:
-                if (item->canMount() || item->realUseFor() == "SWAP") return item->options;
-                else if (!isDriveOrVD) return "--------";
-                break;
-            case Pass:
-                if (item->canMount()) return item->pass;
-                else if (!isDriveOrVD) return "--";
-                break;
+        case Device:
+            if (item->type == DeviceItem::Subvolume) return "----";
+            else return item->device;
+            break;
+        case Size:
+            if (item->type == DeviceItem::Subvolume) return "----";
+            else {
+                return QLocale::system().formattedDataSize(item->size,
+                    1, QLocale::DataSizeTraditionalFormat);
+            }
+            break;
+        case UseFor: return item->usefor; break;
+        case Label:
+            if (item->type == DeviceItem::Drive) return item->model;
+            else if (index.flags() & Qt::ItemIsEditable) return item->label;
+            else return item->curLabel;
+            break;
+        case Format:
+            if (item->usefor.isEmpty()) return item->curFormat;
+            else return item->shownFormat(item->format);
+            break;
+        case Options:
+            if (item->canMount() || item->realUseFor() == "SWAP") return item->options;
+            else if (!isDriveOrVD) return "--------";
+            break;
+        case Pass:
+            if (item->canMount()) return item->pass;
+            else if (!isDriveOrVD) return "--";
+            break;
         }
     } else if (role == Qt::EditRole) {
-        switch (index.column()) {
-            case Device: return item->device; break;
-            case Size: return item->size; break;
-            case UseFor: return item->usefor; break;
-            case Label: return item->label; break;
-            case Format: return item->format; break;
-            case Options: return item->options; break;
-            case Pass: return item->pass; break;
+        switch (index.column())
+        {
+        case Device: return item->device; break;
+        case Size: return item->size; break;
+        case UseFor: return item->usefor; break;
+        case Label: return item->label; break;
+        case Format: return item->format; break;
+        case Options: return item->options; break;
+        case Pass: return item->pass; break;
         }
     } else if (role == Qt::CheckStateRole && !isDriveOrVD
         && index.flags() & Qt::ItemIsUserCheckable) {
-        switch (index.column()) {
-            case Encrypt: return item->encrypt ? Qt::Checked : Qt::Unchecked; break;
-            case Dump: return item->dump ? Qt::Checked : Qt::Unchecked; break;
+        switch (index.column())
+        {
+        case Encrypt: return item->encrypt ? Qt::Checked : Qt::Unchecked; break;
+        case Dump: return item->dump ? Qt::Checked : Qt::Unchecked; break;
         }
     } else if (role == Qt::DecorationRole && index.column() == Device) {
         if (item->type == DeviceItem::Drive && !item->flags.oldLayout) {
@@ -1401,9 +1403,10 @@ bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
     if (role == Qt::CheckStateRole) {
         DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
         changeBegin(item);
-        switch (index.column()) {
-            case Encrypt: item->encrypt = (value == Qt::Checked); break;
-            case Dump: item->dump = (value == Qt::Checked); break;
+        switch (index.column())
+        {
+        case Encrypt: item->encrypt = (value == Qt::Checked); break;
+        case Dump: item->dump = (value == Qt::Checked); break;
         }
     }
     if(!changeEnd()) emit dataChanged(index, index);
@@ -1415,38 +1418,39 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
     if (item->type == DeviceItem::VirtualDevices) return Qt::ItemIsEnabled;
     Qt::ItemFlags flagsOut({Qt::ItemIsSelectable, Qt::ItemIsEnabled});
     if (item->mapCount) return flagsOut;
-    switch (index.column()) {
-        case Device: break;
-        case Size:
-            if (item->type == DeviceItem::Partition && !item->flags.oldLayout) {
-                flagsOut |= Qt::ItemIsEditable;
-            }
-            break;
-        case UseFor:
-            if (item->type != DeviceItem::Drive) flagsOut |= Qt::ItemIsEditable;
-            break;
-        case Label:
-            if (item->type == DeviceItem::Subvolume) {
-                if (item->format != "PRESERVE") flagsOut |= Qt::ItemIsEditable;
-            } else {
-                if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
-            }
-            break;
-        case Encrypt:
-            if (item->canEncrypt()) flagsOut |= Qt::ItemIsUserCheckable;
-            break;
-        case Format:
+    switch (index.column())
+    {
+    case Device: break;
+    case Size:
+        if (item->type == DeviceItem::Partition && !item->flags.oldLayout) {
+            flagsOut |= Qt::ItemIsEditable;
+        }
+        break;
+    case UseFor:
+        if (item->type != DeviceItem::Drive) flagsOut |= Qt::ItemIsEditable;
+        break;
+    case Label:
+        if (item->type == DeviceItem::Subvolume) {
+            if (item->format != "PRESERVE") flagsOut |= Qt::ItemIsEditable;
+        } else {
             if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
-            break;
-        case Options:
-            if (item->canMount() || item->realUseFor() == "SWAP") flagsOut |= Qt::ItemIsEditable;
-            break;
-        case Dump:
-            if (item->canMount()) flagsOut |= Qt::ItemIsUserCheckable;
-            break;
-        case Pass:
-            if (item->canMount()) flagsOut |= Qt::ItemIsEditable;
-            break;
+        }
+        break;
+    case Encrypt:
+        if (item->canEncrypt()) flagsOut |= Qt::ItemIsUserCheckable;
+        break;
+    case Format:
+        if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
+        break;
+    case Options:
+        if (item->canMount() || item->realUseFor() == "SWAP") flagsOut |= Qt::ItemIsEditable;
+        break;
+    case Dump:
+        if (item->canMount()) flagsOut |= Qt::ItemIsUserCheckable;
+        break;
+    case Pass:
+        if (item->canMount()) flagsOut |= Qt::ItemIsEditable;
+        break;
     }
     return flagsOut;
 }
@@ -1454,16 +1458,17 @@ QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role)
 {
     assert(orientation == Qt::Horizontal);
     if (role == Qt::DisplayRole) {
-        switch (section) {
-            case Device: return tr("Device"); break;
-            case Size: return tr("Size"); break;
-            case UseFor: return tr("Use For"); break;
-            case Label: return tr("Label"); break;
-            case Encrypt: return tr("Encrypt"); break;
-            case Format: return tr("Format"); break;
-            case Options: return tr("Options"); break;
-            case Dump: return tr("Dump"); break;
-            case Pass: return tr("Pass"); break;
+        switch (section)
+        {
+        case Device: return tr("Device"); break;
+        case Size: return tr("Size"); break;
+        case UseFor: return tr("Use For"); break;
+        case Label: return tr("Label"); break;
+        case Encrypt: return tr("Encrypt"); break;
+        case Format: return tr("Format"); break;
+        case Options: return tr("Options"); break;
+        case Dump: return tr("Dump"); break;
+        case Pass: return tr("Pass"); break;
         }
     } else if (role == Qt::FontRole && section == Encrypt) {
         QFont smallFont;
@@ -2052,28 +2057,31 @@ QSize DeviceItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
 QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *widget = nullptr;
-    switch (index.column()) {
-        case PartMan::Size: widget = new QSpinBox(parent); break;
-        case PartMan::UseFor: {
+    switch (index.column())
+    {
+    case PartMan::Size: widget = new QSpinBox(parent); break;
+    case PartMan::UseFor:
+        {
             QComboBox *combo = new QComboBox(parent);
             combo->setEditable(true);
             combo->setInsertPolicy(QComboBox::NoInsert);
             combo->lineEdit()->setPlaceholderText("----");
             widget = combo;
-            break;
         }
-        case PartMan::Format: widget = new QComboBox(parent); break;
-        case PartMan::Pass: widget = new QSpinBox(parent); break;
-        case PartMan::Options: {
+        break;
+    case PartMan::Format: widget = new QComboBox(parent); break;
+    case PartMan::Pass: widget = new QSpinBox(parent); break;
+    case PartMan::Options:
+        {
             QLineEdit *edit = new QLineEdit(parent);
             edit->setProperty("row", QVariant::fromValue<void *>(index.internalPointer()));
             edit->setContextMenuPolicy(Qt::CustomContextMenu);
             connect(edit, &QLineEdit::customContextMenuRequested,
                 this, &DeviceItemDelegate::partOptionsMenu);
             widget = edit;
-            break;
         }
-        default: widget = new QLineEdit(parent);
+        break;
+    default: widget = new QLineEdit(parent);
     }
     assert(widget != nullptr);
     widget->setAutoFillBackground(true);
@@ -2083,8 +2091,10 @@ QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionVie
 void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
-    switch (index.column()) {
-        case PartMan::Size: {
+    switch (index.column())
+    {
+    case PartMan::Size:
+        {
             DeviceItem *drvit = item->parent();
             assert(drvit != nullptr);
             long long max = drvit->size - (PARTMAN_SAFETY_MB*1048576);
@@ -2098,20 +2108,21 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             spin->setStepType(QSpinBox::AdaptiveDecimalStepType);
             spin->setAccelerated(true);
             spin->setValue(item->size / 1048576);
-            break;
         }
-        case PartMan::UseFor: {
+        break;
+    case PartMan::UseFor:
+        {
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
             combo->addItem("");
             combo->addItems(item->allowedUsesFor(false));
             combo->setCurrentText(item->usefor);
-            break;
         }
-        case PartMan::Label: {
-            qobject_cast<QLineEdit *>(editor)->setText(item->label);
-            break;
-        }
-        case PartMan::Format: {
+        break;
+    case PartMan::Label:
+        qobject_cast<QLineEdit *>(editor)->setText(item->label);
+        break;
+    case PartMan::Format:
+        {
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
             const QStringList &formats = item->allowedFormats();
             assert(!formats.isEmpty());
@@ -2125,17 +2136,14 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             }
             const int ixfmt = combo->findData(item->format);
             if (ixfmt >= 0) combo->setCurrentIndex(ixfmt);
-            break;
         }
-        case PartMan::Pass: {
-            QSpinBox *spin = qobject_cast<QSpinBox *>(editor);
-            spin->setValue(item->pass);
-            break;
-        }
-        case PartMan::Options: {
-            qobject_cast<QLineEdit *>(editor)->setText(item->options);
-            break;
-        }
+        break;
+    case PartMan::Pass:
+        qobject_cast<QSpinBox *>(editor)->setValue(item->pass);
+        break;
+    case PartMan::Options:
+        qobject_cast<QLineEdit *>(editor)->setText(item->options);
+        break;
     }
 }
 void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
@@ -2143,26 +2151,27 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
     PartMan *partman = qobject_cast<PartMan *>(model);
     partman->changeBegin(item);
-    switch (index.column()) {
-        case PartMan::Size:
-            item->size = qobject_cast<QSpinBox *>(editor)->value();
-            item->size *= 1048576; // Separate step to prevent int overflow.
-            break;
-        case PartMan::UseFor:
-            item->usefor = qobject_cast<QComboBox *>(editor)->currentText().trimmed();
-            break;
-        case PartMan::Label:
-            item->label = qobject_cast<QLineEdit *>(editor)->text().trimmed();
-            break;
-        case PartMan::Format:
-            item->format = qobject_cast<QComboBox *>(editor)->currentData().toString();
-            break;
-        case PartMan::Pass:
-            item->pass = qobject_cast<QSpinBox *>(editor)->value();
-            break;
-        case PartMan::Options:
-            item->options = qobject_cast<QLineEdit *>(editor)->text().trimmed();
-            break;
+    switch (index.column())
+    {
+    case PartMan::Size:
+        item->size = qobject_cast<QSpinBox *>(editor)->value();
+        item->size *= 1048576; // Separate step to prevent int overflow.
+        break;
+    case PartMan::UseFor:
+        item->usefor = qobject_cast<QComboBox *>(editor)->currentText().trimmed();
+        break;
+    case PartMan::Label:
+        item->label = qobject_cast<QLineEdit *>(editor)->text().trimmed();
+        break;
+    case PartMan::Format:
+        item->format = qobject_cast<QComboBox *>(editor)->currentData().toString();
+        break;
+    case PartMan::Pass:
+        item->pass = qobject_cast<QSpinBox *>(editor)->value();
+        break;
+    case PartMan::Options:
+        item->options = qobject_cast<QLineEdit *>(editor)->text().trimmed();
+        break;
     }
     const int changed = partman->changeEnd(false);
     item->autoFill(changed);
