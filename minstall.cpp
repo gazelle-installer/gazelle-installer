@@ -1883,7 +1883,7 @@ void MInstall::updatePartitionWidgets(bool all)
     comboDisk->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Drive && item->size >= partman.rootSpaceNeeded
-                && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)) {
+                && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
             item->addToCombo(comboDisk);
         }
     }
@@ -2310,7 +2310,7 @@ void MInstall::on_radioBootMBR_toggled()
 {
     comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)) {
+        if (item->type == DeviceItem::Drive && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
             if (!item->flags.nasty || brave) item->addToCombo(comboBoot, true);
         }
     }
@@ -2321,7 +2321,7 @@ void MInstall::on_radioBootPBR_toggled()
 {
     comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Partition && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)) {
+        if (item->type == DeviceItem::Partition && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
             if (item->flags.curESP || item->realUseFor() == "ESP") continue;
             else if (item->format.compare("SWAP", Qt::CaseInsensitive)) continue;
             else if (item->format == "crypto_LUKS") continue;
@@ -2340,7 +2340,7 @@ void MInstall::on_radioBootESP_toggled()
     comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
         if ((item->flags.curESP || item->realUseFor() == "ESP")
-            && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)) item->addToCombo(comboBoot);
+            && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) item->addToCombo(comboBoot);
     }
     labelBoot->setText(tr("Partition to use:"));
 }

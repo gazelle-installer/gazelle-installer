@@ -80,6 +80,12 @@ void PartMan::setup()
         gui.boxCryptoPass->hide();
         gui.treePartitions->setColumnHidden(Encrypt, true);
     }
+
+    // UUID of the device that the live system is booted from.
+    if (QFile::exists("/live/config/initrd.out")) {
+        QSettings livecfg("/live/config/initrd.out", QSettings::NativeFormat);
+        bootUUID = livecfg.value("BOOT_UUID").toString();
+    }
 }
 
 void PartMan::scan(DeviceItem *drvstart)
@@ -94,12 +100,6 @@ void PartMan::scan(DeviceItem *drvstart)
         proc.exec("partprobe -s", true);
         proc.exec("blkid -c /dev/null", true);
         root.clear();
-    }
-
-    QString bootUUID;
-    if (QFile::exists("/live/config/initrd.out")) {
-        QSettings livecfg("/live/config/initrd.out", QSettings::NativeFormat);
-        bootUUID = livecfg.value("BOOT_UUID").toString();
     }
 
     for (const QJsonValue &jsonDrive : jsonBD) {
@@ -135,16 +135,16 @@ void PartMan::scan(DeviceItem *drvstart)
             partit->flags.curESP = (partTypeName=="EFI System");
             if (partit->flags.curESP) partit->usefor = "ESP";
             if (!partit->flags.nasty) partit->flags.nasty = partTypeName.startsWith("Microsoft LDM");
-            partit->flags.start = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
+            partit->flags.bootRoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
             partit->curFormat = jsonPart["fstype"].toString();
             // Propagate the boot and nasty flags up to the drive.
-            if (partit->flags.start) drvit->flags.start = true;
+            if (partit->flags.bootRoot) drvit->flags.bootRoot = true;
             if (partit->flags.nasty) drvit->flags.nasty = true;
             notifyChange(partit);
         }
         for (int ixPart = drvit->childCount() - 1; ixPart >= 0; --ixPart) {
             // Propagate the boot flag across the entire drive.
-            if (drvit->flags.start) drvit->child(ixPart)->flags.start = true;
+            if (drvit->flags.bootRoot) drvit->child(ixPart)->flags.bootRoot = true;
         }
         notifyChange(drvit);
     }
@@ -174,8 +174,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         }
     }
     const QString &bdRaw = proc.execOut("lsblk -T -bJo"
-        " TYPE,NAME,UUID,SIZE,PHY-SEC,FSTYPE,LABEL"
-        " /dev/mapper/* 2>/dev/null", true);
+        " TYPE,NAME,UUID,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/* 2>/dev/null", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
     if (jsonBD.empty()) {
@@ -189,34 +188,37 @@ void PartMan::scanVirtualDevices(bool rescan)
     }
     assert(vdlit != nullptr);
     for (const QJsonValue &jsonDev : jsonBD) {
-        const QString &bdname = jsonDev["name"].toString();
-        const long long bdsize = jsonDev["size"].toVariant().toLongLong();
-        const QString &bdlabel = jsonDev["label"].toString();
-        const bool crypto = jsonDev["type"].toString() == "crypt";
+        const QString &name = jsonDev["name"].toString();
+        const long long size = jsonDev["size"].toVariant().toLongLong();
+        const int physec = jsonDev["phy-sec"].toInt();
+        const QString &label = jsonDev["label"].toString();
+        const bool crypto = (jsonDev["type"].toString() == "crypt");
         // Check if the device is already in the list.
-        DeviceItem *devit = listed.value(bdname);
+        DeviceItem *devit = listed.value(name);
         if (devit) {
-            if (bdsize != devit->size || bdlabel != devit->curLabel
+            if (size != devit->size || physec != devit->physec || label != devit->curLabel
                 || crypto != devit->flags.cryptoV) {
                 // List entry is different to the device, so refresh it.
                 delete devit;
                 devit = nullptr;
             }
-            listed.remove(bdname);
+            listed.remove(name);
         }
         // Create a new list entry if needed.
         if (!devit) {
             devit = new DeviceItem(DeviceItem::VirtualBD, vdlit);
-            devit->device = devit->devMapper = bdname;
-            devit->size = bdsize;
-            devit->curLabel = bdlabel;
+            devit->device = devit->devMapper = name;
+            devit->size = size;
+            devit->physec = physec;
+            devit->flags.bootRoot = (!bootUUID.isEmpty() && jsonDev["uuid"]==bootUUID);
+            devit->curLabel = label;
             devit->curFormat = jsonDev["fstype"].toString();
             devit->flags.cryptoV = crypto;
             notifyChange(devit);
         }
-        DeviceItem *orit = findOrigin(bdname);
+        DeviceItem *orit = findOrigin(name);
         if (orit) {
-            orit->devMapper = bdname;
+            orit->devMapper = name;
             notifyChange(orit);
         }
     }
