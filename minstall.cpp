@@ -49,7 +49,7 @@ enum Step {
 };
 
 MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
-    : proc(this), partman(proc, listBlkDevs, *this, this)
+    : proc(this), partman(proc, *this, this)
 {
     setupUi(this);
     listLog->addItem("Version " VERSION);
@@ -1445,16 +1445,16 @@ int MInstall::showPage(int curr, int next)
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
                 if (!uefi) {
-                    const int bdindex = listBlkDevs.findDevice(comboDisk->currentData().toString());
-                    if (bdindex >= 0 && listBlkDevs.at(bdindex).size >= (2048LL*1073741824LL)) {
+                    DeviceItem *devit = partman.findDevice(comboDisk->currentData().toString());
+                    if (devit && devit->size >= (2048LL*1073741824LL)) {
                         msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
                                            " On some systems, a GPT-formatted disk will not boot.");
                         return curr;
                     }
                 }
                 int ans = QMessageBox::warning(this, windowTitle(),
-                                               msg.arg(comboDisk->currentData().toString(), PROJECTNAME),
-                                               QMessageBox::Yes, QMessageBox::No);
+                    msg.arg(comboDisk->currentData().toString(), PROJECTNAME),
+                    QMessageBox::Yes, QMessageBox::No);
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
             partman.clearAllUses();
@@ -1869,19 +1869,22 @@ void MInstall::updatePartitionWidgets(bool all)
     comboDisk->setEnabled(false);
     comboDisk->clear();
     comboDisk->addItem(tr("Loading..."));
-    listBlkDevs.build(proc);
+    partman.scan();
     if (mactest) {
-        for (BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (bdinfo.name.startsWith("sda")) bdinfo.isNasty = true;
+        for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
+            if (item->device.startsWith("sda")) {
+                item->flags.nasty = true;
+                partman.notifyChange(item);
+            }
         }
     }
 
     // disk combo box
     comboDisk->clear();
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDrive && bdinfo.size >= partman.rootSpaceNeeded
-                && (!bdinfo.isStart || INSTALL_FROM_ROOT_DEVICE)) {
-            bdinfo.addToCombo(comboDisk);
+    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
+        if (item->type == DeviceItem::Drive && item->size >= partman.rootSpaceNeeded
+                && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)) {
+            item->addToCombo(comboDisk);
         }
     }
     comboDisk->setCurrentIndex(0);
@@ -1890,8 +1893,8 @@ void MInstall::updatePartitionWidgets(bool all)
     if (all) {
         // whole-disk vs custom-partition radio buttons
         radioEntireDisk->setChecked(true);
-        for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-            if (!bdinfo.isDrive) {
+        for (DeviceItemIterator it(partman); *it; it.next()) {
+            if ((*it)->isVolume()) {
                 // found at least one partition
                 radioCustomPart->setChecked(true);
                 break;
@@ -1899,8 +1902,6 @@ void MInstall::updatePartitionWidgets(bool all)
         }
     }
 
-    // Partition tree.
-    partman.populate();
     // Partition slider.
     setupPartitionSlider();
 }
@@ -2308,9 +2309,9 @@ void MInstall::on_radioCustomPart_toggled(bool checked)
 void MInstall::on_radioBootMBR_toggled()
 {
     comboBoot->clear();
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isDrive && (!bdinfo.isStart || INSTALL_FROM_ROOT_DEVICE)) {
-            if (!bdinfo.isNasty || brave) bdinfo.addToCombo(comboBoot, true);
+    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
+        if (item->type == DeviceItem::Drive && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)) {
+            if (!item->flags.nasty || brave) item->addToCombo(comboBoot, true);
         }
     }
     labelBoot->setText(tr("System boot disk:"));
@@ -2319,12 +2320,13 @@ void MInstall::on_radioBootMBR_toggled()
 void MInstall::on_radioBootPBR_toggled()
 {
     comboBoot->clear();
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (!(bdinfo.isDrive || bdinfo.fs=="swap" || bdinfo.isESP)
-            && (!bdinfo.isStart || INSTALL_FROM_ROOT_DEVICE)
-            && bdinfo.isNative && bdinfo.fs != "crypto_LUKS") {
+    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
+        if (item->type == DeviceItem::Partition && item->format != "swap"
+            && !item->flags.curESP && item->realUseFor() != "ESP"
+            && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)
+            && item->format != "crypto_LUKS" && !item->encrypt) {
             // list only Linux partitions excluding crypto_LUKS partitions
-            if (!bdinfo.isNasty || brave) bdinfo.addToCombo(comboBoot, true);
+            if (!item->flags.nasty || brave) item->addToCombo(comboBoot, true);
         }
     }
     labelBoot->setText(tr("Partition to use:"));
@@ -2333,8 +2335,9 @@ void MInstall::on_radioBootPBR_toggled()
 void MInstall::on_radioBootESP_toggled()
 {
     comboBoot->clear();
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isESP && (!bdinfo.isStart || INSTALL_FROM_ROOT_DEVICE)) bdinfo.addToCombo(comboBoot);
+    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
+        if ((item->flags.curESP || item->realUseFor() == "ESP")
+            && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)) item->addToCombo(comboBoot);
     }
     labelBoot->setText(tr("Partition to use:"));
 }

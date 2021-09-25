@@ -30,7 +30,6 @@
 #include "mprocess.h"
 #include "msettings.h"
 #include "partman.h"
-#include "blockdev.h"
 #include "safecache.h"
 
 #include "ui_meinstall.h"
@@ -148,7 +147,6 @@ private:
 
     QWidget *nextFocus = nullptr;
     PartMan partman;
-    BlockDeviceList listBlkDevs;
     QStringList listHomes;
     SafeCache key;
 
