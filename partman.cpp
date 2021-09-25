@@ -2056,8 +2056,25 @@ void DeviceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
 }
 QSize DeviceItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    const QSize &size = QStyledItemDelegate::sizeHint(option,  index);
-    return QSize(size.width() + 4, option.fontMetrics.height() + 4);
+    DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
+    int width = QStyledItemDelegate::sizeHint(option, index).width();
+    // In the case of Format and Use For, the cell should accommodate all options in the list.
+    const int residue = width - option.fontMetrics.boundingRect(index.data(Qt::DisplayRole).toString()).width();
+    switch(index.column()) {
+    case PartMan::Format:
+        for (const QString &fmt : item->allowedFormats()) {
+            const int fw = option.fontMetrics.boundingRect(item->shownFormat(fmt)).width() + residue;
+            if (fw > width) width = fw;
+        }
+        break;
+    case PartMan::UseFor:
+        for (const QString &use : item->allowedUsesFor(false)) {
+            const int uw = option.fontMetrics.boundingRect(use).width() + residue;
+            if (uw > width) width = uw;
+        }
+        break;
+    }
+    return QSize(width + 4, option.fontMetrics.height() + 4);
 }
 
 QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
