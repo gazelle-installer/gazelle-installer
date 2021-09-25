@@ -1757,7 +1757,7 @@ QStringList DeviceItem::allowedUsesFor(bool real) const
     if (!partman || size >= partman->rootSpaceNeeded) list << "root";
     if (type == Subvolume) list << "home"; // swap requires Linux 5.0 or later
     else {
-        list << "Format";
+        list.prepend("Format");
         if (type != VirtualBD) {
             if (size <= 16777216) list << "BIOS-GRUB";
             if (size <= 4294967296) list << "ESP" << "boot";
