@@ -714,17 +714,14 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             bool hasBiosGrub = false;
             for (int ixdev = 0; ixdev < partCount; ++ixdev) {
                 DeviceItem *partit = drvit->child(ixdev);
-                const QString &dev = partit->shownDevice();
                 const QString &use = partit->realUseFor();
+                QString actmsg;
                 if (use.isEmpty()) continue;
                 else if (use == "BIOS-GRUB") hasBiosGrub = true;
-                if (partit->willFormat()) details += tr("Format %1").arg(dev);
-                else if (use == "/") {
-                    details += tr("Delete the data on %1 except for /home").arg(dev);
-                } else {
-                    details += tr("Reuse (no reformat) %1 as %2").arg(dev, partit->shownUseFor());
-                }
-                details += '\n';
+                if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
+                else if (use != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
+                else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
+                details += actmsg.arg(partit->shownDevice(), partit->shownUseFor()) + '\n';
             }
             // Potentially unbootable GPT when on a BIOS-based PC.
             const bool hasBoot = (drvit->active != nullptr);
@@ -2178,7 +2175,7 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     if (changed) partman->notifyChange(item);
 }
 
-void DeviceItemDelegate::partOptionsMenu(const QPoint &)
+void DeviceItemDelegate::partOptionsMenu()
 {
     QLineEdit *edit = static_cast<QLineEdit *>(sender());
     if (!edit) return;
