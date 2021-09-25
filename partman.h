@@ -60,7 +60,7 @@ public:
     struct Flags {
         bool nasty : 1;
         bool oldLayout : 1;
-        bool start : 1;
+        bool bootRoot : 1;
         bool useGPT : 1;
         bool curESP : 1;
         bool cryptoV : 1;
@@ -180,6 +180,7 @@ public:
         Pass,
         _TreeColumns_
     };
+    QString bootUUID;
     bool gptoverride=false, uefi=false, brave=false;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
