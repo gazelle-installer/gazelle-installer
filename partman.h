@@ -130,7 +130,7 @@ class DeviceItemDelegate : public QStyledItemDelegate
         const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
-    void partOptionsMenu(const QPoint &);
+    void partOptionsMenu();
     // No setStepType() in Debian Buster.
     void spinSizeValueChange(int i);
 };
