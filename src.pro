@@ -54,14 +54,12 @@ HEADERS += minstall.h \
     mtreeview.h \
     version.h \
     msettings.h \
-    blockdev.h \
     partman.h \
     safecache.h \
     mprocess.h
 SOURCES += app.cpp minstall.cpp \
     mpassedit.cpp \
     msettings.cpp \
-    blockdev.cpp \
     mtreeview.cpp \
     partman.cpp \
     safecache.cpp \

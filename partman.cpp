@@ -2,7 +2,7 @@
  * Basic partition manager for the installer.
  ***************************************************************************
  *
- *   Copyright (C) 2020-2021 by AK-47
+ *   Copyright (C) 2019, 2020-2021 by AK-47
  *   Transplanted code, marked with comments further down this file:
  *    - Copyright (C) 2003-2010 by Warren Woodford
  *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
@@ -27,27 +27,27 @@
 #include <QDebug>
 #include <QTimer>
 #include <QLocale>
+#include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QRegularExpression>
 #include <QMessageBox>
+#include <QPainter>
 #include <QMenu>
 #include <QSpinBox>
 #include <QComboBox>
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
-#include <QFileInfo>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QPainter>
 
 #include "msettings.h"
 #include "partman.h"
 
 #define PARTMAN_SAFETY_MB 32 // 1MB at start + Compensate for rounding errors.
 
-PartMan::PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent)
-    : QAbstractItemModel(parent), proc(mproc), root(DeviceItem::Unknown),
-      listBlkDevs(bdlist), gui(ui), master(parent)
+PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent)
+    : QAbstractItemModel(parent), proc(mproc), root(DeviceItem::Unknown), gui(ui), master(parent)
 {
     root.partman = this;
     QTimer::singleShot(0, this, &PartMan::setup);
@@ -82,35 +82,96 @@ void PartMan::setup()
     }
 }
 
-void PartMan::populate(DeviceItem *drvstart)
+void PartMan::scan(DeviceItem *drvstart)
 {
-    if (!drvstart) root.clear();
-    DeviceItem *curdrv = nullptr;
-    for (const BlockDeviceInfo &bdinfo : listBlkDevs) {
-        if (bdinfo.isStart && !brave) continue;
-        DeviceItem *curdev = nullptr;
-        if (bdinfo.isDrive) {
-            if (!drvstart) curdrv = new DeviceItem(DeviceItem::Drive, &root);
-            else if (bdinfo.name == drvstart->device) curdrv = drvstart;
-            else if (!curdrv) continue; // Skip until the drive is drvstart.
-            else break; // Exit the loop early if the drive isn't drvstart.
-            curdev = curdrv;
-            curdev->curLabel = bdinfo.model; // Model
-        } else {
-            if (!curdrv) continue;
-            curdev = new DeviceItem(DeviceItem::Partition, curdrv);
-            curdev->curLabel = bdinfo.label;
-            curdev->curFormat = bdinfo.fs;
-            if (bdinfo.isBoot) curdev->setActive(true);
-            if (bdinfo.isESP) curdev->usefor = "ESP";
-        }
-        assert(curdev != nullptr);
-        curdev->flags.oldLayout = true;
-        curdev->device = bdinfo.name;
-        curdev->size = bdinfo.size;
-        curdev->flags.mapLock = (bdinfo.mapCount > 0);
-        notifyChange(curdev);
+    // expressions for matching various partition types
+    const QRegularExpression rxExtended("^(0x05|0x0f|0x15|0x1f|0x91|0x9b|0xc5|0xcf|0xd5)$");
+    const QRegularExpression rxESP("^(c12a7328-f81f-11d2-ba4b-00a0c93ec93b|0xef)$");
+    const QRegularExpression rxWinLDM("^(0x42|5808c8aa-7e8f-42e0-85d2-e1e90434cfb3"
+                                      "|af9b60a0-1431-4f62-bc68-3311714a69ad)$"); // Windows LDM
+
+    // Backup ESP detection. Populated when needed.
+    QStringList backup_list;
+    bool backup_checked = false;
+    // Collect information and populate the block device list.
+    QString cmd("lsblk -T -bJo TYPE,NAME,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPE,FSTYPE,LABEL,MODEL,PARTFLAGS");
+    if (drvstart) cmd += " /dev/" + drvstart->device;
+    const QString &bdRaw = proc.execOut(cmd, true);
+    const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
+    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
+
+    if (!drvstart) {
+        proc.exec("partprobe -s", true);
+        proc.exec("blkid -c /dev/null", true);
+        root.clear();
     }
+
+    QString bootUUID;
+    if (QFile::exists("/live/config/initrd.out")) {
+        QSettings livecfg("/live/config/initrd.out", QSettings::NativeFormat);
+        bootUUID = livecfg.value("BOOT_UUID").toString();
+    }
+
+    for (const QJsonValue &jsonDrive : jsonBD) {
+        const QString &jdName = jsonDrive["name"].toString();
+        if (jsonDrive["type"] != "disk") continue;
+        if (jdName.startsWith("zram")) continue;
+        DeviceItem *drvit = drvstart;
+        if (!drvstart) drvit = new DeviceItem(DeviceItem::Drive, &root);
+        else if (jdName != drvstart->device) continue;
+
+        drvit->clear();
+        drvit->flags.oldLayout = true;
+        drvit->device = jdName;
+        drvit->flags.useGPT = (jsonDrive["pttype"]=="gpt");
+        drvit->size = jsonDrive["size"].toVariant().toLongLong();
+        drvit->physec = jsonDrive["phy-sec"].toInt();
+        drvit->curLabel = jsonDrive["label"].toString();
+        drvit->model = jsonDrive["model"].toString();
+        const QJsonArray &jsonParts = jsonDrive["children"].toArray();
+        for (const QJsonValue &jsonPart : jsonParts) {
+            const QString &partType = jsonPart["parttype"].toString();
+            if (partType.count(rxExtended)) continue;
+            DeviceItem *partit = new DeviceItem(DeviceItem::Partition, drvit);
+            partit->flags.oldLayout = true;
+            partit->device = jsonPart["name"].toString();
+            partit->size = jsonPart["size"].toVariant().toLongLong();
+            partit->physec = jsonPart["phy-sec"].toInt();
+            partit->curLabel = jsonPart["label"].toString();
+            partit->model = jsonPart["model"].toString();
+            const int partflags = jsonPart["partflags"].toString().toUInt(nullptr, 0);
+            if ((partflags & 0x80) || (partflags & 0x04)) partit->setActive(true);
+            partit->mapCount = jsonPart["children"].toArray().count();
+
+            if (!partType.isEmpty()) {
+                partit->flags.curESP = (partType.count(rxESP) >= 1);
+                if (!partit->flags.nasty) partit->flags.nasty = (partType.count(rxWinLDM) >= 1);
+            }
+            if (!partit->flags.curESP) {
+                // Backup detection for drives that don't have UUID for ESP.
+                if (!backup_checked) {
+                    backup_list = proc.execOutLines("fdisk -l -o DEVICE,TYPE"
+                        " | grep 'EFI System' |cut -d\\  -f1 | cut -d/ -f3");
+                    backup_checked = true;
+                }
+                partit->flags.curESP = backup_list.contains(partit->device);
+            }
+            if (partit->flags.curESP) partit->usefor = "ESP";
+
+            partit->flags.start = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
+            partit->curFormat = jsonPart["fstype"].toString();
+            // Propagate the boot and nasty flags up to the drive.
+            if (partit->flags.start) drvit->flags.start = true;
+            if (partit->flags.nasty) drvit->flags.nasty = true;
+            notifyChange(partit);
+        }
+        for (int ixPart = drvit->childCount() - 1; ixPart >= 0; --ixPart) {
+            // Propagate the boot flag across the entire drive.
+            if (drvit->flags.start) drvit->child(ixPart)->flags.start = true;
+        }
+        notifyChange(drvit);
+    }
+
     if (!drvstart) scanVirtualDevices(false);
     gui.treePartitions->expandAll();
     resizeColumnsToFit();
@@ -179,7 +240,6 @@ void PartMan::scanVirtualDevices(bool rescan)
         DeviceItem *orit = findOrigin(bdname);
         if (orit) {
             orit->devMapper = bdname;
-            orit->flags.mapLock = true;
             notifyChange(orit);
         }
     }
@@ -220,7 +280,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 partit->flags.oldLayout = drvPreserve;
             } else {
                 partit = new DeviceItem(DeviceItem::Partition, drvit);
-                partit->device = BlockDeviceInfo::join(drvit->device, ixPart+1);
+                partit->device = DeviceItem::join(drvit->device, ixPart+1);
             }
             // Configuration management, accounting for automatic control correction order.
             const QString &groupPart = "Storage." + partit->device;
@@ -396,7 +456,7 @@ void PartMan::treeMenu(const QPoint &)
             actScanSubvols = menu.addAction(tr("Scan subvolumes"));
             actScanSubvols->setDisabled(twit->willFormat());
         }
-        if (twit->flags.mapLock && actUnlock) actUnlock->setEnabled(false);
+        if (twit->mapCount && actUnlock) actUnlock->setEnabled(false);
         QAction *action = menu.exec(QCursor::pos());
         if (!action) return;
         else if (action == actAdd) partAddClick(true);
@@ -436,7 +496,7 @@ void PartMan::treeMenu(const QPoint &)
         else if (action == actCrypto) twit->layoutDefault(-1, true);
         else if (action == actReset) {
             while (twit->childCount()) delete twit->child(0);
-            populate(twit);
+            scan(twit);
         }
     } else if (twit->type == DeviceItem::Subvolume) {
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
@@ -509,14 +569,10 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
         if (ok) {
             twit->usefor.clear();
             twit->flags.autoCrypto = checkCrypttab->isChecked();
-            twit->flags.mapLock = true;
+            twit->mapCount++;
             notifyChange(twit);
-            // Refreshing the drive will not necessarily re-scan block devices.
-            // This updates the device list manually to keep the tree accurate.
-            const int ixBD = listBlkDevs.findDevice(twit->device);
-            if (ixBD >= 0) listBlkDevs[ixBD].mapCount++;
-            // Update virtual device list.
             scanVirtualDevices(true);
+            resizeColumnsToFit();
             treeSelChange();
         }
         gui.boxMain->setEnabled(true);
@@ -538,16 +594,14 @@ void PartMan::partMenuLock(DeviceItem *twit)
     DeviceItem *origin = findOrigin(dev);
     if (origin) ok = proc.exec("cryptsetup close " + dev, true);
     if (ok) {
-        const int ixBD = listBlkDevs.findDevice(origin->device);
-        const int oMapCount = listBlkDevs.at(ixBD).mapCount;
-        if (oMapCount > 0) listBlkDevs[ixBD].mapCount--;
-        if (oMapCount <= 1) origin->flags.mapLock = false;
+        if (origin->mapCount > 0) origin->mapCount--;
         origin->devMapper.clear();
         origin->flags.autoCrypto = false;
         notifyChange(origin);
     }
     // Refresh virtual devices list.
     scanVirtualDevices(true);
+    resizeColumnsToFit();
     treeSelChange();
 
     gui.boxMain->setEnabled(true);
@@ -674,7 +728,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             const int partCount = drvit->childCount();
             bool setupGPT = gptoverride || drvit->size >= 2199023255552 || partCount > 4;
             if (drvit->flags.oldLayout) {
-                setupGPT = listBlkDevs.at(listBlkDevs.findDevice(drvit->device)).isGPT;
+                setupGPT = drvit->flags.useGPT;
             } else if (drvit->type != DeviceItem::VirtualDevices) {
                 details += tr("Prepare %1 partition table on %2").arg(setupGPT?"GPT":"MBR", drvit->device) + '\n';
             }
@@ -728,48 +782,17 @@ bool PartMan::calculatePartBD()
         DeviceItem *drvit = root.child(ixDrive);
         if (drvit->type == DeviceItem::VirtualDevices) continue;
         const bool useExist = drvit->flags.oldLayout;
-        QString drv = drvit->device;
-        int ixDriveBD = listBlkDevs.findDevice(drv);
         const int partCount = drvit->childCount();
         const long long driveSize = drvit->size / 1048576;
-
         if (!useExist) {
-            // Remove partitions from the list that belong to this drive.
-            const int ixRemoveBD = ixDriveBD + 1;
-            if (ixDriveBD < 0) return false;
-            while (ixRemoveBD < listBlkDevs.size() && !listBlkDevs.at(ixRemoveBD).isDrive) {
-                listToUnmount << listBlkDevs.at(ixRemoveBD).name;
-                listBlkDevs.removeAt(ixRemoveBD);
-            }
             // see if GPT needs to be used (either UEFI or >=2TB drive)
-            listBlkDevs[ixDriveBD].isGPT = gptoverride || uefi || driveSize >= 2097152 || partCount > 4;
+            drvit->flags.useGPT = gptoverride || uefi || driveSize >= 2097152 || partCount > 4;
         }
         // Add (or mark) future partitions to the list.
-        for (int ixPart=0, ixPartBD=ixDriveBD+1; ixPart < partCount; ++ixPart, ++ixPartBD) {
+        for (int ixPart=0; ixPart < partCount; ++ixPart) {
             DeviceItem *twit = drvit->child(ixPart);
             if (twit->usefor.isEmpty()) continue;
-            QString bdFS;
-            if (twit->encrypt) bdFS = QStringLiteral("crypto_LUKS");
-            else bdFS = twit->format;
-            if (useExist) {
-                BlockDeviceInfo &bdinfo = listBlkDevs[ixPartBD];
-                listToUnmount << bdinfo.name;
-                bdinfo.label = twit->label;
-                if (twit->willFormat() && !bdFS.isEmpty()) bdinfo.fs = bdFS;
-                bdinfo.isNasty = false; // future partitions are safe
-                bdinfo.isFuture = bdinfo.isNative = true;
-                bdinfo.isESP = (twit->realUseFor() == "ESP");
-            } else {
-                const BlockDeviceInfo &drvbd = listBlkDevs.at(ixDriveBD);
-                BlockDeviceInfo bdinfo;
-                bdinfo.name = twit->device;
-                bdinfo.fs = bdFS;
-                bdinfo.size = twit->size;
-                bdinfo.isFuture = bdinfo.isNative = true;
-                bdinfo.isGPT = drvbd.isGPT;
-                bdinfo.isESP = (twit->realUseFor() == "ESP");
-                listBlkDevs.insert(ixPartBD, bdinfo);
-            }
+            if (useExist) listToUnmount << twit->device;
         }
     }
     return true;
@@ -834,8 +857,12 @@ bool PartMan::checkTargetDrivesOK()
 
 bool PartMan::luksFormat(const QString &dev, const QByteArray &password)
 {
-    const QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512 --pbkdf argon2id luksFormat /dev/";
-    if (!proc.exec(cmd + dev, true, &password)) return false;
+    DeviceItem *item = findDevice(dev);
+    assert(item != nullptr);
+    QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512 --pbkdf argon2id";
+    if (item->physec > 0) cmd += " --sector-size=" + QString::number(item->physec);
+    cmd += " luksFormat /dev/" + dev;
+    if (!proc.exec(cmd, true, &password)) return false;
     return true;
 }
 
@@ -851,8 +878,7 @@ bool PartMan::luksOpen(const QString &dev, const QString &luksfs,
 DeviceItem *PartMan::selectedDriveAuto()
 {
     QString drv(gui.comboDisk->currentData().toString());
-    int bdindex = listBlkDevs.findDevice(drv);
-    if (bdindex<0) return nullptr;
+    if (!findDevice(drv)) return nullptr;
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
         DeviceItem *const drvit = root.child(ixi);
         if (drvit->device == drv) return drvit;
@@ -904,23 +930,18 @@ bool PartMan::preparePartitions()
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
         DeviceItem *drvit = root.child(ixi);
         if (drvit->flags.oldLayout || drvit->type == DeviceItem::VirtualDevices) continue;
-        const QString &drv = drvit->device;
         proc.status(tr("Preparing partition tables"));
-        const int index = listBlkDevs.findDevice(drv);
-        assert (index >= 0);
 
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
-        const long long bytes = listBlkDevs.at(index).size;
-        const long long offset = (bytes / 65536) - 63; // Account for integer rounding.
-        const QString &cmd = QStringLiteral("dd conv=notrunc bs=64K count=64 if=/dev/zero of=/dev/") + drv;
+        const long long offset = (drvit->size / 65536) - 63; // Account for integer rounding.
+        const QString &cmd = QStringLiteral("dd conv=notrunc bs=64K count=64 if=/dev/zero of=/dev/") + drvit->device;
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
         // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
         proc.exec(cmd);
         // Last 17KB = secondary partition table (for GPT disks).
         proc.exec(cmd + " seek=" + QString::number(offset));
-
-        const bool useGPT = listBlkDevs.at(index).isGPT;
-        if (!proc.exec("parted -s /dev/" + drv + " mklabel " + (useGPT ? "gpt" : "msdos"))) return false;
+        if (!proc.exec("parted -s /dev/" + drvit->device + " mklabel "
+            + (drvit->flags.useGPT ? "gpt" : "msdos"))) return false;
     }
     proc.sleep(1000);
 
@@ -929,10 +950,8 @@ bool PartMan::preparePartitions()
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
         DeviceItem *drvit = root.child(ixi);
         if (drvit->type == DeviceItem::VirtualDevices) continue;
-        const QString &drvdev = drvit->device;
         const int devCount = drvit->childCount();
-        const int ixBlkDev = listBlkDevs.findDevice(drvdev);
-        const bool useGPT = (ixBlkDev >= 0 && listBlkDevs.at(ixBlkDev).isGPT);
+        const bool useGPT = drvit->flags.useGPT;
         if (drvit->flags.oldLayout) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
@@ -945,14 +964,14 @@ bool PartMan::preparePartitions()
                 const char *ptype = useGPT ? "8303" : "83";
                 if (useFor.isEmpty()) continue;
                 else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
-                const QStringList &devsplit = BlockDeviceInfo::split(twit->device);
+                const QStringList &devsplit = DeviceItem::split(twit->device);
                 if (!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1), ptype))) return false;
                 proc.sleep(1000);
                 proc.status();
             }
         } else {
             // Creating new partitions.
-            const QString cmdParted("parted -s --align optimal /dev/" + drvdev + " mkpart primary %1MiB %2MiB");
+            const QString cmdParted("parted -s --align optimal /dev/" + drvit->device + " mkpart primary %1MiB %2MiB");
             long long start = 1; // start with 1 MB to aid alignment
             for (int ixdev = 0; ixdev<devCount; ++ixdev) {
                 DeviceItem *twit = drvit->child(ixdev);
@@ -968,7 +987,7 @@ bool PartMan::preparePartitions()
         for (int ixdev=0; ixdev<devCount; ++ixdev) {
             DeviceItem *twit = drvit->child(ixdev);
             if (twit->usefor.isEmpty()) continue;
-            QStringList devsplit(BlockDeviceInfo::split(twit->device));
+            QStringList devsplit(DeviceItem::split(twit->device));
             QString cmd = "parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1);
             bool ok = true;
             if (twit->isActive()) {
@@ -1011,12 +1030,12 @@ bool PartMan::formatPartitions()
         if (useFor == "ESP") {
             if (!proc.exec("mkfs.msdos -F " + twit->format.mid(3)+' '+dev)) return false;
             // Sets boot flag and ESP flag.
-            const QStringList &devsplit = BlockDeviceInfo::split(dev);
+            const QStringList &devsplit = DeviceItem::split(dev);
             if (!proc.exec("parted -s /dev/" + devsplit.at(0)
                 + " set " + devsplit.at(1) + " esp on")) return false;
         } else if (useFor == "BIOS-GRUB") {
             proc.exec("dd bs=64K if=/dev/zero of=" + dev);
-            const QStringList &devsplit = BlockDeviceInfo::split(dev);
+            const QStringList &devsplit = DeviceItem::split(dev);
             if (!proc.exec("parted -s /dev/" + devsplit.at(0)
                 + " set " + devsplit.at(1) + " bios_grub on")) return false;
         } else if (useFor == "SWAP") {
@@ -1326,6 +1345,14 @@ DeviceItem *PartMan::findOrigin(const QString &vdev)
     return nullptr;
 }
 
+DeviceItem *PartMan::findDevice(const QString &devname) const
+{
+    for (DeviceItemIterator it(*this); *it; it.next()) {
+        if ((*it)->device == devname) return *it;
+    }
+    return nullptr;
+}
+
 /* Model View Controller */
 
 QVariant PartMan::data(const QModelIndex &index, int role) const
@@ -1346,7 +1373,11 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
                 }
                 break;
             case UseFor: return item->usefor; break;
-            case Label: return (index.flags() & Qt::ItemIsEditable) ? item->label : item->curLabel; break;
+            case Label:
+                if (item->type == DeviceItem::Drive) return item->model;
+                else if (index.flags() & Qt::ItemIsEditable) return item->label;
+                else return item->curLabel;
+                break;
             case Format:
                 if (item->usefor.isEmpty()) return item->curFormat;
                 else return item->shownFormat(item->format);
@@ -1381,7 +1412,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
             return QIcon(":/appointment-soon");
         } else if (item->type == DeviceItem::VirtualBD && item->flags.cryptoV) {
             return QIcon::fromTheme("unlock");
-        } else if (item->flags.mapLock) {
+        } else if (item->mapCount) {
             return QIcon::fromTheme("lock");
         }
     } else if (role == Qt::FontRole && index.column() == Device) {
@@ -1409,7 +1440,7 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
     DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
     if (item->type == DeviceItem::VirtualDevices) return Qt::ItemIsEnabled;
     Qt::ItemFlags flagsOut({Qt::ItemIsSelectable, Qt::ItemIsEnabled});
-    if (item->flags.mapLock) return flagsOut;
+    if (item->mapCount) return flagsOut;
     switch (index.column()) {
         case Device: break;
         case Size:
@@ -1467,6 +1498,11 @@ QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role)
     }
     return QVariant();
 }
+QModelIndex PartMan::index(DeviceItem *item) const
+{
+    if (item == &root) return QModelIndex();
+    return createIndex(item->row(), 0, item);
+}
 QModelIndex PartMan::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent)) return QModelIndex();
@@ -1480,7 +1516,7 @@ QModelIndex PartMan::parent(const QModelIndex &index) const
     if (!index.isValid()) return QModelIndex();
     DeviceItem *cit = static_cast<DeviceItem *>(index.internalPointer());
     DeviceItem *pit = cit->parent();
-    if (!pit) return QModelIndex();
+    if (!pit || pit == &root) return QModelIndex();
     return createIndex(pit->row(), 0, pit);
 }
 inline DeviceItem *PartMan::item(const QModelIndex &index) const
@@ -1568,12 +1604,10 @@ DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *pre
     : parentItem(parent), type(type)
 {
     if (parent) {
-        partman = parentItem->partman;
+        partman = parent->partman;
         const int i = preceding ? (parentItem->children.indexOf(preceding) + 1) : parentItem->childCount();
-        if (partman) {
-            partman->beginInsertRows(partman->createIndex(parentItem->row(), 0, parentItem), i, i);
-        }
-        parentItem->children.insert(i, this);
+        if (partman) partman->beginInsertRows(partman->index(parent), i, i);
+        parent->children.insert(i, this);
         if (partman) partman->endInsertRows();
     }
 }
@@ -1581,7 +1615,7 @@ DeviceItem::~DeviceItem()
 {
     if (parentItem && partman) {
         const int r = parentItem->indexOfChild(this);
-        partman->beginRemoveRows(partman->createIndex(parentItem->row(), 0, parentItem), r, r);
+        partman->beginRemoveRows(partman->index(parentItem), r, r);
     }
     for (DeviceItem *cit : children) {
         cit->partman = nullptr; // Stop unnecessary signals.
@@ -1600,7 +1634,8 @@ DeviceItem::~DeviceItem()
 }
 void DeviceItem::clear()
 {
-    if (partman) partman->beginRemoveRows(partman->createIndex(0, 0, this), 0, children.count()-1);
+    const int chcount = children.count();
+    if (partman && chcount > 0) partman->beginRemoveRows(partman->index(this), 0, chcount - 1);
     for (DeviceItem *cit : children) {
         cit->partman = nullptr; // Stop unnecessary signals.
         cit->parentItem = nullptr; // Stop double deletes.
@@ -1609,7 +1644,7 @@ void DeviceItem::clear()
     children.clear();
     active = nullptr;
     flags.oldLayout = false;
-    if (partman) partman->endRemoveRows();
+    if (partman && chcount > 0) partman->endRemoveRows();
 }
 inline int DeviceItem::row() const
 {
@@ -1680,7 +1715,7 @@ bool DeviceItem::isLocked() const
     for (int ixPart = 0; ixPart < partCount; ++ixPart) {
         if (children.at(ixPart)->isLocked()) return true;
     }
-    return flags.mapLock;
+    return (mapCount != 0);
 }
 inline bool DeviceItem::willFormat() const
 {
@@ -1772,10 +1807,6 @@ QString DeviceItem::shownFormat(const QString &fmt) const
         else if (realUseFor() != "/") return qApp->tr("Preserve (%1)").arg(curFormat);
         else return qApp->tr("Preserve /home (%1)").arg(curFormat);
     }
-}
-inline bool DeviceItem::isVolume() const
-{
-    return (type == Partition || type == VirtualBD);
 }
 bool DeviceItem::canMount() const
 {
@@ -1881,7 +1912,7 @@ void DeviceItem::labelParts()
 {
     for (int ixi = childCount() - 1; ixi >= 0; --ixi) {
         DeviceItem *chit = children.at(ixi);
-        chit->device = BlockDeviceInfo::join(device, ixi + 1);
+        chit->device = join(device, ixi + 1);
         if (partman) partman->notifyChange(chit, PartMan::Device, PartMan::Device);
     }
     if (partman) partman->resizeColumnsToFit();
@@ -1940,10 +1971,43 @@ int DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTree)
     return rootFormatSize;
 }
 
-/* A very slimmed down and non-standard one-way tree iterator. */
-DeviceItemIterator::DeviceItemIterator(PartMan &partman) : pos(&partman.root)
+// Return block device info that is suitable for a combo box.
+void DeviceItem::addToCombo(QComboBox *combo, bool warnNasty) const
 {
-    next();
+    QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
+    if (!curFormat.isEmpty()) strout += ' ' + curFormat;
+    else if (!format.isEmpty()) strout += ' ' + format;
+    if (!label.isEmpty()) strout += " - " + label;
+    if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
+    QString stricon;
+    if (!flags.oldLayout || !usefor.isEmpty()) stricon = ":/appointment-soon";
+    else if (flags.nasty && warnNasty) stricon = ":/dialog-warning";
+    combo->addItem(QIcon(stricon), device + " (" + strout + ")", device);
+}
+// Split a device name into its drive and partition.
+QStringList DeviceItem::split(const QString &devname)
+{
+    const QRegularExpression rxdev1("^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$");
+    const QRegularExpression rxdev2("^(?:\\/dev\\/)*([a-z]*)([0-9]*)$");
+    QRegularExpressionMatch rxmatch(rxdev1.match(devname));
+    if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
+    QStringList list(rxmatch.capturedTexts());
+    if (!list.isEmpty()) list.removeFirst();
+    return list;
+}
+QString DeviceItem::join(const QString &drive, int partnum)
+{
+    QString name = drive;
+    if (name.startsWith("nvme") || name.startsWith("mmcblk")) name += 'p';
+    return (name + QString::number(partnum));
+}
+
+/* A very slimmed down and non-standard one-way tree iterator. */
+DeviceItemIterator::DeviceItemIterator(const PartMan &partman)
+{
+    if (partman.root.childCount() < 1) return;
+    ixParents.push(0);
+    pos = partman.root.child(0);
 }
 void DeviceItemIterator::next()
 {
