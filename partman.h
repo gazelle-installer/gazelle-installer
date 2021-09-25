@@ -2,7 +2,7 @@
  * Basic partition manager for the installer.
  ***************************************************************************
  *
- *   Copyright (C) 2020-2021 by AK-47
+ *   Copyright (C) 2019, 2020-2021 by AK-47
  *   Transplanted code, marked with comments further down this file:
  *    - Copyright (C) 2003-2010 by Warren Woodford
  *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
@@ -32,7 +32,6 @@
 #include <QStack>
 
 #include "mprocess.h"
-#include "blockdev.h"
 #include "ui_meinstall.h"
 #include "msettings.h"
 
@@ -59,12 +58,17 @@ public:
         Subvolume
     } type;
     struct Flags {
+        bool nasty : 1;
         bool oldLayout : 1;
+        bool start : 1;
+        bool useGPT : 1;
+        bool curESP : 1;
         bool cryptoV : 1;
         bool autoCrypto : 1;
-        bool mapLock : 1;
     } flags = {};
-    QString device, devMapper;
+    int mapCount = 0;
+    int physec;
+    QString model, device, devMapper;
     long long size = 0;
     QString label, curLabel;
     QString usefor;
@@ -97,19 +101,22 @@ public:
     QStringList allowedUsesFor(bool real = true) const;
     QStringList allowedFormats() const;
     QString shownFormat(const QString &fmt) const;
-    bool isVolume() const;
+    inline bool isVolume() const { return (type == Partition || type == VirtualBD); }
     bool canMount() const;
     /* Convenience */
     int layoutDefault(int rootPercent, bool crypto, bool updateTree=true);
+    void addToCombo(QComboBox *combo, bool warnNasty = false) const;
+    static QStringList split(const QString &devname);
+    static QString join(const QString &drive, int partnum);
 };
 class DeviceItemIterator
 {
-    DeviceItem *pos;
+    DeviceItem *pos = nullptr;
     int ixPos = 0;
     QStack<int> ixParents;
 public:
     DeviceItemIterator(DeviceItem *item) : pos(item) {}
-    DeviceItemIterator(PartMan &partman);
+    DeviceItemIterator(const PartMan &partman);
     inline DeviceItem *operator*() const { return pos; }
     void next();
 };
@@ -134,7 +141,6 @@ class PartMan : public QAbstractItemModel
     MProcess &proc;
     DeviceItem root;
     DeviceItem *changing = nullptr;
-    BlockDeviceList &listBlkDevs;
     Ui::MeInstall &gui;
     QWidget *master;
     QMap<QString, DeviceItem *> mounts;
@@ -176,8 +182,8 @@ public:
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
     QMap<QString, QString> defaultLabels;
-    PartMan(MProcess &mproc, BlockDeviceList &bdlist, Ui::MeInstall &ui, QWidget *parent);
-    void populate(DeviceItem *drvstart = nullptr);
+    PartMan(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent);
+    void scan(DeviceItem *drvstart = nullptr);
     bool manageConfig(MSettings &config, bool save);
     bool composeValidate(bool automatic, const QString &project);
     bool checkTargetDrivesOK();
@@ -194,13 +200,14 @@ public:
     QString getMountDev(const QString &point, const bool mapped=true);
     int swapCount();
     int isEncrypt(const QString &point);
+    DeviceItem *findDevice(const QString &devname) const;
     // Model View Controller
     QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-    inline QModelIndex index(DeviceItem *item) const { return createIndex(item->row(), 0, item); }
+    QModelIndex index(DeviceItem *item) const;
     QModelIndex parent(const QModelIndex &index) const override;
     DeviceItem *item(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
