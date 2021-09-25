@@ -2321,11 +2321,14 @@ void MInstall::on_radioBootPBR_toggled()
 {
     comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Partition && item->format != "swap"
-            && !item->flags.curESP && item->realUseFor() != "ESP"
-            && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)
-            && item->format != "crypto_LUKS" && !item->encrypt) {
-            // list only Linux partitions excluding crypto_LUKS partitions
+        if (item->type == DeviceItem::Partition && (!item->flags.start || INSTALL_FROM_ROOT_DEVICE)) {
+            if (item->flags.curESP || item->realUseFor() == "ESP") continue;
+            else if (item->format.compare("SWAP", Qt::CaseInsensitive)) continue;
+            else if (item->format == "crypto_LUKS") continue;
+            else if (item->format.isEmpty() || item->format == "PRESERVE") {
+                if (item->curFormat == "crypto_LUKS") continue;
+                if (!item->curFormat.compare("SWAP", Qt::CaseInsensitive)) continue;
+            }
             if (!item->flags.nasty || brave) item->addToCombo(comboBoot, true);
         }
     }
