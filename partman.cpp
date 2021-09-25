@@ -677,7 +677,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
 
     DeviceItem *rootitem = mounts.value("/");
     if (rootitem) {
-        if (rootitem->willFormat() && mounts.contains("/home")) {
+        if (!rootitem->willFormat() && mounts.contains("/home")) {
             const QString errmsg = tr("Cannot preserve /home inside root (/) if"
                 " a separate /home partition is also mounted.");
             QMessageBox::critical(master, master->windowTitle(), errmsg);
@@ -1691,7 +1691,7 @@ bool DeviceItem::isLocked() const
 }
 inline bool DeviceItem::willFormat() const
 {
-    return usefor != "PRESERVE" && !usefor.isEmpty();
+    return format != "PRESERVE" && !usefor.isEmpty();
 }
 bool DeviceItem::canEncrypt() const
 {
@@ -1726,14 +1726,15 @@ QString DeviceItem::shownDevice() const
 QStringList DeviceItem::allowedUsesFor(bool real) const
 {
     QStringList list;
-    if (type == Subvolume) list << "root" << "home"; // swap requires Linux 5.0 or later
+    if (!partman || size >= partman->rootSpaceNeeded) list << "root";
+    if (type == Subvolume) list << "home"; // swap requires Linux 5.0 or later
     else {
         list << "Format";
         if (type != VirtualBD) {
             if (size <= 16777216) list << "BIOS-GRUB";
             if (size <= 4294967296) list << "ESP" << "boot";
         }
-        list << "root" << "swap" << "home";
+        list << "swap" << "home";
     }
     if (real) {
         for(QString &use : list) use = realUseFor(use);
