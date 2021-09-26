@@ -374,13 +374,7 @@ void PartMan::treeSelChange()
         DeviceItem *drvit = twit->parent();
         if (!drvit) drvit = twit;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
-        else if (!isold) {
-            long long maxMB = (drvit->size / 1048576) - PARTMAN_SAFETY_MB;
-            for (int ixi = drvit->childCount() - 1; ixi >= 0; --ixi) {
-                maxMB -= drvit->child(ixi)->size / 1048576;
-            }
-            gui.pushPartAdd->setEnabled(maxMB > 0);
-        }
+        else if (!isold) gui.pushPartAdd->setEnabled(twit->driveFreeSpace() > 1048576);
     } else {
         gui.pushPartClear->setEnabled(false);
         gui.pushPartAdd->setEnabled(false);
@@ -1364,8 +1358,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
             break;
         case UseFor: return item->usefor; break;
         case Label:
-            if (item->type == DeviceItem::Drive) return item->model;
-            else if (index.flags() & Qt::ItemIsEditable) return item->label;
+            if (index.flags() & Qt::ItemIsEditable) return item->label;
             else return item->curLabel;
             break;
         case Format:
@@ -1379,6 +1372,19 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
         case Pass:
             if (item->canMount()) return item->pass;
             else if (!isDriveOrVD) return "--";
+            break;
+        }
+    } else if (role == Qt::ToolTipRole) {
+        switch (index.column()) {
+        case Device: if (!item->model.isEmpty()) return tr("Model: %1").arg(item->model); break;
+        case Size:
+            if (item->type == DeviceItem::Subvolume) return "----";
+            else if (item->type == DeviceItem::Drive) {
+                long long fs = item->driveFreeSpace();
+                if (fs <= 0) fs = 0;
+                return tr("Free space: %1").arg(QLocale::system().formattedDataSize(fs,
+                    1, QLocale::DataSizeTraditionalFormat));
+            }
             break;
         }
     } else if (role == Qt::DecorationRole && index.column() == Device) {
@@ -1793,6 +1799,17 @@ bool DeviceItem::canMount() const
     const QString &use = realUseFor();
     return !(use.isEmpty() || use == "FORMAT" || use == "ESP" || use == "SWAP");
 }
+long long DeviceItem::driveFreeSpace(bool inclusive) const
+{
+    const DeviceItem *drvit = parent();
+    if (!drvit) drvit = this;
+    long long free = drvit->size - (PARTMAN_SAFETY_MB * 1048576);
+    for (int ixi = drvit->children.count() - 1; ixi >= 0; --ixi) {
+        DeviceItem *partit = drvit->children.at(ixi);
+        if (inclusive || partit != this) free -= partit->size;
+    }
+    return free;
+}
 /* Convenience */
 DeviceItem *DeviceItem::addPart(int defaultMB, const QString &defaultUse, bool crypto)
 {
@@ -2095,15 +2112,8 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     {
     case PartMan::Size:
         {
-            DeviceItem *drvit = item->parent();
-            assert(drvit != nullptr);
-            long long max = drvit->size - (PARTMAN_SAFETY_MB*1048576);
-            for (int ixi = drvit->childCount() - 1; ixi >= 0; --ixi) {
-                DeviceItem *partit = drvit->child(ixi);
-                if (partit != item) max -= partit->size;
-            }
             QSpinBox *spin = qobject_cast<QSpinBox *>(editor);
-            spin->setRange(1, static_cast<int>(max / 1048576));
+            spin->setRange(1, static_cast<int>(item->driveFreeSpace() / 1048576));
             spin->setSuffix("MB");
             spin->setStepType(QSpinBox::AdaptiveDecimalStepType);
             spin->setAccelerated(true);
