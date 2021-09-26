@@ -395,7 +395,7 @@ void PartMan::treeSelChange()
         gui.pushPartRemove->setEnabled(!isold && !isdrive);
         // Only allow adding partitions if there is enough space.
         DeviceItem *drvit = twit->parent();
-        if (!drvit) drvit = twit;
+        if (!drvit || drvit->type == DeviceItem::Unknown) drvit = twit;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else if (!isold) {
             long long maxMB = (drvit->size / 1048576) - PARTMAN_SAFETY_MB;
@@ -1607,6 +1607,7 @@ void PartMan::notifyChange(class DeviceItem *item, int first, int last)
 DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *preceding)
     : parentItem(parent), type(type)
 {
+    if (type == Partition) size = 1048576;
     if (parent) {
         partman = parent->partman;
         const int i = preceding ? (parentItem->children.indexOf(preceding) + 1) : parentItem->childCount();
