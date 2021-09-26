@@ -45,6 +45,7 @@
 #include "partman.h"
 
 #define PARTMAN_SAFETY_MB 32 // 1MB at start + Compensate for rounding errors.
+#define PARTMAN_MAX_PARTS 128 // Maximum number of partitions Linux supports.
 
 PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent)
     : QAbstractItemModel(parent), proc(mproc), root(DeviceItem::Unknown), gui(ui), master(parent)
@@ -270,6 +271,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             drvPreserve = false;
             drvit->clear();
             partCount = config.value(configNewLayout).toInt();
+            if (partCount > PARTMAN_MAX_PARTS) return false;
             bootdev = config.value("Boot");
         }
         // Partition configuration.
@@ -397,7 +399,10 @@ void PartMan::treeSelChange()
         DeviceItem *drvit = twit->parent();
         if (!drvit) drvit = twit;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
-        else if (!isold) gui.pushPartAdd->setEnabled(twit->driveFreeSpace() > 1048576);
+        else if (!isold) {
+            gui.pushPartAdd->setEnabled(drvit->childCount() < PARTMAN_MAX_PARTS
+                && twit->driveFreeSpace() > 1048576);
+        }
     } else {
         gui.pushPartClear->setEnabled(false);
         gui.pushPartAdd->setEnabled(false);
