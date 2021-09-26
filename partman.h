@@ -103,6 +103,7 @@ public:
     QString shownFormat(const QString &fmt) const;
     inline bool isVolume() const { return (type == Partition || type == VirtualBD); }
     bool canMount() const;
+    long long driveFreeSpace(bool inclusive = false) const;
     /* Convenience */
     int layoutDefault(int rootPercent, bool crypto, bool updateTree=true);
     void addToCombo(QComboBox *combo, bool warnNasty = false) const;
