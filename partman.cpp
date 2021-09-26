@@ -378,7 +378,7 @@ void PartMan::treeSelChange()
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else if (!isold) {
             gui.pushPartAdd->setEnabled(drvit->childCount() < PARTMAN_MAX_PARTS
-                && twit->driveFreeSpace() > 1048576);
+                && twit->driveFreeSpace(true) > 1048576);
         }
     } else {
         gui.pushPartClear->setEnabled(false);
@@ -716,12 +716,17 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             for (int ixdev = 0; ixdev < partCount; ++ixdev) {
                 DeviceItem *partit = drvit->child(ixdev);
                 const QString &use = partit->realUseFor();
+                if (use == "BIOS-GRUB") hasBiosGrub = true;
                 QString actmsg;
-                if (use.isEmpty()) continue;
-                else if (use == "BIOS-GRUB") hasBiosGrub = true;
-                if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
-                else if (use != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
-                else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
+                if (drvit->flags.oldLayout) {
+                    if (use.isEmpty()) continue;
+                    else if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
+                    else if (use != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
+                    else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
+                } else {
+                    if (use.isEmpty()) actmsg = tr("Create %1 without formatting");
+                    else actmsg = tr("Create %1, format to use for %2");
+                }
                 details += actmsg.arg(partit->shownDevice(), partit->shownUseFor()) + '\n';
             }
             // Potentially unbootable GPT when on a BIOS-based PC.
