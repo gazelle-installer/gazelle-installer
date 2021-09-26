@@ -679,7 +679,13 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
     }
 
     DeviceItem *rootitem = mounts.value("/");
-    if (rootitem) {
+    if (!rootitem || rootitem->size < rootSpaceNeeded) {
+        const QString &tmin = QLocale::system().formattedDataSize(rootSpaceNeeded + 1048575,
+            1, QLocale::DataSizeTraditionalFormat);
+        QMessageBox::critical(master, master->windowTitle(),
+            tr("A root partition of at least %1 is required.").arg(tmin));
+        return false;
+    } else {
         if (!rootitem->willFormat() && mounts.contains("/home")) {
             const QString errmsg = tr("Cannot preserve /home inside root (/) if"
                 " a separate /home partition is also mounted.");
@@ -687,12 +693,6 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             return false;
         }
         if (rootitem->encrypt) encryptRoot = true;
-    } else {
-        const QString &tmin = QLocale::system().formattedDataSize(rootSpaceNeeded + 1048575,
-            1, QLocale::DataSizeTraditionalFormat);
-        QMessageBox::critical(master, master->windowTitle(), tr("You must choose a root partition.\n"
-            "The root partition must be at least %1.").arg(tmin));
-        return false;
     }
     if (encryptRoot && !mounts.contains("/boot")) {
         QMessageBox::critical(master, master->windowTitle(),
