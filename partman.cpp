@@ -527,7 +527,8 @@ void PartMan::partAddClick(bool)
     drive->labelParts();
     drive->flags.oldLayout = false;
     notifyChange(drive);
-    gui.treePartitions->selectionModel()->select(index(part), QItemSelectionModel::ClearAndSelect);
+    gui.treePartitions->selectionModel()->select(index(part),
+        QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
 void PartMan::partRemoveClick(bool)
