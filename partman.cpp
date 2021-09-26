@@ -2114,19 +2114,17 @@ QSize DeviceItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
 QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *widget = nullptr;
+    QComboBox *combo = nullptr;
     switch (index.column())
     {
     case PartMan::Size: widget = new QSpinBox(parent); break;
     case PartMan::UseFor:
-        {
-            QComboBox *combo = new QComboBox(parent);
-            combo->setEditable(true);
-            combo->setInsertPolicy(QComboBox::NoInsert);
-            combo->lineEdit()->setPlaceholderText("----");
-            widget = combo;
-        }
+        widget = combo = new QComboBox(parent);
+        combo->setEditable(true);
+        combo->setInsertPolicy(QComboBox::NoInsert);
+        combo->lineEdit()->setPlaceholderText("----");
         break;
-    case PartMan::Format: widget = new QComboBox(parent); break;
+    case PartMan::Format: widget = combo = new QComboBox(parent); break;
     case PartMan::Pass: widget = new QSpinBox(parent); break;
     case PartMan::Options:
         {
@@ -2143,6 +2141,10 @@ QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     assert(widget != nullptr);
     widget->setAutoFillBackground(true);
     widget->setFocusPolicy(Qt::StrongFocus);
+    if (combo) {
+        connect(combo,  QOverload<int>::of(&QComboBox::activated),
+            this, &DeviceItemDelegate::emitCommit);
+    }
     return widget;
 }
 void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
@@ -2227,6 +2229,10 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     const int changed = partman->changeEnd(false);
     item->autoFill(changed);
     if (changed) partman->notifyChange(item);
+}
+void DeviceItemDelegate::emitCommit()
+{
+    emit commitData(qobject_cast<QWidget *>(sender()));
 }
 
 void DeviceItemDelegate::partOptionsMenu()
