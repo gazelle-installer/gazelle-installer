@@ -1331,7 +1331,25 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
 {
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
     const bool isDriveOrVD = (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices);
-    if (role == Qt::DisplayRole) {
+    if (role == Qt::EditRole) {
+        switch (index.column())
+        {
+        case Device: return item->device; break;
+        case Size: return item->size; break;
+        case UseFor: return item->usefor; break;
+        case Label: return item->label; break;
+        case Format: return item->format; break;
+        case Options: return item->options; break;
+        case Pass: return item->pass; break;
+        }
+    } else if (role == Qt::CheckStateRole && !isDriveOrVD
+        && index.flags() & Qt::ItemIsUserCheckable) {
+        switch (index.column())
+        {
+        case Encrypt: return item->encrypt ? Qt::Checked : Qt::Unchecked; break;
+        case Dump: return item->dump ? Qt::Checked : Qt::Unchecked; break;
+        }
+    } else if (role == Qt::DisplayRole) {
         switch (index.column()) {
         case Device:
             if (item->type == DeviceItem::Subvolume) return "----";
@@ -1362,24 +1380,6 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
             if (item->canMount()) return item->pass;
             else if (!isDriveOrVD) return "--";
             break;
-        }
-    } else if (role == Qt::EditRole) {
-        switch (index.column())
-        {
-        case Device: return item->device; break;
-        case Size: return item->size; break;
-        case UseFor: return item->usefor; break;
-        case Label: return item->label; break;
-        case Format: return item->format; break;
-        case Options: return item->options; break;
-        case Pass: return item->pass; break;
-        }
-    } else if (role == Qt::CheckStateRole && !isDriveOrVD
-        && index.flags() & Qt::ItemIsUserCheckable) {
-        switch (index.column())
-        {
-        case Encrypt: return item->encrypt ? Qt::Checked : Qt::Unchecked; break;
-        case Dump: return item->dump ? Qt::Checked : Qt::Unchecked; break;
         }
     } else if (role == Qt::DecorationRole && index.column() == Device) {
         if (item->type == DeviceItem::Drive && !item->flags.oldLayout) {
