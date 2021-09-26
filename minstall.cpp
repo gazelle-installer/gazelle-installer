@@ -1039,15 +1039,17 @@ bool MInstall::installLoader()
 void MInstall::enableOOBE()
 {
     QTreeWidgetItemIterator it(treeServices);
-    for (; *it; ++it)
+    for (; *it; ++it) {
         if ((*it)->parent()) setService((*it)->text(0), false); // Speed up the OOBE boot.
+    }
     proc.exec("chroot /mnt/antiX/ update-rc.d oobe defaults", true);
 }
 bool MInstall::processOOBE()
 {
     QTreeWidgetItemIterator it(treeServices);
-    for (; *it; ++it)
+    for (; *it; ++it) {
         if ((*it)->parent()) setService((*it)->text(0), (*it)->checkState(0) == Qt::Checked);
+    }
 
     if (!setComputerName()) return false;
     setLocale();
@@ -1385,8 +1387,9 @@ void MInstall::stashServices(bool save)
 {
     QTreeWidgetItemIterator it(treeServices);
     while (*it) {
-        if ((*it)->parent() != nullptr)
+        if ((*it)->parent() != nullptr) {
             (*it)->setCheckState(save?2:0, (*it)->checkState(save?0:2));
+        }
         ++it;
     }
 }

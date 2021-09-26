@@ -372,7 +372,7 @@ void PartMan::treeSelChange()
         gui.pushPartRemove->setEnabled(!isold && !isdrive);
         // Only allow adding partitions if there is enough space.
         DeviceItem *drvit = twit->parent();
-        if (!drvit || drvit->type == DeviceItem::Unknown) drvit = twit;
+        if (!drvit) drvit = twit;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else if (!isold) {
             long long maxMB = (drvit->size / 1048576) - PARTMAN_SAFETY_MB;
@@ -499,7 +499,7 @@ void PartMan::partAddClick(bool)
     DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
     if (!twit) return;
     DeviceItem *drive = twit->parent();
-    if (!drive || drive->type == DeviceItem::Unknown) drive = twit;
+    if (!drive) drive = twit;
 
     DeviceItem *part = new DeviceItem(DeviceItem::Partition, drive, twit);
     drive->labelParts();
@@ -633,7 +633,8 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
                 return false;
             }
             // Check for duplicate subvolume label entries.
-            DeviceItem *pit = item->parent();
+            DeviceItem *pit = item->parentItem;
+            assert(pit != nullptr);
             const int count = pit->childCount();
             const int index = pit->indexOfChild(item);
             for (int ixi = 0; ixi < count; ++ixi) {
@@ -1491,7 +1492,7 @@ QModelIndex PartMan::parent(const QModelIndex &index) const
 {
     if (!index.isValid()) return QModelIndex();
     DeviceItem *cit = static_cast<DeviceItem *>(index.internalPointer());
-    DeviceItem *pit = cit->parent();
+    DeviceItem *pit = cit->parentItem;
     if (!pit || pit == &root) return QModelIndex();
     return createIndex(pit->row(), 0, pit);
 }
@@ -1567,7 +1568,7 @@ int PartMan::changeEnd(bool notify)
 }
 void PartMan::notifyChange(class DeviceItem *item, int first, int last)
 {
-    DeviceItem *p = item->parent();
+    DeviceItem *const p = item->parentItem;
     if (first < 0) first = 0;
     if (last < 0) last = p ? p->childCount() - 1 : 0;
     const int row = p ? p->indexOfChild(item) : 0;
@@ -1629,6 +1630,7 @@ inline int DeviceItem::row() const
 }
 inline DeviceItem *DeviceItem::parent() const
 {
+    if (parentItem && !parentItem->parentItem) return nullptr; // Invisible root
     return parentItem;
 }
 inline DeviceItem *DeviceItem::child(int row) const
@@ -1707,7 +1709,7 @@ bool DeviceItem::canEncrypt() const
 QString DeviceItem::mappedDevice(const bool full) const
 {
     const DeviceItem *twit = this;
-    if (twit->type == Subvolume) twit = twit->parent();
+    if (twit->type == Subvolume) twit = twit->parentItem;
     if (twit->type == Partition) {
         const QVariant &d = twit->devMapper;
         if (!d.isNull()) {
@@ -1995,14 +1997,14 @@ void DeviceItemIterator::next()
         ixPos = 0;
         pos = pos->child(0);
     } else {
-        DeviceItem *parent = pos->parent();
+        DeviceItem *parent = pos->parentItem;
         if (!parent) {
             pos = nullptr;
             return;
         }
         DeviceItem *chnext = parent->child(ixPos+1);
         while (!chnext && parent) {
-            parent = parent->parent();
+            parent = parent->parentItem;
             if (!parent) break;
             ixPos = ixParents.pop();
             chnext = parent->child(ixPos+1);
