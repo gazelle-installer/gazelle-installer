@@ -665,8 +665,9 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         } else if(!mount.isEmpty() && mount != "FORMAT" && mount != "ESP"){
             mounts.insert(mount, *it);
         }
-        if (item->type != DeviceItem::VirtualBD && item->encrypt) {
-            if (mount == "/") item->devMapper = "root.fsm";
+        if (item->type != DeviceItem::VirtualBD) {
+            if (!item->encrypt) item->devMapper.clear();
+            else if (mount == "/") item->devMapper = "root.fsm";
             else if (mount.startsWith("SWAP")) item->devMapper = mount.toLower();
             else item->devMapper = QString::number(++mapnum) + mount.replace('/','.') + ".fsm";
         }
