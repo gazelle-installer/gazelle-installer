@@ -716,7 +716,6 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             for (int ixdev = 0; ixdev < partCount; ++ixdev) {
                 DeviceItem *partit = drvit->child(ixdev);
                 const QString &use = partit->realUseFor();
-                if (use == "BIOS-GRUB") hasBiosGrub = true;
                 QString actmsg;
                 if (drvit->flags.oldLayout) {
                     if (use.isEmpty()) continue;
@@ -728,6 +727,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
                     else actmsg = tr("Create %1, format to use for %2");
                 }
                 details += actmsg.arg(partit->shownDevice(), partit->shownUseFor()) + '\n';
+                if (use == "BIOS-GRUB") hasBiosGrub = true;
             }
             // Potentially unbootable GPT when on a BIOS-based PC.
             const bool hasBoot = (drvit->active != nullptr);
