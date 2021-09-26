@@ -1443,7 +1443,7 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
         }
         break;
     case UseFor:
-        if (item->type != DeviceItem::Drive) flagsOut |= Qt::ItemIsEditable;
+        if (item->allowedUsesFor().count() > 1) flagsOut |= Qt::ItemIsEditable;
         break;
     case Label:
         if (item->type == DeviceItem::Subvolume) {
@@ -1456,7 +1456,7 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
         if (item->canEncrypt()) flagsOut |= Qt::ItemIsUserCheckable;
         break;
     case Format:
-        if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
+        if (item->allowedFormats().count() > 1) flagsOut |= Qt::ItemIsEditable;
         break;
     case Options:
         if (item->canMount() || item->realUseFor() == "SWAP") flagsOut |= Qt::ItemIsEditable;
@@ -1750,6 +1750,7 @@ QString DeviceItem::shownDevice() const
 }
 QStringList DeviceItem::allowedUsesFor(bool real) const
 {
+    if (!isVolume()) return QStringList();
     QStringList list;
     if (!partman || size >= partman->rootSpaceNeeded) list << "root";
     if (type == Subvolume) list << "home"; // swap requires Linux 5.0 or later
@@ -1768,12 +1769,14 @@ QStringList DeviceItem::allowedUsesFor(bool real) const
 }
 QStringList DeviceItem::allowedFormats() const
 {
+    if (!isVolume()) return QStringList();
     QStringList list;
     bool allowPreserve = false, selPreserve = false;
     if (type == Subvolume) list << "CREATE";
     else {
         const QString &use = realUseFor();
-        if (use == "/boot") list << "ext4";
+        if (use.isEmpty()) return QStringList();
+        else if (use == "/boot") list << "ext4";
         else if (use == "BIOS-GRUB") list << "GRUB";
         else if (use == "ESP") {
             list << "FAT32" << "FAT16" << "FAT12";
