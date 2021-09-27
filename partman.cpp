@@ -297,6 +297,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 if (!partit->format.isEmpty()) config.setValue("Format", partit->format);
                 if (!partit->label.isEmpty()) config.setValue("Label", partit->label);
                 if (!partit->options.isEmpty()) config.setValue("Options", partit->options);
+                config.setValue("CheckBadBlocks", partit->chkbadblk);
                 config.setValue("Dump", partit->dump);
                 config.setValue("Pass", partit->pass);
             } else {
@@ -308,6 +309,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 }
                 partit->usefor = config.value("UseFor").toString();
                 partit->format = config.value("Format").toString();
+                partit->chkbadblk = config.value("CheckBadBlocks").toBool();
                 partit->encrypt = config.value("Encrypt").toBool();
                 partit->label = config.value("Label").toString();
                 partit->options = config.value("Options").toString();
@@ -363,13 +365,9 @@ void PartMan::resizeColumnsToFit()
 void PartMan::treeItemChange()
 {
     // Encryption and bad blocks controls
-    bool canCheck = false;
     bool cryptoAny = false;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         if (item->type != DeviceItem::Partition) continue;
-        if (item->format != "PRESERVE" && !item->usefor.isEmpty()) {
-            if (item->format.startsWith("ext") || item->format == "jfs") canCheck = true;
-        }
         if (item->canEncrypt() && item->encrypt) cryptoAny = true;
     }
     if (gui.boxCryptoPass->isEnabled() != cryptoAny) {
@@ -377,7 +375,6 @@ void PartMan::treeItemChange()
         gui.pushNext->setDisabled(cryptoAny);
         gui.boxCryptoPass->setEnabled(cryptoAny);
     }
-    gui.checkBadBlocks->setEnabled(canCheck);
     treeSelChange();
 }
 
@@ -1018,8 +1015,6 @@ bool PartMan::formatPartitions()
         ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
 
     // Format partitions.
-    const bool badblocks = gui.checkBadBlocks->isChecked();
-
     for (DeviceItemIterator it(*this); DeviceItem *twit = *it; it.next()) {
         if (twit->type != DeviceItem::Partition || !twit->willFormat()) continue;
         const QString &dev = twit->mappedDevice(true);
@@ -1049,7 +1044,7 @@ bool PartMan::formatPartitions()
             if (!twit->label.isEmpty()) cmd.append(" -L \"" + twit->label + '"');
             if (!proc.exec(cmd, true)) return false;
         } else {
-            if (!formatLinuxPartition(dev, twit->format, badblocks, twit->label)) return false;
+            if (!formatLinuxPartition(dev, twit->format, twit->chkbadblk, twit->label)) return false;
         }
         proc.sleep(1000);
     }
@@ -1381,6 +1376,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
         switch (index.column())
         {
         case Encrypt: return item->encrypt ? Qt::Checked : Qt::Unchecked; break;
+        case Check: return item->chkbadblk ? Qt::Checked : Qt::Unchecked; break;
         case Dump: return item->dump ? Qt::Checked : Qt::Unchecked; break;
         }
     } else if (role == Qt::DisplayRole) {
@@ -1427,6 +1423,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
             }
             break;
         }
+        return item->shownDevice();
     } else if (role == Qt::DecorationRole && index.column() == Device) {
         if (item->type == DeviceItem::Drive && !item->flags.oldLayout) {
             return QIcon(":/appointment-soon");
@@ -1450,6 +1447,7 @@ bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
         switch (index.column())
         {
         case Encrypt: item->encrypt = (value == Qt::Checked); break;
+        case Check: item->chkbadblk = (value == Qt::Checked); break;
         case Dump: item->dump = (value == Qt::Checked); break;
         }
     }
@@ -1486,6 +1484,11 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
     case Format:
         if (item->allowedFormats().count() > 1) flagsOut |= Qt::ItemIsEditable;
         break;
+    case Check:
+        if (item->format.startsWith("ext") || item->format == "jfs") {
+            flagsOut |= Qt::ItemIsUserCheckable;
+        }
+        break;
     case Options:
         if (item->canMount() || item->realUseFor() == "SWAP") flagsOut |= Qt::ItemIsEditable;
         break;
@@ -1510,11 +1513,12 @@ QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role)
         case Label: return tr("Label"); break;
         case Encrypt: return tr("Encrypt"); break;
         case Format: return tr("Format"); break;
+        case Check: return tr("Check"); break;
         case Options: return tr("Options"); break;
         case Dump: return tr("Dump"); break;
         case Pass: return tr("Pass"); break;
         }
-    } else if (role == Qt::FontRole && section == Encrypt) {
+    } else if (role == Qt::FontRole && (section == Encrypt || section == Check || section == Dump)) {
         QFont smallFont;
         smallFont.setPointSizeF(smallFont.pointSizeF() * 0.6);
         return smallFont;

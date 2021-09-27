@@ -74,6 +74,7 @@ public:
     QString usefor;
     bool encrypt = false;
     QString format, curFormat;
+    bool chkbadblk = false;
     QString options;
     bool dump = false;
     int pass = 0;
@@ -177,6 +178,7 @@ public:
         Label,
         Encrypt,
         Format,
+        Check,
         Options,
         Dump,
         Pass,

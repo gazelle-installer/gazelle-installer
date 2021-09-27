@@ -608,7 +608,6 @@ void MInstall::manageConfig(enum ConfigAction mode)
         // Custom partitions page. PartMan handles its config groups automatically.
         if (!targetDrive || mode!=ConfigSave) {
             config->setGroupWidget(pagePartitions);
-            config->manageCheckBox("Storage/checkBadBlocks", checkBadBlocks);
             partman.manageConfig(*config, mode==ConfigSave);
         }
 
@@ -1593,6 +1592,8 @@ void MInstall::pageDisplayed(int next)
             "<p>" + tr("<i>Format</i> - This is the partition's format. Available formats depend on what the partition is used for."
                 " When working with an existing layout, you may be able to preserve the format of the partition by selecting <b>Preserve</b>.") + "</p>"
             "<p>" + tr("The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
+            "<p>" + tr("<i>Check</i> - Check and correct for bad blocks on the drive (not supported for all formats)."
+                " This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"
             "<p>" + tr("<i>Mount Options</i> - This specifies mounting options that will be used for this partition.") + "</p>"
             "<p>" + tr("<i>Dump</i> - Instructs the dump utility to include this partition in the backup.") + "</p>"
             "<p>" + tr("<i>Pass</i> - The sequence in which this file system is to be checked at boot. If zero, the file system is not checked.") + "</p>"
@@ -1630,9 +1631,6 @@ void MInstall::pageDisplayed(int next)
             + tr("For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.").arg(PROJECTNAME) + "</p>"
             "<p>" + tr("Additional compression options are available for drives using btrfs."
                 " Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.") + "</p>"
-            "<p><b>" + tr("Bad Blocks") + "</b><br/>"
-            + tr("If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive."
-                " The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"
             "<p><b>" + tr("System partition management tool") + "</b><br/>"
             + tr("For more control over the drive layouts (such as modifying the existing layout on a disk), click the"
                 " partition management button (%1). This will run the operating system's partition management tool,"
