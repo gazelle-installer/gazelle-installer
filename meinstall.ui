@@ -168,12 +168,6 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
         </spacer>
        </item>
        <item row="2" column="0" colspan="6">
@@ -291,12 +285,6 @@
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
                  </spacer>
                 </item>
                 <item row="6" column="1" colspan="3">
@@ -317,12 +305,6 @@
                  <spacer name="horizontalSpacer_9">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
                   </property>
                  </spacer>
                 </item>
@@ -354,12 +336,6 @@
             <spacer name="verticalSpacer_3">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
              </property>
             </spacer>
            </item>
@@ -607,19 +583,14 @@
               <property name="spacing">
                <number>0</number>
               </property>
-              <item row="12" column="0">
-               <widget class="QCheckBox" name="checkBadBlocks">
-                <property name="enabled">
-                 <bool>false</bool>
+              <item row="10" column="2">
+               <widget class="QToolButton" name="pushPartReload">
+                <property name="toolTip">
+                 <string>Query the operating system and reload the layouts of all drives.</string>
                 </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Check for bad sectors (takes longer)</string>
+                <property name="icon">
+                 <iconset resource="images.qrc">
+                  <normaloff>:/view-refresh</normaloff>:/view-refresh</iconset>
                 </property>
                </widget>
               </item>
@@ -633,33 +604,6 @@
                   <normaloff>:/list-remove</normaloff>:/list-remove</iconset>
                 </property>
                </widget>
-              </item>
-              <item row="7" column="2">
-               <spacer name="verticalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="10" column="2">
-               <widget class="QToolButton" name="pushPartReload">
-                <property name="toolTip">
-                 <string>Query the operating system and reload the layouts of all drives.</string>
-                </property>
-                <property name="icon">
-                 <iconset resource="images.qrc">
-                  <normaloff>:/view-refresh</normaloff>:/view-refresh</iconset>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" rowspan="12" colspan="2">
-               <widget class="MTreeView" name="treePartitions"/>
               </item>
               <item row="2" column="2">
                <widget class="QToolButton" name="pushPartAdd">
@@ -682,6 +626,16 @@
                   <normaloff>:/edit-clear-all</normaloff>:/edit-clear-all</iconset>
                 </property>
                </widget>
+              </item>
+              <item row="0" column="0" rowspan="12" colspan="2">
+               <widget class="MTreeView" name="treePartitions"/>
+              </item>
+              <item row="7" column="2">
+               <spacer name="verticalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </spacer>
               </item>
               <item row="11" column="2">
                <widget class="QToolButton" name="pushRunPartMan">
@@ -851,12 +805,6 @@
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
                </spacer>
               </item>
               <item row="0" column="2">
@@ -927,12 +875,6 @@
             <spacer name="v_spacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
              </property>
             </spacer>
            </item>
@@ -1154,12 +1096,6 @@
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
             </spacer>
            </item>
           </layout>
@@ -1217,12 +1153,6 @@
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
                </spacer>
               </item>
               <item row="3" column="0">
@@ -1264,12 +1194,6 @@
                  <spacer name="horizontalSpacer_7">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
                   </property>
                  </spacer>
                 </item>
@@ -1315,12 +1239,6 @@
              </property>
              <property name="sizeType">
               <enum>QSizePolicy::Expanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
              </property>
             </spacer>
            </item>
@@ -1424,12 +1342,6 @@
                <spacer name="horizontalSpacer">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
                 </property>
                </spacer>
               </item>
@@ -1696,12 +1608,6 @@
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
             </spacer>
            </item>
           </layout>
@@ -1761,12 +1667,6 @@
                <spacer name="verticalSpacer_4">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
                 </property>
                </spacer>
               </item>
@@ -1877,12 +1777,6 @@
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
                 </property>
                 <property name="maximumSize">
                  <size>
@@ -1999,7 +1893,6 @@
   <tabstop>pushPartRemove</tabstop>
   <tabstop>pushPartReload</tabstop>
   <tabstop>pushRunPartMan</tabstop>
-  <tabstop>checkBadBlocks</tabstop>
   <tabstop>textCryptoPassCust</tabstop>
   <tabstop>textCryptoPassCust2</tabstop>
   <tabstop>boxBoot</tabstop>
