@@ -2139,6 +2139,7 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             spin->setStepType(QSpinBox::AdaptiveDecimalStepType);
             spin->setAccelerated(true);
             spin->setValue(item->size / 1048576);
+            spin->setWrapping(true);
         }
         break;
     case PartMan::UseFor:
