@@ -2124,7 +2124,17 @@ QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     QComboBox *combo = nullptr;
     switch (index.column())
     {
-    case PartMan::Size: widget = new QSpinBox(parent); break;
+    case PartMan::Size:
+        {
+            QSpinBox *spin = new QSpinBox(parent);
+            spin->setSuffix("MB");
+            connect(spin, QOverload<int>::of(&QSpinBox::valueChanged),
+                this, &DeviceItemDelegate::spinSizeValueChange);
+            spin->setAccelerated(true);
+            spin->setWrapping(true);
+            widget = spin;
+        }
+        break;
     case PartMan::UseFor:
         widget = combo = new QComboBox(parent);
         combo->setEditable(true);
@@ -2163,17 +2173,13 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
         {
             QSpinBox *spin = qobject_cast<QSpinBox *>(editor);
             spin->setRange(1, static_cast<int>(item->driveFreeSpace() / 1048576));
-            spin->setSuffix("MB");
-            connect(spin, QOverload<int>::of(&QSpinBox::valueChanged),
-                this, &DeviceItemDelegate::spinSizeValueChange);
-            spin->setAccelerated(true);
             spin->setValue(item->size / 1048576);
-            spin->setWrapping(true);
         }
         break;
     case PartMan::UseFor:
         {
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
+            combo->clear();
             combo->addItem("");
             combo->addItems(item->allowedUsesFor(false));
             combo->setCurrentText(item->usefor);
@@ -2185,6 +2191,7 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     case PartMan::Format:
         {
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
+            combo->clear();
             const QStringList &formats = item->allowedFormats();
             assert(!formats.isEmpty());
             for (const QString &fmt : formats) {
