@@ -2131,7 +2131,7 @@ QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionVie
             connect(spin, QOverload<int>::of(&QSpinBox::valueChanged),
                 this, &DeviceItemDelegate::spinSizeValueChange);
             spin->setAccelerated(true);
-            spin->setWrapping(true);
+            spin->setSpecialValueText("MAX");
             widget = spin;
         }
         break;
@@ -2172,7 +2172,7 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     case PartMan::Size:
         {
             QSpinBox *spin = qobject_cast<QSpinBox *>(editor);
-            spin->setRange(1, static_cast<int>(item->driveFreeSpace() / 1048576));
+            spin->setRange(0, static_cast<int>(item->driveFreeSpace() / 1048576));
             spin->setValue(item->size / 1048576);
         }
         break;
@@ -2224,6 +2224,7 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     case PartMan::Size:
         item->size = qobject_cast<QSpinBox *>(editor)->value();
         item->size *= 1048576; // Separate step to prevent int overflow.
+        if (item->size == 0) item->size = item->driveFreeSpace();
         break;
     case PartMan::UseFor:
         item->usefor = qobject_cast<QComboBox *>(editor)->currentText().trimmed();
