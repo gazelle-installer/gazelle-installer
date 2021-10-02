@@ -122,6 +122,7 @@ void PartMan::scan(DeviceItem *drvstart)
         else if (jdName != drvstart->device) continue;
 
         drvit->clear();
+        drvit->flags.curEmpty = true;
         drvit->flags.oldLayout = true;
         drvit->device = jdName;
         drvit->flags.useGPT = (jsonDrive["pttype"]=="gpt");
@@ -134,6 +135,7 @@ void PartMan::scan(DeviceItem *drvstart)
             const QString &partType = jsonPart["parttype"].toString();
             if (partType.count(rxExtended)) continue;
             DeviceItem *partit = new DeviceItem(DeviceItem::Partition, drvit);
+            drvit->flags.curEmpty = false;
             partit->flags.oldLayout = true;
             partit->device = jsonPart["name"].toString();
             partit->size = jsonPart["size"].toVariant().toLongLong();
@@ -258,7 +260,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         DeviceItem *drvit = root.child(ixDrive);
         // Check if the drive is to be cleared and formatted.
         int partCount = drvit->childCount();
-        bool drvPreserve = drvit->flags.oldLayout;
+        bool drvPreserve = !drvit->willInitPartTable();
         const QString &configNewLayout = "Storage/NewLayout." + drvit->device;
         QVariant bootdev;
         if (save) {
@@ -388,7 +390,7 @@ void PartMan::treeSelChange()
         bool islocked = true;
         if (isdrive) {
             islocked = twit->isLocked();
-            if (twit->childCount() <= 0) isold = false;
+            if (twit->flags.curEmpty) isold = false;
         }
         gui.pushPartClear->setEnabled(!islocked);
         gui.pushPartRemove->setEnabled(!isold && !isdrive);
@@ -483,7 +485,7 @@ void PartMan::treeMenu(const QPoint &)
 
         const bool locked = twit->isLocked();
         actClear->setDisabled(locked);
-        actReset->setDisabled(locked || twit->flags.oldLayout);
+        actReset->setDisabled(locked);
         menuTemplates->setDisabled(locked);
         actCrypto->setVisible(gui.boxCryptoPass->isVisible());
 
@@ -727,8 +729,8 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
             DeviceItem *drvit = root.child(ixdrv);
             const int partCount = drvit->childCount();
-            bool setupGPT = gptoverride || drvit->size >= 2199023255552 || partCount > 4;
-            if (drvit->flags.oldLayout) {
+            bool setupGPT = uefi || gptoverride || drvit->size >= 2199023255552 || partCount > 4;
+            if (!drvit->willInitPartTable()) {
                 setupGPT = drvit->flags.useGPT;
             } else if (drvit->type != DeviceItem::VirtualDevices) {
                 details += tr("Prepare %1 partition table on %2").arg(setupGPT?"GPT":"MBR", drvit->device) + '\n';
@@ -738,7 +740,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
                 DeviceItem *partit = drvit->child(ixdev);
                 const QString &use = partit->realUseFor();
                 QString actmsg;
-                if (drvit->flags.oldLayout) {
+                if (!drvit->willInitPartTable()) {
                     if (use.isEmpty()) continue;
                     else if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
                     else if (use != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
@@ -784,7 +786,7 @@ bool PartMan::calculatePartBD()
     for (int ixDrive = 0; ixDrive < root.childCount(); ++ixDrive) {
         DeviceItem *drvit = root.child(ixDrive);
         if (drvit->type == DeviceItem::VirtualDevices) continue;
-        const bool useExist = drvit->flags.oldLayout;
+        const bool useExist = !drvit->willInitPartTable();
         const int partCount = drvit->childCount();
         const long long driveSize = drvit->size / 1048576;
         if (!useExist) {
@@ -903,7 +905,7 @@ int PartMan::countPrepSteps()
     int nstep = 0;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Drive) {
-            if (!item->flags.oldLayout) ++nstep; // New partition table
+            if (item->willInitPartTable()) ++nstep; // New partition table
         } else if (item->isVolume()) {
             const QString &tuse = item->realUseFor();
             // Preparation
@@ -932,7 +934,7 @@ bool PartMan::preparePartitions()
     // Prepare partition tables on devices which will have a new layout.
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
         DeviceItem *drvit = root.child(ixi);
-        if (drvit->flags.oldLayout || drvit->type == DeviceItem::VirtualDevices) continue;
+        if (!drvit->willInitPartTable()) continue;
         proc.status(tr("Preparing partition tables"));
 
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
@@ -955,7 +957,7 @@ bool PartMan::preparePartitions()
         if (drvit->type == DeviceItem::VirtualDevices) continue;
         const int devCount = drvit->childCount();
         const bool useGPT = drvit->flags.useGPT;
-        if (drvit->flags.oldLayout) {
+        if (!drvit->willInitPartTable()) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
             if (useGPT) cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:%3";
