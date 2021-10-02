@@ -59,6 +59,7 @@ public:
     } type;
     struct Flags {
         bool nasty : 1;
+        bool curEmpty : 1;
         bool oldLayout : 1;
         bool bootRoot : 1;
         bool useGPT : 1;
@@ -94,6 +95,7 @@ public:
     void setActive(bool boot);
     bool isActive() const;
     bool isLocked() const;
+    inline bool willInitPartTable() const { return (type == Drive && (!flags.oldLayout || flags.curEmpty)); }
     bool willFormat() const;
     bool canEncrypt() const;
     QString mappedDevice(const bool full = false) const;
