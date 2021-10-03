@@ -98,8 +98,8 @@ void PartMan::scan(DeviceItem *drvstart)
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
 
     if (!drvstart) {
-        proc.exec("partprobe -s", true);
-        proc.exec("blkid -c /dev/null", true);
+        proc.exec("partprobe -s", true); // Inform the kernel of partition changes.
+        proc.exec("blkid -c /dev/null", true); // Refresh cached blkid information.
         root.clear();
     }
 
