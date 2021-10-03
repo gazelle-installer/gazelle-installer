@@ -776,30 +776,6 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         if (msgbox.exec() != QMessageBox::Yes) return false;
     }
 
-    calculatePartBD();
-    return true;
-}
-
-bool PartMan::calculatePartBD()
-{
-    listToUnmount.clear();
-    for (int ixDrive = 0; ixDrive < root.childCount(); ++ixDrive) {
-        DeviceItem *drvit = root.child(ixDrive);
-        if (drvit->type == DeviceItem::VirtualDevices) continue;
-        const bool useExist = !drvit->willInitPartTable();
-        const int partCount = drvit->childCount();
-        const long long driveSize = drvit->size / 1048576;
-        if (!useExist) {
-            // see if GPT needs to be used (either UEFI or >=2TB drive)
-            drvit->flags.useGPT = gptoverride || uefi || driveSize >= 2097152 || partCount > 4;
-        }
-        // Add (or mark) future partitions to the list.
-        for (int ixPart=0; ixPart < partCount; ++ixPart) {
-            DeviceItem *twit = drvit->child(ixPart);
-            if (twit->usefor.isEmpty()) continue;
-            if (useExist) listToUnmount << twit->device;
-        }
-    }
     return true;
 }
 
@@ -925,7 +901,25 @@ bool PartMan::preparePartitions()
 {
     proc.log(__PRETTY_FUNCTION__);
 
-    // detach all existing partitions on the selected drive
+    // Detach all existing partitions.
+    QStringList listToUnmount;
+    for (int ixDrive = 0; ixDrive < root.childCount(); ++ixDrive) {
+        DeviceItem *drvit = root.child(ixDrive);
+        if (drvit->type == DeviceItem::VirtualDevices) continue;
+        const int partCount = drvit->childCount();
+        if (drvit->willInitPartTable()) {
+            // Clearing the drive, so mark all partitions on the drive for unmounting.
+            listToUnmount << proc.execOutLines("lsblk -nro name /dev/" + drvit->device, true);
+            // See if GPT needs to be used (either UEFI or >=2TB drive)
+            drvit->flags.useGPT = (gptoverride || uefi || drvit->size >= 2199023255552 || partCount > 4);
+        } else {
+            // Using the existing layout, so only mark used partitions for unmounting.
+            for (int ixPart=0; ixPart < partCount; ++ixPart) {
+                DeviceItem *twit = drvit->child(ixPart);
+                if (!twit->usefor.isEmpty()) listToUnmount << twit->device;
+            }
+        }
+    }
     for (const QString &strdev : listToUnmount) {
         proc.exec("swapoff /dev/" + strdev, true);
         proc.exec("/bin/umount /dev/" + strdev, true);

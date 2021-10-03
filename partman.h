@@ -151,12 +151,10 @@ class PartMan : public QAbstractItemModel
     Ui::MeInstall &gui;
     QWidget *master;
     QMap<QString, DeviceItem *> mounts;
-    QStringList listToUnmount;
     void setup();
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit();
     bool formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label);
-    bool calculatePartBD();
     bool prepareSubvolumes(DeviceItem *partit);
     DeviceItem *findOrigin(const QString &vdev);
     void treeItemChange();
