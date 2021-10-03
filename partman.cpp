@@ -978,7 +978,6 @@ bool PartMan::preparePartitions()
         }
     }
     proc.exec("partprobe -s", true);
-    proc.sleep(1000);
     return true;
 }
 
