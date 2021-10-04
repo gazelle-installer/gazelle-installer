@@ -67,6 +67,7 @@ public:
         bool cryptoV : 1;
         bool autoCrypto : 1;
     } flags = {};
+    int order = -1;
     int mapCount = 0;
     int physec;
     QString model, device, devMapper;
