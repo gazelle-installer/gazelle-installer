@@ -159,13 +159,16 @@ void PartMan::scan(DeviceItem *drvstart)
                 }
                 partit->flags.curESP = backup_list.contains(partit->device);
             }
-            if (partit->flags.curESP) partit->usefor = "ESP";
 
             partit->flags.bootRoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
             partit->curFormat = jsonPart["fstype"].toString();
             // Propagate the boot and nasty flags up to the drive.
             if (partit->flags.bootRoot) drvit->flags.bootRoot = true;
             if (partit->flags.nasty) drvit->flags.nasty = true;
+            else if (partit->flags.curESP) {
+                partit->usefor = "ESP";
+                partit->format = "PRESERVE";
+            }
             notifyChange(partit);
         }
         for (int ixPart = drvit->childCount() - 1; ixPart >= 0; --ixPart) {
@@ -309,14 +312,14 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                     if (sizeTotal > sizeMax) return false;
                     if (config.value("Boot").toBool()) partit->setActive(true);
                 }
-                partit->usefor = config.value("UseFor").toString();
-                partit->format = config.value("Format").toString();
-                partit->chkbadblk = config.value("CheckBadBlocks").toBool();
-                partit->encrypt = config.value("Encrypt").toBool();
-                partit->label = config.value("Label").toString();
-                partit->options = config.value("Options").toString();
-                partit->dump = config.value("Dump").toBool();
-                partit->pass = config.value("Pass").toInt();
+                partit->usefor = config.value("UseFor", partit->usefor).toString();
+                partit->format = config.value("Format", partit->format).toString();
+                partit->chkbadblk = config.value("CheckBadBlocks", partit->chkbadblk).toBool();
+                partit->encrypt = config.value("Encrypt", partit->encrypt).toBool();
+                partit->label = config.value("Label", partit->label).toString();
+                partit->options = config.value("Options", partit->options).toString();
+                partit->dump = config.value("Dump", partit->dump).toBool();
+                partit->pass = config.value("Pass", partit->pass).toInt();
             }
             if (bootdev == partit->device) partit->setActive(true);
             int subvolCount = 0;
