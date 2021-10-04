@@ -253,16 +253,19 @@ void PartMan::scanVirtualDevices(bool rescan)
             devit->curLabel = label;
             devit->curFormat = jsonDev["fstype"].toString();
             devit->flags.cryptoV = crypto;
-            notifyChange(devit);
+            devit->flags.oldLayout = true;
         }
+    }
+    for (const auto &it : listed.toStdMap()) delete it.second;
+    vdlit->sortChildren();
+    for(int ixi = 0; ixi < vdlit->childCount(); ++ixi) {
+        const QString &name = vdlit->child(ixi)->device;
         DeviceItem *orit = findOrigin(name);
         if (orit) {
             orit->devMapper = name;
             notifyChange(orit);
         }
     }
-    for (const auto &it : listed.toStdMap()) delete it.second;
-    vdlit->sortChildren();
     gui.treePartitions->expand(index(vdlit));
 }
 
@@ -1625,10 +1628,9 @@ int PartMan::changeEnd(bool notify)
 }
 void PartMan::notifyChange(class DeviceItem *item, int first, int last)
 {
-    DeviceItem *const p = item->parentItem;
     if (first < 0) first = 0;
-    if (last < 0) last = p ? p->childCount() - 1 : 0;
-    const int row = p ? p->indexOfChild(item) : 0;
+    if (last < 0) last = _TreeColumns_ - 1;
+    const int row = item->row();
     emit dataChanged(createIndex(row, first, item), createIndex(row, last, item));
 }
 
