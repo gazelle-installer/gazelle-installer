@@ -100,9 +100,18 @@ void PartMan::scan(DeviceItem *drvstart)
     if (!drvstart) {
         proc.exec("partprobe -s", true); // Inform the kernel of partition changes.
         proc.exec("blkid -c /dev/null", true); // Refresh cached blkid information.
-        root.clear();
+    }
+    // Partitions listed in order of their physical locations.
+    QStringList order;
+    QString curdev;
+    for(const QString &line : proc.execOutLines("parted -lm", true)) {
+        const QString &sect = line.section(':', 0, 0);
+        const int part = sect.toInt();
+        if (part) order.append(DeviceItem::join(curdev, part));
+        else if (sect.startsWith("/dev/")) curdev = sect.mid(5);
     }
 
+    if (!drvstart) root.clear();
     for (const QJsonValue &jsonDrive : jsonBD) {
         const QString &jdName = jsonDrive["name"].toString();
         if (jsonDrive["type"] != "disk") continue;
@@ -128,6 +137,7 @@ void PartMan::scan(DeviceItem *drvstart)
             drvit->flags.curEmpty = false;
             partit->flags.oldLayout = true;
             partit->device = jsonPart["name"].toString();
+            partit->order = order.indexOf(partit->device);
             partit->size = jsonPart["size"].toVariant().toLongLong();
             partit->physec = jsonPart["phy-sec"].toInt();
             partit->curLabel = jsonPart["label"].toString();
@@ -142,16 +152,16 @@ void PartMan::scan(DeviceItem *drvstart)
             // Propagate the boot and nasty flags up to the drive.
             if (partit->flags.bootRoot) drvit->flags.bootRoot = true;
             if (partit->flags.nasty) drvit->flags.nasty = true;
-            else if (partit->flags.curESP) {
+            else if (partit->flags.curESP && partit->allowedUsesFor().contains("ESP")) {
                 partit->usefor = "ESP";
-                partit->format = "PRESERVE";
+                partit->format = partit->allowedFormats().at(0);
             }
-            notifyChange(partit);
         }
         for (int ixPart = drvit->childCount() - 1; ixPart >= 0; --ixPart) {
             // Propagate the boot flag across the entire drive.
             if (drvit->flags.bootRoot) drvit->child(ixPart)->flags.bootRoot = true;
         }
+        drvit->sortChildren();
         notifyChange(drvit);
     }
 
@@ -242,19 +252,13 @@ bool PartMan::manageConfig(MSettings &config, bool save)
         int partCount = drvit->childCount();
         bool drvPreserve = drvit->flags.oldLayout;
         const QString &configNewLayout = "Storage/NewLayout." + drvit->device;
-        QVariant bootdev;
         if (save) {
             if (!drvPreserve) config.setValue(configNewLayout, partCount);
-            if (drvit->active) {
-                bootdev = drvit->active->device;
-                config.setValue("Boot", bootdev);
-            }
         } else if (config.contains(configNewLayout)) {
             drvPreserve = false;
             drvit->clear();
             partCount = config.value(configNewLayout).toInt();
             if (partCount > PARTMAN_MAX_PARTS) return false;
-            bootdev = config.value("Boot");
         }
         // Partition configuration.
         const long long sizeMax = drvit->size - (PARTMAN_SAFETY_MB * 1048576);
@@ -263,7 +267,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             DeviceItem *partit = nullptr;
             if (save || drvPreserve) {
                 partit = drvit->child(ixPart);
-                partit->flags.oldLayout = drvPreserve;
+                if (!save) partit->flags.oldLayout = true;
             } else {
                 partit = new DeviceItem(DeviceItem::Partition, drvit);
                 partit->device = DeviceItem::join(drvit->device, ixPart+1);
@@ -298,7 +302,6 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                 partit->dump = config.value("Dump", partit->dump).toBool();
                 partit->pass = config.value("Pass", partit->pass).toInt();
             }
-            if (bootdev == partit->device) partit->setActive(true);
             int subvolCount = 0;
             if (partit->format == "btrfs") {
                 if (!save) subvolCount = config.value("Subvolumes").toInt();
@@ -475,8 +478,9 @@ void PartMan::treeMenu(const QPoint &)
         else if (action == actBasic) twit->layoutDefault(-1, false);
         else if (action == actCrypto) twit->layoutDefault(-1, true);
         else if (action == actReset) {
-            while (twit->childCount()) delete twit->child(0);
+            gui.boxMain->setEnabled(false);
             scan(twit);
+            gui.boxMain->setEnabled(true);
         }
     } else if (twit->type == DeviceItem::Subvolume) {
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
@@ -1000,7 +1004,10 @@ bool PartMan::formatPartitions()
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(dev));
         else proc.status(fmtstatus.arg(twit->shownUseFor()));
         if (useFor == "ESP") {
-            if (!proc.exec("mkfs.msdos -F " + twit->format.mid(3)+' '+dev)) return false;
+            QString cmd("mkfs.msdos -F " + twit->format.mid(3));
+            if (twit->chkbadblk) cmd.append(" -c");
+            if (!twit->label.isEmpty()) cmd += " -n \"" + twit->label.trimmed().left(11) + '\"';
+            if (!proc.exec(cmd + ' ' + dev)) return false;
             // Sets boot flag and ESP flag.
             const QStringList &devsplit = DeviceItem::split(dev);
             if (!proc.exec("parted -s /dev/" + devsplit.at(0)
@@ -1455,7 +1462,8 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
         if (item->allowedFormats().count() > 1) flagsOut |= Qt::ItemIsEditable;
         break;
     case Check:
-        if (item->format.startsWith("ext") || item->format == "jfs") {
+        if (item->format.startsWith("ext") || item->format == "jfs"
+            || item->format.startsWith("FAT", Qt::CaseInsensitive)) {
             flagsOut |= Qt::ItemIsUserCheckable;
         }
         break;
@@ -1669,6 +1677,7 @@ inline int DeviceItem::childCount() const
 void DeviceItem::sortChildren()
 {
     auto cmp = [](DeviceItem *l, DeviceItem *r) {
+        if (l->order != r->order) return l->order < r->order;
         return l->device < r->device;
     };
     std::sort(children.begin(), children.end(), cmp);
@@ -1760,7 +1769,7 @@ QStringList DeviceItem::allowedUsesFor(bool real) const
         list.prepend("Format");
         if (type != VirtualBD) {
             if (size <= 16777216) list << "BIOS-GRUB";
-            if (size <= 4294967296) list << "ESP" << "boot";
+            if (size <= 8589934592) list << "ESP" << "boot";
         }
         list << "swap" << "home";
     }
@@ -1774,18 +1783,20 @@ QStringList DeviceItem::allowedFormats() const
     if (!isVolume()) return QStringList();
     QStringList list;
     bool allowPreserve = false, selPreserve = false;
-    if (type == Subvolume) list << "CREATE";
+    if (type == Subvolume) list.append("CREATE");
     else {
         const QString &use = realUseFor();
         if (use.isEmpty()) return QStringList();
-        else if (use == "/boot") list << "ext4";
-        else if (use == "BIOS-GRUB") list << "GRUB";
+        else if (use == "/boot") list.append("ext4");
+        else if (use == "BIOS-GRUB") list.append("GRUB");
         else if (use == "ESP") {
-            list << "FAT32" << "FAT16" << "FAT12";
+            list.append("FAT32");
+            if (size <= 4294901760) list.append("FAT16");
+            if (size <= 33553920) list.append("FAT12");
             selPreserve = allowPreserve = (list.contains(curFormat, Qt::CaseInsensitive)
                 || !curFormat.compare("VFAT", Qt::CaseInsensitive));
         } else if (use == "SWAP") {
-            list << "SWAP";
+            list.append("SWAP");
             selPreserve = allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         } else {
             list << "ext4" << "ext3" << "ext2";
