@@ -130,14 +130,15 @@ void MTreeView::drawRow(QPainter *painter, const QStyleOptionViewItem &option, c
         painter->restore();
     }
     // Cursor
-    if (currentIndex().isValid()) {
+    const QRect &cirect = visualRect(currentIndex());
+    if (currentIndex().isValid() && cirect.isValid()) {
         painter->save();
         const QColor &c = option.palette.color(QPalette::Active, QPalette::Highlight);
         pen.setColor(QColor(255 - c.red(), 255 - c.green(), 255 - c.blue()));
         pen.setWidth(2);
         painter->setPen(pen);
         painter->translate(pen.widthF() / 2, pen.widthF() / 2);
-        painter->drawRect(visualRect(currentIndex()).adjusted(0, 0, -pen.width(), -pen.width()));
+        painter->drawRect(cirect.adjusted(0, 0, -pen.width(), -pen.width()));
         painter->restore();
     }
 }
