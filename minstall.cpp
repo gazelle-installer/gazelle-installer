@@ -804,8 +804,8 @@ bool MInstall::installLinux()
         checkLocalClock->setChecked(true);
 
     // create a /etc/machine-id file for systems that use systemd
-    if (proc.exec("chroot command -v  systemd-machine-id-setup >/dev/null 2>&1", false))
-        proc.exec("chroot systemd-machine-id-setup", false);
+    if (proc.exec("chroot /mnt/antiX command -v systemd-machine-id-setup >/dev/null 2>&1", false))
+        proc.exec("chroot /mnt/antiX systemd-machine-id-setup", false);
 
     return true;
 }
