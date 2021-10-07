@@ -1641,6 +1641,7 @@ DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *pre
 {
     if (type == Partition) size = 1048576;
     if (parent) {
+        physec = parent->physec;
         partman = parent->partman;
         const int i = preceding ? (parentItem->children.indexOf(preceding) + 1) : parentItem->childCount();
         if (partman) partman->beginInsertRows(partman->index(parent), i, i);
