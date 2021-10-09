@@ -132,7 +132,8 @@ void PartMan::scan(DeviceItem *drvstart)
         const QJsonArray &jsonParts = jsonDrive["children"].toArray();
         for (const QJsonValue &jsonPart : jsonParts) {
             const QString &partTypeName = jsonPart["parttypename"].toString();
-            if (partTypeName=="Extended") continue;
+            if (partTypeName == "Extended" || partTypeName == "W95 Ext'd (LBA)"
+                || partTypeName == "Linux extended") continue;
             DeviceItem *partit = new DeviceItem(DeviceItem::Partition, drvit);
             drvit->flags.curEmpty = false;
             partit->flags.oldLayout = true;
@@ -145,8 +146,8 @@ void PartMan::scan(DeviceItem *drvstart)
             const int partflags = jsonPart["partflags"].toString().toUInt(nullptr, 0);
             if ((partflags & 0x80) || (partflags & 0x04)) partit->setActive(true);
             partit->mapCount = jsonPart["children"].toArray().count();
-            partit->flags.curESP = (partTypeName=="EFI System");
-            if (!partit->flags.nasty) partit->flags.nasty = partTypeName.startsWith("Microsoft LDM");
+            partit->flags.curESP = partTypeName.startsWith("EFI "); // "System"/"(FAT-12/16/32)"
+            if (partTypeName.startsWith("Microsoft LDM")) partit->flags.nasty = true;
             partit->flags.bootRoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
             partit->curFormat = jsonPart["fstype"].toString();
             // Propagate the boot and nasty flags up to the drive.
