@@ -1453,10 +1453,9 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
         if (item->allowedUsesFor().count() > 1) flagsOut |= Qt::ItemIsEditable;
         break;
     case Label:
-        if (item->type == DeviceItem::Subvolume) {
-            if (item->format != "PRESERVE") flagsOut |= Qt::ItemIsEditable;
-        } else {
-            if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
+        if (item->format != "PRESERVE") {
+            if (item->type == DeviceItem::Subvolume) flagsOut |= Qt::ItemIsEditable;
+            else if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
         }
         break;
     case Encrypt:
