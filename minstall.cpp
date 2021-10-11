@@ -803,9 +803,12 @@ bool MInstall::installLinux()
     if (proc.execOut("guess-hwclock") == "localtime")
         checkLocalClock->setChecked(true);
 
-    // create a /etc/machine-id file for systems that use systemd
-    if (proc.exec("chroot /mnt/antiX command -v systemd-machine-id-setup >/dev/null 2>&1", false))
-        proc.exec("chroot /mnt/antiX systemd-machine-id-setup", false);
+    // create a /etc/machine-id file and /var/lib/dbus/machine-id file
+    proc.exec("/bin/mount --rbind --make-rslave /dev /mnt/antiX/dev", true);
+    proc.exec("chroot /mnt/antiX rm  /var/lib/dbus/machine-id /etc/machine-id", false);
+    proc.exec("chroot /mnt/antiX dbus-uuidgen --ensure=/etc/machine-id", false);
+    proc.exec("chroot /mnt/antiX dbus-uuidgen --ensure", false);
+    proc.exec("/bin/umount -R /mnt/antiX/dev", true);
 
     return true;
 }
