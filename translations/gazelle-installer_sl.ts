@@ -1,5 +1,61 @@
 <?xml version="1.0" ?><!DOCTYPE TS><TS language="sl" version="2.1">
 <context>
+    <name>DeviceItem</name>
+    <message>
+        <location filename="partman.cpp" line="1694"/>
+        <source>EFI System Partition</source>
+        <translation>EFI sistemski razdelek</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1695"/>
+        <source>swap space</source>
+        <translation>prostor za izmenjavo</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1696"/>
+        <source>format only</source>
+        <translation>zgolj formatiranje</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1808"/>
+        <source>Create</source>
+        <translation>Ustvari</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1811"/>
+        <source>Preserve</source>
+        <translation>Ohrani</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1812"/>
+        <source>Preserve (%1)</source>
+        <translation>Ohrani (%1)</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1813"/>
+        <source>Preserve /home (%1)</source>
+        <translation>Ohrani /home (%1)</translation>
+    </message>
+</context>
+<context>
+    <name>DeviceItemDelegate</name>
+    <message>
+        <location filename="partman.cpp" line="2225"/>
+        <source>&amp;Templates</source>
+        <translation>&amp;Predloge</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="2229"/>
+        <source>Compression (&amp;ZLIB)</source>
+        <translation>Stiskanje (&amp;ZLIB)</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="2231"/>
+        <source>Compression (&amp;LZO)</source>
+        <translation>Stiskanje (&amp;LZO)</translation>
+    </message>
+</context>
+<context>
     <name>MInstall</name>
     <message>
         <location filename="minstall.cpp" line="73"/>
@@ -90,121 +146,121 @@ Uživajte v sistemu %1!</translation>
         <translation>Končano</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="723"/>
+        <location filename="minstall.cpp" line="722"/>
         <source>Invalid settings found in configuration file (%1). Please review marked fields as you encounter them.</source>
         <translation>V konfiguracijski datoteki (%1) so bile najdene napačne nastavitve. Prosimo, preverite označena polja.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="756"/>
+        <location filename="minstall.cpp" line="755"/>
         <source>Deleting old system</source>
         <translation>Brisanje starega sistema</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="760"/>
+        <location filename="minstall.cpp" line="759"/>
         <source>Failed to delete old %1 on destination.
 Returning to Step 1.</source>
         <translation>Neuspešno brisanje starega %1 na destinaciji.
 Vračam se na prvi korak.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="767"/>
+        <location filename="minstall.cpp" line="766"/>
         <source>Creating system directories</source>
         <translation>Ustvarjanje sistemskih direktorijev</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="778"/>
+        <location filename="minstall.cpp" line="777"/>
         <source>Fixing configuration</source>
         <translation>Popravljanje konfiguracije</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="833"/>
+        <location filename="minstall.cpp" line="836"/>
         <source>Copying new system</source>
         <translation>Kopiranje novega sistema</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="864"/>
+        <location filename="minstall.cpp" line="867"/>
         <source>Failed to write %1 to destination.
 Returning to Step 1.</source>
         <translation>Neuspešno zapisovanje na destinacijo %1.
 Vračam se na prvi korak.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="906"/>
-        <location filename="minstall.cpp" line="1014"/>
+        <location filename="minstall.cpp" line="909"/>
+        <location filename="minstall.cpp" line="1017"/>
         <source>Updating initramfs</source>
         <translation>Posodabljam initramfs</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="916"/>
+        <location filename="minstall.cpp" line="919"/>
         <source>Installing GRUB</source>
         <translation>Nameščam GRUB</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="946"/>
+        <location filename="minstall.cpp" line="949"/>
         <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
         <translation>Namesitev GRUB ni uspela. Lahko zaženete živ nosilec in uporabite GRUB reševalni meni, da bi popravili namestitev.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1070"/>
+        <location filename="minstall.cpp" line="1077"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>Uporabniško ime ne more vsebovati posebnih znakov ali presledkov.
 Prosimo, izberite drugo ime pred nadaljevanjem.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1081"/>
+        <location filename="minstall.cpp" line="1088"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Oprostite, to ime je že v rabi.
 Prosimo, izberite drugo ime.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1091"/>
+        <location filename="minstall.cpp" line="1098"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>Niste podali gesla za korenski dostop. Želite nadaljevati?</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1100"/>
+        <location filename="minstall.cpp" line="1107"/>
         <source>The home directory for %1 already exists.</source>
         <translation>Imenik /home za %1 že obstaja.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1132"/>
+        <location filename="minstall.cpp" line="1139"/>
         <source>Failed to set user account passwords.</source>
         <translation>Neuspela nastavitev gesla za uporabniški račun</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1148"/>
+        <location filename="minstall.cpp" line="1155"/>
         <source>Failed to save old home directory.</source>
         <translation>Neuspešno shranjevanje starega /home imenika</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1153"/>
+        <location filename="minstall.cpp" line="1160"/>
         <source>Failed to delete old home directory.</source>
         <translation>Neuspešno brisanje starega /home imenika.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1171"/>
+        <location filename="minstall.cpp" line="1178"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Ustvarjanje uporabnikovega imenika ni uspelo.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1176"/>
+        <location filename="minstall.cpp" line="1183"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Poimenovanje uporabnikovega imenika ni bilo uspešno.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1197"/>
+        <location filename="minstall.cpp" line="1204"/>
         <source>Sorry, failed to set ownership of user directory.</source>
         <translation>Določitev lastništva za uporabnikov imenik ni bilo uspešno.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1240"/>
+        <location filename="minstall.cpp" line="1241"/>
         <source>Please enter a computer name.</source>
         <translation>Vnesite ime računalnika.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1244"/>
+        <location filename="minstall.cpp" line="1245"/>
         <source>Sorry, your computer name contains invalid characters.
 You'll have to select a different
 name before proceeding.</source>
@@ -213,12 +269,12 @@ Morali boste izbrati
 drugo ime, preden lahko nadaljujete.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1250"/>
+        <location filename="minstall.cpp" line="1251"/>
         <source>Please enter a domain name.</source>
         <translation>Prosiom vnesite ime domene.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1254"/>
+        <location filename="minstall.cpp" line="1255"/>
         <source>Sorry, your computer domain contains invalid characters.
 You'll have to select a different
 name before proceeding.</source>
@@ -227,17 +283,17 @@ Morali boste izbrati
 drugo ime, preden lahko nadaljujete.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1261"/>
+        <location filename="minstall.cpp" line="1262"/>
         <source>Please enter a workgroup.</source>
         <translation>Vnesite ime delovne skupine</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1446"/>
+        <location filename="minstall.cpp" line="1448"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
         <translation>Ali naj formatiram in uporabim celoten disk (%1) za %2?</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1450"/>
+        <location filename="minstall.cpp" line="1452"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
         <translation>OPOZORILO: Izbrani pogon ima zmogljivost vsaj 2TB in mora biti formatiran z uporabo GPT. Na nekaterih sistemih diski, ki so formatirani z GPT, ne morejo izvesti zagona.</translation>
     </message>
@@ -323,19 +379,19 @@ drugo ime, preden lahko nadaljujete.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1553"/>
-        <location filename="minstall.cpp" line="1637"/>
+        <location filename="minstall.cpp" line="1636"/>
         <source>Encryption</source>
         <translation>Šifriranje</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1554"/>
-        <location filename="minstall.cpp" line="1638"/>
+        <location filename="minstall.cpp" line="1637"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>Šifriranje je možno preko LUKS. Zahtevano je geslo.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1555"/>
-        <location filename="minstall.cpp" line="1639"/>
+        <location filename="minstall.cpp" line="1638"/>
         <source>A separate unencrypted boot partition is required.</source>
         <translation>Potreben je ločen nešifriran zagosnki razdelek.</translation>
     </message>
@@ -375,57 +431,57 @@ drugo ime, preden lahko nadaljujete.</translation>
         <translation>&lt;i&gt;Velikost&lt;/i&gt; - Velikost razdelka. To je mogoče spremeniti le v novi razporeditvi.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1578"/>
+        <location filename="minstall.cpp" line="1588"/>
         <source>&lt;i&gt;Label&lt;/i&gt; - The label that is assigned to the partition once it has been formatted.</source>
         <translation>&lt;i&gt;Label&lt;/i&gt; - Oznaka se pripiše razdelku po formatiranju.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1579"/>
+        <location filename="minstall.cpp" line="1578"/>
         <source>&lt;i&gt;Use For&lt;/i&gt; - To use this partition in an installation, you must select something here.</source>
         <translation>&lt;i&gt;Uporabi za&lt;/i&gt; - Da bi ta razdelek uporabili pri namestitvi, morate tu nekaj izbrati.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1580"/>
+        <location filename="minstall.cpp" line="1579"/>
         <source>Format - Format without mounting.</source>
         <translation>Formatiranje - formatiraj brez priklapljanja.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1581"/>
+        <location filename="minstall.cpp" line="1580"/>
         <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
         <translation>BIOS-GRUB - BIOS zagonski GPT razdelek za GRUB.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1582"/>
+        <location filename="minstall.cpp" line="1581"/>
         <source>EFI - EFI System Partition.</source>
         <translation>EFI - EFI sistemski razdelek.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1583"/>
+        <location filename="minstall.cpp" line="1582"/>
         <source>boot - Boot manager (/boot).</source>
         <translation>zagon - zagonski upravljalnik (/boot).</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1584"/>
+        <location filename="minstall.cpp" line="1583"/>
         <source>root - System root (/).</source>
         <translation>root - koren sistema (/).</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1585"/>
+        <location filename="minstall.cpp" line="1584"/>
         <source>swap - Swap space.</source>
         <translation>swap - izmenjevalni prostor</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1586"/>
+        <location filename="minstall.cpp" line="1585"/>
         <source>home - User data (/home).</source>
         <translation>home - uporabniški podatki (/home).</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1587"/>
+        <location filename="minstall.cpp" line="1586"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Poleg naštetih je mogoče ustvariti tudi svojo točko priklopa. Lastne pirklopne točke se morajo začeti s poševnico (&quot;/&quot;).</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1588"/>
+        <location filename="minstall.cpp" line="1587"/>
         <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
         <translation>Namestilnik obravnava &quot;/boot&quot;, &quot;/&quot;, in &quot;/home&quot; popolnoma na enak način kot &quot;boot&quot;, &quot;root&quot;, in  &quot;home.</translation>
     </message>
@@ -446,442 +502,437 @@ drugo ime, preden lahko nadaljujete.</translation>
     </message>
     <message>
         <location filename="minstall.cpp" line="1593"/>
+        <source>&lt;i&gt;Check&lt;/i&gt; - Check and correct for bad blocks on the drive (not supported for all formats). This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
+        <translation>&lt;i&gt;Preveri&lt;/i&gt; - Preveri in popravi okvarjene sektorje na disku (ni podprto za vse formate). To zahteva veliko časa, zato to preskočite, če ne sumite, da ima diska okvarjene sektorje.</translation>
+    </message>
+    <message>
+        <location filename="minstall.cpp" line="1595"/>
         <source>&lt;i&gt;Mount Options&lt;/i&gt; - This specifies mounting options that will be used for this partition.</source>
         <translation>&lt;i&gt;Možnosti priklopa&lt;/i&gt; - Tu določite možnosti priklopa, ki bodo uporabljene za ta razdelek.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1594"/>
+        <location filename="minstall.cpp" line="1596"/>
         <source>&lt;i&gt;Dump&lt;/i&gt; - Instructs the dump utility to include this partition in the backup.</source>
         <translation>&lt;i&gt;Deponiraj&lt;/i&gt; - Ukaže orodju za deponiranje, da v varnostno kopijo vključi tudi ta razdelek.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1595"/>
+        <location filename="minstall.cpp" line="1597"/>
         <source>&lt;i&gt;Pass&lt;/i&gt; - The sequence in which this file system is to be checked at boot. If zero, the file system is not checked.</source>
         <translation>&lt;i&gt;Prehod&lt;/i&gt; - Zaporedje preizkusa datotečnega sistema ob zagonu. Če je nič, datotečni sistem ne bo preizkušen.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1596"/>
+        <location filename="minstall.cpp" line="1598"/>
         <source>Menus and actions</source>
         <translation>Meniji in dejanja</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1597"/>
+        <location filename="minstall.cpp" line="1599"/>
         <source>A variety of actions are available by right-clicking any drive or partition item in the list.</source>
         <translation>Na voljo so različna dejanja, do katerih dostopate z desnim klikom na razdelku v seznamu.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1598"/>
+        <location filename="minstall.cpp" line="1600"/>
         <source>The buttons to the right of the list can also be used to manipulate the entries.</source>
         <translation>Za spreminjanje vnosov je mogoče uporabiti tudi gumbe desno od seznama.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1599"/>
+        <location filename="minstall.cpp" line="1601"/>
         <source>The installer cannot modify the layout already on the drive. To create a custom layout, mark the drive for a new layout with the &lt;b&gt;New layout&lt;/b&gt; menu action or button (%1). This clears the existing layout.</source>
         <translation>Namestitveni program ne more spreminjati raporeda, ki je že na pogonu. Da bi oblikovali lastno razporeditev, označite pogon kot nov razpored z izbiro &lt;b&gt;Nov razporedv meniju dejanj ali s pritiksom na  (%1). To bo počistilo obstoječo shemo.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1602"/>
+        <location filename="minstall.cpp" line="1604"/>
         <source>Basic layout requirements</source>
         <translation>Osnovne zahteve ob razporejanju</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1603"/>
+        <location filename="minstall.cpp" line="1605"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
         <translation>%1 potrebuje korenski /root razdelek. Izmenjevalni swap razdelek je opcijski, a je zelo priporočljiv. Če želite uporabljati funkcijo Hiberniraj na disku, ki jo ponuja %1, boste potrebovali swap razdelek, ki je večji od velikosti fizičnega pomnilnika.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1605"/>
+        <location filename="minstall.cpp" line="1607"/>
         <source>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</source>
         <translation>Če izberete ločen /home razdelek, bo v prihodnje lažje nadgraditi vaš računalnik, vendar le v primeru, da ne gre za nadgrajevanje namestitve, ki nima ločenega /home razdelka</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1607"/>
+        <location filename="minstall.cpp" line="1609"/>
         <source>Partition boot flag</source>
         <translation>Zastavica zagonskega razdelka</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1608"/>
+        <location filename="minstall.cpp" line="1610"/>
         <source>For the installed operating system to boot, the boot flag must be set on the appropriate partition. This is usually the boot or root partition. The flag can be changed using the &lt;b&gt;Set boot flag&lt;/b&gt; menu action.</source>
         <translation>Da bi se nameščeni operacijski sistem zagnal, mora biti zastavica dodana ustreznem razdelku. Ponavadi je to zagonski, korenski oz. root razdelek. Zastavico je mogoče spremeniti s pomočjo menika &lt;b&gt;Določi zagonsko zastavico&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1610"/>
+        <location filename="minstall.cpp" line="1612"/>
         <source>A partition whose boot flag will be set is shown with its device name in &lt;i&gt;italic&lt;/i&gt; type.</source>
         <translation>Razdelek z nastavljeno zagonsko zastavico bo z imenom naprave prikazan v &lt;i&gt;kurzivi&lt;/i&gt;.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1611"/>
+        <location filename="minstall.cpp" line="1613"/>
         <source>Boot partition</source>
         <translation>Zagonski razdelek</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1612"/>
+        <location filename="minstall.cpp" line="1614"/>
         <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
         <translation>Ta razdelek je na splošno potreben le za korenske razdelke na virtualnih napravah, kot so šifrirani, LVM ali programski RAID nosilci.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1613"/>
+        <location filename="minstall.cpp" line="1615"/>
         <source>It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.</source>
         <translation>Vsebuje osnovno jedro in gonilnike, ki so potrebni za dostop do šifriranega diska ali virtualnih naprav.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1614"/>
+        <location filename="minstall.cpp" line="1616"/>
         <source>BIOS-GRUB partition</source>
         <translation>BIOS-GRUB razdelek</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1615"/>
+        <location filename="minstall.cpp" line="1617"/>
         <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
         <translation>Če je uporabljen GPT formatiran disk v ne-EFI sistemu, je potreben 1MB BIOS zagonski razdelek, da bi lahko uproabljali GRUB.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1616"/>
+        <location filename="minstall.cpp" line="1618"/>
         <source>New drives are formatted in GPT if more than 4 partitions are to be created, or the drive has a capacity greater than 2TB. If the installer is about to format the disk in GPT, and there is no BIOS-GRUB partition, a warning will be displayed before the installation starts.</source>
         <translation>Novejši diski so formatirani kot GPT, če se ustvari več kot 4 razdelke ali če ima disk več kot 2TB. Če je namestilnik pred formatiranjem diska kot GPT in BIOS-GRUB razdelek ne obstaja, se bo pred začetkom namestitve prikazalo opozorilo.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1618"/>
+        <location filename="minstall.cpp" line="1620"/>
         <source>Need help creating a layout?</source>
         <translation>Potrebujete pomoč pri razporejanju?</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1619"/>
+        <location filename="minstall.cpp" line="1621"/>
         <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
         <translation>Desno kliknite na pogon, ki odpre meni in izberite predlogo razporeda. Predloge so podobne tistim, ki se uporabijo ob navadni namestitvi.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1620"/>
+        <location filename="minstall.cpp" line="1622"/>
         <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
         <translation>&lt;i&gt;Standardna namestitev&lt;/i&gt; - Ustreza večini potreb. Ta predloga ne ustvari ločenega zagonskega razdelka, zato ni primerna za šifriran operacijski sistem.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1621"/>
+        <location filename="minstall.cpp" line="1623"/>
         <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
         <translation>&lt;i&gt;Šifriran sistem&lt;/i&gt; - vsebuje zagonski razdelek, ki je potreben za nalaganje šifriranega operacijskega sistema. To predlogo je mogoče uporabiti tudi kot osnovo za večzagonski sistem.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1622"/>
+        <location filename="minstall.cpp" line="1624"/>
         <source>Upgrading</source>
         <translation>Nadgrajujem</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1623"/>
+        <location filename="minstall.cpp" line="1625"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and select &lt;b&gt;Preserve&lt;/b&gt; as the format.</source>
         <translation>Za nadgradnjo obstoječe Linux namestitve izberite isti domači home razdelek in izberite &lt;b&gt;Ohrani&lt;/b&gt; kot format.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1624"/>
+        <location filename="minstall.cpp" line="1626"/>
         <source>If you do not use a separate home partition, select &lt;b&gt;Preserve /home&lt;/b&gt; on the root file system entry to preserve the existing /home directory located on your root partition. The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.</source>
         <translation>Če ne uporabljate ločenega domačega razdelka, izberite &lt;b&gt;Ohrani /home&lt;/b&gt; na korenskem datotečnem sistemu, da ohranite mapo /home na korenskem razdelku. Namestilnik bo ohranil le /home, ostalo pa bo izbrisal. Tovrstna namestitev potrebuje mnogo več časa.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1626"/>
+        <location filename="minstall.cpp" line="1628"/>
         <source>Preferred Filesystem Type</source>
         <translation>Zaželjen datotečni sistem</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1627"/>
+        <location filename="minstall.cpp" line="1629"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.</source>
         <translation>Za %1 lahko izberete formatiranje kot ext2, ext3, ext4, f2fs, jfs, xfs, btrfs ali reiser.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1628"/>
+        <location filename="minstall.cpp" line="1630"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>Dodatne možnosti za stiskanje podatkov so na voljo za pogone, ki uproabljajo btrfs, vendar je stopnja kompresije manjša. Zlib je počasnejši, a ima večjo stopnjo stiskanja.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1630"/>
-        <source>Bad Blocks</source>
-        <translation>Napake na disku</translation>
-    </message>
-    <message>
-        <location filename="minstall.cpp" line="1631"/>
-        <source>If you choose ext2, ext3 or ext4 as the format type, you have the option of checking and correcting for bad blocks on the drive. The badblock check is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
-        <translation>Če kot vrsto formata izberete ext2, ext3 ali ext4, imate možnost preverjanja in popravljanja napak na disku, ki so posledica okvar blokov. Preverjanje napak na disku zahteva veliko časa. zato boste morda raje preskočili ta korak, razen če ne sumite, da so na vašem disku napake.</translation>
-    </message>
-    <message>
-        <location filename="minstall.cpp" line="1633"/>
+        <location filename="minstall.cpp" line="1632"/>
         <source>System partition management tool</source>
         <translation>Orodje za upravljanje razdelkov</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1634"/>
+        <location filename="minstall.cpp" line="1633"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
         <translation>Za več nadzora nad razporeditvami pogonov (kot je denimo spreminjanje obstoječe razporeditve na disku) kliknite na gumb za upravljanje z razdelki (%1). To pa zagnalo upravjlalnik razdelkov operacijskega sistema, ki omogoča ustvarjanje točno takšnega razporeda, kot ga potrebujete.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1640"/>
+        <location filename="minstall.cpp" line="1639"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
         <translation>Za ohranitev šifriranega razdelka nanj desno kliknite in izberite &lt;b&gt;Odklep&lt;/b&gt;. V dialog vnesite ime virtualne naprave in geslo. Ko je naprava odklenjena, se bo izbrano ime pojavilo pod &lt;i&gt;Virtualne naprave&lt;/i&gt; s podobnimi možnostmi, kot jih imajo navadni razdelki.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1642"/>
+        <location filename="minstall.cpp" line="1641"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
         <translation>Za odklep šifiriranega razdelka ob zagonu ga je potrebno dodativ crypttab datoteko. Za to uporabite meni &lt;b&gt;Dodaj v crypttab&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1643"/>
+        <location filename="minstall.cpp" line="1642"/>
         <source>Other partitions</source>
         <translation>Drugi razdelki</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1644"/>
+        <location filename="minstall.cpp" line="1643"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
         <translation>Namestitveni program omogoča uporabo ali ustvarjanje drugih razdelkov za druge namene, vendar je dobro vedeti, da starejši sistemi ne morejo delati z več kot 4 razdelki.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1645"/>
+        <location filename="minstall.cpp" line="1644"/>
         <source>Subvolumes</source>
         <translation>Pod-pogoni</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1646"/>
+        <location filename="minstall.cpp" line="1645"/>
         <source>Some file systems, such as Btrfs, support multiple subvolumes in a single partition. These are not physical subdivisions, and so their order does not matter.</source>
         <translation>Nekateri datotečni sistemi, kot denimo Btrfs, podpirajo več podpogonov na enem razdelku. Ker ne gre za fizično razdelitev, njihov vrstni red ni pomemben.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1648"/>
+        <location filename="minstall.cpp" line="1647"/>
         <source>Use the &lt;b&gt;Scan subvolumes&lt;/b&gt; menu action to search an existing Btrfs partition for subvolumes. To create a new subvolume, use the &lt;b&gt;New subvolume&lt;/b&gt; menu action.</source>
         <translation>Uporabite meni &lt;b&gt;Pošči podpogone&lt;/b&gt;za iskanje obstoječih Btrfs razdelkov in podpogonov. Nov podpogon ustvarite z menijem &lt;b&gt;Nov podpogon&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1650"/>
+        <location filename="minstall.cpp" line="1649"/>
         <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
         <translation>Obstojeli podpogoni se lahko ohranijo, vendar mora ime ostati enako.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1651"/>
+        <location filename="minstall.cpp" line="1650"/>
         <source>Virtual Devices</source>
         <translation>Virtualne naprave</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1652"/>
+        <location filename="minstall.cpp" line="1651"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
         <translation>Če namestilnik odkrije virtualno napravo, kot odprti LUKS razdelek, LVM logični pogon ali programsko ustvarjeni RAID, so ti lahko uporabljeni pri namestitvi.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1653"/>
+        <location filename="minstall.cpp" line="1652"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Raba virtualnih naprav (z izjemo ohranjanja šifriranih datotečni sistemov) je napredna funkcija, za katero je mogoče potrebno urediti nekaj datotek (npr.initramfs, crypttab, fstab), ki zagotavljajo, da so virtualne naprave ustvarjene ob zagonu.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1659"/>
+        <location filename="minstall.cpp" line="1658"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Izberite način zaganjana&lt;/b&gt;&lt;br/&gt;%1 uporablja zaganjalnik GRUB za zagon boot %1 in MS-Windows. &lt;p&gt;Privzeto se namesti GRUB2 v Master Boot Record ali ESP (EFI sistemska particija za 64-bitni sisteme z UEFI zagonom) vašega zagonskega diska, ki nadomesti zaganjalnik, ki ste ga uporabljali do tedaj. To je normalno.&lt;/p&gt;&lt;p&gt;Če želite namestiti GRUB2 v koren oz. root, bo GRUB2 nameščen na začetku korenske root particije. Ta možnost je pimerna le za strokovnjake.&lt;/p&gt;&lt;p&gt;Če odznačite Namesti GRUB, se GRUB ne bo namestil. Ta možnost je primerna le za strokovnjake.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1673"/>
+        <location filename="minstall.cpp" line="1672"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Omogočene pogoste storitve&lt;/b&gt;&lt;br/&gt; Izberite poljubno od teh storitev, ki bi jih lahko potrebovali s svojo konfiguracijo sistema in storitve se bodo samodejno zagnale, ko zaženete %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1677"/>
+        <location filename="minstall.cpp" line="1676"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Identiteta računalnika&lt;/b&gt;&lt;br/&gt;Ime računalnika je unikatno ime, ki identificira vaš računalnik, kadar se nahaja v mreži. Domena računalnika se uporablja le, kadar to zahteva vaš ponudnik interneta ali vaše lokalno omrežje. &lt;/p&gt;&lt;p&gt;Ime računalnika ali domene lahko vsebuje le alfanumerične znake, pike in vezaje. Ne more vsebovati presledkov ali se začeti oziroma končati z vezajem. &lt;/p&gt;&lt;p&gt;Če želite deliti katerega od direktorijev ali tiskalnikov za rabo z lokalnim računalnikom, ki poganja MS-Windows ali Mac OSX, je potrebno aktivirati SaMBa strežnik. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1690"/>
+        <location filename="minstall.cpp" line="1689"/>
         <source>Localization Defaults</source>
         <translation>Privzete lokalne nastavitve</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1691"/>
+        <location filename="minstall.cpp" line="1690"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation>Določi privzete krajevne nastavitve. To bo uporabljno, razen če jih uporabnik kasneje ne zavrže.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1692"/>
+        <location filename="minstall.cpp" line="1691"/>
         <source>Configure Clock</source>
         <translation>Nastavitve časa:</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1693"/>
+        <location filename="minstall.cpp" line="1692"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation>Če imate Apple ali čisti Unix računalnik, bo sistemska ura privzeto nastavljena na greenviški čas (GMT) ali univerzalni čas (UTC). Za spreminjanje označite polje &quot;&lt;b&gt;Sistemska ura uporablja krajevni čas&lt;/b&gt;&quot;</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1695"/>
+        <location filename="minstall.cpp" line="1694"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation>Sistem se zažene s časovnim pasom GMT/UTC. Za spremembo časovnega pasu ob zagonu po namestitivi kliknite z desno na uro v pultu in izberite Lastnosti.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1697"/>
+        <location filename="minstall.cpp" line="1696"/>
         <source>Service Settings</source>
         <translation>Nastavitve storitve</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1698"/>
+        <location filename="minstall.cpp" line="1697"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation>Večina uporabnikov naj ne bi spreminjala priovzetih vrednosti. Uporabniki z manj zmogljivimi računalniki pa si večkrat želijo izklopiti nepotrebne storitve, da bi ohranili čim več pomnilnika. Poskrbite, da veste, kaj delate!</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1704"/>
+        <location filename="minstall.cpp" line="1703"/>
         <source>Default User Login</source>
         <translation>Privzeta prijava uporabnika</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1705"/>
+        <location filename="minstall.cpp" line="1704"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
         <translation>Korenski ali root uporabnik ima podobno funkcijo kot administrator v nekaterih drugih operacijskih sistemih. Tega uporabnika naj ne bi uporabljali kot svoj običajen račun. Vnesite ime za nov (privzeti) uporabniški račun, ki ga boste uporabljali pri vsakodnevnih opravilih. Če je potrebno, lahko kasneje dodate še druge uporabniške račune z %1  Upravljanje uporabnikov.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1709"/>
+        <location filename="minstall.cpp" line="1708"/>
         <source>Passwords</source>
         <translation>Gesla</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1710"/>
+        <location filename="minstall.cpp" line="1709"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
         <translation>Vnesite novo geslo za svoj privzeti uporabniški račun in za korenski račun. Vsako geslo mora biti vnešeno dvakrat,</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1712"/>
+        <location filename="minstall.cpp" line="1711"/>
         <source>No passwords</source>
         <translation>Ni gesel</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1713"/>
+        <location filename="minstall.cpp" line="1712"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
         <translation>Če želite imeti privzet uporabniški račun brez gesla, pustite polja za geslo prazna. To omogoča prijavo brez vnosa gesla.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1715"/>
+        <location filename="minstall.cpp" line="1714"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
         <translation>Očitno je, da je to smiselno le, le uporabniški račun ni potrebno ščititi, kot npr. kadar gre za javno dostopen terminal.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1723"/>
+        <location filename="minstall.cpp" line="1722"/>
         <source>Old Home Directory</source>
         <translation>Stari /home imenik</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1724"/>
+        <location filename="minstall.cpp" line="1723"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation>Za izbrano uporabniško ime že obstaja /home imenik. Ta zaslon vam omogoča, da določite, kaj se zgodi s tem imenikom.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1726"/>
+        <location filename="minstall.cpp" line="1725"/>
         <source>Re-use it for this installation</source>
         <translation>Ponovno uporabi za to namestitev</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1727"/>
+        <location filename="minstall.cpp" line="1726"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation>Za ta uporabniški račun bo uporabljen stari imenik /home. To je dobra izbira za nadgradnjo, saj bodo datoteke in nastavitve ostale nedotaknjene.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1729"/>
+        <location filename="minstall.cpp" line="1728"/>
         <source>Rename it and create a new directory</source>
         <translation>Preimenuj in ustvari nov imenik</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1730"/>
+        <location filename="minstall.cpp" line="1729"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation>Za uporabnika bo ustvarjen nov /home imenik, stari pa bo preimenovan. Vaše datoteke in nastavitve v novi namestitvi ne bodo takoj vidne, a se lahko do njih dostopa v preimenovanem imeniku.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1732"/>
+        <location filename="minstall.cpp" line="1731"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation>Star imenik bo imel na koncu številko, ki je odvisna od tega, kolikokrat poprej je bil imenik že preimenovan.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1733"/>
+        <location filename="minstall.cpp" line="1732"/>
         <source>Delete it and create a new directory</source>
         <translation>Izbriši in ustvari nov imenik</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1734"/>
+        <location filename="minstall.cpp" line="1733"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation>Stari imenik /home bo izbrisan in ustvarjena bo povsem nov.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1735"/>
+        <location filename="minstall.cpp" line="1734"/>
         <source>Warning</source>
         <translation>Opozorilo</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1736"/>
+        <location filename="minstall.cpp" line="1735"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation>Vse datoteke in nastavitve bodo za stalno izbrisane, če je izbrana ta možnost. Vaše možnosti za njihovo obnovitev bodo majhne.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1752"/>
+        <location filename="minstall.cpp" line="1751"/>
         <source>Installation in Progress</source>
         <translation>Namestitev poteka</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1753"/>
+        <location filename="minstall.cpp" line="1752"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation>%1 se namešča. Sveža namestitev bo vzela med 3-20 minut, odvisno od hitrosti sistema in velikosti razdelkov, ki jih ponovno formatirate.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1755"/>
+        <location filename="minstall.cpp" line="1754"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation>Če pritisnete tipko Prekini, se bo namestitev zaustavila, takoj ko bo to mogoče.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1757"/>
+        <location filename="minstall.cpp" line="1756"/>
         <source>Change settings while you wait</source>
         <translation>Med nameščanjem spremenite nastavitve</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1758"/>
+        <location filename="minstall.cpp" line="1757"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation>Medtem, ko se %1 namešča, lahko kliknete na tipki &lt;b&gt;Naprej&lt;/b&gt; ali &lt;b&gt;Nazaj&lt;/b&gt; in vnesete druge informacije za namestitev.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1760"/>
+        <location filename="minstall.cpp" line="1759"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation>Te korake opravite v svojem ritmu. Namestitveni program vas bo počakal, če je to potrebno.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1768"/>
+        <location filename="minstall.cpp" line="1767"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Čestitke!&lt;/b&gt;&lt;br/&gt;Uspešno ste zaključili namestitev za %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Iskanje programov&lt;/b&gt;&lt;br/&gt;Skupaj z %1 je nameščenih na stotine odličnih programov. Najbolje je, da jih spoznavate tako, da jih poiščete v menuju in preizkusite. Mnogo aplikacij je bilo razvitih posebej za %1 projekt. Te so prikazane v glavnem menuju.&lt;p&gt;Poleg tega %1 vsebuje mnogo standardnih Linux programov, ki jih je mogoče zagnati le iz terminala in zato niso prikazani v menuju.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1777"/>
+        <location filename="minstall.cpp" line="1776"/>
         <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
         <translation>Naj vam bo %1 v užitek&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1778"/>
+        <location filename="minstall.cpp" line="1777"/>
         <location filename="minstall.cpp" line="2168"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Podpora za %1&lt;/b&gt;&lt;br/&gt;%1 je podprt s strani ljudi, kakršnih ste vi. Nekateri pomagajo drugim preko podpornega foruma -%2 - drugi s prevajanjem pomoči v druge jezike, podajanjem predlgovo, pisanjem dokumentacije ali preizkusanjem novih programov.&lt;/p&gt; </translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1808"/>
+        <location filename="minstall.cpp" line="1807"/>
         <source>Finish</source>
         <translation>Zaključi</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1811"/>
+        <location filename="minstall.cpp" line="1810"/>
         <source>OK</source>
         <translation>V redu</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1813"/>
+        <location filename="minstall.cpp" line="1812"/>
         <source>Next</source>
         <translation>Naslednji</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1848"/>
+        <location filename="minstall.cpp" line="1847"/>
         <source>Configuring sytem. Please wait.</source>
         <translation>Konfiguriram sistem. Počakajte.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1851"/>
+        <location filename="minstall.cpp" line="1850"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Konfiguriranje je končasno. Ponovno zaganjam sistem.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1855"/>
+        <location filename="minstall.cpp" line="1854"/>
         <source>Could not complete configuration.</source>
         <translation>Konfiguriranje ni bilo uspešno.</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="1873"/>
+        <location filename="minstall.cpp" line="1872"/>
         <source>Loading...</source>
         <translation>Nalaganje...</translation>
     </message>
@@ -957,8 +1008,8 @@ Ali bi jo res radi zaustavili?</translation>
         <translation>Zagonski disk sistema:</translation>
     </message>
     <message>
-        <location filename="minstall.cpp" line="2332"/>
-        <location filename="minstall.cpp" line="2341"/>
+        <location filename="minstall.cpp" line="2336"/>
+        <location filename="minstall.cpp" line="2346"/>
         <source>Partition to use:</source>
         <translation>Razdelek za uporabo:</translation>
     </message>
@@ -1009,435 +1060,389 @@ Ali bi jo res radi zaustavili?</translation>
         <translation>Alt+N</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="206"/>
+        <location filename="meinstall.ui" line="200"/>
         <source>Gathering Information, please stand by.</source>
         <translation>Zbiram podatke, prosimo počakajte.</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="241"/>
+        <location filename="meinstall.ui" line="235"/>
         <source>Terms of Use</source>
         <translation>Pogoji uporabe</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="268"/>
+        <location filename="meinstall.ui" line="262"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Nastavitve tipkovnice&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="275"/>
+        <location filename="meinstall.ui" line="269"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="282"/>
+        <location filename="meinstall.ui" line="276"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Različica:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="305"/>
+        <location filename="meinstall.ui" line="293"/>
         <source>Change Keyboard Settings</source>
         <translation>Spremeni nastavitve tipkovnice</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="312"/>
+        <location filename="meinstall.ui" line="300"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Razpored:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="375"/>
+        <location filename="meinstall.ui" line="351"/>
         <source>Select type of installation</source>
         <translation>Izberi vrsto namestitve</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="387"/>
+        <location filename="meinstall.ui" line="363"/>
         <source>Regular install using the entire disk</source>
         <translation>Običajna namestitev z uporabo celotnega diska</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="416"/>
+        <location filename="meinstall.ui" line="392"/>
         <source>Use disk:</source>
         <translation>Uporabi disk:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="426"/>
-        <location filename="meinstall.ui" line="685"/>
+        <location filename="meinstall.ui" line="402"/>
         <source>Encrypt</source>
         <translation>Šifriranje</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="438"/>
-        <location filename="meinstall.ui" line="774"/>
+        <location filename="meinstall.ui" line="414"/>
+        <location filename="meinstall.ui" line="682"/>
         <source>Encryption password:</source>
         <translation>Šifrirno geslo:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="468"/>
-        <location filename="meinstall.ui" line="807"/>
+        <location filename="meinstall.ui" line="444"/>
+        <location filename="meinstall.ui" line="715"/>
         <source>Confirm password:</source>
         <translation>Potrdite geslo:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="515"/>
+        <location filename="meinstall.ui" line="491"/>
         <source>Root</source>
         <translation>Koren</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="550"/>
+        <location filename="meinstall.ui" line="526"/>
         <source>Home</source>
         <translation>Domov</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="572"/>
+        <location filename="meinstall.ui" line="548"/>
         <source>Customize the disk layout</source>
         <translation>Lastna razporeditev diskov</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="604"/>
+        <location filename="meinstall.ui" line="580"/>
         <source>Choose partitions</source>
         <translation>Izberite razdelke</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="622"/>
-        <source>Check for bad sectors (takes longer)</source>
-        <translation>Preveri ali obstajajo okvarjena področja (potrebuje več časa)</translation>
-    </message>
-    <message>
-        <location filename="meinstall.ui" line="629"/>
+        <location filename="meinstall.ui" line="600"/>
         <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
         <translation>Odstrani obstoječ zapis v razporedu. To deluje le z zapisi v novem razporedu.</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="653"/>
+        <location filename="meinstall.ui" line="589"/>
         <source>Query the operating system and reload the layouts of all drives.</source>
         <translation>Poizvej z operacijskim sistemom in ponovno naloži razporede vseh pogonov.</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="665"/>
-        <source>Device</source>
-        <translation>Naprava</translation>
-    </message>
-    <message>
-        <location filename="meinstall.ui" line="670"/>
-        <source>Size</source>
-        <translation>Velikost</translation>
-    </message>
-    <message>
-        <location filename="meinstall.ui" line="675"/>
-        <source>Label</source>
-        <translation>Vrsta</translation>
-    </message>
-    <message>
-        <location filename="meinstall.ui" line="680"/>
-        <source>Use For</source>
-        <translation>Uporabi za</translation>
-    </message>
-    <message>
-        <location filename="meinstall.ui" line="690"/>
-        <source>Format</source>
-        <translation>Format</translation>
-    </message>
-    <message>
-        <location filename="meinstall.ui" line="695"/>
-        <source>Mount Options</source>
-        <translation>Možnosti priklopa</translation>
-    </message>
-    <message>
-        <location filename="meinstall.ui" line="700"/>
-        <source>Dump</source>
-        <translation>Deponiraj</translation>
-    </message>
-    <message>
-        <location filename="meinstall.ui" line="705"/>
-        <source>Pass</source>
-        <translation>Prehod</translation>
-    </message>
-    <message>
-        <location filename="meinstall.ui" line="713"/>
+        <location filename="meinstall.ui" line="611"/>
         <source>Add a new partition entry. This only works with a new layout.</source>
         <translation>Dodaj zapis novega razdelka. To deluje le z novim razporedom.</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="724"/>
+        <location filename="meinstall.ui" line="622"/>
         <source>Mark the selected drive to be cleared for a new layout.</source>
         <translation>Označi izbrane pogone za brisanje ob ustvarjanju novega razporeda.</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="735"/>
+        <location filename="meinstall.ui" line="643"/>
         <source>Run the partition management application of this operating system.</source>
         <translation>Zaženi upravljalnik razdelkov tega operacijskega sistema</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="758"/>
+        <location filename="meinstall.ui" line="666"/>
         <source>Encryption options</source>
         <translation>Možnosti šifriranja</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="833"/>
+        <location filename="meinstall.ui" line="741"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Namesti GRUB za Linux in Windows</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="857"/>
+        <location filename="meinstall.ui" line="765"/>
         <source>Master Boot Record</source>
         <translation>Master Boot Record</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="863"/>
+        <location filename="meinstall.ui" line="771"/>
         <source>MBR</source>
         <translation>MBR</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="866"/>
+        <location filename="meinstall.ui" line="774"/>
         <source>Alt+B</source>
         <translation>Alt+B</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="888"/>
+        <location filename="meinstall.ui" line="796"/>
         <source>EFI System Partition</source>
         <translation>EFI sistemski razdelek</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="891"/>
+        <location filename="meinstall.ui" line="799"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="923"/>
+        <location filename="meinstall.ui" line="825"/>
         <source>Partition Boot Record</source>
         <translation>Partition Boot Record</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="926"/>
+        <location filename="meinstall.ui" line="828"/>
         <source>PBR</source>
         <translation>PBR</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="939"/>
+        <location filename="meinstall.ui" line="841"/>
         <source>System boot disk:</source>
         <translation>Zagonski disk sistema:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="952"/>
+        <location filename="meinstall.ui" line="854"/>
         <source>Location to install on:</source>
         <translation>Lokacija za namestitev:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1010"/>
+        <location filename="meinstall.ui" line="906"/>
         <source>Common Services to Enable</source>
         <translation>Omogoči pogoste storitve:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1029"/>
+        <location filename="meinstall.ui" line="925"/>
         <source>Service</source>
         <translation>Storitev</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1034"/>
+        <location filename="meinstall.ui" line="930"/>
         <source>Description</source>
         <translation>Opis</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1067"/>
+        <location filename="meinstall.ui" line="963"/>
         <source>Computer Network Names</source>
         <translation>Imena računalnikov v mreži</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1094"/>
+        <location filename="meinstall.ui" line="990"/>
         <source>Workgroup</source>
         <translation>Delovna skupina</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1107"/>
+        <location filename="meinstall.ui" line="1003"/>
         <source>Workgroup:</source>
         <translation>Delovna skupina:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1120"/>
+        <location filename="meinstall.ui" line="1016"/>
         <source>SaMBa Server for MS Networking</source>
         <translation>SaMBa strežnik za MS Networking</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1136"/>
+        <location filename="meinstall.ui" line="1032"/>
         <source>example.dom</source>
         <translation>primer.dom</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1149"/>
+        <location filename="meinstall.ui" line="1045"/>
         <source>Computer domain:</source>
         <translation>Domena računalnika:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1175"/>
+        <location filename="meinstall.ui" line="1071"/>
         <source>Computer name:</source>
         <translation>Ime računalnika:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1236"/>
+        <location filename="meinstall.ui" line="1126"/>
         <source>Configure Clock</source>
         <translation>Nastavitve časa:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1277"/>
+        <location filename="meinstall.ui" line="1161"/>
         <source>Format:</source>
         <translation>Format:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1305"/>
+        <location filename="meinstall.ui" line="1189"/>
         <source>Timezone:</source>
         <translation>Časovni pas:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1350"/>
+        <location filename="meinstall.ui" line="1228"/>
         <source>System clock uses local time</source>
         <translation>Sistemska ura uporablja krajevni čas</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1382"/>
+        <location filename="meinstall.ui" line="1254"/>
         <source>Localization Defaults</source>
         <translation>Privzete lokalne nastavitve</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1422"/>
+        <location filename="meinstall.ui" line="1294"/>
         <source>Locale:</source>
         <translation>Lokalizacija:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1444"/>
+        <location filename="meinstall.ui" line="1316"/>
         <source>Service Settings (advanced)</source>
         <translation>Nastavitve storitev (napredno)</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1462"/>
+        <location filename="meinstall.ui" line="1334"/>
         <source>Adjust which services should run at startup</source>
         <translation>Določi, katere storitve naj se zaženejo ob zagonu</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1465"/>
+        <location filename="meinstall.ui" line="1337"/>
         <source>View</source>
         <translation>Ogled</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1510"/>
+        <location filename="meinstall.ui" line="1376"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
         <translation>Modifikacije namizja, ki so bile opravljene v živem okolju, bodo prenešene na nameščen OS</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1513"/>
+        <location filename="meinstall.ui" line="1379"/>
         <source>Save live desktop changes</source>
         <translation>Shrani spremembe iz živega namizja</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1526"/>
+        <location filename="meinstall.ui" line="1392"/>
         <source>Default User Account</source>
         <translation>Privzeti uporabniški račun</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1538"/>
+        <location filename="meinstall.ui" line="1404"/>
         <source>Default user login name:</source>
         <translation>Ime privzetega uporabnika:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1554"/>
+        <location filename="meinstall.ui" line="1420"/>
         <source>Default user password:</source>
         <translation>Geslo privzetega uporabnika:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1567"/>
+        <location filename="meinstall.ui" line="1433"/>
         <source>Confirm user password:</source>
         <translation>Potrdi geslo uporabnika:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1628"/>
+        <location filename="meinstall.ui" line="1494"/>
         <source>username</source>
         <translation>uporabniško ime</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1644"/>
+        <location filename="meinstall.ui" line="1510"/>
         <source>Root (administrator) Account</source>
         <translation>Korenski (administratorski) račun</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1662"/>
+        <location filename="meinstall.ui" line="1528"/>
         <source>Root password:</source>
         <translation>Korensko geslo:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1707"/>
+        <location filename="meinstall.ui" line="1573"/>
         <source>Confirm root password:</source>
         <translation>Potrdite korensko geslo:</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1736"/>
+        <location filename="meinstall.ui" line="1602"/>
         <source>Autologin</source>
         <translation>Samodejna prijava</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1772"/>
+        <location filename="meinstall.ui" line="1632"/>
         <source>Existing Home Directory</source>
         <translation>Obstoječi /home imenik</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1781"/>
+        <location filename="meinstall.ui" line="1641"/>
         <source>What would you like to do with the old directory?</source>
         <translation>Kaj bi radi storili s starim imenikom?</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1788"/>
+        <location filename="meinstall.ui" line="1648"/>
         <source>Re-use it for this installation</source>
         <translation>Ponovno uporabi za to namestitev</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1795"/>
+        <location filename="meinstall.ui" line="1655"/>
         <source>Rename it and create a new directory</source>
         <translation>Preimenuj in ustvari nov imenik</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1802"/>
+        <location filename="meinstall.ui" line="1662"/>
         <source>Delete it and create a new directory</source>
         <translation>Izbriši in ustvari nov imenik</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1847"/>
+        <location filename="meinstall.ui" line="1701"/>
         <source>Tips</source>
         <translation>Namigi</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1891"/>
+        <location filename="meinstall.ui" line="1745"/>
         <source>Installation complete</source>
         <translation>Namestitev je dokončana</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1897"/>
+        <location filename="meinstall.ui" line="1751"/>
         <source>Automatically reboot the system when the installer is closed</source>
         <translation>Samodejni ponovni zagon po tem, ko se namestitveni program zapre</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1916"/>
+        <location filename="meinstall.ui" line="1770"/>
         <source>Reminders</source>
         <translation>Opomniki</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1957"/>
+        <location filename="meinstall.ui" line="1805"/>
         <source>Back</source>
         <translation>Nazaj</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1964"/>
+        <location filename="meinstall.ui" line="1812"/>
         <source>Alt+K</source>
         <translation>Alt+K</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1977"/>
+        <location filename="meinstall.ui" line="1825"/>
         <source>Installation in progress</source>
         <translation>Namestitev poteka</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1992"/>
+        <location filename="meinstall.ui" line="1840"/>
         <source>Abort</source>
         <translation>Prekini</translation>
     </message>
     <message>
-        <location filename="meinstall.ui" line="1995"/>
+        <location filename="meinstall.ui" line="1843"/>
         <source>Alt+A</source>
         <translation>Alt+A</translation>
     </message>
@@ -1445,308 +1450,309 @@ Ali bi jo res radi zaustavili?</translation>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="partman.cpp" line="154"/>
+        <location filename="partman.cpp" line="186"/>
         <source>Virtual Devices</source>
         <translation>Virtualne naprave</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="431"/>
-        <source>EFI System Partition</source>
-        <translation>EFI sistemski razdelek</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="432"/>
-        <source>swap space</source>
-        <translation>prostor za izmenjavo</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="433"/>
-        <source>swap space #%1</source>
-        <translation>prostor za izmenjavo #%1</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="434"/>
-        <source>format only</source>
-        <translation>zgolj formatiranje</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="544"/>
-        <source>Preserve (%1)</source>
-        <translation>Ohrani (%1)</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="544"/>
-        <source>Preserve /home (%1)</source>
-        <translation>Ohrani /home (%1)</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="591"/>
-        <location filename="partman.cpp" line="1066"/>
-        <source>Create</source>
-        <translation>Ustvari</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="800"/>
-        <location filename="partman.cpp" line="857"/>
+        <location filename="partman.cpp" line="397"/>
+        <location filename="partman.cpp" line="452"/>
         <source>&amp;Add partition</source>
         <translation>Dod&amp;aj razdelek</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="802"/>
+        <location filename="partman.cpp" line="399"/>
         <source>&amp;Remove partition</source>
         <translation>Odstrani &amp;razdelek</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="812"/>
+        <location filename="partman.cpp" line="409"/>
         <source>&amp;Lock</source>
         <translation>Zak&amp;leni</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="816"/>
+        <location filename="partman.cpp" line="413"/>
         <source>&amp;Unlock</source>
         <translation>&amp;Odklep</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="822"/>
-        <location filename="partman.cpp" line="957"/>
+        <location filename="partman.cpp" line="418"/>
+        <location filename="partman.cpp" line="528"/>
         <source>Add to crypttab</source>
         <translation>Dodaj v crypttab</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="828"/>
+        <location filename="partman.cpp" line="424"/>
         <source>Set boot flag</source>
         <translation>Dodaj zagonsko zastavico</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="835"/>
+        <location filename="partman.cpp" line="430"/>
         <source>New subvolume</source>
         <translation>Nov podpogon</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="836"/>
+        <location filename="partman.cpp" line="431"/>
         <source>Scan subvolumes</source>
         <translation>Poišči podpogone</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="860"/>
+        <location filename="partman.cpp" line="455"/>
         <source>New &amp;layout</source>
         <translation>Nov &amp;razpored</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="861"/>
+        <location filename="partman.cpp" line="456"/>
         <source>&amp;Reset layout</source>
         <translation>Po&amp;nastavi razpored</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="862"/>
-        <location filename="partman.cpp" line="896"/>
+        <location filename="partman.cpp" line="457"/>
         <source>&amp;Templates</source>
         <translation>&amp;Predloge</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="863"/>
+        <location filename="partman.cpp" line="458"/>
         <source>&amp;Standard install</source>
         <translation>&amp;Standardna namestitev</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="864"/>
+        <location filename="partman.cpp" line="459"/>
         <source>&amp;Encrypted system</source>
         <translation>&amp;Šifrirana namestitev</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="882"/>
+        <location filename="partman.cpp" line="477"/>
         <source>Remove subvolume</source>
         <translation>Odstrani podpogon</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="899"/>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation>Stiskanje (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="901"/>
-        <source>Compression (&amp;LZO)</source>
-        <translation>Stiskanje (&amp;LZO)</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="954"/>
+        <location filename="partman.cpp" line="525"/>
         <source>Unlock Drive</source>
         <translation>Odkleni pogon</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="960"/>
+        <location filename="partman.cpp" line="531"/>
         <source>Virtual Device:</source>
         <translation>Virtualna naprava:</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="961"/>
+        <location filename="partman.cpp" line="532"/>
         <source>Password:</source>
         <translation>&quot;Geslo:&quot;</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="994"/>
+        <location filename="partman.cpp" line="558"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>Naprave ni bilo mogoče odkleniti. Preverite geslo.</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1029"/>
+        <location filename="partman.cpp" line="587"/>
         <source>Failed to close %1</source>
         <translation>Napaka pri zapiranju %1</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1105"/>
-        <source>Preserve</source>
-        <translation>Ohrani</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="1146"/>
+        <location filename="partman.cpp" line="629"/>
         <source>Invalid subvolume label</source>
         <translation>Napačna oznaka podpogona</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1156"/>
+        <location filename="partman.cpp" line="640"/>
         <source>Duplicate subvolume label</source>
         <translation>Podvoji oznako podpogona</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1166"/>
+        <location filename="partman.cpp" line="649"/>
         <source>Invalid use for %1: %2</source>
         <translation>Neveljavna raba za %1: %2</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1178"/>
+        <location filename="partman.cpp" line="660"/>
         <source>%1 is already selected for: %2</source>
         <translation>%1 je že izbran za: %2</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1211"/>
+        <location filename="partman.cpp" line="684"/>
+        <source>A root partition of at least %1 is required.</source>
+        <translation>Potreben je korenski razdelek z najmanj %1.</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="688"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>Ne morem ohraniti doma /home v korenu /root, če je priklopljen tudi ločen razdelek /home.</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1220"/>
-        <source>You must choose a root partition.
-The root partition must be at least %1.</source>
-        <translation>Izbrati morate korenski oz. root razdelek.
-Korenski razdelek mora imeti vsaj %1.</translation>
+        <location filename="partman.cpp" line="720"/>
+        <source>Format %1 to use for %2</source>
+        <translation>Formatiraj %1 za uporabo kot %2</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1226"/>
+        <location filename="partman.cpp" line="1387"/>
+        <source>Model: %1</source>
+        <translation>Model: %1</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1393"/>
+        <source>Free space: %1</source>
+        <translation>Prostor na voljo: %1</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1482"/>
+        <source>Device</source>
+        <translation>Naprava</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1483"/>
+        <source>Size</source>
+        <translation>Velikost</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1484"/>
+        <source>Use For</source>
+        <translation>Uporabi za</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1485"/>
+        <source>Label</source>
+        <translation>Vrsta</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1486"/>
+        <source>Encrypt</source>
+        <translation>Šifriranje</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1487"/>
+        <source>Format</source>
+        <translation>Format</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1488"/>
+        <source>Check</source>
+        <translation>Preveri</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1489"/>
+        <source>Options</source>
+        <translation>Možnosti</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1490"/>
+        <source>Dump</source>
+        <translation>Deponiraj</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="1491"/>
+        <source>Pass</source>
+        <translation>Prehod</translation>
+    </message>
+    <message>
+        <location filename="partman.cpp" line="697"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Za šifriranje korena oz. root, je potrebno ustvariti ločen zagonski razdelek.</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1238"/>
-        <source>Delete the data on %1 except for /home</source>
-        <translation>Izbriši podatke na %1, razen za /home</translation>
+        <location filename="partman.cpp" line="711"/>
+        <source>Prepare %1 partition table on %2</source>
+        <translation>Pripravi %1 tabelo razdelkov na %2</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1241"/>
+        <location filename="partman.cpp" line="721"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Ponovno uporabi (brez formatiranja) %1 kot %2</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1247"/>
-        <source>%1, to be used for %2</source>
-        <translation>%1 naj bo uporabljen za %2</translation>
+        <location filename="partman.cpp" line="724"/>
+        <source>Create %1 without formatting</source>
+        <translation>Ustvari %1 brez formatiranja</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1250"/>
-        <source>The following partitions you selected are not Linux partitions:</source>
-        <translation>Naslednji izbrani razdelki niso Linux razdelki:</translation>
+        <location filename="partman.cpp" line="725"/>
+        <source>Create %1, format to use for %2</source>
+        <translation>Ustvari %1, formatiraj za rabo kot %2</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1258"/>
-        <source>Are you sure you want to reformat these partitions?</source>
-        <translation>Ste prepričani, da želite ponovno formatirati te razdelke?</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="1288"/>
+        <location filename="partman.cpp" line="741"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>Naslednji pogoni so ali bodo nameščeni z GPT, a nimajo BIOS-GRUB razdelka:</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1290"/>
+        <location filename="partman.cpp" line="743"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>Sistem se morda ne bo mogel zagnati z GPT pogonov, ki nimajo BIOS-GRUB razdelka.</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1291"/>
+        <location filename="partman.cpp" line="744"/>
         <source>Are you sure you want to continue?</source>
         <translation>Želite nadaljevati?</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1301"/>
-        <source>The %1 installer will now format and destroy the data on the following partitions:</source>
-        <translation>Namestitveni program %1 bo sedaj formatiral in uničil podatke na naslednjih razdelkih:</translation>
+        <location filename="partman.cpp" line="748"/>
+        <source>The %1 installer will now perform the requested actions.</source>
+        <translation>Program za namestitev %1 bo izvedel zahtevana dejanja.</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1309"/>
-        <source>The %1 installer will now perform the following actions:</source>
-        <translation>Program za namestitev %1 bo sedaj izvedel naslednja dejanja:</translation>
-    </message>
-    <message>
-        <location filename="partman.cpp" line="1313"/>
+        <location filename="partman.cpp" line="749"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation>Teh dejanj ni mogoče razveljaviti. Ali bi radi nadaljevali?</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1413"/>
+        <location filename="partman.cpp" line="812"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Diski z razdelki, ki ste jih izbrali, odpovedujejo:</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1417"/>
+        <location filename="partman.cpp" line="816"/>
         <source>Smartmon tool output:</source>
         <translation>Izpis za Smarton orodje:</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1418"/>
+        <location filename="partman.cpp" line="817"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Diski z izbranimi razdelki za namestitev so sicer prestali SMART monitor test (smartctl), a je test pokazal, da bodo v bližnji prihodnosti imeli večjo možnost za napake.</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1423"/>
+        <location filename="partman.cpp" line="822"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>Če niste prepričani, zaprite namestitveni program in zaženite GSmartControl za več informacij.</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1425"/>
+        <location filename="partman.cpp" line="824"/>
         <source>Do you want to abort the installation?</source>
         <translation>Želite prekiniti namestitev?</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1430"/>
+        <location filename="partman.cpp" line="829"/>
         <source>Do you want to continue?</source>
         <translation>Želite nadaljevati?</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1578"/>
+        <location filename="partman.cpp" line="913"/>
         <source>Preparing partition tables</source>
         <translation>Priprava tabel razdelkov</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1597"/>
+        <location filename="partman.cpp" line="928"/>
         <source>Preparing required partitions</source>
         <translation>Pripravljanje zahtevanih razdelkov</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1671"/>
+        <location filename="partman.cpp" line="996"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Ustvarjanje šifriranega nosilca: %1</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1676"/>
+        <location filename="partman.cpp" line="1001"/>
         <source>Formatting: %1</source>
         <translation>Formatiranje: %1</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1765"/>
+        <location filename="partman.cpp" line="1085"/>
         <source>Preparing subvolumes</source>
         <translation>Pripravljanje podpogonov</translation>
     </message>
     <message>
-        <location filename="partman.cpp" line="1903"/>
+        <location filename="partman.cpp" line="1217"/>
         <source>Mounting: %1</source>
         <translation>Priklapljanje: %1</translation>
     </message>
@@ -1754,26 +1760,26 @@ Korenski razdelek mora imeti vsaj %1.</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="app.cpp" line="50"/>
+        <location filename="app.cpp" line="63"/>
         <source>Customizable GUI installer for MX Linux and antiX Linux</source>
         <translation>Prilagodljiva grafična namestitev za MX Linux in antiX Linux</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="53"/>
+        <location filename="app.cpp" line="66"/>
         <source>Installs automatically using the configuration file (more information below).
 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.</source>
         <translation>Samodejna namestitev z uporabo nastavitvene datoteke (več podatkov je spodaj).
 - POZOR: je lahko nevarna možnost, saj bo razdelke samodejno pobrisala.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="55"/>
+        <location filename="app.cpp" line="68"/>
         <source>Overrules sanity checks on partitions and drives, causing them to be displayed.
 -- WARNING: this can break things, use it only if you don&apos;t care about data on drive.</source>
         <translation>Prekliče preverjanja ohranjenosti na razdelkih in pogonih, zato bodo prikazana.
 - POZOR: to lahko pokvari zadeve. Uporabite le, če podatki niso tako pomembni.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="57"/>
+        <location filename="app.cpp" line="70"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.
 By default /etc/minstall.conf is used.
 This configuration can be used with --auto for an unattended installation.
@@ -1788,7 +1794,7 @@ Namestilnik ne bo zapisoval gesel ali neuporabljenih nastavitev v novo namestitv
 Pomnite, da je to eksperimentalno. Prihodnji namestilniki so lahko nezdružljivi s obstoječimi namestitvenimi datotekami.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="63"/>
+        <location filename="app.cpp" line="76"/>
         <source>Always use GPT when doing a whole-drive installation regardlesss of capacity.
 Without this option, GPT will only be used on drives with at least 2TB capacity.
 GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.</source>
@@ -1797,17 +1803,17 @@ V nasprotnem primeru bo GPT uporabljen le na diskih, ki so večji od 2TB.
 GPT je vedno uporabljen na namestitvah na celotni pogon v UEFI sistemih, ne glede na zmogljivost ali izbiro te možnosti.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="66"/>
+        <location filename="app.cpp" line="79"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>Ko končate, ne odklopite /mnt/antiX ali katerega od povezanih vsebnikov, </translation>
     </message>
     <message>
-        <location filename="app.cpp" line="67"/>
+        <location filename="app.cpp" line="80"/>
         <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
         <translation>Še en poskusni način namestilnika. Razdelki/pogoni bodo FORMATIRANI, datoteke pa ne bodo skopirane.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="68"/>
+        <location filename="app.cpp" line="81"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
@@ -1816,31 +1822,36 @@ Ob zagonu bo namestilnik zagnan z --oobe, tako da lahko uproabnik poda pte podro
 To je uporabno za OEM namestitve, v namen prodaje ali oddaje računalnika, ki bo imel nameščen OS.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="71"/>
+        <location filename="app.cpp" line="84"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
         <translation>Možnost izbire Izkušnje iz škatle.
 To bo samodejno zagnano ob namestitvi z --oem možnostjo.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="73"/>
+        <location filename="app.cpp" line="86"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
         <translation>Poskusni način za grafični vmesnik. Lahko preizkusite različne zaslone, ne da bi dejansko kaj namestili.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="74"/>
+        <location filename="app.cpp" line="87"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
         <translation>Namestitev z rsync namesto cp ob prilagojenem razdeljevanju razdelkov.
 - ne gformatira korena /root in ne deluje s šifriranjem.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="76"/>
+        <location filename="app.cpp" line="89"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Naloži namestitveno datoteko, kot je določeno od &lt;config-file&gt;.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="91"/>
+        <location filename="app.cpp" line="93"/>
+        <source>Too many arguments. Please check the command format by running the program with --help</source>
+        <translation>Preveč argumentov. Preverite format ukaza z uporabo --help argumenta.</translation>
+    </message>
+    <message>
+        <location filename="app.cpp" line="103"/>
         <source>The installer won't launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -1849,12 +1860,12 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Prosimo, zaprite ga, če je to mogoče, ali v terminalu zaženite &apos;pkill minstall&apos;.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="115"/>
+        <location filename="app.cpp" line="110"/>
         <source>This operation requires root access.</source>
         <translation>To dejanje potrebuje korenski dostop.</translation>
     </message>
     <message>
-        <location filename="app.cpp" line="129"/>
+        <location filename="app.cpp" line="128"/>
         <source>Configuration file (%1) not found.</source>
         <translation>Kongiracijska datoteka (%1) ni bila najdena.</translation>
     </message>
