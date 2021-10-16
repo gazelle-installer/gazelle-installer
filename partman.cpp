@@ -877,9 +877,11 @@ int PartMan::countPrepSteps()
             else if (!tuse.isEmpty()) ++nstep; // Existing partition
             // Formatting
             if (item->encrypt) nstep += 2; // LUKS Format
-            if (item->willFormat()) ++nstep; // New file system or subvolume
+            if (item->willFormat()) ++nstep; // New file system
             // Mounting
             if (tuse.startsWith('/')) ++nstep;
+        } else if (item->type == DeviceItem::Subvolume) {
+            ++nstep; // Create a new subvolume.
         }
     }
     return nstep;
@@ -1450,7 +1452,7 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
         }
         break;
     case UseFor:
-        if (item->allowedUsesFor().count() > 1) flagsOut |= Qt::ItemIsEditable;
+        if (item->allowedUsesFor().count() >= 1) flagsOut |= Qt::ItemIsEditable;
         break;
     case Label:
         if (item->format != "PRESERVE") {
@@ -1612,6 +1614,7 @@ DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *pre
 {
     if (type == Partition) size = 1048576;
     if (parent) {
+        if (type == Subvolume) size = parent->size;
         physec = parent->physec;
         partman = parent->partman;
         const int i = preceding ? (parentItem->children.indexOf(preceding) + 1) : parentItem->childCount();
@@ -1764,7 +1767,7 @@ QString DeviceItem::shownDevice() const
 }
 QStringList DeviceItem::allowedUsesFor(bool real) const
 {
-    if (!isVolume()) return QStringList();
+    if (!isVolume() && type != Subvolume) return QStringList();
     QStringList list;
     if (!partman || size >= partman->rootSpaceNeeded) list << "root";
     if (type == Subvolume) list << "home"; // swap requires Linux 5.0 or later
@@ -1783,11 +1786,10 @@ QStringList DeviceItem::allowedUsesFor(bool real) const
 }
 QStringList DeviceItem::allowedFormats() const
 {
-    if (!isVolume()) return QStringList();
     QStringList list;
     bool allowPreserve = false, selPreserve = false;
     if (type == Subvolume) list.append("CREATE");
-    else {
+    else if (isVolume()) {
         const QString &use = realUseFor();
         if (use.isEmpty()) return QStringList();
         else if (use == "/boot") list.append("ext4");
