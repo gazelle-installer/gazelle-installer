@@ -186,6 +186,10 @@ void PartMan::scan(DeviceItem *drvstart)
         }
         drvit->sortChildren();
         notifyChange(drvit);
+        // Hide the live boot media and its partitions by default.
+        if (!brave && drvit->flags.bootRoot) {
+            gui.treePartitions->setRowHidden(drvit->row(), QModelIndex(), true);
+        }
     }
 
     if (!drvstart) scanVirtualDevices(false);
