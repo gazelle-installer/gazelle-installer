@@ -63,7 +63,8 @@ public:
         bool curEmpty : 1;
         bool oldLayout : 1;
         bool bootRoot : 1;
-        bool useGPT : 1;
+        bool curMBR : 1;
+        bool curGPT : 1;
         bool curESP : 1;
         bool volCrypto : 1;
     } flags = {};
@@ -97,6 +98,7 @@ public:
     void setActive(bool boot);
     bool isActive() const;
     bool isLocked() const;
+    bool willUseGPT() const;
     bool willFormat() const;
     bool canEncrypt() const;
     QString mappedDevice(const bool full = false) const;

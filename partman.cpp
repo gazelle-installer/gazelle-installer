@@ -134,7 +134,9 @@ void PartMan::scan(DeviceItem *drvstart)
         drvit->flags.curEmpty = true;
         drvit->flags.oldLayout = true;
         drvit->device = jdName;
-        drvit->flags.useGPT = (jsonDrive["pttype"]=="gpt");
+        const QString &ptType = jsonDrive["pttype"].toString();
+        drvit->flags.curGPT = (ptType=="gpt");
+        drvit->flags.curMBR = (ptType=="dos");
         drvit->size = jsonDrive["size"].toVariant().toLongLong();
         drvit->physec = jsonDrive["phy-sec"].toInt();
         drvit->curLabel = jsonDrive["label"].toString();
@@ -744,10 +746,8 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
             DeviceItem *drvit = root.child(ixdrv);
             const int partCount = drvit->childCount();
-            bool setupGPT = uefi || gptoverride || drvit->size >= 2199023255552 || partCount > 4;
-            if (drvit->flags.oldLayout) {
-                setupGPT = drvit->flags.useGPT;
-            } else if (drvit->type != DeviceItem::VirtualDevices) {
+            bool setupGPT = drvit->willUseGPT();
+            if (!drvit->flags.oldLayout && drvit->type != DeviceItem::VirtualDevices) {
                 details += tr("Prepare %1 partition table on %2").arg(setupGPT?"GPT":"MBR", drvit->device) + '\n';
             }
             bool hasBiosGrub = false;
@@ -933,8 +933,6 @@ bool PartMan::preparePartitions()
         } else {
             // Clearing the drive, so mark all partitions on the drive for unmounting.
             listToUnmount << proc.execOutLines("lsblk -nro name /dev/" + drvit->device, true);
-            // See if GPT needs to be used (either UEFI or >=2TB drive)
-            drvit->flags.useGPT = (gptoverride || uefi || drvit->size >= 2199023255552 || partCount > 4);
         }
     }
     for (const QString &strdev : listToUnmount) {
@@ -957,7 +955,7 @@ bool PartMan::preparePartitions()
         // Last 17KB = secondary partition table (for GPT disks).
         proc.exec(cmd + " seek=" + QString::number(offset));
         if (!proc.exec("parted -s /dev/" + drvit->device + " mklabel "
-            + (drvit->flags.useGPT ? "gpt" : "msdos"))) return false;
+            + (drvit->willUseGPT() ? "gpt" : "msdos"))) return false;
     }
     proc.sleep(1000);
 
@@ -967,7 +965,7 @@ bool PartMan::preparePartitions()
         DeviceItem *drvit = root.child(ixi);
         if (drvit->type == DeviceItem::VirtualDevices) continue;
         const int devCount = drvit->childCount();
-        const bool useGPT = drvit->flags.useGPT;
+        const bool useGPT = drvit->willUseGPT();
         if (drvit->flags.oldLayout) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
@@ -1415,8 +1413,13 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
             else return item->curLabel;
             break;
         case Format:
-            if (item->usefor.isEmpty()) return item->curFormat;
-            else return item->shownFormat(item->format);
+            if (item->type == DeviceItem::Drive) {
+                if (item->willUseGPT()) return "GPT";
+                else if (item->flags.curMBR || !item->flags.oldLayout) return "MBR";
+            } else {
+                if (item->usefor.isEmpty()) return item->curFormat;
+                else return item->shownFormat(item->format);
+            }
             break;
         case Options:
             if (item->canMount() || item->realUseFor() == "SWAP") return item->options;
@@ -1762,6 +1765,14 @@ bool DeviceItem::isLocked() const
     }
     return (mapCount != 0);
 }
+inline bool DeviceItem::willUseGPT() const
+{
+    if (type != Drive) return false;
+    if (flags.oldLayout) return flags.curGPT;
+    else if (size >= 2199023255552 || children.count() > 4) return true;
+    else if (partman) return (partman->gptoverride || partman->uefi);
+    return false;
+}
 inline bool DeviceItem::willFormat() const
 {
     return format != "PRESERVE" && !usefor.isEmpty();
@@ -1889,6 +1900,7 @@ DeviceItem *DeviceItem::addPart(int defaultMB, const QString &defaultUse, bool c
 void DeviceItem::driveAutoSetActive()
 {
     if (active) return;
+    if (partman && partman->uefi && willUseGPT()) return;
     const int partcount = children.count();
     for (const QString &pref : QStringList({"/boot", "/"})) {
         for (int ixPart = 0; ixPart < partcount; ++ixPart) {
