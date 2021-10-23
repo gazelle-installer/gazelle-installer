@@ -240,7 +240,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         DeviceItem *devit = listed.value(name);
         if (devit) {
             if (size != devit->size || physec != devit->physec || label != devit->curLabel
-                || crypto != devit->flags.cryptoV) {
+                || crypto != devit->flags.volCrypto) {
                 // List entry is different to the device, so refresh it.
                 delete devit;
                 devit = nullptr;
@@ -256,7 +256,7 @@ void PartMan::scanVirtualDevices(bool rescan)
             devit->flags.bootRoot = (!bootUUID.isEmpty() && jsonDev["uuid"]==bootUUID);
             devit->curLabel = label;
             devit->curFormat = jsonDev["fstype"].toString();
-            devit->flags.cryptoV = crypto;
+            devit->flags.volCrypto = crypto;
             devit->flags.oldLayout = true;
         }
     }
@@ -307,10 +307,11 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             config.beginGroup(groupPart);
             if (save) {
                 config.setValue("Size", partit->size);
-                config.setValue("Encrypt", partit->encrypt);
-                if (partit->isActive()) config.setValue("Boot", true);
+                if (partit->isActive()) config.setValue("Active", true);
+                if (partit->addToCrypttab) config.setValue("AddToCrypttab", true);
                 if (!partit->usefor.isEmpty()) config.setValue("UseFor", partit->usefor);
                 if (!partit->format.isEmpty()) config.setValue("Format", partit->format);
+                config.setValue("Encrypt", partit->encrypt);
                 if (!partit->label.isEmpty()) config.setValue("Label", partit->label);
                 if (!partit->options.isEmpty()) config.setValue("Options", partit->options);
                 config.setValue("CheckBadBlocks", partit->chkbadblk);
@@ -321,8 +322,9 @@ bool PartMan::manageConfig(MSettings &config, bool save)
                     partit->size = config.value("Size").toLongLong();
                     sizeTotal += partit->size;
                     if (sizeTotal > sizeMax) return false;
-                    if (config.value("Boot").toBool()) partit->setActive(true);
+                    if (config.value("Active").toBool()) partit->setActive(true);
                 }
+                partit->addToCrypttab = config.value("AddToCrypttab").toBool();
                 partit->usefor = config.value("UseFor", partit->usefor).toString();
                 partit->format = config.value("Format", partit->format).toString();
                 partit->chkbadblk = config.value("CheckBadBlocks", partit->chkbadblk).toBool();
@@ -439,12 +441,12 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actUnlock = nullptr;
         QAction *actAddCrypttab = nullptr;
         QAction *actNewSubvolume = nullptr, *actScanSubvols = nullptr;
-        QAction *actSetBoot = nullptr;
+        QAction *actActive = nullptr;
         actRemove->setEnabled(gui.pushPartRemove->isEnabled());
         menu.addSeparator();
         if (twit->type == DeviceItem::VirtualBD) {
             actRemove->setEnabled(false);
-            if (twit->flags.cryptoV) actLock = menu.addAction(tr("&Lock"));
+            if (twit->flags.volCrypto) actLock = menu.addAction(tr("&Lock"));
         } else {
             bool allowCryptTab = false;
             if (twit->flags.oldLayout && twit->curFormat == "crypto_LUKS") {
@@ -455,13 +457,13 @@ void PartMan::treeMenu(const QPoint &)
             if (allowCryptTab) {
                 actAddCrypttab = menu.addAction(tr("Add to crypttab"));
                 actAddCrypttab->setCheckable(true);
-                actAddCrypttab->setChecked(twit->flags.autoCrypto);
+                actAddCrypttab->setChecked(twit->addToCrypttab);
                 actAddCrypttab->setEnabled(twit->willMap());
             }
             menu.addSeparator();
-            actSetBoot = menu.addAction(tr("Set boot flag"));
-            actSetBoot->setCheckable(true);
-            actSetBoot->setChecked(twit->isActive());
+            actActive = menu.addAction(tr("Active partition"));
+            actActive->setCheckable(true);
+            actActive->setChecked(twit->isActive());
         }
         if (twit->format == "btrfs") {
             menu.addSeparator();
@@ -476,10 +478,9 @@ void PartMan::treeMenu(const QPoint &)
         else if (action == actRemove) partRemoveClick(true);
         else if (action == actUnlock) partMenuUnlock(twit);
         else if (action == actLock) partMenuLock(twit);
-        else if (action == actSetBoot) twit->setActive(action->isChecked());
-        else if (action == actAddCrypttab) {
-            twit->flags.autoCrypto = action->isChecked();
-        } else if (action == actNewSubvolume) {
+        else if (action == actActive) twit->setActive(action->isChecked());
+        else if (action == actAddCrypttab) twit->addToCrypttab = action->isChecked();
+        else if (action == actNewSubvolume) {
             new DeviceItem(DeviceItem::Subvolume, twit);
             gui.treePartitions->expand(selIndex);
         } else if (action == actScanSubvols) {
@@ -583,7 +584,7 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
         const bool ok = luksOpen(twit->device, mapdev, editPass->text().toUtf8());
         if (ok) {
             twit->usefor.clear();
-            twit->flags.autoCrypto = checkCrypttab->isChecked();
+            twit->addToCrypttab = checkCrypttab->isChecked();
             twit->mapCount++;
             notifyChange(twit);
             scanVirtualDevices(true);
@@ -611,7 +612,7 @@ void PartMan::partMenuLock(DeviceItem *twit)
     if (ok) {
         if (origin->mapCount > 0) origin->mapCount--;
         origin->devMapper.clear();
-        origin->flags.autoCrypto = false;
+        origin->addToCrypttab = false;
         notifyChange(origin);
     }
     // Refresh virtual devices list.
@@ -1163,7 +1164,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     // Find extra devices
     QMap<QString, QString> extraAdd;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->flags.autoCrypto) extraAdd.insert(item->device, item->mappedDevice());
+        if (item->addToCrypttab) extraAdd.insert(item->device, item->mappedDevice());
     }
     // File systems
     for (auto &it : mounts.toStdMap()) {
@@ -1398,6 +1399,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
         switch (index.column()) {
         case Device:
             if (item->type == DeviceItem::Subvolume) return "----";
+            else if (item->isActive()) return item->device + '*';
             else return item->device;
             break;
         case Size:
@@ -1442,15 +1444,11 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
     } else if (role == Qt::DecorationRole && index.column() == Device) {
         if (item->type == DeviceItem::Drive && !item->flags.oldLayout) {
             return QIcon(":/appointment-soon");
-        } else if (item->type == DeviceItem::VirtualBD && item->flags.cryptoV) {
+        } else if (item->type == DeviceItem::VirtualBD && item->flags.volCrypto) {
             return QIcon::fromTheme("unlock");
         } else if (item->mapCount) {
             return QIcon::fromTheme("lock");
         }
-    } else if (role == Qt::FontRole && index.column() == Device) {
-        QFont font;
-        font.setItalic(item->isActive());
-        return font;
     }
     return QVariant();
 }
