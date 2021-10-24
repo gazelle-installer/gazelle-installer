@@ -1865,21 +1865,13 @@ void DeviceItem::driveAutoSetActive()
 {
     if (active) return;
     if (partman && partman->uefi && willUseGPT()) return;
-    const int partcount = children.count();
+    // Cannot use partman->mounts map here as it may not be populated.
     for (const QString &pref : QStringList({"/boot", "/"})) {
-        for (int ixPart = 0; ixPart < partcount; ++ixPart) {
-            DeviceItem *partit = child(ixPart);
-            if (partit->realUseFor() == pref) {
-                partit->setActive(true);
+        for (DeviceItemIterator it(this); DeviceItem *item = *it; it.next()) {
+            if (item->realUseFor() == pref) {
+                while (item && item->type != Partition) item = item->parentItem;
+                if (item) item->setActive(true);
                 return;
-            } else {
-                const int svcount = partit->childCount();
-                for (int ixSV = 0; ixSV < svcount; ++ixSV) {
-                    if (partit->child(ixSV)->realUseFor() == pref) {
-                        partit->setActive(true);
-                        return;
-                    }
-                }
             }
         }
     }
@@ -1916,7 +1908,9 @@ void DeviceItem::autoFill(unsigned int changed)
         }
         // Automatic default boot device selection
         if ((type != VirtualBD) && (use == "/boot" || use == "/")) {
-            if (parentItem) parentItem->driveAutoSetActive();
+            DeviceItem *drvit = this;
+            while (drvit && drvit->type != Drive) drvit = drvit->parentItem;
+            if (drvit) drvit->driveAutoSetActive();
         }
     }
     if (format.isEmpty()) {
