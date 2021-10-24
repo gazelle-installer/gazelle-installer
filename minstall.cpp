@@ -1432,8 +1432,7 @@ void MInstall::setService(const QString &service, bool enabled)
 }
 void MInstall::failUI(const QString &msg)
 {
-    proc.log(__PRETTY_FUNCTION__);
-    qDebug() << "Phase" << phase << '-' << msg;
+    proc.log("FAILED Phase " + QString::number(phase) + " - " + msg);
     if (phase >= 0) {
         boxMain->setEnabled(false);
         QMessageBox::critical(this, windowTitle(), msg);
@@ -1926,8 +1925,6 @@ void MInstall::setupPartitionSlider()
 
 void MInstall::buildServiceList()
 {
-    proc.log(__PRETTY_FUNCTION__);
-
     //setup treeServices
     treeServices->header()->setMinimumSectionSize(150);
     treeServices->header()->resizeSection(0,150);
@@ -2203,7 +2200,6 @@ void MInstall::on_pushClose_clicked()
 
 void MInstall::setupkeyboardbutton()
 {
-    proc.log(__PRETTY_FUNCTION__);
     QFile file("/etc/default/keyboard");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         while (!file.atEnd()) {
