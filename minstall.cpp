@@ -2358,12 +2358,13 @@ void MInstall::selectBootMain()
     const DeviceItem *twit = partman.mounts.value("/boot");
     if (!twit) twit = partman.mounts.value("/");
     if (twit->origin) twit = twit->origin;
-    while (twit && twit->type != DeviceItem::Drive) twit = twit->parent();
+    while (twit && twit->type != DeviceItem::Partition) twit = twit->parent();
+    if (!radioBootPBR->isChecked() && twit) twit = twit->parent();
     if (!twit) return;
-    int ixsel = comboBoot->findData(twit->device); // Boot drive
+    int ixsel = comboBoot->findData(twit->device); // Boot drive or partition
     for(int ixi = 0; ixsel < 0 && ixi < comboBoot->count(); ++ixi) {
         const QStringList &s = DeviceItem::split(comboBoot->itemData(ixi).toString());
-        if (s.at(0) == twit->device) ixsel = ixi; // Boot partition
+        if (s.at(0) == twit->device) ixsel = ixi; // Partition on boot drive
     }
     if (ixsel >= 0) comboBoot->setCurrentIndex(ixsel);
 }
