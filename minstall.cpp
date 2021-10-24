@@ -2358,7 +2358,8 @@ void MInstall::selectBootMain()
     const DeviceItem *twit = partman.mounts.value("/boot");
     if (!twit) twit = partman.mounts.value("/");
     if (twit->origin) twit = twit->origin;
-    if (twit->type == DeviceItem::Partition) twit = twit->parent();
+    while (twit && twit->type != DeviceItem::Drive) twit = twit->parent();
+    if (!twit) return;
     int ixsel = comboBoot->findData(twit->device); // Boot drive
     for(int ixi = 0; ixsel < 0 && ixi < comboBoot->count(); ++ixi) {
         const QStringList &s = DeviceItem::split(comboBoot->itemData(ixi).toString());
