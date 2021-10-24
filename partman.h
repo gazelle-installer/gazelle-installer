@@ -50,6 +50,7 @@ class DeviceItem
     void labelParts();
 public:
     DeviceItem *active = nullptr;
+    DeviceItem *origin = nullptr;
     enum DeviceType {
         Unknown,
         Drive,
@@ -153,13 +154,11 @@ class PartMan : public QAbstractItemModel
     DeviceItem *changing = nullptr;
     Ui::MeInstall &gui;
     QWidget *master;
-    QMap<QString, DeviceItem *> mounts;
     void setup();
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit();
     bool formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label);
     bool prepareSubvolumes(DeviceItem *partit);
-    DeviceItem *findOrigin(const QString &vdev);
     void treeItemChange();
     void treeSelChange();
     void treeMenu(const QPoint &);
@@ -191,6 +190,7 @@ public:
     bool gptoverride=false, uefi=false, brave=false;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
+    QMap<QString, DeviceItem *> mounts;
     QMap<QString, QString> defaultLabels;
     PartMan(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent);
     void scan(DeviceItem *drvstart = nullptr);

@@ -59,6 +59,7 @@ public:
     bool validateComputerName();
     bool setComputerName();
     bool setUserInfo();
+    void selectBootMain();
     void buildBootLists();
     void buildServiceList();
     void disablehiberanteinitramfs();
