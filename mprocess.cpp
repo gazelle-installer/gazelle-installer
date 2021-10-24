@@ -147,16 +147,15 @@ QString MProcess::joinCommand(const QString &program, const QStringList &argumen
 QListWidgetItem *MProcess::log(const QString &text, const LogType type)
 {
     if (type == Standard) qDebug().noquote() << text;
-    if (type == Section) qDebug().noquote() << "+++" << text << "+++";
-    else if (type == Status) qDebug().noquote() << "-" << text << "-";
-    if (!logView) return nullptr;
+    else if (type == Section) qDebug().noquote() << "<<" << text << ">>";
+    else if (type == Status) qDebug().noquote() << "++" << text << "++";
+    if (!logView || type == Section) return nullptr;
     QListWidgetItem *entry = new QListWidgetItem(text, logView);
     logView->addItem(entry);
     if (type == Exec) entry->setForeground(Qt::cyan);
-    else if (type != Standard) {
+    else if (type == Status) {
         QFont font(entry->font());
-        if (type == Section) font.setBold(true);
-        else if (type == Status) font.setItalic(true);
+        font.setBold(true);
         entry->setFont(font);
     }
     logView->scrollToBottom();
