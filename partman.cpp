@@ -244,10 +244,19 @@ void PartMan::scanVirtualDevices(bool rescan)
     vdlit->sortChildren();
     for(int ixi = 0; ixi < vdlit->childCount(); ++ixi) {
         const QString &name = vdlit->child(ixi)->device;
-        DeviceItem *orit = findOrigin(name);
-        if (orit) {
-            orit->devMapper = name;
-            notifyChange(orit);
+        DeviceItem *vit = vdlit->child(ixi);
+        vit->origin = nullptr; // Clear stale origin pointer.
+        QStringList lines = proc.execOutLines("cryptsetup status " + vit->device, true);
+        // Find the associated partition and decrement its reference count if found.
+        for (const QString &line : lines) {
+            const QString &trline = line.trimmed();
+            if (!trline.startsWith("device:")) continue;
+            vit->origin = findDevice(trline.mid(trline.lastIndexOf('/') + 1));
+            if (vit->origin) {
+                vit->origin->devMapper = name;
+                notifyChange(vit->origin);
+                break;
+            }
         }
     }
     gui.treePartitions->expand(index(vdlit));
@@ -587,7 +596,7 @@ void PartMan::partMenuLock(DeviceItem *twit)
     const QString &dev = twit->mappedDevice();
     bool ok = false;
     // Find the associated partition and decrement its reference count if found.
-    DeviceItem *origin = findOrigin(dev);
+    DeviceItem *origin = twit->origin;
     if (origin) ok = proc.exec("cryptsetup close " + dev, true);
     if (ok) {
         if (origin->mapCount > 0) origin->mapCount--;
@@ -595,6 +604,7 @@ void PartMan::partMenuLock(DeviceItem *twit)
         origin->addToCrypttab = false;
         notifyChange(origin);
     }
+    twit->origin = nullptr;
     // Refresh virtual devices list.
     scanVirtualDevices(true);
     resizeColumnsToFit();
@@ -1315,23 +1325,6 @@ int PartMan::isEncrypt(const QString &point)
     return count;
 }
 
-DeviceItem *PartMan::findOrigin(const QString &vdev)
-{
-    QStringList lines = proc.execOutLines("cryptsetup status " + vdev, true);
-    // Find the associated partition and decrement its reference count if found.
-    for (const QString &line : lines) {
-        const QString &trline = line.trimmed();
-        if (trline.startsWith("device:")) {
-            const QString &trdev = trline.mid(trline.lastIndexOf('/') + 1);
-            for (DeviceItemIterator it(*this); *it; it.next()) {
-                if ((*it)->device == trdev) return *it;
-            }
-            return nullptr;
-        }
-    }
-    return nullptr;
-}
-
 DeviceItem *PartMan::findDevice(const QString &devname) const
 {
     for (DeviceItemIterator it(*this); *it; it.next()) {
@@ -1667,7 +1660,7 @@ inline int DeviceItem::row() const
 {
     return parentItem ? parentItem->children.indexOf(const_cast<DeviceItem *>(this)) : 0;
 }
-inline DeviceItem *DeviceItem::parent() const
+DeviceItem *DeviceItem::parent() const
 {
     if (parentItem && !parentItem->parentItem) return nullptr; // Invisible root
     return parentItem;

@@ -2318,6 +2318,7 @@ void MInstall::on_radioBootMBR_toggled()
             if (!item->flags.nasty || brave) item->addToCombo(comboBoot, true);
         }
     }
+    selectBootMain();
     labelBoot->setText(tr("System boot disk:"));
 }
 
@@ -2326,7 +2327,7 @@ void MInstall::on_radioBootPBR_toggled()
     comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Partition && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
-            if (item->flags.curESP || item->realUseFor() == "ESP") continue;
+            if (item->realUseFor() == "ESP") continue;
             else if (!item->format.compare("SWAP", Qt::CaseInsensitive)) continue;
             else if (item->format == "crypto_LUKS") continue;
             else if (item->format.isEmpty() || item->format == "PRESERVE") {
@@ -2336,6 +2337,7 @@ void MInstall::on_radioBootPBR_toggled()
             if (!item->flags.nasty || brave) item->addToCombo(comboBoot, true);
         }
     }
+    selectBootMain();
     labelBoot->setText(tr("Partition to use:"));
 }
 
@@ -2343,10 +2345,26 @@ void MInstall::on_radioBootESP_toggled()
 {
     comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if ((item->flags.curESP || item->realUseFor() == "ESP")
-            && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) item->addToCombo(comboBoot);
+        if (item->realUseFor() == "ESP" && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
+            item->addToCombo(comboBoot);
+        }
     }
+    selectBootMain();
     labelBoot->setText(tr("Partition to use:"));
+}
+
+void MInstall::selectBootMain()
+{
+    const DeviceItem *twit = partman.mounts.value("/boot");
+    if (!twit) twit = partman.mounts.value("/");
+    if (twit->origin) twit = twit->origin;
+    if (twit->type == DeviceItem::Partition) twit = twit->parent();
+    int ixsel = comboBoot->findData(twit->device); // Boot drive
+    for(int ixi = 0; ixsel < 0 && ixi < comboBoot->count(); ++ixi) {
+        const QStringList &s = DeviceItem::split(comboBoot->itemData(ixi).toString());
+        if (s.at(0) == twit->device) ixsel = ixi; // Boot partition
+    }
+    if (ixsel >= 0) comboBoot->setCurrentIndex(ixsel);
 }
 
 // build ESP list available to install GRUB
