@@ -18,6 +18,7 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_fi.ts \
                 translations/gazelle-installer_fil_PH.ts \
                 translations/gazelle-installer_fr.ts \
+                translations/gazelle-installer_fr_BE.ts \
                 translations/gazelle-installer_he_IL.ts \
                 translations/gazelle-installer_hi.ts \
                 translations/gazelle-installer_hr.ts \
