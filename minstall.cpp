@@ -793,10 +793,9 @@ bool MInstall::installLinux()
         proc.exec("/bin/rm -rf /mnt/antiX/home/demo");
 
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
-    // not sure if this is still needed with the live-to-installed change but OK
+    // modification to preserve points that are still mounted.
     if (!POPULATE_MEDIA_MOUNTPOINTS) {
-        proc.exec("/bin/rm -rf /mnt/antiX/media/sd*", false);
-        proc.exec("/bin/rm -rf /mnt/antiX/media/hd*", false);
+        proc.exec("/bin/rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*", false);
     }
 
     // guess localtime vs UTC
