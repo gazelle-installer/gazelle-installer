@@ -1448,7 +1448,7 @@ int MInstall::showPage(int curr, int next)
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
                 if (!uefi) {
-                    DeviceItem *devit = partman.findDevice(comboDisk->currentData().toString());
+                    DeviceItem *devit = partman.findByPath("/dev/" + comboDisk->currentData().toString());
                     if (devit && devit->size >= (2048LL*1073741824LL)) {
                         msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
                                            " On some systems, a GPT-formatted disk will not boot.");
