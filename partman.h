@@ -69,7 +69,7 @@ public:
         bool curESP : 1;
         bool volCrypto : 1;
     } flags = {};
-    QString model, device, devMapper;
+    QString model, device, path, devMapper;
     QString label, curLabel;
     QString usefor;
     QString format, curFormat;
@@ -102,7 +102,7 @@ public:
     bool willUseGPT() const;
     bool willFormat() const;
     bool canEncrypt() const;
-    QString mappedDevice(const bool full = false) const;
+    QString mappedDevice() const;
     bool willMap() const;
     QString shownDevice() const;
     QStringList allowedUsesFor(bool real = true) const;
@@ -167,8 +167,8 @@ class PartMan : public QAbstractItemModel
     void partMenuUnlock(DeviceItem *twit);
     void partMenuLock(DeviceItem *twit);
     void scanSubvolumes(DeviceItem *partit);
-    bool luksFormat(const QString &dev, const QByteArray &password);
-    bool luksOpen(const QString &dev, const QString &luksfs,
+    bool luksFormat(const QString &devpath, const QByteArray &password);
+    bool luksOpen(const QString &devpath, const QString &luksfs,
         const QByteArray &password, const QString &options = QString());
 public:
     enum TreeColumns {
@@ -208,7 +208,7 @@ public:
     QString getMountDev(const QString &point, const bool mapped=true);
     int swapCount();
     int isEncrypt(const QString &point);
-    DeviceItem *findDevice(const QString &devname) const;
+    DeviceItem *findByPath(const QString &devpath) const;
     // Model View Controller
     QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
