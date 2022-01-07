@@ -2078,7 +2078,25 @@ void DeviceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
         pen.setWidth(2);
         painter->setPen(pen);
         painter->translate(pen.widthF() / 2, pen.widthF() / 2);
-        painter->drawRect(option.rect.adjusted(0, 0, -pen.width(), -pen.width()));
+        const QRect &rect = option.rect.adjusted(0, 0, -pen.width(), -pen.width());
+        painter->drawRect(rect);
+        // Arrow to indicate a drop-down list
+        if(index.column() == PartMan::Format || index.column() == PartMan::UseFor) {
+            const int arrowEdgeX = 4, arrowEdgeY = 6, arrowWidth = 8;
+            pen.setWidthF(1.5);
+            painter->setPen(pen);
+            QBrush brush = pen.brush();
+            brush.setStyle(Qt::Dense4Pattern);
+            painter->setBrush(brush);
+            pen.setColor(option.palette.color(QPalette::Active, QPalette::Text));
+            const int adjright = rect.right() - arrowEdgeX;
+            QPoint arrow[] = {
+                {adjright, rect.top() + arrowEdgeY},
+                {adjright - arrowWidth/2, rect.bottom() - arrowEdgeY},
+                {adjright - arrowWidth, rect.top() + arrowEdgeY}
+            };
+            painter->drawConvexPolygon(arrow, 3);
+        }
         painter->restore();
     }
 }
