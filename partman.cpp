@@ -1211,6 +1211,11 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         const QString &mountopts = twit->options;
         if (twit->type == DeviceItem::Subvolume) {
             out << " subvol=" << twit->label;
+            //make root subvol default
+            if (it.first == "/") {
+                QString cmd = "btrfs subvolume set-default /mnt/antiX/" + twit->label;
+                proc.exec(cmd.toUtf8());
+            }
             if (!mountopts.isEmpty()) out << ',' << mountopts;
         } else {
             if (mountopts.isEmpty()) out << " defaults";
