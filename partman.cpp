@@ -1213,8 +1213,8 @@ bool PartMan::makeFstab(bool populateMediaMounts)
             out << " subvol=" << twit->label;
             //make root subvol default
             if (it.first == "/") {
-                QString cmd = "btrfs subvolume set-default /mnt/antiX/" + twit->label;
-                proc.exec(cmd.toUtf8());
+                QString SUBVOLID = proc.execOut("btrfs subvolume list /mnt/antiX | grep -w " + twit->label + " | cut -d\\  -f2");
+                proc.exec("btrfs subvolume set-default " + SUBVOLID + " /mnt/antiX");
             }
             if (!mountopts.isEmpty()) out << ',' << mountopts;
         } else {
