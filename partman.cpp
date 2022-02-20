@@ -922,7 +922,7 @@ bool PartMan::preparePartitions()
             }
         } else {
             // Clearing the drive, so mark all partitions on the drive for unmounting.
-            listToUnmount << proc.execOutLines("LC_ALL=C.UTF-8 lsblk -nro path " + drvit->path, true);
+            listToUnmount << proc.execOutLines("lsblk -nro path " + drvit->path, true);
         }
     }
     for (const QString &devpath : listToUnmount) {
