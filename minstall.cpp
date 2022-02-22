@@ -1931,6 +1931,7 @@ void MInstall::buildServiceList()
     treeServices->header()->resizeSection(0,150);
 
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
+    services_desc.setIniCodec("UTF-8");
 
     for (const QString &service : qAsConst(ENABLE_SERVICES)) {
         const QString &lang = QLocale::system().bcp47Name().toLower();
