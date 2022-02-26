@@ -91,7 +91,7 @@ void PartMan::setup()
 
 void PartMan::scan(DeviceItem *drvstart)
 {
-    QString cmd("LC_ALL=C.UTF-8 lsblk -T -bJo TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL,PARTFLAGS");
+    QString cmd("lsblk -T -bJo TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL,PARTFLAGS");
     if (drvstart) cmd += ' ' + drvstart->path;
     const QString &bdRaw = proc.execOut(cmd, true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
@@ -199,7 +199,7 @@ void PartMan::scanVirtualDevices(bool rescan)
             }
         }
     }
-    const QString &bdRaw = proc.execOut("LC_ALL=C.UTF-8 lsblk -T -bJo"
+    const QString &bdRaw = proc.execOut("lsblk -T -bJo"
         " TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/* 2>/dev/null", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();

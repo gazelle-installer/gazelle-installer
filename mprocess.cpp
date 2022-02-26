@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <QApplication>
+#include <QProcessEnvironment>
 #include <QDebug>
 #include <QEventLoop>
 #include <QTimer>
@@ -29,6 +30,10 @@
 MProcess::MProcess(QObject *parent)
     : QProcess(parent)
 {
+    // Stop user-selected locale from interfering with command output parsing.
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("LC_ALL", "C.UTF-8");
+    setProcessEnvironment(env);
 }
 
 void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall)
