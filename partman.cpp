@@ -1060,9 +1060,7 @@ bool PartMan::formatPartitions()
 bool PartMan::formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label)
 {
     QString cmd;
-    if (format == "reiserfs") {
-        cmd = "mkfs.reiserfs -q";
-    } else if (format == "btrfs") {
+    if (format == "btrfs") {
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
@@ -1086,7 +1084,7 @@ bool PartMan::formatLinuxPartition(const QString &devpath, const QString &format
 
     cmd.append(" " + devpath);
     if (!label.isEmpty()) {
-        if (format == "reiserfs" || format == "f2fs") cmd.append(" -l \"");
+        if (format == "f2fs") cmd.append(" -l \"");
         else cmd.append(" -L \"");
         cmd.append(label + "\"");
     }
@@ -1815,7 +1813,7 @@ QStringList DeviceItem::allowedFormats() const
             selPreserve = allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         } else {
             list << "ext4" << "ext3" << "ext2";
-            list << "f2fs" << "jfs" << "xfs" << "btrfs" << "reiserfs";
+            list << "f2fs" << "jfs" << "xfs" << "btrfs";
             if (use != "FORMAT") allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
             if (use == "/home") selPreserve = allowPreserve;
         }
@@ -1927,13 +1925,8 @@ void DeviceItem::autoFill(unsigned int changed)
     if (changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format))) {
         // Default options, dump and pass
         if (!(use.isEmpty() || use == "FORMAT" || use == "ESP")) {
-            const QString &lformat = format.toLower();
-            if (lformat == "reiserfs") {
-                options = "noatime,notail";
-                pass = 0;
-            } else if (lformat == "swap") {
-                options = "defaults";
-            } else {
+            if (format == "SWAP") options = "defaults";
+            else {
                 if (use == "/boot" || use == "/") {
                     pass = (format == "btrfs") ? 0 : 1;
                 }
