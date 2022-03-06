@@ -648,7 +648,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
     bool encryptRoot = false;
     mounts.clear();
     // Partition use and other validation
-    int mapnum = 0, swapnum = 0;
+    int mapnum = 0, swapnum = 0, volnum = 0;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices) continue;
         if (item->type == DeviceItem::Subvolume) {
@@ -698,6 +698,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         }
         if (item->type != DeviceItem::VirtualBD) {
             if (!item->encrypt) item->devMapper.clear();
+            else if (mount == "FORMAT") item->devMapper = QString("vol%1.fsm").arg(++volnum);
             else if (mount == "/") item->devMapper = "root.fsm";
             else if (mount.startsWith("SWAP")) item->devMapper = mount.toLower();
             else item->devMapper = QString::number(++mapnum) + mount.replace('/','.') + ".fsm";
@@ -1126,48 +1127,48 @@ bool PartMan::prepareSubvolumes(DeviceItem *partit)
 // write out crypttab if encrypting for auto-opening
 bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
 {
-    QFile file("/mnt/antiX/etc/crypttab");
-    if (!file.open(QIODevice::WriteOnly)) return false;
-    QTextStream out(&file);
-    const QLineEdit *passedit = gui.radioEntireDisk->isChecked()
-        ? gui.textCryptoPass : gui.textCryptoPassCust;
-    const QByteArray password(passedit->text().toUtf8());
-    const QString cmdAddKey("cryptsetup luksAddKey /dev/%1 /mnt/antiX" + keyfile);
-    const QString cmdBlkID("blkid -s UUID -o value /dev/");
-    // Find the file system device which contains the key
+    // Find the file system and device which contains the key.
     QString keyMount('/'); // If no mount point matches, it's in a directory on the root.
+    QString keyDev;
     const bool noKey = keyfile.isEmpty();
     if (!noKey) {
         for (const auto &it : mounts.toStdMap()) {
             if (keyfile.startsWith(it.first+'/')) keyMount = it.first;
         }
+        DeviceItem *devit = mounts.value(keyMount);
+        if (devit && devit->type == DeviceItem::Subvolume) devit = devit->parentItem;
+        if (devit) keyDev = devit->device;
     }
     // Find extra devices
-    QMap<QString, QString> extraAdd;
+    QMap<QString, QString> cryptAdd;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->addToCrypttab) extraAdd.insert(item->device, item->devMapper);
+        if (item->addToCrypttab) cryptAdd.insert(item->device, item->devMapper);
     }
     // File systems
     for (auto &it : mounts.toStdMap()) {
-        if (!it.second->encrypt) continue;
-        const QString &dev = it.second->device;
-        QString uuid = proc.execOut(cmdBlkID + dev);
-        out << it.second->devMapper << " /dev/disk/by-uuid/" << uuid;
-        if (noKey || it.first == keyMount) out << " none";
-        else {
-            if (isNewKey) {
-                if (!proc.exec(cmdAddKey.arg(dev), true, &password)) return false;
+        if (it.second->encrypt) cryptAdd.insert(it.second->device, it.second->devMapper);
+        else if (it.second->type == DeviceItem::Subvolume) {
+            // Treat format-only, encrypted parent BTRFS partition as an extra device.
+            DeviceItem *partit = it.second->parent();
+            if (partit->encrypt && partit->realUseFor() == "FORMAT") {
+                cryptAdd.insert(partit->device, partit->devMapper);
             }
-            out << ' ' << keyfile;
         }
-        out << " luks\n";
-        extraAdd.remove(dev);
     }
-    // Extra devices
-    for (auto &it : extraAdd.toStdMap()) {
+
+    QFile file("/mnt/antiX/etc/crypttab");
+    if (!file.open(QIODevice::WriteOnly)) return false;
+    QTextStream out(&file);
+    // Add devices to crypttab.
+    const QLineEdit *passedit = gui.radioEntireDisk->isChecked()
+        ? gui.textCryptoPass : gui.textCryptoPassCust;
+    const QByteArray password(passedit->text().toUtf8());
+    const QString cmdAddKey("cryptsetup luksAddKey /dev/%1 /mnt/antiX" + keyfile);
+    const QString cmdBlkID("blkid -s UUID -o value /dev/");
+    for (auto &it : cryptAdd.toStdMap()) {
         QString uuid = proc.execOut(cmdBlkID + it.first);
         out << it.second << " /dev/disk/by-uuid/" << uuid;
-        if (noKey) out << " none";
+        if (noKey || it.first == keyDev) out << " none";
         else {
             if (isNewKey) {
                 if (!proc.exec(cmdAddKey.arg(it.first), true, &password)) return false;
@@ -1315,15 +1316,15 @@ int PartMan::isEncrypt(const QString &point)
     int count = 0;
     if (point.isEmpty()) {
         for (DeviceItem *twit : mounts) {
-            if (twit->encrypt) ++count;
+            if (twit->willEncrypt()) ++count;
         }
     } else if (point == "SWAP") {
         for (const auto &mount : mounts.toStdMap()) {
-            if (mount.first.startsWith("SWAP") && mount.second->encrypt) ++count;
+            if (mount.first.startsWith("SWAP") && mount.second->willEncrypt()) ++count;
         }
     } else {
         const DeviceItem *twit = mounts.value(point);
-        if (twit && twit->encrypt) ++count;
+        if (twit && twit->willEncrypt()) ++count;
     }
     return count;
 }
@@ -1753,6 +1754,11 @@ bool DeviceItem::canEncrypt() const
     const QString &use = realUseFor();
     return !(use.isEmpty() || use == "ESP" || use == "BIOS-GRUB" || use == "/boot");
 }
+inline bool DeviceItem::willEncrypt() const
+{
+    if (type == Subvolume) return parentItem->encrypt;
+    return encrypt;
+}
 QString DeviceItem::mappedDevice() const
 {
     const DeviceItem *twit = this;
@@ -1766,6 +1772,7 @@ QString DeviceItem::mappedDevice() const
 inline bool DeviceItem::willMap() const
 {
     if (type == Drive || type == VirtualDevices) return false;
+    else if (type == Subvolume) return !parentItem->devMapper.isEmpty();
     return !devMapper.isEmpty();
 }
 QString DeviceItem::shownDevice() const
