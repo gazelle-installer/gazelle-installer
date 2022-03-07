@@ -36,8 +36,11 @@ class MProcess : public QProcess
     QProgressBar *progBar = nullptr;
     int progSliceStart = 0, progSliceSpace = 0;
     long progSlicePos = 0, progSliceSteps = 0;
+    QString curRoot;
     bool exec(const QString &program, const QStringList &arguments,
         const QByteArray *input, bool needRead, QListWidgetItem *logEntry);
+protected:
+    void setupChildProcess() override;
 public:
     enum LogType {
         Standard,
@@ -47,6 +50,7 @@ public:
     };
     MProcess(QObject *parent = Q_NULLPTR);
     void setupUI(QListWidget *listLog, QProgressBar *progInstall);
+    void setRoot(const QString &root);
     /* Raw binary execution */
     bool exec(const QString &program, const QStringList &arguments,
         const QByteArray *input = nullptr, bool needRead = false);

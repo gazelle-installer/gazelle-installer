@@ -24,6 +24,7 @@
 #include <QEventLoop>
 #include <QTimer>
 #include <QDir>
+#include <unistd.h>
 
 #include "mprocess.h"
 
@@ -44,6 +45,20 @@ void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall)
     pal.setColor(QPalette::Base, Qt::black);
     pal.setColor(QPalette::Text, Qt::white);
     listLog->setPalette(pal);
+}
+
+void MProcess::setupChildProcess()
+{
+    if (curRoot.isEmpty()) return;
+    chroot(curRoot.toUtf8().constData());
+    chdir("/");
+}
+void MProcess::setRoot(const QString &root)
+{
+    if (halting) return;
+    if (!root.isEmpty()) log("New chroot: " + root, Standard);
+    else if (!curRoot.isEmpty() && root.isEmpty()) log("End chroot: " + curRoot, Standard);
+    curRoot = root;
 }
 
 bool MProcess::exec(const QString &program, const QStringList &arguments,
