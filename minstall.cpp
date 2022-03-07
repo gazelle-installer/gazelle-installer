@@ -918,7 +918,7 @@ bool MInstall::installLoader()
             //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
             //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
         //}
-        return proc.exec("chroot", {"/mnt/antiX update-initramfs", "-u", "-t", "-k", "all"});
+        return proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
     }
 
     proc.status(tr("Installing GRUB"));
@@ -1027,7 +1027,7 @@ bool MInstall::installLoader()
         //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
         //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
     //}
-    proc.exec("chroot", {"/mnt/antiX update-initramfs", "-u", "-t", "-k", "all"});
+    proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
     proc.status();
     qDebug() << "clear chroot env";
     proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});

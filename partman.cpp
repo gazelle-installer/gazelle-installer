@@ -847,8 +847,8 @@ bool PartMan::luksFormat(const QString &devpath, const QByteArray &password)
 {
     DeviceItem *item = findByPath(devpath);
     assert(item != nullptr);
-    QStringList cargs({"--batch-mode", "--key-size", "512", "--hash", "sha512", "--pbkdf", "argon2id"});
-    if (item->physec > 0) cargs << "--sector-size=" << QString::number(item->physec);
+    QStringList cargs({"--batch-mode", "--key-size=512", "--hash=sha512", "--pbkdf=argon2id"});
+    if (item->physec > 0) cargs.append("--sector-size=" + QString::number(item->physec));
     cargs << "luksFormat" << devpath;
     if (!proc.exec("cryptsetup", cargs, &password)) return false;
     return true;
