@@ -91,20 +91,21 @@ void PartMan::setup()
 
 void PartMan::scan(DeviceItem *drvstart)
 {
-    QString cmd("lsblk -T -bJo TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL,PARTFLAGS");
-    if (drvstart) cmd += ' ' + drvstart->path;
-    const QString &bdRaw = proc.execOut(cmd, true);
+    QStringList cargs({"-T", "-bJo",
+        "TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL,PARTFLAGS"});
+    if (drvstart) cargs.append(drvstart->path);
+    const QString &bdRaw = proc.execOut("lsblk", cargs, true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
 
     if (!drvstart) {
-        proc.exec("partprobe -s", true); // Inform the kernel of partition changes.
-        proc.exec("blkid -c /dev/null", true); // Refresh cached blkid information.
+        proc.exec("partprobe", "-s"); // Inform the kernel of partition changes.
+        proc.exec("blkid", {"-c", "/dev/null"}); // Refresh cached blkid information.
     }
     // Partitions listed in order of their physical locations.
     QStringList order;
     QString curdev;
-    for(const QString &line : proc.execOutLines("parted -lm", true)) {
+    for(const QString &line : proc.execOutLines("parted", "-lm")) {
         const QString &sect = line.section(':', 0, 0);
         const int part = sect.toInt();
         if (part) order.append(DeviceItem::join(curdev, part));
@@ -199,7 +200,7 @@ void PartMan::scanVirtualDevices(bool rescan)
             }
         }
     }
-    const QString &bdRaw = proc.execOut("lsblk -T -bJo"
+    const QString &bdRaw = proc.shellOut("lsblk -T -bJo"
         " TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/* 2>/dev/null", true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
@@ -250,7 +251,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         const QString &name = vdlit->child(ixi)->device;
         DeviceItem *vit = vdlit->child(ixi);
         vit->origin = nullptr; // Clear stale origin pointer.
-        QStringList lines = proc.execOutLines("cryptsetup status " + vit->path, true);
+        QStringList lines = proc.execOutLines("cryptsetup", {"status", vit->path});
         // Find the associated partition and decrement its reference count if found.
         for (const QString &line : lines) {
             const QString &trline = line.trimmed();
@@ -600,7 +601,7 @@ void PartMan::partMenuLock(DeviceItem *twit)
     bool ok = false;
     // Find the associated partition and decrement its reference count if found.
     DeviceItem *origin = twit->origin;
-    if (origin) ok = proc.exec("cryptsetup close " + twit->path, true);
+    if (origin) ok = proc.exec("cryptsetup", {"close", twit->path});
     if (ok) {
         if (origin->mapCount > 0) origin->mapCount--;
         origin->devMapper.clear();
@@ -627,10 +628,10 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
     while (partit->childCount()) delete partit->child(0);
     mkdir("/mnt/btrfs-scratch", 0755);
     QStringList lines;
-    if (!proc.exec("mount -o noatime " + partit->mappedDevice()
-        + " /mnt/btrfs-scratch", true)) goto END;
+    if (!proc.exec("mount", {"-o", "noatime",
+        partit->mappedDevice(), "/mnt/btrfs-scratch"})) goto END;
     lines = proc.execOutLines("btrfs subvolume list /mnt/btrfs-scratch", true);
-    proc.exec("umount /mnt/btrfs-scratch", true);
+    proc.exec("umount", "/mnt/btrfs-scratch");
     for (const QString &line : lines) {
         const int start = line.indexOf("path") + 5;
         if (line.length() <= start) goto END;
@@ -802,12 +803,12 @@ bool PartMan::checkTargetDrivesOK()
         // If any partitions are selected run the SMART tests.
         if (!purposes.isEmpty()) {
             QString smartMsg = drvit->device + " (" + purposes.join(", ") + ")";
-            proc.exec("smartctl -H " + drvit->path, true);
+            proc.exec("smartctl", {"-H", drvit->path});
             if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & 8) {
                 // See smartctl(8) manual: EXIT STATUS (Bit 3)
                 smartFail += " - " + smartMsg + "\n";
             } else {
-                const QString &out = proc.execOut("smartctl -A " + drvit->path
+                const QString &out = proc.shellOut("smartctl -A " + drvit->path
                         + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
                 if (!out.isEmpty()) smartWarn += " ---- " + smartMsg + " ---\n" + out + "\n\n";
             }
@@ -846,20 +847,20 @@ bool PartMan::luksFormat(const QString &devpath, const QByteArray &password)
 {
     DeviceItem *item = findByPath(devpath);
     assert(item != nullptr);
-    QString cmd = "cryptsetup --batch-mode --key-size 512 --hash sha512 --pbkdf argon2id";
-    if (item->physec > 0) cmd += " --sector-size=" + QString::number(item->physec);
-    cmd += " luksFormat " + devpath;
-    if (!proc.exec(cmd, true, &password)) return false;
+    QStringList cargs({"--batch-mode", "--key-size", "512", "--hash", "sha512", "--pbkdf", "argon2id"});
+    if (item->physec > 0) cargs << "--sector-size=" << QString::number(item->physec);
+    cargs << "luksFormat" << devpath;
+    if (!proc.exec("cryptsetup", cargs, &password)) return false;
     return true;
 }
 
 bool PartMan::luksOpen(const QString &devpath, const QString &luksfs,
     const QByteArray &password, const QString &options)
 {
-    QString cmd = "cryptsetup luksOpen " + devpath;
-    if (!luksfs.isEmpty()) cmd += " " + luksfs;
-    if (!options.isEmpty()) cmd += " " + options;
-    return proc.exec(cmd, true, &password);
+    QStringList cargs({"luksOpen", devpath});
+    if (!luksfs.isEmpty()) cargs.append(luksfs);
+    if (!options.isEmpty()) cargs.append(options);
+    return proc.exec("cryptsetup", cargs, &password);
 }
 
 DeviceItem *PartMan::selectedDriveAuto()
@@ -923,12 +924,12 @@ bool PartMan::preparePartitions()
             }
         } else {
             // Clearing the drive, so mark all partitions on the drive for unmounting.
-            listToUnmount << proc.execOutLines("lsblk -nro path " + drvit->path, true);
+            listToUnmount << proc.execOutLines("lsblk", {"-nro", "path", drvit->path});
         }
     }
     for (const QString &devpath : listToUnmount) {
-        proc.exec("swapoff " + devpath, true);
-        proc.exec("/bin/umount " + devpath, true);
+        proc.exec("swapoff", {devpath});
+        proc.exec("/bin/umount", {devpath});
     }
 
     // Prepare partition tables on devices which will have a new layout.
@@ -939,14 +940,15 @@ bool PartMan::preparePartitions()
 
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
         const long long offset = (drvit->size / 65536) - 63; // Account for integer rounding.
-        const QString &cmd = QStringLiteral("dd conv=notrunc bs=64K count=64 if=/dev/zero of=") + drvit->path;
+        QStringList cargs({"conv=notrunc", "bs=64K", "count=64", "if=/dev/zero", "of=" + drvit->path});
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
         // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
-        proc.exec(cmd);
+        proc.exec("dd", cargs);
         // Last 17KB = secondary partition table (for GPT disks).
-        proc.exec(cmd + " seek=" + QString::number(offset));
-        if (!proc.exec("parted -s " + drvit->path + " mklabel "
-            + (drvit->willUseGPT() ? "gpt" : "msdos"))) return false;
+        cargs.append("seek=" + QString::number(offset));
+        proc.exec("dd", cargs);
+        if (!proc.exec("parted", {"-s", drvit->path, "mklabel",
+            (drvit->willUseGPT() ? "gpt" : "msdos")})) return false;
     }
 
     // Prepare partition tables, creating tables and partitions when needed.
@@ -969,17 +971,17 @@ bool PartMan::preparePartitions()
                 if (useFor.isEmpty()) continue;
                 else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
                 const QStringList &devsplit = DeviceItem::split(twit->device);
-                if (!proc.exec(cmd.arg(devsplit.at(0), devsplit.at(1), ptype))) return false;
+                if (!proc.shell(cmd.arg(devsplit.at(0), devsplit.at(1), ptype))) return false;
                 proc.status();
             }
         } else {
             // Creating new partitions.
-            const QString cmdParted("parted -s --align optimal " + drvit->path + " mkpart primary %1MiB %2MiB");
             long long start = 1; // start with 1 MB to aid alignment
             for (int ixdev = 0; ixdev<devCount; ++ixdev) {
                 DeviceItem *twit = drvit->child(ixdev);
                 const long long end = start + twit->size / 1048576;
-                const bool rc = proc.exec(cmdParted.arg(QString::number(start), QString::number(end)));
+                const bool rc = proc.exec("parted", {"-s", "--align", "optimal", drvit->path,
+                    "mkpart" , "primary", QString::number(start) + "MiB", QString::number(end) + "MiB"});
                 if (!rc) return false;
                 start = end;
                 proc.status();
@@ -989,18 +991,17 @@ bool PartMan::preparePartitions()
         for (int ixdev=0; ixdev<devCount; ++ixdev) {
             DeviceItem *twit = drvit->child(ixdev);
             if (twit->usefor.isEmpty()) continue;
-            QStringList devsplit(DeviceItem::split(twit->device));
-            QString cmd = "parted -s /dev/" + devsplit.at(0) + " set " + devsplit.at(1);
-            bool ok = true;
             if (twit->isActive()) {
-                if (!useGPT) ok = proc.exec(cmd + " boot on");
-                else ok = proc.exec(cmd + " legacy_boot on");
+                QStringList devsplit(DeviceItem::split(twit->device));
+                QStringList cargs({"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1)});
+                cargs.append(useGPT ? "legacy_boot" : "boot");
+                cargs.append("on");
+                if(!proc.exec("parted", cargs)) return false;
             }
-            if (!ok) return false;
             proc.status();
         }
     }
-    proc.exec("partprobe -s", true);
+    proc.exec("partprobe", "-s");
     return true;
 }
 
@@ -1027,23 +1028,24 @@ bool PartMan::formatPartitions()
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(dev));
         else proc.status(fmtstatus.arg(twit->shownUseFor()));
         if (useFor == "ESP") {
-            QString cmd("mkfs.msdos -F " + twit->format.mid(3));
-            if (twit->chkbadblk) cmd.append(" -c");
-            if (!twit->label.isEmpty()) cmd += " -n \"" + twit->label.trimmed().left(11) + '\"';
-            if (!proc.exec(cmd + ' ' + dev)) return false;
+            QStringList cargs({"-F", twit->format.mid(3)});
+            if (twit->chkbadblk) cargs.append("-c");
+            if (!twit->label.isEmpty()) cargs << "-n" << twit->label.trimmed().left(11);
+            cargs.append(dev);
+            if (!proc.exec("mkfs.msdos", cargs)) return false;
             // Sets boot flag and ESP flag.
             const QStringList &devsplit = DeviceItem::split(dev);
-            if (!proc.exec("parted -s /dev/" + devsplit.at(0)
-                + " set " + devsplit.at(1) + " esp on")) return false;
+            if (!proc.exec("parted", {"-s", "/dev/" + devsplit.at(0),
+                "set", devsplit.at(1), "esp", "on"})) return false;
         } else if (useFor == "BIOS-GRUB") {
-            proc.exec("dd bs=64K if=/dev/zero of=" + dev);
+            proc.exec("dd", {"bs=64K", "if=/dev/zero", "of=" + dev});
             const QStringList &devsplit = DeviceItem::split(dev);
-            if (!proc.exec("parted -s /dev/" + devsplit.at(0)
-                + " set " + devsplit.at(1) + " bios_grub on")) return false;
+            if (!proc.exec("parted", {"-s", "/dev/" + devsplit.at(0),
+                "set", devsplit.at(1), "bios_grub", "on"})) return false;
         } else if (useFor == "SWAP") {
-            QString cmd("/sbin/mkswap " + dev);
-            if (!twit->label.isEmpty()) cmd.append(" -L \"" + twit->label + '"');
-            if (!proc.exec(cmd, true)) return false;
+            QStringList cargs(dev);
+            if (!twit->label.isEmpty()) cargs << "-L" << twit->label;
+            if (!proc.exec("/sbin/mkswap", cargs)) return false;
         } else {
             if (!formatLinuxPartition(dev, twit->format, twit->chkbadblk, twit->label)) return false;
         }
@@ -1060,40 +1062,36 @@ bool PartMan::formatPartitions()
 // Transplanted straight from minstall.cpp
 bool PartMan::formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label)
 {
-    QString cmd;
+    QStringList cargs;
     if (format == "btrfs") {
+        cargs.append("-f");
         // btrfs and set up fsck
         proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
         // set creation options for small drives using btrfs
-        QString size_str = proc.execOut("/sbin/sfdisk -s " + devpath);
+        QString size_str = proc.execOut("/sbin/sfdisk", {"-s", devpath});
         long long size = size_str.toLongLong();
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
-        if (size < 6000) {
-            cmd = "mkfs.btrfs -f -M -O skinny-metadata";
-        } else {
-            cmd = "mkfs.btrfs -f";
-        }
+        if (size < 6000) cargs << "-M" << "-O" << "skinny-metadata";
     } else if (format == "xfs" || format == "f2fs") {
-        cmd = "mkfs." + format + " -f";
+        cargs.append("-f");
     } else { // jfs, ext2, ext3, ext4
-        cmd = "mkfs." + format;
-        if (format == "jfs") cmd.append(" -q");
-        else cmd.append(" -F");
-        if (chkBadBlocks) cmd.append(" -c");
+        if (format == "jfs") cargs.append("-q");
+        else cargs.append("-F");
+        if (chkBadBlocks) cargs.append("-c");
     }
 
-    cmd.append(" " + devpath);
+    cargs.append(devpath);
     if (!label.isEmpty()) {
-        if (format == "f2fs") cmd.append(" -l \"");
-        else cmd.append(" -L \"");
-        cmd.append(label + "\"");
+        if (format == "f2fs") cargs.append("-l");
+        else cargs.append("-L");
+        cargs.append(label);
     }
-    if (!proc.exec(cmd)) return false;
+    if (!proc.exec("mkfs." + format, cargs)) return false;
 
     if (format.startsWith("ext")) {
         // ext4 tuning
-        proc.exec("/sbin/tune2fs -c0 -C0 -i1m " + devpath);
+        proc.exec("/sbin/tune2fs", {"-c0", "-C0", "-i1m", devpath});
     }
     return true;
 }
@@ -1112,15 +1110,16 @@ bool PartMan::prepareSubvolumes(DeviceItem *partit)
     svlist.sort(); // This ensures nested subvolumes are created in the right order.
     bool ok = true;
     mkdir("/mnt/btrfs-scratch", 0755);
-    if (!proc.exec("mount -o noatime " + partit->mappedDevice()
-        + " /mnt/btrfs-scratch", true)) return false;
+    if (!proc.exec("mount", {"-o", "noatime", partit->mappedDevice(),
+        "/mnt/btrfs-scratch"})) return false;
     for (const QString &subvol : svlist) {
         proc.exec("btrfs subvolume delete /mnt/btrfs-scratch/" + subvol, true);
-        if (!proc.exec("btrfs subvolume create /mnt/btrfs-scratch/" + subvol, true)) ok = false;
+        if (!proc.exec("btrfs", {"subvolume", "create",
+            "/mnt/btrfs-scratch/" + subvol})) ok = false;
         if (!ok) break;
         proc.status();
     }
-    if (!proc.exec("umount /mnt/btrfs-scratch", true)) return false;
+    if (!proc.exec("umount", "/mnt/btrfs-scratch")) return false;
     return ok;
 }
 
@@ -1163,15 +1162,14 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     const QLineEdit *passedit = gui.radioEntireDisk->isChecked()
         ? gui.textCryptoPass : gui.textCryptoPassCust;
     const QByteArray password(passedit->text().toUtf8());
-    const QString cmdAddKey("cryptsetup luksAddKey /dev/%1 /mnt/antiX" + keyfile);
-    const QString cmdBlkID("blkid -s UUID -o value /dev/");
     for (auto &it : cryptAdd.toStdMap()) {
-        QString uuid = proc.execOut(cmdBlkID + it.first);
+        QString uuid = proc.execOut("blkid", {"-s", "UUID", "-o", "value", "/dev/" + it.first});
         out << it.second << " /dev/disk/by-uuid/" << uuid;
         if (noKey || it.first == keyDev) out << " none";
         else {
             if (isNewKey) {
-                if (!proc.exec(cmdAddKey.arg(it.first), true, &password)) return false;
+                if (!proc.exec("cryptsetup", {"luksAddKey",
+                    "/dev/"+it.first, "/mnt/antiX"+keyfile}, &password)) return false;
             }
             out << ' ' << keyfile;
         }
@@ -1179,8 +1177,8 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     }
     // Update cryptdisks if the key is not in the root file system.
     if (keyMount != '/') {
-        if (!proc.exec("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\" + keyMount
-            + "\"/' /mnt/antiX/etc/default/cryptdisks", false)) return false;
+        if (!proc.shell("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\"
+            + keyMount + "\"/' /mnt/antiX/etc/default/cryptdisks")) return false;
     }
     file.close();
     return true;
@@ -1193,7 +1191,7 @@ bool PartMan::makeFstab(bool populateMediaMounts)
     if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
     out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
-    const QString cmdBlkID("blkid -o value UUID -s UUID ");
+    QStringList cargsBlkID({"-o", "value", "UUID", "-s", "UUID"});
     // File systems and swap space.
     for (auto &it : mounts.toStdMap()) {
         const DeviceItem *twit = it.second;
@@ -1201,9 +1199,13 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         qDebug() << "Creating fstab entry for:" << it.first << dev;
         // Device ID or UUID
         if (twit->willMap()) out << dev;
-        else out << "UUID=" + proc.execOut(cmdBlkID + dev);
+        else {
+            cargsBlkID.append(dev);
+            out << "UUID=" + proc.execOut("blkid", cargsBlkID);
+            cargsBlkID.removeLast();
+        }
         // Mount point, file system
-        QString fsfmt = proc.execOut("blkid " + dev + " -o value -s TYPE");
+        QString fsfmt = proc.execOut("blkid", {dev, "-o", "value", "-s", "TYPE"});
         if (fsfmt == "swap") out << " swap swap";
         else out << ' ' << it.first << ' ' << fsfmt;
         // Options
@@ -1212,8 +1214,8 @@ bool PartMan::makeFstab(bool populateMediaMounts)
             out << " subvol=" << twit->label;
             //make root subvol default
             if (it.first == "/") {
-                QString SUBVOLID = proc.execOut("btrfs subvolume list /mnt/antiX | grep -w " + twit->label + " | cut -d\\  -f2");
-                proc.exec("btrfs subvolume set-default " + SUBVOLID + " /mnt/antiX");
+                QString SUBVOLID = proc.shellOut("btrfs subvolume list /mnt/antiX | grep -w " + twit->label + " | cut -d\\  -f2");
+                proc.exec("btrfs", {"subvolume", "set-default", SUBVOLID, "/mnt/antiX"});
             }
             if (!mountopts.isEmpty()) out << ',' << mountopts;
         } else {
@@ -1226,13 +1228,14 @@ bool PartMan::makeFstab(bool populateMediaMounts)
     // EFI System Partition
     if (gui.radioBootESP->isChecked()) {
         const QString espdev = "/dev/" + gui.comboBoot->currentData().toString();
-        const QString espdevUUID = "UUID=" + proc.execOut(cmdBlkID + espdev);
+        cargsBlkID.append(espdev);
+        const QString espdevUUID = "UUID=" + proc.execOut("blkid", cargsBlkID);
         qDebug() << "espdev" << espdev << espdevUUID;
         out << espdevUUID + " /boot/efi vfat noatime,dmask=0002,fmask=0113 0 0\n";
     }
     file.close();
     if (populateMediaMounts) {
-        if (!proc.exec("/sbin/make-fstab -O --install=/mnt/antiX"
+        if (!proc.shell("/sbin/make-fstab -O --install=/mnt/antiX"
             " --mntpnt=/media")) return false;
     }
     return true;
@@ -1249,7 +1252,7 @@ bool PartMan::mountPartitions()
         if (!proc.mkpath(point)) return false;
         if (it.first == "/boot") {
              // needed to run fsck because sfdisk --part-type can mess up the partition
-            if (!proc.exec("fsck.ext4 -y " + dev)) return false;
+            if (!proc.exec("fsck.ext4", {"-y", dev})) return false;
         }
         QStringList opts;
         if (it.second->type == DeviceItem::Subvolume) {
@@ -1262,8 +1265,7 @@ bool PartMan::mountPartitions()
         opts.removeAll("atime");
         opts.removeAll("relatime");
         if (!opts.contains("noatime")) opts << "noatime";
-        const QString &cmd = QString("/bin/mount %1 %2 -o %3").arg(dev, point, opts.join(','));
-        if (!proc.exec(cmd)) return false;
+        if (!proc.exec("/bin/mount", {dev, point, "-o", opts.join(',')})) return false;
     }
     return true;
 }
@@ -1277,11 +1279,11 @@ void PartMan::unmount()
         if (it.key().at(0) != '/') continue;
         DeviceItem *twit = it.value();
         if (!it.key().startsWith("SWAP")) {
-            proc.exec("swapoff " + twit->mappedDevice(), true);
+            proc.exec("swapoff", {twit->mappedDevice()});
         }
-        proc.exec("/bin/umount -l /mnt/antiX" + it.key(), true);
+        proc.exec("/bin/umount", {"-l", "/mnt/antiX" + it.key()});
         if (twit->encrypt) {
-            proc.exec("cryptsetup close " + twit->devMapper, true);
+            proc.exec("cryptsetup", {"close", twit->devMapper});
         }
     }
 }
