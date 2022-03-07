@@ -99,13 +99,13 @@ void PartMan::scan(DeviceItem *drvstart)
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
 
     if (!drvstart) {
-        proc.exec("partprobe", "-s"); // Inform the kernel of partition changes.
+        proc.exec("partprobe", {"-s"}); // Inform the kernel of partition changes.
         proc.exec("blkid", {"-c", "/dev/null"}); // Refresh cached blkid information.
     }
     // Partitions listed in order of their physical locations.
     QStringList order;
     QString curdev;
-    for(const QString &line : proc.execOutLines("parted", "-lm")) {
+    for(const QString &line : proc.execOutLines("parted", {"-lm"})) {
         const QString &sect = line.section(':', 0, 0);
         const int part = sect.toInt();
         if (part) order.append(DeviceItem::join(curdev, part));
@@ -630,8 +630,8 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
     QStringList lines;
     if (!proc.exec("mount", {"-o", "noatime",
         partit->mappedDevice(), "/mnt/btrfs-scratch"})) goto END;
-    lines = proc.execOutLines("btrfs subvolume list /mnt/btrfs-scratch", true);
-    proc.exec("umount", "/mnt/btrfs-scratch");
+    lines = proc.execOutLines("btrfs", {"subvolume", "list", "/mnt/btrfs-scratch"});
+    proc.exec("umount", {"/mnt/btrfs-scratch"});
     for (const QString &line : lines) {
         const int start = line.indexOf("path") + 5;
         if (line.length() <= start) goto END;
@@ -1001,7 +1001,7 @@ bool PartMan::preparePartitions()
             proc.status();
         }
     }
-    proc.exec("partprobe", "-s");
+    proc.exec("partprobe", {"-s"});
     return true;
 }
 
@@ -1066,7 +1066,7 @@ bool PartMan::formatLinuxPartition(const QString &devpath, const QString &format
     if (format == "btrfs") {
         cargs.append("-f");
         // btrfs and set up fsck
-        proc.exec("/bin/cp -fp /bin/true /sbin/fsck.auto");
+        proc.exec("/bin/cp", {"-fp", "/bin/true", "/sbin/fsck.auto"});
         // set creation options for small drives using btrfs
         QString size_str = proc.execOut("/sbin/sfdisk", {"-s", devpath});
         long long size = size_str.toLongLong();
@@ -1113,13 +1113,13 @@ bool PartMan::prepareSubvolumes(DeviceItem *partit)
     if (!proc.exec("mount", {"-o", "noatime", partit->mappedDevice(),
         "/mnt/btrfs-scratch"})) return false;
     for (const QString &subvol : svlist) {
-        proc.exec("btrfs subvolume delete /mnt/btrfs-scratch/" + subvol, true);
+        proc.exec("btrfs", {"subvolume", "delete", "/mnt/btrfs-scratch/" + subvol});
         if (!proc.exec("btrfs", {"subvolume", "create",
             "/mnt/btrfs-scratch/" + subvol})) ok = false;
         if (!ok) break;
         proc.status();
     }
-    if (!proc.exec("umount", "/mnt/btrfs-scratch")) return false;
+    if (!proc.exec("umount", {"/mnt/btrfs-scratch"})) return false;
     return ok;
 }
 

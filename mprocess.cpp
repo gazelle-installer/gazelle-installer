@@ -103,7 +103,7 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     return (status > 0);
 }
 
-/* Raw binary execution. */
+/* Raw program execution. */
 bool MProcess::exec(const QString &program, const QStringList &arguments, const QByteArray *input, bool needRead)
 {
     if (halting) return false;
@@ -274,26 +274,4 @@ bool MProcess::mkpath(const QString &path)
     qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
     log(logEntry, rc ? 1 : -1);
     return rc;
-}
-
-// TODO: Remove old execution routines when conversion is complete.
-
-bool MProcess::exec(const QString &cmd, const bool rawexec, const QByteArray *input, bool needRead)
-{
-    if (!rawexec) return shell(cmd, input, needRead);
-    QStringList args = splitCommand(cmd);
-    QString prog = args.takeFirst();
-    return exec(prog, args, input, needRead);
-}
-QString MProcess::execOut(const QString &cmd, bool everything)
-{
-    exec(cmd, false, nullptr, true);
-    QString strout(readAllStandardOutput().trimmed());
-    if (everything) return strout;
-    return strout.section("\n", 0, 0);
-}
-QStringList MProcess::execOutLines(const QString &cmd, const bool rawexec)
-{
-    exec(cmd, rawexec, nullptr, true);
-    return QString(readAllStandardOutput().trimmed()).split('\n', Qt::SkipEmptyParts);
 }

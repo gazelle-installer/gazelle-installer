@@ -50,12 +50,12 @@ public:
     };
     MProcess(QObject *parent = Q_NULLPTR);
     void setupUI(QListWidget *listLog, QProgressBar *progInstall);
-    void setRoot(const QString &root);
-    /* Raw binary execution */
-    bool exec(const QString &program, const QStringList &arguments,
+    void setRoot(const QString &root = QString());
+    /* Raw program execution */
+    bool exec(const QString &program, const QStringList &arguments = {},
         const QByteArray *input = nullptr, bool needRead = false);
-    QString execOut(const QString &program, const QStringList &arguments, bool everything = false);
-    QStringList execOutLines(const QString &program, const QStringList &arguments);
+    QString execOut(const QString &program, const QStringList &arguments = {}, bool everything = false);
+    QStringList execOutLines(const QString &program, const QStringList &arguments = {});
     /* Shell script execution */
     bool shell(const QString &cmd, const QByteArray *input = nullptr, bool needRead = false);
     QString shellOut(const QString &cmd, bool everything = false);
@@ -72,11 +72,6 @@ public:
     // Common functions that are traditionally carried out by processes.
     void sleep(const int msec, const bool silent = false);
     bool mkpath(const QString &path);
-
-    // TODO: Replace old execution routines when conversion is complete.
-    bool exec(const QString &cmd, const bool rawexec = false, const QByteArray *input = nullptr, bool needRead = false);
-    QString execOut(const QString &cmd, bool everything = false);
-    QStringList execOutLines(const QString &cmd, const bool rawexec = false);
 };
 
 #endif // MPROCESS_H

@@ -374,10 +374,13 @@ void MInstall::setupAutoMount(bool enabled)
         // disable auto-mount
         if (have_sysctl) {
             // Use systemctl to prevent automount by masking currently unmasked mount points
-            listMaskedMounts = proc.shellOutLines("systemctl list-units --full --all -t mount --no-legend 2>/dev/null | grep -v masked | cut -f1 -d' '"
-                " | egrep -v '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'").join(' ');
-            if (!listMaskedMounts.isEmpty())
-                proc.exec("systemctl --runtime mask --quiet -- " + listMaskedMounts);
+            const QStringList &listMaskedMounts = proc.shellOutLines("systemctl list-units"
+                " --full --all -t mount --no-legend 2>/dev/null | grep -v masked | cut -f1 -d' '"
+                " | egrep -v '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc|run-user-.*-gvfs"
+                    "|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'");
+            if (!listMaskedMounts.isEmpty()) {
+                proc.exec("systemctl", QStringList({"--runtime", "mask", "--quiet", "--"}) + listMaskedMounts);
+            }
         }
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
@@ -490,7 +493,7 @@ void MInstall::disablehiberanteinitramfs()
 {
     if (phase < 0) return;
     if (partman.isEncrypt("SWAP")) {
-        proc.exec("touch /mnt/antiX/initramfs-tools/conf.d/resume");
+        proc.exec("touch", {"/mnt/antiX/initramfs-tools/conf.d/resume"});
         QFile file("/mnt/antiX/etc/initramfs-tools/conf.d/resume");
         if (file.open(QIODevice::WriteOnly)) {
             QTextStream out(&file);
@@ -740,7 +743,7 @@ bool MInstall::saveHomeBasic()
     mkdir("/mnt/antiX", 0755);
     const bool ok = proc.exec("/bin/mount", {"-o", "ro", homedev, "/mnt/antiX"});
     // Store a listing of /home to compare with the user name given later.
-    if (ok) listHomes = proc.execOutLines("/bin/ls -1 /mnt/antiX" + homedir);
+    if (ok) listHomes = proc.execOutLines("/bin/ls", {"-1", "/mnt/antiX" + homedir});
     proc.exec("/bin/umount", {"-l", "/mnt/antiX"});
     return ok;
 }
@@ -792,7 +795,7 @@ bool MInstall::installLinux()
 
     //remove home unless a demo home is found in remastered linuxfs
     if (!isRemasteredDemoPresent)
-        proc.exec("/bin/rm -rf /mnt/antiX/home/demo");
+        proc.exec("/bin/rm", {"-rf", "/mnt/antiX/home/demo"});
 
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
     // modification to preserve points that are still mounted.
@@ -1121,26 +1124,26 @@ bool MInstall::setUserInfo()
 
     // set the user passwords first
     bool ok = true;
-    QString cmdChRoot;
-    if (!oobe) cmdChRoot = "chroot /mnt/antiX ";
+    if (!oobe) proc.setRoot("/mnt/antiX");
     const QString &userPass = textUserPass->text();
     QByteArray userinfo;
-    if (!(boxRootAccount->isChecked())) ok = proc.exec(cmdChRoot + "passwd -l root", true);
+    if (!(boxRootAccount->isChecked())) ok = proc.exec("passwd", {"-l", "root"});
     else {
         const QString &rootPass = textRootPass->text();
-        if (rootPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d root", true);
+        if (rootPass.isEmpty()) ok = proc.exec("passwd", {"-d", "root"});
         else userinfo.append(QString("root:" + rootPass).toUtf8());
     }
-    if (ok && userPass.isEmpty()) ok = proc.exec(cmdChRoot + "passwd -d demo", true);
+    if (ok && userPass.isEmpty()) ok = proc.exec("passwd", {"-d", "demo"});
     else {
         if (!userinfo.isEmpty()) userinfo.append('\n');
         userinfo.append(QString("demo:" + userPass).toUtf8());
     }
-    if (ok && !userinfo.isEmpty()) ok = proc.exec(cmdChRoot + "chpasswd", true, &userinfo);
+    if (ok && !userinfo.isEmpty()) ok = proc.exec("chpasswd", {}, &userinfo);
     if (!ok) {
         failUI(tr("Failed to set user account passwords."));
         return false;
     }
+    proc.setRoot();
 
     QString rootpath;
     if (!oobe) rootpath = "/mnt/antiX";
@@ -1292,16 +1295,16 @@ bool MInstall::setComputerName()
     const QString &compname = textComputerName->text();
     QString cmd("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost"
         " | head -1 | awk '{print $2}')\"'/" + compname + "/' ");
-    if (!oobe) proc.exec(cmd + "/mnt/antiX/etc/hosts", false);
+    if (!oobe) proc.shell(cmd + "/mnt/antiX/etc/hosts");
     else {
-        proc.exec(cmd + "/tmp/hosts", false);
-        proc.exec("/bin/mv -f /tmp/hosts " + etcpath, true);
+        proc.shell(cmd + "/tmp/hosts");
+        proc.shell("/bin/mv -f /tmp/hosts " + etcpath);
     }
-    proc.exec("echo \"" + compname + "\" | cat > " + etcpath + "/hostname", false);
-    proc.exec("echo \"" + compname + "\" | cat > " + etcpath + "/mailname", false);
-    proc.exec("sed -i 's/.*send host-name.*/send host-name \""
-        + compname + "\";/g' " + etcpath + "/dhcp/dhclient.conf", false);
-    proc.exec("echo \"" + compname + "\" | cat > " + etcpath + "/defaultdomain", false);
+    proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/hostname");
+    proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/mailname");
+    proc.shell("sed -i 's/.*send host-name.*/send host-name \""
+        + compname + "\";/g' " + etcpath + "/dhcp/dhclient.conf");
+    proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/defaultdomain");
     return true;
 }
 
@@ -1318,22 +1321,17 @@ void MInstall::setLocale()
     qDebug() << "Update locale";
     proc.shell(cmd);
     cmd = QString("Language=%1").arg(comboLocale->currentData().toString());
+    const QString &selTimeZone = comboTimeZone->currentData().toString();
 
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
     //replace with link
     if (!oobe) {
-        cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(comboTimeZone->currentData().toString());
-        proc.shell(cmd);
+        proc.exec("/bin/ln", {"-nfs", "/usr/share/zoneinfo/" + selTimeZone, "/mnt/antiX/etc/localtime"});
     }
-    cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(comboTimeZone->currentData().toString());
-    proc.shell(cmd);
+    proc.exec("/bin/ln", {"-nfs", "/usr/share/zoneinfo/" + selTimeZone, "/etc/localtime"});
     // /etc/timezone is text file with the timezone written in it. Write the user-selected timezone in it now.
-    if (!oobe) {
-        cmd = QString("echo %1 > /mnt/antiX/etc/timezone").arg(comboTimeZone->currentData().toString());
-        proc.shell(cmd);
-    }
-    cmd = QString("echo %1 > /etc/timezone").arg(comboTimeZone->currentData().toString());
-    proc.shell(cmd);
+    if (!oobe) proc.shell("echo " + selTimeZone + " > /mnt/antiX/etc/timezone");
+    proc.shell("echo " + selTimeZone + " > /etc/timezone");
 
     // Set clock to use LOCAL
     if (checkLocalClock->isChecked()) {
@@ -1341,7 +1339,7 @@ void MInstall::setLocale()
     } else {
         proc.shell("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime");
     }
-    proc.exec("hwclock --hctosys");
+    proc.exec("hwclock", {"--hctosys"});
     if (!oobe) {
         proc.exec("/bin/cp", {"-f /etc/adjtime", "/mnt/antiX/etc/"});
         proc.exec("/bin/cp", {"-f /etc/default/rcS", "/mnt/antiX/etc/default"});
@@ -1401,36 +1399,36 @@ void MInstall::stashServices(bool save)
 void MInstall::setService(const QString &service, bool enabled)
 {
     qDebug() << "Set service:" << service << enabled;
-    QString chroot, rootpath;
+    QString rootpath;
     if (!oobe) {
-        chroot = "chroot /mnt/antiX ";
+        proc.setRoot("/mnt/antiX");
         rootpath = "/mnt/antiX";
     }
     if (enabled) {
-        proc.exec(chroot + "update-rc.d " + service + " defaults");
-        if (containsSystemD)
-            proc.exec(chroot + "systemctl enable " + service);
+        proc.exec("update-rc.d", {service, " defaults"});
+        if (containsSystemD) proc.exec("systemctl", {"enable", service});
         if (containsRunit) {
             QFile::remove(rootpath+"/etc/sv/" + service + "/down");
             if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
                 proc.mkpath(rootpath+"/etc/sv/" + service);
-                proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
+                proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
             }
         }
     } else {
-        proc.exec(chroot + "update-rc.d " + service + " remove");
+        proc.exec("update-rc.d", {service, "remove"});
         if (containsSystemD) {
-            proc.exec(chroot + "systemctl disable " + service);
-            proc.exec(chroot + "systemctl mask " + service);
+            proc.exec("systemctl", {"disable", service});
+            proc.exec("systemctl", {"mask", service});
         }
         if (containsRunit) {
             if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
                 proc.mkpath(rootpath+"/etc/sv/" + service);
-                proc.exec(chroot + "ln -fs /etc/sv/" + service + " /etc/service/");
+                proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
             }
-            proc.exec(chroot + "touch /etc/sv/" + service + "/down");
+            proc.exec("touch", {"/etc/sv/" + service + "/down"});
         }
     }
+    proc.setRoot();
 }
 void MInstall::failUI(const QString &msg)
 {
@@ -2004,7 +2002,7 @@ void MInstall::closeEvent(QCloseEvent *event)
         if (!oobe) cleanup();
         else if (!pretend) {
             proc.unhalt();
-            proc.exec("/usr/sbin/shutdown -hP now");
+            proc.exec("/usr/sbin/shutdown", {"-hP", "now"});
         }
         QWidget::closeEvent(event);
         if (widgetStack->currentWidget() != pageEnd) {
