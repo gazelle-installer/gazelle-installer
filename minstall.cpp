@@ -169,7 +169,7 @@ void MInstall::startup()
 
         // calculate required disk space
         bootSource = "/live/aufs/boot";
-        partman.bootSpaceNeeded = proc.execOut("du -sb " + bootSource).section('\t', 0, 0).toLongLong();
+        partman.bootSpaceNeeded = proc.execOut("du", {"-sb", bootSource}).section('\t', 0, 0).toLongLong();
         if (!pretend && partman.bootSpaceNeeded==0) {
             QMessageBox::critical(this, windowTitle(), tr("Cannot access installation source."));
             exit(EXIT_FAILURE);
@@ -183,7 +183,7 @@ void MInstall::startup()
         long long compression_factor;
         QString linuxfs_compression_type = "xz"; //default conservative
         if (QFileInfo::exists(SQFILE_FULL))
-            linuxfs_compression_type = proc.execOut("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none 2>/dev/null | od -An -tdI");
+            linuxfs_compression_type = proc.shellOut("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none 2>/dev/null | od -An -tdI");
 
         // gzip, xz, or lz4
         switch (linuxfs_compression_type.toInt()) {
@@ -203,9 +203,9 @@ void MInstall::startup()
         qDebug() << "linuxfs compression type is " << linuxfs_compression_type << "compression factor is " << compression_factor;
 
         long long rootfs_file_size = 0;
-        long long linuxfs_file_size = (proc.execOut("df /live/linux --output=used --total |tail -n1").toLongLong() * 1024 * 100) / compression_factor;
+        long long linuxfs_file_size = (proc.shellOut("df /live/linux --output=used --total |tail -n1").toLongLong() * 1024 * 100) / compression_factor;
         if (QFileInfo::exists("/live/perist-root")) {
-            rootfs_file_size = proc.execOut("df /live/persist-root --output=used --total |tail -n1").toLongLong() * 1024;
+            rootfs_file_size = proc.shellOut("df /live/persist-root --output=used --total |tail -n1").toLongLong() * 1024;
         }
 
         qDebug() << "linuxfs file size is " << linuxfs_file_size << " rootfs file size is " << rootfs_file_size;
@@ -220,7 +220,7 @@ void MInstall::startup()
         qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
 
         // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
-        if (proc.exec("uname -m | grep -q i686", false) && proc.exec("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
+        if (proc.shell("uname -m | grep -q i686") && proc.shell("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
             const int ans = QMessageBox::question(this, windowTitle(),
                 tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not"
                     " be able to boot unless you select Legacy Boot or similar at restart.\n"
@@ -245,8 +245,8 @@ void MInstall::startup()
         // Detect snapshot-backup account(s)
         // test if there's another user other than demo in /home,
         // indicating a possible snapshot or complicated live-usb
-        haveSnapshotUserAccounts = proc.exec("/bin/ls -1 /home"
-            " | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false);
+        haveSnapshotUserAccounts = proc.shell("/bin/ls -1 /home"
+            " | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]");
         qDebug() << "check for possible snapshot:" << haveSnapshotUserAccounts;
     }
 
@@ -270,7 +270,8 @@ void MInstall::startup()
     setupkeyboardbutton();
 
     // timezone lists
-    listTimeZones = proc.execOutLines("find -L /usr/share/zoneinfo/posix -mindepth 2 -type f -printf %P\\n", true);
+    listTimeZones = proc.execOutLines("find", {"-L", "/usr/share/zoneinfo/posix",
+        "-mindepth", "2", "-type", "f", "-printf", "%P\\n"});
     comboTimeArea->clear();
     for (const QString &zone : listTimeZones) {
         const QString &area = zone.section('/', 0, 0);
@@ -285,7 +286,7 @@ void MInstall::startup()
 
     // locale list
     comboLocale->clear();
-    QStringList loclist = proc.execOutLines("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'");
+    QStringList loclist = proc.shellOutLines("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'");
     for (QString &strloc : loclist) {
         strloc.replace("utf8", "UTF-8", Qt::CaseInsensitive);
         QLocale loc(strloc);
@@ -298,7 +299,7 @@ void MInstall::startup()
     else on_comboLocale_currentIndexChanged(ixLocale);
 
     // if it looks like an apple...
-    if (proc.exec("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus", false)) {
+    if (proc.shell("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus")) {
         mactest = true;
         checkLocalClock->setChecked(true);
     }
@@ -314,7 +315,7 @@ void MInstall::startup()
     }
 
     // check for the Samba server
-    QString val = proc.execOut("dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'");
+    QString val = proc.shellOut("dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'");
     haveSamba = (val.compare("installed") == 0);
 
     buildServiceList();
@@ -357,12 +358,12 @@ void MInstall::setupAutoMount(bool enabled)
     }
     // check if udisksd is running.
     bool udisksd_running = false;
-    if (proc.exec("ps -e | grep 'udisksd'")) udisksd_running = true;
+    if (proc.shell("ps -e | grep 'udisksd'")) udisksd_running = true;
     // create a list of rules files that are being temporarily overridden
     QStringList udev_temp_mdadm_rules;
     finfo.setFile("/run/udev");
     if (finfo.isDir()) {
-        udev_temp_mdadm_rules = proc.execOutLines("egrep -l '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d");
+        udev_temp_mdadm_rules = proc.shellOutLines("egrep -l '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d");
         for (QString &rule : udev_temp_mdadm_rules) {
             rule.replace("/lib/udev", "/run/udev");
         }
@@ -373,7 +374,7 @@ void MInstall::setupAutoMount(bool enabled)
         // disable auto-mount
         if (have_sysctl) {
             // Use systemctl to prevent automount by masking currently unmasked mount points
-            listMaskedMounts = proc.execOutLines("systemctl list-units --full --all -t mount --no-legend 2>/dev/null | grep -v masked | cut -f1 -d' '"
+            listMaskedMounts = proc.shellOutLines("systemctl list-units --full --all -t mount --no-legend 2>/dev/null | grep -v masked | cut -f1 -d' '"
                 " | egrep -v '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'").join(' ');
             if (!listMaskedMounts.isEmpty())
                 proc.exec("systemctl --runtime mask --quiet -- " + listMaskedMounts);
@@ -381,29 +382,31 @@ void MInstall::setupAutoMount(bool enabled)
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
         proc.mkpath("/run/udev/rules.d");
-        for (const QString &rule : udev_temp_mdadm_rules)
-            proc.exec("touch " + rule);
+        for (const QString &rule : udev_temp_mdadm_rules) {
+            proc.exec("touch", {rule});
+        }
 
         if (udisksd_running) {
-            proc.exec("echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/91-mx-udisks-inhibit.rules");
-            proc.exec("udevadm control --reload");
-            proc.exec("udevadm trigger --subsystem-match=block");
+            proc.shell("echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/91-mx-udisks-inhibit.rules");
+            proc.exec("udevadm", {"control", "--reload"});
+            proc.exec("udevadm", {"trigger", "--subsystem-match=block"});
         }
     } else {
         // enable auto-mount
         if (udisksd_running) {
-            proc.exec("rm -f /run/udev/rules.d/91-mx-udisks-inhibit.rules");
-            proc.exec("udevadm control --reload");
-            proc.exec("partprobe -s");
+            proc.exec("rm", {"-f", "/run/udev/rules.d/91-mx-udisks-inhibit.rules"});
+            proc.exec("udevadm", {"control", "--reload"});
+            proc.exec("partprobe", {"-s"});
             proc.sleep(1000);
         }
         // clear the rules that were temporarily overridden
-        for (const QString &rule : udev_temp_mdadm_rules)
-            proc.exec("rm -f " + rule);
+        for (const QString &rule : udev_temp_mdadm_rules) {
+            proc.shell("rm -f " + rule); // TODO: check if each rule is a single file name.
+        }
 
         // Use systemctl to restore that status of any mount points changed above
         if (have_sysctl && !listMaskedMounts.isEmpty()) {
-            proc.exec("systemctl --runtime unmask --quiet -- $MOUNTLIST");
+            proc.shell("systemctl --runtime unmask --quiet -- $MOUNTLIST");
         }
     }
     autoMountEnabled = enabled;
@@ -415,13 +418,12 @@ void MInstall::setupAutoMount(bool enabled)
 // Check if running inside VirtualBox
 bool MInstall::isInsideVB()
 {
-    return proc.exec("lspci -n | grep -qE '80ee:beef|80ee:cafe'", false);
+    return proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'");
 }
 
 bool MInstall::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
 {
-    QString cmd = QString("sed -i 's/%1/%2/g' %3").arg(oldtext, newtext, filepath);
-    return proc.exec(cmd);
+    return proc.exec("sed", {"-i", QString("s/%1/%2/g").arg(oldtext, newtext), filepath});
 }
 
 QString MInstall::sliderSizeString(long long size)
@@ -526,7 +528,7 @@ bool MInstall::processNextPhase()
                 return false;
             }
             //run blkid -c /dev/null to freshen UUID cache
-            proc.exec("blkid -c /dev/null", true);
+            proc.exec("blkid", {"-c", "/dev/null"});
             if (!installLinux()) return false;
         } else {
             if (!pretendToInstall(14, 200)) return false;
@@ -547,17 +549,17 @@ bool MInstall::processNextPhase()
             proc.advance(1, 1);
             proc.status(tr("Setting system configuration"));
             if (!isInsideVB() && !oobe) {
-                proc.exec("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-                proc.exec("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-                proc.exec("/bin/mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-                proc.exec("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1", false);
-                proc.exec("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1", false);
+                proc.shell("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+                proc.shell("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+                proc.shell("/bin/mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+                proc.shell("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+                proc.shell("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
             }
             if (oem) enableOOBE();
             else if (!processOOBE()) return false;
             manageConfig(ConfigSave);
             config->dumpDebug();
-            proc.exec("/bin/sync", true); // the sync(2) system call will block the GUI
+            proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
             if (!installLoader()) return false;
         } else if (!pretendToInstall(5, 100)) {
             return false;
@@ -736,10 +738,10 @@ bool MInstall::saveHomeBasic()
     }
 
     mkdir("/mnt/antiX", 0755);
-    const bool ok = proc.exec("/bin/mount -o ro " + homedev + " /mnt/antiX");
+    const bool ok = proc.exec("/bin/mount", {"-o", "ro", homedev, "/mnt/antiX"});
     // Store a listing of /home to compare with the user name given later.
     if (ok) listHomes = proc.execOutLines("/bin/ls -1 /mnt/antiX" + homedir);
-    proc.exec("/bin/umount -l /mnt/antiX", false);
+    proc.exec("/bin/umount", {"-l", "/mnt/antiX"});
     return ok;
 }
 
@@ -753,7 +755,7 @@ bool MInstall::installLinux()
         // if root was not formatted and not using --sync option then re-use it
         // remove all folders in root except for /home
         proc.status(tr("Deleting old system"));
-        proc.exec("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;", false);
+        proc.shell("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;");
 
         if (proc.exitStatus() != QProcess::NormalExit) {
             failUI(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
@@ -779,9 +781,9 @@ bool MInstall::installLinux()
     chmod("/mnt/antiX/tmp", 01777);
 
     // Copy live set up to install and clean up.
-    proc.exec("/usr/sbin/live-to-installed /mnt/antiX", false);
+    proc.shell("/usr/sbin/live-to-installed /mnt/antiX");
     qDebug() << "Desktop menu";
-    proc.exec("chroot /mnt/antiX desktop-menu --write-out-global", false);
+    proc.exec("chroot", {"/mnt/antiX", "desktop-menu", "--write-out-global"});
 
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     partman.makeFstab(POPULATE_MEDIA_MOUNTPOINTS);
@@ -795,19 +797,18 @@ bool MInstall::installLinux()
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
     // modification to preserve points that are still mounted.
     if (!POPULATE_MEDIA_MOUNTPOINTS) {
-        proc.exec("/bin/rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*", false);
+        proc.shell("/bin/rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*");
     }
 
     // guess localtime vs UTC
-    if (proc.execOut("guess-hwclock") == "localtime")
-        checkLocalClock->setChecked(true);
+    if (proc.shellOut("guess-hwclock") == "localtime") checkLocalClock->setChecked(true);
 
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
-    proc.exec("/bin/mount --rbind --make-rslave /dev /mnt/antiX/dev", true);
-    proc.exec("chroot /mnt/antiX rm  /var/lib/dbus/machine-id /etc/machine-id", false);
-    proc.exec("chroot /mnt/antiX dbus-uuidgen --ensure=/etc/machine-id", false);
-    proc.exec("chroot /mnt/antiX dbus-uuidgen --ensure", false);
-    proc.exec("/bin/umount -R /mnt/antiX/dev", true);
+    proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
+    proc.exec("chroot", {"/mnt/antiX", "rm", "/var/lib/dbus/machine-id", "/etc/machine-id"});
+    proc.exec("chroot", {"/mnt/antiX", "dbus-uuidgen", "--ensure=/etc/machine-id"});
+    proc.exec("chroot", {"/mnt/antiX", "dbus-uuidgen", "--ensure"});
+    proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
 
     return true;
 }
@@ -885,12 +886,10 @@ bool MInstall::installLoader()
     if (phase < 0) return false;
     proc.advance(4, 4);
 
-    QString cmd;
-    QString val = proc.execOut("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
+    QString val = proc.shellOut("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
 
     // the old initrd is not valid for this hardware
-    if (!val.isEmpty())
-        proc.exec("/bin/rm -f /mnt/antiX/boot/" + val);
+    if (!val.isEmpty()) proc.exec("/bin/rm", {"-f", "/mnt/antiX/boot/" + val});
 
     bool efivarfs = QFileInfo("/sys/firmware/efi/efivars").isDir();
     bool efivarfs_mounted = false;
@@ -903,8 +902,9 @@ bool MInstall::installLoader()
             file.close();
         }
     }
-    if (efivarfs && !efivarfs_mounted)
-        proc.exec("/bin/mount -t efivarfs efivarfs /sys/firmware/efi/efivars", true);
+    if (efivarfs && !efivarfs_mounted) {
+        proc.exec("/bin/mount", {"-t", "efivarfs", "efivarfs", "/sys/firmware/efi/efivars"});
+    }
 
     if (!boxBoot->isChecked()) {
         // skip it
@@ -912,55 +912,56 @@ bool MInstall::installLoader()
         //if useing f2fs, then add modules to /etc/initramfs-tools/modules
         qDebug() << "Update initramfs";
         //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
-            //proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
-            //proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
+            //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
+            //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
         //}
-        return proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
+        return proc.exec("chroot", {"/mnt/antiX update-initramfs", "-u", "-t", "-k", "all"});
     }
 
     proc.status(tr("Installing GRUB"));
 
     // set mounts for chroot
-    proc.exec("/bin/mount --rbind --make-rslave /dev /mnt/antiX/dev", true);
-    proc.exec("/bin/mount --rbind --make-rslave /sys /mnt/antiX/sys", true);
-    proc.exec("/bin/mount --rbind /proc /mnt/antiX/proc", true);
-    proc.exec("/bin/mount -t tmpfs -o size=100m,nodev,mode=755 tmpfs /mnt/antiX/run", true);
-    proc.exec("/bin/mkdir /mnt/antiX/run/udev", true);
-    proc.exec("/bin/mount --rbind /run/udev /mnt/antiX/run/udev", true);
-
-    QString arch;
+    proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
+    proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
+    proc.exec("/bin/mount", {"--rbind", "/proc", "/mnt/antiX/proc"});
+    proc.exec("/bin/mount", {"-t", "tmpfs", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
+    proc.exec("/bin/mkdir", {"/mnt/antiX/run/udev"});
+    proc.exec("/bin/mount", {"--rbind", "/run/udev", "/mnt/antiX/run/udev"});
 
     // install new Grub now
+    bool isOK = false;
+    QString arch;
     const QString &boot = "/dev/" + comboBoot->currentData().toString();
     if (!radioBootESP->isChecked()) {
-        cmd = QString("grub-install --target=i386-pc --recheck --no-floppy --force --boot-directory=/mnt/antiX/boot %1").arg(boot);
+        isOK = proc.exec("grub-install", {"--target=i386-pc", "--recheck",
+            "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", boot});
     } else {
         mkdir("/mnt/antiX/boot/efi", 0755);
-        QString mount = QString("/bin/mount %1 /mnt/antiX/boot/efi").arg(boot);
-        proc.exec(mount);
+        proc.exec("/bin/mount", {boot, "/mnt/antiX/boot/efi"});
         // rename arch to match grub-install target
-        arch = proc.execOut("cat /sys/firmware/efi/fw_platform_size");
+        arch = proc.execOut("cat", {"/sys/firmware/efi/fw_platform_size"});
         arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
-        cmd = QString("chroot /mnt/antiX grub-install --force-extra-removable --target=%1-efi --efi-directory=/boot/efi --bootloader-id=%2%3 --recheck").arg(arch, PROJECTSHORTNAME, PROJECTVERSION);
-    }
 
-    qDebug() << "Installing Grub";
-    if (!proc.exec(cmd)) {
-        // error
-        QMessageBox::critical(this, windowTitle(),
-                              tr("GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
-        proc.exec("/bin/umount -R /mnt/antiX/run", true);
-        proc.exec("/bin/umount -R /mnt/antiX/proc", true);
-        proc.exec("/bin/umount -R /mnt/antiX/sys", true);
-        proc.exec("/bin/umount -R /mnt/antiX/dev", true);
-        if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true))
-            proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
+        isOK = proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
+            "--target=" + arch + "-efi", "--efi-directory=/boot/efi",
+            "--bootloader-id=" + PROJECTSHORTNAME + PROJECTVERSION, "--recheck"});
+    }
+    if (!isOK) {
+        QMessageBox::critical(this, windowTitle(), tr("GRUB installation failed."
+            " You can reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
+        proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
+        proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
+        proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
+        proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
+        if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
+            proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
+        }
         return false;
     }
 
     //added non-live boot codes to those in /etc/default/grub, remove duplicates
     //get non-live boot codes
-    QString cmdline = proc.execOut("/live/bin/non-live-cmdline");
+    QString cmdline = proc.shellOut("/live/bin/non-live-cmdline");
 
     //get /etc/default/grub codes
     QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
@@ -997,42 +998,42 @@ bool MInstall::installLoader()
 
     //do the replacement in /etc/default/grub
     qDebug() << "Add cmdline options to Grub";
-    cmd = QString("sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub").arg(finalcmdlinestring);
-    proc.exec(cmd, false);
+    const QString cmd = "sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub";
+    proc.shell(cmd.arg(finalcmdlinestring));
 
     //copy memtest efi files if needed
 
     if (uefi) {
         mkdir("/mnt/antiX/boot/uefi-mt", 0755);
-        if (arch == "i386")
-            proc.exec("/bin/cp /live/boot-dev/boot/uefi-mt/mtest-32.efi /mnt/antiX/boot/uefi-mt", true);
-        else
-            proc.exec("/bin/cp /live/boot-dev/boot/uefi-mt/mtest-64.efi /mnt/antiX/boot/uefi-mt", true);
+        if (arch == "i386") {
+            proc.exec("/bin/cp", {"/live/boot-dev/boot/uefi-mt/mtest-32.efi", "/mnt/antiX/boot/uefi-mt"});
+        } else {
+            proc.exec("/bin/cp", {"/live/boot-dev/boot/uefi-mt/mtest-64.efi", "/mnt/antiX/boot/uefi-mt"});
+        }
     }
     proc.status();
 
     //update grub with new config
 
     qDebug() << "Update Grub";
-    proc.exec("chroot /mnt/antiX update-grub");
+    proc.exec("chroot", {"/mnt/antiX", "update-grub"});
 
     proc.status(tr("Updating initramfs"));
     //if useing f2fs, then add modules to /etc/initramfs-tools/modules
     //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
-        //proc.exec("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
-        //proc.exec("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
+        //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
+        //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
     //}
-    proc.exec("chroot /mnt/antiX update-initramfs -u -t -k all");
+    proc.exec("chroot", {"/mnt/antiX update-initramfs", "-u", "-t", "-k", "all"});
     proc.status();
     qDebug() << "clear chroot env";
-    proc.exec("/bin/umount -R /mnt/antiX/run", true);
-    proc.exec("/bin/umount -R /mnt/antiX/proc", true);
-    proc.exec("/bin/umount -R /mnt/antiX/sys", true);
-    proc.exec("/bin/umount -R /mnt/antiX/dev", true);
-
-    if (proc.exec("mountpoint -q /mnt/antiX/boot/efi", true))
-        proc.exec("/bin/umount /mnt/antiX/boot/efi", true);
-
+    proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
+    proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
+    proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
+    proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
+    if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
+        proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
+    }
     return true;
 }
 
@@ -1043,7 +1044,7 @@ void MInstall::enableOOBE()
     for (; *it; ++it) {
         if ((*it)->parent()) setService((*it)->text(0), false); // Speed up the OOBE boot.
     }
-    proc.exec("chroot /mnt/antiX/ update-rc.d oobe defaults", true);
+    proc.exec("chroot", {"/mnt/antiX/", "update-rc.d", "oobe", "defaults"});
 }
 bool MInstall::processOOBE()
 {
@@ -1055,14 +1056,13 @@ bool MInstall::processOOBE()
     if (!setComputerName()) return false;
     setLocale();
     if (haveSnapshotUserAccounts) { // skip user account creation
-        QString cmd = "rsync -a /home/ /mnt/antiX/home/"
-                      " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority'"
-                      " --exclude '.ICEauthority' --exclude '.config/session'";
-        proc.exec(cmd);
+        proc.exec("rsync", {"-a", "/home/", "/mnt/antiX/home/",
+            "--exclude", ".cache", "--exclude", ".gvfs", "--exclude", ".dbus", "--exclude", ".Xauthority",
+            "--exclude", ".ICEauthority", "--exclude", ".config/session"});
     } else {
         if (!setUserInfo()) return false;
     }
-    if (oobe) proc.exec("update-rc.d oobe disable", false);
+    if (oobe) proc.exec("update-rc.d", {"oobe", "disable"});
     return true;
 }
 
@@ -1150,38 +1150,40 @@ bool MInstall::setUserInfo()
     if (QFileInfo::exists(dpath)) {
         if (radioOldHomeSave->isChecked()) {
             bool ok = false;
-            QString cmd = QString("/bin/mv -f %1 %1.00%2").arg(dpath);
-            for (int ixi = 1; ixi < 10 && !ok; ++ixi)
-                ok = proc.exec(cmd.arg(ixi));
+            QStringList cargs({"-f", dpath, dpath});
+            for (int ixi = 1; ixi < 10 && !ok; ++ixi) {
+                cargs.last() = dpath + ".00" + QString::number(ixi);
+                ok = proc.exec("/bin/mv", cargs);
+            }
             if (!ok) {
                 failUI(tr("Failed to save old home directory."));
                 return false;
             }
         } else if (radioOldHomeDelete->isChecked()) {
-            if (!proc.exec("/bin/rm -rf " + dpath)) {
+            if (!proc.exec("/bin/rm", {"-rf", dpath})) {
                 failUI(tr("Failed to delete old home directory."));
                 return false;
             }
         }
-        proc.exec("/bin/sync", true); // The sync(2) system call will block the GUI.
+        proc.exec("/bin/sync"); // The sync(2) system call will block the GUI.
     }
 
     if (QFileInfo::exists(dpath.toUtf8())) { // Still exists.
-        proc.exec("/bin/cp -n " + skelpath + "/.bash_profile " + dpath, true);
-        proc.exec("/bin/cp -n " + skelpath + "/.bashrc " + dpath, true);
-        proc.exec("/bin/cp -n " + skelpath + "/.gtkrc " + dpath, true);
-        proc.exec("/bin/cp -n " + skelpath + "/.gtkrc-2.0 " + dpath, true);
-        proc.exec("/bin/cp -Rn " + skelpath + "/.config " + dpath, true);
-        proc.exec("/bin/cp -Rn " + skelpath + "/.local " + dpath, true);
+        proc.exec("/bin/cp", {"-n", skelpath + "/.bash_profile", dpath});
+        proc.exec("/bin/cp", {"-n", skelpath + "/.bashrc", dpath});
+        proc.exec("/bin/cp", {"-n", skelpath + "/.gtkrc", dpath});
+        proc.exec("/bin/cp", {"-n", skelpath + "/.gtkrc-2.0", dpath});
+        proc.exec("/bin/cp", {"-Rn", skelpath + "/.config", dpath});
+        proc.exec("/bin/cp", {"-Rn", skelpath + "/.local", dpath});
     } else { // dir does not exist, must create it
         // Copy skel to demo, unless demo folder exists in remastered linuxfs.
         if (!isRemasteredDemoPresent) {
-            if (!proc.exec("/bin/cp -a " + skelpath + ' ' + dpath)) {
+            if (!proc.exec("/bin/cp", {"-a", skelpath, dpath})) {
                 failUI(tr("Sorry, failed to create user directory."));
                 return false;
             }
         } else { // still rename the demo directory even if remastered demo home folder is detected
-            if (!proc.exec("/bin/mv -f " + rootpath + "/home/demo " + dpath)) {
+            if (!proc.exec("/bin/mv", {"-f", rootpath + "/home/demo", dpath})) {
                 failUI(tr("Sorry, failed to name user directory."));
                 return false;
             }
@@ -1202,7 +1204,7 @@ bool MInstall::setUserInfo()
     }
 
     // fix the ownership, demo=newuser
-    if (!proc.exec("chown -R demo:demo " + dpath)) {
+    if (!proc.exec("chown", {"-R", "demo:demo", dpath})) {
         failUI(tr("Sorry, failed to set ownership of user directory."));
         return false;
     }
@@ -1227,7 +1229,7 @@ bool MInstall::setUserInfo()
         replaceStringInFile("autologin-user=", "#autologin-user=", rootpath + "/etc/lightdm/lightdm.conf");
         replaceStringInFile("User=.*", "User=", rootpath + "/etc/sddm.conf");
     }
-    proc.exec("touch " + rootpath + "/var/mail/" + textUserName->text());
+    proc.exec("touch", {rootpath + "/var/mail/" + textUserName->text()});
 
     return true;
 }
@@ -1314,74 +1316,75 @@ void MInstall::setLocale()
     if (!oobe) cmd = "chroot /mnt/antiX ";
     cmd += QString("/usr/sbin/update-locale \"LANG=%1\"").arg(comboLocale->currentData().toString());
     qDebug() << "Update locale";
-    proc.exec(cmd);
+    proc.shell(cmd);
     cmd = QString("Language=%1").arg(comboLocale->currentData().toString());
 
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
     //replace with link
     if (!oobe) {
         cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /mnt/antiX/etc/localtime").arg(comboTimeZone->currentData().toString());
-        proc.exec(cmd, false);
+        proc.shell(cmd);
     }
     cmd = QString("/bin/ln -nfs /usr/share/zoneinfo/%1 /etc/localtime").arg(comboTimeZone->currentData().toString());
-    proc.exec(cmd, false);
+    proc.shell(cmd);
     // /etc/timezone is text file with the timezone written in it. Write the user-selected timezone in it now.
     if (!oobe) {
         cmd = QString("echo %1 > /mnt/antiX/etc/timezone").arg(comboTimeZone->currentData().toString());
-        proc.exec(cmd, false);
+        proc.shell(cmd);
     }
     cmd = QString("echo %1 > /etc/timezone").arg(comboTimeZone->currentData().toString());
-    proc.exec(cmd, false);
+    proc.shell(cmd);
 
     // Set clock to use LOCAL
-    if (checkLocalClock->isChecked())
-        proc.exec("echo '0.0 0 0.0\n0\nLOCAL' > /etc/adjtime", false);
-    else
-        proc.exec("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime", false);
+    if (checkLocalClock->isChecked()) {
+        proc.shell("echo '0.0 0 0.0\n0\nLOCAL' > /etc/adjtime");
+    } else {
+        proc.shell("echo '0.0 0 0.0\n0\nUTC' > /etc/adjtime");
+    }
     proc.exec("hwclock --hctosys");
     if (!oobe) {
-        proc.exec("/bin/cp -f /etc/adjtime /mnt/antiX/etc/");
-        proc.exec("/bin/cp -f /etc/default/rcS /mnt/antiX/etc/default");
+        proc.exec("/bin/cp", {"-f /etc/adjtime", "/mnt/antiX/etc/"});
+        proc.exec("/bin/cp", {"-f /etc/default/rcS", "/mnt/antiX/etc/default"});
     }
 
     // Set clock format
     QString skelpath = oobe ? "/etc/skel" : "/mnt/antiX/etc/skel";
     if (radioClock12->isChecked()) {
         //mx systems
-        proc.exec("sed -i '/data0=/c\\data0=%l:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
-        proc.exec("sed -i '/data0=/c\\data0=%l:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
-        proc.exec("sed -i '/time_format=/c\\time_format=%l:%M' /home/demo/.config/xfce4/panel/datetime-1.rc", false);
-        proc.exec("sed -i '/time_format=/c\\time_format=%l:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc", false);
+        proc.shell("sed -i '/data0=/c\\data0=%l:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
+        proc.shell("sed -i '/data0=/c\\data0=%l:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
+        proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' /home/demo/.config/xfce4/panel/datetime-1.rc");
+        proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
 
         //mx kde
-        proc.exec("sed -i '/use24hFormat=/c\\use24hFormat=0' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc", false);
-        proc.exec("sed -i '/use24hFormat=/c\\use24hFormat=0' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc", false);
+        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=0' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc");
+        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=0' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc");
 
         //antix systems
-        proc.exec("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.icewm/preferences", false);
-        proc.exec("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.fluxbox/init", false);
-        proc.exec("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.jwm/tray", false);
+        proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.icewm/preferences");
+        proc.shell("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.fluxbox/init");
+        proc.shell("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.jwm/tray");
     } else {
         //mx systems
-        proc.exec("sed -i '/data0=/c\\data0=%H:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
-        proc.exec("sed -i '/data0=/c\\data0=%H:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc", false);
-        proc.exec("sed -i '/time_format=/c\\time_format=%H:%M' /home/demo/.config/xfce4/panel/datetime-1.rc", false);
-        proc.exec("sed -i '/time_format=/c\\time_format=%H:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc", false);
+        proc.shell("sed -i '/data0=/c\\data0=%H:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
+        proc.shell("sed -i '/data0=/c\\data0=%H:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
+        proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' /home/demo/.config/xfce4/panel/datetime-1.rc");
+        proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
 
         //mx kde
-        proc.exec("sed -i '/use24hFormat=/c\\use24hFormat=2' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc", false);
-        proc.exec("sed -i '/use24hFormat=/c\\use24hFormat=2' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc", false);
+        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc");
+        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc");
 
         //antix systems
-        proc.exec("sed -i 's/%H:%M/%H:%M/g' " + skelpath + "/.icewm/preferences", false);
-        proc.exec("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.fluxbox/init", false);
-        proc.exec("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.jwm/tray", false);
+        proc.shell("sed -i 's/%H:%M/%H:%M/g' " + skelpath + "/.icewm/preferences");
+        proc.shell("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.fluxbox/init");
+        proc.shell("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.jwm/tray");
     }
 
     // localize repo
     qDebug() << "Localize repo";
-    if (oobe) proc.exec("localize-repo default");
-    else proc.exec("chroot /mnt/antiX localize-repo default");
+    if (oobe) proc.exec("localize-repo", {"default"});
+    else proc.exec("chroot", {"/mnt/antiX", "localize-repo", "default"});
 }
 
 void MInstall::stashServices(bool save)
@@ -1819,7 +1822,7 @@ void MInstall::gotoPage(int next)
         // finished
         updateCursor(Qt::WaitCursor);
         if (!pretend && checkExitReboot->isChecked()) {
-            proc.exec("/usr/local/bin/persist-config --shutdown --command reboot &", false);
+            proc.shell("/usr/local/bin/persist-config --shutdown --command reboot &");
         }
         qApp->exit(EXIT_SUCCESS);
         return;
@@ -1851,7 +1854,7 @@ void MInstall::gotoPage(int next)
             gotoPage(Step::Splash);
             if (processOOBE()) {
                 labelSplash->setText(tr("Configuration complete. Restarting system."));
-                proc.exec("/usr/sbin/reboot", true);
+                proc.exec("/usr/sbin/reboot");
                 qApp->exit(EXIT_SUCCESS);
             } else {
                 labelSplash->setText(tr("Could not complete configuration."));
@@ -2080,8 +2083,8 @@ void MInstall::on_pushRunPartMan_clicked()
 {
     updateCursor(Qt::WaitCursor);
     boxMain->setEnabled(false);
-    if (QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted", true);
-    else proc.exec("/usr/bin/partitionmanager", true);
+    if (QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted");
+    else proc.exec("/usr/bin/partitionmanager");
     updatePartitionWidgets(false);
     boxMain->setEnabled(true);
     updateCursor();
@@ -2126,14 +2129,14 @@ void MInstall::cleanup(bool endclean)
     proc.unhalt();
     if (endclean) {
         setupAutoMount(true);
-        proc.exec("/bin/cp /var/log/minstall.log /mnt/antiX/var/log >/dev/null 2>&1", false);
-        proc.exec("/bin/rm -rf /mnt/antiX/mnt/antiX >/dev/null 2>&1", false);
+        proc.exec("/bin/cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
+        proc.exec("/bin/rm", {"-rf", "/mnt/antiX/mnt/antiX"});
     }
-    proc.exec("/bin/umount -l /mnt/antiX/boot/efi", true);
-    proc.exec("/bin/umount -l /mnt/antiX/proc", true);
-    proc.exec("/bin/umount -l /mnt/antiX/sys", true);
-    proc.exec("/bin/umount -l /mnt/antiX/dev/shm", true);
-    proc.exec("/bin/umount -l /mnt/antiX/dev", true);
+    proc.exec("/bin/umount", {"-l", "/mnt/antiX/boot/efi"});
+    proc.exec("/bin/umount", {"-l", "/mnt/antiX/proc"});
+    proc.exec("/bin/umount", {"-l", "/mnt/antiX/sys"});
+    proc.exec("/bin/umount", {"-l", "/mnt/antiX/dev/shm"});
+    proc.exec("/bin/umount", {"-l", "/mnt/antiX/dev"});
     if (!mountkeep) partman.unmount();
 }
 
@@ -2224,10 +2227,11 @@ void MInstall::setupkeyboardbutton()
 void MInstall::on_pushSetKeyboard_clicked()
 {
     hide();
-    if (proc.exec("command -v  system-keyboard-qt >/dev/null 2>&1", false))
-        proc.exec("system-keyboard-qt", false);
-    else
-        proc.exec("env GTK_THEME='Adwaita' fskbsetting", false);
+    if (proc.shell("command -v  system-keyboard-qt >/dev/null 2>&1")) {
+        proc.exec("system-keyboard-qt");
+    } else {
+        proc.shell("env GTK_THEME='Adwaita' fskbsetting");
+    }
     show();
     setupkeyboardbutton();
 }
@@ -2452,20 +2456,20 @@ void MInstall::rsynchomefolder(QString dpath)
                   " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
                   " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'"
                   " --exclude '.config/session' | xargs -I '$' sed -i 's|home/demo|home/" + textUserName->text() + "|g' %1/$").arg(dpath);
-    proc.exec(cmd);
+    proc.shell(cmd);
 }
 
 void MInstall::changeRemasterdemoToNewUser(QString dpath)
 {
     QString cmd = ("find " + dpath + " -maxdepth 1 -type f -name '.*' -print0 | xargs -0 sed -i 's|home/demo|home/" + textUserName->text() + "|g'").arg(dpath);
-    proc.exec(cmd);
+    proc.shell(cmd);
     cmd = ("find " + dpath + "/.config -type f -print0 | xargs -0 sed -i 's|home/demo|home/" + textUserName->text() + "|g'").arg(dpath);
-    proc.exec(cmd);
+    proc.shell(cmd);
     cmd = ("find " + dpath + "/.local -type f  -print0 | xargs -0 sed -i 's|home/demo|home/" + textUserName->text() + "|g'").arg(dpath);
-    proc.exec(cmd);
+    proc.shell(cmd);
 }
 
 void MInstall::resetBlueman()
 {
-    proc.exec("runuser -l demo -c 'dconf reset /org/blueman/transfer/shared-path'"); //reset blueman path
+    proc.exec("runuser", {"-l", "demo", "-c", "dconf reset /org/blueman/transfer/shared-path"}); //reset blueman path
 }
