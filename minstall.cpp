@@ -1043,18 +1043,31 @@ bool MInstall::installLoader()
 // out-of-box experience
 void MInstall::enableOOBE()
 {
+    proc.setChRoot("/mnt/antiX");
     QTreeWidgetItemIterator it(treeServices);
     for (; *it; ++it) {
         if ((*it)->parent()) setService((*it)->text(0), false); // Speed up the OOBE boot.
     }
-    proc.exec("chroot", {"/mnt/antiX/", "update-rc.d", "oobe", "defaults"});
+    setService("smbd", false);
+    setService("nmbd", false);
+    setService("samba-ad-dc", false);
+    proc.exec("update-rc.d", {"oobe", "defaults"});
+    proc.setChRoot();
 }
 bool MInstall::processOOBE()
 {
+    if (!oobe) proc.setChRoot("/mnt/antiX");
     QTreeWidgetItemIterator it(treeServices);
     for (; *it; ++it) {
         if ((*it)->parent()) setService((*it)->text(0), (*it)->checkState(0) == Qt::Checked);
     }
+    if (haveSamba) {
+        const bool enable = checkSamba->isChecked();
+        setService("smbd", enable);
+        setService("nmbd", enable);
+        setService("samba-ad-dc", enable);
+    }
+    proc.setChRoot();
 
     if (!setComputerName()) return false;
     setLocale();
@@ -1124,7 +1137,7 @@ bool MInstall::setUserInfo()
 
     // set the user passwords first
     bool ok = true;
-    if (!oobe) proc.setRoot("/mnt/antiX");
+    if (!oobe) proc.setChRoot("/mnt/antiX");
     const QString &userPass = textUserPass->text();
     QByteArray userinfo;
     if (!(boxRootAccount->isChecked())) ok = proc.exec("passwd", {"-l", "root"});
@@ -1143,7 +1156,7 @@ bool MInstall::setUserInfo()
         failUI(tr("Failed to set user account passwords."));
         return false;
     }
-    proc.setRoot();
+    proc.setChRoot();
 
     QString rootpath;
     if (!oobe) rootpath = "/mnt/antiX";
@@ -1286,10 +1299,6 @@ bool MInstall::setComputerName()
     if (haveSamba) {
         //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/samba/smb.conf");
         replaceStringInFile("WORKGROUP", textComputerGroup->text(), etcpath + "/samba/smb.conf");
-        const bool enable = checkSamba->isChecked();
-        setService("smbd", enable);
-        setService("nmbd", enable);
-        setService("samba-ad-dc", enable);
     }
     //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/hosts");
     const QString &compname = textComputerName->text();
@@ -1399,18 +1408,13 @@ void MInstall::stashServices(bool save)
 void MInstall::setService(const QString &service, bool enabled)
 {
     qDebug() << "Set service:" << service << enabled;
-    QString rootpath;
-    if (!oobe) {
-        proc.setRoot("/mnt/antiX");
-        rootpath = "/mnt/antiX";
-    }
     if (enabled) {
         proc.exec("update-rc.d", {service, " defaults"});
         if (containsSystemD) proc.exec("systemctl", {"enable", service});
         if (containsRunit) {
-            QFile::remove(rootpath+"/etc/sv/" + service + "/down");
-            if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
-                proc.mkpath(rootpath+"/etc/sv/" + service);
+            QFile::remove(proc.chRoot + "/etc/sv/" + service + "/down");
+            if (!QFile::exists(proc.chRoot + "/etc/sv/" + service)) {
+                proc.mkpath(proc.chRoot + "/etc/sv/" + service);
                 proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
             }
         }
@@ -1421,14 +1425,13 @@ void MInstall::setService(const QString &service, bool enabled)
             proc.exec("systemctl", {"mask", service});
         }
         if (containsRunit) {
-            if (!QFile::exists(rootpath+"/etc/sv/" + service)) {
-                proc.mkpath(rootpath+"/etc/sv/" + service);
+            if (!QFile::exists(proc.chRoot + "/etc/sv/" + service)) {
+                proc.mkpath(proc.chRoot + "/etc/sv/" + service);
                 proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
             }
             proc.exec("touch", {"/etc/sv/" + service + "/down"});
         }
     }
-    proc.setRoot();
 }
 void MInstall::failUI(const QString &msg)
 {

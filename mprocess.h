@@ -36,7 +36,6 @@ class MProcess : public QProcess
     QProgressBar *progBar = nullptr;
     int progSliceStart = 0, progSliceSpace = 0;
     long progSlicePos = 0, progSliceSteps = 0;
-    QString curRoot;
     bool exec(const QString &program, const QStringList &arguments,
         const QByteArray *input, bool needRead, QListWidgetItem *logEntry);
 protected:
@@ -48,9 +47,10 @@ public:
         Status,
         Exec
     };
+    QString chRoot;
     MProcess(QObject *parent = Q_NULLPTR);
     void setupUI(QListWidget *listLog, QProgressBar *progInstall);
-    void setRoot(const QString &root = QString());
+    void setChRoot(const QString &newroot = QString());
     /* Raw program execution */
     bool exec(const QString &program, const QStringList &arguments = {},
         const QByteArray *input = nullptr, bool needRead = false);

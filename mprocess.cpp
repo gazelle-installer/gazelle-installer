@@ -49,16 +49,16 @@ void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall)
 
 void MProcess::setupChildProcess()
 {
-    if (curRoot.isEmpty()) return;
-    chroot(curRoot.toUtf8().constData());
+    if (chRoot.isEmpty()) return;
+    chroot(chRoot.toUtf8().constData());
     chdir("/");
 }
-void MProcess::setRoot(const QString &root)
+void MProcess::setChRoot(const QString &newroot)
 {
     if (halting) return;
-    if (!root.isEmpty()) log("New chroot: " + root, Standard);
-    else if (!curRoot.isEmpty() && root.isEmpty()) log("End chroot: " + curRoot, Standard);
-    curRoot = root;
+    if (!newroot.isEmpty()) log("Set chroot: " + newroot, Standard);
+    else if (!chRoot.isEmpty() && newroot.isEmpty()) log("End chroot: " + chRoot, Standard);
+    chRoot = newroot;
 }
 
 bool MProcess::exec(const QString &program, const QStringList &arguments,
