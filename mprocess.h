@@ -45,6 +45,7 @@ public:
         Standard,
         Section,
         Status,
+        Fail,
         Exec
     };
     QString chRoot;

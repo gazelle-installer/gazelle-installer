@@ -55,7 +55,6 @@ void MProcess::setupChildProcess()
 }
 void MProcess::setChRoot(const QString &newroot)
 {
-    if (halting) return;
     if (!newroot.isEmpty()) log("Set chroot: " + newroot, Standard);
     else if (!chRoot.isEmpty() && newroot.isEmpty()) log("End chroot: " + chRoot, Standard);
     chRoot = newroot;
@@ -135,6 +134,7 @@ void MProcess::halt()
     halting = true;
     terminate();
     QTimer::singleShot(5000, this, &QProcess::kill);
+    setChRoot();
 }
 
 void MProcess::unhalt()
@@ -174,14 +174,16 @@ QListWidgetItem *MProcess::log(const QString &text, const LogType type)
     if (type == Standard) qDebug().noquote() << text;
     else if (type == Section) qDebug().noquote() << "<<" << text << ">>";
     else if (type == Status) qDebug().noquote() << "++" << text << "++";
+    else if (type == Fail) qDebug().noquote() << "--" << text << "--";
     if (!logView || type == Section) return nullptr;
     QListWidgetItem *entry = new QListWidgetItem(text, logView);
     logView->addItem(entry);
     if (type == Exec) entry->setForeground(Qt::cyan);
-    else if (type == Status) {
+    else if (type == Status || type == Fail) {
         QFont font(entry->font());
         font.setBold(true);
         entry->setFont(font);
+        if (type == Fail) entry->setForeground(Qt::magenta);
     }
     logView->scrollToBottom();
     return entry;

@@ -86,7 +86,7 @@ public:
     void gotoPage(int next);
     void pageDisplayed(int next);
     void setupkeyboardbutton();
-    bool abort(bool onclose);
+    bool abortUI();
     void cleanup(bool endclean = true);
 
 private slots:
