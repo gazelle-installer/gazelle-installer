@@ -94,8 +94,8 @@ void PartMan::scan(DeviceItem *drvstart)
     QStringList cargs({"-T", "-bJo",
         "TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL,PARTFLAGS"});
     if (drvstart) cargs.append(drvstart->path);
-    const QString &bdRaw = proc.execOut("lsblk", cargs, true);
-    const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
+    proc.exec("lsblk", cargs, nullptr, true);
+    const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
 
     if (!drvstart) {
@@ -105,7 +105,8 @@ void PartMan::scan(DeviceItem *drvstart)
     // Partitions listed in order of their physical locations.
     QStringList order;
     QString curdev;
-    for(const QString &line : proc.execOutLines("parted", {"-lm"})) {
+    proc.exec("parted", {"-lm"}, nullptr, true);
+    for(const QString &line : proc.readOutLines()) {
         const QString &sect = line.section(':', 0, 0);
         const int part = sect.toInt();
         if (part) order.append(DeviceItem::join(curdev, part));
@@ -200,8 +201,8 @@ void PartMan::scanVirtualDevices(bool rescan)
             }
         }
     }
-    const QString &bdRaw = proc.shellOut("lsblk -T -bJo"
-        " TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/* 2>/dev/null", true);
+    proc.exec("lsblk", {"-T", "-bJo", "TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,FSTYPE,LABEL"}, nullptr, true);
+    const QString &bdRaw = proc.readOut(true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
     if (jsonBD.empty()) {
@@ -251,9 +252,9 @@ void PartMan::scanVirtualDevices(bool rescan)
         const QString &name = vdlit->child(ixi)->device;
         DeviceItem *vit = vdlit->child(ixi);
         vit->origin = nullptr; // Clear stale origin pointer.
-        QStringList lines = proc.execOutLines("cryptsetup", {"status", vit->path});
         // Find the associated partition and decrement its reference count if found.
-        for (const QString &line : lines) {
+        proc.exec("cryptsetup", {"status", vit->path}, nullptr, true);
+        for (const QString &line : proc.readOutLines()) {
             const QString &trline = line.trimmed();
             if (!trline.startsWith("device:")) continue;
             vit->origin = findByPath(trline.mid(8).trimmed());
@@ -630,7 +631,8 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
     QStringList lines;
     if (!proc.exec("mount", {"-o", "noatime",
         partit->mappedDevice(), "/mnt/btrfs-scratch"})) goto END;
-    lines = proc.execOutLines("btrfs", {"subvolume", "list", "/mnt/btrfs-scratch"});
+    proc.exec("btrfs", {"subvolume", "list", "/mnt/btrfs-scratch"}, nullptr, true);
+    lines = proc.readOutLines();
     proc.exec("umount", {"/mnt/btrfs-scratch"});
     for (const QString &line : lines) {
         const int start = line.indexOf("path") + 5;
@@ -808,8 +810,9 @@ bool PartMan::checkTargetDrivesOK()
                 // See smartctl(8) manual: EXIT STATUS (Bit 3)
                 smartFail += " - " + smartMsg + "\n";
             } else {
-                const QString &out = proc.shellOut("smartctl -A " + drvit->path
-                        + "| grep -E \"^  5|^196|^197|^198\" | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'");
+                proc.shell("smartctl -A " + drvit->path + "| grep -E \"^  5|^196|^197|^198\""
+                    " | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'", nullptr, true);
+                const QString &out = proc.readOut();
                 if (!out.isEmpty()) smartWarn += " ---- " + smartMsg + " ---\n" + out + "\n\n";
             }
         }
@@ -924,7 +927,8 @@ bool PartMan::preparePartitions()
             }
         } else {
             // Clearing the drive, so mark all partitions on the drive for unmounting.
-            listToUnmount << proc.execOutLines("lsblk", {"-nro", "path", drvit->path});
+            proc.exec("lsblk", {"-nro", "path", drvit->path}, nullptr, true);
+            listToUnmount << proc.readOutLines();
         }
     }
     for (const QString &devpath : listToUnmount) {
@@ -1068,8 +1072,8 @@ bool PartMan::formatLinuxPartition(const QString &devpath, const QString &format
         // btrfs and set up fsck
         proc.exec("/bin/cp", {"-fp", "/bin/true", "/sbin/fsck.auto"});
         // set creation options for small drives using btrfs
-        QString size_str = proc.execOut("/sbin/sfdisk", {"-s", devpath});
-        long long size = size_str.toLongLong();
+        proc.exec("/sbin/sfdisk", {"-s", devpath}, nullptr, true);
+        long long size = proc.readOut().toLongLong();
         size = size / 1024; // in MiB
         // if drive is smaller than 6GB, create in mixed mode
         if (size < 6000) cargs << "-M" << "-O" << "skinny-metadata";
@@ -1163,8 +1167,8 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         ? gui.textCryptoPass : gui.textCryptoPassCust;
     const QByteArray password(passedit->text().toUtf8());
     for (auto &it : cryptAdd.toStdMap()) {
-        QString uuid = proc.execOut("blkid", {"-s", "UUID", "-o", "value", "/dev/" + it.first});
-        out << it.second << " /dev/disk/by-uuid/" << uuid;
+        proc.exec("blkid", {"-s", "UUID", "-o", "value", "/dev/" + it.first}, nullptr, true);
+        out << it.second << " /dev/disk/by-uuid/" << proc.readOut();
         if (noKey || it.first == keyDev) out << " none";
         else {
             if (isNewKey) {
@@ -1191,7 +1195,6 @@ bool PartMan::makeFstab(bool populateMediaMounts)
     if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
     out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
-    QStringList cargsBlkID({"-o", "value", "UUID", "-s", "UUID"});
     // File systems and swap space.
     for (auto &it : mounts.toStdMap()) {
         const DeviceItem *twit = it.second;
@@ -1200,12 +1203,12 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         // Device ID or UUID
         if (twit->willMap()) out << dev;
         else {
-            cargsBlkID.append(dev);
-            out << "UUID=" + proc.execOut("blkid", cargsBlkID);
-            cargsBlkID.removeLast();
+            proc.exec("blkid", {"-o", "value", "UUID", "-s", "UUID", dev}, nullptr, true);
+            out << "UUID=" + proc.readOut();
         }
         // Mount point, file system
-        QString fsfmt = proc.execOut("blkid", {dev, "-o", "value", "-s", "TYPE"});
+        proc.exec("blkid", {dev, "-o", "value", "-s", "TYPE"}, nullptr, true);
+        const QString &fsfmt = proc.readOut();
         if (fsfmt == "swap") out << " swap swap";
         else out << ' ' << it.first << ' ' << fsfmt;
         // Options
@@ -1214,8 +1217,8 @@ bool PartMan::makeFstab(bool populateMediaMounts)
             out << " subvol=" << twit->label;
             //make root subvol default
             if (it.first == "/") {
-                QString SUBVOLID = proc.shellOut("btrfs subvolume list /mnt/antiX | grep -w " + twit->label + " | cut -d\\  -f2");
-                proc.exec("btrfs", {"subvolume", "set-default", SUBVOLID, "/mnt/antiX"});
+                proc.shell("btrfs subvolume list /mnt/antiX | grep -w " + twit->label + " | cut -d\\  -f2", nullptr, true);
+                proc.exec("btrfs", {"subvolume", "set-default", proc.readOut(), "/mnt/antiX"});
             }
             if (!mountopts.isEmpty()) out << ',' << mountopts;
         } else {
@@ -1227,11 +1230,9 @@ bool PartMan::makeFstab(bool populateMediaMounts)
     }
     // EFI System Partition
     if (gui.radioBootESP->isChecked()) {
-        const QString espdev = "/dev/" + gui.comboBoot->currentData().toString();
-        cargsBlkID.append(espdev);
-        const QString espdevUUID = "UUID=" + proc.execOut("blkid", cargsBlkID);
-        qDebug() << "espdev" << espdev << espdevUUID;
-        out << espdevUUID + " /boot/efi vfat noatime,dmask=0002,fmask=0113 0 0\n";
+        const QString &dev = "/dev/" + gui.comboBoot->currentData().toString();
+        proc.exec("blkid", {"-o", "value", "UUID", "-s", "UUID", dev}, nullptr, true);
+        out << "UUID=" << proc.readOut() << " /boot/efi vfat noatime,dmask=0002,fmask=0113 0 0\n";
     }
     file.close();
     if (populateMediaMounts) {

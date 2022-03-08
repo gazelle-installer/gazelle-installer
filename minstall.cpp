@@ -169,7 +169,8 @@ void MInstall::startup()
 
         // calculate required disk space
         bootSource = "/live/aufs/boot";
-        partman.bootSpaceNeeded = proc.execOut("du", {"-sb", bootSource}).section('\t', 0, 0).toLongLong();
+        proc.exec("du", {"-sb", bootSource}, nullptr, true);
+        partman.bootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
         if (!pretend && partman.bootSpaceNeeded==0) {
             QMessageBox::critical(this, windowTitle(), tr("Cannot access installation source."));
             exit(EXIT_FAILURE);
@@ -182,8 +183,11 @@ void MInstall::startup()
         qDebug() << "linuxfs file is at : " << SQFILE_FULL;
         long long compression_factor;
         QString linuxfs_compression_type = "xz"; //default conservative
-        if (QFileInfo::exists(SQFILE_FULL))
-            linuxfs_compression_type = proc.shellOut("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none 2>/dev/null | od -An -tdI");
+        if (QFileInfo::exists(SQFILE_FULL)) {
+            proc.shell("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none"
+                + " 2>/dev/null | od -An -tdI", nullptr, true);
+            linuxfs_compression_type = proc.readOut();
+        }
 
         // gzip, xz, or lz4
         switch (linuxfs_compression_type.toInt()) {
@@ -203,9 +207,11 @@ void MInstall::startup()
         qDebug() << "linuxfs compression type is " << linuxfs_compression_type << "compression factor is " << compression_factor;
 
         long long rootfs_file_size = 0;
-        long long linuxfs_file_size = (proc.shellOut("df /live/linux --output=used --total |tail -n1").toLongLong() * 1024 * 100) / compression_factor;
+        proc.shell("df /live/linux --output=used --total |tail -n1", nullptr, true);
+        long long linuxfs_file_size = (proc.readOut().toLongLong() * 1024 * 100) / compression_factor;
         if (QFileInfo::exists("/live/perist-root")) {
-            rootfs_file_size = proc.shellOut("df /live/persist-root --output=used --total |tail -n1").toLongLong() * 1024;
+            proc.shell("df /live/persist-root --output=used --total |tail -n1", nullptr, true);
+            rootfs_file_size = proc.readOut().toLongLong() * 1024;
         }
 
         qDebug() << "linuxfs file size is " << linuxfs_file_size << " rootfs file size is " << rootfs_file_size;
@@ -270,8 +276,9 @@ void MInstall::startup()
     setupkeyboardbutton();
 
     // timezone lists
-    listTimeZones = proc.execOutLines("find", {"-L", "/usr/share/zoneinfo/posix",
-        "-mindepth", "2", "-type", "f", "-printf", "%P\\n"});
+    proc.exec("find", {"-L", "/usr/share/zoneinfo/posix",
+            "-mindepth", "2", "-type", "f", "-printf", "%P\\n"}, nullptr, true);
+    listTimeZones = proc.readOutLines();
     comboTimeArea->clear();
     for (const QString &zone : listTimeZones) {
         const QString &area = zone.section('/', 0, 0);
@@ -286,7 +293,8 @@ void MInstall::startup()
 
     // locale list
     comboLocale->clear();
-    QStringList loclist = proc.shellOutLines("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'");
+    proc.shell("locale -a | grep -Ev '^(C|POSIX)\\.?' | grep -E 'utf8|UTF-8'", nullptr, true);
+    QStringList loclist = proc.readOutLines();
     for (QString &strloc : loclist) {
         strloc.replace("utf8", "UTF-8", Qt::CaseInsensitive);
         QLocale loc(strloc);
@@ -315,7 +323,8 @@ void MInstall::startup()
     }
 
     // check for the Samba server
-    QString val = proc.shellOut("dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'");
+    proc.shell("dpkg -s samba | grep '^Status.*ok.*' | sed -e 's/.*ok //'", nullptr, true);
+    QString val = proc.readOut();
     haveSamba = (val.compare("installed") == 0);
 
     buildServiceList();
@@ -363,7 +372,8 @@ void MInstall::setupAutoMount(bool enabled)
     QStringList udev_temp_mdadm_rules;
     finfo.setFile("/run/udev");
     if (finfo.isDir()) {
-        udev_temp_mdadm_rules = proc.shellOutLines("egrep -l '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d");
+        proc.shell("egrep -l '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d", nullptr, true);
+        udev_temp_mdadm_rules = proc.readOutLines();
         for (QString &rule : udev_temp_mdadm_rules) {
             rule.replace("/lib/udev", "/run/udev");
         }
@@ -374,12 +384,12 @@ void MInstall::setupAutoMount(bool enabled)
         // disable auto-mount
         if (have_sysctl) {
             // Use systemctl to prevent automount by masking currently unmasked mount points
-            const QStringList &listMaskedMounts = proc.shellOutLines("systemctl list-units"
-                " --full --all -t mount --no-legend 2>/dev/null | grep -v masked | cut -f1 -d' '"
-                " | egrep -v '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc|run-user-.*-gvfs"
-                    "|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'");
-            if (!listMaskedMounts.isEmpty()) {
-                proc.exec("systemctl", QStringList({"--runtime", "mask", "--quiet", "--"}) + listMaskedMounts);
+            proc.shell("systemctl list-units --full --all -t mount --no-legend 2>/dev/null"
+                " | grep -v masked | cut -f1 -d' ' | egrep -v '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc"
+                    "|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'", nullptr, true);
+            const QStringList &maskedMounts = proc.readOutLines();
+            if (!maskedMounts.isEmpty()) {
+                proc.exec("systemctl", QStringList({"--runtime", "mask", "--quiet", "--"}) + maskedMounts);
             }
         }
         // create temporary blank overrides for all udev rules which
@@ -741,9 +751,10 @@ bool MInstall::saveHomeBasic()
     }
 
     mkdir("/mnt/antiX", 0755);
-    const bool ok = proc.exec("/bin/mount", {"-o", "ro", homedev, "/mnt/antiX"});
+    bool ok = proc.exec("/bin/mount", {"-o", "ro", homedev, "/mnt/antiX"});
     // Store a listing of /home to compare with the user name given later.
-    if (ok) listHomes = proc.execOutLines("/bin/ls", {"-1", "/mnt/antiX" + homedir});
+    if (ok) ok = proc.exec("/bin/ls", {"-1", "/mnt/antiX" + homedir}, nullptr, true);
+    if (ok) listHomes = proc.readOutLines();
     proc.exec("/bin/umount", {"-l", "/mnt/antiX"});
     return ok;
 }
@@ -804,7 +815,8 @@ bool MInstall::installLinux()
     }
 
     // guess localtime vs UTC
-    if (proc.shellOut("guess-hwclock") == "localtime") checkLocalClock->setChecked(true);
+    proc.shell("guess-hwclock", nullptr, true);
+    if (proc.readOut() == "localtime") checkLocalClock->setChecked(true);
 
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
     proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
@@ -889,9 +901,9 @@ bool MInstall::installLoader()
     if (phase < 0) return false;
     proc.advance(4, 4);
 
-    QString val = proc.shellOut("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'");
-
     // the old initrd is not valid for this hardware
+    proc.shell("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'", nullptr, true);
+    const QString &val = proc.readOut();
     if (!val.isEmpty()) proc.exec("/bin/rm", {"-f", "/mnt/antiX/boot/" + val});
 
     bool efivarfs = QFileInfo("/sys/firmware/efi/efivars").isDir();
@@ -942,7 +954,8 @@ bool MInstall::installLoader()
         mkdir("/mnt/antiX/boot/efi", 0755);
         proc.exec("/bin/mount", {boot, "/mnt/antiX/boot/efi"});
         // rename arch to match grub-install target
-        arch = proc.execOut("cat", {"/sys/firmware/efi/fw_platform_size"});
+        proc.exec("cat", {"/sys/firmware/efi/fw_platform_size"}, nullptr, true);
+        arch = proc.readOut();
         arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
 
         isOK = proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
@@ -962,17 +975,14 @@ bool MInstall::installLoader()
         return false;
     }
 
-    //added non-live boot codes to those in /etc/default/grub, remove duplicates
-    //get non-live boot codes
-    QString cmdline = proc.shellOut("/live/bin/non-live-cmdline");
-
     //get /etc/default/grub codes
     QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
     QString grubDefault=grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
     qDebug() << "grubDefault is " << grubDefault;
 
-    //covert qstrings to qstringlists and join the default and non-live lists together
-    QStringList finalcmdline=cmdline.split(" ");
+    //added non-live boot codes to those in /etc/default/grub, remove duplicates
+    proc.shell("/live/bin/non-live-cmdline", nullptr, true); // Get non-live boot codes
+    QStringList finalcmdline = proc.readOut().split(" ");
     finalcmdline.append(grubDefault.split(" "));
     qDebug() << "intermediate" << finalcmdline;
 
