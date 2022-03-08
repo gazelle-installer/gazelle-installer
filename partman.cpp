@@ -424,7 +424,7 @@ void PartMan::treeSelChange()
     } else {
         gui.pushPartClear->setEnabled(false);
         gui.pushPartAdd->setEnabled(false);
-        gui.pushPartRemove->setEnabled(false);
+        gui.pushPartRemove->setEnabled(twit && twit->type == DeviceItem::Subvolume);
     }
 }
 
@@ -552,13 +552,15 @@ void PartMan::partAddClick(bool)
 void PartMan::partRemoveClick(bool)
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *partit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (!partit) return;
-    DeviceItem *drvit = partit->parent();
+    DeviceItem *devit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
+    if (!devit) return;
+    DeviceItem *drvit = devit->parent();
     if (!drvit) return;
-    delete partit;
-    drvit->labelParts();
-    treeSelChange();
+    delete devit;
+    if (devit->type != DeviceItem::Subvolume) {
+        drvit->labelParts();
+        treeSelChange();
+    }
 }
 
 // Partition menu items
