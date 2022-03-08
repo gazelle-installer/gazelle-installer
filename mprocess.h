@@ -51,15 +51,11 @@ public:
     MProcess(QObject *parent = Q_NULLPTR);
     void setupUI(QListWidget *listLog, QProgressBar *progInstall);
     void setChRoot(const QString &newroot = QString());
-    /* Raw program execution */
     bool exec(const QString &program, const QStringList &arguments = {},
         const QByteArray *input = nullptr, bool needRead = false);
-    QString execOut(const QString &program, const QStringList &arguments = {}, bool everything = false);
-    QStringList execOutLines(const QString &program, const QStringList &arguments = {});
-    /* Shell script execution */
     bool shell(const QString &cmd, const QByteArray *input = nullptr, bool needRead = false);
-    QString shellOut(const QString &cmd, bool everything = false);
-    QStringList shellOutLines(const QString &cmd);
+    QString readOut(bool everything = false);
+    QStringList readOutLines();
     /* Miscellaneous */
     void halt();
     void unhalt();

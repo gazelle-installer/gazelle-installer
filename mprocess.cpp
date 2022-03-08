@@ -103,7 +103,6 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     return (status > 0);
 }
 
-/* Raw program execution. */
 bool MProcess::exec(const QString &program, const QStringList &arguments, const QByteArray *input, bool needRead)
 {
     if (halting) return false;
@@ -112,21 +111,6 @@ bool MProcess::exec(const QString &program, const QStringList &arguments, const 
     qDebug().nospace().noquote() << "Exec #" << execount << ": " << cmd;
     return exec(program, arguments, input, needRead, log(cmd, Exec));
 }
-
-QString MProcess::execOut(const QString &program, const QStringList &arguments, bool everything)
-{
-    exec(program, arguments, nullptr, true);
-    QString strout(readAllStandardOutput().trimmed());
-    if (everything) return strout;
-    return strout.section("\n", 0, 0);
-}
-QStringList MProcess::execOutLines(const QString &program, const QStringList &arguments)
-{
-    exec(program, arguments, nullptr, true);
-    return QString(readAllStandardOutput().trimmed()).split('\n', Qt::SkipEmptyParts);
-}
-
-/* Shell script execution. */
 bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead)
 {
     if (halting) return false;
@@ -134,16 +118,15 @@ bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead
     qDebug().nospace().noquote() << "Bash #" << execount << ": " << cmd;
     return exec("/bin/bash", {"-c", cmd}, input, needRead, log(cmd, Exec));
 }
-QString MProcess::shellOut(const QString &cmd, bool everything)
+
+QString MProcess::readOut(bool everything)
 {
-    shell(cmd, nullptr, true);
     QString strout(readAllStandardOutput().trimmed());
     if (everything) return strout;
     return strout.section("\n", 0, 0);
 }
-QStringList MProcess::shellOutLines(const QString &cmd)
+QStringList MProcess::readOutLines()
 {
-    shell(cmd, nullptr, true);
     return QString(readAllStandardOutput().trimmed()).split('\n', Qt::SkipEmptyParts);
 }
 
