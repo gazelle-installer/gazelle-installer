@@ -185,7 +185,7 @@ void MInstall::startup()
         QString linuxfs_compression_type = "xz"; //default conservative
         if (QFileInfo::exists(SQFILE_FULL)) {
             proc.shell("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none"
-                + " 2>/dev/null | od -An -tdI", nullptr, true);
+                " 2>/dev/null | od -An -tdI", nullptr, true);
             linuxfs_compression_type = proc.readOut();
         }
 
@@ -1445,7 +1445,7 @@ void MInstall::setService(const QString &service, bool enabled)
 }
 void MInstall::failUI(const QString &msg)
 {
-    proc.log("FAILED Phase " + QString::number(phase) + " - " + msg);
+    proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::Fail);
     if (phase >= 0) {
         boxMain->setEnabled(false);
         QMessageBox::critical(this, windowTitle(), msg);
@@ -2010,8 +2010,9 @@ void MInstall::resizeEvent(QResizeEvent *)
 
 void MInstall::closeEvent(QCloseEvent *event)
 {
-    if (abort(true)) {
+    if (abortUI()) {
         event->accept();
+        phase = -2;
         if (!oobe) cleanup();
         else if (!pretend) {
             proc.unhalt();
@@ -2072,8 +2073,14 @@ void MInstall::on_pushBack_clicked()
 
 void MInstall::on_pushAbort_clicked()
 {
-    abort(false);
+    if(abortUI()) {
+        if (!oobe) cleanup();
+        phase = -1;
+        gotoPage(Step::Terms);
+    }
     QApplication::beep();
+    boxMain->setEnabled(true);
+    updateCursor();
 }
 
 // clicking advanced button to go to Services page
@@ -2101,7 +2108,7 @@ void MInstall::on_pushRunPartMan_clicked()
     updateCursor();
 }
 
-bool MInstall::abort(bool onclose)
+bool MInstall::abortUI()
 {
     proc.log(__PRETTY_FUNCTION__);
     boxMain->setEnabled(false);
@@ -2117,17 +2124,8 @@ bool MInstall::abort(bool onclose)
         }
     }
     updateCursor(Qt::WaitCursor);
+    proc.log("Manual abort", MProcess::Fail);
     proc.halt();
-    // help the installer if it was stuck at the config pages
-    if (onclose) {
-        phase = -2;
-    } else if (phase == 2 && widgetStack->currentWidget() != pageProgress) {
-        phase = -1;
-        gotoPage(Step::Disk);
-    } else {
-        phase = -1;
-    }
-    if (!onclose) boxMain->setEnabled(true);
     return true;
 }
 

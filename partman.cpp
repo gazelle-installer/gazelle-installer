@@ -92,7 +92,7 @@ void PartMan::setup()
 void PartMan::scan(DeviceItem *drvstart)
 {
     QStringList cargs({"-T", "-bJo",
-        "TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL,PARTFLAGS"});
+        "TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL,PARTFLAGS"});
     if (drvstart) cargs.append(drvstart->path);
     proc.exec("lsblk", cargs, nullptr, true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
@@ -131,6 +131,8 @@ void PartMan::scan(DeviceItem *drvstart)
         const QString &ptType = jsonDrive["pttype"].toString();
         drvit->flags.curGPT = (ptType=="gpt");
         drvit->flags.curMBR = (ptType=="dos");
+        drvit->flags.rotational = jsonDrive["rota"].toBool();
+        drvit->discgran = jsonDrive["disc-gran"].toInt();
         drvit->size = jsonDrive["size"].toVariant().toLongLong();
         drvit->physec = jsonDrive["phy-sec"].toInt();
         drvit->curLabel = jsonDrive["label"].toString();
@@ -150,6 +152,8 @@ void PartMan::scan(DeviceItem *drvstart)
             partit->physec = jsonPart["phy-sec"].toInt();
             partit->curLabel = jsonPart["label"].toString();
             partit->model = jsonPart["model"].toString();
+            partit->flags.rotational = jsonPart["rota"].toBool();
+            partit->discgran = jsonPart["disc-gran"].toInt();
             const int partflags = jsonPart["partflags"].toString().toUInt(nullptr, 0);
             if ((partflags & 0x80) || (partflags & 0x04)) partit->setActive(true);
             partit->mapCount = jsonPart["children"].toArray().count();
@@ -201,7 +205,7 @@ void PartMan::scanVirtualDevices(bool rescan)
             }
         }
     }
-    proc.exec("lsblk", {"-T", "-bJo", "TYPE,NAME,PATH,UUID,SIZE,PHY-SEC,FSTYPE,LABEL"}, nullptr, true);
+    proc.shell("lsblk -T -bJo TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,FSTYPE,LABEL /dev/mapper/*", nullptr, true);
     const QString &bdRaw = proc.readOut(true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
@@ -217,6 +221,8 @@ void PartMan::scanVirtualDevices(bool rescan)
     assert(vdlit != nullptr);
     for (const QJsonValue &jsonDev : jsonBD) {
         const QString &path = jsonDev["path"].toString();
+        const bool rota = jsonDev["rota"].toBool();
+        const int discgran = jsonDev["disc-gran"].toInt();
         const long long size = jsonDev["size"].toVariant().toLongLong();
         const int physec = jsonDev["phy-sec"].toInt();
         const QString &label = jsonDev["label"].toString();
@@ -224,8 +230,9 @@ void PartMan::scanVirtualDevices(bool rescan)
         // Check if the device is already in the list.
         DeviceItem *devit = listed.value(path);
         if (devit) {
-            if (size != devit->size || physec != devit->physec || label != devit->curLabel
-                || crypto != devit->flags.volCrypto) {
+            if (rota != devit->flags.rotational || discgran != devit->discgran
+                || size != devit->size || physec != devit->physec
+                || label != devit->curLabel || crypto != devit->flags.volCrypto) {
                 // List entry is different to the device, so refresh it.
                 delete devit;
                 devit = nullptr;
@@ -237,6 +244,8 @@ void PartMan::scanVirtualDevices(bool rescan)
             devit = new DeviceItem(DeviceItem::VirtualBD, vdlit);
             devit->device = jsonDev["name"].toString();
             devit->path = path;
+            devit->flags.rotational = rota;
+            devit->discgran = discgran;
             devit->size = size;
             devit->physec = physec;
             devit->flags.bootRoot = (!bootUUID.isEmpty() && jsonDev["uuid"]==bootUUID);
@@ -576,7 +585,7 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
         const QString &mapdev = editVDev->text();
-        const bool ok = luksOpen(twit->path, mapdev, editPass->text().toUtf8());
+        const bool ok = luksOpen(twit, mapdev, editPass->text().toUtf8());
         if (ok) {
             twit->usefor.clear();
             twit->addToCrypttab = checkCrypttab->isChecked();
@@ -701,7 +710,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         }
         if (item->type != DeviceItem::VirtualBD) {
             if (!item->encrypt) item->devMapper.clear();
-            else if (mount == "FORMAT") item->devMapper = QString("vol%1.fsm").arg(++volnum);
+            else if (mount == "FORMAT") item->devMapper = "vol" + QString::number(++volnum);
             else if (mount == "/") item->devMapper = "root.fsm";
             else if (mount.startsWith("SWAP")) item->devMapper = mount.toLower();
             else item->devMapper = QString::number(++mapnum) + mount.replace('/','.') + ".fsm";
@@ -846,23 +855,19 @@ bool PartMan::checkTargetDrivesOK()
     return true;
 }
 
-bool PartMan::luksFormat(const QString &devpath, const QByteArray &password)
+bool PartMan::luksFormat(DeviceItem *partit, const QByteArray &password)
 {
-    DeviceItem *item = findByPath(devpath);
-    assert(item != nullptr);
     QStringList cargs({"--batch-mode", "--key-size=512", "--hash=sha512", "--pbkdf=argon2id"});
-    if (item->physec > 0) cargs.append("--sector-size=" + QString::number(item->physec));
-    cargs << "luksFormat" << devpath;
+    if (partit->physec > 0) cargs.append("--sector-size=" + QString::number(partit->physec));
+    cargs << "luksFormat" << partit->path;
     if (!proc.exec("cryptsetup", cargs, &password)) return false;
     return true;
 }
 
-bool PartMan::luksOpen(const QString &devpath, const QString &luksfs,
-    const QByteArray &password, const QString &options)
+bool PartMan::luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password)
 {
-    QStringList cargs({"luksOpen", devpath});
-    if (!luksfs.isEmpty()) cargs.append(luksfs);
-    if (!options.isEmpty()) cargs.append(options);
+    QStringList cargs({"open", partit->path, luksfs, "--type", "luks"});
+    if (partit->discgran) cargs.prepend("--allow-discards");
     return proc.exec("cryptsetup", cargs, &password);
 }
 
@@ -1024,9 +1029,9 @@ bool PartMan::formatPartitions()
         const QString &useFor = twit->realUseFor();
         if (twit->encrypt) {
             proc.status(tr("Creating encrypted volume: %1").arg(twit->device));
-            if (!luksFormat(twit->path, encPass)) return false;
+            if (!luksFormat(twit, encPass)) return false;
             proc.status();
-            if (!luksOpen(twit->path, twit->devMapper, encPass)) return false;
+            if (!luksOpen(twit, twit->devMapper, encPass)) return false;
         }
         const QString &fmtstatus = tr("Formatting: %1");
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(dev));
@@ -1143,18 +1148,18 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
         if (devit) keyDev = devit->device;
     }
     // Find extra devices
-    QMap<QString, QString> cryptAdd;
+    QMap<QString, DeviceItem *> cryptAdd;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->addToCrypttab) cryptAdd.insert(item->device, item->devMapper);
+        if (item->addToCrypttab) cryptAdd.insert(item->device, item);
     }
     // File systems
     for (auto &it : mounts.toStdMap()) {
-        if (it.second->encrypt) cryptAdd.insert(it.second->device, it.second->devMapper);
+        if (it.second->encrypt) cryptAdd.insert(it.second->device, it.second);
         else if (it.second->type == DeviceItem::Subvolume) {
             // Treat format-only, encrypted parent BTRFS partition as an extra device.
             DeviceItem *partit = it.second->parent();
             if (partit->encrypt && partit->realUseFor() == "FORMAT") {
-                cryptAdd.insert(partit->device, partit->devMapper);
+                cryptAdd.insert(partit->device, partit);
             }
         }
     }
@@ -1168,7 +1173,7 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     const QByteArray password(passedit->text().toUtf8());
     for (auto &it : cryptAdd.toStdMap()) {
         proc.exec("blkid", {"-s", "UUID", "-o", "value", "/dev/" + it.first}, nullptr, true);
-        out << it.second << " /dev/disk/by-uuid/" << proc.readOut();
+        out << it.second->devMapper << " /dev/disk/by-uuid/" << proc.readOut();
         if (noKey || it.first == keyDev) out << " none";
         else {
             if (isNewKey) {
@@ -1177,7 +1182,12 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
             }
             out << ' ' << keyfile;
         }
-        out << " luks\n";
+        out << " luks";
+        if (!it.second->flags.rotational) {
+            //out << ",no-read-workqueue,no-write-workqueue"; // TODO: cryptsetup 2.3.4 or later.
+            if (it.second->discgran) out << ",discard";
+        }
+        out << '\n';
     }
     // Update cryptdisks if the key is not in the root file system.
     if (keyMount != '/') {
@@ -1273,18 +1283,21 @@ bool PartMan::mountPartitions()
 
 void PartMan::unmount()
 {
-    QMapIterator<QString, DeviceItem *> it(mounts);
-    it.toBack();
-    while (it.hasPrevious()) {
-        it.previous();
-        if (it.key().at(0) != '/') continue;
-        DeviceItem *twit = it.value();
-        if (!it.key().startsWith("SWAP")) {
+    QMapIterator<QString, DeviceItem *> mit(mounts);
+    mit.toBack();
+    while (mit.hasPrevious()) {
+        mit.previous();
+        DeviceItem *twit = mit.value();
+        if (!twit) continue;
+        if (mit.key().startsWith("SWAP")) {
             proc.exec("swapoff", {twit->mappedDevice()});
+        } else if (mit.key().at(0) == '/') {
+            proc.exec("/bin/umount", {"-l", "/mnt/antiX" + mit.key()});
         }
-        proc.exec("/bin/umount", {"-l", "/mnt/antiX" + it.key()});
-        if (twit->encrypt) {
-            proc.exec("cryptsetup", {"close", twit->devMapper});
+    }
+    for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
+        if (item->encrypt && item->type != DeviceItem::VirtualBD) {
+            proc.exec("cryptsetup", {"close", item->devMapper});
         }
     }
 }
@@ -1622,6 +1635,8 @@ DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *pre
 {
     if (type == Partition) size = 1048576;
     if (parent) {
+        flags.rotational = parent->flags.rotational;
+        discgran = parent->discgran;
         if (type == Subvolume) size = parent->size;
         physec = parent->physec;
         partman = parent->partman;
@@ -1935,12 +1950,19 @@ void DeviceItem::autoFill(unsigned int changed)
     if (changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format))) {
         // Default options, dump and pass
         if (!(use.isEmpty() || use == "FORMAT" || use == "ESP")) {
-            if (format == "SWAP") options = "defaults";
+            if (format == "SWAP") options = discgran ? "discard" : "defaults";
             else {
                 if (use == "/boot" || use == "/") {
                     pass = (format == "btrfs") ? 0 : 1;
                 }
-                options = "noatime";
+                options.clear();
+                if (!flags.rotational) {
+                    const bool btrfs = (format=="btrfs" || type==Subvolume);
+                    if (discgran && (format=="ext4" || format=="xfs")) options = "discard,";
+                    else if (discgran && btrfs) options = "ssd,discard=async,";
+                    else if (btrfs) options = "ssd,";
+                }
+                options += "noatime";
                 dump = true;
             }
         }
@@ -2275,10 +2297,15 @@ void DeviceItemDelegate::partOptionsMenu()
     QString selFS = partit->format;
     if (selFS == "PRESERVE") selFS = partit->curFormat;
     if ((partit->type == DeviceItem::Partition && selFS == "btrfs") || partit->type == DeviceItem::Subvolume) {
+        QString tcommon = "noatime";
+        if (partit->discgran) tcommon.prepend("discard=async,");
+        if (!partit->flags.rotational) tcommon.prepend("ssd,");
         QAction *action = menuTemplates->addAction(tr("Compression (&ZLIB)"));
-        action->setData("noatime,compress-force=zlib");
+        action->setData(tcommon + ",compress=zlib");
+        action = menuTemplates->addAction(tr("Compression (Z&STD)"));
+        action->setData(tcommon + ",compress=zstd");
         action = menuTemplates->addAction(tr("Compression (&LZO)"));
-        action->setData("noatime,compress-force=lzo");
+        action->setData(tcommon + ",compress=lzo");
     }
     menuTemplates->setDisabled(menuTemplates->isEmpty());
     QAction *action = menu->exec(QCursor::pos());

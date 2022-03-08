@@ -60,6 +60,7 @@ public:
         Subvolume
     } type;
     struct Flags {
+        bool rotational : 1;
         bool nasty : 1;
         bool curEmpty : 1;
         bool oldLayout : 1;
@@ -78,6 +79,7 @@ public:
     int mapCount = 0;
     int physec;
     int pass = 0;
+    int discgran = 0;
     bool encrypt = false;
     bool chkbadblk = false;
     bool dump = false;
@@ -168,9 +170,8 @@ class PartMan : public QAbstractItemModel
     void partMenuUnlock(DeviceItem *twit);
     void partMenuLock(DeviceItem *twit);
     void scanSubvolumes(DeviceItem *partit);
-    bool luksFormat(const QString &devpath, const QByteArray &password);
-    bool luksOpen(const QString &devpath, const QString &luksfs,
-        const QByteArray &password, const QString &options = QString());
+    bool luksFormat(DeviceItem *partit, const QByteArray &password);
+    bool luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password);
 public:
     enum TreeColumns {
         Device,
