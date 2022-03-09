@@ -36,6 +36,11 @@ class MProcess : public QProcess
     QProgressBar *progBar = nullptr;
     int progSliceStart = 0, progSliceSpace = 0;
     long progSlicePos = 0, progSliceSteps = 0;
+    // System detection results
+    QString testArch;
+    int testEFI = -1;
+    int testMac = -1;
+    // Common execution core
     bool exec(const QString &program, const QStringList &arguments,
         const QByteArray *input, bool needRead, QListWidgetItem *logEntry);
 protected:
@@ -57,7 +62,7 @@ public:
     bool shell(const QString &cmd, const QByteArray *input = nullptr, bool needRead = false);
     QString readOut(bool everything = false);
     QStringList readOutLines();
-    /* Miscellaneous */
+    // Miscellaneous
     void halt();
     void unhalt();
     bool halted() const { return halting; }
@@ -70,6 +75,10 @@ public:
     // Common functions that are traditionally carried out by processes.
     void sleep(const int msec, const bool silent = false);
     bool mkpath(const QString &path);
+    // Operating system
+    const QString &detectArch();
+    int detectEFI(bool noTest = false);
+    bool detectMac();
 };
 
 #endif // MPROCESS_H

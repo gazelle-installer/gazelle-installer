@@ -187,7 +187,7 @@ public:
         _TreeColumns_
     };
     QString bootUUID;
-    bool gptoverride=false, uefi=false, brave=false;
+    bool gptoverride=false, brave=false;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
     QMap<QString, DeviceItem *> mounts;
