@@ -77,7 +77,7 @@ void BootMan::buildBootLists()
     const bool canPBR = (gui.comboBoot->count() > 0);
     gui.radioBootPBR->setEnabled(canPBR);
     chosenBootESP();
-    const bool canESP = (partman.uefi && gui.comboBoot->count() > 0);
+    const bool canESP = (proc.detectEFI() && gui.comboBoot->count() > 0);
     gui.radioBootESP->setEnabled(canESP);
 
     // load one as the default in preferential order: ESP, MBR, PBR
@@ -213,7 +213,7 @@ bool BootMan::install(const QString &loaderID, bool removeNoSplash)
 
     //copy memtest efi files if needed
 
-    if (partman.uefi) {
+    if (proc.detectEFI()) {
         mkdir("/mnt/antiX/boot/uefi-mt", 0755);
         if (arch == "i386") {
             proc.exec("/bin/cp", {"/live/boot-dev/boot/uefi-mt/mtest-32.efi", "/mnt/antiX/boot/uefi-mt"});
@@ -254,7 +254,7 @@ void BootMan::chosenBootMBR()
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Drive && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
-            if (!item->flags.nasty || brave) item->addToCombo(gui.comboBoot, true);
+            if (!item->flags.nasty || partman.brave) item->addToCombo(gui.comboBoot, true);
         }
     }
     selectBootMain();
@@ -273,7 +273,7 @@ void BootMan::chosenBootPBR()
                 if (item->curFormat == "crypto_LUKS") continue;
                 if (!item->curFormat.compare("SWAP", Qt::CaseInsensitive)) continue;
             }
-            if (!item->flags.nasty || brave) item->addToCombo(gui.comboBoot, true);
+            if (!item->flags.nasty || partman.brave) item->addToCombo(gui.comboBoot, true);
         }
     }
     selectBootMain();

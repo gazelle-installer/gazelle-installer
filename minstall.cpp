@@ -62,13 +62,13 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     nocopy = args.isSet("nocopy");
     sync = args.isSet("sync");
     if (!oobe.online) {
-        bootman.brave = partman.brave = brave = args.isSet("brave");
+        partman.brave = args.isSet("brave");
         automatic = args.isSet("auto");
         oem = args.isSet("oem");
         partman.gptoverride = args.isSet("gpt-override");
         mountkeep = args.isSet("mount-keep");
     } else {
-        brave = automatic = oem = false;
+        partman.brave = automatic = oem = false;
         pushClose->setText(tr("Shutdown"));
         phase = 2;
         // dark palette for the OOBE screen
@@ -212,20 +212,15 @@ void MInstall::startup()
 
         qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
 
-        // uefi = false if not uefi, or if a bad combination, like 32 bit iso and 64 bit uefi)
-        if (proc.shell("uname -m | grep -q i686") && proc.shell("grep -q 64 /sys/firmware/efi/fw_platform_size")) {
+        // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
+        if (proc.detectEFI(true)==64 && proc.detectArch()=="i686") {
             const int ans = QMessageBox::question(this, windowTitle(),
                 tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not"
                     " be able to boot unless you select Legacy Boot or similar at restart.\n"
                     "We recommend you quit now and restart in Legacy Boot\n\n"
                     "Do you want to continue the installation?"), QMessageBox::Yes, QMessageBox::No);
             if (ans != QMessageBox::Yes) exit(EXIT_FAILURE);
-            uefi = false;
-        } else {
-            uefi = QFileInfo("/sys/firmware/efi").isDir();
         }
-        partman.uefi = uefi;
-        qDebug() << "uefi =" << uefi;
 
         autoMountEnabled = true; // disable auto mount by force
         if (!pretend) setupAutoMount(false);
@@ -245,11 +240,7 @@ void MInstall::startup()
 
     setupkeyboardbutton();
 
-    // if it looks like an apple...
-    if (proc.shell("grub-probe -d /dev/sda2 2>/dev/null | grep hfsplus")) {
-        mactest = true;
-        checkLocalClock->setChecked(true);
-    }
+    if (proc.detectMac()) checkLocalClock->setChecked(true);
 
     oobe.startup();
 
@@ -767,7 +758,7 @@ int MInstall::showPage(int curr, int next)
         if (radioEntireDisk->isChecked()) {
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
-                if (!uefi) {
+                if (!proc.detectEFI()) {
                     DeviceItem *devit = partman.findByPath("/dev/" + comboDisk->currentData().toString());
                     if (devit && devit->size >= (2048LL*1073741824LL)) {
                         msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
@@ -1203,7 +1194,7 @@ void MInstall::updatePartitionWidgets(bool all)
     comboDisk->clear();
     comboDisk->addItem(tr("Loading..."));
     partman.scan();
-    if (mactest) {
+    if (proc.detectMac()) {
         for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
             if (item->device.startsWith("sda")) {
                 item->flags.nasty = true;

@@ -260,3 +260,41 @@ bool MProcess::mkpath(const QString &path)
     log(logEntry, rc ? 1 : -1);
     return rc;
 }
+
+const QString &MProcess::detectArch()
+{
+    if (testArch.isEmpty()) {
+        if (exec("uname", {"-m"}, nullptr, true)) testArch = readOut();
+        qDebug() << "Detect arch:" << testArch;
+    }
+    return testArch;
+}
+int MProcess::detectEFI(bool noTest)
+{
+    if (testEFI < 0) {
+        testEFI = 0;
+        QFile file("/sys/firmware/efi/fw_platform_size");
+        if (file.open(QFile::ReadOnly | QFile::Text)) {
+            testEFI = file.readLine().toInt();
+            file.close();
+        }
+        qDebug() << "Detect EFI:" << testEFI;
+    }
+    if (!noTest && testEFI == 64) {
+        // Bad combination: 32-bit OS on 64-bit EFI.
+        if (detectArch()=="i686") return 0;
+    }
+    return testEFI;
+}
+bool MProcess::detectMac()
+{
+    bool rc = false;
+    if (testMac < 0) {
+        // if it looks like an apple...
+        rc = exec("grub-probe", {"-d", "/dev/sda2"}, nullptr, true);
+        if (rc) rc = readOut(true).contains("hfsplus");
+        testMac = (rc ? 1 : 0);
+        qDebug() << "Detect Mac:" << rc;
+    }
+    return rc;
+}

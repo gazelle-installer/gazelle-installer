@@ -775,7 +775,9 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             }
             // Potentially unbootable GPT when on a BIOS-based PC.
             const bool hasBoot = (drvit->active != nullptr);
-            if (!uefi && setupGPT && hasBoot && !hasBiosGrub) biosgpt += ' ' + drvit->device;
+            if (!proc.detectEFI() && setupGPT && hasBoot && !hasBiosGrub) {
+                biosgpt += ' ' + drvit->device;
+            }
         }
         // Warning messages
         QMessageBox msgbox(master);
@@ -1761,7 +1763,7 @@ inline bool DeviceItem::willUseGPT() const
     if (type != Drive) return false;
     if (flags.oldLayout) return flags.curGPT;
     else if (size >= 2199023255552 || children.count() > 4) return true;
-    else if (partman) return (partman->gptoverride || partman->uefi);
+    else if (partman) return (partman->gptoverride || partman->proc.detectEFI());
     return false;
 }
 inline bool DeviceItem::willFormat() const
@@ -1893,7 +1895,7 @@ DeviceItem *DeviceItem::addPart(int defaultMB, const QString &defaultUse, bool c
 void DeviceItem::driveAutoSetActive()
 {
     if (active) return;
-    if (partman && partman->uefi && willUseGPT()) return;
+    if (partman && partman->proc.detectEFI() && willUseGPT()) return;
     // Cannot use partman->mounts map here as it may not be populated.
     for (const QString &pref : QStringList({"/boot", "/"})) {
         for (DeviceItemIterator it(this); DeviceItem *item = *it; it.next()) {
@@ -1990,7 +1992,7 @@ int DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTree)
     int rootFormatSize = static_cast<int>(driveSize - PARTMAN_SAFETY_MB);
 
     // Boot partitions.
-    if (partman->uefi) {
+    if (partman->proc.detectEFI()) {
         if (updateTree) addPart(256, "ESP", crypto);
         rootFormatSize -= 256;
     } else if (driveSize >= 2097152 || partman->gptoverride) {

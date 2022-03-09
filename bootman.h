@@ -42,7 +42,6 @@ class BootMan : public QObject
     void chosenBootPBR();
     void chosenBootESP();
 public:
-    bool brave = false;
     bool INSTALL_FROM_ROOT_DEVICE = false;
     BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui, QWidget *parent);
     void startup();

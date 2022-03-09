@@ -104,14 +104,11 @@ private:
     int phase = 0;
 
     // command line options
-    bool brave, pretend, automatic, nocopy, sync;
+    bool pretend, automatic, nocopy, sync;
     bool oem, mountkeep;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
-
-    bool uefi = false;
-    bool mactest = false;
 
     // source medium
     QStringList rootSources;
