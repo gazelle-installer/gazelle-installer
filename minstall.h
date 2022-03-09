@@ -31,6 +31,7 @@
 #include "msettings.h"
 #include "partman.h"
 #include "safecache.h"
+#include "oobe.h"
 
 #include "ui_meinstall.h"
 
@@ -47,37 +48,26 @@ public:
     ~MInstall();
 
     // helpers
-    bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
     static QString sliderSizeString(long long size);
 
     bool isInsideVB();
 
     bool installLoader();
-    void enableOOBE();
-    bool processOOBE();
-    bool validateUserInfo();
-    bool validateComputerName();
-    bool setComputerName();
     bool setUserInfo();
     void selectBootMain();
     void buildBootLists();
-    void buildServiceList();
     void disablehiberanteinitramfs();
     bool processNextPhase();
-    void setLocale();
-    void setService(const QString &service, bool enabled);
     bool writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
     bool POPULATE_MEDIA_MOUNTPOINTS;
 
-    QString DEFAULT_HOSTNAME;
     QString PROJECTFORUM;
     QString PROJECTNAME;
     QString PROJECTSHORTNAME;
     QString PROJECTURL;
     QString PROJECTVERSION;
-    QStringList ENABLE_SERVICES;
     bool REMOVE_NOSPLASH;
     QString SQFILE_FULL;
     long long ROOT_BUFFER, HOME_BUFFER;
@@ -112,13 +102,6 @@ private slots:
     void on_radioBootPBR_toggled();
     void on_radioBootESP_toggled();
 
-    void on_comboLocale_currentIndexChanged(int index);
-    void on_comboTimeArea_currentIndexChanged(int index);
-
-    void on_radioOldHomeUse_toggled(bool);
-    void on_radioOldHomeSave_toggled(bool);
-    void on_radioOldHomeDelete_toggled(bool);
-
     void on_progInstall_valueChanged(int value);
 
 private:
@@ -127,16 +110,13 @@ private:
 
     // command line options
     bool brave, pretend, automatic, nocopy, sync;
-    bool oem, oobe, mountkeep;
+    bool oem, mountkeep;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
 
     bool uefi = false;
     bool mactest = false;
-    bool containsSystemD = false;
-    bool containsRunit = false;
-    bool isRemasteredDemoPresent = false;
 
     // source medium
     QStringList rootSources;
@@ -148,6 +128,7 @@ private:
 
     QWidget *nextFocus = nullptr;
     PartMan partman;
+    Oobe oobe;
     QStringList listHomes;
     SafeCache key;
 
@@ -157,17 +138,11 @@ private:
     int iLastProgress = -1;
 
     // info needed for Phase 2 of the process
-    bool haveSamba = false;
-    bool haveSnapshotUserAccounts = false;
     bool haveOldHome = false;
-
-    // cached time zone list
-    QStringList listTimeZones;
 
     // slots
     void startup();
     void diskPassValidationChanged(bool valid);
-    void userPassValidationChanged();
     // private functions
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void updatePartitionWidgets(bool all);
@@ -179,9 +154,4 @@ private:
     bool copyLinux();
     void failUI(const QString &msg);
     void manageConfig(enum ConfigAction mode);
-    void stashServices(bool save);
-    int selectTimeZone(const QString &zone);
-    void rsynchomefolder(const QString dpath);
-    void changeRemasterdemoToNewUser(const QString dpath);
-    void resetBlueman();
 };
