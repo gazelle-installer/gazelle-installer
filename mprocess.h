@@ -60,6 +60,7 @@ public:
     /* Miscellaneous */
     void halt();
     void unhalt();
+    bool halted() const { return halting; }
     static QString joinCommand(const QString &program, const QStringList &arguments);
     QListWidgetItem *log(const QString &text, const enum LogType type = Section);
     void log(QListWidgetItem *entry, const int status = 1);

@@ -53,6 +53,7 @@ FORMS += meinstall.ui
 HEADERS += minstall.h \
     mpassedit.h \
     mtreeview.h \
+    oobe.h \
     version.h \
     msettings.h \
     partman.h \
@@ -62,6 +63,7 @@ SOURCES += app.cpp minstall.cpp \
     mpassedit.cpp \
     msettings.cpp \
     mtreeview.cpp \
+    oobe.cpp \
     partman.cpp \
     safecache.cpp \
     mprocess.cpp
