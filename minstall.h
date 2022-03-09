@@ -31,6 +31,7 @@
 #include "msettings.h"
 #include "partman.h"
 #include "safecache.h"
+#include "bootman.h"
 #include "oobe.h"
 
 #include "ui_meinstall.h"
@@ -52,10 +53,8 @@ public:
 
     bool isInsideVB();
 
-    bool installLoader();
     bool setUserInfo();
     void selectBootMain();
-    void buildBootLists();
     void disablehiberanteinitramfs();
     bool processNextPhase();
     bool writeKeyFile();
@@ -98,10 +97,6 @@ private slots:
     void on_boxEncryptAuto_toggled(bool checked);
     void on_radioCustomPart_toggled(bool checked);
 
-    void on_radioBootMBR_toggled();
-    void on_radioBootPBR_toggled();
-    void on_radioBootESP_toggled();
-
     void on_progInstall_valueChanged(int value);
 
 private:
@@ -131,6 +126,7 @@ private:
     Oobe oobe;
     QStringList listHomes;
     SafeCache key;
+    BootMan bootman;
 
     // for the tips display
     int ixTip = 0;

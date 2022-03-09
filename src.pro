@@ -51,6 +51,7 @@ TRANSLATIONS += translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_zh_TW.ts
 FORMS += meinstall.ui
 HEADERS += minstall.h \
+    bootman.h \
     mpassedit.h \
     mtreeview.h \
     oobe.h \
@@ -60,6 +61,7 @@ HEADERS += minstall.h \
     safecache.h \
     mprocess.h
 SOURCES += app.cpp minstall.cpp \
+    bootman.cpp \
     mpassedit.cpp \
     msettings.cpp \
     mtreeview.cpp \

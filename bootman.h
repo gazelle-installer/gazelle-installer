@@ -1,5 +1,5 @@
 /***************************************************************************
- * Out-of-Box Experience - GUI and related functions of the installer.
+ * Boot manager (GRUB) setup for the installer.
  ***************************************************************************
  *
  *   Copyright (C) 2022 by AK-47, along with transplanted code:
@@ -20,54 +20,35 @@
  *
  * This file is part of the gazelle-installer.
  ***************************************************************************/
-#ifndef OOBE_H
-#define OOBE_H
+#ifndef BOOTMAN_H
+#define BOOTMAN_H
 
 #include <QObject>
-#include <QStringList>
 #include "ui_meinstall.h"
 #include "mprocess.h"
 #include "msettings.h"
+#include "partman.h"
 
-class Oobe : public QObject
+class BootMan : public QObject
 {
     Q_OBJECT
     MProcess &proc;
     Ui::MeInstall &gui;
     QWidget *master;
-    bool containsSystemD = false;
-    bool containsRunit = false;
-    bool haveSamba = false;
-    QStringList timeZones; // cached time zone list
-    void buildServiceList();
-    int selectTimeZone(const QString &zone);
-    void resetBlueman();
+    PartMan &partman;
+    void selectBootMain();
     // Slots
-    void localeIndexChanged(int index);
-    void timeAreaIndexChanged(int index);
-
+    void chosenBootMBR();
+    void chosenBootPBR();
+    void chosenBootESP();
 public:
-    QString failure;
-    QStringList ENABLE_SERVICES;
-    bool online = false;
-    bool haveSnapshotUserAccounts = false;
-    bool isRemasteredDemoPresent = false;
-    Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent);
+    bool brave = false;
+    bool INSTALL_FROM_ROOT_DEVICE = false;
+    BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui, QWidget *parent);
     void startup();
-    void manageConfig(MSettings &config, bool save);
-    void enable();
-    bool process();
-    void stashServices(bool save);
-    void setService(const QString &service, bool enabled);
-    QWidget *validateComputerName();
-    QWidget *validateUserInfo(bool automatic);
-    bool setComputerName();
-    void setLocale();
-    bool setUserInfo();
-    bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
-    // Slots
-    void userPassValidationChanged();
-    void oldHomeToggled();
+    void manageConfig(MSettings &config);
+    void buildBootLists();
+    bool install(const QString &loaderID, bool removeNoSplash);
 };
 
-#endif // OOBE_H
+#endif // BOOTMAN_H

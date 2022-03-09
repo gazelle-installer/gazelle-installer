@@ -48,7 +48,7 @@ enum Step {
 };
 
 MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
-    : proc(this), partman(proc, *this, this), oobe(proc, *this, this)
+    : proc(this), partman(proc, *this, this), oobe(proc, *this, this), bootman(proc, partman, *this, this)
 {
     setupUi(this);
     listLog->addItem("Version " VERSION);
@@ -62,7 +62,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     nocopy = args.isSet("nocopy");
     sync = args.isSet("sync");
     if (!oobe.online) {
-        partman.brave = brave = args.isSet("brave");
+        bootman.brave = partman.brave = brave = args.isSet("brave");
         automatic = args.isSet("auto");
         oem = args.isSet("oem");
         partman.gptoverride = args.isSet("gpt-override");
@@ -102,7 +102,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     PROJECTVERSION = settings.value("VERSION").toString();
     PROJECTURL = settings.value("PROJECT_URL").toString();
     PROJECTFORUM = settings.value("FORUM_URL").toString();
-    INSTALL_FROM_ROOT_DEVICE = settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
+    bootman.INSTALL_FROM_ROOT_DEVICE = INSTALL_FROM_ROOT_DEVICE = settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
     textComputerName->setText(settings.value("DEFAULT_HOSTNAME").toString());
     oobe.ENABLE_SERVICES = settings.value("ENABLE_SERVICES").toStringList();
     POPULATE_MEDIA_MOUNTPOINTS = settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
@@ -234,6 +234,7 @@ void MInstall::startup()
         partman.defaultLabels["/"] = "root" + PROJECTSHORTNAME + PROJECTVERSION;
         partman.defaultLabels["/home"] = "home" + PROJECTSHORTNAME;
         partman.defaultLabels["SWAP"] = "swap" + PROJECTSHORTNAME;
+        bootman.startup();
     }
 
     // Password box setup
@@ -495,7 +496,7 @@ bool MInstall::processNextPhase()
             manageConfig(ConfigSave);
             config->dumpDebug();
             proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
-            if (!installLoader()) return false;
+            if (!bootman.install(PROJECTSHORTNAME + PROJECTVERSION, REMOVE_NOSPLASH)) return false;
         } else if (!pretendToInstall(5, 100)) {
             return false;
         }
@@ -573,16 +574,8 @@ void MInstall::manageConfig(enum ConfigAction mode)
     }
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
-        if (!oobe.online) {
-            // GRUB page
-            config->startGroup("GRUB", pageBoot);
-            config->manageGroupCheckBox("Install", boxBoot);
-            const char *grubChoices[] = {"MBR", "PBR", "ESP"};
-            QRadioButton *grubRadios[] = {radioBootMBR, radioBootPBR, radioBootESP};
-            config->manageRadios("TargetType", 3, grubChoices, grubRadios);
-            config->manageComboBox("Location", comboBoot, true);
-            config->endGroup();
-        }
+        // GRUB page
+        if (!oobe.online) bootman.manageConfig(*config);
         // Manage the rest of the OOBE pages.
         oobe.manageConfig(*config, mode==ConfigSave);
     }
@@ -755,161 +748,6 @@ bool MInstall::copyLinux()
 ///////////////////////////////////////////////////////////////////////////
 // install loader
 
-// build a grub configuration and install grub
-bool MInstall::installLoader()
-{
-    proc.log(__PRETTY_FUNCTION__);
-    if (proc.halted()) return false;
-    proc.advance(4, 4);
-
-    // the old initrd is not valid for this hardware
-    proc.shell("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'", nullptr, true);
-    const QString &val = proc.readOut();
-    if (!val.isEmpty()) proc.exec("/bin/rm", {"-f", "/mnt/antiX/boot/" + val});
-
-    bool efivarfs = QFileInfo("/sys/firmware/efi/efivars").isDir();
-    bool efivarfs_mounted = false;
-    if (efivarfs) {
-        QFile file("/proc/self/mounts");
-        if (file.open(QFile::ReadOnly | QFile::Text)) {
-            while (!file.atEnd() && !efivarfs_mounted) {
-                if (file.readLine().startsWith("efivarfs")) efivarfs_mounted = true;
-            }
-            file.close();
-        }
-    }
-    if (efivarfs && !efivarfs_mounted) {
-        proc.exec("/bin/mount", {"-t", "efivarfs", "efivarfs", "/sys/firmware/efi/efivars"});
-    }
-
-    if (!boxBoot->isChecked()) {
-        // skip it
-        proc.status(tr("Updating initramfs"));
-        //if useing f2fs, then add modules to /etc/initramfs-tools/modules
-        qDebug() << "Update initramfs";
-        //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
-            //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
-            //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
-        //}
-        return proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
-    }
-
-    proc.status(tr("Installing GRUB"));
-
-    // set mounts for chroot
-    proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
-    proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
-    proc.exec("/bin/mount", {"--rbind", "/proc", "/mnt/antiX/proc"});
-    proc.exec("/bin/mount", {"-t", "tmpfs", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
-    proc.exec("/bin/mkdir", {"/mnt/antiX/run/udev"});
-    proc.exec("/bin/mount", {"--rbind", "/run/udev", "/mnt/antiX/run/udev"});
-
-    // install new Grub now
-    bool isOK = false;
-    QString arch;
-    const QString &boot = "/dev/" + comboBoot->currentData().toString();
-    if (!radioBootESP->isChecked()) {
-        isOK = proc.exec("grub-install", {"--target=i386-pc", "--recheck",
-            "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", boot});
-    } else {
-        mkdir("/mnt/antiX/boot/efi", 0755);
-        proc.exec("/bin/mount", {boot, "/mnt/antiX/boot/efi"});
-        // rename arch to match grub-install target
-        proc.exec("cat", {"/sys/firmware/efi/fw_platform_size"}, nullptr, true);
-        arch = proc.readOut();
-        arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
-
-        isOK = proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
-            "--target=" + arch + "-efi", "--efi-directory=/boot/efi",
-            "--bootloader-id=" + PROJECTSHORTNAME + PROJECTVERSION, "--recheck"});
-    }
-    if (!isOK) {
-        QMessageBox::critical(this, windowTitle(), tr("GRUB installation failed."
-            " You can reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
-        proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
-        proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
-        proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
-        proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
-        if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
-            proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
-        }
-        return false;
-    }
-
-    //get /etc/default/grub codes
-    QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
-    QString grubDefault=grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
-    qDebug() << "grubDefault is " << grubDefault;
-
-    //added non-live boot codes to those in /etc/default/grub, remove duplicates
-    proc.shell("/live/bin/non-live-cmdline", nullptr, true); // Get non-live boot codes
-    QStringList finalcmdline = proc.readOut().split(" ");
-    finalcmdline.append(grubDefault.split(" "));
-    qDebug() << "intermediate" << finalcmdline;
-
-    //remove any duplicate codes in list (typically splash)
-    finalcmdline.removeDuplicates();
-
-    //remove vga=ask
-    finalcmdline.removeAll("vga=ask");
-
-    //remove boot_image code
-    finalcmdline.removeAll("BOOT_IMAGE=/antiX/vmlinuz");
-
-    //remove nosplash boot code if configured in installer.conf
-    if (REMOVE_NOSPLASH) finalcmdline.removeAll("nosplash");
-    //remove in null or empty strings that might have crept in
-    finalcmdline.removeAll({});
-    qDebug() << "Add cmdline options to Grub" << finalcmdline;
-
-    //convert qstringlist back into normal qstring
-    QString finalcmdlinestring = finalcmdline.join(" ");
-    qDebug() << "cmdlinestring" << finalcmdlinestring;
-
-    //get qstring boot codes read for sed command
-    finalcmdlinestring.replace('\\', "\\\\");
-    finalcmdlinestring.replace('|', "\\|");
-
-    //do the replacement in /etc/default/grub
-    qDebug() << "Add cmdline options to Grub";
-    const QString cmd = "sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub";
-    proc.shell(cmd.arg(finalcmdlinestring));
-
-    //copy memtest efi files if needed
-
-    if (uefi) {
-        mkdir("/mnt/antiX/boot/uefi-mt", 0755);
-        if (arch == "i386") {
-            proc.exec("/bin/cp", {"/live/boot-dev/boot/uefi-mt/mtest-32.efi", "/mnt/antiX/boot/uefi-mt"});
-        } else {
-            proc.exec("/bin/cp", {"/live/boot-dev/boot/uefi-mt/mtest-64.efi", "/mnt/antiX/boot/uefi-mt"});
-        }
-    }
-    proc.status();
-
-    //update grub with new config
-
-    qDebug() << "Update Grub";
-    proc.exec("chroot", {"/mnt/antiX", "update-grub"});
-
-    proc.status(tr("Updating initramfs"));
-    //if useing f2fs, then add modules to /etc/initramfs-tools/modules
-    //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
-        //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
-        //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
-    //}
-    proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
-    proc.status();
-    qDebug() << "clear chroot env";
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
-    if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
-        proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
-    }
-    return true;
-}
 
 void MInstall::failUI(const QString &msg)
 {
@@ -1156,7 +994,7 @@ void MInstall::pageDisplayed(int next)
         pushBack->setEnabled(false);
         pushNext->setEnabled(true);
         if (phase <= 0) {
-            buildBootLists();
+            bootman.buildBootLists();
             manageConfig(ConfigLoadB);
         }
         return; // avoid the end that enables both Back and Next buttons
@@ -1228,7 +1066,7 @@ void MInstall::pageDisplayed(int next)
             + tr("All files and settings will be deleted permanently if this option is selected."
                 " Your chances of recovering them are low.") + "</p>");
         // disable the Next button if none of the old home options are selected
-        oobe.oldHomeToggled(false);
+        oobe.oldHomeToggled();
         // if the Next button is disabled, avoid enabling both Back and Next at the end
         if (pushNext->isEnabled() == false) {
             pushBack->setEnabled(true);
@@ -1742,88 +1580,4 @@ void MInstall::on_radioCustomPart_toggled(bool checked)
 {
     if (checked) pushNext->setEnabled(true);
     else on_boxEncryptAuto_toggled(boxEncryptAuto->isChecked());
-}
-
-void MInstall::on_radioBootMBR_toggled()
-{
-    comboBoot->clear();
-    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
-            if (!item->flags.nasty || brave) item->addToCombo(comboBoot, true);
-        }
-    }
-    selectBootMain();
-    labelBoot->setText(tr("System boot disk:"));
-}
-
-void MInstall::on_radioBootPBR_toggled()
-{
-    comboBoot->clear();
-    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Partition && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
-            if (item->realUseFor() == "ESP") continue;
-            else if (!item->format.compare("SWAP", Qt::CaseInsensitive)) continue;
-            else if (item->format == "crypto_LUKS") continue;
-            else if (item->format.isEmpty() || item->format == "PRESERVE") {
-                if (item->curFormat == "crypto_LUKS") continue;
-                if (!item->curFormat.compare("SWAP", Qt::CaseInsensitive)) continue;
-            }
-            if (!item->flags.nasty || brave) item->addToCombo(comboBoot, true);
-        }
-    }
-    selectBootMain();
-    labelBoot->setText(tr("Partition to use:"));
-}
-
-void MInstall::on_radioBootESP_toggled()
-{
-    comboBoot->clear();
-    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->realUseFor() == "ESP" && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
-            item->addToCombo(comboBoot);
-        }
-    }
-    selectBootMain();
-    labelBoot->setText(tr("Partition to use:"));
-}
-
-void MInstall::selectBootMain()
-{
-    const DeviceItem *twit = partman.mounts.value("/boot");
-    if (!twit) twit = partman.mounts.value("/");
-    if (twit->origin) twit = twit->origin;
-    while (twit && twit->type != DeviceItem::Partition) twit = twit->parent();
-    if (!radioBootPBR->isChecked() && twit) twit = twit->parent();
-    if (!twit) return;
-    int ixsel = comboBoot->findData(twit->device); // Boot drive or partition
-    for(int ixi = 0; ixsel < 0 && ixi < comboBoot->count(); ++ixi) {
-        const QStringList &s = DeviceItem::split(comboBoot->itemData(ixi).toString());
-        if (s.at(0) == twit->device) ixsel = ixi; // Partition on boot drive
-    }
-    if (ixsel >= 0) comboBoot->setCurrentIndex(ixsel);
-}
-
-// build ESP list available to install GRUB
-void MInstall::buildBootLists()
-{
-    // refresh lists and enable or disable options according to device presence
-    on_radioBootMBR_toggled();
-    const bool canMBR = (comboBoot->count() > 0);
-    radioBootMBR->setEnabled(canMBR);
-    on_radioBootPBR_toggled();
-    const bool canPBR = (comboBoot->count() > 0);
-    radioBootPBR->setEnabled(canPBR);
-    on_radioBootESP_toggled();
-    const bool canESP = (uefi && comboBoot->count() > 0);
-    radioBootESP->setEnabled(canESP);
-
-    // load one as the default in preferential order: ESP, MBR, PBR
-    if (canESP) radioBootESP->setChecked(true);
-    else if (canMBR) {
-        on_radioBootMBR_toggled();
-        radioBootMBR->setChecked(true);
-    } else if (canPBR) {
-        on_radioBootPBR_toggled();
-        radioBootPBR->setChecked(true);
-    }
 }
