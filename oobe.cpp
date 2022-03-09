@@ -28,7 +28,7 @@
 #include "oobe.h"
 
 Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent)
-    : proc(mproc), gui(ui), master(parent)
+    : QObject(parent), proc(mproc), gui(ui), master(parent)
 {
 
 }
@@ -670,7 +670,7 @@ void Oobe::userPassValidationChanged()
     gui.pushNext->setEnabled(ok);
 }
 
-void Oobe::oldHomeToggled(bool)
+void Oobe::oldHomeToggled()
 {
     gui.pushNext->setEnabled(gui.radioOldHomeUse->isChecked()
         || gui.radioOldHomeSave->isChecked() || gui.radioOldHomeDelete->isChecked());
