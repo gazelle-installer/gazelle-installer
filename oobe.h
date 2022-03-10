@@ -51,7 +51,6 @@ public:
     QStringList ENABLE_SERVICES;
     bool online = false;
     bool haveSnapshotUserAccounts = false;
-    bool isRemasteredDemoPresent = false;
     Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent);
     void startup();
     void manageConfig(MSettings &config, bool save);

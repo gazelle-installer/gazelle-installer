@@ -30,9 +30,9 @@
 #include "mprocess.h"
 #include "msettings.h"
 #include "partman.h"
-#include "safecache.h"
-#include "bootman.h"
+#include "base.h"
 #include "oobe.h"
+#include "bootman.h"
 
 #include "ui_meinstall.h"
 
@@ -55,12 +55,9 @@ public:
 
     bool setUserInfo();
     void selectBootMain();
-    void disablehiberanteinitramfs();
     bool processNextPhase();
-    bool writeKeyFile();
 
     bool INSTALL_FROM_ROOT_DEVICE;
-    bool POPULATE_MEDIA_MOUNTPOINTS;
 
     QString PROJECTFORUM;
     QString PROJECTNAME;
@@ -104,15 +101,11 @@ private:
     int phase = 0;
 
     // command line options
-    bool pretend, automatic, nocopy, sync;
+    bool pretend, automatic;
     bool oem, mountkeep;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
-
-    // source medium
-    QStringList rootSources;
-    QString bootSource;
 
     // auto-mount setup
     QString listMaskedMounts;
@@ -120,9 +113,9 @@ private:
 
     QWidget *nextFocus = nullptr;
     PartMan partman;
+    Base base;
     Oobe oobe;
     QStringList listHomes;
-    SafeCache key;
     BootMan bootman;
 
     // for the tips display

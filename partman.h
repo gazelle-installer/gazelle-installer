@@ -31,9 +31,10 @@
 #include <QMap>
 #include <QStack>
 
-#include "mprocess.h"
 #include "ui_meinstall.h"
+#include "mprocess.h"
 #include "msettings.h"
+#include "safecache.h"
 
 class DeviceItem
 {
@@ -155,6 +156,7 @@ class PartMan : public QAbstractItemModel
     DeviceItem *changing = nullptr;
     Ui::MeInstall &gui;
     QWidget *master;
+    SafeCache key;
     void setup();
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit();
@@ -202,7 +204,8 @@ public:
     int countPrepSteps();
     bool preparePartitions();
     bool formatPartitions();
-    bool fixCryptoSetup(const QString &keyfile, bool isNewKey);
+    void loadKeyMaterial(const QString &keyfile);
+    bool fixCryptoSetup();
     bool makeFstab(bool populateMediaMounts);
     bool mountPartitions();
     void unmount();
