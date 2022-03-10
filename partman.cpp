@@ -1136,9 +1136,44 @@ bool PartMan::prepareSubvolumes(DeviceItem *partit)
     return ok;
 }
 
-// write out crypttab if encrypting for auto-opening
-bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
+void PartMan::loadKeyMaterial(const QString &keyfile)
 {
+    if (keyfile.isEmpty()) return;
+    key.load(keyfile.toUtf8().constData(), -1);
+    const int keylen = key.length();
+    if (keylen > 0) {
+        proc.log(QStringLiteral("Loaded %1-byte key material: ").arg(keylen)
+            + keyfile, MProcess::Standard);
+    }
+}
+
+// write out crypttab if encrypting for auto-opening
+bool PartMan::fixCryptoSetup()
+{
+    if (proc.halted()) return false;
+
+    const QLineEdit *passedit = gui.radioEntireDisk->isChecked()
+        ? gui.textCryptoPass : gui.textCryptoPassCust;
+    const QByteArray password(passedit->text().toUtf8());
+    // Write the key file.
+    static const char *const rngfile = "/dev/urandom";
+    const unsigned int keylength = 4096;
+    QString keyfile;
+    bool isNewKey = true;
+    if (isEncrypt("/")) { // if encrypting root
+        isNewKey = (key.length() == 0);
+        keyfile = "/mnt/antiX/root/keyfile";
+        if (isNewKey) key.load(rngfile, keylength);
+        key.save(keyfile.toUtf8().constData(), 0400);
+    } else if (isEncrypt("/home") && isEncrypt(QString())>1) {
+        // if encrypting /home without encrypting root
+        keyfile = "/mnt/antiX/home/.keyfileDONOTdelete";
+        key.load(rngfile, keylength);
+        key.save(keyfile.toUtf8().constData(), 0400);
+        key.erase();
+    }
+    keyfile.remove(0,10); // Eliminate "/mnt/antiX"
+
     // Find the file system and device which contains the key.
     QString keyMount('/'); // If no mount point matches, it's in a directory on the root.
     QString keyDev;
@@ -1172,9 +1207,6 @@ bool PartMan::fixCryptoSetup(const QString &keyfile, bool isNewKey)
     if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
     // Add devices to crypttab.
-    const QLineEdit *passedit = gui.radioEntireDisk->isChecked()
-        ? gui.textCryptoPass : gui.textCryptoPassCust;
-    const QByteArray password(passedit->text().toUtf8());
     for (auto &it : cryptAdd.toStdMap()) {
         proc.exec("blkid", {"-s", "UUID", "-o", "value", "/dev/" + it.first}, nullptr, true);
         out << it.second->devMapper << " /dev/disk/by-uuid/" << proc.readOut();

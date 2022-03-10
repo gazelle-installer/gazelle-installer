@@ -27,7 +27,6 @@
 #include <cstdlib>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/statvfs.h>
 
 #include "version.h"
 #include "minstall.h"
@@ -48,7 +47,8 @@ enum Step {
 };
 
 MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
-    : proc(this), partman(proc, *this, this), oobe(proc, *this, this), bootman(proc, partman, *this, this)
+    : proc(this), partman(proc, *this, this), base(proc, partman, *this, this),
+        oobe(proc, *this, this), bootman(proc, partman, *this, this)
 {
     setupUi(this);
     listLog->addItem("Version " VERSION);
@@ -59,8 +59,8 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
 
     oobe.online = args.isSet("oobe");
     pretend = args.isSet("pretend");
-    nocopy = args.isSet("nocopy");
-    sync = args.isSet("sync");
+    base.nocopy = args.isSet("nocopy");
+    base.sync = args.isSet("sync");
     if (!oobe.online) {
         partman.brave = args.isSet("brave");
         automatic = args.isSet("auto");
@@ -105,7 +105,7 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     bootman.INSTALL_FROM_ROOT_DEVICE = INSTALL_FROM_ROOT_DEVICE = settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
     textComputerName->setText(settings.value("DEFAULT_HOSTNAME").toString());
     oobe.ENABLE_SERVICES = settings.value("ENABLE_SERVICES").toStringList();
-    POPULATE_MEDIA_MOUNTPOINTS = settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
+    base.POPULATE_MEDIA_MOUNTPOINTS = settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
     REMOVE_NOSPLASH = settings.value("REMOVE_NOSPLASH", "false").toBool();
     ROOT_BUFFER = settings.value("ROOT_BUFFER", 5000).toInt();
     HOME_BUFFER = settings.value("HOME_BUFFER", 2000).toInt();
@@ -145,18 +145,13 @@ void MInstall::startup()
     resizeEvent(nullptr);
 
     if (!oobe.online) {
-        rootSources << "/live/aufs/bin" << "/live/aufs/dev"
-            << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/libx32" << "/live/aufs/lib64"
-            << "/live/aufs/media" << "/live/aufs/mnt" << "/live/aufs/opt" << "/live/aufs/root"
-            << "/live/aufs/sbin" << "/live/aufs/usr" << "/live/aufs/var" << "/live/aufs/home";
 
         //load some live variables
         QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
         SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
 
         // calculate required disk space
-        bootSource = "/live/aufs/boot";
-        proc.exec("du", {"-sb", bootSource}, nullptr, true);
+        proc.exec("du", {"-sb", "/live/aufs/boot"}, nullptr, true);
         partman.bootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
         if (!pretend && partman.bootSpaceNeeded==0) {
             QMessageBox::critical(this, windowTitle(), tr("Cannot access installation source."));
@@ -381,49 +376,6 @@ bool MInstall::pretendToInstall(int space, long steps)
     return true;
 }
 
-bool MInstall::writeKeyFile()
-{
-    if (proc.halted()) return false;
-    static const char *const rngfile = "/dev/urandom";
-    const unsigned int keylength = 4096;
-    const QLineEdit *passedit = radioEntireDisk->isChecked() ? textCryptoPass : textCryptoPassCust;
-    const QByteArray password(passedit->text().toUtf8());
-    const char *keyfile = nullptr;
-    bool newkey = true;
-    if (partman.isEncrypt("/")) { // if encrypting root
-        newkey = (key.length() == 0);
-        keyfile = "/mnt/antiX/root/keyfile";
-        if (newkey) key.load(rngfile, keylength);
-        key.save(keyfile, 0400);
-    } else if (partman.isEncrypt("/home") && partman.isEncrypt(QString())>1) {
-        // if encrypting /home without encrypting root
-        keyfile = "/mnt/antiX/home/.keyfileDONOTdelete";
-        key.load(rngfile, keylength);
-        key.save(keyfile, 0400);
-        key.erase();
-    }
-    if (!partman.fixCryptoSetup(QString(keyfile).remove(0,10), newkey)) {
-        failUI(tr("Failed to finalize encryption setup."));
-        return false;
-    }
-    return true;
-}
-
-// disable hibernate when using encrypted swap
-void MInstall::disablehiberanteinitramfs()
-{
-    if (proc.halted()) return;
-    if (partman.isEncrypt("SWAP")) {
-        proc.exec("touch", {"/mnt/antiX/initramfs-tools/conf.d/resume"});
-        QFile file("/mnt/antiX/etc/initramfs-tools/conf.d/resume");
-        if (file.open(QIODevice::WriteOnly)) {
-            QTextStream out(&file);
-            out << "RESUME=none";
-        }
-        file.close();
-    }
-}
-
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
@@ -453,7 +405,10 @@ bool MInstall::processNextPhase()
             }
             //run blkid -c /dev/null to freshen UUID cache
             proc.exec("blkid", {"-c", "/dev/null"});
-            if (!installLinux()) return false;
+            if (!base.install()) {
+                failUI(base.failure);
+                return false;
+            }
         } else {
             if (!pretendToInstall(14, 200)) return false;
             if (!pretendToInstall(80, 500)) return false;
@@ -551,15 +506,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
                 textCryptoPassCust->setText(epass);
                 textCryptoPassCust2->setText(epass);
             }
-            const QString &keyfile = config->value("KeyMaterial").toString();
-            if (!keyfile.isEmpty()) {
-                key.load(keyfile.toUtf8().constData(), -1);
-                const int keylen = key.length();
-                if (keylen>0) {
-                    proc.log(QStringLiteral("Loaded %1-byte key material: ").arg(keylen)
-                        + keyfile, MProcess::Standard);
-                }
-            }
+            partman.loadKeyMaterial(config->value("KeyMaterial").toString());
         }
         config->endGroup();
     }
@@ -603,142 +550,6 @@ bool MInstall::saveHomeBasic()
     proc.exec("/bin/umount", {"-l", "/mnt/antiX"});
     return ok;
 }
-
-bool MInstall::installLinux()
-{
-    proc.log(__PRETTY_FUNCTION__);
-    if (proc.halted()) return false;
-    proc.advance(1, 2);
-
-    if (!partman.willFormat("/")) {
-        // if root was not formatted and not using --sync option then re-use it
-        // remove all folders in root except for /home
-        proc.status(tr("Deleting old system"));
-        proc.shell("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;");
-
-        if (proc.exitStatus() != QProcess::NormalExit) {
-            failUI(tr("Failed to delete old %1 on destination.\nReturning to Step 1.").arg(PROJECTNAME));
-            return false;
-        }
-    }
-
-    // make empty dirs for opt, dev, proc, sys, run,
-    // home already done
-    proc.status(tr("Creating system directories"));
-    mkdir("/mnt/antiX/opt", 0755);
-    mkdir("/mnt/antiX/dev", 0755);
-    mkdir("/mnt/antiX/proc", 0755);
-    mkdir("/mnt/antiX/sys", 0755);
-    mkdir("/mnt/antiX/run", 0755);
-
-    setupAutoMount(true);
-    if (!copyLinux()) return false;
-
-    proc.advance(1, 1);
-    proc.status(tr("Fixing configuration"));
-    mkdir("/mnt/antiX/tmp", 01777);
-    chmod("/mnt/antiX/tmp", 01777);
-
-    // Copy live set up to install and clean up.
-    proc.shell("/usr/sbin/live-to-installed /mnt/antiX");
-    qDebug() << "Desktop menu";
-    proc.exec("chroot", {"/mnt/antiX", "desktop-menu", "--write-out-global"});
-
-    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
-    partman.makeFstab(POPULATE_MEDIA_MOUNTPOINTS);
-    if(!writeKeyFile()) return false;
-    disablehiberanteinitramfs();
-
-    //remove home unless a demo home is found in remastered linuxfs
-    if (!oobe.isRemasteredDemoPresent)
-        proc.exec("/bin/rm", {"-rf", "/mnt/antiX/home/demo"});
-
-    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
-    // modification to preserve points that are still mounted.
-    if (!POPULATE_MEDIA_MOUNTPOINTS) {
-        proc.shell("/bin/rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*");
-    }
-
-    // guess localtime vs UTC
-    proc.shell("guess-hwclock", nullptr, true);
-    if (proc.readOut() == "localtime") checkLocalClock->setChecked(true);
-
-    // create a /etc/machine-id file and /var/lib/dbus/machine-id file
-    proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
-    proc.exec("chroot", {"/mnt/antiX", "rm", "/var/lib/dbus/machine-id", "/etc/machine-id"});
-    proc.exec("chroot", {"/mnt/antiX", "dbus-uuidgen", "--ensure=/etc/machine-id"});
-    proc.exec("chroot", {"/mnt/antiX", "dbus-uuidgen", "--ensure"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
-
-    return true;
-}
-
-bool MInstall::copyLinux()
-{
-    proc.log(__PRETTY_FUNCTION__);
-    if (proc.halted()) return false;
-
-    // copy most except usr, mnt and home
-    // must copy boot even if saving, the new files are required
-    // media is already ok, usr will be done next, home will be done later
-    // setup and start the process
-    QString prog = "/bin/cp";
-    QStringList args("-av");
-    if (sync) {
-        prog = "rsync";
-        args << "--delete";
-        if (!partman.willFormat("/")) args << "--filter" << "protect home/*";
-    }
-    args << bootSource << rootSources << "/mnt/antiX";
-    struct statvfs svfs;
-    fsfilcnt_t sourceInodes = 1;
-    if (statvfs("/live/linux", &svfs) == 0) {
-        sourceInodes = svfs.f_files - svfs.f_ffree;
-    }
-    proc.advance(80, sourceInodes);
-    proc.status(tr("Copying new system"));
-
-    if (!nocopy) {
-        if (proc.halted()) return false;
-        const QString &joined = MProcess::joinCommand(prog, args);
-        qDebug().noquote() << "Exec COPY:" << joined;
-        QListWidgetItem *logEntry = proc.log(joined, MProcess::Exec);
-
-        QEventLoop eloop;
-        connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
-        connect(&proc, &QProcess::readyRead, &eloop, &QEventLoop::quit);
-        proc.start(prog, args);
-        long ncopy = 0;
-        while (proc.state() != QProcess::NotRunning) {
-            eloop.exec();
-            ncopy += proc.readAllStandardOutput().count('\n');
-            proc.status(ncopy);
-        }
-        disconnect(&proc, &QProcess::readyRead, nullptr, nullptr);
-        disconnect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
-
-        const QByteArray &StdErr = proc.readAllStandardError();
-        if (!StdErr.isEmpty()) {
-            qDebug() << "SErr COPY:" << StdErr;
-            QFont logFont = logEntry->font();
-            logFont.setItalic(true);
-            logEntry->setFont(logFont);
-        }
-        qDebug() << "Exit COPY:" << proc.exitCode() << proc.exitStatus();
-        if (proc.exitStatus() != QProcess::NormalExit) {
-            proc.log(logEntry, -1);
-            failUI(tr("Failed to write %1 to destination.\nReturning to Step 1.").arg(PROJECTNAME));
-            return false;
-        }
-        proc.log(logEntry, proc.exitCode() ? 0 : 1);
-    }
-
-    return (phase >= 0); // Reduces domino effect if the copy is aborted.
-}
-
-///////////////////////////////////////////////////////////////////////////
-// install loader
-
 
 void MInstall::failUI(const QString &msg)
 {

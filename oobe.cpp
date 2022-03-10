@@ -91,9 +91,6 @@ void Oobe::startup()
         if (QFile::exists("/live/aufs/etc/service") && QFile::exists("/live/aufs/sbin/runit")) {
             containsRunit = true;
         }
-        // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
-        isRemasteredDemoPresent = QFileInfo("/live/linux/home/demo").isDir();
-        qDebug() << "check for remastered home demo folder:" << isRemasteredDemoPresent;
         // Detect snapshot-backup account(s)
         // test if there's another user other than demo in /home,
         // indicating a possible snapshot or complicated live-usb
@@ -549,6 +546,10 @@ bool Oobe::setUserInfo()
         proc.exec("/bin/sync"); // The sync(2) system call will block the GUI.
     }
 
+    // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
+    const bool remasteredDemo = QFileInfo("/live/linux/home/demo").isDir();
+    qDebug() << "check for remastered home demo folder:" << remasteredDemo;
+
     if (QFileInfo::exists(dpath.toUtf8())) { // Still exists.
         proc.exec("/bin/cp", {"-n", skelpath + "/.bash_profile", dpath});
         proc.exec("/bin/cp", {"-n", skelpath + "/.bashrc", dpath});
@@ -558,7 +559,7 @@ bool Oobe::setUserInfo()
         proc.exec("/bin/cp", {"-Rn", skelpath + "/.local", dpath});
     } else { // dir does not exist, must create it
         // Copy skel to demo, unless demo folder exists in remastered linuxfs.
-        if (!isRemasteredDemoPresent) {
+        if (!remasteredDemo) {
             if (!proc.exec("/bin/cp", {"-a", skelpath, dpath})) {
                 failure = tr("Sorry, failed to create user directory.");
                 return false;
@@ -587,7 +588,7 @@ bool Oobe::setUserInfo()
     }
 
     // check if remaster exists and checkSaveDesktop not checked, modify the remastered demo folder
-    if (isRemasteredDemoPresent && !gui.checkSaveDesktop->isChecked())
+    if (remasteredDemo && !gui.checkSaveDesktop->isChecked())
     {
         resetBlueman();
         // Change remaster "demo" to new user.
