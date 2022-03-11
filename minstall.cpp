@@ -46,9 +46,8 @@ enum Step {
     End
 };
 
-MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
-    : proc(this), partman(proc, *this, this), base(proc, partman, *this, this),
-        oobe(proc, *this, this), bootman(proc, partman, *this, this)
+MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile)
+    : proc(this), appConf(acfg), appArgs(args)
 {
     setupUi(this);
     listLog->addItem("Version " VERSION);
@@ -57,18 +56,14 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     boxInstall->hide();
 
-    oobe.online = args.isSet("oobe");
+    modeOOBE = args.isSet("oobe");
     pretend = args.isSet("pretend");
-    base.nocopy = args.isSet("nocopy");
-    base.sync = args.isSet("sync");
-    if (!oobe.online) {
-        partman.brave = args.isSet("brave");
+    if (!modeOOBE) {
         automatic = args.isSet("auto");
         oem = args.isSet("oem");
-        partman.gptoverride = args.isSet("gpt-override");
         mountkeep = args.isSet("mount-keep");
     } else {
-        partman.brave = automatic = oem = false;
+        automatic = oem = false;
         pushClose->setText(tr("Shutdown"));
         phase = 2;
         // dark palette for the OOBE screen
@@ -93,41 +88,21 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
         pal.setColor(QPalette::Link, Qt::cyan);
         qApp->setPalette(pal);
     }
-    //if (pretend) listHomes = qApp->arguments(); // dummy existing homes
 
     // setup system variables
-    QSettings settings("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
-    PROJECTNAME = settings.value("PROJECT_NAME").toString();
-    PROJECTSHORTNAME = settings.value("PROJECT_SHORTNAME").toString();
-    PROJECTVERSION = settings.value("VERSION").toString();
-    PROJECTURL = settings.value("PROJECT_URL").toString();
-    PROJECTFORUM = settings.value("FORUM_URL").toString();
-    bootman.INSTALL_FROM_ROOT_DEVICE = INSTALL_FROM_ROOT_DEVICE = settings.value("INSTALL_FROM_ROOT_DEVICE").toBool();
-    textComputerName->setText(settings.value("DEFAULT_HOSTNAME").toString());
-    oobe.ENABLE_SERVICES = settings.value("ENABLE_SERVICES").toStringList();
-    base.POPULATE_MEDIA_MOUNTPOINTS = settings.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
-    REMOVE_NOSPLASH = settings.value("REMOVE_NOSPLASH", "false").toBool();
-    ROOT_BUFFER = settings.value("ROOT_BUFFER", 5000).toInt();
-    HOME_BUFFER = settings.value("HOME_BUFFER", 2000).toInt();
-    setWindowTitle(tr("%1 Installer").arg(PROJECTNAME));
+    PROJECTNAME = appConf.value("PROJECT_NAME").toString();
+    PROJECTSHORTNAME = appConf.value("PROJECT_SHORTNAME").toString();
+    PROJECTVERSION = appConf.value("VERSION").toString();
+    PROJECTURL = appConf.value("PROJECT_URL").toString();
+    PROJECTFORUM = appConf.value("FORUM_URL").toString();
+    ROOT_BUFFER = appConf.value("ROOT_BUFFER", 5000).toInt();
+    HOME_BUFFER = appConf.value("HOME_BUFFER", 2000).toInt();
+    INSTALL_FROM_ROOT_DEVICE = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
 
     gotoPage(Step::Splash);
 
     // config file
     config = new MSettings(cfgfile, this);
-
-    // Link block
-    QString link_block;
-    settings.beginGroup("LINKS");
-    QStringList links = settings.childKeys();
-    for (const QString &link : links)
-        link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + settings.value(link).toString();
-
-    settings.endGroup();
-
-    // set some distro-centric text
-    textReminders->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
-                        + "\n" + link_block);
 
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
@@ -136,6 +111,10 @@ MInstall::MInstall(const QCommandLineParser &args, const QString &cfgfile)
 }
 
 MInstall::~MInstall() {
+    if (oobe) delete oobe;
+    if (base) delete base;
+    if (bootman) delete bootman;
+    if (partman) delete partman;
 }
 
 // meant to be run after the installer becomes visible
@@ -144,16 +123,19 @@ void MInstall::startup()
     proc.log(__PRETTY_FUNCTION__);
     resizeEvent(nullptr);
 
-    if (!oobe.online) {
+    if (!modeOOBE) {
+        partman = new PartMan(proc, *this, appConf, appArgs);
+        base = new Base(proc, *partman, *this, appConf, appArgs);
+        bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
 
         //load some live variables
         QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
-        SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
+        QString SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
 
         // calculate required disk space
         proc.exec("du", {"-sb", "/live/aufs/boot"}, nullptr, true);
-        partman.bootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
-        if (!pretend && partman.bootSpaceNeeded==0) {
+        partman->bootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
+        if (!pretend && partman->bootSpaceNeeded==0) {
             QMessageBox::critical(this, windowTitle(), tr("Cannot access installation source."));
             exit(EXIT_FAILURE);
         }
@@ -200,12 +182,12 @@ void MInstall::startup()
 
         //add rootfs file size to the calculated linuxfs file size.  probaby conservative, as rootfs will likely have some overlap with linuxfs
         long long safety_factor = 1024 * 1024 * 1024; // 1GB safety factor
-        partman.rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
+        partman->rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
 
         const long long spaceBlock = 134217728; // 128MB
-        partman.bootSpaceNeeded += 2*spaceBlock - (partman.bootSpaceNeeded % spaceBlock);
+        partman->bootSpaceNeeded += 2*spaceBlock - (partman->bootSpaceNeeded % spaceBlock);
 
-        qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
+        qDebug() << "Minimum space:" << partman->bootSpaceNeeded << "(boot)," << partman->rootSpaceNeeded << "(root)";
 
         // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
         if (proc.detectEFI(true)==64 && proc.detectArch()=="i686") {
@@ -220,11 +202,18 @@ void MInstall::startup()
         autoMountEnabled = true; // disable auto mount by force
         if (!pretend) setupAutoMount(false);
 
-        partman.defaultLabels["/boot"] = "boot";
-        partman.defaultLabels["/"] = "root" + PROJECTSHORTNAME + PROJECTVERSION;
-        partman.defaultLabels["/home"] = "home" + PROJECTSHORTNAME;
-        partman.defaultLabels["SWAP"] = "swap" + PROJECTSHORTNAME;
-        bootman.startup();
+        // Link block
+        QString link_block;
+        appConf.beginGroup("LINKS");
+        QStringList links = appConf.childKeys();
+        for (const QString &link : links) {
+            link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + appConf.value(link).toString();
+        }
+        appConf.endGroup();
+
+        // set some distro-centric text
+        textReminders->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
+                            + "\n" + link_block);
     }
 
     // Password box setup
@@ -237,16 +226,16 @@ void MInstall::startup()
 
     if (proc.detectMac()) checkLocalClock->setChecked(true);
 
-    oobe.startup();
+    oobe = new Oobe(proc, *this, this, appConf);
 
-    if (oobe.online) manageConfig(ConfigLoadB);
+    if (modeOOBE) manageConfig(ConfigLoadB);
     else {
         updatePartitionWidgets(true);
         manageConfig(ConfigLoadA);
     }
-    oobe.stashServices(true);
+    oobe->stashServices(true);
 
-    if (oobe.online) gotoPage(Step::Network);
+    if (modeOOBE) gotoPage(Step::Network);
     else {
         textCopyright->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
             "%1 uses some components from MEPIS Linux which are released under an Apache free license."
@@ -339,12 +328,6 @@ void MInstall::setupAutoMount(bool enabled)
 /////////////////////////////////////////////////////////////////////////
 // util functions
 
-// Check if running inside VirtualBox
-bool MInstall::isInsideVB()
-{
-    return proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'");
-}
-
 QString MInstall::sliderSizeString(long long size)
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
@@ -358,8 +341,9 @@ void MInstall::updateCursor(const Qt::CursorShape shape)
     if (shape != Qt::ArrowCursor) {
         qApp->setOverrideCursor(QCursor(shape));
     } else {
-        while (qApp->overrideCursor() != nullptr)
+        while (qApp->overrideCursor() != nullptr) {
             qApp->restoreOverrideCursor();
+        }
     }
     qApp->processEvents();
 }
@@ -387,7 +371,7 @@ bool MInstall::processNextPhase()
     if (phase == 0) { // no install started yet
         proc.advance(-1, -1);
         proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
-        if (!partman.checkTargetDrivesOK()) return false;
+        if (!partman->checkTargetDrivesOK()) return false;
         phase = 1; // installation.
 
         // cleanup previous mounts
@@ -395,18 +379,18 @@ bool MInstall::processNextPhase()
 
         // the core of the installation
         if (!pretend) {
-            proc.advance(12, partman.countPrepSteps());
-            bool ok = partman.preparePartitions();
-            if (ok) ok = partman.formatPartitions();
-            if (ok) ok = partman.mountPartitions();
+            proc.advance(12, partman->countPrepSteps());
+            bool ok = partman->preparePartitions();
+            if (ok) ok = partman->formatPartitions();
+            if (ok) ok = partman->mountPartitions();
             if (!ok) {
                 failUI(tr("Failed to prepare required partitions."));
                 return false;
             }
             //run blkid -c /dev/null to freshen UUID cache
             proc.exec("blkid", {"-c", "/dev/null"});
-            if (!base.install()) {
-                failUI(base.failure);
+            if (!base->install()) {
+                failUI(base->failure);
                 return false;
             }
         } else {
@@ -427,22 +411,15 @@ bool MInstall::processNextPhase()
         if (!pretend) {
             proc.advance(1, 1);
             proc.status(tr("Setting system configuration"));
-            if (!isInsideVB() && !oobe.online) {
-                proc.shell("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-                proc.shell("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-                proc.shell("/bin/mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-                proc.shell("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-                proc.shell("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
-            }
-            if (oem) oobe.enable();
-            else if (!oobe.process()) {
-                failUI(oobe.failure);
+            if (oem) oobe->enable();
+            else if (!oobe->process()) {
+                failUI(oobe->failure);
                 return false;
             }
             manageConfig(ConfigSave);
             config->dumpDebug();
             proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
-            if (!bootman.install(PROJECTSHORTNAME + PROJECTVERSION, REMOVE_NOSPLASH)) return false;
+            if (!bootman->install(PROJECTSHORTNAME + PROJECTVERSION)) return false;
         } else if (!pretendToInstall(5, 100)) {
             return false;
         }
@@ -471,7 +448,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->setValue("Version", VERSION);
         config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
-    if ((mode == ConfigSave || mode == ConfigLoadA) && !oobe.online) {
+    if ((mode == ConfigSave || mode == ConfigLoadA) && !modeOOBE) {
         config->startGroup("Storage", pageDisk);
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {radioEntireDisk, radioCustomPart};
@@ -492,7 +469,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         // Custom partitions page. PartMan handles its config groups automatically.
         if (!targetDrive || mode!=ConfigSave) {
             config->setGroupWidget(pagePartitions);
-            partman.manageConfig(*config, mode==ConfigSave);
+            partman->manageConfig(*config, mode==ConfigSave);
         }
 
         // Encryption
@@ -506,16 +483,16 @@ void MInstall::manageConfig(enum ConfigAction mode)
                 textCryptoPassCust->setText(epass);
                 textCryptoPassCust2->setText(epass);
             }
-            partman.loadKeyMaterial(config->value("KeyMaterial").toString());
+            partman->loadKeyMaterial(config->value("KeyMaterial").toString());
         }
         config->endGroup();
     }
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
         // GRUB page
-        if (!oobe.online) bootman.manageConfig(*config);
+        if (!modeOOBE) bootman->manageConfig(*config);
         // Manage the rest of the OOBE pages.
-        oobe.manageConfig(*config, mode==ConfigSave);
+        oobe->manageConfig(*config, mode==ConfigSave);
     }
 
     if (mode == ConfigSave) {
@@ -535,10 +512,10 @@ bool MInstall::saveHomeBasic()
 {
     proc.log(__PRETTY_FUNCTION__);
     QString homedir("/");
-    QString homedev = partman.getMountDev("/home", true);
-    if (homedev.isEmpty() || partman.willFormat("/home")) {
-        if (partman.willFormat("/")) return true;
-        homedev = partman.getMountDev("/", true);
+    QString homedev = partman->getMountDev("/home", true);
+    if (homedev.isEmpty() || partman->willFormat("/home")) {
+        if (partman->willFormat("/")) return true;
+        homedev = partman->getMountDev("/", true);
         homedir = "/home";
     }
 
@@ -570,7 +547,7 @@ int MInstall::showPage(int curr, int next)
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
                 if (!proc.detectEFI()) {
-                    DeviceItem *devit = partman.findByPath("/dev/" + comboDisk->currentData().toString());
+                    DeviceItem *devit = partman->findByPath("/dev/" + comboDisk->currentData().toString());
                     if (devit && devit->size >= (2048LL*1073741824LL)) {
                         msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
                                            " On some systems, a GPT-formatted disk will not boot.");
@@ -582,16 +559,16 @@ int MInstall::showPage(int curr, int next)
                     QMessageBox::Yes, QMessageBox::No);
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
-            partman.clearAllUses();
-            partman.selectedDriveAuto()->layoutDefault(-1, boxEncryptAuto->isChecked());
-            if (!partman.composeValidate(true, PROJECTNAME)) {
+            partman->clearAllUses();
+            partman->selectedDriveAuto()->layoutDefault(-1, boxEncryptAuto->isChecked());
+            if (!partman->composeValidate(true, PROJECTNAME)) {
                 nextFocus = treePartitions;
                 return curr;
             }
             return Step::Boot;
         }
     } else if (curr == Step::Partitions && next > curr) {
-        if (!partman.composeValidate(automatic, PROJECTNAME)) {
+        if (!partman->composeValidate(automatic, PROJECTNAME)) {
             nextFocus = treePartitions;
             return curr;
         }
@@ -606,7 +583,7 @@ int MInstall::showPage(int curr, int next)
         if (oem) return Step::Progress;
         return Step::Services + 1;
     } else if (curr == Step::UserAccounts && next > curr) {
-        nextFocus = oobe.validateUserInfo(automatic);
+        nextFocus = oobe->validateUserInfo(automatic);
         if (nextFocus) return curr;
         // Check for pre-existing /home directory, see if user directory already exists.
         haveOldHome = listHomes.contains(textUserName->text());
@@ -616,27 +593,29 @@ int MInstall::showPage(int curr, int next)
             labelOldHome->setText(str.arg(textUserName->text()));
         }
     } else if (curr == Step::Network && next > curr) {
-        nextFocus = oobe.validateComputerName();
+        nextFocus = oobe->validateComputerName();
         if (nextFocus) return curr;
     } else if (curr == Step::Network && next < curr) { // Backward
         return Step::Boot; // Skip pageServices
     } else if (curr == Step::Localization && next > curr) {
-        if (!pretend && oobe.haveSnapshotUserAccounts) {
+        if (!pretend && oobe->haveSnapshotUserAccounts) {
             return Step::Progress; // Skip pageUserAccounts and pageOldHome
         }
     } else if (curr == Step::OldHome && next < curr) { // Backward
-        if (!pretend && oobe.haveSnapshotUserAccounts) {
+        if (!pretend && oobe->haveSnapshotUserAccounts) {
             return Step::Localization; // Skip pageUserAccounts and pageOldHome
         }
     } else if (curr == Step::Progress && next < curr) { // Backward
         if (oem) return Step::Boot;
         if (!haveOldHome) {
             // skip pageOldHome
-            if (!pretend && oobe.haveSnapshotUserAccounts) return Step::Localization;
+            if (!pretend && oobe->haveSnapshotUserAccounts) {
+                return Step::Localization;
+            }
             return Step::UserAccounts;
         }
     } else if (curr == Step::Services) { // Backward or forward
-        oobe.stashServices(next > curr);
+        oobe->stashServices(next > curr);
         return Step::Localization; // The page that called pageServices
     }
     return next;
@@ -644,7 +623,7 @@ int MInstall::showPage(int curr, int next)
 
 void MInstall::pageDisplayed(int next)
 {
-    if (!oobe.online) {
+    if (!modeOOBE) {
         const int ixProgress = widgetStack->indexOf(pageProgress);
         // progress bar shown only for install and configuration pages.
         boxInstall->setVisible(next >= widgetStack->indexOf(pageBoot) && next <= ixProgress);
@@ -652,11 +631,7 @@ void MInstall::pageDisplayed(int next)
         if (next != ixProgress) ixTipStart = ixTip;
     }
 
-    // These calculations are only for display text, and do not affect the installation.
-    long long rootMin = partman.rootSpaceNeeded + 1048575;
-    const QString &tminroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
-    rootMin = (4 * rootMin) + ROOT_BUFFER * 1048576; // (Root + snapshot [squashfs + ISO] + backup) + buffer.
-    const QString &trecroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
+    QString tminroot, trecroot; // Only used for Step::Disk
 
     switch (next) {
     case Step::Terms:
@@ -670,6 +645,14 @@ void MInstall::pageDisplayed(int next)
         pushNext->setDefault(true);
         break;
     case Step::Disk:
+        if (partman) {
+            // These calculations are only for display text, and do not affect the installation.
+            long long rootMin = partman->rootSpaceNeeded + 1048575;
+            tminroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
+            rootMin = (4 * rootMin) + ROOT_BUFFER * 1048576; // (Root + snapshot [squashfs + ISO] + backup) + buffer.
+            trecroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
+        }
+
         textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
             + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(tminroot, trecroot) + "</p>"
             "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
@@ -796,7 +779,7 @@ void MInstall::pageDisplayed(int next)
         pushBack->setEnabled(false);
         pushNext->setEnabled(true);
         if (phase <= 0) {
-            bootman.buildBootLists();
+            bootman->buildBootLists();
             manageConfig(ConfigLoadB);
         }
         return; // avoid the end that enables both Back and Next buttons
@@ -811,7 +794,7 @@ void MInstall::pageDisplayed(int next)
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
-        if (oobe.online) {
+        if (modeOOBE) {
             pushBack->setEnabled(false);
             pushNext->setEnabled(true);
             return; // avoid the end that enables both Back and Next buttons
@@ -848,7 +831,7 @@ void MInstall::pageDisplayed(int next)
             " does not need to be secure, such as a public terminal.") + "</p>");
         if (!nextFocus) nextFocus = textUserName;
         pushBack->setEnabled(true);
-        oobe.userPassValidationChanged();
+        oobe->userPassValidationChanged();
         return; // avoid the end that enables both Back and Next buttons
 
     case Step::OldHome:
@@ -868,7 +851,7 @@ void MInstall::pageDisplayed(int next)
             + tr("All files and settings will be deleted permanently if this option is selected."
                 " Your chances of recovering them are low.") + "</p>");
         // disable the Next button if none of the old home options are selected
-        oobe.oldHomeToggled();
+        oobe->oldHomeToggled();
         // if the Next button is disabled, avoid enabling both Back and Next at the end
         if (pushNext->isEnabled() == false) {
             pushBack->setEnabled(true);
@@ -975,16 +958,16 @@ void MInstall::gotoPage(int next)
 
     // process next installation phase
     if (next == widgetStack->indexOf(pageBoot) || next == widgetStack->indexOf(pageProgress)) {
-        if (oobe.online) {
+        if (modeOOBE) {
             updateCursor(Qt::BusyCursor);
             labelSplash->setText(tr("Configuring sytem. Please wait."));
             gotoPage(Step::Splash);
-            if (oobe.process()) {
+            if (oobe->process()) {
                 labelSplash->setText(tr("Configuration complete. Restarting system."));
                 proc.exec("/usr/sbin/reboot");
                 qApp->exit(EXIT_SUCCESS);
             } else {
-                failUI(oobe.failure);
+                failUI(oobe->failure);
                 labelSplash->setText(tr("Could not complete configuration."));
                 pushClose->show();
             }
@@ -999,25 +982,15 @@ void MInstall::gotoPage(int next)
 
 void MInstall::updatePartitionWidgets(bool all)
 {
-    proc.log(__PRETTY_FUNCTION__);
-
     comboDisk->setEnabled(false);
     comboDisk->clear();
     comboDisk->addItem(tr("Loading..."));
-    partman.scan();
-    if (proc.detectMac()) {
-        for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-            if (item->device.startsWith("sda")) {
-                item->flags.nasty = true;
-                partman.notifyChange(item);
-            }
-        }
-    }
+    partman->scan();
 
     // disk combo box
     comboDisk->clear();
-    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive && item->size >= partman.rootSpaceNeeded
+    for (DeviceItemIterator it(*partman); DeviceItem *item = *it; it.next()) {
+        if (item->type == DeviceItem::Drive && item->size >= partman->rootSpaceNeeded
                 && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
             item->addToCombo(comboDisk);
         }
@@ -1028,7 +1001,7 @@ void MInstall::updatePartitionWidgets(bool all)
     if (all) {
         // whole-disk vs custom-partition radio buttons
         radioEntireDisk->setChecked(true);
-        for (DeviceItemIterator it(partman); *it; it.next()) {
+        for (DeviceItemIterator it(*partman); *it; it.next()) {
             if ((*it)->isVolume()) {
                 // found at least one partition
                 radioCustomPart->setChecked(true);
@@ -1085,7 +1058,7 @@ void MInstall::closeEvent(QCloseEvent *event)
     if (abortUI()) {
         event->accept();
         phase = -2;
-        if (!oobe.online) cleanup();
+        if (!modeOOBE) cleanup();
         else if (!pretend) {
             proc.unhalt();
             proc.exec("/usr/sbin/shutdown", {"-hP", "now"});
@@ -1137,7 +1110,7 @@ void MInstall::on_pushBack_clicked()
 void MInstall::on_pushAbort_clicked()
 {
     if(abortUI()) {
-        if (!oobe.online) cleanup();
+        if (!modeOOBE) cleanup();
         phase = -1;
         gotoPage(Step::Terms);
     }
@@ -1209,7 +1182,7 @@ void MInstall::cleanup(bool endclean)
     proc.exec("/bin/umount", {"-l", "/mnt/antiX/sys"});
     proc.exec("/bin/umount", {"-l", "/mnt/antiX/dev/shm"});
     proc.exec("/bin/umount", {"-l", "/mnt/antiX/dev"});
-    if (!mountkeep) partman.unmount();
+    if (!mountkeep) partman->unmount();
 }
 
 void MInstall::on_progInstall_valueChanged(int value)
@@ -1325,13 +1298,14 @@ void MInstall::on_sliderPart_sliderPressed()
 }
 void MInstall::on_sliderPart_valueChanged(int value)
 {
+    if (!partman) return;
     const bool crypto = boxEncryptAuto->isChecked();
-    DeviceItem *drvitem = partman.selectedDriveAuto();
+    DeviceItem *drvitem = partman->selectedDriveAuto();
     if (!drvitem) return;
     long long available = drvitem->layoutDefault(100, crypto, false);
     if (!available) return;
     const long long roundUp = available - 1;
-    const long long rootMinMB = (partman.rootSpaceNeeded + 1048575) / 1048576;
+    const long long rootMinMB = (partman->rootSpaceNeeded + 1048575) / 1048576;
     const long long homeMinMB = 16; // 16MB for basic profile and setup files
     const long long rootRecMB = (4 * rootMinMB) + ROOT_BUFFER; // (Root + snapshot [squashfs + ISO] + backup) + buffer
     const long long homeRecMB = homeMinMB + HOME_BUFFER;

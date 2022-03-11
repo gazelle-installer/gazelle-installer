@@ -94,6 +94,9 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    QSettings appConf("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
+    a.setApplicationDisplayName(a.tr("%1 Installer").arg(appConf.value("PROJECT_NAME").toString()));
+
     // The lock is released when this object is destroyed.
     QLockFile lockfile("/var/lock/gazelle-installer.lock");
     if (!parser.isSet("pretend")) {
@@ -132,7 +135,7 @@ int main(int argc, char *argv[])
 
     // main routine
     qDebug() << "Installer version:" << VERSION;
-    MInstall minstall(parser, cfgfile);
+    MInstall minstall(appConf, parser, cfgfile);
     const QRect &geo = a.desktop()->availableGeometry(&minstall);
     if (parser.isSet("oobe")) minstall.setGeometry(geo);
     else minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);

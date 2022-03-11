@@ -45,13 +45,11 @@ protected:
     void reject();
 
 public:
-    MInstall(const QCommandLineParser &args, const QString &cfgfile);
+    MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile);
     ~MInstall();
 
     // helpers
     static QString sliderSizeString(long long size);
-
-    bool isInsideVB();
 
     bool setUserInfo();
     void selectBootMain();
@@ -64,8 +62,6 @@ public:
     QString PROJECTSHORTNAME;
     QString PROJECTURL;
     QString PROJECTVERSION;
-    bool REMOVE_NOSPLASH;
-    QString SQFILE_FULL;
     long long ROOT_BUFFER, HOME_BUFFER;
 
     int showPage(int curr, int next);
@@ -98,11 +94,13 @@ private slots:
 
 private:
     MProcess proc;
+    QSettings &appConf;
+    const QCommandLineParser &appArgs;
     int phase = 0;
 
     // command line options
     bool pretend, automatic;
-    bool oem, mountkeep;
+    bool oem, modeOOBE, mountkeep;
     // configuration management
     MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
@@ -112,11 +110,11 @@ private:
     bool autoMountEnabled = true;
 
     QWidget *nextFocus = nullptr;
-    PartMan partman;
-    Base base;
-    Oobe oobe;
+    PartMan *partman = nullptr;
+    Base *base = nullptr;
+    Oobe *oobe = nullptr;
     QStringList listHomes;
-    BootMan bootman;
+    BootMan *bootman = nullptr;
 
     // for the tips display
     int ixTip = 0;

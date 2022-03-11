@@ -24,6 +24,7 @@
 #define BOOTMAN_H
 
 #include <QObject>
+#include <QCommandLineParser>
 #include "ui_meinstall.h"
 #include "mprocess.h"
 #include "msettings.h"
@@ -36,18 +37,19 @@ class BootMan : public QObject
     Ui::MeInstall &gui;
     QWidget *master;
     PartMan &partman;
+    bool installFromRootDevice, removeNoSplash;
+    bool brave;
     void selectBootMain();
     // Slots
     void chosenBootMBR();
     void chosenBootPBR();
     void chosenBootESP();
 public:
-    bool INSTALL_FROM_ROOT_DEVICE = false;
-    BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui, QWidget *parent);
-    void startup();
+    BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
+        const QSettings &appConf, const QCommandLineParser &appArgs);
     void manageConfig(MSettings &config);
     void buildBootLists();
-    bool install(const QString &loaderID, bool removeNoSplash);
+    bool install(const QString &loaderID);
 };
 
 #endif // BOOTMAN_H

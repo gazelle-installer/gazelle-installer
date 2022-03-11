@@ -27,14 +27,12 @@
 #include <QTimeZone>
 #include "oobe.h"
 
-Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent)
+Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf)
     : QObject(parent), proc(mproc), gui(ui), master(parent)
 {
+    gui.textComputerName->setText(appConf.value("DEFAULT_HOSTNAME").toString());
+    enableServices = appConf.value("ENABLE_SERVICES").toStringList();
 
-}
-
-void Oobe::startup()
-{
     // User accounts
     gui.textUserPass->setup(gui.textUserPass2, gui.progUserPassMeter);
     gui.textRootPass->setup(gui.textRootPass2, gui.progRootPassMeter);
@@ -235,7 +233,7 @@ void Oobe::buildServiceList()
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
     services_desc.setIniCodec("UTF-8");
 
-    for (const QString &service : qAsConst(ENABLE_SERVICES)) {
+    for (const QString &service : enableServices) {
         const QString &lang = QLocale::system().bcp47Name().toLower();
         QString lang_str = (lang == "en")? "" : "_" + lang;
         QStringList list = services_desc.value(service + lang_str).toStringList();
