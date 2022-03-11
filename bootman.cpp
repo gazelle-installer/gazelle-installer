@@ -26,14 +26,14 @@
 #include <QFileInfo>
 #include "bootman.h"
 
-BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui, QWidget *parent)
-    : QObject(parent), proc(mproc), gui(ui), partman(pman)
+BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
+    const QSettings &appConf, const QCommandLineParser &appArgs)
+    : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
+    installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
+    removeNoSplash = appConf.value("REMOVE_NOSPLASH").toBool();
+    brave = appArgs.isSet("brave");
 
-}
-
-void BootMan::startup()
-{
     connect(gui.radioBootMBR, &QRadioButton::toggled, this, &BootMan::chosenBootMBR);
     connect(gui.radioBootPBR, &QRadioButton::toggled, this, &BootMan::chosenBootPBR);
     connect(gui.radioBootESP, &QRadioButton::toggled, this, &BootMan::chosenBootESP);
@@ -92,7 +92,7 @@ void BootMan::buildBootLists()
 }
 
 // build a grub configuration and install grub
-bool BootMan::install(const QString &loaderID, bool removeNoSplash)
+bool BootMan::install(const QString &loaderID)
 {
     proc.log(__PRETTY_FUNCTION__);
     if (proc.halted()) return false;
@@ -253,8 +253,8 @@ void BootMan::chosenBootMBR()
 {
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
-            if (!item->flags.nasty || partman.brave) item->addToCombo(gui.comboBoot, true);
+        if (item->type == DeviceItem::Drive && (!item->flags.bootRoot || installFromRootDevice)) {
+            if (!item->flags.nasty || brave) item->addToCombo(gui.comboBoot, true);
         }
     }
     selectBootMain();
@@ -265,7 +265,7 @@ void BootMan::chosenBootPBR()
 {
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Partition && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
+        if (item->type == DeviceItem::Partition && (!item->flags.bootRoot || installFromRootDevice)) {
             if (item->realUseFor() == "ESP") continue;
             else if (!item->format.compare("SWAP", Qt::CaseInsensitive)) continue;
             else if (item->format == "crypto_LUKS") continue;
@@ -273,7 +273,7 @@ void BootMan::chosenBootPBR()
                 if (item->curFormat == "crypto_LUKS") continue;
                 if (!item->curFormat.compare("SWAP", Qt::CaseInsensitive)) continue;
             }
-            if (!item->flags.nasty || partman.brave) item->addToCombo(gui.comboBoot, true);
+            if (!item->flags.nasty || brave) item->addToCombo(gui.comboBoot, true);
         }
     }
     selectBootMain();
@@ -284,7 +284,7 @@ void BootMan::chosenBootESP()
 {
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->realUseFor() == "ESP" && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
+        if (item->realUseFor() == "ESP" && (!item->flags.bootRoot || installFromRootDevice)) {
             item->addToCombo(gui.comboBoot);
         }
     }

@@ -25,6 +25,7 @@
 #ifndef PARTMAN_H
 #define PARTMAN_H
 
+#include <QCommandLineParser>
 #include <QAbstractItemModel>
 #include <QStyledItemDelegate>
 #include <QString>
@@ -157,7 +158,8 @@ class PartMan : public QAbstractItemModel
     Ui::MeInstall &gui;
     QWidget *master;
     SafeCache key;
-    void setup();
+    QMap<QString, QString> defaultLabels;
+    bool brave, gptoverride;
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit();
     bool formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label);
@@ -189,12 +191,10 @@ public:
         _TreeColumns_
     };
     QString bootUUID;
-    bool gptoverride=false, brave=false;
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
     QMap<QString, DeviceItem *> mounts;
-    QMap<QString, QString> defaultLabels;
-    PartMan(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent);
+    PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs);
     void scan(DeviceItem *drvstart = nullptr);
     bool manageConfig(MSettings &config, bool save);
     bool composeValidate(bool automatic, const QString &project);

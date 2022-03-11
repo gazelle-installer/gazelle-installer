@@ -25,9 +25,14 @@
 #include <QFileInfo>
 #include "base.h"
 
-Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui, QWidget *parent)
-    : QObject(parent), proc(mproc), gui(ui), partman(pman)
+Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
+    const QSettings &appConf, const QCommandLineParser &appArgs)
+    : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
+    populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
+    nocopy = appArgs.isSet("nocopy");
+    sync = appArgs.isSet("sync");
+
     bootSource = "/live/aufs/boot";
     rootSources << "/live/aufs/bin" << "/live/aufs/dev"
         << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/libx32" << "/live/aufs/lib64"
@@ -75,7 +80,7 @@ bool Base::install()
     proc.exec("chroot", {"/mnt/antiX", "desktop-menu", "--write-out-global"});
 
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
-    partman.makeFstab(POPULATE_MEDIA_MOUNTPOINTS);
+    partman.makeFstab(populateMediaMounts);
     if (!partman.fixCryptoSetup()) {
         failure = tr("Failed to finalize encryption setup.");
         return false;
@@ -97,7 +102,7 @@ bool Base::install()
 
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
     // modification to preserve points that are still mounted.
-    if (!POPULATE_MEDIA_MOUNTPOINTS) {
+    if (!populateMediaMounts) {
         proc.shell("/bin/rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*");
     }
 
@@ -113,6 +118,15 @@ bool Base::install()
     proc.exec("dbus-uuidgen", {"--ensure"});
     proc.setChRoot();
     proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
+
+    // Disable VirtualBox Guest Additions if not running in VirtualBox.
+    if(!proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'")) {
+        proc.shell("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        proc.shell("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        proc.shell("/bin/mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        proc.shell("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        proc.shell("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
+    }
 
     return true;
 }

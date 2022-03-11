@@ -39,6 +39,7 @@ class Oobe : public QObject
     bool containsRunit = false;
     bool haveSamba = false;
     QStringList timeZones; // cached time zone list
+    QStringList enableServices;
     void buildServiceList();
     int selectTimeZone(const QString &zone);
     void resetBlueman();
@@ -48,11 +49,9 @@ class Oobe : public QObject
 
 public:
     QString failure;
-    QStringList ENABLE_SERVICES;
     bool online = false;
     bool haveSnapshotUserAccounts = false;
-    Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent);
-    void startup();
+    Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf);
     void manageConfig(MSettings &config, bool save);
     void enable();
     bool process();

@@ -24,6 +24,7 @@
 #define BASE_H
 
 #include <QObject>
+#include <QCommandLineParser>
 #include "ui_meinstall.h"
 #include "mprocess.h"
 #include "msettings.h"
@@ -36,16 +37,17 @@ class Base : public QObject
     Ui::MeInstall &gui;
     QWidget *master;
     PartMan &partman;
+    bool nocopy, sync;
+    bool populateMediaMounts;
     bool copyLinux();
 public:
     QString failure;
-    bool nocopy, sync;
-    bool POPULATE_MEDIA_MOUNTPOINTS;
     // source medium
     QString bootSource;
     QStringList rootSources;
 
-    explicit Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui, QWidget *parent);
+    Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
+        const QSettings &appConf, const QCommandLineParser &appArgs);
     bool install();
 
 signals:
