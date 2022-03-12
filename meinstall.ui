@@ -494,6 +494,43 @@
                     </item>
                     <item>
                      <widget class="QSlider" name="sliderPart">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">QSlider::groove:horizontal { border: 1 inset; }
+
+QSlider::sub-page:horizontal {
+	background: QLinearGradient(x1:0, y1:0, x2:1, y2:1, stop:0 #006 stop:1 #03F);
+	border: 1 inset #666;
+	border-right: none;
+}
+QSlider::add-page:horizontal {
+	background: QLinearGradient(x1:0, y1:0, x2:1, y2:1, stop:0 #060, stop:1 #0F3);
+	border: 1 inset #666;
+	border-left: none;
+}
+
+QSlider::handle:horizontal {
+	background: QLinearGradient(x1:0, y1:1, x2:1, y2:0, stop:0 #666, stop:1 #CCC);
+	width: 5;
+	border: 1 outset #666;
+}
+QSlider::handle:horizontal:hover {
+	background: QLinearGradient(x1:0, y1:1, x2:1, y2:0, stop:0 #999, stop:1 #FFF);
+}
+
+QSlider::sub-page:horizontal:disabled,
+QSlider::add-page:horizontal:disabled,
+QSlider::handle:horizontal:disabled {
+	background: none;
+	border-color: #444;
+	border-style: solid;
+}</string>
+                      </property>
                       <property name="maximum">
                        <number>100</number>
                       </property>
@@ -502,12 +539,6 @@
                       </property>
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="tickPosition">
-                       <enum>QSlider::TicksBothSides</enum>
-                      </property>
-                      <property name="tickInterval">
-                       <number>10</number>
                       </property>
                      </widget>
                     </item>
