@@ -70,6 +70,8 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     connect(gui.pushPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
     connect(gui.pushPartAdd, &QToolButton::clicked, this, &PartMan::partAddClick);
     connect(gui.pushPartRemove, &QToolButton::clicked, this, &PartMan::partRemoveClick);
+    connect(gui.pushPartReload, &QToolButton::clicked, this, &PartMan::partReloadClick);
+    connect(gui.pushPartManRun, &QToolButton::clicked, this, &PartMan::partManRunClick);
     connect(this, &PartMan::dataChanged, this, &PartMan::treeItemChange);
     gui.pushPartAdd->setEnabled(false);
     gui.pushPartRemove->setEnabled(false);
@@ -568,6 +570,24 @@ void PartMan::partRemoveClick(bool)
         drvit->labelParts();
         treeSelChange();
     }
+}
+void PartMan::partReloadClick()
+{
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    gui.boxMain->setEnabled(false);
+    scan();
+    gui.boxMain->setEnabled(true);
+    QGuiApplication::restoreOverrideCursor();
+}
+void PartMan::partManRunClick()
+{
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    gui.boxMain->setEnabled(false);
+    if (QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted");
+    else proc.exec("/usr/bin/partitionmanager");
+    scan();
+    gui.boxMain->setEnabled(true);
+    QGuiApplication::restoreOverrideCursor();
 }
 
 // Partition menu items
@@ -2180,7 +2200,7 @@ QSize DeviceItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
     int width = QStyledItemDelegate::sizeHint(option, index).width();
     // In the case of Format and Use For, the cell should accommodate all options in the list.
-    const int residue = width - option.fontMetrics.boundingRect(index.data(Qt::DisplayRole).toString()).width();
+    const int residue = 10 + width - option.fontMetrics.boundingRect(index.data(Qt::DisplayRole).toString()).width();
     switch(index.column()) {
     case PartMan::Format:
         for (const QString &fmt : item->allowedFormats()) {

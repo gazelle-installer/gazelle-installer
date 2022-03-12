@@ -171,6 +171,8 @@ class PartMan : public QAbstractItemModel
     void partClearClick(bool);
     void partAddClick(bool);
     void partRemoveClick(bool);
+    void partReloadClick();
+    void partManRunClick();
     void partMenuUnlock(DeviceItem *twit);
     void partMenuLock(DeviceItem *twit);
     void scanSubvolumes(DeviceItem *partit);
