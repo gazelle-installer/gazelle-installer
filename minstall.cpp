@@ -95,9 +95,6 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     PROJECTVERSION = appConf.value("VERSION").toString();
     PROJECTURL = appConf.value("PROJECT_URL").toString();
     PROJECTFORUM = appConf.value("FORUM_URL").toString();
-    ROOT_BUFFER = appConf.value("ROOT_BUFFER", 5000).toInt();
-    HOME_BUFFER = appConf.value("HOME_BUFFER", 2000).toInt();
-    INSTALL_FROM_ROOT_DEVICE = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
 
     gotoPage(Step::Splash);
 
@@ -124,9 +121,23 @@ void MInstall::startup()
     resizeEvent(nullptr);
 
     if (!modeOOBE) {
+        // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
+        if (proc.detectEFI(true)==64 && proc.detectArch()=="i686") {
+            const int ans = QMessageBox::question(this, windowTitle(),
+                tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not"
+                    " be able to boot unless you select Legacy Boot or similar at restart.\n"
+                    "We recommend you quit now and restart in Legacy Boot\n\n"
+                    "Do you want to continue the installation?"), QMessageBox::Yes, QMessageBox::No);
+            if (ans != QMessageBox::Yes) exit(EXIT_FAILURE);
+        }
+
         partman = new PartMan(proc, *this, appConf, appArgs);
         base = new Base(proc, *partman, *this, appConf, appArgs);
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
+
+        ROOT_BUFFER = appConf.value("ROOT_BUFFER", 5000).toInt();
+        HOME_BUFFER = appConf.value("HOME_BUFFER", 2000).toInt();
+        INSTALL_FROM_ROOT_DEVICE = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
 
         //load some live variables
         QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
@@ -140,8 +151,8 @@ void MInstall::startup()
             exit(EXIT_FAILURE);
         }
 
-        //rootspaceneeded is the size of the linuxfs file * a compression factor + contents of the rootfs.  conservative but fast
-        //factors are same as used in live-remaster
+        //rootspaceneeded is the size of the linuxfs file * a compression factor + contents of the rootfs.
+        //conservative but fast. Factors are same as used in live-remaster. Using "du -sb ..." here is so slow, people thought the installer crashed.
 
         //get compression factor by reading the linuxfs squasfs file, if available
         qDebug() << "linuxfs file is at : " << SQFILE_FULL;
@@ -167,7 +178,6 @@ void MInstall::startup()
             default: // anythng else or linuxfs not reachable (toram), should be pretty conservative
                 compression_factor = 25;
         }
-
         qDebug() << "linuxfs compression type is " << linuxfs_compression_type << "compression factor is " << compression_factor;
 
         long long rootfs_file_size = 0;
@@ -177,27 +187,15 @@ void MInstall::startup()
             proc.shell("df /live/persist-root --output=used --total |tail -n1", nullptr, true);
             rootfs_file_size = proc.readOut().toLongLong() * 1024;
         }
-
         qDebug() << "linuxfs file size is " << linuxfs_file_size << " rootfs file size is " << rootfs_file_size;
 
         //add rootfs file size to the calculated linuxfs file size.  probaby conservative, as rootfs will likely have some overlap with linuxfs
         long long safety_factor = 1024 * 1024 * 1024; // 1GB safety factor
         partman->rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
-
         const long long spaceBlock = 134217728; // 128MB
         partman->bootSpaceNeeded += 2*spaceBlock - (partman->bootSpaceNeeded % spaceBlock);
 
         qDebug() << "Minimum space:" << partman->bootSpaceNeeded << "(boot)," << partman->rootSpaceNeeded << "(root)";
-
-        // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
-        if (proc.detectEFI(true)==64 && proc.detectArch()=="i686") {
-            const int ans = QMessageBox::question(this, windowTitle(),
-                tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not"
-                    " be able to boot unless you select Legacy Boot or similar at restart.\n"
-                    "We recommend you quit now and restart in Legacy Boot\n\n"
-                    "Do you want to continue the installation?"), QMessageBox::Yes, QMessageBox::No);
-            if (ans != QMessageBox::Yes) exit(EXIT_FAILURE);
-        }
 
         autoMountEnabled = true; // disable auto mount by force
         if (!pretend) setupAutoMount(false);
@@ -230,7 +228,26 @@ void MInstall::startup()
 
     if (modeOOBE) manageConfig(ConfigLoadB);
     else {
-        updatePartitionWidgets(true);
+        // Build disk widgets
+        partman->scan();
+        comboDisk->clear();
+        for (DeviceItemIterator it(*partman); DeviceItem *item = *it; it.next()) {
+            if (item->type == DeviceItem::Drive && item->size >= partman->rootSpaceNeeded
+                    && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
+                item->addToCombo(comboDisk);
+            }
+        }
+        comboDisk->setCurrentIndex(0);
+        radioEntireDisk->setChecked(true);
+        for (DeviceItemIterator it(*partman); *it; it.next()) {
+            if ((*it)->isVolume()) {
+                // found at least one partition
+                radioCustomPart->setChecked(true);
+                break;
+            }
+        }
+        setupPartitionSlider();
+        // Override with whatever is in the config.
         manageConfig(ConfigLoadA);
     }
     oobe->stashServices(true);
@@ -676,7 +693,6 @@ void MInstall::pageDisplayed(int next)
             updateCursor(Qt::WaitCursor);
             phase = 0;
             proc.unhalt();
-            updatePartitionWidgets(true);
             updateCursor();
         }
         pushBack->setEnabled(true);
@@ -980,39 +996,6 @@ void MInstall::gotoPage(int next)
     }
 }
 
-void MInstall::updatePartitionWidgets(bool all)
-{
-    comboDisk->setEnabled(false);
-    comboDisk->clear();
-    comboDisk->addItem(tr("Loading..."));
-    partman->scan();
-
-    // disk combo box
-    comboDisk->clear();
-    for (DeviceItemIterator it(*partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive && item->size >= partman->rootSpaceNeeded
-                && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
-            item->addToCombo(comboDisk);
-        }
-    }
-    comboDisk->setCurrentIndex(0);
-    comboDisk->setEnabled(true);
-
-    if (all) {
-        // whole-disk vs custom-partition radio buttons
-        radioEntireDisk->setChecked(true);
-        for (DeviceItemIterator it(*partman); *it; it.next()) {
-            if ((*it)->isVolume()) {
-                // found at least one partition
-                radioCustomPart->setChecked(true);
-                break;
-            }
-        }
-    }
-
-    // Partition slider.
-    setupPartitionSlider();
-}
 void MInstall::setupPartitionSlider()
 {
     // Allow the slider labels to fit all possible formatted sizes.
@@ -1123,25 +1106,6 @@ void MInstall::on_pushAbort_clicked()
 void MInstall::on_pushServices_clicked()
 {
     gotoPage(Step::Services);
-}
-
-void MInstall::on_pushPartReload_clicked()
-{
-    updateCursor(Qt::WaitCursor);
-    boxMain->setEnabled(false);
-    updatePartitionWidgets(false);
-    boxMain->setEnabled(true);
-    updateCursor();
-}
-void MInstall::on_pushRunPartMan_clicked()
-{
-    updateCursor(Qt::WaitCursor);
-    boxMain->setEnabled(false);
-    if (QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted");
-    else proc.exec("/usr/bin/partitionmanager");
-    updatePartitionWidgets(false);
-    boxMain->setEnabled(true);
-    updateCursor();
 }
 
 bool MInstall::abortUI()

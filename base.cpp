@@ -157,7 +157,7 @@ bool Base::copyLinux()
     proc.status(tr("Copying new system"));
     // Placed here so the progress bar moves to the right position before the next step.
     if (proc.halted()) return false;
-    if (!nocopy) return true; // Skip copying on purpose
+    if (nocopy) return true; // Skip copying on purpose
 
     const QString &joined = MProcess::joinCommand(prog, args);
     qDebug().noquote() << "Exec COPY:" << joined;

@@ -80,8 +80,6 @@ private slots:
     void on_pushSetKeyboard_clicked();
     void on_pushClose_clicked();
     void on_pushNext_clicked();
-    void on_pushPartReload_clicked();
-    void on_pushRunPartMan_clicked();
     void on_pushServices_clicked();
 
     void on_comboDisk_currentIndexChanged(int);
@@ -124,12 +122,11 @@ private:
     // info needed for Phase 2 of the process
     bool haveOldHome = false;
 
-    // slots
     void startup();
+    // slots
     void diskPassValidationChanged(bool valid);
     // private functions
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
-    void updatePartitionWidgets(bool all);
     void setupPartitionSlider();
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int space, long steps);
