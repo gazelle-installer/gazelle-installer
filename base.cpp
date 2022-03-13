@@ -46,10 +46,13 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     partman.bootSpaceNeeded += 2*spaceBlock - (partman.bootSpaceNeeded % spaceBlock);
 
     QSettings livesettings("/live/config/initrd.out", QSettings::NativeFormat);
-    bool floatOK = false;
-    const QString &SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
+    QString SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
+    if (!QFile::exists(SQFILE_FULL + ".info")) {
+        SQFILE_FULL = livesettings.value("TORAM_MP", "/live/to-ram").toString() + "/antiX/linuxfs";
+    }
     qDebug() << "linuxfs file is at : " << SQFILE_FULL;
     const QSettings squashinfo(SQFILE_FULL + ".info");
+    bool floatOK = false;
     partman.rootSpaceNeeded = 1024 * squashinfo.value("UncompressedSizeKB").toFloat(&floatOK);
     if (!floatOK) {
         //conservative but fast. Factors are same as used in live-remaster. Using "du -sb ..." here is so slow, people thought the installer crashed.
