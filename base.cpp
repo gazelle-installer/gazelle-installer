@@ -38,6 +38,65 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
         << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/libx32" << "/live/aufs/lib64"
         << "/live/aufs/media" << "/live/aufs/mnt" << "/live/aufs/opt" << "/live/aufs/root"
         << "/live/aufs/sbin" << "/live/aufs/usr" << "/live/aufs/var" << "/live/aufs/home";
+
+    // calculate required disk space
+    proc.exec("du", {"-sb", bootSource}, nullptr, true);
+    partman.bootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
+    const long long spaceBlock = 134217728; // 128MB
+    partman.bootSpaceNeeded += 2*spaceBlock - (partman.bootSpaceNeeded % spaceBlock);
+
+    QSettings livesettings("/live/config/initrd.out", QSettings::NativeFormat);
+    bool floatOK = false;
+    const QString &SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
+    qDebug() << "linuxfs file is at : " << SQFILE_FULL;
+    const QSettings squashinfo(SQFILE_FULL + ".info");
+    partman.rootSpaceNeeded = 1024 * squashinfo.value("UncompressedSizeKB").toFloat(&floatOK);
+    if (!floatOK) {
+        //conservative but fast. Factors are same as used in live-remaster. Using "du -sb ..." here is so slow, people thought the installer crashed.
+        //get compression factor by reading the linuxfs squasfs file, if available
+        long long compression_factor;
+        int linuxfs_compression_type = 0; //default conservative
+        if (QFileInfo::exists(SQFILE_FULL)) {
+            proc.shell("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none"
+                " 2>/dev/null | od -An -tdI", nullptr, true);
+            linuxfs_compression_type = proc.readOut().toInt();
+        }
+        // gzip, xz, or lz4
+        switch (linuxfs_compression_type) {
+            case 1: // gzip
+                compression_factor = 30;
+                break;
+            case 2: // lzo, not used by antiX
+            case 3: // lzma, not used by antiX
+            case 5: // lz4
+                compression_factor = 42;
+                break;
+            case 4: // xz
+            default: // anythng else or linuxfs not reachable (toram), should be pretty conservative
+                compression_factor = 25;
+        }
+        qDebug() << "linuxfs compression type is" << linuxfs_compression_type << "compression factor is" << compression_factor;
+        proc.shell("df /live/linux --output=used --total |tail -n1", nullptr, true);
+        partman.rootSpaceNeeded = (proc.readOut().toLongLong() * 1024 * 100) / compression_factor;
+        partman.rootSpaceNeeded += 1024 * 1024 * 1024; // 1GB safety factor
+    }
+    qDebug() << "linuxfs file size is " << partman.rootSpaceNeeded;
+    // Account for persistent root.
+    if (QFileInfo::exists("/live/perist-root")) {
+        proc.shell("df /live/persist-root --output=used --total |tail -n1", nullptr, true);
+        const long long rootfs_size = proc.readOut().toLongLong() * 1024;
+        qDebug() << "rootfs size is " << rootfs_size;
+        // probaby conservative, as rootfs will likely have some overlap with linuxfs.
+        partman.rootSpaceNeeded += rootfs_size;
+    }
+    // Account for file tails.
+    struct statvfs svfs;
+    if (statvfs("/live/linux", &svfs) == 0) {
+        partman.rootSpaceNeeded += (svfs.f_files - svfs.f_ffree) * svfs.f_bsize;
+    }
+
+    qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
+
 }
 
 bool Base::install()
