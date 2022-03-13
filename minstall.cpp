@@ -139,63 +139,11 @@ void MInstall::startup()
         HOME_BUFFER = appConf.value("HOME_BUFFER", 2000).toInt();
         INSTALL_FROM_ROOT_DEVICE = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
 
-        //load some live variables
-        QSettings livesettings("/live/config/initrd.out",QSettings::NativeFormat);
-        QString SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
-
-        // calculate required disk space
-        proc.exec("du", {"-sb", "/live/aufs/boot"}, nullptr, true);
-        partman->bootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
+        // Unable to get space requirements since there's no medium.
         if (!pretend && partman->bootSpaceNeeded==0) {
             QMessageBox::critical(this, windowTitle(), tr("Cannot access installation source."));
             exit(EXIT_FAILURE);
         }
-
-        //rootspaceneeded is the size of the linuxfs file * a compression factor + contents of the rootfs.
-        //conservative but fast. Factors are same as used in live-remaster. Using "du -sb ..." here is so slow, people thought the installer crashed.
-
-        //get compression factor by reading the linuxfs squasfs file, if available
-        qDebug() << "linuxfs file is at : " << SQFILE_FULL;
-        long long compression_factor;
-        QString linuxfs_compression_type = "xz"; //default conservative
-        if (QFileInfo::exists(SQFILE_FULL)) {
-            proc.shell("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none"
-                " 2>/dev/null | od -An -tdI", nullptr, true);
-            linuxfs_compression_type = proc.readOut();
-        }
-
-        // gzip, xz, or lz4
-        switch (linuxfs_compression_type.toInt()) {
-            case 1: // gzip
-                compression_factor = 30;
-                break;
-            case 2: // lzo, not used by antiX
-            case 3: // lzma, not used by antiX
-            case 5: // lz4
-                compression_factor = 42;
-                break;
-            case 4: // xz
-            default: // anythng else or linuxfs not reachable (toram), should be pretty conservative
-                compression_factor = 25;
-        }
-        qDebug() << "linuxfs compression type is " << linuxfs_compression_type << "compression factor is " << compression_factor;
-
-        long long rootfs_file_size = 0;
-        proc.shell("df /live/linux --output=used --total |tail -n1", nullptr, true);
-        long long linuxfs_file_size = (proc.readOut().toLongLong() * 1024 * 100) / compression_factor;
-        if (QFileInfo::exists("/live/perist-root")) {
-            proc.shell("df /live/persist-root --output=used --total |tail -n1", nullptr, true);
-            rootfs_file_size = proc.readOut().toLongLong() * 1024;
-        }
-        qDebug() << "linuxfs file size is " << linuxfs_file_size << " rootfs file size is " << rootfs_file_size;
-
-        //add rootfs file size to the calculated linuxfs file size.  probaby conservative, as rootfs will likely have some overlap with linuxfs
-        long long safety_factor = 1024 * 1024 * 1024; // 1GB safety factor
-        partman->rootSpaceNeeded = linuxfs_file_size + rootfs_file_size + safety_factor;
-        const long long spaceBlock = 134217728; // 128MB
-        partman->bootSpaceNeeded += 2*spaceBlock - (partman->bootSpaceNeeded % spaceBlock);
-
-        qDebug() << "Minimum space:" << partman->bootSpaceNeeded << "(boot)," << partman->rootSpaceNeeded << "(root)";
 
         autoMountEnabled = true; // disable auto mount by force
         if (!pretend) setupAutoMount(false);
@@ -1271,7 +1219,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
     const long long roundUp = available - 1;
     const long long rootMinMB = (partman->rootSpaceNeeded + 1048575) / 1048576;
     const long long homeMinMB = 16; // 16MB for basic profile and setup files
-    const long long rootRecMB = (4 * rootMinMB) + ROOT_BUFFER; // (Root + snapshot [squashfs + ISO] + backup) + buffer
+    const long long rootRecMB = rootMinMB + ROOT_BUFFER;
     const long long homeRecMB = homeMinMB + HOME_BUFFER;
     const int minPercent = ((rootMinMB * 100) + roundUp) / available;
     const int maxPercent = 100 - (((homeMinMB * 100) + roundUp) / available);
