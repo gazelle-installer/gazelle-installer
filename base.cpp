@@ -19,6 +19,7 @@
  *
  * This file is part of the gazelle-installer.
  ****************************************************************************/
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <QDebug>
@@ -92,10 +93,10 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
         // probaby conservative, as rootfs will likely have some overlap with linuxfs.
         partman.rootSpaceNeeded += rootfs_size;
     }
-    // Account for file tails.
+    // Account for inodes and file tails.
     struct statvfs svfs;
     if (statvfs("/live/linux", &svfs) == 0) {
-        partman.rootSpaceNeeded += (svfs.f_files - svfs.f_ffree) * svfs.f_bsize;
+        partman.rootSpaceNeeded += (2 * (svfs.f_files - svfs.f_ffree) * sysconf(_SC_PAGESIZE));
     }
 
     qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
