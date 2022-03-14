@@ -93,7 +93,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings 
         // test if there's another user other than demo in /home,
         // indicating a possible snapshot or complicated live-usb
         haveSnapshotUserAccounts = proc.shell("/bin/ls -1 /home"
-            " | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]");
+            " | grep -Ev '^(lost\\+found|demo|snapshot)$' | grep -q '[a-zA-Z0-9]'");
         qDebug() << "check for possible snapshot:" << haveSnapshotUserAccounts;
     }
 
