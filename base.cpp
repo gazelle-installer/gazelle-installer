@@ -82,7 +82,6 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
         qDebug() << "linuxfs compression type is" << linuxfs_compression_type << "compression factor is" << compression_factor;
         proc.shell("df /live/linux --output=used --total |tail -n1", nullptr, true);
         partman.rootSpaceNeeded = (proc.readOut().toLongLong() * 1024 * 100) / compression_factor;
-        partman.rootSpaceNeeded += 1024 * 1024 * 1024; // 1GB safety factor
     }
     qDebug() << "linuxfs file size is " << partman.rootSpaceNeeded;
     // Account for persistent root.
@@ -96,7 +95,7 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     // Account for inodes and file tails.
     struct statvfs svfs;
     if (statvfs("/live/linux", &svfs) == 0) {
-        partman.rootSpaceNeeded += (2 * (svfs.f_files - svfs.f_ffree) * sysconf(_SC_PAGESIZE));
+        partman.rootSpaceNeeded += (svfs.f_files - svfs.f_ffree) * sysconf(_SC_PAGESIZE);
     }
 
     qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
