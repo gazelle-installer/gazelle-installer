@@ -43,8 +43,6 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     // calculate required disk space
     proc.exec("du", {"-sb", bootSource}, nullptr, true);
     partman.bootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
-    const long long spaceBlock = 134217728; // 128MB
-    partman.bootSpaceNeeded += 2*spaceBlock - (partman.bootSpaceNeeded % spaceBlock);
 
     QSettings livesettings("/live/config/initrd.out", QSettings::NativeFormat);
     QString SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
@@ -92,14 +90,8 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
         // probaby conservative, as rootfs will likely have some overlap with linuxfs.
         partman.rootSpaceNeeded += rootfs_size;
     }
-    // Account for inodes and file tails.
-    struct statvfs svfs;
-    if (statvfs("/live/linux", &svfs) == 0) {
-        partman.rootSpaceNeeded += (svfs.f_files - svfs.f_ffree) * sysconf(_SC_PAGESIZE);
-    }
 
     qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
-
 }
 
 bool Base::install()
