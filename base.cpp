@@ -54,32 +54,10 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     bool floatOK = false;
     partman.rootSpaceNeeded = 1024 * squashinfo.value("UncompressedSizeKB").toFloat(&floatOK);
     if (!floatOK) {
-        //conservative but fast. Factors are same as used in live-remaster. Using "du -sb ..." here is so slow, people thought the installer crashed.
-        //get compression factor by reading the linuxfs squasfs file, if available
-        long long compression_factor;
-        int linuxfs_compression_type = 0; //default conservative
-        if (QFileInfo::exists(SQFILE_FULL)) {
-            proc.shell("dd if=" + SQFILE_FULL + " bs=1 skip=20 count=2 status=none"
-                " 2>/dev/null | od -An -tdI", nullptr, true);
-            linuxfs_compression_type = proc.readOut().toInt();
-        }
-        // gzip, xz, or lz4
-        switch (linuxfs_compression_type) {
-            case 1: // gzip
-                compression_factor = 30;
-                break;
-            case 2: // lzo, not used by antiX
-            case 3: // lzma, not used by antiX
-            case 5: // lz4
-                compression_factor = 42;
-                break;
-            case 4: // xz
-            default: // anythng else or linuxfs not reachable (toram), should be pretty conservative
-                compression_factor = 25;
-        }
-        qDebug() << "linuxfs compression type is" << linuxfs_compression_type << "compression factor is" << compression_factor;
-        proc.shell("df /live/linux --output=used --total |tail -n1", nullptr, true);
-        partman.rootSpaceNeeded = (proc.readOut().toLongLong() * 1024 * 100) / compression_factor;
+        rootSources.prepend("-sb");
+        proc.exec("du", rootSources, nullptr, true);
+        rootSources.removeFirst();
+        partman.rootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
     }
     qDebug() << "linuxfs file size is " << partman.rootSpaceNeeded;
     // Account for persistent root.
