@@ -2,7 +2,7 @@
  * Basic partition manager for the installer.
  ***************************************************************************
  *
- *   Copyright (C) 2019, 2020-2021 by AK-47
+ *   Copyright (C) 2019, 2020-2022 by AK-47
  *   Transplanted code, marked with comments further down this file:
  *    - Copyright (C) 2003-2010 by Warren Woodford
  *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
