@@ -114,6 +114,9 @@ private:
     QStringList listHomes;
     BootMan *bootman = nullptr;
 
+    // Splash screen
+    int throbPos = 0;
+    QTimer *throbber = nullptr;
     // for the tips display
     int ixTip = 0;
     int ixTipStart = -1;
@@ -123,6 +126,8 @@ private:
     bool haveOldHome = false;
 
     void startup();
+    void splashSetThrobber(bool active);
+    void splashThrob();
     // slots
     void diskPassValidationChanged(bool valid);
     // private functions
@@ -135,4 +140,5 @@ private:
     bool copyLinux();
     void failUI(const QString &msg);
     void manageConfig(enum ConfigAction mode);
+    bool eventFilter(QObject *watched, QEvent *event);
 };
