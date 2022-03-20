@@ -44,22 +44,21 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     proc.exec("du", {"-sb", bootSource}, nullptr, true);
     partman.bootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
 
-    QSettings livesettings("/live/config/initrd.out", QSettings::NativeFormat);
-    QString SQFILE_FULL = livesettings.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
-    if (!QFile::exists(SQFILE_FULL + ".info")) {
-        SQFILE_FULL = livesettings.value("TORAM_MP", "/live/to-ram").toString() + "/antiX/linuxfs";
+    QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
+    QString linuxfs = liveInfo.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
+    if (!QFile::exists(linuxfs + ".info")) {
+        linuxfs = liveInfo.value("TORAM_MP", "/live/to-ram").toString() + "/antiX/linuxfs";
     }
-    qDebug() << "linuxfs file is at : " << SQFILE_FULL;
-    const QSettings squashinfo(SQFILE_FULL + ".info");
+    const QSettings squashInfo(linuxfs + ".info", QSettings::IniFormat);
     bool floatOK = false;
-    partman.rootSpaceNeeded = 1024 * squashinfo.value("UncompressedSizeKB").toFloat(&floatOK);
+    partman.rootSpaceNeeded = 1024 * squashInfo.value("UncompressedSizeKB").toFloat(&floatOK);
     if (!floatOK) {
         rootSources.prepend("-sb");
         proc.exec("du", rootSources, nullptr, true);
         rootSources.removeFirst();
         partman.rootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
     }
-    qDebug() << "linuxfs file size is " << partman.rootSpaceNeeded;
+    qDebug() << "Image:" << linuxfs << partman.rootSpaceNeeded << floatOK;
     // Account for persistent root.
     if (QFileInfo::exists("/live/perist-root")) {
         proc.shell("df /live/persist-root --output=used --total |tail -n1", nullptr, true);
