@@ -47,13 +47,14 @@ enum Step {
 };
 
 MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile)
-    : proc(this), appConf(acfg), appArgs(args)
+    : proc(this), appConf(acfg), appArgs(args), helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
     setupUi(this);
     listLog->addItem("Version " VERSION);
     proc.setupUI(listLog, progInstall);
     updateCursor(Qt::WaitCursor);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
+    textHelp->installEventFilter(this);
     boxInstall->hide();
 
     modeOOBE = args.isSet("oobe");
@@ -119,7 +120,6 @@ MInstall::~MInstall() {
 void MInstall::startup()
 {
     proc.log(__PRETTY_FUNCTION__);
-    resizeEvent(nullptr);
 
     if (!modeOOBE) {
         // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
@@ -990,7 +990,8 @@ void MInstall::setupPartitionSlider()
 
 bool MInstall::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == labelSplash && event->type() == QEvent::Paint) {
+    if (event->type() != QEvent::Paint) return false;
+    else if (watched == labelSplash) {
         // Setup needed to draw the load indicator.
         QPainter painter(labelSplash);
         painter.setRenderHints(QPainter::Antialiasing);
@@ -1020,6 +1021,11 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event)
             painter.drawConvexPolygon(blade, 4);
             painter.rotate(angle);
         }
+    } else if (watched == textHelp) {
+        // Draw the help pane backdrop image, which goes through the alpha-channel background.
+        QPainter painter(textHelp);
+        painter.setRenderHints(QPainter::Antialiasing);
+        painter.drawPixmap(textHelp->viewport()->rect(), helpBackdrop, helpBackdrop.rect());
     }
     return false;
 }
@@ -1036,14 +1042,7 @@ void MInstall::changeEvent(QEvent *event)
         pal.setColor(QPalette::Base, col);
         textHelp->setPalette(pal);
         setupPartitionSlider();
-        resizeEvent(nullptr);
     }
-}
-
-void MInstall::resizeEvent(QResizeEvent *)
-{
-    textHelp->resize(tabHelp->size());
-    labelHelpBackdrop->resize(textHelp->size());
 }
 
 void MInstall::closeEvent(QCloseEvent *event)
@@ -1075,16 +1074,6 @@ void MInstall::reject()
 
 /////////////////////////////////////////////////////////////////////////
 // slots
-
-void MInstall::on_splitter_splitterMoved(int, int)
-{
-    resizeEvent(nullptr);
-}
-void MInstall::on_tabsMain_currentChanged(int index)
-{
-    // Make the help widgets the correct size.
-    if (index == 0) resizeEvent(nullptr);
-}
 
 void MInstall::diskPassValidationChanged(bool valid)
 {

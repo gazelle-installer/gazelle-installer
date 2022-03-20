@@ -42,58 +42,27 @@
        <attribute name="title">
         <string>Help</string>
        </attribute>
-       <widget class="QTextEdit" name="textHelp">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>181</width>
-          <height>421</height>
-         </rect>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
+       <layout class="QVBoxLayout">
+        <property name="leftMargin">
          <number>0</number>
         </property>
-        <property name="sizeAdjustPolicy">
-         <enum>QAbstractScrollArea::AdjustToContents</enum>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="labelHelpBackdrop">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>181</width>
-          <height>421</height>
-         </rect>
-        </property>
-        <property name="lineWidth">
+        <property name="topMargin">
          <number>0</number>
         </property>
-        <property name="pixmap">
-         <pixmap>/usr/share/gazelle-installer-data/backdrop-textbox.png</pixmap>
+        <property name="rightMargin">
+         <number>0</number>
         </property>
-        <property name="scaledContents">
-         <bool>true</bool>
+        <property name="bottomMargin">
+         <number>0</number>
         </property>
-       </widget>
-       <zorder>labelHelpBackdrop</zorder>
-       <zorder>textHelp</zorder>
+        <item>
+         <widget class="QTextEdit" name="textHelp">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tabLog">
        <attribute name="title">
