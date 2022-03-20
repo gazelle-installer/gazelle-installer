@@ -23,6 +23,7 @@
 #include <QProcessEnvironment>
 #include <QTimer>
 #include <QToolTip>
+#include <QPainter>
 
 #include <cstdlib>
 #include <fcntl.h>
@@ -112,6 +113,7 @@ MInstall::~MInstall() {
     if (base) delete base;
     if (bootman) delete bootman;
     if (partman) delete partman;
+    if (throbber) delete throbber;
 }
 
 // meant to be run after the installer becomes visible
@@ -211,6 +213,28 @@ void MInstall::startup()
 
     // automatic installation
     if (automatic) pushNext->click();
+}
+
+void MInstall::splashSetThrobber(bool active)
+{
+    if (active) {
+        if (throbber) return;
+        labelSplash->installEventFilter(this);
+        throbber = new QTimer(this);
+        connect(throbber, &QTimer::timeout, this, &MInstall::splashThrob);
+        throbber->start(100);
+    } else {
+        if (!throbber) return;
+        delete throbber;
+        throbber = nullptr;
+        labelSplash->removeEventFilter(this);
+    }
+    labelSplash->update();
+}
+void MInstall::splashThrob()
+{
+    ++throbPos;
+    labelSplash->update();
 }
 
 // turn auto-mount off and on
@@ -507,7 +531,9 @@ void MInstall::failUI(const QString &msg)
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
 {
-    if (curr == Step::Disk && next > curr) {
+    if (next == Step::Splash) splashSetThrobber(true); // Enter
+    else if (curr == Step::Splash) splashSetThrobber(false); // Leave
+    else if (curr == Step::Disk && next > curr) {
         if (radioEntireDisk->isChecked()) {
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
@@ -931,6 +957,7 @@ void MInstall::gotoPage(int next)
                 proc.exec("/usr/sbin/reboot");
                 qApp->exit(EXIT_SUCCESS);
             } else {
+                splashSetThrobber(false);
                 failUI(oobe->failure);
                 labelSplash->setText(tr("Could not complete configuration."));
                 pushClose->show();
@@ -961,6 +988,42 @@ void MInstall::setupPartitionSlider()
 
 /////////////////////////////////////////////////////////////////////////
 // event handlers
+
+bool MInstall::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == labelSplash && event->type() == QEvent::Paint) {
+        // Setup needed to draw the load indicator.
+        QPainter painter(labelSplash);
+        painter.setRenderHints(QPainter::Antialiasing);
+        const int lW = labelSplash->width(), lH = labelSplash->height();
+        painter.translate(lW / 2, lH / 2);
+        painter.scale(lW / 200.0, lH / 200.0);
+        QColor color = labelSplash->palette().text().color();
+        color.setRed(255 - color.red());
+        color.setAlpha(70);
+        QPen pen(color.darker());
+        pen.setWidth(3);
+        pen.setJoinStyle(Qt::MiterJoin);
+        painter.setPen(pen);
+        // Draw the load indicator on the splash screen.
+        const int count = 16;
+        const int alphaMin = 0, alphaMax = 70;
+        const QPoint blade[] = {
+            QPoint(0, 0), QPoint(9, -75),
+            QPoint(0, -93), QPoint(-9, -75)
+        };
+        const qreal angle = 360.0 / count;
+        painter.rotate(angle * throbPos);
+        const int astep = (alphaMax - alphaMin) / count;
+        for (int ixi = alphaMin; ixi <= alphaMax; ixi += astep) {
+            color.setAlpha(ixi);
+            painter.setBrush(color);
+            painter.drawConvexPolygon(blade, 4);
+            painter.rotate(angle);
+        }
+    }
+    return false;
+}
 
 void MInstall::changeEvent(QEvent *event)
 {
