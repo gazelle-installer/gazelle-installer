@@ -39,7 +39,6 @@ class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
 protected:
     void changeEvent(QEvent *event);
-    void resizeEvent(QResizeEvent *);
     void closeEvent(QCloseEvent * event);
     void reject();
 
@@ -71,9 +70,6 @@ public:
     void cleanup(bool endclean = true);
 
 private slots:
-    void on_splitter_splitterMoved(int, int);
-    void on_tabsMain_currentChanged(int index);
-
     void on_pushAbort_clicked();
     void on_pushBack_clicked();
     void on_pushSetKeyboard_clicked();
@@ -113,6 +109,7 @@ private:
     QStringList listHomes;
     BootMan *bootman = nullptr;
 
+    QPixmap helpBackdrop;
     // Splash screen
     int throbPos = 0;
     QTimer *throbber = nullptr;
