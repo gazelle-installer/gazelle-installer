@@ -735,7 +735,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             QMessageBox::critical(master, QString(), tr("%1 is already"
                 " selected for: %2").arg(twit->shownDevice(), twit->shownUseFor()));
             return false;
-        } else if(!mount.isEmpty() && mount != "FORMAT" && mount != "ESP"){
+        } else if(!mount.isEmpty() && mount != "FORMAT" && mount != "ESP" && mount != "BIOS-GRUB"){
             mounts.insert(mount, *it);
         }
         if (item->type != DeviceItem::VirtualBD) {
