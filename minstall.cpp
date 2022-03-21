@@ -1009,7 +1009,7 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event)
         const int count = 16;
         const int alphaMin = 0, alphaMax = 70;
         const QPoint blade[] = {
-            QPoint(0, 0), QPoint(9, -75),
+            QPoint(0, -6), QPoint(9, -75),
             QPoint(0, -93), QPoint(-9, -75)
         };
         const qreal angle = 360.0 / count;
