@@ -41,24 +41,26 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
         << "/live/aufs/sbin" << "/live/aufs/usr" << "/live/aufs/var" << "/live/aufs/home";
 
     // calculate required disk space
-    proc.exec("du", {"-sb", bootSource}, nullptr, true);
-    partman.bootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
+    proc.exec("du", {"-scb", bootSource}, nullptr, true);
+    partman.bootSpaceNeeded = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
 
     QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
-    QString linuxfs = liveInfo.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString();
-    if (!QFile::exists(linuxfs + ".info")) {
-        linuxfs = liveInfo.value("TORAM_MP", "/live/to-ram").toString() + "/antiX/linuxfs";
+    QString infile = liveInfo.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString() + ".info";
+    if (!QFile::exists(infile)) {
+        infile = liveInfo.value("TORAM_MP", "/live/to-ram").toString() + "/antiX/linuxfs.info";
     }
-    const QSettings squashInfo(linuxfs + ".info", QSettings::IniFormat);
     bool floatOK = false;
-    partman.rootSpaceNeeded = 1024 * squashInfo.value("UncompressedSizeKB").toFloat(&floatOK);
+    if (QFile::exists(infile)) {
+        const QSettings squashInfo(infile, QSettings::IniFormat);
+        partman.rootSpaceNeeded = 1024 * squashInfo.value("UncompressedSizeKB").toFloat(&floatOK);
+    }
     if (!floatOK) {
-        rootSources.prepend("-sb");
+        rootSources.prepend("-scb");
         proc.exec("du", rootSources, nullptr, true);
         rootSources.removeFirst();
-        partman.rootSpaceNeeded = proc.readOut().section('\t', 0, 0).toLongLong();
+        partman.rootSpaceNeeded = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
     }
-    qDebug() << "Image:" << linuxfs << partman.rootSpaceNeeded << floatOK;
+    qDebug() << "Image size:" << partman.rootSpaceNeeded << floatOK << infile;
     // Account for persistent root.
     if (QFileInfo::exists("/live/perist-root")) {
         proc.shell("df /live/persist-root --output=used --total |tail -n1", nullptr, true);
