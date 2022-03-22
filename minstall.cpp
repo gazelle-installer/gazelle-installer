@@ -186,14 +186,20 @@ void MInstall::startup()
                 item->addToCombo(comboDisk);
             }
         }
-        comboDisk->setCurrentIndex(0);
-        radioEntireDisk->setChecked(true);
-        for (DeviceItemIterator it(*partman); *it; it.next()) {
-            if ((*it)->isVolume()) {
-                // found at least one partition
-                radioCustomPart->setChecked(true);
-                break;
+        if (comboDisk->count() >= 1) {
+            comboDisk->setCurrentIndex(0);
+            radioEntireDisk->setChecked(true);
+            for (DeviceItemIterator it(*partman); *it; it.next()) {
+                if ((*it)->isVolume()) {
+                    // found at least one partition
+                    radioCustomPart->setChecked(true);
+                    break;
+                }
             }
+        } else {
+            radioEntireDisk->setEnabled(false);
+            boxAutoPart->setEnabled(false);
+            radioCustomPart->setChecked(true);
         }
         setupPartitionSlider();
         // Override with whatever is in the config.
