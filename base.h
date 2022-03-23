@@ -39,16 +39,15 @@ class Base : public QObject
     PartMan &partman;
     bool nocopy, sync;
     bool populateMediaMounts;
-    bool copyLinux();
+    void copyLinux();
 public:
-    QString failure;
     // source medium
     QString bootSource;
     QStringList rootSources;
 
     Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
         const QSettings &appConf, const QCommandLineParser &appArgs);
-    bool install();
+    void install();
 
 signals:
 

@@ -48,20 +48,19 @@ class Oobe : public QObject
     void timeAreaIndexChanged(int index);
 
 public:
-    QString failure;
     bool online = false;
     bool haveSnapshotUserAccounts = false;
     Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf);
     void manageConfig(MSettings &config, bool save);
     void enable();
-    bool process();
+    void process();
     void stashServices(bool save);
     void setService(const QString &service, bool enabled);
     QWidget *validateComputerName();
     QWidget *validateUserInfo(bool automatic);
-    bool setComputerName();
+    void setComputerName();
     void setLocale();
-    bool setUserInfo();
+    void setUserInfo();
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
     // Slots
     void userPassValidationChanged();

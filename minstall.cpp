@@ -357,73 +357,74 @@ bool MInstall::pretendToInstall(int space, long steps)
 // process the next phase of installation if possible
 bool MInstall::processNextPhase()
 {
-    widgetStack->setEnabled(true);
-    // Phase < 0 = install has been aborted (Phase -2 on close)
-    if (proc.halted()) return false;
-    // Phase 0 = install not started yet, Phase 1 = install in progress
-    // Phase 2 = waiting for operator input, Phase 3 = post-install steps
-    if (phase == 0) { // no install started yet
-        proc.advance(-1, -1);
-        proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
-        if (!partman->checkTargetDrivesOK()) return false;
-        phase = 1; // installation.
+    try {
+        widgetStack->setEnabled(true);
+        // Phase < 0 = install has been aborted (Phase -2 on close)
+        if (proc.halted()) return false;
+        // Phase 0 = install not started yet, Phase 1 = install in progress
+        // Phase 2 = waiting for operator input, Phase 3 = post-install steps
+        if (phase == 0) { // no install started yet
+            proc.advance(-1, -1);
+            proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
+            if (!partman->checkTargetDrivesOK()) return false;
+            phase = 1; // installation.
 
-        // cleanup previous mounts
-        cleanup(false);
+            // cleanup previous mounts
+            cleanup(false);
 
-        // the core of the installation
-        if (!pretend) {
-            proc.advance(12, partman->countPrepSteps());
-            bool ok = partman->preparePartitions();
-            if (ok) ok = partman->formatPartitions();
-            if (ok) ok = partman->mountPartitions();
-            if (!ok) {
-                failUI(tr("Failed to prepare required partitions."));
+            // the core of the installation
+            if (!pretend) {
+                proc.advance(12, partman->countPrepSteps());
+                partman->preparePartitions();
+                partman->formatPartitions();
+                partman->mountPartitions();
+                //run blkid -c /dev/null to freshen UUID cache
+                proc.exec("blkid", {"-c", "/dev/null"});
+                base->install();
+            } else {
+                if (!pretendToInstall(14, 200)) return false;
+                if (!pretendToInstall(80, 500)) return false;
+            }
+            if (widgetStack->currentWidget() != pageProgress) {
+                progInstall->setEnabled(false);
+                proc.status(tr("Paused for required operator input"));
+                QApplication::beep();
+            }
+            phase = 2;
+        }
+        if (phase == 2 && widgetStack->currentWidget() == pageProgress) {
+            phase = 3;
+            progInstall->setEnabled(true);
+            pushBack->setEnabled(false);
+            if (!pretend) {
+                proc.advance(1, 1);
+                proc.status(tr("Setting system configuration"));
+                if (oem) oobe->enable();
+                oobe->process();
+                manageConfig(ConfigSave);
+                config->dumpDebug();
+                proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
+                bootman->install();
+            } else if (!pretendToInstall(5, 100)) {
                 return false;
             }
-            //run blkid -c /dev/null to freshen UUID cache
-            proc.exec("blkid", {"-c", "/dev/null"});
-            if (!base->install()) {
-                failUI(base->failure);
-                return false;
-            }
-        } else {
-            if (!pretendToInstall(14, 200)) return false;
-            if (!pretendToInstall(80, 500)) return false;
-        }
-        if (widgetStack->currentWidget() != pageProgress) {
-            progInstall->setEnabled(false);
-            proc.status(tr("Paused for required operator input"));
-            QApplication::beep();
-        }
-        phase = 2;
-    }
-    if (phase == 2 && widgetStack->currentWidget() == pageProgress) {
-        phase = 3;
-        progInstall->setEnabled(true);
-        pushBack->setEnabled(false);
-        if (!pretend) {
+            phase = 4;
             proc.advance(1, 1);
-            proc.status(tr("Setting system configuration"));
-            if (oem) oobe->enable();
-            else if (!oobe->process()) {
-                failUI(oobe->failure);
-                return false;
-            }
-            manageConfig(ConfigSave);
-            config->dumpDebug();
-            proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
-            if (!bootman->install(PROJECTSHORTNAME + PROJECTVERSION)) return false;
-        } else if (!pretendToInstall(5, 100)) {
-            return false;
+            proc.status(tr("Cleaning up"));
+            cleanup();
+            proc.status(tr("Finished"));
+            gotoPage(Step::End);
         }
-        phase = 4;
-        proc.advance(1, 1);
-        proc.status(tr("Cleaning up"));
-        cleanup();
-        proc.status(tr("Finished"));
-        gotoPage(Step::End);
+    } catch (const char *msg) {
+        proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::Fail);
+        if (!proc.halted()) {
+            boxMain->setEnabled(false);
+            QMessageBox::critical(this, windowTitle(), tr(msg));
+            updateCursor(Qt::WaitCursor);
+        }
+        return false;
     }
+
     return true;
 }
 
@@ -521,17 +522,6 @@ bool MInstall::saveHomeBasic()
     proc.exec("/bin/umount", {"-l", "/mnt/antiX"});
     return ok;
 }
-
-void MInstall::failUI(const QString &msg)
-{
-    proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::Fail);
-    if (!proc.halted()) {
-        boxMain->setEnabled(false);
-        QMessageBox::critical(this, windowTitle(), msg);
-        updateCursor(Qt::WaitCursor);
-    }
-}
-
 
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
@@ -957,14 +947,15 @@ void MInstall::gotoPage(int next)
             updateCursor(Qt::BusyCursor);
             labelSplash->setText(tr("Configuring sytem. Please wait."));
             gotoPage(Step::Splash);
-            if (oobe->process()) {
+            try {
+                oobe->process();
                 labelSplash->setText(tr("Configuration complete. Restarting system."));
                 proc.exec("/usr/sbin/reboot");
                 qApp->exit(EXIT_SUCCESS);
-            } else {
+            } catch (const char *msg) {
                 splashSetThrobber(false);
-                failUI(oobe->failure);
-                labelSplash->setText(tr("Could not complete configuration."));
+                proc.log(QString("FAILED OOBE - ") + msg, MProcess::Fail);
+                labelSplash->setText(tr(msg));
                 pushClose->show();
             }
         } else if (!processNextPhase() && phase > -2) {
