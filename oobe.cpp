@@ -194,7 +194,7 @@ void Oobe::enable()
     proc.setChRoot();
 }
 
-bool Oobe::process()
+void Oobe::process()
 {
     if (!online) proc.setChRoot("/mnt/antiX");
     QTreeWidgetItemIterator it(gui.treeServices);
@@ -209,17 +209,16 @@ bool Oobe::process()
     }
     proc.setChRoot();
 
-    if (!setComputerName()) return false;
+    setComputerName();
     setLocale();
     if (haveSnapshotUserAccounts) { // skip user account creation
         proc.exec("rsync", {"-a", "/home/", "/mnt/antiX/home/",
             "--exclude", ".cache", "--exclude", ".gvfs", "--exclude", ".dbus", "--exclude", ".Xauthority",
             "--exclude", ".ICEauthority", "--exclude", ".config/session"});
     } else {
-        if (!setUserInfo()) return false;
+        setUserInfo();
     }
     if (online) proc.exec("update-rc.d", {"oobe", "disable"});
-    return true;
 }
 
 /* Services */
@@ -344,7 +343,7 @@ QWidget *Oobe::validateComputerName()
 }
 
 // set the computer name, can not be rerun
-bool Oobe::setComputerName()
+void Oobe::setComputerName()
 {
     QString etcpath = online ? "/etc" : "/mnt/antiX/etc";
     if (haveSamba) {
@@ -365,7 +364,6 @@ bool Oobe::setComputerName()
     proc.shell("sed -i 's/.*send host-name.*/send host-name \""
         + compname + "\";/g' " + etcpath + "/dhcp/dhclient.conf");
     proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/defaultdomain");
-    return true;
 }
 
 // return 0 = success, 1 = bad area, 2 = bad zone
@@ -492,7 +490,7 @@ QWidget *Oobe::validateUserInfo(bool automatic)
 }
 
 // setup the user, cannot be rerun
-bool Oobe::setUserInfo()
+void Oobe::setUserInfo()
 {
     // set the user passwords first
     bool ok = true;
@@ -511,10 +509,7 @@ bool Oobe::setUserInfo()
         userinfo.append(QString("demo:" + userPass).toUtf8());
     }
     if (ok && !userinfo.isEmpty()) ok = proc.exec("chpasswd", {}, &userinfo);
-    if (!ok) {
-        failure = tr("Failed to set user account passwords.");
-        return false;
-    }
+    if (!ok) throw "Failed to set user account passwords.";
     proc.setChRoot();
 
     QString rootpath;
@@ -531,14 +526,10 @@ bool Oobe::setUserInfo()
                 cargs.last() = dpath + ".00" + QString::number(ixi);
                 ok = proc.exec("/bin/mv", cargs);
             }
-            if (!ok) {
-                failure = tr("Failed to save old home directory.");
-                return false;
-            }
+            if (!ok) throw "Failed to save old home directory.";
         } else if (gui.radioOldHomeDelete->isChecked()) {
             if (!proc.exec("/bin/rm", {"-rf", dpath})) {
-                failure = tr("Failed to delete old home directory.");
-                return false;
+                throw "Failed to delete old home directory.";
             }
         }
         proc.exec("/bin/sync"); // The sync(2) system call will block the GUI.
@@ -559,13 +550,11 @@ bool Oobe::setUserInfo()
         // Copy skel to demo, unless demo folder exists in remastered linuxfs.
         if (!remasteredDemo) {
             if (!proc.exec("/bin/cp", {"-a", skelpath, dpath})) {
-                failure = tr("Sorry, failed to create user directory.");
-                return false;
+                throw "Sorry, failed to create user directory.";
             }
         } else { // still rename the demo directory even if remastered demo home folder is detected
             if (!proc.exec("/bin/mv", {"-f", rootpath + "/home/demo", dpath})) {
-                failure = tr("Sorry, failed to name user directory.");
-                return false;
+                throw "Sorry, failed to name user directory.";
             }
         }
     }
@@ -600,8 +589,7 @@ bool Oobe::setUserInfo()
 
     // fix the ownership, demo=newuser
     if (!proc.exec("chown", {"-R", "demo:demo", dpath})) {
-        failure = tr("Sorry, failed to set ownership of user directory.");
-        return false;
+        throw "Sorry, failed to set ownership of user directory.";
     }
 
     // change in files
@@ -625,8 +613,6 @@ bool Oobe::setUserInfo()
         replaceStringInFile("User=.*", "User=", rootpath + "/etc/sddm.conf");
     }
     proc.exec("touch", {rootpath + "/var/mail/" + username});
-
-    return true;
 }
 
 void Oobe::resetBlueman()

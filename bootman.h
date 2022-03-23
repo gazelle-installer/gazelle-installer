@@ -37,6 +37,7 @@ class BootMan : public QObject
     Ui::MeInstall &gui;
     QWidget *master;
     PartMan &partman;
+    QString loaderID;
     bool installFromRootDevice, removeNoSplash;
     bool brave;
     void selectBootMain();
@@ -49,7 +50,7 @@ public:
         const QSettings &appConf, const QCommandLineParser &appArgs);
     void manageConfig(MSettings &config);
     void buildBootLists();
-    bool install(const QString &loaderID);
+    void install();
 };
 
 #endif // BOOTMAN_H

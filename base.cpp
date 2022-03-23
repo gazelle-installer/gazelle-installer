@@ -73,10 +73,10 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
 }
 
-bool Base::install()
+void Base::install()
 {
     proc.log(__PRETTY_FUNCTION__);
-    if (proc.halted()) return false;
+    if (proc.halted()) return;
     proc.advance(1, 2);
 
     if (!partman.willFormat("/")) {
@@ -86,8 +86,7 @@ bool Base::install()
         proc.shell("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;");
 
         if (proc.exitStatus() != QProcess::NormalExit) {
-            failure = tr("Failed to delete old system on destination.");
-            return false;
+            throw "Failed to delete old system on destination.";
         }
     }
 
@@ -100,7 +99,7 @@ bool Base::install()
     mkdir("/mnt/antiX/sys", 0755);
     mkdir("/mnt/antiX/run", 0755);
 
-    if (!copyLinux()) return false;
+    copyLinux();
 
     proc.advance(1, 1);
     proc.status(tr("Fixing configuration"));
@@ -115,8 +114,7 @@ bool Base::install()
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     partman.makeFstab(populateMediaMounts);
     if (!partman.fixCryptoSetup()) {
-        failure = tr("Failed to finalize encryption setup.");
-        return false;
+        throw "Failed to finalize encryption setup.";
     }
     // Disable hibernation inside initramfs.
     if (partman.isEncrypt("SWAP")) {
@@ -160,14 +158,12 @@ bool Base::install()
         proc.shell("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
         proc.shell("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
     }
-
-    return true;
 }
 
-bool Base::copyLinux()
+void Base::copyLinux()
 {
     proc.log(__PRETTY_FUNCTION__);
-    if (proc.halted()) return false;
+    if (proc.halted()) return;
 
     // copy most except usr, mnt and home
     // must copy boot even if saving, the new files are required
@@ -189,8 +185,7 @@ bool Base::copyLinux()
     proc.advance(80, sourceInodes);
     proc.status(tr("Copying new system"));
     // Placed here so the progress bar moves to the right position before the next step.
-    if (proc.halted()) return false;
-    if (nocopy) return true; // Skip copying on purpose
+    if (nocopy) return; // Skip copying on purpose
 
     const QString &joined = MProcess::joinCommand(prog, args);
     qDebug().noquote() << "Exec COPY:" << joined;
@@ -219,10 +214,7 @@ bool Base::copyLinux()
     qDebug() << "Exit COPY:" << proc.exitCode() << proc.exitStatus();
     if (proc.exitStatus() != QProcess::NormalExit) {
         proc.log(logEntry, -1);
-        failure = tr("Failed to copy the new system.");
-        return false;
+        throw "Failed to copy the new system.";
     }
     proc.log(logEntry, proc.exitCode() ? 0 : 1);
-
-    return !proc.halted(); // Reduces domino effect if the copy is aborted.
 }

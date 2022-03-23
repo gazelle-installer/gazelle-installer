@@ -132,9 +132,6 @@ private:
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int space, long steps);
     bool saveHomeBasic();
-    bool installLinux();
-    bool copyLinux();
-    void failUI(const QString &msg);
     void manageConfig(enum ConfigAction mode);
     bool eventFilter(QObject *watched, QEvent *event);
 };

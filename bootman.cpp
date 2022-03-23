@@ -30,6 +30,7 @@ BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     const QSettings &appConf, const QCommandLineParser &appArgs)
     : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
+    loaderID = appConf.value("PROJECT_SHORTNAME").toString() + appConf.value("VERSION").toString();
     installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
     removeNoSplash = appConf.value("REMOVE_NOSPLASH").toBool();
     brave = appArgs.isSet("brave");
@@ -92,10 +93,10 @@ void BootMan::buildBootLists()
 }
 
 // build a grub configuration and install grub
-bool BootMan::install(const QString &loaderID)
+void BootMan::install()
 {
     proc.log(__PRETTY_FUNCTION__);
-    if (proc.halted()) return false;
+    if (proc.halted()) return;
     proc.advance(4, 4);
 
     // the old initrd is not valid for this hardware
@@ -127,7 +128,9 @@ bool BootMan::install(const QString &loaderID)
             //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
             //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
         //}
-        return proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
+        if (!proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"})) {
+            throw "Failed to update initramfs.";
+        }
     }
 
     proc.status(tr("Installing GRUB"));
@@ -160,8 +163,6 @@ bool BootMan::install(const QString &loaderID)
             "--bootloader-id=" + loaderID, "--recheck"});
     }
     if (!isOK) {
-        QMessageBox::critical(master, master->windowTitle(), tr("GRUB installation failed."
-            " You can reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
         proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
         proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
         proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
@@ -169,7 +170,8 @@ bool BootMan::install(const QString &loaderID)
         if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
             proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
         }
-        return false;
+        throw "GRUB installation failed. You can reboot to the live medium"
+            " and use the GRUB Rescue menu to repair the installation.";
     }
 
     //get /etc/default/grub codes
@@ -244,7 +246,6 @@ bool BootMan::install(const QString &loaderID)
     if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
         proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
     }
-    return true;
 }
 
 /* Slots */

@@ -135,12 +135,19 @@ int main(int argc, char *argv[])
 
     // main routine
     qDebug() << "Installer version:" << VERSION;
-    MInstall minstall(appConf, parser, cfgfile);
-    const QRect &geo = a.desktop()->availableGeometry(&minstall);
-    if (parser.isSet("oobe")) minstall.setGeometry(geo);
-    else minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
-    minstall.show();
-    return a.exec();
+    try {
+        MInstall minstall(appConf, parser, cfgfile);
+        const QRect &geo = a.desktop()->availableGeometry(&minstall);
+        if (parser.isSet("oobe")) minstall.setGeometry(geo);
+        else minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
+        minstall.show();
+        return a.exec();
+    } catch (const char *msg) {
+        qDebug() << "ERROR:" << msg;
+        QMessageBox::critical(nullptr, QString(), QObject::tr(msg));
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
 
 // The implementation of the handler
