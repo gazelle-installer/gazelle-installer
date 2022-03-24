@@ -509,7 +509,9 @@ void Oobe::setUserInfo()
         userinfo.append(QString("demo:" + userPass).toUtf8());
     }
     if (ok && !userinfo.isEmpty()) ok = proc.exec("chpasswd", {}, &userinfo);
-    if (!ok) throw "Failed to set user account passwords.";
+    if (!ok) {
+        throw QT_TR_NOOP("Failed to set user account passwords.");
+    }
     proc.setChRoot();
 
     QString rootpath;
@@ -526,10 +528,12 @@ void Oobe::setUserInfo()
                 cargs.last() = dpath + ".00" + QString::number(ixi);
                 ok = proc.exec("/bin/mv", cargs);
             }
-            if (!ok) throw "Failed to save old home directory.";
+            if (!ok) {
+                throw QT_TR_NOOP("Failed to save old home directory.");
+            }
         } else if (gui.radioOldHomeDelete->isChecked()) {
             if (!proc.exec("/bin/rm", {"-rf", dpath})) {
-                throw "Failed to delete old home directory.";
+                throw QT_TR_NOOP("Failed to delete old home directory.");
             }
         }
         proc.exec("/bin/sync"); // The sync(2) system call will block the GUI.
@@ -550,11 +554,11 @@ void Oobe::setUserInfo()
         // Copy skel to demo, unless demo folder exists in remastered linuxfs.
         if (!remasteredDemo) {
             if (!proc.exec("/bin/cp", {"-a", skelpath, dpath})) {
-                throw "Sorry, failed to create user directory.";
+                throw QT_TR_NOOP("Sorry, failed to create user directory.");
             }
         } else { // still rename the demo directory even if remastered demo home folder is detected
             if (!proc.exec("/bin/mv", {"-f", rootpath + "/home/demo", dpath})) {
-                throw "Sorry, failed to name user directory.";
+                throw QT_TR_NOOP("Sorry, failed to name user directory.");
             }
         }
     }
@@ -589,7 +593,7 @@ void Oobe::setUserInfo()
 
     // fix the ownership, demo=newuser
     if (!proc.exec("chown", {"-R", "demo:demo", dpath})) {
-        throw "Sorry, failed to set ownership of user directory.";
+        throw QT_TR_NOOP("Sorry, failed to set ownership of user directory.");
     }
 
     // change in files

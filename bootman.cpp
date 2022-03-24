@@ -129,7 +129,7 @@ void BootMan::install()
             //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
         //}
         if (!proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"})) {
-            throw "Failed to update initramfs.";
+            throw QT_TR_NOOP("Failed to update initramfs.");
         }
     }
 
@@ -170,8 +170,8 @@ void BootMan::install()
         if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
             proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
         }
-        throw "GRUB installation failed. You can reboot to the live medium"
-            " and use the GRUB Rescue menu to repair the installation.";
+        throw QT_TR_NOOP("GRUB installation failed. You can reboot to the live"
+            " medium and use the GRUB Rescue menu to repair the installation.");
     }
 
     //get /etc/default/grub codes
