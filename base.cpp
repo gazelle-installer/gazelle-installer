@@ -86,7 +86,7 @@ void Base::install()
         proc.shell("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;");
 
         if (proc.exitStatus() != QProcess::NormalExit) {
-            throw "Failed to delete old system on destination.";
+            throw QT_TR_NOOP("Failed to delete old system on destination.");
         }
     }
 
@@ -114,7 +114,7 @@ void Base::install()
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     partman.makeFstab(populateMediaMounts);
     if (!partman.fixCryptoSetup()) {
-        throw "Failed to finalize encryption setup.";
+        throw QT_TR_NOOP("Failed to finalize encryption setup.");
     }
     // Disable hibernation inside initramfs.
     if (partman.isEncrypt("SWAP")) {
@@ -214,7 +214,7 @@ void Base::copyLinux()
     qDebug() << "Exit COPY:" << proc.exitCode() << proc.exitStatus();
     if (proc.exitStatus() != QProcess::NormalExit) {
         proc.log(logEntry, -1);
-        throw "Failed to copy the new system.";
+        throw QT_TR_NOOP("Failed to copy the new system.");
     }
     proc.log(logEntry, proc.exitCode() ? 0 : 1);
 }
