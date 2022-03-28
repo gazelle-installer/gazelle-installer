@@ -162,8 +162,7 @@ class PartMan : public QAbstractItemModel
     bool brave, gptoverride;
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit();
-    bool formatLinuxPartition(const QString &devpath, const QString &format, bool chkBadBlocks, const QString &label);
-    bool prepareSubvolumes(DeviceItem *partit);
+    void prepareSubvolumes(DeviceItem *partit);
     void treeItemChange();
     void treeSelChange();
     void treeMenu(const QPoint &);
@@ -176,8 +175,8 @@ class PartMan : public QAbstractItemModel
     void partMenuUnlock(DeviceItem *twit);
     void partMenuLock(DeviceItem *twit);
     void scanSubvolumes(DeviceItem *partit);
-    bool luksFormat(DeviceItem *partit, const QByteArray &password);
-    bool luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password);
+    void luksFormat(DeviceItem *partit, const QByteArray &password);
+    void luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password);
 public:
     enum TreeColumns {
         Device,
@@ -204,12 +203,12 @@ public:
     DeviceItem *selectedDriveAuto();
     void clearAllUses();
     int countPrepSteps();
-    bool preparePartitions();
-    bool formatPartitions();
+    void preparePartitions();
+    void formatPartitions();
     void loadKeyMaterial(const QString &keyfile);
     bool fixCryptoSetup();
     bool makeFstab(bool populateMediaMounts);
-    bool mountPartitions();
+    void mountPartitions();
     void unmount();
     bool willFormat(const QString &point);
     QString getMountDev(const QString &point, const bool mapped=true);
