@@ -966,7 +966,7 @@ void PartMan::preparePartitions()
             // Using the existing layout, so only mark used partitions for unmounting.
             for (int ixPart=0; ixPart < partCount; ++ixPart) {
                 DeviceItem *twit = drvit->child(ixPart);
-                if (!twit->usefor.isEmpty()) listToUnmount << twit->device;
+                if (!twit->usefor.isEmpty()) listToUnmount << twit->path;
             }
         } else {
             // Clearing the drive, so mark all partitions on the drive for unmounting.
