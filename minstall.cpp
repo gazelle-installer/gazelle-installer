@@ -514,12 +514,16 @@ bool MInstall::saveHomeBasic()
         homedir = "/home";
     }
 
+    // Just in case the device or mount point is in use elsewhere.
+    proc.exec("/usr/bin/umount", {"-q", homedev});
+    proc.exec("/usr/bin/umount", {"-q", "/mnt/antiX"});
+
+    // Store a listing of /home to compare with the user name given later.
     mkdir("/mnt/antiX", 0755);
     bool ok = proc.exec("/bin/mount", {"-o", "ro", homedev, "/mnt/antiX"});
-    // Store a listing of /home to compare with the user name given later.
     if (ok) ok = proc.exec("/bin/ls", {"-1", "/mnt/antiX" + homedir}, nullptr, true);
     if (ok) listHomes = proc.readOutLines();
-    proc.exec("/bin/umount", {"-l", "/mnt/antiX"});
+    proc.exec("/usr/bin/umount", {"-l", "/mnt/antiX"});
     return ok;
 }
 
@@ -1131,18 +1135,18 @@ void MInstall::cleanup(bool endclean)
     proc.log(__PRETTY_FUNCTION__);
     if (pretend) return;
 
-    proc.unhalt();
     if (endclean) {
+        proc.unhalt();
         setupAutoMount(true);
-        proc.exec("/bin/cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
-        proc.exec("/bin/rm", {"-rf", "/mnt/antiX/mnt/antiX"});
+        proc.exec("/usr/bin/cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
+        proc.exec("/usr/bin/rm", {"-rf", "/mnt/antiX/mnt/antiX"});
     }
-    proc.exec("/bin/umount", {"-l", "/mnt/antiX/boot/efi"});
-    proc.exec("/bin/umount", {"-l", "/mnt/antiX/proc"});
-    proc.exec("/bin/umount", {"-l", "/mnt/antiX/sys"});
-    proc.exec("/bin/umount", {"-l", "/mnt/antiX/dev/shm"});
-    proc.exec("/bin/umount", {"-l", "/mnt/antiX/dev"});
-    if (!mountkeep) partman->unmount();
+    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/boot/efi"});
+    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/proc"});
+    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/sys"});
+    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev/shm"});
+    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev"});
+    if (endclean && !mountkeep) partman->unmount();
 }
 
 void MInstall::on_progInstall_valueChanged(int value)

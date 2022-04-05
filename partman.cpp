@@ -974,9 +974,11 @@ void PartMan::preparePartitions()
             listToUnmount << proc.readOutLines();
         }
     }
+    proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
+    const QStringList swaps = proc.readOutLines();
     for (const QString &devpath : listToUnmount) {
-        proc.exec("swapoff", {devpath});
-        proc.exec("/bin/umount", {devpath});
+        if (swaps.contains(devpath)) proc.exec("swapoff", {devpath});
+        else proc.exec("/usr/bin/umount", {"-q", devpath});
     }
 
     // Prepare partition tables on devices which will have a new layout.
