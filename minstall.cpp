@@ -246,7 +246,7 @@ void MInstall::startup()
         // test if there's another user other than demo in /home,
         // indicating a possible snapshot or complicated live-usb
         haveSnapshotUserAccounts = proc.exec("/bin/ls -1 /home"
-            " | grep -Ev '(lost\\+found|demo|snapshot)' | grep -q [a-zA-Z0-9]", false);
+            " | grep -Ev '^(lost\\+found|demo|snapshot)$' | grep -q '[a-zA-Z0-9]'", false);
         qDebug() << "check for possible snapshot:" << haveSnapshotUserAccounts;
     }
 
