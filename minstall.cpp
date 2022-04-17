@@ -530,9 +530,11 @@ bool MInstall::saveHomeBasic()
 // logic displaying pages
 int MInstall::showPage(int curr, int next)
 {
-    if (next == Step::Splash) splashSetThrobber(true); // Enter
-    else if (curr == Step::Splash) splashSetThrobber(false); // Leave
-    else if (curr == Step::Disk && next > curr) {
+    if (next == Step::Splash) { // Enter splash screen
+        splashSetThrobber(appConf.value("SPLASH_THROBBER", true).toBool());
+    } else if (curr == Step::Splash) { // Leave splash screen
+        splashSetThrobber(false);
+    } else if (curr == Step::Disk && next > curr) {
         if (radioEntireDisk->isChecked()) {
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
