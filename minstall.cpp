@@ -173,7 +173,7 @@ void MInstall::startup()
 
     if (proc.detectMac()) checkLocalClock->setChecked(true);
 
-    oobe = new Oobe(proc, *this, this, appConf);
+    oobe = new Oobe(proc, *this, this, appConf, oem, modeOOBE);
 
     if (modeOOBE) manageConfig(ConfigLoadB);
     else {
