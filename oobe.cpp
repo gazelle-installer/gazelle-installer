@@ -27,8 +27,8 @@
 #include <QTimeZone>
 #include "oobe.h"
 
-Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf)
-    : QObject(parent), proc(mproc), gui(ui), master(parent)
+Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf, bool oem, bool modeOOBE)
+    : QObject(parent), proc(mproc), gui(ui), master(parent), oem(oem), online(modeOOBE)
 {
     gui.textComputerName->setText(appConf.value("DEFAULT_HOSTNAME").toString());
     enableServices = appConf.value("ENABLE_SERVICES").toStringList();
@@ -211,7 +211,7 @@ void Oobe::process()
 
     setComputerName();
     setLocale();
-    if (haveSnapshotUserAccounts) { // skip user account creation
+    if (haveSnapshotUserAccounts || oem) { // skip user account creation
         proc.exec("rsync", {"-a", "/home/", "/mnt/antiX/home/",
             "--exclude", ".cache", "--exclude", ".gvfs", "--exclude", ".dbus", "--exclude", ".Xauthority",
             "--exclude", ".ICEauthority", "--exclude", ".config/session"});
@@ -431,7 +431,7 @@ void Oobe::setLocale()
         //mx fluxbox
         proc.shell("sed -i '/time1_format/c\\time1_format=%l:%M' " + skelpath + "/.config/tint2/tint2rc");
         proc.shell("sed -i '/time1_format/c\\time1_format=%l:%M' /home/demo/.config/tint2/tint2rc");
-       
+
         //antix systems
         proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.icewm/preferences");
         proc.shell("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.fluxbox/init");
@@ -446,7 +446,7 @@ void Oobe::setLocale()
         //mx kde
         proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc");
         proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc");
-        
+
         //mx fluxbox
         proc.shell("sed -i '/time1_format/c\\time1_format=%H:%M' " + skelpath + "/.config/tint2/tint2rc");
         proc.shell("sed -i '/time1_format/c\\time1_format=%H:%M' /home/demo/.config/tint2/tint2rc");

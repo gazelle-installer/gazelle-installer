@@ -38,6 +38,7 @@ class Oobe : public QObject
     bool containsSystemD = false;
     bool containsRunit = false;
     bool haveSamba = false;
+    bool oem = false;
     QStringList timeZones; // cached time zone list
     QStringList enableServices;
     void buildServiceList();
@@ -50,7 +51,7 @@ class Oobe : public QObject
 public:
     bool online = false;
     bool haveSnapshotUserAccounts = false;
-    Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf);
+    Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf, bool oem, bool modeOOBE);
     void manageConfig(MSettings &config, bool save);
     void enable();
     void process();
