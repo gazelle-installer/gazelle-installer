@@ -212,12 +212,6 @@ void Oobe::process()
         proc.setChRoot();
         setComputerName();
         setLocale();
-    } else {
-        if (!online) {
-            proc.setChRoot("/mnt/antiX");
-            proc.shell("sed -i 's/splash\b/nosplash/g' /boot/grub/grub.cfg");
-            proc.setChRoot();
-        }
     }
     if (haveSnapshotUserAccounts || oem) { // skip user account creation
         proc.exec("rsync", {"-a", "/home/", "/mnt/antiX/home/",
@@ -227,7 +221,7 @@ void Oobe::process()
         setUserInfo();
     }
     if (online) {
-        proc.shell("sed -i 's/nosplash\b/splash/g' /boot/grub/grub.cfg");
+        proc.shell("sed -i 's/nosplash\\b/splash/g' /boot/grub/grub.cfg");
         proc.exec("update-rc.d", {"oobe", "disable"});
     }
 }
