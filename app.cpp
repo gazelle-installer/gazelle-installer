@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
         {"oobe", QObject::tr("Out Of the Box Experience option.\n"
             "This will start automatically if installed with --oem option.")},
         {{"p", "pretend"}, QObject::tr("Test mode for GUI, you can advance to different screens without actially installing.")},
+        {{"r", "reboot"}, QObject::tr("Reboot automatically when done installing.")},
         {{"s", "sync"}, QObject::tr("Installing with rsync instead of cp on custom partitioning.\n"
             "-- doesn't format /root and it doesn't work with encryption.")}});
     parser.addPositionalArgument("config-file", QObject::tr("Load a configuration file as specified by <config-file>."), "<config-file>");
