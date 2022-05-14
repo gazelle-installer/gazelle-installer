@@ -288,7 +288,7 @@ void Oobe::setService(const QString &service, bool enabled)
 {
     qDebug() << "Set service:" << service << enabled;
     if (enabled) {
-        proc.exec("update-rc.d", {service, " defaults"});
+        proc.exec("update-rc.d", {service, "defaults"});
         if (containsSystemD) proc.exec("systemctl", {"enable", service});
         if (containsRunit) {
             QFile::remove(proc.chRoot + "/etc/sv/" + service + "/down");
