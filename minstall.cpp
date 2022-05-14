@@ -405,6 +405,7 @@ bool MInstall::processNextPhase()
                 config->dumpDebug();
                 proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
                 bootman->install();
+                if (oem) proc.shell("sed -i 's/splash\\b/nosplash/g' /mnt/antiX/boot/grub/grub.cfg");
             } else if (!pretendToInstall(5, 100)) {
                 return false;
             }
