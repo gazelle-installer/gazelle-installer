@@ -196,21 +196,23 @@ void Oobe::enable()
 
 void Oobe::process()
 {
-    if (!online) proc.setChRoot("/mnt/antiX");
-    QTreeWidgetItemIterator it(gui.treeServices);
-    for (; *it; ++it) {
-        if ((*it)->parent()) setService((*it)->text(0), (*it)->checkState(0) == Qt::Checked);
-    }
-    if (haveSamba) {
-        const bool enable = gui.checkSamba->isChecked();
-        setService("smbd", enable);
-        setService("nmbd", enable);
-        setService("samba-ad-dc", enable);
-    }
-    proc.setChRoot();
+    if (!oem) {
+        if (!online) proc.setChRoot("/mnt/antiX");
 
-    setComputerName();
-    setLocale();
+        QTreeWidgetItemIterator it(gui.treeServices);
+        for (; *it; ++it) {
+            if ((*it)->parent()) setService((*it)->text(0), (*it)->checkState(0) == Qt::Checked);
+        }
+        if (haveSamba) {
+            const bool enable = gui.checkSamba->isChecked();
+            setService("smbd", enable);
+            setService("nmbd", enable);
+            setService("samba-ad-dc", enable);
+        }
+        proc.setChRoot();
+        setComputerName();
+        setLocale();
+    }
     if (haveSnapshotUserAccounts || oem) { // skip user account creation
         proc.exec("rsync", {"-a", "/home/", "/mnt/antiX/home/",
             "--exclude", ".cache", "--exclude", ".gvfs", "--exclude", ".dbus", "--exclude", ".Xauthority",
