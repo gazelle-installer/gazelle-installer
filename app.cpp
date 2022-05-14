@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
             "The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.\n"
             "The installer will not write any passwords or ignored settings to the new configuration file.\n"
             "Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.")},
-        {{"d", "shutdown"}, QObject::tr("Shutdown automatically when done installing.")},
+        {{"f", "poweroff"}, QObject::tr("Shutdowns automatically when done installing.")},
         {"gpt-override", QObject::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"
             "Without this option, GPT will only be used on drives with at least 2TB capacity.\n"
             "GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.")},
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
         {"oobe", QObject::tr("Out Of the Box Experience option.\n"
             "This will start automatically if installed with --oem option.")},
         {{"p", "pretend"}, QObject::tr("Test mode for GUI, you can advance to different screens without actially installing.")},
-        {{"r", "reboot"}, QObject::tr("Reboot automatically when done installing.")},
+        {{"r", "reboot"}, QObject::tr("Reboots automatically when done installing.")},
         {{"s", "sync"}, QObject::tr("Installing with rsync instead of cp on custom partitioning.\n"
             "-- doesn't format /root and it doesn't work with encryption.")}});
     parser.addPositionalArgument("config-file", QObject::tr("Load a configuration file as specified by <config-file>."), "<config-file>");

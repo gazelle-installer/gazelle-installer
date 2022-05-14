@@ -417,8 +417,8 @@ bool MInstall::processNextPhase()
             if (!pretend && appArgs.isSet("reboot")) {
                 proc.shell("/usr/local/bin/persist-config --shutdown --command reboot &");
             }
-            if (!pretend && appArgs.isSet("shutdown")) {
-                proc.shell("/usr/local/bin/persist-config --shutdown --command shutdown &");
+            if (!pretend && appArgs.isSet("poweroff")) {
+                proc.shell("/usr/local/bin/persist-config --shutdown --command poweroff &");
             }
             gotoPage(Step::End);
         }
