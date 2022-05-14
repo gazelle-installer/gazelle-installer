@@ -213,7 +213,11 @@ void Oobe::process()
         setComputerName();
         setLocale();
     } else {
-        proc.shell("sed -i 's/splash\b/nosplash/g' /boot/grub/grub.cfg");
+        if (!online) {
+            proc.setChRoot("/mnt/antiX");
+            proc.shell("sed -i 's/splash\b/nosplash/g' /boot/grub/grub.cfg");
+            proc.setChRoot();
+        }
     }
     if (haveSnapshotUserAccounts || oem) { // skip user account creation
         proc.exec("rsync", {"-a", "/home/", "/mnt/antiX/home/",
