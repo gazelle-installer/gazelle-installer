@@ -676,7 +676,7 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
     proc.exec("btrfs", {"subvolume", "list", "/mnt/btrfs-scratch"}, nullptr, true);
     lines = proc.readOutLines();
     proc.exec("umount", {"/mnt/btrfs-scratch"});
-    for (const QString &line : lines) {
+    for (const QString &line : qAsConst(lines)) {
         const int start = line.indexOf("path") + 5;
         if (line.length() <= start) goto END;
         DeviceItem *svit = new DeviceItem(DeviceItem::Subvolume, partit);
@@ -976,7 +976,7 @@ void PartMan::preparePartitions()
     }
     proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
     const QStringList swaps = proc.readOutLines();
-    for (const QString &devpath : listToUnmount) {
+    for (const QString &devpath : qAsConst(listToUnmount)) {
         if (swaps.contains(devpath)) proc.exec("swapoff", {devpath});
         else proc.exec("/usr/bin/umount", {"-q", devpath});
     }
@@ -1149,7 +1149,7 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
         throw msgfail;
     }
     bool ok = true;
-    for (const QString &subvol : svlist) {
+    for (const QString &subvol : qAsConst(svlist)) {
         proc.exec("btrfs", {"subvolume", "delete", "/mnt/btrfs-scratch/" + subvol});
         ok = proc.exec("btrfs", {"subvolume", "create", "/mnt/btrfs-scratch/" + subvol});
         if (!ok) break;
@@ -1390,7 +1390,7 @@ int PartMan::isEncrypt(const QString &point)
 {
     int count = 0;
     if (point.isEmpty()) {
-        for (DeviceItem *twit : mounts) {
+        for (DeviceItem *twit : qAsConst(mounts)) {
             if (twit->willEncrypt()) ++count;
         }
     } else if (point == "SWAP") {
@@ -1713,7 +1713,7 @@ DeviceItem::~DeviceItem()
         const int r = parentItem->indexOfChild(this);
         partman->beginRemoveRows(partman->index(parentItem), r, r);
     }
-    for (DeviceItem *cit : children) {
+    for (DeviceItem *cit : qAsConst(children)) {
         cit->partman = nullptr; // Stop unnecessary signals.
         cit->parentItem = nullptr; // Stop double deletes.
         delete cit;
@@ -1732,7 +1732,7 @@ void DeviceItem::clear()
 {
     const int chcount = children.count();
     if (partman && chcount > 0) partman->beginRemoveRows(partman->index(this), 0, chcount - 1);
-    for (DeviceItem *cit : children) {
+    for (DeviceItem *cit : qAsConst(children)) {
         cit->partman = nullptr; // Stop unnecessary signals.
         cit->parentItem = nullptr; // Stop double deletes.
         delete cit;
@@ -1772,7 +1772,7 @@ void DeviceItem::sortChildren()
     };
     std::sort(children.begin(), children.end(), cmp);
     if (partman) {
-        for (DeviceItem *c : children) partman->notifyChange(c);
+        for (DeviceItem *c : qAsConst(children)) partman->notifyChange(c);
     }
 }
 /* Helpers */
