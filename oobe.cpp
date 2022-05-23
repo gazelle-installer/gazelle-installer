@@ -51,7 +51,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings 
             "-mindepth", "2", "-type", "f", "-printf", "%P\\n"}, nullptr, true);
     timeZones = proc.readOutLines();
     gui.comboTimeArea->clear();
-    for (const QString &zone : timeZones) {
+    for (const QString &zone : qAsConst(timeZones)) {
         const QString &area = zone.section('/', 0, 0);
         if (gui.comboTimeArea->findData(QVariant(area)) < 0) {
             QString text(area);
@@ -237,7 +237,7 @@ void Oobe::buildServiceList()
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
     services_desc.setIniCodec("UTF-8");
 
-    for (const QString &service : enableServices) {
+    for (const QString &service : qAsConst(enableServices)) {
         const QString &lang = QLocale::system().bcp47Name().toLower();
         QString lang_str = (lang == "en")? "" : "_" + lang;
         QStringList list = services_desc.value(service + lang_str).toStringList();
@@ -652,7 +652,7 @@ void Oobe::timeAreaIndexChanged(int index)
     if (index < 0 || index >= gui.comboTimeArea->count()) return;
     const QString &area = gui.comboTimeArea->itemData(index).toString();
     gui.comboTimeZone->clear();
-    for (const QString &zone : timeZones) {
+    for (const QString &zone : qAsConst(timeZones)) {
         if (zone.startsWith(area)) {
             QString text(QString(zone).section('/', 1));
             text.replace('_', ' ');

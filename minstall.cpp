@@ -289,7 +289,7 @@ void MInstall::setupAutoMount(bool enabled)
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
         proc.mkpath("/run/udev/rules.d");
-        for (const QString &rule : udev_temp_mdadm_rules) {
+        for (const QString &rule : qAsConst(udev_temp_mdadm_rules)) {
             proc.exec("touch", {rule});
         }
 
@@ -307,7 +307,7 @@ void MInstall::setupAutoMount(bool enabled)
             proc.sleep(1000);
         }
         // clear the rules that were temporarily overridden
-        for (const QString &rule : udev_temp_mdadm_rules) {
+        for (const QString &rule : qAsConst(udev_temp_mdadm_rules)) {
             proc.shell("rm -f " + rule); // TODO: check if each rule is a single file name.
         }
 

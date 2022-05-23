@@ -72,7 +72,7 @@ SOURCES += app.cpp minstall.cpp \
     safecache.cpp \
     mprocess.cpp
 LIBS +=
-CONFIG += release warn_on thread qt c++11
+CONFIG += release warn_on thread qt c++17
 
 RESOURCES += \
     images.qrc
