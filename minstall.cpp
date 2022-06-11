@@ -459,12 +459,15 @@ void MInstall::manageConfig(enum ConfigAction mode)
         if (targetDrive || mode!=ConfigSave) {
             config->manageComboBox("Drive", comboDisk, true);
             config->manageGroupCheckBox("DriveEncrypt", boxEncryptAuto);
-            if (mode==ConfigSave) config->setValue("RootPortion", sliderPart->value());
-            else if (config->contains("RootPortion")) {
+            if (mode == ConfigSave) {
+                config->setValue("RootPortion", sliderPart->value());
+            } else if (config->contains("RootPortion")) {
                  const int sliderVal = config->value("RootPortion").toInt();
                  sliderPart->setValue(sliderVal);
                  on_sliderPart_valueChanged(sliderVal);
-                 if (sliderPart->value() != sliderVal) config->markBadWidget(sliderPart);
+                 if (sliderPart->value() != sliderVal) {
+                     config->markBadWidget(sliderPart);
+                 }
             }
         }
         config->endGroup();
@@ -528,9 +531,11 @@ bool MInstall::saveHomeBasic()
     // Store a listing of /home to compare with the user name given later.
     mkdir("/mnt/antiX", 0755);
     bool ok = proc.exec("/bin/mount", {"-o", "ro", homedev, "/mnt/antiX"});
-    if (ok) ok = proc.exec("/bin/ls", {"-1", "/mnt/antiX" + homedir}, nullptr, true);
-    if (ok) listHomes = proc.readOutLines();
-    proc.exec("/usr/bin/umount", {"-l", "/mnt/antiX"});
+    if (ok) {
+        ok = proc.exec("/bin/ls", {"-1", "/mnt/antiX" + homedir}, nullptr, true);
+        if (ok) listHomes = proc.readOutLines();
+        proc.exec("/usr/bin/umount", {"-l", "/mnt/antiX"});
+    }
     return ok;
 }
 
@@ -949,9 +954,11 @@ void MInstall::gotoPage(int next)
 
     // automatic installation
     if (automatic) {
-        if (!MSettings::isBadWidget(widgetStack->currentWidget())
-            && next > curr) pushNext->click();
-        else if (curr!=0) automatic = false; // failed validation
+        if (!MSettings::isBadWidget(widgetStack->currentWidget()) && next > curr) {
+            pushNext->click();
+        } else if (curr!=0) { // failed validation
+            automatic = false;
+        }
     }
 
     // process next installation phase
@@ -1043,9 +1050,7 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event)
 void MInstall::changeEvent(QEvent *event)
 {
     const QEvent::Type etype = event->type();
-    if (etype == QEvent::ApplicationPaletteChange
-        || etype == QEvent::PaletteChange || etype == QEvent::StyleChange)
-    {
+    if (etype == QEvent::ApplicationPaletteChange || etype == QEvent::PaletteChange || etype == QEvent::StyleChange) {
         QPalette pal = qApp->palette(textHelp);
         QColor col = pal.color(QPalette::Base);
         col.setAlpha(200);
@@ -1160,15 +1165,17 @@ void MInstall::cleanup(bool endclean)
 
 void MInstall::on_progInstall_valueChanged(int value)
 {
-    if (ixTipStart < 0 || widgetStack->currentWidget() != pageProgress)
+    if (ixTipStart < 0 || widgetStack->currentWidget() != pageProgress) {
         return; // no point displaying a new hint if it will be invisible
+    }
 
     const int tipcount = 6;
     ixTip = tipcount;
     if (ixTipStart < tipcount) {
         int imax = (progInstall->maximum() - iLastProgress) / (tipcount - ixTipStart);
-        if (imax != 0)
+        if (imax != 0) {
             ixTip = ixTipStart + (value - iLastProgress) / imax;
+        }
     }
 
     switch(ixTip)
@@ -1224,22 +1231,21 @@ void MInstall::on_pushClose_clicked()
 void MInstall::setupkeyboardbutton()
 {
     QFile file("/etc/default/keyboard");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        while (!file.atEnd()) {
-            QString line(file.readLine().trimmed());
-            QLabel *plabel = nullptr;
-            if (line.startsWith("XKBMODEL")) plabel = labelKeyboardModel;
-            else if (line.startsWith("XKBLAYOUT")) plabel = labelKeyboardLayout;
-            else if (line.startsWith("XKBVARIANT")) plabel = labelKeyboardVariant;
-            if (plabel != nullptr) {
-                line = line.section('=', 1);
-                line.replace(",", " ");
-                line.remove(QChar('"'));
-                plabel->setText(line);
-            }
+    if (!file.open(QFile::ReadOnly | QFile::Text)) return;
+    while (!file.atEnd()) {
+        QString line(file.readLine().trimmed());
+        QLabel *plabel = nullptr;
+        if (line.startsWith("XKBMODEL")) plabel = labelKeyboardModel;
+        else if (line.startsWith("XKBLAYOUT")) plabel = labelKeyboardLayout;
+        else if (line.startsWith("XKBVARIANT")) plabel = labelKeyboardVariant;
+        if (plabel != nullptr) {
+            line = line.section('=', 1);
+            line.replace(",", " ");
+            line.remove(QChar('"'));
+            plabel->setText(line);
         }
-        file.close();
     }
+    file.close();
 }
 
 void MInstall::on_pushSetKeyboard_clicked()
@@ -1267,7 +1273,9 @@ void MInstall::on_sliderPart_sliderPressed()
     else if (val<1) tipText = tipText.arg(">0", "<100");
     else tipText = tipText.arg(val).arg(100-val);
     sliderPart->setToolTip(tipText);
-    if (sliderPart->isSliderDown()) QToolTip::showText(QCursor::pos(), tipText, sliderPart);
+    if (sliderPart->isSliderDown()) {
+        QToolTip::showText(QCursor::pos(), tipText, sliderPart);
+    }
 }
 void MInstall::on_sliderPart_valueChanged(int value)
 {

@@ -117,8 +117,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (logFile.open(QFile::Append | QFile::Text)) qInstallMessageHandler(messageHandler);
-    else qDebug() << "Cannot write to installer log:" << logFile.fileName();
+    if (logFile.open(QFile::Append | QFile::Text)) {
+        qInstallMessageHandler(messageHandler);
+    } else {
+        qDebug() << "Cannot write to installer log:" << logFile.fileName();
+    }
 
     QString cfgfile;
     if (parser.isSet("config") || parser.positionalArguments().size() == 1) {
