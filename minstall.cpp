@@ -495,7 +495,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
         // GRUB page
-        if (!modeOOBE) bootman->manageConfig(*config);
+        if (!modeOOBE && radioCustomPart->isChecked()) bootman->manageConfig(*config);
         // Manage the rest of the OOBE pages.
         oobe->manageConfig(*config, mode==ConfigSave);
     }
@@ -569,7 +569,8 @@ int MInstall::showPage(int curr, int next)
                 nextFocus = treePartitions;
                 return curr;
             }
-            return Step::Boot;
+            bootman->buildBootLists(); // Load default boot options
+            return Step::Network;
         }
     } else if (curr == Step::Partitions && next > curr) {
         if (!partman->composeValidate(automatic, PROJECTNAME)) {
@@ -627,6 +628,7 @@ int MInstall::showPage(int curr, int next)
 
 void MInstall::pageDisplayed(int next)
 {
+    bool enableBack = true, enableNext = true;
     if (!modeOOBE) {
         const int ixProgress = widgetStack->indexOf(pageProgress);
         // progress bar shown only for install and configuration pages.
@@ -682,10 +684,9 @@ void MInstall::pageDisplayed(int next)
             proc.unhalt();
             updateCursor();
         }
-        pushBack->setEnabled(true);
-        pushNext->setEnabled(radioCustomPart->isChecked()
-            || !boxEncryptAuto->isChecked() || textCryptoPass->isValid());
-        return; // avoid the end that enables both Back and Next buttons
+        enableNext = radioCustomPart->isChecked()
+            || !boxEncryptAuto->isChecked() || textCryptoPass->isValid();
+        break;
 
     case Step::Partitions:
         textHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
@@ -769,9 +770,8 @@ void MInstall::pageDisplayed(int next)
             "<p><b>" + tr("Virtual Devices") + "</b><br/>"
             + tr("If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
             "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
-        pushBack->setEnabled(true);
-        pushNext->setEnabled(!(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || textCryptoPassCust->isValid());
-        return; // avoid the end that enables both Back and Next buttons
+        enableNext = !(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || textCryptoPassCust->isValid();
+        break;
 
     case Step::Boot: // Start of installation.
         textHelp->setText(tr("<p><b>Select Boot Method</b><br/> %1 uses the GRUB bootloader to boot %1 and MS-Windows. "
@@ -779,13 +779,12 @@ void MInstall::pageDisplayed(int next)
                              "<p>If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.</p>"
                              "<p>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</p>").arg(PROJECTNAME));
 
-        pushBack->setEnabled(false);
-        pushNext->setEnabled(true);
+        enableBack = false;
         if (phase <= 0) {
             bootman->buildBootLists();
             manageConfig(ConfigLoadB);
         }
-        return; // avoid the end that enables both Back and Next buttons
+        break;
 
     case Step::Services:
         textHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
@@ -797,11 +796,8 @@ void MInstall::pageDisplayed(int next)
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
-        if (modeOOBE) {
-            pushBack->setEnabled(false);
-            pushNext->setEnabled(true);
-            return; // avoid the end that enables both Back and Next buttons
-        }
+        if (modeOOBE) enableBack = false;
+        else enableBack = radioCustomPart->isChecked();
         break;
 
     case Step::Localization:
@@ -833,9 +829,9 @@ void MInstall::pageDisplayed(int next)
         + tr("Obviously, this should only be done in situations where the user account"
             " does not need to be secure, such as a public terminal.") + "</p>");
         if (!nextFocus) nextFocus = textUserName;
-        pushBack->setEnabled(true);
         oobe->userPassValidationChanged();
-        return; // avoid the end that enables both Back and Next buttons
+        enableNext = false;
+        break;
 
     case Step::OldHome:
         textHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
@@ -857,8 +853,8 @@ void MInstall::pageDisplayed(int next)
         oobe->oldHomeToggled();
         // if the Next button is disabled, avoid enabling both Back and Next at the end
         if (pushNext->isEnabled() == false) {
-            pushBack->setEnabled(true);
-            return;
+            enableBack = true;
+            enableNext = false;
         }
         break;
 
@@ -877,9 +873,8 @@ void MInstall::pageDisplayed(int next)
             + "</p><p>"
             + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
             + "</p>");
-        pushBack->setEnabled(true);
-        pushNext->setEnabled(false);
-        return; // avoid enabling both Back and Next buttons at the end
+        enableNext = false;
+        break;
 
     case Step::End:
         pushClose->setEnabled(false);
@@ -901,8 +896,8 @@ void MInstall::pageDisplayed(int next)
         break;
     }
 
-    pushBack->setEnabled(true);
-    pushNext->setEnabled(true);
+    pushBack->setEnabled(enableBack);
+    pushNext->setEnabled(enableNext);
 }
 
 void MInstall::gotoPage(int next)
@@ -962,7 +957,8 @@ void MInstall::gotoPage(int next)
     }
 
     // process next installation phase
-    if (next == widgetStack->indexOf(pageBoot) || next == widgetStack->indexOf(pageProgress)) {
+    if (next == Step::Boot || next == Step::Progress
+        || (radioEntireDisk->isChecked() && next == Step::Network)) {
         if (modeOOBE) {
             updateCursor(Qt::BusyCursor);
             labelSplash->setText(tr("Configuring sytem. Please wait."));
