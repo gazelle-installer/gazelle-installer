@@ -387,15 +387,13 @@ int Oobe::selectTimeZone(const QString &zone)
 void Oobe::setLocale()
 {
     proc.log(__PRETTY_FUNCTION__);
-    QString cmd2;
-    QString cmd;
 
     //locale
+    qDebug() << "Update locale";
+    QString cmd;
     if (!online) cmd = "chroot /mnt/antiX ";
     cmd += QString("/usr/sbin/update-locale \"LANG=%1\"").arg(gui.comboLocale->currentData().toString());
-    qDebug() << "Update locale";
     proc.shell(cmd);
-    cmd = QString("Language=%1").arg(gui.comboLocale->currentData().toString());
     const QString &selTimeZone = gui.comboTimeZone->currentData().toString();
 
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
@@ -416,8 +414,8 @@ void Oobe::setLocale()
     }
     proc.exec("hwclock", {"--hctosys"});
     if (!online) {
-        proc.exec("/bin/cp", {"-f /etc/adjtime", "/mnt/antiX/etc/"});
-        proc.exec("/bin/cp", {"-f /etc/default/rcS", "/mnt/antiX/etc/default"});
+        proc.exec("/bin/cp", {"-f", "/etc/adjtime", "/mnt/antiX/etc/"});
+        proc.exec("/bin/cp", {"-f", "/etc/default/rcS", "/mnt/antiX/etc/default"});
     }
 
     // Set clock format
