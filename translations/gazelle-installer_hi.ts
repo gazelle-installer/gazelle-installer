@@ -1,42 +1,40 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="hi">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="hi">
 <context>
     <name>Base</name>
     <message>
         <location filename="../base.cpp" line="85"/>
         <source>Deleting old system</source>
-        <translation type="unfinished">पुराना सिस्टम हटाना जारी</translation>
+        <translation>पुराना सिस्टम हटाना जारी</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="89"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../base.cpp" line="95"/>
         <source>Creating system directories</source>
-        <translation type="unfinished">सिस्टम डायरेक्टरी सृजन जारी</translation>
+        <translation>सिस्टम डायरेक्टरी सृजन जारी</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="105"/>
         <source>Fixing configuration</source>
-        <translation type="unfinished">विन्यास सुधार जारी</translation>
+        <translation>विन्यास सुधार जारी</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="117"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../base.cpp" line="186"/>
         <source>Copying new system</source>
-        <translation type="unfinished">नवीन सिस्टम कॉपी करना जारी</translation>
+        <translation>नवीन सिस्टम कॉपी करना जारी</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="217"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -45,33 +43,33 @@
         <location filename="../bootman.cpp" line="124"/>
         <location filename="../bootman.cpp" line="233"/>
         <source>Updating initramfs</source>
-        <translation type="unfinished">Initramfs अपडेट करना जारी</translation>
+        <translation>Initramfs अपडेट करना जारी</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="132"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../bootman.cpp" line="136"/>
         <source>Installing GRUB</source>
-        <translation type="unfinished">GRUB इंस्टॉल करना जारी</translation>
+        <translation>GRUB इंस्टॉल करना जारी</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="173"/>
         <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
-        <translation type="unfinished">GRUB इंस्टॉल विफल। आप लाइव मध्यम में पुनः बूट कर GRUB निवारण मेन्यू द्वारा इंस्टॉल प्रक्रिया सुधार सकते हैं।</translation>
+        <translation>GRUB इंस्टॉल विफल। आप लाइव मध्यम में पुनः बूट कर GRUB निवारण मेन्यू द्वारा इंस्टॉल प्रक्रिया सुधार सकते हैं।</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="262"/>
         <source>System boot disk:</source>
-        <translation type="unfinished">सिस्टम बूट डिस्क :</translation>
+        <translation>सिस्टम बूट डिस्क :</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="281"/>
         <location filename="../bootman.cpp" line="293"/>
         <source>Partition to use:</source>
-        <translation type="unfinished">उपयोग हेतु विभाजन :</translation>
+        <translation>उपयोग हेतु विभाजन :</translation>
     </message>
 </context>
 <context>
@@ -89,7 +87,7 @@
     <message>
         <location filename="../partman.cpp" line="1793"/>
         <source>format only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1916"/>
@@ -99,7 +97,7 @@
     <message>
         <location filename="../partman.cpp" line="1919"/>
         <source>Preserve</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1920"/>
@@ -109,7 +107,7 @@
     <message>
         <location filename="../partman.cpp" line="1921"/>
         <source>Preserve /home (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -117,22 +115,22 @@
     <message>
         <location filename="../partman.cpp" line="2357"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="2364"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="2366"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="2368"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -143,8 +141,19 @@
         <translation>बंद करें</translation>
     </message>
     <message>
-        <source>%1 Installer</source>
-        <translation type="vanished">%1 इंस्टॉलर</translation>
+        <location filename="../minstall.cpp" line="128"/>
+        <source>You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot unless you select Legacy Boot or similar at restart.
+We recommend you quit now and restart in Legacy Boot
+
+Do you want to continue the installation?</source>
+        <translation>आपके द्वारा 32-बिट ओएस को 64 बिट UEFI मोड में आरंभ किया गया, सिस्टम तब तक आरंभ नहीं होगा जब तक आप पुनः आरंभ पर Legacy Boot या कोई समान विकल्प का चयन नहीं करेंगें।
+हम अनुशंसित करते हैं कि आप सिस्टम अभी बंद कर Legacy Boot में पुनः आरंभ करें।
+क्या आप इंस्टॉल प्रक्रिया जारी रखें चाहते हैं?</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="145"/>
+        <source>Cannot access installation source.</source>
+        <translation>इंस्टॉल स्रोत हेतु अभिगम विफल।</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="162"/>
@@ -154,21 +163,6 @@
         <translation>%1 का समर्थन करें
 
 %1 लिनक्स के समर्थक आप जैसे उपयोक्ता हैं। कुछ चर्चा-मंच %2 पर सहायता कर या विभिन्न भाषाओं में फाइलों का अनुवाद कर या सुझाव प्रदान कर, प्रलेख लेखन द्वारा या नवीन सॉफ्टवेयर का परीक्षण कर इस परियोजना में योगदान करते हैं।</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="145"/>
-        <source>Cannot access installation source.</source>
-        <translation>इंस्टॉल स्रोत हेतु अभिगम विफल।</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="128"/>
-        <source>You are running 32bit OS started in 64 bit UEFI mode, the system will not be able to boot unless you select Legacy Boot or similar at restart.
-We recommend you quit now and restart in Legacy Boot
-
-Do you want to continue the installation?</source>
-        <translation>आपके द्वारा 32-बिट ओएस को 64 बिट UEFI मोड में आरंभ किया गया, सिस्टम तब तक आरंभ नहीं होगा जब तक आप पुनः आरंभ पर Legacy Boot या कोई समान विकल्प का चयन नहीं करेंगें।
-हम अनुशंसित करते हैं कि आप सिस्टम अभी बंद कर Legacy Boot में पुनः आरंभ करें।
-क्या आप इंस्टॉल प्रक्रिया जारी रखें चाहते हैं?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="212"/>
@@ -214,736 +208,620 @@ Enjoy using %1</source>
         <translation>पूर्ण हुआ</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="508"/>
+        <location filename="../minstall.cpp" line="511"/>
         <source>Invalid settings found in configuration file (%1). Please review marked fields as you encounter them.</source>
         <translation>विन्यास फाइल (%1) में अमान्य सेटिंग्स मिली। कृपया प्रक्रिया के दौरान चिन्हित क्षेत्रों पर ध्यान दें।</translation>
     </message>
     <message>
-        <source>Deleting old system</source>
-        <translation type="vanished">पुराना सिस्टम हटाना जारी</translation>
-    </message>
-    <message>
-        <source>Failed to delete old %1 on destination.
-Returning to Step 1.</source>
-        <translation type="vanished">लक्ष्य से पुराना %1 हटाना विफल।
-चरण संख्या 1 पर वापस।</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">सिस्टम डायरेक्टरी सृजन जारी</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">विन्यास सुधार जारी</translation>
-    </message>
-    <message>
-        <source>Copying new system</source>
-        <translation type="vanished">नवीन सिस्टम कॉपी करना जारी</translation>
-    </message>
-    <message>
-        <source>Failed to write %1 to destination.
-Returning to Step 1.</source>
-        <translation type="vanished">लक्ष्य पर %1 राइट करना विफल।
-चरण संख्या 1 पर वापस।</translation>
-    </message>
-    <message>
-        <source>Updating initramfs</source>
-        <translation type="vanished">Initramfs अपडेट करना जारी</translation>
-    </message>
-    <message>
-        <source>Installing GRUB</source>
-        <translation type="vanished">GRUB इंस्टॉल करना जारी</translation>
-    </message>
-    <message>
-        <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
-        <translation type="vanished">GRUB इंस्टॉल विफल। आप लाइव मध्यम में पुनः बूट कर GRUB निवारण मेन्यू द्वारा इंस्टॉल प्रक्रिया सुधार सकते हैं।</translation>
-    </message>
-    <message>
-        <source>The user name cannot contain special characters or spaces.
-Please choose another name before proceeding.</source>
-        <translation type="vanished">उपयोक्ता नाम में कोई विशिष्ट या रिक्त अक्षर न हो।
-कृपया प्रक्रिया जारी रखने से पहले एक उचित नाम चुनें।</translation>
-    </message>
-    <message>
-        <source>Sorry, that name is in use.
-Please select a different name.</source>
-        <translation type="vanished">क्षमा करें, यह नाम पहले से प्रयुक्त है।
-कृपया कोई भिन्न नाम चुनें।</translation>
-    </message>
-    <message>
-        <source>You did not provide a password for the root account. Do you want to continue?</source>
-        <translation type="vanished">आपने रूट अकाउंट हेतु कोई कूटशब्द प्रदान नहीं किया है। क्या आप जारी रखना चाहते हैं?</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="591"/>
-        <source>The home directory for %1 already exists.</source>
-        <translation>%1 हेतु होम डायरेक्टरी पहले से मौजूद है।</translation>
-    </message>
-    <message>
-        <source>Failed to set user account passwords.</source>
-        <translation type="vanished">उपयोक्ता अकाउंट हेतु कूटशब्द सेट करना विफल।</translation>
-    </message>
-    <message>
-        <source>Failed to save old home directory.</source>
-        <translation type="vanished">पुरानी होम डायरेक्टरी संचित करना विफल।</translation>
-    </message>
-    <message>
-        <source>Failed to delete old home directory.</source>
-        <translation type="vanished">पुरानी होम डायरेक्टरी हटाना विफल।</translation>
-    </message>
-    <message>
-        <source>Sorry, failed to create user directory.</source>
-        <translation type="vanished">क्षमा करें, उपयोक्ता डायरेक्टरी बनाना विफल।</translation>
-    </message>
-    <message>
-        <source>Sorry, failed to name user directory.</source>
-        <translation type="vanished">क्षमा करें, उपयोक्ता डायरेक्टरी नामांकन विफल।</translation>
-    </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">क्षमा करें, उपयोक्ता डायरेक्टरी हेतु स्वामित्व सेट करना विफल।</translation>
-    </message>
-    <message>
-        <source>Please enter a computer name.</source>
-        <translation type="vanished">कृपया कंप्यूटर नाम दर्ज करें।</translation>
-    </message>
-    <message>
-        <source>Sorry, your computer name contains invalid characters.
-You&apos;ll have to select a different
-name before proceeding.</source>
-        <translation type="vanished">क्षमा करें, आपके कंप्यूटर नाम में अमान्य अक्षर हैं।
-कृपया प्रक्रिया जारी
-रखने से पहले एक उचित नाम चुनें।</translation>
-    </message>
-    <message>
-        <source>Please enter a domain name.</source>
-        <translation type="vanished">कृपया डोमेन नाम दर्ज करें।</translation>
-    </message>
-    <message>
-        <source>Sorry, your computer domain contains invalid characters.
-You&apos;ll have to select a different
-name before proceeding.</source>
-        <translation type="vanished">क्षमा करें, आपके कंप्यूटर डोमेन में अमान्य अक्षर हैं।
-कृपया प्रक्रिया जारी
-रखने से पहले एक उचित नाम चुनें।</translation>
-    </message>
-    <message>
-        <source>Please enter a workgroup.</source>
-        <translation type="vanished">कृपया कार्यसमूह दर्ज करें।</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="547"/>
+        <location filename="../minstall.cpp" line="552"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
         <translation>क्या %2 हेतु फॉर्मेट कर समूची डिस्क (%1) उपयोग करें?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="551"/>
+        <location filename="../minstall.cpp" line="556"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
         <translation>चेतावनी : चयनित ड्राइव की क्षमता कम-से-कम 2टीबी की है व इस हेतु GPT विभाजन विधि आवश्यक है। कुछ सिस्टम पर GPT डिस्क आरंभ नहीं होती है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="576"/>
+        <location filename="../minstall.cpp" line="582"/>
         <source>The data in /home cannot be preserved because the required information could not be obtained.</source>
         <translation>/home का डेटा संचित करना विफल क्योंकि इस हेतु आवश्यक सूचना प्राप्त नहीं हो सकी।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="637"/>
+        <location filename="../minstall.cpp" line="597"/>
+        <source>The home directory for %1 already exists.</source>
+        <translation>%1 हेतु होम डायरेक्टरी पहले से मौजूद है।</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="644"/>
         <source>General Instructions</source>
         <translation>सामान्य दिशानिर्देश</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="638"/>
+        <location filename="../minstall.cpp" line="645"/>
         <source>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</source>
         <translation>जारी रखने से पहले सभी कार्यरत अनुप्रयोग बंद कर लें।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="639"/>
+        <location filename="../minstall.cpp" line="646"/>
         <source>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.</source>
         <translation>प्रत्येक पृष्ठ पर उपलब्ध दिशानिर्देश पढ़ें, इच्छित चयन करें, व प्रक्रिया जारी रखने हेतु अगला पर क्लिक करें। किसी प्रकार का हानिकारक कार्य करने से पूर्व पुष्टिकरण विंडो प्रदर्शित होगी।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="641"/>
+        <location filename="../minstall.cpp" line="648"/>
         <source>Limitations</source>
         <translation>उपयोग सीमाएँ</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="642"/>
+        <location filename="../minstall.cpp" line="649"/>
         <source>Remember, this software is provided AS-IS with no warranty what-so-ever. It is solely your responsibility to backup your data before proceeding.</source>
         <translation>ध्यान रहें कि यह वारंटी रहित सॉफ्टवेयर अपने वर्तमान वास्तविक स्वरूप आपको प्रदान किया जा रहा है। प्रक्रिया जारी रखने से पहले डेटा बैकअप करना पूर्णतया आपका दायित्व है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="655"/>
+        <location filename="../minstall.cpp" line="662"/>
         <source>Installation Options</source>
         <translation>इंस्टॉल प्रक्रिया विकल्प</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="656"/>
+        <location filename="../minstall.cpp" line="663"/>
         <source>Installation requires about %1 of space. %2 or more is preferred.</source>
         <translation>इंस्टॉल हेतु लगभग %1 स्पेस आवश्यक। %2 या अधिक इच्छित।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="657"/>
+        <location filename="../minstall.cpp" line="664"/>
         <source>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.</source>
         <translation>यदि आप मैक ओएस या विंडोज ओएस (विस्टा उपरांत) उपयोग कर रहें हैं तो इंस्टॉल करने से पहले अपने सिस्टम के सॉफ्टवेयर द्वारा विभाजन व बूट प्रबंधक सेट करने की आवश्यकता हो सकती है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="658"/>
+        <location filename="../minstall.cpp" line="665"/>
         <source>Using the root-home space slider</source>
         <translation>रूट-होम स्पेस परिवर्तन साधन (स्लाइडर) उपयोग होगा</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="659"/>
+        <location filename="../minstall.cpp" line="666"/>
         <source>The drive can be divided into separate system (root) and user data (home) partitions using the slider.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="660"/>
+        <location filename="../minstall.cpp" line="667"/>
         <source>The &lt;b&gt;root&lt;/b&gt; partition will contain the operating system and applications.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="661"/>
+        <location filename="../minstall.cpp" line="668"/>
         <source>The &lt;b&gt;home&lt;/b&gt; partition will contain the data of all users, such as their settings, files, documents, pictures, music, videos, etc.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="662"/>
+        <location filename="../minstall.cpp" line="669"/>
         <source>Move the slider to the right to increase the space for &lt;b&gt;root&lt;/b&gt;. Move it to the left to increase the space for &lt;b&gt;home&lt;/b&gt;.</source>
         <translation>परिवर्तन साधन (स्लाइडर) को दायीं ओर करने से &lt;b&gt;रूट&lt;/b&gt; हेतु स्पेस वर्धन होगा। परिवर्तन साधन (स्लाइडर) को बायीं ओर करने से &lt;b&gt;होम&lt;/b&gt; हेतु स्पेस वर्धन होगा।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="663"/>
+        <location filename="../minstall.cpp" line="670"/>
         <source>Move the slider all the way to the right if you want both root and home on the same partition.</source>
         <translation>परिवर्तन साधन (स्लाइडर) को पूर्णतया दायीं ओर करने से रूट व होम दोनों एक ही विभाजन पर स्थित होंगें।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="664"/>
+        <location filename="../minstall.cpp" line="671"/>
         <source>Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier. This can also improve overall performance by constraining the system files to a defined portion of the drive.</source>
         <translation>होम डायरेक्टरी को अलग विभाजन में रखने से ऑपरेटिंग सिस्टम अपग्रेड की विश्वसनीयता में सुधार होता है। इससे बैकअप व रिकवरी भी सरल होती है। इस कारण ड्राइव के परिभाषित भाग में सिस्टम फ़ाइलों को सीमित करके समग्र प्रदर्शन में भी सुधार संभव है। </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="666"/>
-        <location filename="../minstall.cpp" line="750"/>
+        <location filename="../minstall.cpp" line="673"/>
+        <location filename="../minstall.cpp" line="756"/>
         <source>Encryption</source>
         <translation>एन्क्रिप्शन</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="667"/>
-        <location filename="../minstall.cpp" line="751"/>
+        <location filename="../minstall.cpp" line="674"/>
+        <location filename="../minstall.cpp" line="757"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>LUKS द्वारा एन्क्रिप्शन संभव है। कूटशब्द आवश्यक।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="668"/>
-        <location filename="../minstall.cpp" line="752"/>
+        <location filename="../minstall.cpp" line="675"/>
+        <location filename="../minstall.cpp" line="758"/>
         <source>A separate unencrypted boot partition is required.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="669"/>
+        <location filename="../minstall.cpp" line="676"/>
         <source>When encryption is used with autoinstall, the separate boot partition will be automatically created.</source>
         <translation>स्वतः इंस्टॉल के साथ एन्क्रिप्शन प्रयुक्त होने पर पृथक बूट विभाजन का स्वतः सृजन होगा।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="670"/>
+        <location filename="../minstall.cpp" line="677"/>
         <source>Using a custom disk layout</source>
         <translation>अनुकूलित डिस्क अभिन्यास प्रयुक्त होगा</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="671"/>
+        <location filename="../minstall.cpp" line="678"/>
         <source>If you need more control over where %1 is installed to, select &quot;&lt;b&gt;%2&lt;/b&gt;&quot; and click &lt;b&gt;Next&lt;/b&gt;. On the next page, you will then be able to select and configure the storage devices and partitions you need.</source>
         <translation>%1 के इंस्टॉल स्थान हेतु अधिक नियंत्रण हेतु &quot;&lt;b&gt;%2&lt;/b&gt;&quot; चयन कर &lt;b&gt;अगला&lt;/b&gt; पर क्लिक करें। फिर अगले पृष्ठ पर आप आवश्यक संचय उपकरणों व विभाजनों का चयन एवं विन्यास कर सकेंगे।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="686"/>
+        <location filename="../minstall.cpp" line="692"/>
         <source>Choose Partitions</source>
         <translation>विभाजन चयन</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="687"/>
+        <location filename="../minstall.cpp" line="693"/>
         <source>The partition list allows you to choose what partitions are used for this installation.</source>
         <translation>विभाजन सूची द्वारा आप इंस्टॉल प्रक्रिया हेतु प्रयुक्त होने वाले विभाजन चुन सकते हैं।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="688"/>
+        <location filename="../minstall.cpp" line="694"/>
         <source>&lt;i&gt;Device&lt;/i&gt; - This is the block device name that is, or will be, assigned to the created partition.</source>
         <translation>&lt;i&gt;उपकरण&lt;/i&gt; - यह बनाए गए विभाजन को आवंटित हुए या होने वाले ब्लॉक उपकरण का नाम है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="689"/>
+        <location filename="../minstall.cpp" line="695"/>
         <source>&lt;i&gt;Size&lt;/i&gt; - The size of the partition. This can only be changed on a new layout.</source>
         <translation>&lt;i&gt;आकार&lt;/i&gt; - विभाजन का आकार। इसे केवल नवीन अभिन्यास पर ही बदलना संभव है। </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="690"/>
-        <source>&lt;i&gt;Use For&lt;/i&gt; - To use this partition in an installation, you must select something here.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="691"/>
-        <source>Format - Format without mounting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="692"/>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="693"/>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="694"/>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="695"/>
-        <source>root - System root (/).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="696"/>
-        <source>swap - Swap space.</source>
-        <translation type="unfinished"></translation>
+        <source>&lt;i&gt;Use For&lt;/i&gt; - To use this partition in an installation, you must select something here.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="697"/>
-        <source>home - User data (/home).</source>
-        <translation type="unfinished"></translation>
+        <source>Format - Format without mounting.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="698"/>
-        <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
-        <translation type="unfinished"></translation>
+        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="699"/>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="unfinished"></translation>
+        <source>EFI - EFI System Partition.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="700"/>
+        <source>boot - Boot manager (/boot).</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="701"/>
+        <source>root - System root (/).</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="702"/>
+        <source>swap - Swap space.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="703"/>
+        <source>home - User data (/home).</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="704"/>
+        <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="705"/>
+        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="706"/>
         <source>&lt;i&gt;Label&lt;/i&gt; - The label that is assigned to the partition once it has been formatted.</source>
         <translation>&lt;i&gt;उपनाम&lt;/i&gt; - फॉर्मेट होने के उपरांत विभाजन को आवंटित उपनाम।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="701"/>
+        <location filename="../minstall.cpp" line="707"/>
         <source>&lt;i&gt;Encrypt&lt;/i&gt; - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="702"/>
+        <location filename="../minstall.cpp" line="708"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;प्रारूप&lt;/i&gt; - यह विभाजन का प्रारूप है। उपलब्ध प्रारूप विभाजन के उपयोग पर निर्भर करता है। मौजूदा अभिन्यास उपयोग करते समय, &lt;b&gt;संरक्षण&lt;/b&gt; का चयन कर विभाजन का प्रारूप संरक्षित करना संभव है।</translation>
     </message>
     <message>
-        <source>The ext2, ext3, ext4, jfs, xfs, btrfs and reiserfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="vanished">ext2, ext3, ext4, jfs, xfs, btrfs व reiserfs लिनक्स फाइल सिस्टम समर्थित हैं एवं ext4 अनुशंसित है।</translation>
+        <location filename="../minstall.cpp" line="710"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="707"/>
+        <location filename="../minstall.cpp" line="712"/>
+        <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="713"/>
         <source>&lt;i&gt;Check&lt;/i&gt; - Check and correct for bad blocks on the drive (not supported for all formats). This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="709"/>
+        <location filename="../minstall.cpp" line="715"/>
         <source>&lt;i&gt;Mount Options&lt;/i&gt; - This specifies mounting options that will be used for this partition.</source>
         <translation>&lt;i&gt;माउंट विकल्प&lt;/i&gt; - इससे विभाजन हेतु प्रयुक्त माउंट विकल्प निर्दिष्ट होंगें।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="710"/>
+        <location filename="../minstall.cpp" line="716"/>
         <source>&lt;i&gt;Dump&lt;/i&gt; - Instructs the dump utility to include this partition in the backup.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="711"/>
+        <location filename="../minstall.cpp" line="717"/>
         <source>&lt;i&gt;Pass&lt;/i&gt; - The sequence in which this file system is to be checked at boot. If zero, the file system is not checked.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="712"/>
+        <location filename="../minstall.cpp" line="718"/>
         <source>Menus and actions</source>
         <translation>मेन्यू व कार्य</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="713"/>
+        <location filename="../minstall.cpp" line="719"/>
         <source>A variety of actions are available by right-clicking any drive or partition item in the list.</source>
         <translation>सूची से ड्राइव या विभाजन पर दायां-क्लिक कर विभिन्न कार्यों हेतु उपलब्ध विकल्प देखना संभव है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="714"/>
+        <location filename="../minstall.cpp" line="720"/>
         <source>The buttons to the right of the list can also be used to manipulate the entries.</source>
         <translation>सूची के दायीं ओर दिए बटन द्वारा प्रविष्टियों में परिवर्तन संभव है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="715"/>
+        <location filename="../minstall.cpp" line="721"/>
         <source>The installer cannot modify the layout already on the drive. To create a custom layout, mark the drive for a new layout with the &lt;b&gt;New layout&lt;/b&gt; menu action or button (%1). This clears the existing layout.</source>
         <translation>ड्राइव पर मौजूद अभिन्यास को इंस्टॉलर द्वारा बदलना संभव नहीं है। अनुकूलित अभिन्यास बनाने हेतु, ड्राइव को नवीन &lt;b&gt;अभिन्यास मेन्यू&lt;/b&gt; कार्य या बटन (%1) से नवीन अभिन्यास हेतु चिन्हित करें। इससे मौजूदा अभिन्यास रिक्त होगा।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="718"/>
+        <location filename="../minstall.cpp" line="724"/>
         <source>Basic layout requirements</source>
         <translation>सामान्य अभिन्यास आवश्यकताएँ</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="719"/>
+        <location filename="../minstall.cpp" line="725"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
         <translation>%1 हेतु रूट विभाजन आवश्यक है। स्वैप विभाजन वैकल्पिक है परन्तु अनुशंसित भी। यदि आप %1 की डिस्क-पर-स्थगित सुविधा उपयोग करना चाहते हैं तो स्वैप का आकार वास्तविक मेमोरी से अधिक रखें।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="721"/>
+        <location filename="../minstall.cpp" line="727"/>
         <source>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</source>
         <translation>भावी अपग्रेड प्रक्रिया सरल होगी यदि आप पृथक /home विभाजन का चयन करते हैं, परन्तु यह अपग्रेड ऐसे इंस्टॉल हेतु संभव नहीं होगा जिसका होम विभाजन पृथक नहीं है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="723"/>
-        <source>Active partition</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="724"/>
-        <source>For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="725"/>
-        <source>The active partition of a drive can be chosen using the &lt;b&gt;Active partition&lt;/b&gt; menu action.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="726"/>
-        <source>A partition with an asterisk (*) next to its device name is, or will become, the active partition.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="727"/>
-        <source>Boot partition</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="728"/>
-        <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="729"/>
-        <source>It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.</source>
-        <translation type="unfinished"></translation>
+        <source>Active partition</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="730"/>
-        <source>BIOS-GRUB partition</source>
-        <translation type="unfinished"></translation>
+        <source>For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="731"/>
-        <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
-        <translation type="unfinished"></translation>
+        <source>The active partition of a drive can be chosen using the &lt;b&gt;Active partition&lt;/b&gt; menu action.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="732"/>
-        <source>New drives are formatted in GPT if more than 4 partitions are to be created, or the drive has a capacity greater than 2TB. If the installer is about to format the disk in GPT, and there is no BIOS-GRUB partition, a warning will be displayed before the installation starts.</source>
-        <translation type="unfinished"></translation>
+        <source>A partition with an asterisk (*) next to its device name is, or will become, the active partition.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="733"/>
+        <source>Boot partition</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="734"/>
+        <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="735"/>
+        <source>It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="736"/>
+        <source>BIOS-GRUB partition</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="737"/>
+        <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="738"/>
+        <source>New drives are formatted in GPT if more than 4 partitions are to be created, or the drive has a capacity greater than 2TB. If the installer is about to format the disk in GPT, and there is no BIOS-GRUB partition, a warning will be displayed before the installation starts.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="740"/>
         <source>Need help creating a layout?</source>
         <translation>क्या अभिन्यास बनाने हेतु सहायता की आवश्यकता है?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="735"/>
+        <location filename="../minstall.cpp" line="741"/>
         <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
         <translation>ड्राइव पर दायां-क्लिक कर प्रदर्शित मेन्यू से अभिन्यास हेतु नमूना चुनें। ये नमूने सामान्य इंस्टॉल के समान हैं।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="736"/>
+        <location filename="../minstall.cpp" line="742"/>
         <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
         <translation>&lt;i&gt;सामान्य इंस्टॉल&lt;/i&gt; - अधिकतर सेटअप हेतु उपयुक्त। इस नमूने से पृथक बूट विभाजन जोड़ना संभव नहीं है अतः यह एन्क्रिप्शन युक्त ऑपरेटिंग सिस्टम हेतु अयोग्य है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="737"/>
+        <location filename="../minstall.cpp" line="743"/>
         <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
         <translation>&lt;i&gt;एन्क्रिप्शन युक्त सिस्टम&lt;/i&gt; - एन्क्रिप्शन युक्त ऑपरेटिंग सिस्टम लोड करने हेतु आवश्यक बूट विभाजन सम्मिलित करता है। इस नमूने का उपयोग एकाधिक-बूट सिस्टम हेतु भी संभव है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="738"/>
+        <location filename="../minstall.cpp" line="744"/>
         <source>Upgrading</source>
         <translation>अपग्रेड जारी</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="739"/>
+        <location filename="../minstall.cpp" line="745"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and select &lt;b&gt;Preserve&lt;/b&gt; as the format.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="740"/>
+        <location filename="../minstall.cpp" line="746"/>
         <source>If you do not use a separate home partition, select &lt;b&gt;Preserve /home&lt;/b&gt; on the root file system entry to preserve the existing /home directory located on your root partition. The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="742"/>
+        <location filename="../minstall.cpp" line="748"/>
         <source>Preferred Filesystem Type</source>
         <translation>इच्छित फाइल सिस्टम प्रकार</translation>
     </message>
     <message>
-        <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs, btrfs or reiser.</source>
-        <translation type="vanished">%1 हेतु आप विभाजनों को ext2, ext3, ext4, f2fs, jfs, xfs, btrfs या reiser के रूप में फॉर्मेट कर सकते हैं।</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="704"/>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="706"/>
-        <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="743"/>
+        <location filename="../minstall.cpp" line="749"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="744"/>
+        <location filename="../minstall.cpp" line="750"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>btrfs प्रयुक्त ड्राइव हेतु अतिरिक्त संपीड़न विकल्प उपलब्ध हैं। Lzo तीव्र है परन्तु संपीड़न मंद है। Zlib मंद है परन्तु संपीड़न उच्च है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="746"/>
+        <location filename="../minstall.cpp" line="752"/>
         <source>System partition management tool</source>
         <translation>सिस्टम विभाजन प्रबंधन साधन</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="747"/>
+        <location filename="../minstall.cpp" line="753"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
         <translation>ड्राइव अभिन्यास हेतु अधिक नियंत्रण (जैसे डिस्क के मौजूदा अभिन्यास में परिवर्तन) हेतु विभाजन प्रबंधन बटन (%1) पर क्लिक करें। इससे ऑपरेटिंग सिस्टम का विभाजन प्रबंधक साधन निष्पादित होगा जिस द्वारा आप सटीक रूप से इच्छित अभिन्यास बना सकेंगे।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="753"/>
+        <location filename="../minstall.cpp" line="759"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="755"/>
+        <location filename="../minstall.cpp" line="761"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="756"/>
+        <location filename="../minstall.cpp" line="762"/>
         <source>Other partitions</source>
         <translation>अन्य विभाजन</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="757"/>
+        <location filename="../minstall.cpp" line="763"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
         <translation>इंस्टॉलर द्वारा अन्य उद्देश्यों हेतु अन्य विभाजनों को बनाना या उपयोग करना संभव है, हालांकि यह ध्यान रहें कि पुराने सिस्टम की ड्राइव पर 4 से अधिक विभाजन बनाना संभव नहीं है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="758"/>
-        <source>Subvolumes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="759"/>
-        <source>Some file systems, such as Btrfs, support multiple subvolumes in a single partition. These are not physical subdivisions, and so their order does not matter.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="761"/>
-        <source>Use the &lt;b&gt;Scan subvolumes&lt;/b&gt; menu action to search an existing Btrfs partition for subvolumes. To create a new subvolume, use the &lt;b&gt;New subvolume&lt;/b&gt; menu action.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="763"/>
-        <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="764"/>
-        <source>Virtual Devices</source>
-        <translation type="unfinished"></translation>
+        <source>Subvolumes</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="765"/>
-        <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation type="unfinished"></translation>
+        <source>Some file systems, such as Btrfs, support multiple subvolumes in a single partition. These are not physical subdivisions, and so their order does not matter.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>Use the &lt;b&gt;Scan subvolumes&lt;/b&gt; menu action to search an existing Btrfs partition for subvolumes. To create a new subvolume, use the &lt;b&gt;New subvolume&lt;/b&gt; menu action.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>Virtual Devices</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../minstall.cpp" line="772"/>
+        <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="777"/>
         <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;बूट विधि चयन&lt;/b&gt;&lt;br/&gt;%1 व माइक्रोसॉफ्ट विंडोज बूट करने हेतु %1 GRUB बूट लोड साधन का उपयोग करता है। &lt;p&gt;डिफ़ॉल्ट रूप से GRUB2 आपके पूर्व प्रयुक्त बूट लोड साधन के स्थान पर आपकी हार्ड ड्राइव में मास्टर बूट रिकॉर्ड (MBR) या ESP (64-बिट UEFI बूट सिस्टम हेतु EFI सिस्टम विभाजन) पर इंस्टॉल होता है। यह एक सामान्य प्रक्रिया है।&lt;/p&gt;&lt;p&gt;यदि GRUB2 को विभाजन बूट रिकॉर्ड (PBR) पर इंस्टॉल करते है तो GRUB2 रूट विभाजन के आरंभ पर इंस्टॉल होगा। यह विकल्प केवल विशेषज्ञों हेतु है।&lt;/p&gt;&lt;p&gt;आप द्वारा GRUB विकल्प अचयनित करने पर, इस समय GRUB इंस्टॉल नहीं होगा। यह विकल्प केवल विशेषज्ञों हेतु है।&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="786"/>
+        <location filename="../minstall.cpp" line="790"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;सक्रिय सेवाओं का चयन&lt;/b&gt;&lt;br/&gt;इनमें से अपने सिस्टम विन्यास हेतु इच्छित सामान्य सेवाएँ चुनें व %1 आरंभ होने पर चयनित सेवाएँ स्वतः ही आरंभ होंगी।&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="790"/>
+        <location filename="../minstall.cpp" line="794"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;कंप्यूटर पहचान&lt;/b&gt;&lt;br/&gt;कंप्यूटर नाम एक सामान्य परन्तु विशिष्ट नाम होता है जो नेटवर्क पर आपके कंप्यूटर की पहचान होता है। कंप्यूटर डोमेन संभवतः कभी प्रयुक्त न हो जब तक आपके इंटरनेट प्रदाता या लोकल नेटवर्क हेतु इसकी आवश्यकता हो।&lt;/p&gt;&lt;p&gt;कंप्यूटर व डोमेन नामों में केवल अक्षरांक, बिंदु व हायफ़न ही स्वीकार्य हैं। रिक्त अक्षर व आरंभ या अंत में हायफ़न स्वीकार्य नहीं हैं।&lt;/p&gt;&lt;p&gt;साम्बा सर्वर द्वारा एमएस-विंडोज या मैक ओएस-एक्स कार्यरत अपने लोकल कंप्यूटर के साथ डायरेक्टरी फोल्डर या प्रिंटर सहभाजन करने हेतु साम्बा सर्वर सक्रिय करना आवश्यक है।&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="803"/>
+        <location filename="../minstall.cpp" line="804"/>
         <source>Localization Defaults</source>
         <translation>स्थानिकी डिफ़ॉल्ट</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="804"/>
+        <location filename="../minstall.cpp" line="805"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation>डिफ़ॉल्ट स्थानिकी सेट करें। यह बाद में उपयोक्ता द्वारा अधिलेखित करने तक लागू रहेगा।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="805"/>
+        <location filename="../minstall.cpp" line="806"/>
         <source>Configure Clock</source>
         <translation>घड़ी विन्यास</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="806"/>
+        <location filename="../minstall.cpp" line="807"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation>यदि आपका कंप्यूटर एप्पल या यूनिक्स कंप्यूटर है, तो डिफ़ॉल्ट रूप से सिस्टम घड़ी ग्रीनिच माध्य समय (जीएमटी) या समन्वित सार्वत्रिक समय (यूटीसी) पर सेट है। इसे बदलने हेतु &quot;&lt;b&gt;सिस्टम घड़ी द्वारा स्थानीय समय प्रयुक्त&lt;/b&gt;&quot; का विकल्प चिन्हित करें।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="808"/>
+        <location filename="../minstall.cpp" line="809"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation>सिस्टम डिफ़ॉल्ट रूप से जीएमटी/यूटीसी अनुसार समय क्षेत्र के साथ बूट करता है। समय क्षेत्र परिवर्तन हेतु, नवीन इंस्टॉल में पुनः आरंभ उपरांत पैनल में घड़ी पर दायां-क्लिक कर विशेषताएँ चुनें।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="810"/>
+        <location filename="../minstall.cpp" line="811"/>
         <source>Service Settings</source>
         <translation>सेवा सेटिंग्स</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="811"/>
+        <location filename="../minstall.cpp" line="812"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation>अधिकांश उपयोक्ताओं को डिफ़ॉल्ट में परिवर्तन नहीं करना चाहिए। सीमित संसाधन वाले कंप्यूटर के उपयोक्ता कभी-कभी RAM उपयोग को यथासंभव कम रखने हेतु अनावश्यक सेवाओं को निष्क्रिय कर सकते हैं। सुनिश्चित करें कि आप कार्य से भलीभाँति परिचित हैं!</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="817"/>
+        <location filename="../minstall.cpp" line="818"/>
         <source>Default User Login</source>
         <translation>डिफ़ॉल्ट उपयोक्ता लॉगिन</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="818"/>
+        <location filename="../minstall.cpp" line="819"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
         <translation>कई अन्य ऑपरेटिंग सिस्टम में रूट उपयोक्ता प्रशासक उपयोक्ता के समान होता है। रूट उपयोक्ता को अपने दैनिक उपयोक्ता अकाउंट के रूप उपयोग न करें। कृपया दैनिक उपयोग के लिए अपने नवीन (डिफ़ॉल्ट) उपयोक्ता अकाउंट हेतु नाम दर्ज करें। आप बाद में आवश्यकता अनुसार %1 उपयोक्ता प्रबंधक उपयोग कर अन्य उपयोक्ता अकाउंट जोड़ सकते हैं।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="822"/>
+        <location filename="../minstall.cpp" line="823"/>
         <source>Passwords</source>
         <translation>कूटशब्द</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="823"/>
+        <location filename="../minstall.cpp" line="824"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
         <translation>अपने डिफ़ॉल्ट उपयोक्ता अकाउंट व रूट अकाउंट हेतु नवीन कूटशब्द दर्ज करें। प्रत्येक कूटशब्द दो बार दर्ज करें।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="825"/>
+        <location filename="../minstall.cpp" line="826"/>
         <source>No passwords</source>
         <translation>कोई कूटशब्द नहीं</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="826"/>
+        <location filename="../minstall.cpp" line="827"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
         <translation>डिफ़ॉल्ट उपयोक्ता अकाउंट को कूटशब्द रहित रखने हेतु कूटशब्द क्षेत्र को रिक्त रखें। इससे आप बिना कूटशब्द के लॉगिन कर सकेंगे।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="828"/>
+        <location filename="../minstall.cpp" line="829"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
         <translation>स्वाभाविक रूप से ऐसा केवल ऐसी परिस्थिति में करना चाहिए जहाँ उपयोक्ता अकाउंट की सुरक्षा अनावश्यक है, जैसे कोई सार्वजानिक टर्मिनल।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="836"/>
+        <location filename="../minstall.cpp" line="837"/>
         <source>Old Home Directory</source>
         <translation>पुरानी होम डायरेक्टरी</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="837"/>
+        <location filename="../minstall.cpp" line="838"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation>चयनित उपयोक्ता नाम की होम डायरेक्टरी पहले से मौजूद है। इस स्क्रीन द्वारा आप इस डायरेक्टरी में होने वाले कार्य चुन सकते हैं।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="839"/>
+        <location filename="../minstall.cpp" line="840"/>
         <source>Re-use it for this installation</source>
         <translation>इस इंस्टॉल हेतु पुनः उपयोग करें</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="840"/>
+        <location filename="../minstall.cpp" line="841"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation>इस उपयोक्ता अकाउंट हेतु पुरानी होम डायरेक्टरी प्रयुक्त होगी। अपग्रेड हेतु यह एक उचित विकल्प है व इससे आपकी फाइलों व सेटिंग्स की उपलब्धता भी सुनिश्चित रहेगी। </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="842"/>
+        <location filename="../minstall.cpp" line="843"/>
         <source>Rename it and create a new directory</source>
         <translation>उसका नाम परिवर्तन कर एक नवीन डायरेक्टरी बनाएँ</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="843"/>
+        <location filename="../minstall.cpp" line="844"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation>इस उपयोक्ता हेतु एक नवीन होम डायरेक्टरी का सृजन होगा परन्तु पुरानी होम डायरेक्टरी का नाम परिवर्तन होगा। आपकी फाइलों व सेटिंग्स तुरंत प्रभाव से उपलब्ध नहीं होंगी परन्तु वे परिवर्तित नाम वाली डायरेक्टरी में उपलब्ध होंगी।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="845"/>
+        <location filename="../minstall.cpp" line="846"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation>नाम परिवर्तन आवृत्ति की संख्या अनुसार पुरानी डायरेक्टरी के नाम के अंत में एक संख्या संलग्न होगी।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="846"/>
+        <location filename="../minstall.cpp" line="847"/>
         <source>Delete it and create a new directory</source>
         <translation>उसे हटाकर कर एक नवीन डायरेक्टरी बनाएँ</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="847"/>
+        <location filename="../minstall.cpp" line="848"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation>पुरानी होम डायरेक्टरी हटा दी जाएगी एवं एक नई का सृजन होगा।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="848"/>
+        <location filename="../minstall.cpp" line="849"/>
         <source>Warning</source>
         <translation>चेतावनी</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="849"/>
+        <location filename="../minstall.cpp" line="850"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation>यह विकल्प चयनित होने पर सभी फाइलों व सेटिंग्स को स्थायी रूप से हटा दिया जाएगा। व उन्हें पुनः प्राप्त करने की संभावना भी कम होगी।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="865"/>
+        <location filename="../minstall.cpp" line="866"/>
         <source>Installation in Progress</source>
         <translation>इंस्टॉल प्रक्रिया जारी है</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="866"/>
+        <location filename="../minstall.cpp" line="867"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation>%1 का इंस्टॉल जारी है। आपके सिस्टम की गति व पुनः फॉर्मेट होने वाले विभाजनों के आकार के आधार पर एक नवीन इंस्टॉल हेतु सामान्यतः 3-20 मिनट का समय लगता है।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="868"/>
+        <location filename="../minstall.cpp" line="869"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation>निरस्त का बटन क्लिक करने के उपरांत शीघ्रतम समय में इंस्टॉल प्रक्रिया बंद की जाएगी।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="870"/>
+        <location filename="../minstall.cpp" line="871"/>
         <source>Change settings while you wait</source>
         <translation>प्रतीक्षा अवधि का उपयोग सेटिंग्स परिवर्तन कर करें</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="871"/>
+        <location filename="../minstall.cpp" line="872"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation>%1 के इंस्टॉल होने तक आप &lt;b&gt;अगला&lt;/b&gt; या &lt;b&gt;पिछला&lt;/b&gt; बटन पर क्लिक कर इंस्टॉल प्रक्रिया हेतु आवश्यक अन्य सूचना दर्ज कर सकते हैं।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="873"/>
+        <location filename="../minstall.cpp" line="874"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation>इन चरणों को अपने अनुसार पूरा करें। आप द्वारा इनपुट आवश्यक होने पर इंस्टॉलर प्रतीक्षा करेगा।</translation>
     </message>
@@ -959,7 +837,7 @@ name before proceeding.</source>
     </message>
     <message>
         <location filename="../minstall.cpp" line="891"/>
-        <location filename="../minstall.cpp" line="1191"/>
+        <location filename="../minstall.cpp" line="1194"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;%1 का समर्थन करें&lt;/b&gt;&lt;br/&gt; %1 लिनक्स के समर्थक आप जैसे उपयोक्ता हैं। कुछ चर्चा-मंच %2 पर सहायता कर या विभिन्न भाषाओं में फाइलों का अनुवाद कर या सुझाव प्रदान कर, प्रलेख लेखन द्वारा या नवीन सॉफ्टवेयर का परीक्षण कर इस परियोजना में योगदान करते हैं।&lt;/p&gt;</translation>
     </message>
@@ -979,95 +857,79 @@ name before proceeding.</source>
         <translation>अगला</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="961"/>
+        <location filename="../minstall.cpp" line="964"/>
         <source>Configuring sytem. Please wait.</source>
         <translation>सिस्टम विन्यास जारी। कृपया प्रतीक्षा करें।</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="965"/>
+        <location filename="../minstall.cpp" line="968"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>विन्यास प्रक्रिया पूर्ण। अब सिस्टम पुनः आरंभ होगा।</translation>
     </message>
     <message>
-        <source>Could not complete configuration.</source>
-        <translation type="vanished">विन्यास प्रक्रिया पूर्ण करना विफल।</translation>
-    </message>
-    <message>
-        <source>Loading...</source>
-        <translation type="vanished">लोड करना जारी...</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="988"/>
-        <location filename="../minstall.cpp" line="1303"/>
+        <location filename="../minstall.cpp" line="991"/>
+        <location filename="../minstall.cpp" line="1307"/>
         <source>Root</source>
         <translation>रूट</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="990"/>
-        <location filename="../minstall.cpp" line="1311"/>
+        <location filename="../minstall.cpp" line="993"/>
+        <location filename="../minstall.cpp" line="1315"/>
         <source>Home</source>
         <translation>होम</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1127"/>
+        <location filename="../minstall.cpp" line="1128"/>
         <source>Confirmation</source>
         <translation>पुष्टिकरण</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1127"/>
+        <location filename="../minstall.cpp" line="1128"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>इंस्टॉल व विन्यास अभी पूर्ण नहीं हुई है।
 क्या आप निश्चित ही अभी स्थगित करना चाहते हैं?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1177"/>
+        <location filename="../minstall.cpp" line="1180"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;सहायता प्राप्ति&lt;/b&gt;&lt;br/&gt;%1 हेतु सामान्य सूचना %2 पर उपलब्ध है।&lt;/p&gt;&lt;p&gt; %3 चर्चा-मंच पर सहायता हेतु स्वयंसेवक %4 पर मौजूद हैं।&lt;/p&gt;&lt;p&gt;सहायता हेतु प्रश्न करते समय कृपया अपनी समस्या व अपने कंप्यूटर का विस्तार से वर्णन करें। आमतौर पर &apos;यह अनुप्रयोग उचित रूप से कार्य नहीं कर रहा है&apos; जैसे वाक्य समस्या निवारण हेतु सहायक नहीं होते हैं।&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1185"/>
+        <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;इंस्टॉल हेतु सुधार करना&lt;/b&gt;&lt;br/&gt;हार्ड ड्राइव से %1 कार्यरत करना विफल होने पर सामान्यतः लाइव डीवीडी या लाइव यूएसबी से %1 में सम्मिलित सिस्टम विन्यास के साधन निष्पादित कर या सिस्टम निवारण हेतु सामान्य लिनक्स साधन उपयोग कर यह समस्या हल करना संभव है।&lt;/p&gt;&lt;p&gt;%1 लाइव डीवीडी या लाइव यूएसबी उपयोग कर अपने एमएस-विंडो सिस्टम से भी डेटा की पुनः प्राप्ति संभव है!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1199"/>
+        <location filename="../minstall.cpp" line="1202"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;ध्वनि मिक्सर सेट करना&lt;/b&gt;&lt;br/&gt;%1 आप हेतु ध्वनि मिक्सर विन्यस्त करने के लिए प्रयासरत है परंतु कभी-कभी ध्वनि श्रवण करने हेतु आपको मिक्सर द्वारा ध्वनि वर्धन व चैनलों की ध्वनि बंद करने की आवश्यकता हो सकती है।&lt;/p&gt; &lt;p&gt;मिक्सर का शॉर्टकट मेन्यू में ही स्थित है। मिक्सर खोलने हेतु उस पर क्लिक करें।&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1207"/>
+        <location filename="../minstall.cpp" line="1210"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;अपने %1 को नवीनतम रखना&lt;/b&gt;&lt;br/&gt;कृपया सूचना व अपडेट हेतु देखें &lt;/p&gt;&lt;p&gt;%2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1212"/>
+        <location filename="../minstall.cpp" line="1215"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;विशिष्ट आभार&lt;/b&gt;&lt;br/&gt;उन सभी का धन्यवाद जिन्होंने अपने समय, धन राशि, सुझावों, कार्यों, प्रशंसा, विचारों, प्रचार व/या प्रोत्साहन के रूप में %1 का समर्थन किया।&lt;/p&gt;&lt;p&gt;आपके सहयोग के बिना %1 का अस्तित्व संभव नहीं था।&lt;/p&gt;&lt;p&gt;%2 सॉफ्टवेयर विकासकर्ता टीम&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1264"/>
+        <location filename="../minstall.cpp" line="1266"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1266"/>
+        <location filename="../minstall.cpp" line="1268"/>
         <source>Combined root and home</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1308"/>
+        <location filename="../minstall.cpp" line="1312"/>
         <source>----</source>
         <translation>----</translation>
-    </message>
-    <message>
-        <source>System boot disk:</source>
-        <translation type="vanished">सिस्टम बूट डिस्क :</translation>
-    </message>
-    <message>
-        <source>Partition to use:</source>
-        <translation type="vanished">उपयोग हेतु विभाजन :</translation>
     </message>
 </context>
 <context>
@@ -1080,12 +942,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../mpassedit.cpp" line="188"/>
         <source>Hide the password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../mpassedit.cpp" line="188"/>
         <source>Show the password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -1161,6 +1023,11 @@ Do you really want to stop now?</source>
         <translation>पूर्ण डिस्क उपयोग कर सामान्य इंस्टॉल</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="342"/>
+        <source>Customize the disk layout</source>
+        <translation>डिस्क अभिन्यास अनुकूलित करें</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="355"/>
         <source>Use disk:</source>
         <translation>उपयोग हेतु डिस्क :</translation>
@@ -1191,11 +1058,6 @@ Do you really want to stop now?</source>
         <location filename="../meinstall.ui" line="526"/>
         <source>Home</source>
         <translation>होम</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="342"/>
-        <source>Customize the disk layout</source>
-        <translation>डिस्क अभिन्यास अनुकूलित करें</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="567"/>
@@ -1508,84 +1370,84 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../oobe.cpp" line="320"/>
         <source>Please enter a computer name.</source>
-        <translation type="unfinished">कृपया कंप्यूटर नाम दर्ज करें।</translation>
+        <translation>कृपया कंप्यूटर नाम दर्ज करें।</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="324"/>
         <source>Sorry, your computer name contains invalid characters.
-You&apos;ll have to select a different
+You'll have to select a different
 name before proceeding.</source>
-        <translation type="unfinished">क्षमा करें, आपके कंप्यूटर नाम में अमान्य अक्षर हैं।
+        <translation>क्षमा करें, आपके कंप्यूटर नाम में अमान्य अक्षर हैं।
 कृपया प्रक्रिया जारी
 रखने से पहले एक उचित नाम चुनें।</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="329"/>
         <source>Please enter a domain name.</source>
-        <translation type="unfinished">कृपया डोमेन नाम दर्ज करें।</translation>
+        <translation>कृपया डोमेन नाम दर्ज करें।</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="333"/>
         <source>Sorry, your computer domain contains invalid characters.
-You&apos;ll have to select a different
+You'll have to select a different
 name before proceeding.</source>
-        <translation type="unfinished">क्षमा करें, आपके कंप्यूटर डोमेन में अमान्य अक्षर हैं।
+        <translation>क्षमा करें, आपके कंप्यूटर डोमेन में अमान्य अक्षर हैं।
 कृपया प्रक्रिया जारी
 रखने से पहले एक उचित नाम चुनें।</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="340"/>
         <source>Please enter a workgroup.</source>
-        <translation type="unfinished">कृपया कार्यसमूह दर्ज करें।</translation>
+        <translation>कृपया कार्यसमूह दर्ज करें।</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="477"/>
+        <location filename="../oobe.cpp" line="475"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
-        <translation type="unfinished">उपयोक्ता नाम में कोई विशिष्ट या रिक्त अक्षर न हो।
+        <translation>उपयोक्ता नाम में कोई विशिष्ट या रिक्त अक्षर न हो।
 कृपया प्रक्रिया जारी रखने से पहले एक उचित नाम चुनें।</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="488"/>
+        <location filename="../oobe.cpp" line="486"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
-        <translation type="unfinished">क्षमा करें, यह नाम पहले से प्रयुक्त है।
+        <translation>क्षमा करें, यह नाम पहले से प्रयुक्त है।
 कृपया कोई भिन्न नाम चुनें।</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="497"/>
+        <location filename="../oobe.cpp" line="495"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
-        <translation type="unfinished">आपने रूट अकाउंट हेतु कोई कूटशब्द प्रदान नहीं किया है। क्या आप जारी रखना चाहते हैं?</translation>
+        <translation>आपने रूट अकाउंट हेतु कोई कूटशब्द प्रदान नहीं किया है। क्या आप जारी रखना चाहते हैं?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="526"/>
+        <location filename="../oobe.cpp" line="524"/>
         <source>Failed to set user account passwords.</source>
-        <translation type="unfinished">उपयोक्ता अकाउंट हेतु कूटशब्द सेट करना विफल।</translation>
+        <translation>उपयोक्ता अकाउंट हेतु कूटशब्द सेट करना विफल।</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="545"/>
+        <location filename="../oobe.cpp" line="543"/>
         <source>Failed to save old home directory.</source>
-        <translation type="unfinished">पुरानी होम डायरेक्टरी संचित करना विफल।</translation>
+        <translation>पुरानी होम डायरेक्टरी संचित करना विफल।</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="549"/>
+        <location filename="../oobe.cpp" line="547"/>
         <source>Failed to delete old home directory.</source>
-        <translation type="unfinished">पुरानी होम डायरेक्टरी हटाना विफल।</translation>
+        <translation>पुरानी होम डायरेक्टरी हटाना विफल।</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="570"/>
+        <location filename="../oobe.cpp" line="568"/>
         <source>Sorry, failed to create user directory.</source>
-        <translation type="unfinished">क्षमा करें, उपयोक्ता डायरेक्टरी बनाना विफल।</translation>
+        <translation>क्षमा करें, उपयोक्ता डायरेक्टरी बनाना विफल।</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="574"/>
+        <location filename="../oobe.cpp" line="572"/>
         <source>Sorry, failed to name user directory.</source>
-        <translation type="unfinished">क्षमा करें, उपयोक्ता डायरेक्टरी नामांकन विफल।</translation>
+        <translation>क्षमा करें, उपयोक्ता डायरेक्टरी नामांकन विफल।</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="609"/>
+        <location filename="../oobe.cpp" line="607"/>
         <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="unfinished">क्षमा करें, उपयोक्ता डायरेक्टरी हेतु स्वामित्व सेट करना विफल।</translation>
+        <translation>क्षमा करें, उपयोक्ता डायरेक्टरी हेतु स्वामित्व सेट करना विफल।</translation>
     </message>
 </context>
 <context>
@@ -1593,7 +1455,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="226"/>
         <source>Virtual Devices</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="450"/>
@@ -1609,33 +1471,33 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="462"/>
         <source>&amp;Lock</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="466"/>
         <source>&amp;Unlock</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="471"/>
         <location filename="../partman.cpp" line="601"/>
         <source>Add to crypttab</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="477"/>
         <source>Active partition</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="483"/>
         <source>New subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="484"/>
         <source>Scan subvolumes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="507"/>
@@ -1650,7 +1512,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="509"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="510"/>
@@ -1665,42 +1527,42 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="530"/>
         <source>Remove subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="598"/>
         <source>Unlock Drive</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="604"/>
         <source>Virtual Device:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="605"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="634"/>
         <source>Could not unlock device. Possible incorrect password.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="663"/>
         <source>Failed to close %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="707"/>
         <source>Invalid subvolume label</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="718"/>
         <source>Duplicate subvolume label</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="727"/>
@@ -1715,7 +1577,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="763"/>
         <source>A root partition of at least %1 is required.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="767"/>
@@ -1730,12 +1592,12 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="788"/>
         <source>Prepare %1 partition table on %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="797"/>
         <source>Format %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="798"/>
@@ -1745,37 +1607,37 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="799"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="801"/>
         <source>Create %1 without formatting</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="802"/>
         <source>Create %1, format to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="819"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="821"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="822"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="826"/>
         <source>The %1 installer will now perform the requested actions.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="827"/>
@@ -1815,22 +1677,22 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="898"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="907"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="957"/>
         <source>Failed to prepare required partitions.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="988"/>
         <source>Preparing partition tables</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1004"/>
@@ -1840,7 +1702,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1070"/>
         <source>Creating encrypted volume: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1075"/>
@@ -1850,22 +1712,22 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1078"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1136"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1145"/>
         <source>Preparing subvolumes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1319"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1322"/>
@@ -1875,12 +1737,12 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1482"/>
         <source>Model: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1490"/>
         <source>Free space: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1575"/>
@@ -1915,7 +1777,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1581"/>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1582"/>
@@ -1925,101 +1787,12 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1583"/>
         <source>Dump</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../partman.cpp" line="1584"/>
         <source>Pass</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QApplication</name>
-    <message>
-        <source>Customizable GUI installer for MX Linux and antiX Linux</source>
-        <translation type="vanished">एमएक्स लिनक्स व एंटी-एक्स लिनक्स हेतु अनुकूलन युक्त ग्राफिकल अंतरफलक इंस्टॉलर</translation>
-    </message>
-    <message>
-        <source>Installs automatically using the configuration file (more information below).
--- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.</source>
-        <translation type="vanished">विन्यास फाइल प्रयुक्त कर स्वतः इंस्टॉल (अधिक सूचना नीचे प्रदर्शित है)।
--- चेतावनी : संभवतः हानिकारक विकल्प, इससे सभी विभाजन स्वतः ही पूर्ण रूप से हट जाएँगे।</translation>
-    </message>
-    <message>
-        <source>Overrules sanity checks on partitions and drives, causing them to be displayed.
--- WARNING: this can break things, use it only if you don&apos;t care about data on drive.</source>
-        <translation type="vanished">विभाजनों व ड्राइव हेतु उपयुक्तता जाँच को अधिलेखित कर उन्हें प्रदर्शित करता है।
--- चेतावनी : इससे सिस्टम हानि संभव है, इसे केवल तभी उपयोग करें जब आपके अनुसार ड्राइव डेटा का महत्त्व शून्य है।</translation>
-    </message>
-    <message>
-        <source>Load a configuration file as specified by &lt;config-file&gt;.
-By default /etc/minstall.conf is used.
-This configuration can be used with --auto for an unattended installation.
-The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.
-The installer will not write any passwords or ignored settings to the new configuration file.
-Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.</source>
-        <translation type="vanished">&lt;config-file&gt; द्वारा निर्दिष्ट विन्यास फाइल लोड करें।
-डिफ़ॉल्ट रूप से /etc/minstall.conf प्रयुक्त होगी।
-इस विन्यास का उपयोग एक स्वछंद इंस्टॉल हेतु --auto के साथ करना संभव है।
-इंस्टॉलर /mnt/antiX/etc/minstall.conf सृजन (या इसे अधिलेखित) कर भविष्य में उपयोग हेतु एक प्रतिलिपि /etc/minstalled.conf पर संचित करता है।
-नवीन विन्यास फाइल में इंस्टॉलर द्वारा कोई कूटशब्द या अनदेखी की गई सेटिंग्स सम्मिलित नहीं होंगी।
-कृपया ध्यान दें, यह प्रायोगिक है। भावी इंस्टॉलर संस्करणों द्वारा मौजूदा विन्यास फाइलों की संगतता का क्षय होना संभव है।</translation>
-    </message>
-    <message>
-        <source>Always use GPT when doing a whole-drive installation regardlesss of capacity.
-Without this option, GPT will only be used on drives with at least 2TB capacity.
-GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.</source>
-        <translation type="vanished">संचय क्षमता की अनदेखी करते हुए सदैव सम्पूर्ण-ड्राइव इंस्टॉल हेतु GPT ही उपयोग करें।
-इस विकल्प के बिना GPT का उपयोग केवल कम-से-कम 2 टीबी की ड्राइव पर ही संभव है।
-इस विकल्प के बिना भी संचय क्षमता की अनदेखी करते हुए UEFI सिस्टम पर सदैव सम्पूर्ण-ड्राइव इंस्टॉल हेतु का GPT ही उपयोग होता है।</translation>
-    </message>
-    <message>
-        <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="vanished">इंस्टॉलर हेतु एक अन्य जाँच मोड, विभाजन/ड्राइव फॉर्मेट होंगी, फाइलें कॉपी नहीं होगीं। </translation>
-    </message>
-    <message>
-        <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
-Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
-This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
-        <translation type="vanished">ऑपरेटिंग सिस्टम इंस्टॉल कर, सिस्टम पुनः आरंभ होने तक उपयोक्ता-विशिष्ट विकल्पों की सूचना विंडो लंबित करें।
-पुनः आरंभ उपरांत इंस्टॉलर --oobe के साथ निष्पादित होगा ताकि उपयोक्ता सूचना दर्ज कर सके।
-यह मूल उपकरण निर्माता (ओईएम) इंस्टॉल हेतु उपयोगी है, ऐसे कंप्यूटर जिनका विक्रय ऑपरेटिंग सिस्टम सहित होता है।</translation>
-    </message>
-    <message>
-        <source>Out Of the Box Experience option.
-This will start automatically if installed with --oem option.</source>
-        <translation type="vanished">असंशोधित वास्तविक स्वरूप के अनुभव हेतु विकल्प।
---oem विकल्प के साथ इंस्टॉल होने पर यह स्वतः ही आरंभ होगा।</translation>
-    </message>
-    <message>
-        <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
-        <translation type="vanished">ग्राफिकल अंतरफलक हेतु जाँच मोड, आप बिना वास्तव में इंस्टॉल करें विभिन्न स्क्रीन देख सकते हैं।</translation>
-    </message>
-    <message>
-        <source>Installing with rsync instead of cp on custom partitioning.
--- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
-        <translation type="vanished">अनुकूलित विभाजन हेतु cp के स्थान पर rsync के साथ इंस्टॉल करना जारी है।
--- /root फॉर्मेट नहीं होगा व यह एन्क्रिप्शन हेतु संगत नहीं है।</translation>
-    </message>
-    <message>
-        <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
-        <translation type="vanished">&lt;config-file&gt; द्वारा निर्दिष्ट विन्यास फाइल लोड करें।</translation>
-    </message>
-    <message>
-        <source>The installer won&apos;t launch because it appears to be running already in the background.
-
-Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
-        <translation type="vanished">इंस्टॉलर आरंभ विफल क्योंकि प्रतीत होता है कि वह पहले से ही बैकग्राउंड में कार्यरत है।
-
-संभव हो तो उसे बंद करें अन्यथा टर्मिनल में &apos;pkill minstall&apos; कमांड निष्पादित करें।</translation>
-    </message>
-    <message>
-        <source>This operation requires root access.</source>
-        <translation type="vanished">इस कार्य हेतु रूट अभिगम आवश्यक है।</translation>
-    </message>
-    <message>
-        <source>Configuration file (%1) not found.</source>
-        <translation type="vanished">विन्यास फाइल (%1) नहीं मिली।</translation>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
@@ -2027,20 +1800,20 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
     <message>
         <location filename="../app.cpp" line="63"/>
         <source>Customizable GUI installer for MX Linux and antiX Linux</source>
-        <translation type="unfinished">एमएक्स लिनक्स व एंटी-एक्स लिनक्स हेतु अनुकूलन युक्त ग्राफिकल अंतरफलक इंस्टॉलर</translation>
+        <translation>एमएक्स लिनक्स व एंटी-एक्स लिनक्स हेतु अनुकूलन युक्त ग्राफिकल अंतरफलक इंस्टॉलर</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="66"/>
         <source>Installs automatically using the configuration file (more information below).
 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.</source>
-        <translation type="unfinished">विन्यास फाइल प्रयुक्त कर स्वतः इंस्टॉल (अधिक सूचना नीचे प्रदर्शित है)।
+        <translation>विन्यास फाइल प्रयुक्त कर स्वतः इंस्टॉल (अधिक सूचना नीचे प्रदर्शित है)।
 -- चेतावनी : संभवतः हानिकारक विकल्प, इससे सभी विभाजन स्वतः ही पूर्ण रूप से हट जाएँगे।</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="68"/>
         <source>Overrules sanity checks on partitions and drives, causing them to be displayed.
 -- WARNING: this can break things, use it only if you don&apos;t care about data on drive.</source>
-        <translation type="unfinished">विभाजनों व ड्राइव हेतु उपयुक्तता जाँच को अधिलेखित कर उन्हें प्रदर्शित करता है।
+        <translation>विभाजनों व ड्राइव हेतु उपयुक्तता जाँच को अधिलेखित कर उन्हें प्रदर्शित करता है।
 -- चेतावनी : इससे सिस्टम हानि संभव है, इसे केवल तभी उपयोग करें जब आपके अनुसार ड्राइव डेटा का महत्त्व शून्य है।</translation>
     </message>
     <message>
@@ -2051,7 +1824,7 @@ This configuration can be used with --auto for an unattended installation.
 The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.
 The installer will not write any passwords or ignored settings to the new configuration file.
 Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.</source>
-        <translation type="unfinished">&lt;config-file&gt; द्वारा निर्दिष्ट विन्यास फाइल लोड करें।
+        <translation>&lt;config-file&gt; द्वारा निर्दिष्ट विन्यास फाइल लोड करें।
 डिफ़ॉल्ट रूप से /etc/minstall.conf प्रयुक्त होगी।
 इस विन्यास का उपयोग एक स्वछंद इंस्टॉल हेतु --auto के साथ करना संभव है।
 इंस्टॉलर /mnt/antiX/etc/minstall.conf सृजन (या इसे अधिलेखित) कर भविष्य में उपयोग हेतु एक प्रतिलिपि /etc/minstalled.conf पर संचित करता है।
@@ -2061,33 +1834,33 @@ Please note, this is experimental. Future installer versions may break compatibi
     <message>
         <location filename="../app.cpp" line="76"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../app.cpp" line="77"/>
         <source>Always use GPT when doing a whole-drive installation regardlesss of capacity.
 Without this option, GPT will only be used on drives with at least 2TB capacity.
 GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.</source>
-        <translation type="unfinished">संचय क्षमता की अनदेखी करते हुए सदैव सम्पूर्ण-ड्राइव इंस्टॉल हेतु GPT ही उपयोग करें।
+        <translation>संचय क्षमता की अनदेखी करते हुए सदैव सम्पूर्ण-ड्राइव इंस्टॉल हेतु GPT ही उपयोग करें।
 इस विकल्प के बिना GPT का उपयोग केवल कम-से-कम 2 टीबी की ड्राइव पर ही संभव है।
 इस विकल्प के बिना भी संचय क्षमता की अनदेखी करते हुए UEFI सिस्टम पर सदैव सम्पूर्ण-ड्राइव इंस्टॉल हेतु का GPT ही उपयोग होता है।</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="80"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../app.cpp" line="81"/>
         <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="unfinished">इंस्टॉलर हेतु एक अन्य जाँच मोड, विभाजन/ड्राइव फॉर्मेट होंगी, फाइलें कॉपी नहीं होगीं। </translation>
+        <translation>इंस्टॉलर हेतु एक अन्य जाँच मोड, विभाजन/ड्राइव फॉर्मेट होंगी, फाइलें कॉपी नहीं होगीं। </translation>
     </message>
     <message>
         <location filename="../app.cpp" line="82"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
-        <translation type="unfinished">ऑपरेटिंग सिस्टम इंस्टॉल कर, सिस्टम पुनः आरंभ होने तक उपयोक्ता-विशिष्ट विकल्पों की सूचना विंडो लंबित करें।
+        <translation>ऑपरेटिंग सिस्टम इंस्टॉल कर, सिस्टम पुनः आरंभ होने तक उपयोक्ता-विशिष्ट विकल्पों की सूचना विंडो लंबित करें।
 पुनः आरंभ उपरांत इंस्टॉलर --oobe के साथ निष्पादित होगा ताकि उपयोक्ता सूचना दर्ज कर सके।
 यह मूल उपकरण निर्माता (ओईएम) इंस्टॉल हेतु उपयोगी है, ऐसे कंप्यूटर जिनका विक्रय ऑपरेटिंग सिस्टम सहित होता है।</translation>
     </message>
@@ -2095,59 +1868,59 @@ This is useful for OEM installations, selling or giving away a computer with an 
         <location filename="../app.cpp" line="85"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
-        <translation type="unfinished">असंशोधित वास्तविक स्वरूप के अनुभव हेतु विकल्प।
+        <translation>असंशोधित वास्तविक स्वरूप के अनुभव हेतु विकल्प।
 --oem विकल्प के साथ इंस्टॉल होने पर यह स्वतः ही आरंभ होगा।</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="87"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
-        <translation type="unfinished">ग्राफिकल अंतरफलक हेतु जाँच मोड, आप बिना वास्तव में इंस्टॉल करें विभिन्न स्क्रीन देख सकते हैं।</translation>
+        <translation>ग्राफिकल अंतरफलक हेतु जाँच मोड, आप बिना वास्तव में इंस्टॉल करें विभिन्न स्क्रीन देख सकते हैं।</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="88"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../app.cpp" line="89"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
-        <translation type="unfinished">अनुकूलित विभाजन हेतु cp के स्थान पर rsync के साथ इंस्टॉल करना जारी है।
+        <translation>अनुकूलित विभाजन हेतु cp के स्थान पर rsync के साथ इंस्टॉल करना जारी है।
 -- /root फॉर्मेट नहीं होगा व यह एन्क्रिप्शन हेतु संगत नहीं है।</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="91"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
-        <translation type="unfinished">&lt;config-file&gt; द्वारा निर्दिष्ट विन्यास फाइल लोड करें।</translation>
+        <translation>&lt;config-file&gt; द्वारा निर्दिष्ट विन्यास फाइल लोड करें।</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="95"/>
         <source>Too many arguments. Please check the command format by running the program with --help</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../app.cpp" line="100"/>
         <source>%1 Installer</source>
-        <translation type="unfinished">%1 इंस्टॉलर</translation>
+        <translation>%1 इंस्टॉलर</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="108"/>
-        <source>The installer won&apos;t launch because it appears to be running already in the background.
+        <source>The installer won't launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
-        <translation type="unfinished">इंस्टॉलर आरंभ विफल क्योंकि प्रतीत होता है कि वह पहले से ही बैकग्राउंड में कार्यरत है।
+        <translation>इंस्टॉलर आरंभ विफल क्योंकि प्रतीत होता है कि वह पहले से ही बैकग्राउंड में कार्यरत है।
 
 संभव हो तो उसे बंद करें अन्यथा टर्मिनल में &apos;pkill minstall&apos; कमांड निष्पादित करें।</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="115"/>
         <source>This operation requires root access.</source>
-        <translation type="unfinished">इस कार्य हेतु रूट अभिगम आवश्यक है।</translation>
+        <translation>इस कार्य हेतु रूट अभिगम आवश्यक है।</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="133"/>
+        <location filename="../app.cpp" line="136"/>
         <source>Configuration file (%1) not found.</source>
-        <translation type="unfinished">विन्यास फाइल (%1) नहीं मिली।</translation>
+        <translation>विन्यास फाइल (%1) नहीं मिली।</translation>
     </message>
 </context>
 </TS>
