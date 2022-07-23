@@ -9,7 +9,7 @@
     <message>
         <location filename="../base.cpp" line="89"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"/>
+        <translation>Misslykades med att ta bort det gamla systemet på destinationen.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="95"/>
@@ -34,7 +34,7 @@
     <message>
         <location filename="../base.cpp" line="217"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades med att kopiera det nya systemet.</translation>
     </message>
 </context>
 <context>
@@ -48,7 +48,7 @@
     <message>
         <location filename="../bootman.cpp" line="132"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades med att uppdatera initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="136"/>
@@ -125,7 +125,7 @@
     <message>
         <location filename="../partman.cpp" line="2366"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"/>
+        <translation>Kompression (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2368"/>
@@ -429,12 +429,12 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"/>
+        <translation>Att välja &lt;b&gt;Bevara /home&lt;/b&gt; för  root partitionen bevarar innehållet i /home katalogen, tar bort allt annat. Detta alternativ kan enbart användas när /home är på samma partition som root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="712"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"/>
+        <translation>ext2, ext3, ext4, jfs, xfs och btrfs Linux filsystem stöds och ext4 rekommenderas.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="713"/>
@@ -584,7 +584,7 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"/>
+        <translation>För %1, kan du välja att formatera partitionerna som ext2, ext3, ext4, f2fs, jfs, xfs eller btrfsr.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -1679,12 +1679,12 @@ Var vänlig välj ett annat namn.</translation>
     <message>
         <location filename="../partman.cpp" line="898"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades med att formatera LUKS container.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="907"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades med att öppna LUKS container.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="957"/>
@@ -1714,12 +1714,12 @@ Var vänlig välj ett annat namn.</translation>
     <message>
         <location filename="../partman.cpp" line="1078"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades med att formatera partition.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1136"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades med att förbereda undervolymer.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1145"/>
@@ -1729,7 +1729,7 @@ Var vänlig välj ett annat namn.</translation>
     <message>
         <location filename="../partman.cpp" line="1319"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"/>
+        <translation>Misslyckades med montering av partition.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1322"/>
@@ -1836,7 +1836,7 @@ Var vänlig notera, detta är experimentelt. Framtida versioner av installeraren
     <message>
         <location filename="../app.cpp" line="76"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Stängs av automatiskt när installationen är klar.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="77"/>
@@ -1881,7 +1881,7 @@ Detta startar automatiskt om det installeras med --oem alternativet.</translatio
     <message>
         <location filename="../app.cpp" line="88"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Startar om automatiskt när installationen är klar.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="89"/>

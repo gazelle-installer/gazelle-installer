@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[antix-development.gazelle-installer]
+file_filter = ./gazelle-installer_<lang>.ts
+source_file = gazelle-installer_en.ts
+source_lang = en
+type = ts

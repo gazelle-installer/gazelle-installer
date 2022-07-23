@@ -9,7 +9,7 @@
     <message>
         <location filename="../base.cpp" line="89"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"/>
+        <translation>S’u arrit të fshihet sistemi i vjetër te vendmbërritje.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="95"/>
@@ -34,7 +34,7 @@
     <message>
         <location filename="../base.cpp" line="217"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"/>
+        <translation>S’u arrit të kopjohej sistemi i ri.</translation>
     </message>
 </context>
 <context>
@@ -48,7 +48,7 @@
     <message>
         <location filename="../bootman.cpp" line="132"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"/>
+        <translation>S’u arrit të përditësohej initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="136"/>
@@ -125,7 +125,7 @@
     <message>
         <location filename="../partman.cpp" line="2366"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"/>
+        <translation>Ngjeshje (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2368"/>
@@ -429,12 +429,12 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"/>
+        <translation>Përzgjedhja e &lt;b&gt;Ruaje /home&lt;/b&gt; për pjesën e rrënjës ruan lëndën e drejtorisë /home, duke fshirë gjithçka tjetër. Kjo mundësi mund të përdoret vetëm kur /home gjendet në të njëjtën pjesë me rrënjën.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="712"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"/>
+        <translation>Mbulohen sistemet ext2, ext3, ext4, jfs, xfs dhe btrfs të kartelave dhe rekomandohet ext4.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="713"/>
@@ -584,7 +584,7 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"/>
+        <translation>Për %1, mund të zgjidhni t’i formatoni pjesët si ext2, ext3, ext4, f2fs, jfs, xfs ose btrfs.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -1679,12 +1679,12 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="898"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>S’u arrit të formatohej kontejner LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="907"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>S’u arrit të hapej kontejner LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="957"/>
@@ -1714,12 +1714,12 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="1078"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"/>
+        <translation>S’u arrit të formatohej pjesa.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1136"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"/>
+        <translation>S’u arrit të përgatiten nënvëllime.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1145"/>
@@ -1729,7 +1729,7 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="1319"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"/>
+        <translation>S’u arrit të montohej pjesë.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1322"/>
@@ -1836,7 +1836,7 @@ Ju lutemi, kini parasysh, kjo është eksperimentale. Versione të ardhshëm të
     <message>
         <location filename="../app.cpp" line="76"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Bëhet fikje vetvetiu, kur të ketë përfunduar instalimi.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="77"/>
@@ -1881,7 +1881,7 @@ Kjo do të instalohet automatikisht, nëse instalimi bëhet me mundësinë --oem
     <message>
         <location filename="../app.cpp" line="88"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Riniset vetvetiu, kur të ketë përfunduar instalimi.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="89"/>

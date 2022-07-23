@@ -9,7 +9,7 @@
     <message>
         <location filename="../base.cpp" line="89"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"/>
+        <translation>指定した場所の古いシステム情報の削除に失敗しました。</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="95"/>
@@ -34,7 +34,7 @@
     <message>
         <location filename="../base.cpp" line="217"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"/>
+        <translation>新しいシステムのコピーに失敗しました。</translation>
     </message>
 </context>
 <context>
@@ -48,7 +48,7 @@
     <message>
         <location filename="../bootman.cpp" line="132"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"/>
+        <translation>initramfs の更新に失敗しました。</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="136"/>
@@ -125,7 +125,7 @@
     <message>
         <location filename="../partman.cpp" line="2366"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"/>
+        <translation>圧縮 (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2368"/>
@@ -429,12 +429,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"/>
+        <translation>root パーティションで &lt;b&gt;Preserve /home&lt;/b&gt; を選択すると、/home ディレクトリの内容が保存され、その他はすべて削除されます。このオプションは、/home が root と同じパーティションに存在する場合にのみ使用できます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="712"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"/>
+        <translation>ext2、ext3、 ext4、 jfs、 xfs、 btrfs の Linux ファイルシステムをサポートしますが、 ext4 システムをお推めします。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="713"/>
@@ -584,7 +584,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"/>
+        <translation>%1 については、フォーマットするパーティションの形式を ext2、ext3、 ext4、 f2fs、 jfs、 xfs、 btrfs の中から選択することが可能です。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -1677,12 +1677,12 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="898"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation> LUKS コンテナの初期化に失敗しました。</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="907"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>LUKS コンテナを開くことができません。</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="957"/>
@@ -1712,12 +1712,12 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1078"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"/>
+        <translation>パーティションの初期化に失敗しました。</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1136"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"/>
+        <translation>サブボリュームの準備に失敗しました。</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1145"/>
@@ -1727,7 +1727,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1319"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"/>
+        <translation>パーティションのマウントに失敗しました。</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1322"/>
@@ -1834,7 +1834,7 @@ Please note, this is experimental. Future installer versions may break compatibi
     <message>
         <location filename="../app.cpp" line="76"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>インストールが完了すると自動的にシャットダウンします。</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="77"/>
@@ -1879,7 +1879,7 @@ This will start automatically if installed with --oem option.</source>
     <message>
         <location filename="../app.cpp" line="88"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>インストールが完了すると自動的に再起動します。</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="89"/>

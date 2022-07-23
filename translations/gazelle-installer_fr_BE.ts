@@ -9,7 +9,7 @@
     <message>
         <location filename="../base.cpp" line="89"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de supprimer l&apos;ancien système sur la destination.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="95"/>
@@ -24,7 +24,7 @@
     <message>
         <location filename="../base.cpp" line="117"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation>Échec de la finalisation de la configuration du cryptage.</translation>
+        <translation>Impossible de finaliser la configuration du cryptage.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="186"/>
@@ -34,7 +34,7 @@
     <message>
         <location filename="../base.cpp" line="217"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de copier le nouveau système.</translation>
     </message>
 </context>
 <context>
@@ -48,7 +48,7 @@
     <message>
         <location filename="../bootman.cpp" line="132"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de mettre à jour initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="136"/>
@@ -63,13 +63,13 @@
     <message>
         <location filename="../bootman.cpp" line="262"/>
         <source>System boot disk:</source>
-        <translation>Disque système de démarrage :</translation>
+        <translation>Disque de démarrage du système:</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="281"/>
         <location filename="../bootman.cpp" line="293"/>
         <source>Partition to use:</source>
-        <translation>Partition à utiliser :</translation>
+        <translation>Partition à utiliser:</translation>
     </message>
 </context>
 <context>
@@ -125,7 +125,7 @@
     <message>
         <location filename="../partman.cpp" line="2366"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"/>
+        <translation>Compression (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2368"/>
@@ -186,7 +186,7 @@ Profitez bien de %1</translation>
     <message>
         <location filename="../minstall.cpp" line="368"/>
         <source>Preparing to install %1</source>
-        <translation>Installation de %1 en préparation</translation>
+        <translation>Préparation de l&apos;installation de %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="390"/>
@@ -216,7 +216,7 @@ Profitez bien de %1</translation>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
-        <translation>Etes-vous d&apos;accord de formater et d&apos;utiliser la totalité du disque (%1) pour %2 ?</translation>
+        <translation>Etes-vous d&apos;accord de formater et d&apos;utiliser la totalité du disque (%1) pour %2?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="556"/>
@@ -429,12 +429,12 @@ Profitez bien de %1</translation>
     <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionner &lt;b&gt;Préserver /home&lt;/b&gt; pour la partition root, préserve le contenu du répertoire /home, en supprimant tout le reste. Cette option ne peut être utilisée que lorsque /home se trouve sur la même partition que root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="712"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"/>
+        <translation>Les systèmes de fichiers Linux ext2, ext3, ext4, jfs, xfs et btrfs sont pris en charge et ext4 est recommandé.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="713"/>
@@ -544,7 +544,7 @@ Profitez bien de %1</translation>
     <message>
         <location filename="../minstall.cpp" line="740"/>
         <source>Need help creating a layout?</source>
-        <translation>Vous avez besoin d&apos;aide pour créer une disposition ?</translation>
+        <translation>Vous avez besoin d&apos;aide pour créer une disposition?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="741"/>
@@ -584,7 +584,7 @@ Profitez bien de %1</translation>
     <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"/>
+        <translation>Pour %1, vous pouvez choisir de formater les partitions en ext2, ext3, ext4, f2fs, jfs, xfs ou btrfs.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -704,7 +704,7 @@ Profitez bien de %1</translation>
     <message>
         <location filename="../minstall.cpp" line="812"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
-        <translation>La plupart des utilisateurs ne devraient pas modifier les valeurs par défaut. Les utilisateurs disposant d&apos;ordinateurs à faibles ressources souhaitent parfois désactiver les services inutiles afin de limiter au maximum l&apos;utilisation de la RAM. Assurez-vous de savoir ce que vous faites !</translation>
+        <translation>La plupart des utilisateurs ne devraient pas modifier les valeurs par défaut. Les utilisateurs disposant d&apos;ordinateurs à faibles ressources souhaitent parfois désactiver les services inutiles afin de limiter au maximum l&apos;utilisation de la RAM. Assurez-vous de savoir ce que vous faites!</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="818"/>
@@ -889,7 +889,7 @@ Profitez bien de %1</translation>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>L&apos;installation et la configuration sont inachevées.
-Voulez-vous vraiment quitter maintenant ?</translation>
+Voulez-vous vraiment quitter maintenant?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1180"/>
@@ -899,7 +899,7 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Réparer votre Installation&lt;/b&gt;&lt;br/&gt;Si %1 arrête de fonctionner depuis le disque dur, il est parfois possible de corriger le problème en démarrant depuis le LiveDVD ou LiveUSB et en exécutant l&apos;un des utilitaires de %1 ou un autre outil Linux pour réparer le système. &lt;/p&gt;&lt;p&gt;Vous pouvez également utiliser le LiveDVD ou LiveUSB de %1 pour récupérer des données d&apos;un système MS-Windows !&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Réparer votre installation&lt;/b&gt;&lt;br/&gt;Si %1 arrête de fonctionner depuis le disque dur, il est parfois possible de corriger le problème en démarrant depuis le LiveDVD ou LiveUSB et en exécutant l&apos;un des utilitaires de %1 ou un autre outil Linux pour réparer le système. &lt;/p&gt;&lt;p&gt;Vous pouvez également utiliser le LiveDVD ou LiveUSB de %1 pour récupérer des données d&apos;un système MS-Windows!&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1202"/>
@@ -1032,7 +1032,7 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../meinstall.ui" line="355"/>
         <source>Use disk:</source>
-        <translation>Utiliser le disque :</translation>
+        <translation>Utiliser le disque:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="368"/>
@@ -1049,7 +1049,7 @@ Voulez-vous vraiment quitter maintenant ?</translation>
         <location filename="../meinstall.ui" line="410"/>
         <location filename="../meinstall.ui" line="702"/>
         <source>Confirm password:</source>
-        <translation>Confirmer le mot de passe :</translation>
+        <translation>Confirmer le mot de passe:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="457"/>
@@ -1139,12 +1139,12 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../meinstall.ui" line="828"/>
         <source>System boot disk:</source>
-        <translation>Disque de démarrage du système :</translation>
+        <translation>Disque de démarrage du système:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="841"/>
         <source>Location to install on:</source>
-        <translation>Emplacement de l&apos;installation :</translation>
+        <translation>Emplacement de l&apos;installation:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="893"/>
@@ -1174,7 +1174,7 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../meinstall.ui" line="990"/>
         <source>Workgroup:</source>
-        <translation>Groupe de travail :</translation>
+        <translation>Groupe de travail:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1003"/>
@@ -1189,12 +1189,12 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../meinstall.ui" line="1032"/>
         <source>Computer domain:</source>
-        <translation>Nom de domaine :</translation>
+        <translation>Nom de domaine:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1058"/>
         <source>Computer name:</source>
-        <translation>Nom de l&apos;ordinateur :</translation>
+        <translation>Nom de l&apos;ordinateur:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1113"/>
@@ -1204,12 +1204,12 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../meinstall.ui" line="1148"/>
         <source>Format:</source>
-        <translation>Format :</translation>
+        <translation>Format:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1176"/>
         <source>Timezone:</source>
-        <translation>Fuseau horaire :</translation>
+        <translation>Fuseau horaire:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1215"/>
@@ -1224,7 +1224,7 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../meinstall.ui" line="1281"/>
         <source>Locale:</source>
-        <translation>Variable locale :</translation>
+        <translation>Variable locale:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1303"/>
@@ -1259,17 +1259,17 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../meinstall.ui" line="1391"/>
         <source>Default user login name:</source>
-        <translation>Nom d&apos;utilisateur par défaut :</translation>
+        <translation>Nom d&apos;utilisateur par défaut:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1407"/>
         <source>Default user password:</source>
-        <translation>Mot de passe utilisateur par défaut :</translation>
+        <translation>Mot de passe utilisateur par défaut:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1420"/>
         <source>Confirm user password:</source>
-        <translation>Confirmer le mot de passe utilisateur :</translation>
+        <translation>Confirmer le mot de passe utilisateur:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1481"/>
@@ -1284,12 +1284,12 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../meinstall.ui" line="1515"/>
         <source>Root password:</source>
-        <translation>Mot de passe administrateur : </translation>
+        <translation>Mot de passe administrateur: </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1560"/>
         <source>Confirm root password:</source>
-        <translation>Confirmer le mot de passe administrateur : </translation>
+        <translation>Confirmer le mot de passe administrateur: </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1589"/>
@@ -1417,7 +1417,7 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../oobe.cpp" line="495"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
-        <translation>Vous n&apos;avez pas fourni de mot de passe pour le compte root. Voulez-vous continuer ?</translation>
+        <translation>Vous n&apos;avez pas fourni de mot de passe pour le compte root. Voulez-vous continuer?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="524"/>
@@ -1537,12 +1537,12 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="604"/>
         <source>Virtual Device:</source>
-        <translation>Périphérique virtuel :</translation>
+        <translation>Périphérique virtuel:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="605"/>
         <source>Password:</source>
-        <translation>Mot de passe :</translation>
+        <translation>Mot de passe:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="634"/>
@@ -1632,7 +1632,7 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="822"/>
         <source>Are you sure you want to continue?</source>
-        <translation>Êtes-vous certain de vouloir continuer ?</translation>
+        <translation>Êtes-vous certain de vouloir continuer?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="826"/>
@@ -1642,7 +1642,7 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="827"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation>Ces actions sont irréversibles. Voulez-vous continuer ?</translation>
+        <translation>Ces actions sont irréversibles. Voulez-vous continuer?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="866"/>
@@ -1652,7 +1652,7 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="870"/>
         <source>Smartmon tool output:</source>
-        <translation>Résultat de l&apos;outil Smartmon : </translation>
+        <translation>Résultat de l&apos;outil Smartmon: </translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="871"/>
@@ -1667,22 +1667,22 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="878"/>
         <source>Do you want to abort the installation?</source>
-        <translation>Voulez-vous interrompre l&apos;installation ?</translation>
+        <translation>Voulez-vous interrompre l&apos;installation?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="883"/>
         <source>Do you want to continue?</source>
-        <translation>Voulez-vous continuer ?</translation>
+        <translation>Voulez-vous continuer?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="898"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de formater le conteneur LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="907"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible d&apos;ouvrir le conteneur LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="957"/>
@@ -1702,22 +1702,22 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="1070"/>
         <source>Creating encrypted volume: %1</source>
-        <translation>Création du disque crypté : %1</translation>
+        <translation>Création du disque crypté: %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1075"/>
         <source>Formatting: %1</source>
-        <translation>Formatage : %1</translation>
+        <translation>Formatage: %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1078"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de formater la partition.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1136"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"/>
+        <translation>La préparation des sous-volumes a échoué.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1145"/>
@@ -1727,22 +1727,22 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="1319"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de monter la partition.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1322"/>
         <source>Mounting: %1</source>
-        <translation>Montage : %1</translation>
+        <translation>Montage: %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1482"/>
         <source>Model: %1</source>
-        <translation>Modèle : %1</translation>
+        <translation>Modèle: %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1490"/>
         <source>Free space: %1</source>
-        <translation>Espace libre : %1</translation>
+        <translation>Espace libre: %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1575"/>
@@ -1807,14 +1807,14 @@ Veuillez choisir un nom différent.</translation>
         <source>Installs automatically using the configuration file (more information below).
 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.</source>
         <translation>S&apos;installe automatiquement en utilisant le fichier de configuration (plus d&apos;informations ci-dessous).
--- AVERTISSEMENT : option potentiellement dangereuse, elle effacera automatiquement la ou les partition(s).</translation>
+-- AVERTISSEMENT: option potentiellement dangereuse, elle effacera automatiquement la ou les partition(s).</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="68"/>
         <source>Overrules sanity checks on partitions and drives, causing them to be displayed.
 -- WARNING: this can break things, use it only if you don&apos;t care about data on drive.</source>
         <translation>Annule les contrôles d&apos;intégrité des partitions et des lecteurs, ce qui les fait apparaître.
--- AVERTISSEMENT : cela peut casser des choses, ne l&apos;utilisez que si vous ne vous souciez pas des données sur le disque.</translation>
+-- AVERTISSEMENT: cela peut casser des choses, ne l&apos;utilisez que si vous ne vous souciez pas des données sur le disque.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="70"/>
@@ -1834,7 +1834,7 @@ Veuillez noter que ceci est expérimental. Les futures versions de l&apos;instal
     <message>
         <location filename="../app.cpp" line="76"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>S&apos;arrête automatiquement à la fin de l&apos;installation.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="77"/>
@@ -1879,7 +1879,7 @@ Il sera lancé automatiquement s&apos;il est installé avec l&apos;option --oem.
     <message>
         <location filename="../app.cpp" line="88"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Redémarre automatiquement après installation.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="89"/>
