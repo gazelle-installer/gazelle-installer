@@ -9,7 +9,7 @@
     <message>
         <location filename="../base.cpp" line="89"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de supprimer l&apos;ancien système sur la destination.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="95"/>
@@ -24,7 +24,7 @@
     <message>
         <location filename="../base.cpp" line="117"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation>Échec de la finalisation de la configuration du cryptage.</translation>
+        <translation>Impossible de finaliser la configuration du cryptage.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="186"/>
@@ -34,7 +34,7 @@
     <message>
         <location filename="../base.cpp" line="217"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de copier le nouveau système.</translation>
     </message>
 </context>
 <context>
@@ -48,7 +48,7 @@
     <message>
         <location filename="../bootman.cpp" line="132"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de mettre à jour initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="136"/>
@@ -125,7 +125,7 @@
     <message>
         <location filename="../partman.cpp" line="2366"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"/>
+        <translation>Compression (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2368"/>
@@ -149,7 +149,7 @@ Do you want to continue the installation?</source>
         <translation>Vous utilisez un système d&apos;exploitation 32bit lancé en mode UEFI 64 bit; le système ne pourra pas démarrer à moins que vous ne sélectionniez Legacy Boot ou similaire au démarrage.
 Nous vous recommandons de quitter et de redémarrer en mode Legacy Boot
 
-Voulez-vous continuer l&apos;installation?</translation>
+Voulez-vous continuer l&apos;installation ?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="145"/>
@@ -186,7 +186,7 @@ Profitez bien de %1</translation>
     <message>
         <location filename="../minstall.cpp" line="368"/>
         <source>Preparing to install %1</source>
-        <translation>Installation de %1 en préparation</translation>
+        <translation>Préparation de l&apos;installation de %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="390"/>
@@ -429,12 +429,12 @@ Profitez bien de %1</translation>
     <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"/>
+        <translation>Sélectionner &lt;b&gt;Préserver /home&lt;/b&gt; pour la partition root, préserve le contenu du répertoire /home, en supprimant tout le reste. Cette option ne peut être utilisée que lorsque /home se trouve sur la même partition que root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="712"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"/>
+        <translation>Les systèmes de fichiers Linux ext2, ext3, ext4, jfs, xfs et btrfs sont pris en charge et ext4 est recommandé.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="713"/>
@@ -584,7 +584,7 @@ Profitez bien de %1</translation>
     <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"/>
+        <translation>Pour %1, vous pouvez choisir de formater les partitions en ext2, ext3, ext4, f2fs, jfs, xfs ou btrfs.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -899,7 +899,7 @@ Voulez-vous vraiment quitter maintenant ?</translation>
     <message>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Réparer votre Installation&lt;/b&gt;&lt;br/&gt;Si %1 arrête de fonctionner depuis le disque dur, il est parfois possible de corriger le problème en démarrant depuis le LiveDVD ou LiveUSB et en exécutant l&apos;un des utilitaires de %1 ou un autre outil Linux pour réparer le système. &lt;/p&gt;&lt;p&gt;Vous pouvez également utiliser le LiveDVD ou LiveUSB de %1 pour récupérer des données d&apos;un système MS-Windows !&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Réparer votre installation&lt;/b&gt;&lt;br/&gt;Si %1 arrête de fonctionner depuis le disque dur, il est parfois possible de corriger le problème en démarrant depuis le LiveDVD ou LiveUSB et en exécutant l&apos;un des utilitaires de %1 ou un autre outil Linux pour réparer le système. &lt;/p&gt;&lt;p&gt;Vous pouvez également utiliser le LiveDVD ou LiveUSB de %1 pour récupérer des données d&apos;un système MS-Windows !&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1202"/>
@@ -1677,12 +1677,12 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="898"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de formater le conteneur LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="907"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible d&apos;ouvrir le conteneur LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="957"/>
@@ -1712,12 +1712,12 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="1078"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de formater la partition.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1136"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"/>
+        <translation>La préparation des sous-volumes a échoué.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1145"/>
@@ -1727,7 +1727,7 @@ Veuillez choisir un nom différent.</translation>
     <message>
         <location filename="../partman.cpp" line="1319"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"/>
+        <translation>Impossible de monter la partition.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1322"/>
@@ -1834,7 +1834,7 @@ Veuillez noter que ceci est expérimental. Les futures versions de l&apos;instal
     <message>
         <location filename="../app.cpp" line="76"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>S&apos;arrête automatiquement à la fin de l&apos;installation.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="77"/>
@@ -1879,7 +1879,7 @@ Il sera lancé automatiquement s&apos;il est installé avec l&apos;option --oem.
     <message>
         <location filename="../app.cpp" line="88"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Redémarre automatiquement après installation.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="89"/>

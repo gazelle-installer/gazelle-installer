@@ -9,7 +9,7 @@
     <message>
         <location filename="../base.cpp" line="89"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile eliminare il vecchio sistema sulla destinazione.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="95"/>
@@ -34,7 +34,7 @@
     <message>
         <location filename="../base.cpp" line="217"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile copiare il nuovo sistema.</translation>
     </message>
 </context>
 <context>
@@ -48,7 +48,7 @@
     <message>
         <location filename="../bootman.cpp" line="132"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile aggiornare initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="136"/>
@@ -125,7 +125,7 @@
     <message>
         <location filename="../partman.cpp" line="2366"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"/>
+        <translation>Compressione (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2368"/>
@@ -430,12 +430,12 @@ Se hai bisogno di un maggior controllo riguardo la posizione di installazione di
     <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"/>
+        <translation>Selezionando &lt;b&gt;Preserva /home&lt;/b&gt; per la partizione root, preserva i contenuti della directory /home, eliminando tutto il resto. Questa opzione può essere usata solo quando /home è nella stessa partizione di root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="712"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"/>
+        <translation>I file di sistema Linux ext2, ext3, ext4, jfs, xfs e btrfs sono supportati e ext4 è raccomandato.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="713"/>
@@ -585,7 +585,7 @@ Se hai bisogno di un maggior controllo riguardo la posizione di installazione di
     <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"/>
+        <translation>Per %1, potresti scegliere di formattare le partizioni come ext2, ext3, ext4, f2fs, jfs, xfs o btrfs.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -1682,12 +1682,12 @@ Per favore, scegli un nome differente.</translation>
     <message>
         <location filename="../partman.cpp" line="898"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile formattare il contenitore LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="907"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile aprire il contenitore LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="957"/>
@@ -1717,12 +1717,12 @@ Per favore, scegli un nome differente.</translation>
     <message>
         <location filename="../partman.cpp" line="1078"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile formattare la partizione.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1136"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile preparare i sottovolumi.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1145"/>
@@ -1732,7 +1732,7 @@ Per favore, scegli un nome differente.</translation>
     <message>
         <location filename="../partman.cpp" line="1319"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"/>
+        <translation>Impossibile montare la partizione.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1322"/>
@@ -1838,7 +1838,7 @@ Si tenga conto che queste funzioni sono sperimentali. Le future versioni dell&ap
     <message>
         <location filename="../app.cpp" line="76"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Spegnimento automatico alla fine dell&apos;installazione.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="77"/>
@@ -1883,7 +1883,7 @@ Si avvierà automaticamente se installato con l&apos;opzione --oem.</translation
     <message>
         <location filename="../app.cpp" line="88"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Riavvio automatico alla fine dell&apos;installazione.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="89"/>

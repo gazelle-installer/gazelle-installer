@@ -9,7 +9,7 @@
     <message>
         <location filename="../base.cpp" line="89"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"/>
+        <translation>Ha fallat en esborrar el sistema anterior a la destinació.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="95"/>
@@ -34,7 +34,7 @@
     <message>
         <location filename="../base.cpp" line="217"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"/>
+        <translation>Ha fallat en copiar el nou sistema.</translation>
     </message>
 </context>
 <context>
@@ -48,7 +48,7 @@
     <message>
         <location filename="../bootman.cpp" line="132"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"/>
+        <translation>Ha fallat en actualitzar initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="136"/>
@@ -125,7 +125,7 @@
     <message>
         <location filename="../partman.cpp" line="2366"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"/>
+        <translation>Compressió (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2368"/>
@@ -429,12 +429,12 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"/>
+        <translation>En seleccionar &lt;b&gt;Preserva /home&lt;/b&gt; per la nova partició arrel preserva el contingut del directori  /home, esborrant la resta. Aquesta opció només es pot usar quan  /home està a la mateixa partició que l&apos;arrel.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="712"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"/>
+        <translation>Se suporten els sistemes de fitxer Linux ext2, ext3, ext4, jfs, xfs i btrfs; es recomana  ext4.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="713"/>
@@ -584,7 +584,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"/>
+        <translation>Per %1, podeu triar formatar les particions com a ext2, ext3, ext4, f2fs, jfs, xfs o btrfs.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -1679,12 +1679,12 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="898"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Ha fallat en formatar el contenidor LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="907"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"/>
+        <translation>Ha fallat en obrir el contenidor LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="957"/>
@@ -1714,12 +1714,12 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="1078"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"/>
+        <translation>Ha fallat en formatar la partició.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1136"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"/>
+        <translation>Ha fallat en preparar els subvolums.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1145"/>
@@ -1729,7 +1729,7 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="1319"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"/>
+        <translation>Ha fallat en muntar la partició.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1322"/>
@@ -1836,7 +1836,7 @@ Tingueu en compte que això és experimental. Les futures versions de l&apos;ins
     <message>
         <location filename="../app.cpp" line="76"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Apaga automàticament en acabar la instal·lació.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="77"/>
@@ -1879,7 +1879,7 @@ Arrencarà automàticament si s&apos;ha instal·lat amb l&apos;opció --oem.</tr
     <message>
         <location filename="../app.cpp" line="88"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"/>
+        <translation>Reinicia automàticament en acabar la instal·lació.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="89"/>
