@@ -2060,7 +2060,7 @@ int DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTree)
     const int bootMinMB = static_cast<int>(partman->bootSpaceNeeded / 1048576);
     if (!crypto) rootMinMB += bootMinMB;
     else {
-        int bootFormatSize = 512;
+        int bootFormatSize = 1024;
         if (bootFormatSize < bootMinMB) bootFormatSize = static_cast<int>(partman->bootSpaceNeeded);
         if (updateTree) addPart(bootFormatSize, "boot", crypto);
         rootFormatSize -= bootFormatSize;
