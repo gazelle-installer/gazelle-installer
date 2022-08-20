@@ -134,8 +134,8 @@ void PartMan::scan(DeviceItem *drvstart)
         drvit->device = jdName;
         drvit->path = jdPath;
         const QString &ptType = jsonDrive["pttype"].toString();
-        drvit->flags.curGPT = (ptType=="gpt");
-        drvit->flags.curMBR = (ptType=="dos");
+        drvit->flags.curGPT = (ptType == "gpt");
+        drvit->flags.curMBR = (ptType == "dos");
         drvit->flags.rotational = jsonDrive["rota"].toBool();
         drvit->discgran = jsonDrive["disc-gran"].toInt();
         drvit->size = jsonDrive["size"].toVariant().toLongLong();
@@ -163,7 +163,7 @@ void PartMan::scan(DeviceItem *drvstart)
             if ((partflags & 0x80) || (partflags & 0x04)) partit->setActive(true);
             partit->mapCount = jsonPart["children"].toArray().count();
             partit->flags.curESP = partTypeName.startsWith("EFI "); // "System"/"(FAT-12/16/32)"
-            partit->flags.bootRoot = (!bootUUID.isEmpty() && jsonPart["uuid"]==bootUUID);
+            partit->flags.bootRoot = (!bootUUID.isEmpty() && jsonPart["uuid"] == bootUUID);
             partit->curFormat = jsonPart["fstype"].toString();
             // Touching MacOS first drive, or MS LDM may brick the system.
             if ((proc.detectMac() && partit->device.startsWith("sda"))
@@ -257,7 +257,7 @@ void PartMan::scanVirtualDevices(bool rescan)
             devit->discgran = discgran;
             devit->size = size;
             devit->physec = physec;
-            devit->flags.bootRoot = (!bootUUID.isEmpty() && jsonDev["uuid"]==bootUUID);
+            devit->flags.bootRoot = (!bootUUID.isEmpty() && jsonDev["uuid"] == bootUUID);
             devit->curLabel = label;
             devit->curFormat = jsonDev["fstype"].toString();
             devit->flags.volCrypto = crypto;
@@ -2018,8 +2018,8 @@ void DeviceItem::autoFill(unsigned int changed)
                 }
                 options.clear();
                 if (!flags.rotational) {
-                    const bool btrfs = (format=="btrfs" || type==Subvolume);
-                    if (discgran && (format=="ext4" || format=="xfs")) options = "discard,";
+                    const bool btrfs = (format == "btrfs" || type == Subvolume);
+                    if (discgran && (format == "ext4" || format == "xfs")) options = "discard,";
                     else if (discgran && btrfs) options = "ssd,discard=async,";
                     else if (btrfs) options = "ssd,";
                 }
