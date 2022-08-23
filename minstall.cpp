@@ -570,6 +570,7 @@ int MInstall::showPage(int curr, int next)
                 return curr;
             }
             bootman->buildBootLists(); // Load default boot options
+            manageConfig(ConfigLoadB);
             return Step::Network;
         }
     } else if (curr == Step::Partitions && next > curr) {
@@ -852,7 +853,7 @@ void MInstall::pageDisplayed(int next)
         // disable the Next button if none of the old home options are selected
         oobe->oldHomeToggled();
         // if the Next button is disabled, avoid enabling both Back and Next at the end
-        if (pushNext->isEnabled() == false) {
+        if (!pushNext->isEnabled()) {
             enableBack = true;
             enableNext = false;
         }
