@@ -39,6 +39,7 @@ class Base : public QObject
     PartMan &partman;
     bool nocopy, sync;
     bool populateMediaMounts;
+    void checkMediaMD5(const QString &path);
     void copyLinux();
 public:
     // source medium
