@@ -24,12 +24,23 @@
 #include <sys/statvfs.h>
 #include <QDebug>
 #include <QFileInfo>
+#include <QCryptographicHash>
+#include <QDirIterator>
 #include "base.h"
 
 Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     const QSettings &appConf, const QCommandLineParser &appArgs)
     : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
+    QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
+    const QString &toramMP = liveInfo.value("TORAM_MP", "/live/to-ram").toString();
+    if(appArgs.isSet("no-media-check")) proc.log("MEDIA NOT CHECKED", MProcess::Standard);
+    else {
+        QString msrc = liveInfo.value("SQFILE_DIR", "/live/boot-dev/antiX").toString();
+        if (!QFile::exists(msrc)) msrc = toramMP + "/antiX";
+        checkMediaMD5(msrc);
+    }
+
     populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
     nocopy = appArgs.isSet("nocopy");
     sync = appArgs.isSet("sync");
@@ -44,11 +55,8 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     proc.exec("du", {"-scb", bootSource}, nullptr, true);
     partman.bootSpaceNeeded = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
 
-    QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
-    QString infile = liveInfo.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString() + ".info";
-    if (!QFile::exists(infile)) {
-        infile = liveInfo.value("TORAM_MP", "/live/to-ram").toString() + "/antiX/linuxfs.info";
-    }
+    QString infile = liveInfo.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs.info").toString() + ".info";
+    if (!QFile::exists(infile)) infile = toramMP + "/antiX/linuxfs.info";
     bool floatOK = false;
     if (QFile::exists(infile)) {
         const QSettings squashInfo(infile, QSettings::IniFormat);
@@ -71,6 +79,61 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     }
 
     qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
+}
+
+void Base::checkMediaMD5(const QString &path)
+{
+    const QString osplash = gui.labelSplash->text();
+    const QString &nsplash = tr("Checking installation media: %1%");
+    gui.labelSplash->setText(nsplash.arg(0));
+    qint64 btotal = 0;
+    struct FileHash {
+        QString path;
+        QByteArray hash;
+    };
+    QList<FileHash> hashes;
+    static const char *failmsg = QT_TR_NOOP("The installation media is corrupt.");
+    // Obtain a list of MD5 hashes and their files.
+    QDirIterator it(path, {"*.md5"}, QDir::Files);
+    QStringList missing({"initrd.gz", "linuxfs", "vmlinuz"});
+    while (it.hasNext()) {
+        QFile file(it.next());
+        if (!file.open(QFile::ReadOnly | QFile::Text)) throw failmsg;
+        while (!file.atEnd()) {
+            QString line(file.readLine().trimmed());
+            const QString &fname = line.section(' ', 1, 1, QString::SectionSkipEmpty);
+            missing.removeOne(fname);
+            FileHash sfhash = {
+                .path = it.path() + '/' + fname,
+                .hash = QByteArray::fromHex(line.section(' ', 0, 0, QString::SectionSkipEmpty).toUtf8())
+            };
+            hashes.append(sfhash);
+            btotal += QFileInfo(sfhash.path).size();
+            qApp->processEvents();
+        }
+    }
+    if(!missing.isEmpty()) throw failmsg;
+    // Check the MD5 hash of each file.
+    const size_t bufsize = 65536;
+    std::unique_ptr<char[]> buf(new char[bufsize]);
+    qint64 bprog = 0;
+    for(const FileHash &fh : hashes) {
+        QListWidgetItem *logEntry = proc.log("Check MD5: " + fh.path, MProcess::Standard);
+        QFile file(fh.path);
+        if(!file.open(QFile::ReadOnly)) throw failmsg;
+        QCryptographicHash hash(QCryptographicHash::Md5);
+        while (!file.atEnd()) {
+            const qint64 rlen = file.read(buf.get(), bufsize);
+            if(rlen < 0) throw failmsg;
+            hash.addData(buf.get(), rlen);
+            bprog += rlen;
+            gui.labelSplash->setText(nsplash.arg((bprog * 100) / btotal));
+            qApp->processEvents();
+        }
+        if(hash.result() != fh.hash) throw failmsg;
+        proc.log(logEntry);
+    }
+    gui.labelSplash->setText(osplash);
 }
 
 void Base::install()

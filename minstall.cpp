@@ -105,7 +105,15 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
     qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
-    QTimer::singleShot(0, this, &MInstall::startup);
+    QTimer::singleShot(0, this, [this]() {
+        try {
+            startup();
+        } catch (const char *msg) {
+            proc.log(QStringLiteral("FAILED START - ") + msg, MProcess::Fail);
+            QMessageBox::critical(this, windowTitle(), tr(msg));
+            exit(EXIT_FAILURE);
+        }
+    });
 }
 
 MInstall::~MInstall() {
@@ -140,10 +148,9 @@ void MInstall::startup()
         HOME_BUFFER = appConf.value("HOME_BUFFER", 2000).toInt();
         INSTALL_FROM_ROOT_DEVICE = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
 
-        // Unable to get space requirements since there's no medium.
+        // Unable to get space requirements since there's no media.
         if (!pretend && partman->bootSpaceNeeded==0) {
-            QMessageBox::critical(this, windowTitle(), tr("Cannot access installation source."));
-            exit(EXIT_FAILURE);
+            throw QT_TR_NOOP("Cannot access installation media.");
         }
 
         autoMountEnabled = true; // disable auto mount by force
