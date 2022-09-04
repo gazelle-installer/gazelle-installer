@@ -23,6 +23,7 @@
 #include <QTimer>
 #include <QToolTip>
 #include <QPainter>
+#include <QDir>
 
 #include <cstdlib>
 #include <fcntl.h>
@@ -539,8 +540,9 @@ bool MInstall::saveHomeBasic()
     mkdir("/mnt/antiX", 0755);
     bool ok = proc.exec("/bin/mount", {"-o", "ro", homedev, "/mnt/antiX"});
     if (ok) {
-        ok = proc.exec("/bin/ls", {"-1", "/mnt/antiX" + homedir}, nullptr, true);
-        if (ok) listHomes = proc.readOutLines();
+        QDir hd("/mnt/antiX" + homedir);
+        ok = hd.exists() && hd.isReadable();
+        listHomes = hd.entryList(QDir::Dirs);
         proc.exec("/usr/bin/umount", {"-l", "/mnt/antiX"});
     }
     return ok;
