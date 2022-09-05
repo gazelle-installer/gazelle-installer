@@ -76,7 +76,7 @@ void Base::scanMedia()
     proc.exec("du", {"-scb", bootSource}, nullptr, true);
     partman.bootSpaceNeeded = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
 
-    QString infile = liveInfo.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs.info").toString() + ".info";
+    QString infile = liveInfo.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString() + ".info";
     if (!QFile::exists(infile)) infile = toramMP + "/antiX/linuxfs.info";
     bool floatOK = false;
     if (QFile::exists(infile)) {
@@ -118,7 +118,10 @@ void Base::checkMediaMD5(const QString &path)
     static const char *failmsg = QT_TR_NOOP("The installation media is corrupt.");
     // Obtain a list of MD5 hashes and their files.
     QDirIterator it(path, {"*.md5"}, QDir::Files);
-    QStringList missing({"initrd.gz", "linuxfs", "vmlinuz"});
+    QStringList missing("linuxfs");
+    if (!QFile::exists("/live/config/did-toram") || QFile::exists("/live/config/toram-all")) {
+        missing << "vmlinuz" << "initrd.gz";
+    }
     while (it.hasNext()) {
         QFile file(it.next());
         if (!file.open(QFile::ReadOnly | QFile::Text)) throw failmsg;
