@@ -88,6 +88,7 @@ int main(int argc, char *argv[])
         {{"r", "reboot"}, QObject::tr("Reboots automatically when done installing.")},
         {{"s", "sync"}, QObject::tr("Installing with rsync instead of cp on custom partitioning.\n"
             "-- doesn't format /root and it doesn't work with encryption.")},
+        {"media-check", QObject::tr("Always check the installation media at the beginning.")},
         {"no-media-check", QObject::tr("Do not check the installation media at the beginning.\n"
             "Not recommended unless the installation media is guaranteed to be free from errors.")}});
     parser.addPositionalArgument("config-file", QObject::tr("Load a configuration file as specified by <config-file>."), "<config-file>");

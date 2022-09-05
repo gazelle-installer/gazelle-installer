@@ -143,6 +143,7 @@ void MInstall::startup()
 
         partman = new PartMan(proc, *this, appConf, appArgs);
         base = new Base(proc, *partman, *this, appConf, appArgs);
+        base->scanMedia();
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
 
         ROOT_BUFFER = appConf.value("ROOT_BUFFER", 5000).toInt();
@@ -1071,6 +1072,7 @@ void MInstall::closeEvent(QCloseEvent *event)
     if (abortUI()) {
         event->accept();
         phase = -2;
+        if (base) base->haltCheck(true);
         if (!modeOOBE) cleanup();
         else if (!pretend) {
             proc.unhalt();
@@ -1088,9 +1090,10 @@ void MInstall::closeEvent(QCloseEvent *event)
     }
 }
 
+// Override QDialog::reject() so Escape won't close the window.
 void MInstall::reject()
 {
-    // dummy (overrides QDialog::reject() so Escape won't close the window)
+    if (base) base->haltCheck(false);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -1134,9 +1137,8 @@ bool MInstall::abortUI()
     boxMain->setEnabled(false);
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
-        const QMessageBox::StandardButton rc = QMessageBox::warning(this,
-            tr("Confirmation"), tr("The installation and configuration"
-                " is incomplete.\nDo you really want to stop now?"),
+        const QMessageBox::StandardButton rc = QMessageBox::warning(this, QString(),
+            tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
             QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if (rc == QMessageBox::No) {
             boxMain->setEnabled(true);

@@ -37,8 +37,10 @@ class Base : public QObject
     Ui::MeInstall &gui;
     QWidget *master;
     PartMan &partman;
-    bool nocopy, sync;
-    bool populateMediaMounts;
+    bool nocopy = false, sync = false;
+    bool populateMediaMounts = false;
+    bool mediacheck = false, nomediacheck = false;
+    bool checking = false;
     void checkMediaMD5(const QString &path);
     void copyLinux();
 public:
@@ -48,6 +50,8 @@ public:
 
     Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
         const QSettings &appConf, const QCommandLineParser &appArgs);
+    void scanMedia();
+    void haltCheck(bool silent);
     void install();
 
 signals:
