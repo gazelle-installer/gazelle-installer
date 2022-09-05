@@ -26,24 +26,45 @@
 #include <QFileInfo>
 #include <QCryptographicHash>
 #include <QDirIterator>
+#include <QMessageBox>
 #include "base.h"
 
 Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     const QSettings &appConf, const QCommandLineParser &appArgs)
     : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
+    mediacheck = appArgs.isSet("media-check");
+    if (!mediacheck) nomediacheck = appArgs.isSet("no-media-check");
+    populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
+    nocopy = appArgs.isSet("nocopy");
+    sync = appArgs.isSet("sync");
+}
+
+void Base::scanMedia()
+{
     QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
     const QString &toramMP = liveInfo.value("TORAM_MP", "/live/to-ram").toString();
-    if(appArgs.isSet("no-media-check")) proc.log("MEDIA NOT CHECKED", MProcess::Standard);
+
+    // Check the installation media for errors (skip if not required).
+    bool checkmd5 = false;
+    if (!mediacheck) {
+        QFile file("/live/config/proc-cmdline");
+        if (file.open(QFile::ReadOnly | QFile::Text)) {
+            while (!file.atEnd()) {
+                if(file.readLine().trimmed() == "checkmd5") {
+                    checkmd5 = true;
+                    break;
+                }
+            }
+        }
+    }
+    if(checkmd5) proc.log("No media check (checkmd5)", MProcess::Standard);
+    else if(nomediacheck) proc.log("No media check", MProcess::Standard);
     else {
         QString msrc = liveInfo.value("SQFILE_DIR", "/live/boot-dev/antiX").toString();
         if (!QFile::exists(msrc)) msrc = toramMP + "/antiX";
         checkMediaMD5(msrc);
     }
-
-    populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
-    nocopy = appArgs.isSet("nocopy");
-    sync = appArgs.isSet("sync");
 
     bootSource = "/live/aufs/boot";
     rootSources << "/live/aufs/bin" << "/live/aufs/dev"
@@ -83,8 +104,10 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
 
 void Base::checkMediaMD5(const QString &path)
 {
+    checking = true;
     const QString osplash = gui.labelSplash->text();
-    const QString &nsplash = tr("Checking installation media: %1%");
+    const QString &nsplash = tr("Checking installation media.")
+        + "<br/><font size=2>%1% - " + tr("Press ESC to skip.") + "</font>";
     gui.labelSplash->setText(nsplash.arg(0));
     qint64 btotal = 0;
     struct FileHash {
@@ -120,9 +143,9 @@ void Base::checkMediaMD5(const QString &path)
     for(const FileHash &fh : hashes) {
         QListWidgetItem *logEntry = proc.log("Check MD5: " + fh.path, MProcess::Standard);
         QFile file(fh.path);
-        if(!file.open(QFile::ReadOnly)) throw failmsg;
+        if (!file.open(QFile::ReadOnly)) throw failmsg;
         QCryptographicHash hash(QCryptographicHash::Md5);
-        while (!file.atEnd()) {
+        while (checking && !file.atEnd()) {
             const qint64 rlen = file.read(buf.get(), bufsize);
             if(rlen < 0) throw failmsg;
             hash.addData(buf.get(), rlen);
@@ -130,10 +153,25 @@ void Base::checkMediaMD5(const QString &path)
             gui.labelSplash->setText(nsplash.arg((bprog * 100) / btotal));
             qApp->processEvents();
         }
-        if(hash.result() != fh.hash) throw failmsg;
+        if (!checking) break;
+        if (hash.result() != fh.hash) throw failmsg;
         proc.log(logEntry);
     }
     gui.labelSplash->setText(osplash);
+    if (!checking) proc.log("Check halted", MProcess::Standard);
+    checking = false;
+}
+
+void Base::haltCheck(bool silent)
+{
+    if (!checking) return;
+    if (!silent) {
+        QMessageBox::StandardButton rc = QMessageBox::warning(gui.boxMain, QString(),
+            tr("Are you sure you want to skip checking the installation media?"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if(rc != QMessageBox::Yes) return;
+    }
+    checking = false;
 }
 
 void Base::install()
