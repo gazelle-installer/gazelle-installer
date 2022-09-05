@@ -165,6 +165,7 @@ void PartMan::scan(DeviceItem *drvstart)
             partit->flags.curESP = partTypeName.startsWith("EFI "); // "System"/"(FAT-12/16/32)"
             partit->flags.bootRoot = (!bootUUID.isEmpty() && jsonPart["uuid"] == bootUUID);
             partit->curFormat = jsonPart["fstype"].toString();
+            if (partTypeName == "BIOS boot") partit->curFormat = "BIOS-GRUB";
             // Touching MacOS first drive, or MS LDM may brick the system.
             if ((proc.detectMac() && partit->device.startsWith("sda"))
                 || partTypeName.startsWith("Microsoft LDM")) {
@@ -793,8 +794,11 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
                 const QString &use = partit->realUseFor();
                 QString actmsg;
                 if (drvit->flags.oldLayout) {
-                    if (use.isEmpty()) continue;
-                    else if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
+                    if (use.isEmpty()) {
+                        if (partit->curFormat == "BIOS-GRUB") hasBiosGrub = true;
+                        continue;
+                    }
+                    if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
                     else if (use != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
                     else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
                 } else {
