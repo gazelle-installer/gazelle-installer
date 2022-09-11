@@ -41,7 +41,7 @@ class Base : public QObject
     bool populateMediaMounts = false;
     bool mediacheck = false, nomediacheck = false;
     bool checking = false;
-    void checkMediaMD5(const QString &path);
+    void checkMediaMD5(const QString &path, const QString &sqfs);
     void copyLinux();
 public:
     // source medium
