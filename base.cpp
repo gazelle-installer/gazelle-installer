@@ -43,7 +43,9 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
 void Base::scanMedia()
 {
     QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
-    const QString &toramMP = liveInfo.value("TORAM_MP", "/live/to-ram").toString();
+    const QString &sqpath = '/' + liveInfo.value("SQFILE_PATH", "antiX").toString();
+    const QString &sqtoram = liveInfo.value("TORAM_MP", "/live/to-ram").toString() + sqpath;
+    const QString &sqloc = liveInfo.value("SQFILE_DIR", "/live/boot-dev/antiX").toString();
 
     // Check the installation media for errors (skip if not required).
     bool checkmd5 = false;
@@ -61,9 +63,8 @@ void Base::scanMedia()
     if(checkmd5) proc.log("No media check (checkmd5)", MProcess::Standard);
     else if(nomediacheck) proc.log("No media check", MProcess::Standard);
     else {
-        QString msrc = liveInfo.value("SQFILE_DIR", "/live/boot-dev/antiX").toString();
-        if (!QFile::exists(msrc)) msrc = toramMP + "/antiX";
-        checkMediaMD5(msrc);
+        const QString &sqfile = liveInfo.value("SQFILE_NAME", "linuxfs").toString();
+        checkMediaMD5(QFile::exists(sqtoram+'/'+sqfile) ? sqtoram : sqloc, sqfile);
     }
 
     bootSource = "/live/aufs/boot";
@@ -76,9 +77,9 @@ void Base::scanMedia()
     proc.exec("du", {"-scb", bootSource}, nullptr, true);
     partman.bootSpaceNeeded = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
 
-    QString infile = liveInfo.value("SQFILE_FULL", "/live/boot-dev/antiX/linuxfs").toString() + ".info";
-    if (!QFile::exists(infile)) infile = toramMP + "/antiX/linuxfs.info";
     bool floatOK = false;
+    QString infile = sqtoram + "/linuxfs.info";
+    if (!QFile::exists(infile)) infile = sqloc + "/linuxfs.info";
     if (QFile::exists(infile)) {
         const QSettings squashInfo(infile, QSettings::IniFormat);
         partman.rootSpaceNeeded = 1024 * squashInfo.value("UncompressedSizeKB").toFloat(&floatOK);
@@ -102,7 +103,7 @@ void Base::scanMedia()
     qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
 }
 
-void Base::checkMediaMD5(const QString &path)
+void Base::checkMediaMD5(const QString &path, const QString &sqfs)
 {
     checking = true;
     const QString osplash = gui.labelSplash->text();
@@ -118,7 +119,7 @@ void Base::checkMediaMD5(const QString &path)
     static const char *failmsg = QT_TR_NOOP("The installation media is corrupt.");
     // Obtain a list of MD5 hashes and their files.
     QDirIterator it(path, {"*.md5"}, QDir::Files);
-    QStringList missing("linuxfs");
+    QStringList missing(sqfs);
     if (!QFile::exists("/live/config/did-toram") || QFile::exists("/live/config/toram-all")) {
         missing << "vmlinuz" << "initrd.gz";
     }
