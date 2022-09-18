@@ -67,7 +67,7 @@ public:
     void unhalt();
     bool halted() const { return halting; }
     static QString joinCommand(const QString &program, const QStringList &arguments);
-    QListWidgetItem *log(const QString &text, const enum LogType type = Section);
+    QListWidgetItem *log(const QString &text, const enum LogType type = Standard);
     void log(QListWidgetItem *entry, const int status = 1);
     void status(const QString &text, long progress = -1);
     void status(long progress = -1);

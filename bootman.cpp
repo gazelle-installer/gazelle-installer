@@ -95,7 +95,7 @@ void BootMan::buildBootLists()
 // build a grub configuration and install grub
 void BootMan::install()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     if (proc.halted()) return;
     proc.advance(4, 4);
 
