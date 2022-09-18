@@ -275,7 +275,7 @@ void MInstall::setupAutoMount(bool enabled)
     QStringList udev_temp_mdadm_rules;
     finfo.setFile("/run/udev");
     if (finfo.isDir()) {
-        proc.shell("egrep -l '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d", nullptr, true);
+        proc.shell("grep -El '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d", nullptr, true);
         udev_temp_mdadm_rules = proc.readOutLines();
         for (QString &rule : udev_temp_mdadm_rules) {
             rule.replace("/lib/udev", "/run/udev");
@@ -288,7 +288,7 @@ void MInstall::setupAutoMount(bool enabled)
         if (have_sysctl) {
             // Use systemctl to prevent automount by masking currently unmasked mount points
             proc.shell("systemctl list-units --full --all -t mount --no-legend 2>/dev/null"
-                " | grep -v masked | cut -f1 -d' ' | egrep -v '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc"
+                " | grep -v masked | cut -f1 -d' ' | grep -Ev '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc"
                     "|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'", nullptr, true);
             const QStringList &maskedMounts = proc.readOutLines();
             if (!maskedMounts.isEmpty()) {
