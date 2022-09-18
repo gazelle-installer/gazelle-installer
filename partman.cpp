@@ -957,7 +957,7 @@ int PartMan::countPrepSteps()
 
 void PartMan::preparePartitions()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     static const char *const msgfail = QT_TR_NOOP("Failed to prepare required partitions.");
 
     // Detach all existing partitions.
@@ -1059,7 +1059,7 @@ void PartMan::preparePartitions()
 
 void PartMan::formatPartitions()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
 
     const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
         ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
@@ -1169,8 +1169,7 @@ void PartMan::loadKeyMaterial(const QString &keyfile)
     key.load(keyfile.toUtf8().constData(), -1);
     const int keylen = key.length();
     if (keylen > 0) {
-        proc.log(QStringLiteral("Loaded %1-byte key material: ").arg(keylen)
-            + keyfile, MProcess::Standard);
+        proc.log(QStringLiteral("Loaded %1-byte key material: ").arg(keylen) + keyfile);
     }
 }
 
@@ -1317,7 +1316,7 @@ bool PartMan::makeFstab(bool populateMediaMounts)
 
 void PartMan::mountPartitions()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     for (auto &it : mounts.toStdMap()) {
         if (it.first.at(0) != '/') continue;
         static const char *const msgfail = QT_TR_NOOP("Failed to mount partition.");

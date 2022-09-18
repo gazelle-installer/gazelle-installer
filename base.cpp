@@ -60,8 +60,8 @@ void Base::scanMedia()
             }
         }
     }
-    if(checkmd5) proc.log("No media check (checkmd5)", MProcess::Standard);
-    else if(nomediacheck) proc.log("No media check", MProcess::Standard);
+    if(checkmd5) proc.log("No media check (checkmd5)");
+    else if(nomediacheck) proc.log("No media check");
     else {
         const QString &sqfile = liveInfo.value("SQFILE_NAME", "linuxfs").toString();
         checkMediaMD5(QFile::exists(sqtoram+'/'+sqfile) ? sqtoram : sqloc, sqfile);
@@ -145,7 +145,7 @@ void Base::checkMediaMD5(const QString &path, const QString &sqfs)
     std::unique_ptr<char[]> buf(new char[bufsize]);
     qint64 bprog = 0;
     for(const FileHash &fh : hashes) {
-        QListWidgetItem *logEntry = proc.log("Check MD5: " + fh.path, MProcess::Standard);
+        QListWidgetItem *logEntry = proc.log("Check MD5: " + fh.path);
         QFile file(fh.path);
         if (!file.open(QFile::ReadOnly)) throw failmsg;
         QCryptographicHash hash(QCryptographicHash::Md5);
@@ -162,7 +162,7 @@ void Base::checkMediaMD5(const QString &path, const QString &sqfs)
         proc.log(logEntry);
     }
     gui.labelSplash->setText(osplash);
-    if (!checking) proc.log("Check halted", MProcess::Standard);
+    if (!checking) proc.log("Check halted");
     checking = false;
 }
 
@@ -180,7 +180,7 @@ void Base::haltCheck(bool silent)
 
 void Base::install()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     if (proc.halted()) return;
     proc.advance(1, 2);
 
@@ -267,7 +267,7 @@ void Base::install()
 
 void Base::copyLinux()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     if (proc.halted()) return;
 
     // copy most except usr, mnt and home

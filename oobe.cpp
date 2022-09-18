@@ -386,7 +386,7 @@ int Oobe::selectTimeZone(const QString &zone)
 
 void Oobe::setLocale()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
 
     //locale
     qDebug() << "Update locale";

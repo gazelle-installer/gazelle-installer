@@ -128,7 +128,7 @@ MInstall::~MInstall() {
 // meant to be run after the installer becomes visible
 void MInstall::startup()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
 
     if (!modeOOBE) {
         // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
@@ -254,7 +254,7 @@ void MInstall::splashThrob()
 // turn auto-mount off and on
 void MInstall::setupAutoMount(bool enabled)
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
 
     if (autoMountEnabled == enabled) return;
     QFileInfo finfo;
@@ -524,7 +524,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
 
 bool MInstall::saveHomeBasic()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     QString homedir("/");
     QString homedev = partman->getMountDev("/home", true);
     if (homedev.isEmpty() || partman->willFormat("/home")) {
@@ -1133,7 +1133,7 @@ void MInstall::on_pushServices_clicked()
 
 bool MInstall::abortUI()
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     boxMain->setEnabled(false);
     // ask for confirmation when installing (except for some steps that don't need confirmation)
     if (phase > 0 && phase < 4) {
@@ -1154,7 +1154,7 @@ bool MInstall::abortUI()
 // run before closing the app, do some cleanup
 void MInstall::cleanup(bool endclean)
 {
-    proc.log(__PRETTY_FUNCTION__);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     if (pretend) return;
 
     if (endclean) {
