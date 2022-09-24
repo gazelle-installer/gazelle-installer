@@ -92,7 +92,7 @@
     <message>
         <location filename="../partman.cpp" line="1916"/>
         <source>Create</source>
-        <translation type="unfinished"/>
+        <translation>Aanmaken</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1919"/>
@@ -138,7 +138,7 @@
     <message>
         <location filename="../minstall.cpp" line="68"/>
         <source>Shutdown</source>
-        <translation type="unfinished"/>
+        <translation>Afsluiten</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="128"/>
@@ -192,12 +192,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="414"/>
         <source>Cleaning up</source>
-        <translation type="unfinished"/>
+        <translation>Opruimen</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
         <source>Finished</source>
-        <translation type="unfinished"/>
+        <translation>Voltooid</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="511"/>
@@ -710,7 +710,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="823"/>
         <source>Passwords</source>
-        <translation type="unfinished"/>
+        <translation>Wachtwoorden</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="824"/>
@@ -780,7 +780,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="849"/>
         <source>Warning</source>
-        <translation type="unfinished"/>
+        <translation>Waarschuwing</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="850"/>
@@ -846,7 +846,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="926"/>
         <source>Next</source>
-        <translation type="unfinished"/>
+        <translation>Volgende</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="964"/>
@@ -862,7 +862,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="991"/>
         <location filename="../minstall.cpp" line="1307"/>
         <source>Root</source>
-        <translation type="unfinished"/>
+        <translation>Root</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="993"/>
@@ -956,17 +956,17 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="107"/>
         <source>Close</source>
-        <translation type="unfinished"/>
+        <translation>Sluiten</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="118"/>
         <source>Next</source>
-        <translation type="unfinished"/>
+        <translation>Volgende</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="125"/>
         <source>Alt+N</source>
-        <translation type="unfinished"/>
+        <translation>Alt+N</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="166"/>
@@ -976,7 +976,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="201"/>
         <source>Terms of Use</source>
-        <translation type="unfinished"/>
+        <translation>Gebruiksvoorwaarden</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="228"/>
@@ -1043,7 +1043,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="457"/>
         <source>Root</source>
-        <translation type="unfinished"/>
+        <translation>Root</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="526"/>
@@ -1098,12 +1098,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="758"/>
         <source>MBR</source>
-        <translation type="unfinished"/>
+        <translation>MBR</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="761"/>
         <source>Alt+B</source>
-        <translation type="unfinished"/>
+        <translation>Alt+B</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="783"/>
@@ -1143,12 +1143,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="912"/>
         <source>Service</source>
-        <translation type="unfinished"/>
+        <translation>Dienst</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="917"/>
         <source>Description</source>
-        <translation type="unfinished"/>
+        <translation>Beschrijving</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="950"/>
@@ -1228,7 +1228,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1324"/>
         <source>View</source>
-        <translation type="unfinished"/>
+        <translation>Bekijk</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1363"/>
@@ -1258,12 +1258,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1420"/>
         <source>Confirm user password:</source>
-        <translation type="unfinished"/>
+        <translation>Bevestig gebruikerswachtwoord:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1481"/>
         <source>username</source>
-        <translation type="unfinished"/>
+        <translation>gebruikersnaam</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1497"/>
@@ -1333,7 +1333,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1792"/>
         <source>Back</source>
-        <translation type="unfinished"/>
+        <translation>Terug</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1799"/>
@@ -1353,7 +1353,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1830"/>
         <source>Alt+A</source>
-        <translation type="unfinished"/>
+        <translation>Alt+A</translation>
     </message>
 </context>
 <context>
@@ -1732,12 +1732,12 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1575"/>
         <source>Device</source>
-        <translation type="unfinished"/>
+        <translation>Apparaat</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1576"/>
         <source>Size</source>
-        <translation type="unfinished"/>
+        <translation>Grootte</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1577"/>
@@ -1747,7 +1747,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1578"/>
         <source>Label</source>
-        <translation type="unfinished"/>
+        <translation>Label</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1579"/>
@@ -1757,7 +1757,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1580"/>
         <source>Format</source>
-        <translation type="unfinished"/>
+        <translation>Formaat</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1581"/>
