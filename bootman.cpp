@@ -158,6 +158,9 @@ void BootMan::install()
         arch = proc.readOut();
         arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
 
+        // remove any efivars-dump-entries in NVRAM
+        proc.shell("/bin/ls /sys/firmware/efi/efivars/dump* 1>/dev/null 2>/dev/null && /bin/rm /sys/firmware/efi/efivars/dump*", nullptr, true);
+
         isOK = proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
             "--target=" + arch + "-efi", "--efi-directory=/boot/efi",
             "--bootloader-id=" + loaderID, "--recheck"});
@@ -217,10 +220,23 @@ void BootMan::install()
 
     if (proc.detectEFI()) {
         mkdir("/mnt/antiX/boot/uefi-mt", 0755);
+        QString mtest;
+        QString mtest_dev;
+        QString mtest_ram;
         if (arch == "i386") {
-            proc.exec("/bin/cp", {"/live/boot-dev/boot/uefi-mt/mtest-32.efi", "/mnt/antiX/boot/uefi-mt"});
+            mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-32.efi";
+            mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-32.efi";
         } else {
-            proc.exec("/bin/cp", {"/live/boot-dev/boot/uefi-mt/mtest-64.efi", "/mnt/antiX/boot/uefi-mt"});
+            mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-64.efi";
+            mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-64.efi";
+        }
+        if (QFileInfo(mtest_ram).exists()) {
+            mtest = mtest_ram;
+        } else if (QFileInfo(mtest_dev).exists()) {
+            mtest = mtest_dev;
+        }
+        if (!mtest.isNull()) {
+            proc.exec("/bin/cp", {mtest, "/mnt/antiX/boot/uefi-mt"});
         }
     }
     proc.status();

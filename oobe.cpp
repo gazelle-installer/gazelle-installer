@@ -612,6 +612,8 @@ void Oobe::setUserInfo()
     replaceStringInFile("demo", username, rootpath + "/etc/gshadow");
     replaceStringInFile("demo", username, rootpath + "/etc/passwd");
     replaceStringInFile("demo", username, rootpath + "/etc/shadow");
+    replaceStringInFile("demo", username, rootpath + "/etc/subuid");
+    replaceStringInFile("demo", username, rootpath + "/etc/subgid");
     replaceStringInFile("demo", username, rootpath + "/etc/slim.conf");
     replaceStringInFile("demo", username, rootpath + "/etc/lightdm/lightdm.conf");
     replaceStringInFile("demo", username, rootpath + "/home/*/.gtkrc-2.0");
