@@ -158,6 +158,9 @@ void BootMan::install()
         arch = proc.readOut();
         arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
 
+        // remove any efivars-dump-entries in NVRAM
+        proc.shell("/bin/ls /sys/firmware/efi/efivars/dump* 1>/dev/null 2>/dev/null && /bin/rm /sys/firmware/efi/efivars/dump*", nullptr, true);
+
         isOK = proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
             "--target=" + arch + "-efi", "--efi-directory=/boot/efi",
             "--bootloader-id=" + loaderID, "--recheck"});
