@@ -217,10 +217,23 @@ void BootMan::install()
 
     if (proc.detectEFI()) {
         mkdir("/mnt/antiX/boot/uefi-mt", 0755);
+        QString mtest;
+        QString mtest_dev;
+        QString mtest_ram;
         if (arch == "i386") {
-            proc.exec("/bin/cp", {"/live/boot-dev/boot/uefi-mt/mtest-32.efi", "/mnt/antiX/boot/uefi-mt"});
+            mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-32.efi";
+            mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-32.efi";
         } else {
-            proc.exec("/bin/cp", {"/live/boot-dev/boot/uefi-mt/mtest-64.efi", "/mnt/antiX/boot/uefi-mt"});
+            mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-64.efi";
+            mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-64.efi";
+        }
+        if (QFileInfo(mtest_ram).exists()) {
+            mtest = mtest_ram;
+        } else if (QFileInfo(mtest_dev).exists()) {
+            mtest = mtest_dev;
+        }
+        if (!mtest.isNull()) {
+            proc.exec("/bin/cp", {mtest, "/mnt/antiX/boot/uefi-mt"});
         }
     }
     proc.status();
