@@ -39,6 +39,7 @@
 
 class DeviceItem
 {
+    Q_DECLARE_TR_FUNCTIONS(DeviceItem)
     friend class PartMan;
     friend class DeviceItemIterator;
     friend class DeviceItemDelegate;

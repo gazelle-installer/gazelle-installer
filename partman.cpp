@@ -1791,9 +1791,9 @@ QString DeviceItem::shownUseFor() const
 {
     const QString &use = realUseFor();
     if (use == "/") return "/ (root)";
-    else if (use == "ESP") return qApp->tr("EFI System Partition");
-    else if (use == "SWAP") return qApp->tr("swap space");
-    else if (use == "FORMAT") return qApp->tr("format only");
+    else if (use == "ESP") return tr("EFI System Partition");
+    else if (use == "SWAP") return tr("swap space");
+    else if (use == "FORMAT") return tr("format only");
     return use;
 }
 void DeviceItem::setActive(bool boot)
@@ -1916,12 +1916,12 @@ QStringList DeviceItem::allowedFormats() const
 }
 QString DeviceItem::shownFormat(const QString &fmt) const
 {
-    if (fmt == "CREATE") return qApp->tr("Create");
+    if (fmt == "CREATE") return tr("Create");
     else if (fmt != "PRESERVE") return fmt;
     else {
-        if (type == Subvolume) return qApp->tr("Preserve");
-        else if (realUseFor() != "/") return qApp->tr("Preserve (%1)").arg(curFormat);
-        else return qApp->tr("Preserve /home (%1)").arg(curFormat);
+        if (type == Subvolume) return tr("Preserve");
+        else if (realUseFor() != "/") return tr("Preserve (%1)").arg(curFormat);
+        else return tr("Preserve /home (%1)").arg(curFormat);
     }
 }
 bool DeviceItem::canMount() const
