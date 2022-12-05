@@ -50,3 +50,6 @@ minstall
 
 # Exclude build folder
 debs
+
+# Transifex ignore
+.tx/

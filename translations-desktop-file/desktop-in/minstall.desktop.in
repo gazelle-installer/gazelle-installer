@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Exec=minstall-launcher
+Icon=/usr/share/gazelle-installer-data/logo.png
+# The desktop entry name will be displayed within the menu.
+Name=Installer
+# # The desktop entry comment will be shown within the menu.
+Comment=Install Linux
+Terminal=false
+NoDisplay=true
