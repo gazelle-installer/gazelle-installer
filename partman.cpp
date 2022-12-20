@@ -981,7 +981,7 @@ void PartMan::preparePartitions()
     proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
     const QStringList swaps = proc.readOutLines();
     for (const QString &devpath : qAsConst(listToUnmount)) {
-        if (swaps.contains(devpath)) proc.exec("swapoff", {devpath});
+        if (swaps.contains(devpath)) proc.shell("grep -q " + devpath + " /proc/swaps && swapoff " + devpath);
         else proc.exec("/usr/bin/umount", {"-q", devpath});
     }
 
@@ -1352,7 +1352,7 @@ void PartMan::unmount()
         DeviceItem *twit = mit.value();
         if (!twit) continue;
         if (mit.key().startsWith("SWAP")) {
-            proc.exec("swapoff", {twit->mappedDevice()});
+            proc.shell("grep -q " + twit->mappedDevice() + " /proc/swaps &&  swapoff " + twit->mappedDevice());
         } else if (mit.key().at(0) == '/') {
             proc.exec("/bin/umount", {"-l", "/mnt/antiX" + mit.key()});
         }
