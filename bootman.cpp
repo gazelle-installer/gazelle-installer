@@ -104,36 +104,16 @@ void BootMan::install()
     const QString &val = proc.readOut();
     if (!val.isEmpty()) proc.exec("/bin/rm", {"-f", "/mnt/antiX/boot/" + val});
 
-    bool efivarfs = QFileInfo("/sys/firmware/efi/efivars").isDir();
-    bool efivarfs_mounted = false;
-    if (efivarfs) {
-        QFile file("/proc/self/mounts");
-        if (file.open(QFile::ReadOnly | QFile::Text)) {
-            while (!file.atEnd() && !efivarfs_mounted) {
-                if (file.readLine().startsWith("efivarfs")) efivarfs_mounted = true;
-            }
-            file.close();
-        }
-    }
-    if (efivarfs && !efivarfs_mounted) {
-        proc.exec("/bin/mount", {"-t", "efivarfs", "efivarfs", "/sys/firmware/efi/efivars"});
+    bool efivars_isdir = false;
+    bool efivars_ismounted = false;
+    if (gui.boxBoot->isChecked() && gui.radioBootESP->isChecked()) {
+        QString efivars = QStringLiteral("/sys/firmware/efi/efivars");
+        efivars_isdir = QFileInfo(efivars).isDir();
+        if (efivars_isdir) efivars_ismounted = proc.exec("/bin/mountpoint", {"-q", efivars});
+        if (!efivars_ismounted) proc.exec("/bin/mount", {"-t", "efivarfs", "efivarfs", efivars});
     }
 
-    if (!gui.boxBoot->isChecked()) {
-        // skip it
-        proc.status(tr("Updating initramfs"));
-        //if useing f2fs, then add modules to /etc/initramfs-tools/modules
-        qDebug() << "Update initramfs";
-        //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
-            //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
-            //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
-        //}
-        if (!proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"})) {
-            throw QT_TR_NOOP("Failed to update initramfs.");
-        }
-    }
-
-    proc.status(tr("Installing GRUB"));
+    if (gui.radioBootESP->isChecked()) mkdir("/mnt/antiX/boot/efi", 0755);
 
     // set mounts for chroot
     proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
@@ -143,108 +123,127 @@ void BootMan::install()
     proc.exec("/bin/mkdir", {"/mnt/antiX/run/udev"});
     proc.exec("/bin/mount", {"--rbind", "/run/udev", "/mnt/antiX/run/udev"});
 
-    // install new Grub now
-    bool isOK = false;
-    QString arch;
-    const QString &boot = "/dev/" + gui.comboBoot->currentData().toString();
-    if (!gui.radioBootESP->isChecked()) {
-        isOK = proc.exec("grub-install", {"--target=i386-pc", "--recheck",
-            "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", boot});
-    } else {
-        mkdir("/mnt/antiX/boot/efi", 0755);
-        proc.exec("/bin/mount", {boot, "/mnt/antiX/boot/efi"});
-        // rename arch to match grub-install target
-        proc.exec("cat", {"/sys/firmware/efi/fw_platform_size"}, nullptr, true);
-        arch = proc.readOut();
-        arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
+    if (gui.boxBoot->isChecked()) {
+        proc.status(tr("Installing GRUB"));
 
-        // remove any efivars-dump-entries in NVRAM
-        proc.shell("/bin/ls /sys/firmware/efi/efivars/dump* 1>/dev/null 2>/dev/null && /bin/rm /sys/firmware/efi/efivars/dump*", nullptr, true);
-
-        isOK = proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
-            "--target=" + arch + "-efi", "--efi-directory=/boot/efi",
-            "--bootloader-id=" + loaderID, "--recheck"});
-    }
-    if (!isOK) {
-        proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
-        proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
-        proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
-        proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
-        if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
-            proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
-        }
-        throw QT_TR_NOOP("GRUB installation failed. You can reboot to the live"
-            " medium and use the GRUB Rescue menu to repair the installation.");
-    }
-
-    //get /etc/default/grub codes
-    QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
-    QString grubDefault=grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
-    qDebug() << "grubDefault is " << grubDefault;
-
-    //added non-live boot codes to those in /etc/default/grub, remove duplicates
-    proc.shell("/live/bin/non-live-cmdline", nullptr, true); // Get non-live boot codes
-    QStringList finalcmdline = proc.readOut().split(" ");
-    finalcmdline.append(grubDefault.split(" "));
-    qDebug() << "intermediate" << finalcmdline;
-
-    //remove any duplicate codes in list (typically splash)
-    finalcmdline.removeDuplicates();
-
-    //remove vga=ask
-    finalcmdline.removeAll("vga=ask");
-
-    //remove boot_image code
-    finalcmdline.removeAll("BOOT_IMAGE=/antiX/vmlinuz");
-
-    //remove nosplash boot code if configured in installer.conf
-    if (removeNoSplash) finalcmdline.removeAll("nosplash");
-    //remove in null or empty strings that might have crept in
-    finalcmdline.removeAll({});
-    qDebug() << "Add cmdline options to Grub" << finalcmdline;
-
-    //convert qstringlist back into normal qstring
-    QString finalcmdlinestring = finalcmdline.join(" ");
-    qDebug() << "cmdlinestring" << finalcmdlinestring;
-
-    //get qstring boot codes read for sed command
-    finalcmdlinestring.replace('\\', "\\\\");
-    finalcmdlinestring.replace('|', "\\|");
-
-    //do the replacement in /etc/default/grub
-    qDebug() << "Add cmdline options to Grub";
-    const QString cmd = "sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub";
-    proc.shell(cmd.arg(finalcmdlinestring));
-
-    //copy memtest efi files if needed
-
-    if (proc.detectEFI()) {
-        mkdir("/mnt/antiX/boot/uefi-mt", 0755);
-        QString mtest;
-        QString mtest_dev;
-        QString mtest_ram;
-        if (arch == "i386") {
-            mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-32.efi";
-            mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-32.efi";
+        // install new Grub now
+        bool isOK = false;
+        QString arch;
+        const QString &boot = "/dev/" + gui.comboBoot->currentData().toString();
+        if (!gui.radioBootESP->isChecked()) {
+            isOK = proc.exec("grub-install", {"--target=i386-pc", "--recheck",
+                "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", boot});
         } else {
-            mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-64.efi";
-            mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-64.efi";
+            proc.exec("/bin/mount", {boot, "/mnt/antiX/boot/efi"});
+            // rename arch to match grub-install target
+            proc.exec("cat", {"/sys/firmware/efi/fw_platform_size"}, nullptr, true);
+            arch = proc.readOut();
+            arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
+
+        if (efivars_ismounted) {
+            // remove any efivars-dump-entries in NVRAM
+            proc.shell("/bin/ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
+            const QString &dump = proc.readOut();
+            if (!dump.isEmpty()) proc.shell("/bin/rm /sys/firmware/efi/efivars/dump*", nullptr, true);
         }
-        if (QFileInfo(mtest_ram).exists()) {
-            mtest = mtest_ram;
-        } else if (QFileInfo(mtest_dev).exists()) {
-            mtest = mtest_dev;
+
+            isOK = proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
+                "--target=" + arch + "-efi", "--efi-directory=/boot/efi",
+                "--bootloader-id=" + loaderID, "--recheck"});
         }
-        if (!mtest.isNull()) {
-            proc.exec("/bin/cp", {mtest, "/mnt/antiX/boot/uefi-mt"});
+        if (!isOK) {
+            proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
+            proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
+            proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
+            proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
+            if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
+                proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
+            }
+            throw QT_TR_NOOP("GRUB installation failed. You can reboot to the live"
+                " medium and use the GRUB Rescue menu to repair the installation.");
         }
+
+        //get /etc/default/grub codes
+        QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
+        QString grubDefault=grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
+        qDebug() << "grubDefault is " << grubDefault;
+
+        //added non-live boot codes to those in /etc/default/grub, remove duplicates
+        proc.shell("/live/bin/non-live-cmdline", nullptr, true); // Get non-live boot codes
+        QStringList finalcmdline = proc.readOut().split(" ");
+        finalcmdline.append(grubDefault.split(" "));
+        qDebug() << "intermediate" << finalcmdline;
+
+        //get built-in config_cmdline
+        proc.shell("grep ^CONFIG_CMDLINE= /boot/config-$(uname -r) | cut -d '\"' -f2", nullptr, true);
+        const QStringList confcmdline = proc.readOut().split(" ");
+
+        for (const QString &confparameter : confcmdline) {
+        finalcmdline.removeAll(confparameter);
+        }
+
+        //remove any duplicate codes in list (typically splash)
+        finalcmdline.removeDuplicates();
+
+        //remove vga=ask
+        finalcmdline.removeAll("vga=ask");
+
+        //remove toram=min and toram=store - is not yet in non-live-cmdline
+        finalcmdline.removeAll("toram=min");
+        finalcmdline.removeAll("toram=store");
+
+        //remove boot_image code
+        finalcmdline.removeAll("BOOT_IMAGE=/antiX/vmlinuz");
+
+        //remove nosplash boot code if configured in installer.conf
+        if (removeNoSplash) finalcmdline.removeAll("nosplash");
+        //remove in null or empty strings that might have crept in
+        finalcmdline.removeAll({});
+        qDebug() << "Add cmdline options to Grub" << finalcmdline;
+
+        //convert qstringlist back into normal qstring
+        QString finalcmdlinestring = finalcmdline.join(" ");
+        qDebug() << "cmdlinestring" << finalcmdlinestring;
+
+        //get qstring boot codes read for sed command
+        finalcmdlinestring.replace('\\', "\\\\");
+        finalcmdlinestring.replace('|', "\\|");
+
+        //do the replacement in /etc/default/grub
+        qDebug() << "Add cmdline options to Grub";
+        const QString cmd = "sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub";
+        proc.shell(cmd.arg(finalcmdlinestring));
+
+        //copy memtest efi files if needed
+
+        if (proc.detectEFI()) {
+            mkdir("/mnt/antiX/boot/uefi-mt", 0755);
+            QString mtest;
+            QString mtest_dev;
+            QString mtest_ram;
+            if (arch == "i386") {
+                mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-32.efi";
+                mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-32.efi";
+            } else {
+                mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-64.efi";
+                mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-64.efi";
+            }
+            if (QFileInfo(mtest_ram).exists()) {
+                mtest = mtest_ram;
+            } else if (QFileInfo(mtest_dev).exists()) {
+                mtest = mtest_dev;
+            }
+            if (!mtest.isNull()) {
+                proc.exec("/bin/cp", {mtest, "/mnt/antiX/boot/uefi-mt"});
+            }
+        }
+        proc.status();
+
+        //update grub with new config
+
+        qDebug() << "Update Grub";
+        proc.exec("chroot", {"/mnt/antiX", "update-grub"});
     }
-    proc.status();
-
-    //update grub with new config
-
-    qDebug() << "Update Grub";
-    proc.exec("chroot", {"/mnt/antiX", "update-grub"});
 
     proc.status(tr("Updating initramfs"));
     //if useing f2fs, then add modules to /etc/initramfs-tools/modules
