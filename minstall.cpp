@@ -275,7 +275,7 @@ void MInstall::setupAutoMount(bool enabled)
     QStringList udev_temp_mdadm_rules;
     finfo.setFile("/run/udev");
     if (finfo.isDir()) {
-        proc.shell("grep -El '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d", nullptr, true);
+        proc.shell("grep -El '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d/*", nullptr, true);
         udev_temp_mdadm_rules = proc.readOutLines();
         for (QString &rule : udev_temp_mdadm_rules) {
             rule.replace("/lib/udev", "/run/udev");
@@ -297,7 +297,7 @@ void MInstall::setupAutoMount(bool enabled)
         }
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
-        proc.mkpath("/run/udev/rules.d");
+        if (!QDir().exists("/run/udev/rules.d")) proc.mkpath("/run/udev/rules.d");
         for (const QString &rule : qAsConst(udev_temp_mdadm_rules)) {
             proc.exec("touch", {rule});
         }
@@ -1163,11 +1163,11 @@ void MInstall::cleanup(bool endclean)
         proc.exec("/usr/bin/cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
         proc.exec("/usr/bin/rm", {"-rf", "/mnt/antiX/mnt/antiX"});
     }
-    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/boot/efi"});
-    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/proc"});
-    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/sys"});
-    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev/shm"});
-    proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev"});
+    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/boot/efi"})) proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/boot/efi"});
+    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/proc"}))     proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/proc"});
+    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/sys"}))      proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/sys"});
+    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/dev/shm"}))  proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev/shm"});
+    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/dev"}))      proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev"});
     if (endclean && !mountkeep) partman->unmount();
 }
 
