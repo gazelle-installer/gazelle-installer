@@ -77,7 +77,7 @@
     <message>
         <location filename="../partman.cpp" line="1791"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished"/>
+        <translation>EFI Systeempartitie</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1792"/>
@@ -1093,7 +1093,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="752"/>
         <source>Master Boot Record</source>
-        <translation type="unfinished"/>
+        <translation>Master Boot Record</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="758"/>
@@ -1108,12 +1108,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="783"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished"/>
+        <translation>EFI Systeempartitie</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="786"/>
         <source>ESP</source>
-        <translation type="unfinished"/>
+        <translation>ESP</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="812"/>

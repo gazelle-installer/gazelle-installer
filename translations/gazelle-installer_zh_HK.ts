@@ -197,7 +197,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="416"/>
         <source>Finished</source>
-        <translation type="unfinished"/>
+        <translation>已完成</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="511"/>
@@ -841,7 +841,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="924"/>
         <source>OK</source>
-        <translation type="unfinished"/>
+        <translation>确定</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="926"/>
@@ -946,7 +946,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="43"/>
         <source>Help</source>
-        <translation type="unfinished"/>
+        <translation>說明</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="69"/>
@@ -966,7 +966,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="125"/>
         <source>Alt+N</source>
-        <translation type="unfinished"/>
+        <translation>Alt+N</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="166"/>
@@ -1103,7 +1103,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="761"/>
         <source>Alt+B</source>
-        <translation type="unfinished"/>
+        <translation>Alt+B</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="783"/>
