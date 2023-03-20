@@ -64,6 +64,7 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     const QByteArray *input, bool needRead, QListWidgetItem *logEntry)
 {
     QEventLoop eloop;
+    connect(this, QOverload<QProcess::ProcessError>::of(&QProcess::errorOccurred), &eloop, &QEventLoop::quit);
     connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
     start(program, arguments);
     if (!debugUnusedOutput) {
@@ -74,6 +75,8 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     closeWriteChannel();
     eloop.exec();
     disconnect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
+    disconnect(this, QOverload<QProcess::ProcessError>::of(&QProcess::errorOccurred), nullptr, nullptr);
+
     if (debugUnusedOutput) {
         bool hasOut = false;
         if (!needRead) {
@@ -94,10 +97,13 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
             logEntry->setFont(logFont);
         }
     }
-    qDebug().nospace() << "Exit #" << execount << ": " << exitCode() << " " << exitStatus();
+    qDebug().nospace() << "Exit #" << execount << ": " << exitCode() << " " << exitStatus() << " " << error();
+
     int status = 1;
     if (exitStatus() != QProcess::NormalExit) status = -1;
+    else if (error() != QProcess::UnknownError) status = -2;
     else if (exitCode() != 0) status = 0;
+
     log(logEntry, status);
     return (status > 0);
 }
