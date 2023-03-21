@@ -22,7 +22,6 @@
  * This file is part of the gazelle-installer.
  ***************************************************************************/
 
-#include <sys/sysinfo.h>
 #include <sys/stat.h>
 #include <QDebug>
 #include <QLocale>
@@ -2068,17 +2067,6 @@ int DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTree)
         if (updateTree) addPart(bootFormatSize, "boot", crypto);
         rootFormatSize -= bootFormatSize;
     }
-    // Swap space.
-    int swapFormatSize = rootFormatSize-rootMinMB;
-    struct sysinfo sinfo;
-    if (sysinfo(&sinfo) != 0) sinfo.totalram = 2048;
-    else sinfo.totalram = (sinfo.totalram / (1048576 * 2)) * 3; // 1.5xRAM
-    sinfo.totalram /= 128; ++sinfo.totalram; sinfo.totalram *= 128; // Multiple of 128MB
-    if (swapFormatSize > static_cast<int>(sinfo.totalram)) swapFormatSize = static_cast<int>(sinfo.totalram);
-    int swapMaxMB = rootFormatSize / (20 * 128); ++swapMaxMB; swapMaxMB *= 128; // 5% root
-    if (swapMaxMB > 8192) swapMaxMB = 8192; // 8GB cap for the whole calculation.
-    if (swapFormatSize > swapMaxMB) swapFormatSize = swapMaxMB;
-    rootFormatSize -= swapFormatSize;
     // Home
     int homeFormatSize = rootFormatSize;
     rootFormatSize = (rootFormatSize * rootPercent) / 100;
@@ -2087,7 +2075,6 @@ int DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTree)
 
     if (updateTree) {
         addPart(rootFormatSize, "root", crypto);
-        if (swapFormatSize>0) addPart(swapFormatSize, "swap", crypto);
         if (homeFormatSize>0) addPart(homeFormatSize, "home", crypto);
         labelParts();
         driveAutoSetActive();
