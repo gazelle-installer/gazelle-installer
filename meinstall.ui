@@ -912,7 +912,7 @@ QSlider::handle:horizontal:disabled {
                    <bool>true</bool>
                   </property>
                   <property name="suffix">
-                   <string>MB</string>
+                   <string> MB</string>
                   </property>
                   <property name="stepType">
                    <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
