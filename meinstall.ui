@@ -865,6 +865,77 @@ QSlider::handle:horizontal:disabled {
              </property>
             </spacer>
            </item>
+           <item row="1" column="0">
+            <widget class="QGroupBox" name="boxSwap">
+             <property name="title">
+              <string>Create a swap file</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <layout class="QGridLayout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="labelSwapFile">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Location:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="labelSwapSize">
+                <property name="text">
+                 <string>Size:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" colspan="4">
+               <widget class="QLineEdit" name="textSwapFile">
+                <property name="text">
+                 <string notr="true">/swapfile</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QSpinBox" name="spinSwapSize">
+                  <property name="accelerated">
+                   <bool>true</bool>
+                  </property>
+                  <property name="suffix">
+                   <string>MB</string>
+                  </property>
+                  <property name="stepType">
+                   <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QToolButton" name="pushSwapSizeReset">
+                  <property name="icon">
+                   <iconset resource="images.qrc">
+                    <normaloff>:/view-refresh</normaloff>:/view-refresh</iconset>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="1" column="2" colspan="3">
+               <widget class="QLabel" name="labelSwapMax">
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
           </layout>
          </widget>
          <widget class="QWidget" name="pageServices">
