@@ -56,6 +56,7 @@ HEADERS += minstall.h \
     mpassedit.h \
     mtreeview.h \
     oobe.h \
+    swapman.h \
     version.h \
     msettings.h \
     partman.h \
@@ -70,7 +71,8 @@ SOURCES += app.cpp minstall.cpp \
     oobe.cpp \
     partman.cpp \
     safecache.cpp \
-    mprocess.cpp
+    mprocess.cpp \
+    swapman.cpp
 LIBS +=
 CONFIG += release warn_on thread qt c++17
 

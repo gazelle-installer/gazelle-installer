@@ -121,6 +121,7 @@ MInstall::~MInstall() {
     if (oobe) delete oobe;
     if (base) delete base;
     if (bootman) delete bootman;
+    if (swapman) delete swapman;
     if (partman) delete partman;
     if (throbber) delete throbber;
 }
@@ -145,6 +146,7 @@ void MInstall::startup()
         base = new Base(proc, *partman, *this, appConf, appArgs);
         base->scanMedia();
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
+        swapman = new SwapMan(proc, *partman, *this);
 
         ROOT_BUFFER = appConf.value("ROOT_BUFFER", 5000).toInt();
         HOME_BUFFER = appConf.value("HOME_BUFFER", 2000).toInt();
@@ -414,6 +416,7 @@ bool MInstall::processNextPhase()
                 config->dumpDebug();
                 proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
                 bootman->install();
+                swapman->install();
                 if (oem) proc.shell("sed -i 's/splash\\b/nosplash/g' /mnt/antiX/boot/grub/grub.cfg");
             } else if (!pretendToInstall(5, 100)) {
                 return false;
@@ -504,7 +507,10 @@ void MInstall::manageConfig(enum ConfigAction mode)
 
     if (mode == ConfigSave || mode == ConfigLoadB) {
         // GRUB page
-        if (!modeOOBE && radioCustomPart->isChecked()) bootman->manageConfig(*config);
+        if (!modeOOBE && radioCustomPart->isChecked()) {
+            bootman->manageConfig(*config);
+            swapman->manageConfig(*config, mode==ConfigSave);
+        }
         // Manage the rest of the OOBE pages.
         oobe->manageConfig(*config, mode==ConfigSave);
     }

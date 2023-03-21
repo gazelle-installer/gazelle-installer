@@ -32,6 +32,7 @@
 #include "base.h"
 #include "oobe.h"
 #include "bootman.h"
+#include "swapman.h"
 
 #include "ui_meinstall.h"
 
@@ -108,6 +109,7 @@ private:
     Oobe *oobe = nullptr;
     QStringList listHomes;
     BootMan *bootman = nullptr;
+    SwapMan *swapman = nullptr;
 
     QPixmap helpBackdrop;
     // Splash screen
