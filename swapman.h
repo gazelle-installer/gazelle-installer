@@ -36,7 +36,8 @@ class SwapMan : public QObject
     void sizeResetClick();
 public:
     SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui);
-    void manageConfig(MSettings &config, bool save);
+    void manageConfig(MSettings &config);
+    void setupDefaults();
     void install();
     static unsigned long recommendedMB(bool hibernation);
 };

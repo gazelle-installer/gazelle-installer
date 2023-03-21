@@ -385,7 +385,7 @@ bool MInstall::processNextPhase()
 
             // the core of the installation
             if (!pretend) {
-                proc.advance(12, partman->countPrepSteps());
+                proc.advance(11, partman->countPrepSteps());
                 partman->preparePartitions();
                 partman->formatPartitions();
                 partman->mountPartitions();
@@ -509,7 +509,7 @@ void MInstall::manageConfig(enum ConfigAction mode)
         // GRUB page
         if (!modeOOBE && radioCustomPart->isChecked()) {
             bootman->manageConfig(*config);
-            swapman->manageConfig(*config, mode==ConfigSave);
+            swapman->manageConfig(*config);
         }
         // Manage the rest of the OOBE pages.
         oobe->manageConfig(*config, mode==ConfigSave);
@@ -586,6 +586,7 @@ int MInstall::showPage(int curr, int next)
                 return curr;
             }
             bootman->buildBootLists(); // Load default boot options
+            swapman->setupDefaults();
             manageConfig(ConfigLoadB);
             return Step::Network;
         }
@@ -799,6 +800,7 @@ void MInstall::pageDisplayed(int next)
         enableBack = false;
         if (phase <= 0) {
             bootman->buildBootLists();
+            swapman->setupDefaults();
             manageConfig(ConfigLoadB);
         }
         break;

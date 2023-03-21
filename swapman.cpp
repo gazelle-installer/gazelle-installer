@@ -30,34 +30,40 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui)
     connect(ui.pushSwapSizeReset, &QToolButton::clicked, this, &SwapMan::sizeResetClick);
 }
 
-void SwapMan::manageConfig(MSettings &config, bool save)
+void SwapMan::manageConfig(MSettings &config)
 {
-    if(!save) {
-        gui.boxSwap->setChecked(partman.swapCount() <= 0);
-        swapFileEdited(gui.textSwapFile->text());
-        sizeResetClick();
-    }
     config.startGroup("Swap", gui.pageBoot);
     config.manageGroupCheckBox("Install", gui.boxSwap);
     config.manageLineEdit("File", gui.textSwapFile);
     config.manageSpinBox("Size", gui.spinSwapSize);
     config.endGroup();
 }
+void SwapMan::setupDefaults()
+{
+    gui.boxSwap->setChecked(partman.swapCount() <= 0);
+    swapFileEdited(gui.textSwapFile->text());
+    sizeResetClick();
+}
 
 void SwapMan::install()
 {
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    if (proc.halted()) return;
+    proc.advance(1, 2);
     const int size = gui.spinSwapSize->value();
     if(!gui.boxSwap->isChecked() || size <= 0) return;
     static const char *const msgfail = QT_TR_NOOP("Failed to create or install swap file.");
     const QString &instpath = gui.textSwapFile->text().trimmed();
     const QString &realpath = "/mnt/antiX" + instpath;
 
+    proc.status(tr("Creating swap file"));
     // Create a blank swap file.
     bool ok = proc.exec("fallocate", {"-l", QStringLiteral("%1M").arg(size), realpath});
     if(ok) chmod(instpath.toUtf8().constData(), 0600);
     if(ok) ok = proc.exec("mkswap", {realpath});
     if(!ok) throw msgfail;
     // Append the fstab with the swap file entry.
+    proc.status(tr("Configuring swap file"));
     QFile file("/mnt/antiX/etc/fstab");
     if (!file.open(QIODevice::Append | QIODevice::WriteOnly)) throw msgfail;
     file.write(instpath.toUtf8());
