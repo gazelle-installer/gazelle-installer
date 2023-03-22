@@ -52,3 +52,6 @@ debs
 
 # Transifex ignore
 .tx/
+
+# Auto-generated makefile
+Makefile
