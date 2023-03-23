@@ -426,6 +426,8 @@ void Oobe::setLocale()
         proc.shell("sed -i '/data0=/c\\data0=%l:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
         proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' /home/demo/.config/xfce4/panel/datetime-1.rc");
         proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
+        proc.shell("sed -i 's/%H/%l/' /home/demo/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
+        proc.shell("sed -i 's/%H/%l/' " + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
 
         //mx kde
         proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=0' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc");
@@ -445,6 +447,9 @@ void Oobe::setLocale()
         proc.shell("sed -i '/data0=/c\\data0=%H:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
         proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' /home/demo/.config/xfce4/panel/datetime-1.rc");
         proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
+        proc.shell("sed -i 's/%l/%H/' /home/demo/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
+        proc.shell("sed -i 's/%l/%H/' " + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
+
 
         //mx kde
         proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc");
