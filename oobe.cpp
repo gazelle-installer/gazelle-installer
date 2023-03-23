@@ -612,6 +612,19 @@ void Oobe::setUserInfo()
         throw QT_TR_NOOP("Sorry, failed to set ownership of user directory.");
     }
 
+    //set permissions to default in /etc/adduser.conf
+    proc.shell("grep ^#DIR_MODE /etc/adduser.conf", nullptr, true);
+    QString DIR_MODE = proc.readOut();
+    if (!DIR_MODE.isEmpty()){
+        DIR_MODE="0700"; //default permisions
+    } else {
+        DIR_MODE=DIR_MODE.section("=",1,1);
+    }
+    if (!proc.exec("chmod", {DIR_MODE, dpath})){
+        throw QT_TR_NOOP("Sorry, failed to set permissions of user directory.");
+    }
+
+
     // change in files
     replaceStringInFile("demo", username, rootpath + "/etc/group");
     replaceStringInFile("demo", username, rootpath + "/etc/gshadow");
