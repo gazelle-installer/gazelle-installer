@@ -613,7 +613,7 @@ void Oobe::setUserInfo()
     }
 
     //set permissions to default in /etc/adduser.conf
-    proc.shell("grep ^#DIR_MODE /etc/adduser.conf", nullptr, true);
+    proc.shell("grep ^DIR_MODE /etc/adduser.conf", nullptr, true);
     QString DIR_MODE = proc.readOut();
     if (!DIR_MODE.isEmpty()){
         DIR_MODE="0700"; //default permisions
