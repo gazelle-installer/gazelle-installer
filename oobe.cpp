@@ -20,6 +20,7 @@
  *
  * This file is part of the gazelle-installer.
  ***************************************************************************/
+#include <sys/stat.h>
 #include <QDebug>
 #include <QMessageBox>
 #include <QFileInfo>
@@ -538,7 +539,7 @@ void Oobe::setUserInfo()
 
     if (QFileInfo::exists(dpath)) {
         if (gui.radioOldHomeSave->isChecked()) {
-            bool ok = false;
+            ok = false;
             QStringList cargs({"-f", dpath, dpath});
             for (int ixi = 1; ixi < 10 && !ok; ++ixi) {
                 cargs.last() = dpath + ".00" + QString::number(ixi);
@@ -608,22 +609,16 @@ void Oobe::setUserInfo()
     }
 
     // fix the ownership, demo=newuser
-    if (!proc.exec("chown", {"-R", "demo:demo", dpath})) {
-        throw QT_TR_NOOP("Sorry, failed to set ownership of user directory.");
+    ok = proc.exec("chown", {"-R", "demo:demo", dpath});
+    if (ok) {
+        // Set permissions according to /etc/adduser.conf
+        QSettings addusercfg("/etc/adduser.conf", QSettings::NativeFormat);
+        mode_t mode = addusercfg.value("DIR_MODE", "0700").toString().toUInt(&ok, 8);
+        if (ok) ok = (chmod(dpath.toUtf8().constData(), mode) == 0);
     }
-
-    //set permissions to default in /etc/adduser.conf
-    proc.shell("grep ^DIR_MODE /etc/adduser.conf", nullptr, true);
-    QString DIR_MODE = proc.readOut();
-    if (!DIR_MODE.isEmpty()){
-        DIR_MODE="0700"; //default permisions
-    } else {
-        DIR_MODE=DIR_MODE.section("=",1,1);
+    if (!ok) {
+        throw QT_TR_NOOP("Failed to set ownership or permissions of user directory.");
     }
-    if (!proc.exec("chmod", {DIR_MODE, dpath})){
-        throw QT_TR_NOOP("Sorry, failed to set permissions of user directory.");
-    }
-
 
     // change in files
     replaceStringInFile("demo", username, rootpath + "/etc/group");
