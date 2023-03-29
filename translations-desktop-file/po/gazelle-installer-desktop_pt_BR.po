@@ -4,8 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
-# Danylo Sa <kaiserblast@gmail.com>, 2022
-# Dolphin Oracle <dolphinoracle@gmail.com>, 2022
+# marcelo cripe <marcelocripe@gmail.com>, 2022
 # 
 #, fuzzy
 msgid ""
@@ -14,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-04 23:30-0500\n"
 "PO-Revision-Date: 2022-12-21 01:00+0000\n"
-"Last-Translator: Dolphin Oracle <dolphinoracle@gmail.com>, 2022\n"
+"Last-Translator: marcelo cripe <marcelocripe@gmail.com>, 2022\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/anticapitalista/teams/10162/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,9 +24,9 @@ msgstr ""
 #. The desktop entry name will be displayed within the menu.
 #: desktop-in/minstall.desktop.in:8
 msgid "Installer"
-msgstr "Instalador"
+msgstr "Instalador do MX Linux"
 
 #. # The desktop entry comment will be shown within the menu.
 #: desktop-in/minstall.desktop.in:10
 msgid "Install Linux"
-msgstr "Instala o sistema no disco rígido"
+msgstr "Instala o sistema operacional no dispositivo de armazenamento"
