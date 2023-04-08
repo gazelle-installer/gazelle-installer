@@ -81,7 +81,7 @@ void SwapMan::install()
     // Hibernation.
     if (gui.checkHibernation->isChecked()) {
         if (devit->format == "btrfs") {
-            proc.exec("btrfs", {"inspect-internal", "map-swapfile", realpath}, nullptr, true);
+            proc.exec("btrfs", {"inspect-internal", "map-swapfile", "-r", realpath}, nullptr, true);
         } else {
             proc.shell("filefrag -v " + realpath + " | awk 'NR==4 {print $4}' | tr -d .", nullptr, true);
         }
