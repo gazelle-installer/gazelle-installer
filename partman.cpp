@@ -1894,10 +1894,10 @@ QStringList DeviceItem::allowedUsesFor(bool real) const
 QStringList DeviceItem::allowedFormats() const
 {
     QStringList list;
-    bool allowPreserve = false, selPreserve = false;
+    const QString &use = realUseFor();
+    bool allowPreserve = false;
     if (type == Subvolume) list.append("CREATE");
     else if (isVolume()) {
-        const QString &use = realUseFor();
         if (use.isEmpty()) return QStringList();
         else if (use == "/boot") list.append("ext4");
         else if (use == "BIOS-GRUB") list.append("GRUB");
@@ -1905,21 +1905,20 @@ QStringList DeviceItem::allowedFormats() const
             list.append("FAT32");
             if (size <= 4294901760) list.append("FAT16");
             if (size <= 33553920) list.append("FAT12");
-            selPreserve = allowPreserve = (list.contains(curFormat, Qt::CaseInsensitive)
+            allowPreserve = (list.contains(curFormat, Qt::CaseInsensitive)
                 || !curFormat.compare("VFAT", Qt::CaseInsensitive));
         } else if (use == "SWAP") {
             list.append("SWAP");
-            selPreserve = allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
+            allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         } else {
             list << "ext4" << "ext3" << "ext2";
             list << "f2fs" << "jfs" << "xfs" << "btrfs";
             if (use != "FORMAT") allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
-            if (use != "/") selPreserve = allowPreserve;
         }
     }
     if (encrypt) allowPreserve = false;
     if (allowPreserve) {
-        if (selPreserve) list.prepend("PRESERVE");
+        if (use != "/") list.prepend("PRESERVE");
         else list.append("PRESERVE");
     }
     return list;
