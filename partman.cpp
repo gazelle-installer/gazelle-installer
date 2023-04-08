@@ -1914,7 +1914,7 @@ QStringList DeviceItem::allowedFormats() const
             list << "ext4" << "ext3" << "ext2";
             list << "f2fs" << "jfs" << "xfs" << "btrfs";
             if (use != "FORMAT") allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
-            if (use == "/home") selPreserve = allowPreserve;
+            if (use != "/") selPreserve = allowPreserve;
         }
     }
     if (encrypt) allowPreserve = false;
