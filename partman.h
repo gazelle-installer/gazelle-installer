@@ -216,6 +216,7 @@ public:
     int swapCount();
     int isEncrypt(const QString &point);
     DeviceItem *findByPath(const QString &devpath) const;
+    DeviceItem *findHostDev(const QString &path) const;
     // Model View Controller
     QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;

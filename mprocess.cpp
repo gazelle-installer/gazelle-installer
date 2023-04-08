@@ -100,12 +100,16 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     qDebug().nospace() << "Exit #" << execount << ": " << exitCode() << " " << exitStatus() << " " << error();
 
     int status = 1;
-    if (exitStatus() != QProcess::NormalExit) status = -1;
-    else if (error() != QProcess::UnknownError) status = -2;
-    else if (exitCode() != 0) status = 0;
+    if (exitStatus() != QProcess::NormalExit) status = -1; // Process crash
+    else if (error() != QProcess::UnknownError) status = -2; // Start error
+    else if (exitCode() != 0) status = 0; // Process error
 
     log(logEntry, status);
-    return (status > 0);
+    if (status <= 0) {
+        if (exceptionInfo) throw exceptionInfo;
+        return false;
+    }
+    return true;
 }
 
 bool MProcess::exec(const QString &program, const QStringList &arguments, const QByteArray *input, bool needRead)
@@ -237,6 +241,11 @@ void MProcess::advance(int space, long steps)
     qApp->processEvents();
 }
 
+void MProcess::setExceptionMode(const char *failInfo)
+{
+    exceptionInfo = failInfo;
+}
+
 // Common functions that are traditionally carried out by processes.
 
 void MProcess::sleep(const int msec, const bool silent)
@@ -264,6 +273,7 @@ bool MProcess::mkpath(const QString &path)
     const bool rc = QDir().mkpath(path);
     qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
     log(logEntry, rc ? 1 : -1);
+    if(!rc && exceptionInfo) throw exceptionInfo;
     return rc;
 }
 
