@@ -197,6 +197,7 @@ void MInstall::startup()
                 item->addToCombo(comboDisk);
             }
         }
+        connect(radioEntireDisk, &QCheckBox::toggled, boxAutoPart, &QGroupBox::setEnabled);
         if (comboDisk->count() >= 1) {
             comboDisk->setCurrentIndex(0);
             radioEntireDisk->setChecked(true);
@@ -215,6 +216,9 @@ void MInstall::startup()
         setupPartitionSlider();
         // Override with whatever is in the config.
         manageConfig(ConfigLoadA);
+        // Hibernation check box (regular install).
+        checkHibernationReg->setChecked(checkHibernation->isChecked());
+        connect(checkHibernationReg, &QCheckBox::clicked, checkHibernation, &QCheckBox::setChecked);
     }
     oobe->stashServices(true);
 
@@ -415,8 +419,8 @@ bool MInstall::processNextPhase()
                 manageConfig(ConfigSave);
                 config->dumpDebug();
                 proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
-                bootman->install();
                 swapman->install();
+                bootman->install();
                 if (oem) proc.shell("sed -i 's/splash\\b/nosplash/g' /mnt/antiX/boot/grub/grub.cfg");
             } else if (!pretendToInstall(5, 100)) {
                 return false;
@@ -505,13 +509,10 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->endGroup();
     }
 
+    const bool confAdvanced = (!modeOOBE && radioCustomPart->isChecked());
+    if (confAdvanced) swapman->manageConfig(*config);
     if (mode == ConfigSave || mode == ConfigLoadB) {
-        // GRUB page
-        if (!modeOOBE && radioCustomPart->isChecked()) {
-            bootman->manageConfig(*config);
-            swapman->manageConfig(*config);
-        }
-        // Manage the rest of the OOBE pages.
+        if (confAdvanced) bootman->manageConfig(*config);
         oobe->manageConfig(*config, mode==ConfigSave);
     }
 
@@ -588,6 +589,7 @@ int MInstall::showPage(int curr, int next)
             bootman->buildBootLists(); // Load default boot options
             swapman->setupDefaults();
             manageConfig(ConfigLoadB);
+            checkHibernation->setChecked(checkHibernationReg->isChecked());
             return Step::Network;
         }
     } else if (curr == Step::Partitions && next > curr) {

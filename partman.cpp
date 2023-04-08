@@ -26,6 +26,7 @@
 #include <QDebug>
 #include <QLocale>
 #include <QFileInfo>
+#include <QDir>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -1412,6 +1413,16 @@ DeviceItem *PartMan::findByPath(const QString &devpath) const
         if ((*it)->path == devpath) return *it;
     }
     return nullptr;
+}
+DeviceItem *PartMan::findHostDev(const QString &path) const
+{
+    QString spath = path;
+    DeviceItem *devit = nullptr;
+    do {
+        spath = QDir(QFileInfo(spath).absolutePath()).path();
+        devit = mounts.value(spath);
+    } while(!devit && !spath.isEmpty() && spath != '/');
+    return devit;
 }
 
 /*************************\
