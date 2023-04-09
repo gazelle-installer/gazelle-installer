@@ -390,11 +390,7 @@ bool MInstall::processNextPhase()
             // the core of the installation
             if (!pretend) {
                 proc.advance(11, partman->countPrepSteps());
-                partman->preparePartitions();
-                partman->formatPartitions();
-                partman->mountPartitions();
-                //run blkid -c /dev/null to freshen UUID cache
-                proc.exec("blkid", {"-c", "/dev/null"});
+                partman->prepStorage();
                 base->install();
             } else {
                 if (!pretendToInstall(14, 200)) return false;

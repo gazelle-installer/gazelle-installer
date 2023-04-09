@@ -163,7 +163,12 @@ class PartMan : public QAbstractItemModel
     bool brave, gptoverride;
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit();
+    void preparePartitions();
+    void formatPartitions();
     void prepareSubvolumes(DeviceItem *partit);
+    bool fixCryptoSetup();
+    bool makeFstab();
+    void mountPartitions();
     void treeItemChange();
     void treeSelChange();
     void treeMenu(const QPoint &);
@@ -204,12 +209,9 @@ public:
     DeviceItem *selectedDriveAuto();
     void clearAllUses();
     int countPrepSteps();
-    void preparePartitions();
-    void formatPartitions();
+    void prepStorage();
+    void installTabs();
     void loadKeyMaterial(const QString &keyfile);
-    bool fixCryptoSetup();
-    bool makeFstab(bool populateMediaMounts);
-    void mountPartitions();
     void unmount();
     bool willFormat(const QString &point);
     QString getMountDev(const QString &point, const bool mapped=true);

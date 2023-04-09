@@ -954,6 +954,21 @@ int PartMan::countPrepSteps()
     }
     return nstep;
 }
+void PartMan::prepStorage()
+{
+    preparePartitions();
+    formatPartitions();
+    mountPartitions();
+    //run blkid -c /dev/null to freshen UUID cache
+    proc.exec("blkid", {"-c", "/dev/null"});
+}
+void PartMan::installTabs()
+{
+    makeFstab();
+    if (!fixCryptoSetup()) {
+        throw QT_TR_NOOP("Failed to finalize encryption setup.");
+    }
+}
 
 void PartMan::preparePartitions()
 {
@@ -1261,7 +1276,7 @@ bool PartMan::fixCryptoSetup()
 }
 
 // create /etc/fstab file
-bool PartMan::makeFstab(bool populateMediaMounts)
+bool PartMan::makeFstab()
 {
     QFile file("/mnt/antiX/etc/fstab");
     if (!file.open(QIODevice::WriteOnly)) return false;
@@ -1307,10 +1322,6 @@ bool PartMan::makeFstab(bool populateMediaMounts)
         out << "UUID=" << proc.readOut() << " /boot/efi vfat noatime,dmask=0002,fmask=0113 0 0\n";
     }
     file.close();
-    if (populateMediaMounts) {
-        if (!proc.shell("/sbin/make-fstab -O --install=/mnt/antiX"
-            " --mntpnt=/media")) return false;
-    }
     return true;
 }
 
