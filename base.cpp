@@ -216,11 +216,6 @@ void Base::install()
     qDebug() << "Desktop menu";
     proc.exec("chroot", {"/mnt/antiX", "desktop-menu", "--write-out-global"});
 
-    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
-    partman.makeFstab(populateMediaMounts);
-    if (!partman.fixCryptoSetup()) {
-        throw QT_TR_NOOP("Failed to finalize encryption setup.");
-    }
     // Disable hibernation inside initramfs.
     if (partman.isEncrypt("SWAP")) {
         proc.exec("touch", {"/mnt/antiX/initramfs-tools/conf.d/resume"});
@@ -235,12 +230,6 @@ void Base::install()
     //remove home unless a demo home is found in remastered linuxfs
     if (!QFileInfo("/live/linux/home/demo").isDir())
         proc.exec("/bin/rm", {"-rf", "/mnt/antiX/home/demo"});
-
-    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, don't clean /media folder
-    // modification to preserve points that are still mounted.
-    if (!populateMediaMounts) {
-        proc.shell("/bin/rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*");
-    }
 
     // guess localtime vs UTC
     proc.shell("guess-hwclock", nullptr, true);
@@ -262,6 +251,15 @@ void Base::install()
         proc.shell("/bin/mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");
         proc.shell("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
         proc.shell("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
+    }
+
+    partman.installTabs();
+    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
+    if (populateMediaMounts) {
+        proc.shell("/sbin/make-fstab -O --install=/mnt/antiX --mntpnt=/media");
+    } else {
+        // Otherwise, clean /media folder - modification to preserve points that are still mounted.
+        proc.shell("/bin/rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*");
     }
 }
 
