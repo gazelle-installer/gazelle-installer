@@ -89,8 +89,7 @@ void SwapMan::install()
 
         QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
         QString grubDefault = grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
-        proc.exec("blkid", {"-o", "value", "UUID", "-s", "UUID", devit->mappedDevice()}, nullptr, true);
-        grubDefault += " resume=UUID=" + proc.readOut() + " resume_offset=" + offset;
+        grubDefault += " resume=UUID=" + devit->uuid + " resume_offset=" + offset;
         grubSettings.setValue("GRUB_CMDLINE_LINUX_DEFAULT", grubDefault);
     }
 
