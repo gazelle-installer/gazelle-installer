@@ -855,7 +855,6 @@ void MInstall::pageDisplayed(int next)
             " does not need to be secure, such as a public terminal.") + "</p>");
         if (!nextFocus) nextFocus = textUserName;
         oobe->userPassValidationChanged();
-        enableNext = false;
         break;
 
     case Step::OldHome:
