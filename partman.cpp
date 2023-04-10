@@ -152,6 +152,7 @@ void PartMan::scan(DeviceItem *drvstart)
             partit->flags.oldLayout = true;
             partit->device = jsonPart["name"].toString();
             partit->path = jsonPart["path"].toString();
+            partit->uuid = jsonPart["uuid"].toString();
             partit->order = order.indexOf(partit->device);
             partit->size = jsonPart["size"].toVariant().toLongLong();
             partit->physec = jsonPart["phy-sec"].toInt();
@@ -163,7 +164,7 @@ void PartMan::scan(DeviceItem *drvstart)
             if ((partflags & 0x80) || (partflags & 0x04)) partit->setActive(true);
             partit->mapCount = jsonPart["children"].toArray().count();
             partit->flags.curESP = partTypeName.startsWith("EFI "); // "System"/"(FAT-12/16/32)"
-            partit->flags.bootRoot = (!bootUUID.isEmpty() && jsonPart["uuid"] == bootUUID);
+            partit->flags.bootRoot = (!bootUUID.isEmpty() && partit->uuid == bootUUID);
             partit->curFormat = jsonPart["fstype"].toString();
             if (partTypeName == "BIOS boot") partit->curFormat = "BIOS-GRUB";
             // Touching MacOS first drive, or MS LDM may brick the system.
@@ -254,11 +255,12 @@ void PartMan::scanVirtualDevices(bool rescan)
             devit = new DeviceItem(DeviceItem::VirtualBD, vdlit);
             devit->device = jsonDev["name"].toString();
             devit->path = path;
+            devit->uuid = jsonDev["uuid"].toString();
             devit->flags.rotational = rota;
             devit->discgran = discgran;
             devit->size = size;
             devit->physec = physec;
-            devit->flags.bootRoot = (!bootUUID.isEmpty() && jsonDev["uuid"] == bootUUID);
+            devit->flags.bootRoot = (!bootUUID.isEmpty() && devit->uuid == bootUUID);
             devit->curLabel = label;
             devit->curFormat = jsonDev["fstype"].toString();
             devit->flags.volCrypto = crypto;
@@ -959,8 +961,20 @@ void PartMan::prepStorage()
     preparePartitions();
     formatPartitions();
     mountPartitions();
-    //run blkid -c /dev/null to freshen UUID cache
+    // Run blkid -c /dev/null to freshen UUID cache
     proc.exec("blkid", {"-c", "/dev/null"});
+    // Refresh the UUIDs
+    proc.exec("lsblk", {"--list", "-bJo", "PATH,UUID"}, nullptr, true);
+    const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
+    const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
+    QMap<QString, DeviceItem *> alldevs;
+    for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
+        alldevs.insert(item->path, item);
+    }
+    for (const QJsonValue &jsonDev : jsonBD) {
+        DeviceItem *devit = alldevs.value(jsonDev["path"].toString());
+        if (devit) devit->uuid = jsonDev["uuid"].toString();
+    }
 }
 void PartMan::installTabs()
 {
@@ -1249,8 +1263,7 @@ bool PartMan::fixCryptoSetup()
     QTextStream out(&file);
     // Add devices to crypttab.
     for (auto &it : cryptAdd.toStdMap()) {
-        proc.exec("blkid", {"-s", "UUID", "-o", "value", "/dev/" + it.first}, nullptr, true);
-        out << it.second->devMapper << " /dev/disk/by-uuid/" << proc.readOut();
+        out << it.second->devMapper << " /dev/disk/by-uuid/" << it.second->uuid;
         if (noKey || it.first == keyDev) out << " none";
         else {
             if (isNewKey) {
@@ -1289,10 +1302,7 @@ bool PartMan::makeFstab()
         qDebug() << "Creating fstab entry for:" << it.first << dev;
         // Device ID or UUID
         if (twit->willMap()) out << dev;
-        else {
-            proc.exec("blkid", {"-o", "value", "UUID", "-s", "UUID", dev}, nullptr, true);
-            out << "UUID=" + proc.readOut();
-        }
+        else out << "UUID=" << twit->uuid;
         // Mount point, file system
         proc.exec("blkid", {dev, "-o", "value", "-s", "TYPE"}, nullptr, true);
         const QString &fsfmt = proc.readOut();
@@ -1317,9 +1327,9 @@ bool PartMan::makeFstab()
     }
     // EFI System Partition
     if (gui.radioBootESP->isChecked()) {
-        const QString &dev = "/dev/" + gui.comboBoot->currentData().toString();
-        proc.exec("blkid", {"-o", "value", "UUID", "-s", "UUID", dev}, nullptr, true);
-        out << "UUID=" << proc.readOut() << " /boot/efi vfat noatime,dmask=0002,fmask=0113 0 0\n";
+        DeviceItem *devit = findByPath("/dev/" + gui.comboBoot->currentData().toString());
+        if (!devit) return false;
+        out << "UUID=" << devit->uuid << " /boot/efi vfat noatime,dmask=0002,fmask=0113 0 0\n";
     }
     file.close();
     return true;

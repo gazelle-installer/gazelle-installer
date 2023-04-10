@@ -73,7 +73,7 @@ public:
         bool curESP : 1;
         bool volCrypto : 1;
     } flags = {};
-    QString model, device, path, devMapper;
+    QString model, device, path, uuid, devMapper;
     QString label, curLabel;
     QString usefor;
     QString format, curFormat;
