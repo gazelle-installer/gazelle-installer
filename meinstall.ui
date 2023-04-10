@@ -288,22 +288,46 @@
                 </item>
                 <item row="1" column="1" rowspan="2" colspan="3">
                  <widget class="QLabel" name="labelKeyboardSettings">
+                  <property name="font">
+                   <font>
+                    <bold>true</bold>
+                   </font>
+                  </property>
                   <property name="text">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>Keyboard Settings</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
                 <item row="3" column="1">
                  <widget class="QLabel" name="labelKeyboard1">
+                  <property name="font">
+                   <font>
+                    <bold>true</bold>
+                   </font>
+                  </property>
                   <property name="text">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>Model:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight</set>
                   </property>
                  </widget>
                 </item>
                 <item row="5" column="1">
                  <widget class="QLabel" name="labelKeyboard3">
+                  <property name="font">
+                   <font>
+                    <bold>true</bold>
+                   </font>
+                  </property>
                   <property name="text">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>Variant:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight</set>
                   </property>
                  </widget>
                 </item>
@@ -332,8 +356,16 @@
                 </item>
                 <item row="4" column="1">
                  <widget class="QLabel" name="labelKeyboard2">
+                  <property name="font">
+                   <font>
+                    <bold>true</bold>
+                   </font>
+                  </property>
                   <property name="text">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   <string>Layout:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight</set>
                   </property>
                  </widget>
                 </item>
@@ -2090,4 +2122,5 @@ QSlider::handle:horizontal:disabled {
  <resources>
   <include location="images.qrc"/>
  </resources>
+ <connections/>
 </ui>
