@@ -231,10 +231,6 @@ void Base::install()
     if (!QFileInfo("/live/linux/home/demo").isDir())
         proc.exec("/bin/rm", {"-rf", "/mnt/antiX/home/demo"});
 
-    // guess localtime vs UTC
-    proc.shell("guess-hwclock", nullptr, true);
-    if (proc.readOut() == "localtime") gui.checkLocalClock->setChecked(true);
-
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
     proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
     proc.setChRoot("/mnt/antiX");

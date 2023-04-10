@@ -182,7 +182,10 @@ void MInstall::startup()
 
     setupkeyboardbutton();
 
-    if (proc.detectMac()) checkLocalClock->setChecked(true);
+    // Guess if hardware clock is UTC or local time
+    proc.shell("guess-hwclock", nullptr, true);
+    if (proc.readOut() == "localtime") checkLocalClock->setChecked(true);
+    else if (proc.detectMac()) checkLocalClock->setChecked(true);
 
     oobe = new Oobe(proc, *this, this, appConf, oem, modeOOBE);
 
