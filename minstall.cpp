@@ -909,11 +909,11 @@ void MInstall::pageDisplayed(int next)
         break;
 
     default: // other
-        textHelp->setText("<p><b>" + tr("Enjoy using %1</b></p>").arg(PROJECTNAME) + "\n\n "
+        textHelp->setText("<p><b>" + tr("Enjoy using %1").arg(PROJECTNAME) + "</b></p>"
         + tr("<p><b>Support %1</b><br/>"
             "%1 is supported by people like you. Some help others at the "
             "support forum - %2 - or translate help files into different "
-            "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
+            "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME, PROJECTFORUM));
         pushNext->setDefault(true);
         break;
     }
@@ -1204,7 +1204,7 @@ void MInstall::on_progInstall_valueChanged(int value)
                              "Basic information about %1 is at %2.</p><p>"
                              "There are volunteers to help you at the %3 forum, %4</p>"
                              "<p>If you ask for help, please remember to describe your problem and your computer "
-                             "in some detail. Usually statements like 'it didn't work' are not helpful.</p>").arg(PROJECTNAME).arg(PROJECTURL).arg(PROJECTSHORTNAME).arg(PROJECTFORUM));
+                             "in some detail. Usually statements like 'it didn't work' are not helpful.</p>").arg(PROJECTNAME, PROJECTURL, PROJECTSHORTNAME, PROJECTFORUM));
         break;
 
     case 1:
@@ -1217,7 +1217,7 @@ void MInstall::on_progInstall_valueChanged(int value)
         textTips->setText(tr("<p><b>Support %1</b><br/>"
                              "%1 is supported by people like you. Some help others at the "
                              "support forum - %2 - or translate help files into different "
-                             "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
+                             "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME, PROJECTFORUM));
 
         break;
 
@@ -1231,13 +1231,13 @@ void MInstall::on_progInstall_valueChanged(int value)
 
     case 4:
         textTips->setText(tr("<p><b>Keep Your Copy of %1 up-to-date</b><br/>"
-                             "For more information and updates please visit</p><p> %2</p>").arg(PROJECTNAME).arg(PROJECTFORUM));
+                             "For more information and updates please visit</p><p> %2</p>").arg(PROJECTNAME, PROJECTFORUM));
         break;
 
     default:
         textTips->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
                              "<p>Without you there would be no %1.</p>"
-                             "<p>%2 Dev Team</p>").arg(PROJECTNAME).arg(PROJECTSHORTNAME));
+                             "<p>%2 Dev Team</p>").arg(PROJECTNAME, PROJECTSHORTNAME));
         break;
     }
 }
