@@ -43,7 +43,7 @@
 #include "msettings.h"
 #include "partman.h"
 
-#define PARTMAN_SAFETY_MB 8 // 1MB at start + Compensate for rounding errors.
+#define PARTMAN_SAFETY (8*MB) // 1MB at start + Compensate for rounding errors.
 #define PARTMAN_MAX_PARTS 128 // Maximum number of partitions Linux supports.
 
 PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs)
@@ -307,7 +307,7 @@ bool PartMan::manageConfig(MSettings &config, bool save)
             if (partCount > PARTMAN_MAX_PARTS) return false;
         }
         // Partition configuration.
-        const long long sizeMax = drvit->size - (PARTMAN_SAFETY_MB * 1048576);
+        const long long sizeMax = drvit->size - PARTMAN_SAFETY;
         long long sizeTotal = 0;
         for (int ixPart = 0; ixPart < partCount; ++ixPart) {
             DeviceItem *partit = nullptr;
@@ -1963,7 +1963,7 @@ long long DeviceItem::driveFreeSpace(bool inclusive) const
 {
     const DeviceItem *drvit = parent();
     if (!drvit) drvit = this;
-    long long free = drvit->size - (PARTMAN_SAFETY_MB * 1048576);
+    long long free = drvit->size - PARTMAN_SAFETY;
     for (int ixi = drvit->children.count() - 1; ixi >= 0; --ixi) {
         DeviceItem *partit = drvit->children.at(ixi);
         if (inclusive || partit != this) free -= partit->size;
@@ -1971,12 +1971,11 @@ long long DeviceItem::driveFreeSpace(bool inclusive) const
     return free;
 }
 /* Convenience */
-DeviceItem *DeviceItem::addPart(int defaultMB, const QString &defaultUse, bool crypto)
+DeviceItem *DeviceItem::addPart(long long defaultSize, const QString &defaultUse, bool crypto)
 {
     DeviceItem *partit = new DeviceItem(DeviceItem::Partition, this);
     if (!defaultUse.isEmpty()) partit->usefor = defaultUse;
-    partit->size = defaultMB;
-    partit->size *= 1048576;
+    partit->size = defaultSize;
     partit->autoFill();
     if (partit->canEncrypt()) partit->encrypt = crypto;
     if (partman) partman->notifyChange(partit);
@@ -2073,35 +2072,34 @@ void DeviceItem::labelParts()
     if (partman) partman->resizeColumnsToFit();
 }
 
-int DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTree)
+long long DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTree)
 {
     assert (partman != nullptr);
     if (rootPercent<0) rootPercent = partman->gui.sliderPart->value();
     if (updateTree) clear();
-    const long long driveSize = size / 1048576;
-    int rootFormatSize = static_cast<int>(driveSize - PARTMAN_SAFETY_MB);
+    long long rootFormatSize = size - PARTMAN_SAFETY;
 
     // Boot partitions.
     if (partman->proc.detectEFI()) {
-        if (updateTree) addPart(256, "ESP", crypto);
-        rootFormatSize -= 256;
-    } else if (driveSize >= 2097152 || partman->gptoverride) {
-        if (updateTree) addPart(1, "BIOS-GRUB", crypto);
-        rootFormatSize -= 1;
+        if (updateTree) addPart(256*MB, "ESP", crypto);
+        rootFormatSize -= 256*MB;
+    } else if (size >= (2*TB) || partman->gptoverride) {
+        if (updateTree) addPart(1*MB, "BIOS-GRUB", crypto);
+        rootFormatSize -= 1*MB;
     }
-    int rootMinMB = static_cast<int>(partman->rootSpaceNeeded / 1048576);
-    const int bootMinMB = static_cast<int>(partman->bootSpaceNeeded / 1048576);
-    if (!crypto) rootMinMB += bootMinMB;
+    long long rootMin = partman->rootSpaceNeeded;
+    const long long bootMin = partman->bootSpaceNeeded;
+    if (!crypto) rootMin += bootMin;
     else {
-        int bootFormatSize = 1024;
-        if (bootFormatSize < bootMinMB) bootFormatSize = static_cast<int>(partman->bootSpaceNeeded);
+        int bootFormatSize = 1*GB;
+        if (bootFormatSize < bootMin) bootFormatSize = bootMin;
         if (updateTree) addPart(bootFormatSize, "boot", crypto);
         rootFormatSize -= bootFormatSize;
     }
     // Home
-    int homeFormatSize = rootFormatSize;
+    long long homeFormatSize = rootFormatSize;
     rootFormatSize = (rootFormatSize * rootPercent) / 100;
-    if (rootFormatSize < rootMinMB) rootFormatSize = rootMinMB;
+    if (rootFormatSize < rootMin) rootFormatSize = rootMin;
     homeFormatSize -= rootFormatSize;
 
     if (updateTree) {

@@ -148,8 +148,8 @@ void MInstall::startup()
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
         swapman = new SwapMan(proc, *partman, *this);
 
-        ROOT_BUFFER = appConf.value("ROOT_BUFFER", 5000).toInt();
-        HOME_BUFFER = appConf.value("HOME_BUFFER", 2000).toInt();
+        rootBuffer = appConf.value("ROOT_BUFFER", 5000).toLongLong() * MB;
+        homeBuffer = appConf.value("HOME_BUFFER", 2000).toLongLong() * MB;
         INSTALL_FROM_ROOT_DEVICE = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
 
         // Unable to get space requirements since there's no media.
@@ -674,7 +674,7 @@ void MInstall::pageDisplayed(int next)
             // These calculations are only for display text, and do not affect the installation.
             long long rootMin = partman->rootSpaceNeeded + 1048575;
             tminroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
-            rootMin = (4 * rootMin) + ROOT_BUFFER * 1048576; // (Root + snapshot [squashfs + ISO] + backup) + buffer.
+            rootMin = (4 * rootMin) + rootBuffer; // (Root + snapshot [squashfs + ISO] + backup) + buffer.
             trecroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
         }
 
@@ -1307,14 +1307,13 @@ void MInstall::on_sliderPart_valueChanged(int value)
     long long available = drvitem->layoutDefault(100, crypto, false);
     if (!available) return;
     const long long roundUp = available - 1;
-    const long long rootMinMB = (partman->rootSpaceNeeded + 1048575) / 1048576;
-    const long long homeMinMB = 16; // 16MB for basic profile and setup files
-    const long long rootRecMB = rootMinMB + ROOT_BUFFER;
-    const long long homeRecMB = homeMinMB + HOME_BUFFER;
-    const int minPercent = ((rootMinMB * 100) + roundUp) / available;
-    const int maxPercent = 100 - (((homeMinMB * 100) + roundUp) / available);
-    const int recPercentMin = ((rootRecMB * 100) + roundUp) / available; // Recommended root size.
-    const int recPercentMax = 100 - (((homeRecMB * 100) + roundUp) / available); // Recommended minimum home.
+    const long long homeMin = 16*MB; // 16MB for basic profile and setup files
+    const long long rootRec = partman->rootSpaceNeeded + rootBuffer;
+    const long long homeRec = homeMin + homeBuffer;
+    const int minPercent = ((partman->rootSpaceNeeded * 100) + roundUp) / available;
+    const int maxPercent = 100 - (((homeMin * 100) + roundUp) / available);
+    const int recPercentMin = ((rootRec * 100) + roundUp) / available; // Recommended root size.
+    const int recPercentMax = 100 - (((homeRec * 100) + roundUp) / available); // Recommended minimum home.
 
     const int origValue = value;
     if (value < minPercent) value = minPercent;
@@ -1327,7 +1326,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
     }
 
     const long long availRoot = drvitem->layoutDefault(value, crypto, false);
-    QString valstr = sliderSizeString(availRoot*1048576);
+    QString valstr = sliderSizeString(availRoot);
     available -= availRoot;
     labelSliderRoot->setText(valstr + "\n" + tr("Root"));
 
@@ -1336,7 +1335,7 @@ void MInstall::on_sliderPart_valueChanged(int value)
     if (value < recPercentMin) palRoot.setColor(QPalette::WindowText, Qt::red);
     if (value==100) valstr = tr("----");
     else {
-        valstr = sliderSizeString(available*1048576);
+        valstr = sliderSizeString(available);
         valstr += "\n" + tr("Home");
         if (value > recPercentMax) palHome.setColor(QPalette::WindowText, Qt::red);
     }
