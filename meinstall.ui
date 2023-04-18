@@ -312,7 +312,7 @@
                    <string>Model:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight</set>
+                   <set>Qt::AlignRight|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -327,7 +327,7 @@
                    <string>Variant:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight</set>
+                   <set>Qt::AlignRight|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -365,7 +365,7 @@
                    <string>Layout:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight</set>
+                   <set>Qt::AlignRight|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>

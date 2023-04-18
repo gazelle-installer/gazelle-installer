@@ -37,6 +37,11 @@
 #include "msettings.h"
 #include "safecache.h"
 
+#define KB 1024LL
+#define MB (1024LL*KB)
+#define GB (1024LL*MB)
+#define TB (1024LL*GB)
+
 class DeviceItem
 {
     Q_DECLARE_TR_FUNCTIONS(DeviceItem)
@@ -47,7 +52,7 @@ class DeviceItem
     DeviceItem *parentItem = nullptr;
     class PartMan *partman = nullptr;
     int order = -1;
-    DeviceItem *addPart(int defaultMB, const QString &defaultUse, bool crypto);
+    DeviceItem *addPart(long long defaultSize, const QString &defaultUse, bool crypto);
     void driveAutoSetActive();
     void autoFill(unsigned int changed = 0xFFFF);
     void labelParts();
@@ -118,7 +123,7 @@ public:
     bool canMount() const;
     long long driveFreeSpace(bool inclusive = false) const;
     /* Convenience */
-    int layoutDefault(int rootPercent, bool crypto, bool updateTree=true);
+    long long layoutDefault(int rootPercent, bool crypto, bool updateTree=true);
     void addToCombo(QComboBox *combo, bool warnNasty = false) const;
     static QStringList split(const QString &devname);
     static QString join(const QString &drive, int partnum);

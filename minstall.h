@@ -61,7 +61,7 @@ public:
     QString PROJECTSHORTNAME;
     QString PROJECTURL;
     QString PROJECTVERSION;
-    long long ROOT_BUFFER, HOME_BUFFER;
+    long long rootBuffer, homeBuffer;
 
     int showPage(int curr, int next);
     void gotoPage(int next);
