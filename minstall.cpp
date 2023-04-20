@@ -1306,14 +1306,13 @@ void MInstall::on_sliderPart_valueChanged(int value)
     if (!drvitem) return;
     long long available = drvitem->layoutDefault(100, crypto, false);
     if (!available) return;
-    const long long roundUp = available - 1;
     const long long homeMin = 16*MB; // 16MB for basic profile and setup files
     const long long rootRec = partman->rootSpaceNeeded + rootBuffer;
     const long long homeRec = homeMin + homeBuffer;
-    const int minPercent = ((partman->rootSpaceNeeded * 100) + roundUp) / available;
-    const int maxPercent = 100 - (((homeMin * 100) + roundUp) / available);
-    const int recPercentMin = ((rootRec * 100) + roundUp) / available; // Recommended root size.
-    const int recPercentMax = 100 - (((homeRec * 100) + roundUp) / available); // Recommended minimum home.
+    const int minPercent = percent(partman->rootSpaceNeeded, available, true);
+    const int maxPercent = 100 - percent(homeMin, available);
+    const int recPercentMin = percent(rootRec, available, true); // Recommended root size.
+    const int recPercentMax = 100 - percent(homeRec, available); // Recommended minimum home.
 
     const int origValue = value;
     if (value < minPercent) value = minPercent;

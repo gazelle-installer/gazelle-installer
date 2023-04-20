@@ -240,4 +240,28 @@ public:
     void notifyChange(class DeviceItem *item, int first = -1, int last = -1);
 };
 
+// Calculate a percentage without compromising the range of long long.
+static inline long long portion(long long range, int percent, long round = -1)
+{
+    const bool roundUp = (round > 0);
+    if (roundUp) percent = 100 - percent;
+    else round = -round;
+    long long r = ((range / 100) * percent) + (((range % 100) * percent) / 100);
+    if (roundUp) {
+        r = ((range-r) + (round-1LL)) / round;
+        r *= round;
+        if (r < 0 || r > range) return range;
+    } else {
+        r /= round;
+        r *= round;
+    }
+    return r;
+}
+static inline int percent(long long portion, long long range, bool roundUp = false)
+{
+    if (roundUp) portion = range - portion;
+    const int percent = portion / (double)(range / 100.0L);
+    return roundUp ? 100-percent : percent;
+}
+
 #endif // PARTMAN_H
