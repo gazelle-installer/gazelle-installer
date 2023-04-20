@@ -2077,15 +2077,15 @@ long long DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTre
     assert (partman != nullptr);
     if (rootPercent<0) rootPercent = partman->gui.sliderPart->value();
     if (updateTree) clear();
-    long long rootFormatSize = size - PARTMAN_SAFETY;
+    long long formatSize = PARTMAN_SAFETY;
 
     // Boot partitions.
     if (partman->proc.detectEFI()) {
         if (updateTree) addPart(256*MB, "ESP", crypto);
-        rootFormatSize -= 256*MB;
+        formatSize += 256*MB;
     } else if (size >= (2*TB) || partman->gptoverride) {
         if (updateTree) addPart(1*MB, "BIOS-GRUB", crypto);
-        rootFormatSize -= 1*MB;
+        formatSize += 1*MB;
     }
     long long rootMin = partman->rootSpaceNeeded;
     const long long bootMin = partman->bootSpaceNeeded;
@@ -2094,13 +2094,21 @@ long long DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTre
         int bootFormatSize = 1*GB;
         if (bootFormatSize < bootMin) bootFormatSize = bootMin;
         if (updateTree) addPart(bootFormatSize, "boot", crypto);
-        rootFormatSize -= bootFormatSize;
+        formatSize += bootFormatSize;
     }
+
+    // Root
+    long long rootFormatSize = size - formatSize;
+    if (rootPercent < 100) {
+        rootFormatSize = portion(rootFormatSize, rootPercent, MB);
+        if (rootFormatSize < rootMin && rootMin <= portion(rootFormatSize, rootPercent+1, -MB)) {
+            rootFormatSize = rootMin; // Snap to minimum if within 1% of the requested portion.
+        }
+    }
+    if (rootFormatSize < rootMin) return -(formatSize + rootMin);
+    formatSize += rootFormatSize;
     // Home
-    long long homeFormatSize = rootFormatSize;
-    rootFormatSize = (rootFormatSize * rootPercent) / 100;
-    if (rootFormatSize < rootMin) rootFormatSize = rootMin;
-    homeFormatSize -= rootFormatSize;
+    long long homeFormatSize = size - formatSize;
 
     if (updateTree) {
         addPart(rootFormatSize, "root", crypto);
