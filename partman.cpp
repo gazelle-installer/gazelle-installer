@@ -431,7 +431,7 @@ void PartMan::treeSelChange()
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else if (!isold) {
             gui.pushPartAdd->setEnabled(drvit->childCount() < PARTMAN_MAX_PARTS
-                && twit->driveFreeSpace(true) > 1048576);
+                && twit->driveFreeSpace(true) > 1*MB);
         }
     } else {
         gui.pushPartClear->setEnabled(false);
@@ -1061,7 +1061,7 @@ void PartMan::preparePartitions()
             long long start = 1; // start with 1 MB to aid alignment
             for (int ixdev = 0; ixdev<devCount; ++ixdev) {
                 DeviceItem *twit = drvit->child(ixdev);
-                const long long end = start + twit->size / 1048576;
+                const long long end = start + twit->size / MB;
                 const bool rc = proc.exec("parted", {"-s", "--align", "optimal", drvit->path,
                     "mkpart" , "primary", QString::number(start) + "MiB", QString::number(end) + "MiB"});
                 if (!rc) throw msgfail;
@@ -1728,7 +1728,7 @@ void PartMan::notifyChange(class DeviceItem *item, int first, int last)
 DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *preceding)
     : parentItem(parent), type(type)
 {
-    if (type == Partition) size = 1048576;
+    if (type == Partition) size = 1*MB;
     if (parent) {
         flags.rotational = parent->flags.rotational;
         discgran = parent->discgran;
@@ -1902,8 +1902,8 @@ QStringList DeviceItem::allowedUsesFor(bool real) const
     else {
         list.prepend("Format");
         if (type != VirtualBD) {
-            if (size <= 16777216) list << "BIOS-GRUB";
-            if (size <= 8589934592) list << "ESP" << "boot";
+            if (size <= 16*MB) list << "BIOS-GRUB";
+            if (size <= 8*GB) list << "ESP" << "boot";
         }
         list << "swap" << "home";
     }
@@ -1924,8 +1924,8 @@ QStringList DeviceItem::allowedFormats() const
         else if (use == "BIOS-GRUB") list.append("GRUB");
         else if (use == "ESP") {
             list.append("FAT32");
-            if (size <= 4294901760) list.append("FAT16");
-            if (size <= 33553920) list.append("FAT12");
+            if (size <= (4*GB - 64*KB)) list.append("FAT16");
+            if (size <= (32*MB - 512)) list.append("FAT12");
             allowPreserve = (list.contains(curFormat, Qt::CaseInsensitive)
                 || !curFormat.compare("VFAT", Qt::CaseInsensitive));
         } else if (use == "SWAP") {
@@ -2083,7 +2083,7 @@ long long DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTre
     if (partman->proc.detectEFI()) {
         if (updateTree) addPart(256*MB, "ESP", crypto);
         formatSize += 256*MB;
-    } else if (size >= (2*TB) || partman->gptoverride) {
+    } else if (size >= 2*TB || partman->gptoverride) {
         if (updateTree) addPart(1*MB, "BIOS-GRUB", crypto);
         formatSize += 1*MB;
     }
@@ -2294,8 +2294,8 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     case PartMan::Size:
         {
             QSpinBox *spin = qobject_cast<QSpinBox *>(editor);
-            spin->setRange(0, static_cast<int>(item->driveFreeSpace() / 1048576));
-            spin->setValue(item->size / 1048576);
+            spin->setRange(0, static_cast<int>(item->driveFreeSpace() / MB));
+            spin->setValue(item->size / MB);
         }
         break;
     case PartMan::UseFor:

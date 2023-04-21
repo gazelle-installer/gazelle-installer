@@ -568,7 +568,7 @@ int MInstall::showPage(int curr, int next)
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
                 if (!proc.detectEFI()) {
                     DeviceItem *devit = partman->findByPath("/dev/" + comboDisk->currentData().toString());
-                    if (devit && devit->size >= (2048LL*1073741824LL)) {
+                    if (devit && devit->size >= 2*TB) {
                         msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
                                            " On some systems, a GPT-formatted disk will not boot.");
                         return curr;
@@ -672,7 +672,7 @@ void MInstall::pageDisplayed(int next)
     case Step::Disk:
         if (partman) {
             // These calculations are only for display text, and do not affect the installation.
-            long long rootMin = partman->rootSpaceNeeded + 1048575;
+            long long rootMin = partman->rootSpaceNeeded + (1*MB - 1);
             tminroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
             rootMin = (4 * rootMin) + rootBuffer; // (Root + snapshot [squashfs + ISO] + backup) + buffer.
             trecroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
@@ -1010,7 +1010,7 @@ void MInstall::gotoPage(int next)
 void MInstall::setupPartitionSlider()
 {
     // Allow the slider labels to fit all possible formatted sizes.
-    const QString &strMB = sliderSizeString(1072693248) + '\n'; // "1,023 GB"
+    const QString &strMB = sliderSizeString(1023*GB) + '\n';
     const QFontMetrics &fmetrics = labelSliderRoot->fontMetrics();
     int mwidth = fmetrics.boundingRect(QRect(), Qt::AlignCenter, strMB + tr("Root")).width();
     labelSliderRoot->setMinimumWidth(mwidth);
