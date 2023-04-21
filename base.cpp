@@ -82,7 +82,7 @@ void Base::scanMedia()
     if (!QFile::exists(infile)) infile = sqloc + "/linuxfs.info";
     if (QFile::exists(infile)) {
         const QSettings squashInfo(infile, QSettings::IniFormat);
-        partman.rootSpaceNeeded = 1024 * squashInfo.value("UncompressedSizeKB").toFloat(&floatOK);
+        partman.rootSpaceNeeded = squashInfo.value("UncompressedSizeKB").toFloat(&floatOK) * KB;
     }
     if (!floatOK) {
         rootSources.prepend("-scb");
@@ -94,7 +94,7 @@ void Base::scanMedia()
     // Account for persistent root.
     if (QFileInfo::exists("/live/perist-root")) {
         proc.shell("df /live/persist-root --output=used --total |tail -n1", nullptr, true);
-        const long long rootfs_size = proc.readOut().toLongLong() * 1024;
+        const long long rootfs_size = proc.readOut().toLongLong() * KB;
         qDebug() << "rootfs size is " << rootfs_size;
         // probaby conservative, as rootfs will likely have some overlap with linuxfs.
         partman.rootSpaceNeeded += rootfs_size;

@@ -38,9 +38,11 @@
 #include "safecache.h"
 
 #define KB 1024LL
-#define MB (1024LL*KB)
-#define GB (1024LL*MB)
-#define TB (1024LL*GB)
+#define MB 1048576LL
+#define GB 1073741824LL
+#define TB 1099511627776LL
+#define PB 1125899906842624LL
+#define EB 1152921504606846976LL
 
 class DeviceItem
 {
