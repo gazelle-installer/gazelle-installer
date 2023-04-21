@@ -28,6 +28,7 @@
 
 class MProcess : public QProcess
 {
+    Q_OBJECT
     int execount = 0;
     int sleepcount = 0;
     bool halting = false;
