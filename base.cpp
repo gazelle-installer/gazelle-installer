@@ -31,7 +31,7 @@
 
 Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     const QSettings &appConf, const QCommandLineParser &appArgs)
-    : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
+    : proc(mproc), gui(ui), partman(pman)
 {
     mediacheck = appArgs.isSet("media-check");
     if (!mediacheck) nomediacheck = appArgs.isSet("no-media-check");
@@ -291,8 +291,8 @@ void Base::copyLinux()
     QListWidgetItem *logEntry = proc.log(joined, MProcess::Exec);
 
     QEventLoop eloop;
-    connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
-    connect(&proc, &QProcess::readyRead, &eloop, &QEventLoop::quit);
+    QObject::connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
+    QObject::connect(&proc, &QProcess::readyRead, &eloop, &QEventLoop::quit);
     proc.start(prog, args);
     long ncopy = 0;
     while (proc.state() != QProcess::NotRunning) {
@@ -300,8 +300,8 @@ void Base::copyLinux()
         ncopy += proc.readAllStandardOutput().count('\n');
         proc.status(ncopy);
     }
-    disconnect(&proc, &QProcess::readyRead, nullptr, nullptr);
-    disconnect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
+    QObject::disconnect(&proc, &QProcess::readyRead, nullptr, nullptr);
+    QObject::disconnect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
 
     const QByteArray &StdErr = proc.readAllStandardError();
     if (!StdErr.isEmpty()) {

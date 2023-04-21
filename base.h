@@ -23,16 +23,15 @@
 #ifndef BASE_H
 #define BASE_H
 
-#include <QObject>
 #include <QCommandLineParser>
 #include "ui_meinstall.h"
 #include "mprocess.h"
 #include "msettings.h"
 #include "partman.h"
 
-class Base : public QObject
+class Base
 {
-    Q_OBJECT
+    Q_DECLARE_TR_FUNCTIONS(Base)
     MProcess &proc;
     Ui::MeInstall &gui;
     QWidget *master;
@@ -53,9 +52,6 @@ public:
     void scanMedia();
     void haltCheck(bool silent);
     void install();
-
-signals:
-
 };
 
 #endif // BASE_H
