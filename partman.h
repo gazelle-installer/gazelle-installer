@@ -39,6 +39,9 @@
 #define PB 1125899906842624LL
 #define EB 1152921504606846976LL
 
+#define PARTMAN_SAFETY (8*MB) // 1MB at start + Compensate for rounding errors.
+#define PARTMAN_MAX_PARTS 128 // Maximum number of partitions Linux supports.
+
 class DeviceItem
 {
     Q_DECLARE_TR_FUNCTIONS(DeviceItem)
@@ -49,10 +52,7 @@ class DeviceItem
     DeviceItem *parentItem = nullptr;
     class PartMan *partman = nullptr;
     int order = -1;
-    DeviceItem *addPart(long long defaultSize, const QString &defaultUse, bool crypto);
-    void driveAutoSetActive();
     void autoFill(unsigned int changed = 0xFFFF);
-    void labelParts();
 public:
     DeviceItem *active = nullptr;
     DeviceItem *origin = nullptr;
@@ -99,6 +99,10 @@ public:
     int indexOfChild(DeviceItem *child);
     int childCount() const;
     void sortChildren();
+    // Layout finishing
+    DeviceItem *addPart(long long defaultSize, const QString &defaultUse, bool crypto);
+    void driveAutoSetActive();
+    void labelParts();
     // Helpers
     static QString realUseFor(const QString &use);
     inline QString realUseFor() const { return realUseFor(usefor); }
@@ -120,7 +124,6 @@ public:
     bool canMount() const;
     long long driveFreeSpace(bool inclusive = false) const;
     /* Convenience */
-    long long layoutDefault(long long rootFormatSize, bool crypto, bool updateTree=true);
     void addToCombo(QComboBox *combo, bool warnNasty = false) const;
     static QStringList split(const QString &devname);
     static QString join(const QString &drive, int partnum);

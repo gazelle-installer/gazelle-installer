@@ -26,7 +26,9 @@
 class AutoPart : public QObject
 {
     Q_OBJECT
+    class MProcess &proc;
     class Ui::MeInstall &gui;
+    class PartMan *partman = nullptr;
     class DeviceItem *drvitem = nullptr;
     QString strRoot, strHome, strNone;
     long long available = 0;
@@ -41,8 +43,8 @@ class AutoPart : public QObject
     void actionTriggered(int action);
     void valueChanged(int value);
 public:
-    AutoPart(Ui::MeInstall &ui, const class QSettings &appConf,
-        long long rootNeeded, long long homeNeeded);
+    AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui,
+        const class QSettings &appConf, long long homeNeeded);
     void refresh();
     void setDrive(class DeviceItem *drive, bool swapfile, bool encrypt, bool hibernation, bool snapshot);
     enum Part { Root, Home };
@@ -50,6 +52,7 @@ public:
     long long partSize(Part part = Root);
     // Layout Builder
     void builderGUI(class DeviceItem *drive);
+    long long buildLayout(long long rootFormatSize, bool crypto, bool updateTree=true);
     // Helpers
     long long recommended(bool encrypt, bool hibernation, bool snapshots);
     static QString sizeString(long long size);

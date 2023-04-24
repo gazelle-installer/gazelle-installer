@@ -28,9 +28,8 @@
 #include "swapman.h"
 #include "autopart.h"
 
-AutoPart::AutoPart(Ui::MeInstall &ui, const class QSettings &appConf,
-    long long rootNeeded, long long homeNeeded)
-    : QObject(ui.boxSliderPart), gui(ui)
+AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf, long long homeNeeded)
+    : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman)
 {
     connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPressed);
     connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::actionTriggered);
@@ -39,7 +38,7 @@ AutoPart::AutoPart(Ui::MeInstall &ui, const class QSettings &appConf,
     strRoot = tr("Root");
     strHome = tr("Home");
     strNone = "----";
-    minRoot = rootNeeded;
+    minRoot = pman->rootSpaceNeeded;
     minHome = homeNeeded;
     prefRoot = minRoot + appConf.value("ROOT_BUFFER", 5000).toLongLong() * MB;
     prefHome = minHome + appConf.value("HOME_BUFFER", 2000).toLongLong() * MB;
@@ -66,7 +65,7 @@ void AutoPart::setDrive(DeviceItem *drive, bool swapfile, bool encrypt, bool hib
     drvitem = drive;
     if (!drvitem) return;
     crypto = encrypt;
-    available = drvitem->layoutDefault(-1, encrypt, false);
+    available = buildLayout(-1, encrypt, false);
     if (!available) return;
 
     recRoot = prefRoot;
@@ -137,7 +136,7 @@ void AutoPart::builderGUI(DeviceItem *drive)
         checkHibernation->setEnabled(allocSwap);
         if (!allocSwap) checkHibernation->setChecked(false);
 
-        long long available = drive->layoutDefault(-1, checkEncrypt->isChecked(), false);
+        long long available = buildLayout(-1, checkEncrypt->isChecked(), false);
         auto check = qobject_cast<QCheckBox *>(sender());
         if (available <= 0) check->setChecked(false);
         setDrive(drive, checkSwapFile->isChecked(), checkEncrypt->isChecked(), checkHibernation->isChecked(), checkSnapshot->isChecked());
@@ -154,7 +153,7 @@ void AutoPart::builderGUI(DeviceItem *drive)
     connect(&buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
 
     if (dialog.exec() == QDialog::Accepted) {
-        drive->layoutDefault(sizeRoot, checkEncrypt->isChecked());
+        buildLayout(sizeRoot, checkEncrypt->isChecked());
         gui.boxSwap->setChecked(checkSwapFile->isChecked());
         gui.checkHibernation->setChecked(checkHibernation->isChecked());
     }
@@ -163,6 +162,45 @@ void AutoPart::builderGUI(DeviceItem *drive)
     setDrive(oldDrive, true, gui.boxEncryptAuto->isChecked(), gui.checkHibernationReg->isChecked(), true);
     gui.sliderPart->setSliderPosition(oldPos);
     delete placeholder;
+}
+
+long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool updateTree)
+{
+    if (updateTree) drvitem->clear();
+    if (rootFormatSize < 0) rootFormatSize = LLONG_MAX;
+    long long remaining = drvitem->size - PARTMAN_SAFETY;
+
+    // Boot partitions.
+    if (proc.detectEFI()) {
+        if (updateTree) drvitem->addPart(256*MB, "ESP", crypto);
+        remaining -= 256*MB;
+    } else if (drvitem->willUseGPT()) {
+        if (updateTree) drvitem->addPart(1*MB, "BIOS-GRUB", crypto);
+        remaining -= 1*MB;
+    }
+    long long rootMin = partman->rootSpaceNeeded;
+    const long long bootMin = partman->bootSpaceNeeded;
+    if (!crypto) rootMin += bootMin;
+    else {
+        int bootFormatSize = 1*GB;
+        if (bootFormatSize < bootMin) bootFormatSize = bootMin;
+        if (updateTree) drvitem->addPart(bootFormatSize, "boot", crypto);
+        remaining -= bootFormatSize;
+    }
+
+    // Root
+    if (rootFormatSize > remaining) rootFormatSize = remaining;
+    if (rootFormatSize < rootMin) return -((drvitem->size - remaining) + rootMin);
+    remaining -= rootFormatSize;
+    // Home
+    if (updateTree) {
+        drvitem->addPart(rootFormatSize, "root", crypto);
+        long long homeFormatSize = drvitem->size - remaining;
+        if (homeFormatSize>0) drvitem->addPart(homeFormatSize, "home", crypto);
+        drvitem->labelParts();
+        drvitem->driveAutoSetActive();
+    }
+    return rootFormatSize;
 }
 
 // Helpers
