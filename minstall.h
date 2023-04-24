@@ -79,6 +79,7 @@ private slots:
 
     void on_comboDisk_currentIndexChanged(int);
     void on_boxEncryptAuto_toggled(bool checked);
+    void on_checkHibernationReg_toggled(bool);
     void on_radioCustomPart_toggled(bool checked);
 
     void on_progInstall_valueChanged(int value);
