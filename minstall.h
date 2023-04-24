@@ -74,7 +74,6 @@ private slots:
     void on_pushAbort_clicked();
     void on_pushBack_clicked();
     void on_pushSetKeyboard_clicked();
-    void on_pushClose_clicked();
     void on_pushNext_clicked();
     void on_pushServices_clicked();
 
@@ -125,8 +124,6 @@ private:
     void startup();
     void splashSetThrobber(bool active);
     void splashThrob();
-    // slots
-    void diskPassValidationChanged(bool valid);
     // private functions
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
     void setupAutoMount(bool enabled);

@@ -130,6 +130,7 @@ MInstall::~MInstall() {
 void MInstall::startup()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    connect(pushClose, &QPushButton::clicked, this, &MInstall::close);
 
     if (!modeOOBE) {
         // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
@@ -177,8 +178,8 @@ void MInstall::startup()
     // Password box setup
     textCryptoPass->setup(textCryptoPass2, progCryptoPassMeter, 1, 32, 9);
     textCryptoPassCust->setup(textCryptoPassCust2, progCryptoPassMeterCust, 1, 32, 9);
-    connect(textCryptoPass, &MPassEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
-    connect(textCryptoPassCust, &MPassEdit::validationChanged, this, &MInstall::diskPassValidationChanged);
+    connect(textCryptoPass, &MPassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
+    connect(textCryptoPassCust, &MPassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
 
     setupkeyboardbutton();
 
@@ -1085,11 +1086,6 @@ void MInstall::reject()
 /////////////////////////////////////////////////////////////////////////
 // slots
 
-void MInstall::diskPassValidationChanged(bool valid)
-{
-    pushNext->setEnabled(valid);
-}
-
 void MInstall::on_pushNext_clicked()
 {
     gotoPage(widgetStack->currentIndex() + 1);
@@ -1215,11 +1211,6 @@ void MInstall::on_progInstall_valueChanged(int value)
                              "<p>%2 Dev Team</p>").arg(PROJECTNAME, PROJECTSHORTNAME));
         break;
     }
-}
-
-void MInstall::on_pushClose_clicked()
-{
-    close();
 }
 
 void MInstall::setupkeyboardbutton()
