@@ -32,7 +32,9 @@ class SwapMan : public QObject
     PartMan &partman;
     // Slots
     void swapFileEdited(const QString &text);
-    void sizeResetClick();
+    void sizeResetClicked();
+    void spinSizeChanged(int i);
+    void checkHibernationClicked(bool checked);
 public:
     SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui);
     void manageConfig(MSettings &config);

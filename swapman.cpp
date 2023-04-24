@@ -26,8 +26,9 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui)
     : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
     connect(ui.textSwapFile, &QLineEdit::textEdited, this, &SwapMan::swapFileEdited);
-    connect(ui.pushSwapSizeReset, &QToolButton::clicked, this, &SwapMan::sizeResetClick);
-    connect(ui.checkHibernation, &QCheckBox::clicked, this, &SwapMan::sizeResetClick);
+    connect(ui.spinSwapSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &SwapMan::spinSizeChanged);
+    connect(ui.pushSwapSizeReset, &QToolButton::clicked, this, &SwapMan::sizeResetClicked);
+    connect(ui.checkHibernation, &QCheckBox::clicked, this, &SwapMan::checkHibernationClicked);
 }
 
 void SwapMan::manageConfig(MSettings &config)
@@ -43,7 +44,7 @@ void SwapMan::setupDefaults()
 {
     gui.boxSwap->setChecked(partman.swapCount() <= 0);
     swapFileEdited(gui.textSwapFile->text());
-    sizeResetClick();
+    sizeResetClicked();
 }
 
 void SwapMan::install()
@@ -114,14 +115,31 @@ void SwapMan::swapFileEdited(const QString &text)
     int max = 0;
     if (!devit) gui.labelSwapMax->setText(tr("Invalid location"));
     else {
-        max = devit->size - partman.rootSpaceNeeded;
+        max = (int)((devit->size - partman.rootSpaceNeeded) / MB);
         gui.labelSwapMax->setText(tr("Maximum: %1 MB").arg(max));
     }
     gui.spinSwapSize->setMaximum(max);
+    spinSizeChanged(gui.spinSwapSize->value());
 }
 
-void SwapMan::sizeResetClick()
+void SwapMan::sizeResetClicked()
 {
     const int irec = (int)(recommended(gui.checkHibernation->isChecked()) / MB);
     gui.spinSwapSize->setValue(irec);
+    spinSizeChanged(gui.spinSwapSize->value());
+}
+
+void SwapMan::spinSizeChanged(int i)
+{
+    const int recHibMB = (int)(recommended(true) / MB);
+    if (i < recHibMB) gui.checkHibernation->setChecked(false);
+    gui.checkHibernation->setEnabled(gui.spinSwapSize->maximum() >= recHibMB);
+}
+
+void SwapMan::checkHibernationClicked(bool checked)
+{
+    if (checked) {
+        const int irec = (int)(recommended(gui.checkHibernation->isChecked()) / MB);
+        if(gui.spinSwapSize->value() < irec) gui.spinSwapSize->setValue(irec);
+    }
 }
