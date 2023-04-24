@@ -147,9 +147,9 @@ void MInstall::startup()
         base->scanMedia();
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
         swapman = new SwapMan(proc, *partman, *this);
+        autopart = new AutoPart(*this, appConf, partman->rootSpaceNeeded, 16*MB);
+        partman->autopart = autopart;
 
-        rootBuffer = appConf.value("ROOT_BUFFER", 5000).toLongLong() * MB;
-        homeBuffer = appConf.value("HOME_BUFFER", 2000).toLongLong() * MB;
         INSTALL_FROM_ROOT_DEVICE = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
 
         // Unable to get space requirements since there's no media.
@@ -216,7 +216,7 @@ void MInstall::startup()
             boxAutoPart->setEnabled(false);
             radioCustomPart->setChecked(true);
         }
-        setupPartitionSlider();
+        autopart->refresh();
         // Override with whatever is in the config.
         manageConfig(ConfigLoadA);
         // Hibernation check box (regular install).
@@ -477,11 +477,10 @@ void MInstall::manageConfig(enum ConfigAction mode)
             if (mode == ConfigSave) {
                 config->setValue("RootPortion", sliderPart->value());
             } else if (config->contains("RootPortion")) {
-                 const int sliderVal = config->value("RootPortion").toInt();
-                 sliderPart->setValue(sliderVal);
-                 on_sliderPart_valueChanged(sliderVal);
-                 if (sliderPart->value() != sliderVal) {
-                     config->markBadWidget(sliderPart);
+                 const int portion = config->value("RootPortion").toInt();
+                 sliderPart->setSliderPosition(portion);
+                 if (sliderPart->value() != portion) {
+                     config->markBadWidget(boxSliderPart);
                  }
             }
         }
@@ -580,7 +579,7 @@ int MInstall::showPage(int curr, int next)
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
             partman->clearAllUses();
-            partman->selectedDriveAuto()->layoutDefault(-1, boxEncryptAuto->isChecked());
+            partman->selectedDriveAuto()->layoutDefault(autopart->partSize(), boxEncryptAuto->isChecked());
             if (!partman->composeValidate(true, PROJECTNAME)) {
                 nextFocus = treePartitions;
                 return curr;
@@ -656,8 +655,6 @@ void MInstall::pageDisplayed(int next)
         if (next != ixProgress) ixTipStart = ixTip;
     }
 
-    QString tminroot, trecroot; // Only used for Step::Disk
-
     switch (next) {
     case Step::Terms:
         textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
@@ -670,17 +667,8 @@ void MInstall::pageDisplayed(int next)
         pushNext->setDefault(true);
         break;
     case Step::Disk:
-        if (partman) {
-            // These calculations are only for display text, and do not affect the installation.
-            long long rootMin = partman->rootSpaceNeeded + (1*MB - 1);
-            tminroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
-            rootMin = (4 * rootMin) + rootBuffer; // (Root + snapshot [squashfs + ISO] + backup) + buffer.
-            trecroot = QLocale::system().formattedDataSize(rootMin, 0, QLocale::DataSizeTraditionalFormat);
-        }
-
         textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
-            + tr("Installation requires about %1 of space. %2 or more is preferred.").arg(tminroot, trecroot) + "</p>"
-            "<p>" + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
+            + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
             "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
             + tr("The drive can be divided into separate system (root) and user data (home) partitions using the slider.") + "</p>"
             "<p>" + tr("The <b>root</b> partition will contain the operating system and applications.") + "<br/>"
@@ -1007,21 +995,6 @@ void MInstall::gotoPage(int next)
     }
 }
 
-void MInstall::setupPartitionSlider()
-{
-    // Allow the slider labels to fit all possible formatted sizes.
-    const QString &strMB = sliderSizeString(1023*GB) + '\n';
-    const QFontMetrics &fmetrics = labelSliderRoot->fontMetrics();
-    int mwidth = fmetrics.boundingRect(QRect(), Qt::AlignCenter, strMB + tr("Root")).width();
-    labelSliderRoot->setMinimumWidth(mwidth);
-    mwidth = fmetrics.boundingRect(QRect(), Qt::AlignCenter, strMB + tr("Home")).width();
-    labelSliderHome->setMinimumWidth(mwidth);
-    labelSliderRoot->setText("----");
-    labelSliderHome->setText("----");
-    // Snap the slider to the legal range.
-    on_sliderPart_valueChanged(sliderPart->value());
-}
-
 /////////////////////////////////////////////////////////////////////////
 // event handlers
 
@@ -1076,7 +1049,7 @@ void MInstall::changeEvent(QEvent *event)
         col.setAlpha(200);
         pal.setColor(QPalette::Base, col);
         textHelp->setPalette(pal);
-        setupPartitionSlider();
+        if (autopart) autopart->refresh();
     }
 }
 
@@ -1283,65 +1256,8 @@ void MInstall::on_pushSetKeyboard_clicked()
 
 void MInstall::on_comboDisk_currentIndexChanged(int)
 {
-    on_sliderPart_valueChanged(sliderPart->value());
-}
-
-void MInstall::on_sliderPart_sliderPressed()
-{
-    QString tipText(tr("%1% root\n%2% home"));
-    const int val = sliderPart->value();
-    if (val==100) tipText = tr("Combined root and home");
-    else if (val<1) tipText = tipText.arg(">0", "<100");
-    else tipText = tipText.arg(val).arg(100-val);
-    sliderPart->setToolTip(tipText);
-    if (sliderPart->isSliderDown()) {
-        QToolTip::showText(QCursor::pos(), tipText, sliderPart);
-    }
-}
-void MInstall::on_sliderPart_valueChanged(int value)
-{
-    if (!partman) return;
-    const bool crypto = boxEncryptAuto->isChecked();
-    DeviceItem *drvitem = partman->selectedDriveAuto();
-    if (!drvitem) return;
-    long long available = drvitem->layoutDefault(100, crypto, false);
-    if (!available) return;
-    const long long homeMin = 16*MB; // 16MB for basic profile and setup files
-    const long long rootRec = partman->rootSpaceNeeded + rootBuffer;
-    const long long homeRec = homeMin + homeBuffer;
-    const int minPercent = percent(partman->rootSpaceNeeded, available, true);
-    const int maxPercent = 100 - percent(homeMin, available);
-    const int recPercentMin = percent(rootRec, available, true); // Recommended root size.
-    const int recPercentMax = 100 - percent(homeRec, available); // Recommended minimum home.
-
-    const int origValue = value;
-    if (value < minPercent) value = minPercent;
-    else if (value > maxPercent) value = 100;
-    if (value != origValue) {
-        qApp->beep();
-        sliderPart->blockSignals(true);
-        sliderPart->setValue(value);
-        sliderPart->blockSignals(false);
-    }
-
-    const long long availRoot = drvitem->layoutDefault(value, crypto, false);
-    QString valstr = sliderSizeString(availRoot);
-    available -= availRoot;
-    labelSliderRoot->setText(valstr + "\n" + tr("Root"));
-
-    QPalette palRoot = QApplication::palette();
-    QPalette palHome = QApplication::palette();
-    if (value < recPercentMin) palRoot.setColor(QPalette::WindowText, Qt::red);
-    if (value==100) valstr = tr("----");
-    else {
-        valstr = sliderSizeString(available);
-        valstr += "\n" + tr("Home");
-        if (value > recPercentMax) palHome.setColor(QPalette::WindowText, Qt::red);
-    }
-    labelSliderHome->setText(valstr);
-    labelSliderRoot->setPalette(palRoot);
-    labelSliderHome->setPalette(palHome);
-    on_sliderPart_sliderPressed(); // For the tool tip.
+    DeviceItem *devit = partman->findByPath("/dev/" + comboDisk->currentData().toString());
+    autopart->setDrive(devit, true, boxEncryptAuto->isChecked(), checkHibernationReg->isChecked(), true);
 }
 
 void MInstall::on_boxEncryptAuto_toggled(bool checked)
@@ -1349,7 +1265,7 @@ void MInstall::on_boxEncryptAuto_toggled(bool checked)
     pushNext->setEnabled(!checked || textCryptoPass->isValid());
     radioBootPBR->setDisabled(checked);
     // Account for addition/removal of the boot partition.
-    on_sliderPart_valueChanged(sliderPart->value());
+    on_comboDisk_currentIndexChanged(0);
 }
 
 void MInstall::on_radioCustomPart_toggled(bool checked)

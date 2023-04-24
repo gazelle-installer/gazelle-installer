@@ -1,12 +1,7 @@
 /***************************************************************************
  * Basic partition manager for the installer.
- ***************************************************************************
  *
- *   Copyright (C) 2019, 2020-2021 by AK-47
- *   Transplanted code, marked with comments further down this file:
- *    - Copyright (C) 2003-2010 by Warren Woodford
- *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
- *    - Heavily revised by dolphin oracle, adrian, and anticaptialista 2018.
+ *   Copyright (C) 2019-2023 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -125,7 +120,7 @@ public:
     bool canMount() const;
     long long driveFreeSpace(bool inclusive = false) const;
     /* Convenience */
-    long long layoutDefault(int rootPercent, bool crypto, bool updateTree=true);
+    long long layoutDefault(long long rootFormatSize, bool crypto, bool updateTree=true);
     void addToCombo(QComboBox *combo, bool warnNasty = false) const;
     static QStringList split(const QString &devname);
     static QString join(const QString &drive, int partnum);
@@ -208,6 +203,7 @@ public:
     long long rootSpaceNeeded = 0;
     long long bootSpaceNeeded = 0;
     QMap<QString, DeviceItem *> mounts;
+    class AutoPart *autopart = nullptr;
     PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs);
     void scan(DeviceItem *drvstart = nullptr);
     bool manageConfig(MSettings &config, bool save);
@@ -241,29 +237,5 @@ public:
     int changeEnd(bool notify = true);
     void notifyChange(class DeviceItem *item, int first = -1, int last = -1);
 };
-
-// Calculate a percentage without compromising the range of long long.
-static inline long long portion(long long range, int percent, long round = -1)
-{
-    const bool roundUp = (round > 0);
-    if (roundUp) percent = 100 - percent;
-    else round = -round;
-    long long r = ((range / 100) * percent) + (((range % 100) * percent) / 100);
-    if (roundUp) {
-        r = ((range-r) + (round-1LL)) / round;
-        r *= round;
-        if (r < 0 || r > range) return range;
-    } else {
-        r /= round;
-        r *= round;
-    }
-    return r;
-}
-static inline int percent(long long portion, long long range, bool roundUp = false)
-{
-    if (roundUp) portion = range - portion;
-    const int percent = portion / (double)(range / 100.0L);
-    return roundUp ? 100-percent : percent;
-}
 
 #endif // PARTMAN_H

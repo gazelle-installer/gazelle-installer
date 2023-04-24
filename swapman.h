@@ -1,6 +1,5 @@
 /***************************************************************************
  * Swap space management and setup for the installer.
- ***************************************************************************
  *
  *   Copyright (C) 2023 by AK-47.
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +38,7 @@ public:
     void manageConfig(MSettings &config);
     void setupDefaults();
     void install();
-    static unsigned long recommendedMB(bool hibernation);
+    static long long recommended(bool hibernation);
 };
 
 #endif // SWAPMAN_H

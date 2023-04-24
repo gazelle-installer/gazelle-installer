@@ -1,8 +1,7 @@
 /***************************************************************************
  * Basic partition manager for the installer.
- ***************************************************************************
  *
- *   Copyright (C) 2019, 2020-2022 by AK-47
+ *   Copyright (C) 2019-2023 by AK-47
  *   Transplanted code, marked with comments further down this file:
  *    - Copyright (C) 2003-2010 by Warren Woodford
  *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
@@ -41,6 +40,7 @@
 #include <QDialogButtonBox>
 
 #include "msettings.h"
+#include "autopart.h"
 #include "partman.h"
 
 #define PARTMAN_SAFETY (8*MB) // 1MB at start + Compensate for rounding errors.
@@ -506,25 +506,23 @@ void PartMan::treeMenu(const QPoint &)
     } else if (twit->type == DeviceItem::Drive) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.pushPartAdd->isEnabled());
+        QAction *actBuild = menu.addAction(tr("&Build layout..."));
         menu.addSeparator();
         QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
-        QMenu *menuTemplates = menu.addMenu(tr("&Templates"));
-        const QAction *actBasic = menuTemplates->addAction(tr("&Standard install"));
-        QAction *actCrypto = menuTemplates->addAction(tr("&Encrypted system"));
 
         const bool locked = twit->isLocked();
         actClear->setDisabled(locked);
         actReset->setDisabled(locked);
-        menuTemplates->setDisabled(locked);
-        actCrypto->setVisible(gui.boxCryptoPass->isVisible());
+        actBuild->setDisabled(locked);
 
         QAction *action = menu.exec(QCursor::pos());
         if (action == actAdd) partAddClick(true);
         else if (action == actClear) partClearClick(true);
-        else if (action == actBasic) twit->layoutDefault(-1, false);
-        else if (action == actCrypto) twit->layoutDefault(-1, true);
-        else if (action == actReset) {
+        else if (action == actBuild) {
+            if (autopart) autopart->builderGUI(twit);
+            treeSelChange();
+        } else if (action == actReset) {
             gui.boxMain->setEnabled(false);
             scan(twit);
             gui.boxMain->setEnabled(true);
@@ -1853,7 +1851,7 @@ inline bool DeviceItem::willUseGPT() const
 {
     if (type != Drive) return false;
     if (flags.oldLayout) return flags.curGPT;
-    else if (size >= 2199023255552 || children.count() > 4) return true;
+    else if (size >= 2*TB || children.count() > 4) return true;
     else if (partman) return (partman->gptoverride || partman->proc.detectEFI());
     return false;
 }
@@ -2072,20 +2070,20 @@ void DeviceItem::labelParts()
     if (partman) partman->resizeColumnsToFit();
 }
 
-long long DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTree)
+long long DeviceItem::layoutDefault(long long rootFormatSize, bool crypto, bool updateTree)
 {
     assert (partman != nullptr);
-    if (rootPercent<0) rootPercent = partman->gui.sliderPart->value();
     if (updateTree) clear();
-    long long formatSize = PARTMAN_SAFETY;
+    if (rootFormatSize < 0) rootFormatSize = LLONG_MAX;
+    long long remaining = size - PARTMAN_SAFETY;
 
     // Boot partitions.
     if (partman->proc.detectEFI()) {
         if (updateTree) addPart(256*MB, "ESP", crypto);
-        formatSize += 256*MB;
+        remaining -= 256*MB;
     } else if (size >= 2*TB || partman->gptoverride) {
         if (updateTree) addPart(1*MB, "BIOS-GRUB", crypto);
-        formatSize += 1*MB;
+        remaining -= 1*MB;
     }
     long long rootMin = partman->rootSpaceNeeded;
     const long long bootMin = partman->bootSpaceNeeded;
@@ -2094,28 +2092,20 @@ long long DeviceItem::layoutDefault(int rootPercent, bool crypto, bool updateTre
         int bootFormatSize = 1*GB;
         if (bootFormatSize < bootMin) bootFormatSize = bootMin;
         if (updateTree) addPart(bootFormatSize, "boot", crypto);
-        formatSize += bootFormatSize;
+        remaining -= bootFormatSize;
     }
 
     // Root
-    long long rootFormatSize = size - formatSize;
-    if (rootPercent < 100) {
-        rootFormatSize = portion(rootFormatSize, rootPercent, MB);
-        if (rootFormatSize < rootMin && rootMin <= portion(rootFormatSize, rootPercent+1, -MB)) {
-            rootFormatSize = rootMin; // Snap to minimum if within 1% of the requested portion.
-        }
-    }
-    if (rootFormatSize < rootMin) return -(formatSize + rootMin);
-    formatSize += rootFormatSize;
+    if (rootFormatSize > remaining) rootFormatSize = remaining;
+    if (rootFormatSize < rootMin) return -((size - remaining) + rootMin);
+    remaining -= rootFormatSize;
     // Home
-    long long homeFormatSize = size - formatSize;
-
     if (updateTree) {
         addPart(rootFormatSize, "root", crypto);
+        long long homeFormatSize = size - remaining;
         if (homeFormatSize>0) addPart(homeFormatSize, "home", crypto);
         labelParts();
         driveAutoSetActive();
-        partman->treeSelChange();
     }
     return rootFormatSize;
 }
