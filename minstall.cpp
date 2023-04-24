@@ -148,7 +148,7 @@ void MInstall::startup()
         base->scanMedia();
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
         swapman = new SwapMan(proc, *partman, *this);
-        autopart = new AutoPart(*this, appConf, partman->rootSpaceNeeded, 16*MB);
+        autopart = new AutoPart(proc, partman, *this, appConf, 16*MB);
         partman->autopart = autopart;
 
         INSTALL_FROM_ROOT_DEVICE = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
@@ -580,7 +580,7 @@ int MInstall::showPage(int curr, int next)
                 if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
             partman->clearAllUses();
-            partman->selectedDriveAuto()->layoutDefault(autopart->partSize(), boxEncryptAuto->isChecked());
+            autopart->buildLayout(autopart->partSize(), boxEncryptAuto->isChecked());
             if (!partman->composeValidate(true, PROJECTNAME)) {
                 nextFocus = treePartitions;
                 return curr;

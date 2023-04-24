@@ -43,9 +43,6 @@
 #include "autopart.h"
 #include "partman.h"
 
-#define PARTMAN_SAFETY (8*MB) // 1MB at start + Compensate for rounding errors.
-#define PARTMAN_MAX_PARTS 128 // Maximum number of partitions Linux supports.
-
 PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs)
     : QAbstractItemModel(ui.boxMain), proc(mproc), root(DeviceItem::Unknown), gui(ui)
 {
@@ -1847,7 +1844,7 @@ bool DeviceItem::isLocked() const
     }
     return (mapCount != 0);
 }
-inline bool DeviceItem::willUseGPT() const
+bool DeviceItem::willUseGPT() const
 {
     if (type != Drive) return false;
     if (flags.oldLayout) return flags.curGPT;
@@ -2068,46 +2065,6 @@ void DeviceItem::labelParts()
         if (partman) partman->notifyChange(chit, PartMan::Device, PartMan::Device);
     }
     if (partman) partman->resizeColumnsToFit();
-}
-
-long long DeviceItem::layoutDefault(long long rootFormatSize, bool crypto, bool updateTree)
-{
-    assert (partman != nullptr);
-    if (updateTree) clear();
-    if (rootFormatSize < 0) rootFormatSize = LLONG_MAX;
-    long long remaining = size - PARTMAN_SAFETY;
-
-    // Boot partitions.
-    if (partman->proc.detectEFI()) {
-        if (updateTree) addPart(256*MB, "ESP", crypto);
-        remaining -= 256*MB;
-    } else if (size >= 2*TB || partman->gptoverride) {
-        if (updateTree) addPart(1*MB, "BIOS-GRUB", crypto);
-        remaining -= 1*MB;
-    }
-    long long rootMin = partman->rootSpaceNeeded;
-    const long long bootMin = partman->bootSpaceNeeded;
-    if (!crypto) rootMin += bootMin;
-    else {
-        int bootFormatSize = 1*GB;
-        if (bootFormatSize < bootMin) bootFormatSize = bootMin;
-        if (updateTree) addPart(bootFormatSize, "boot", crypto);
-        remaining -= bootFormatSize;
-    }
-
-    // Root
-    if (rootFormatSize > remaining) rootFormatSize = remaining;
-    if (rootFormatSize < rootMin) return -((size - remaining) + rootMin);
-    remaining -= rootFormatSize;
-    // Home
-    if (updateTree) {
-        addPart(rootFormatSize, "root", crypto);
-        long long homeFormatSize = size - remaining;
-        if (homeFormatSize>0) addPart(homeFormatSize, "home", crypto);
-        labelParts();
-        driveAutoSetActive();
-    }
-    return rootFormatSize;
 }
 
 // Return block device info that is suitable for a combo box.
