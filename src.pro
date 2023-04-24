@@ -125,6 +125,7 @@ TRANSLATIONS += translations/gazelle-installer_af.ts \
 
 FORMS += meinstall.ui
 HEADERS += minstall.h \
+    autopart.h \
     base.h \
     bootman.h \
     mpassedit.h \
@@ -137,6 +138,7 @@ HEADERS += minstall.h \
     safecache.h \
     mprocess.h
 SOURCES += app.cpp minstall.cpp \
+    autopart.cpp \
     base.cpp \
     bootman.cpp \
     mpassedit.cpp \

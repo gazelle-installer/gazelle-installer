@@ -1,6 +1,5 @@
 /***************************************************************************
  * Swap space management and setup for the installer.
- ***************************************************************************
  *
  *   Copyright (C) 2023 by AK-47.
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,20 +95,15 @@ void SwapMan::install()
     proc.setExceptionMode(nullptr);
 }
 
-unsigned long SwapMan::recommendedMB(bool hibernation)
+long long SwapMan::recommended(bool hibernation)
 {
     struct sysinfo sinfo;
-    if (sysinfo(&sinfo) == 0) {
-        sinfo.totalram /= 1048576;
-        unsigned long irec = sinfo.totalram;
-        if (sinfo.totalram > 1024) {
-            irec = (unsigned long)round(sqrt((float)sinfo.totalram/1024.0));
-            irec *= 1024;
-        }
-        if (hibernation) irec += sinfo.totalram;
-        return irec;
-    }
-    return 0;
+    if (sysinfo(&sinfo) != 0) return 0;
+    long long physram = (long long)sinfo.totalram * sinfo.mem_unit;
+    long long irec = hibernation ? physram : 0;
+    if (physram < 1*GB) irec += physram;
+    else irec += (long long)roundl(sqrtl((long double)physram / GB)) * GB;
+    return irec;
 }
 
 /* Slots */
@@ -120,7 +114,7 @@ void SwapMan::swapFileEdited(const QString &text)
     int max = 0;
     if (!devit) gui.labelSwapMax->setText(tr("Invalid location"));
     else {
-        max = devit->size / 2097152; // Max swap = half device size
+        max = devit->size - partman.rootSpaceNeeded;
         gui.labelSwapMax->setText(tr("Maximum: %1 MB").arg(max));
     }
     gui.spinSwapSize->setMaximum(max);
@@ -128,8 +122,6 @@ void SwapMan::swapFileEdited(const QString &text)
 
 void SwapMan::sizeResetClick()
 {
-    int irec = (int)recommendedMB(gui.checkHibernation->isChecked());
-    const int imax = gui.spinSwapSize->maximum() / 2;
-    if (irec > imax) irec = imax;
+    const int irec = (int)(recommended(gui.checkHibernation->isChecked()) / MB);
     gui.spinSwapSize->setValue(irec);
 }

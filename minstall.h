@@ -29,6 +29,7 @@
 #include "mprocess.h"
 #include "msettings.h"
 #include "partman.h"
+#include "autopart.h"
 #include "base.h"
 #include "oobe.h"
 #include "bootman.h"
@@ -61,7 +62,6 @@ public:
     QString PROJECTSHORTNAME;
     QString PROJECTURL;
     QString PROJECTVERSION;
-    long long rootBuffer, homeBuffer;
 
     int showPage(int curr, int next);
     void gotoPage(int next);
@@ -79,8 +79,6 @@ private slots:
     void on_pushServices_clicked();
 
     void on_comboDisk_currentIndexChanged(int);
-    void on_sliderPart_sliderPressed();
-    void on_sliderPart_valueChanged(int value);
     void on_boxEncryptAuto_toggled(bool checked);
     void on_radioCustomPart_toggled(bool checked);
 
@@ -105,6 +103,7 @@ private:
 
     QWidget *nextFocus = nullptr;
     PartMan *partman = nullptr;
+    AutoPart *autopart = nullptr;
     Base *base = nullptr;
     Oobe *oobe = nullptr;
     QStringList listHomes;
@@ -130,7 +129,6 @@ private:
     void diskPassValidationChanged(bool valid);
     // private functions
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
-    void setupPartitionSlider();
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int space, long steps);
     bool saveHomeBasic();
