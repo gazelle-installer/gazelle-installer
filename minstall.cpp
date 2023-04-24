@@ -1258,6 +1258,10 @@ void MInstall::on_boxEncryptAuto_toggled(bool checked)
     // Account for addition/removal of the boot partition.
     on_comboDisk_currentIndexChanged(0);
 }
+void MInstall::on_checkHibernationReg_toggled(bool)
+{
+    on_comboDisk_currentIndexChanged(0);
+}
 
 void MInstall::on_radioCustomPart_toggled(bool checked)
 {
