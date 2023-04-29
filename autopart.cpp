@@ -195,8 +195,7 @@ long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool upda
     // Home
     if (updateTree) {
         drvitem->addPart(rootFormatSize, "root", crypto);
-        long long homeFormatSize = drvitem->size - remaining;
-        if (homeFormatSize>0) drvitem->addPart(homeFormatSize, "home", crypto);
+        if (remaining > 0) drvitem->addPart(remaining, "home", crypto);
         drvitem->labelParts();
         drvitem->driveAutoSetActive();
     }
