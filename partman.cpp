@@ -563,8 +563,9 @@ void PartMan::partRemoveClick(bool)
     if (!devit) return;
     DeviceItem *drvit = devit->parent();
     if (!drvit) return;
+    const bool notSub = (devit->type != DeviceItem::Subvolume);
     delete devit;
-    if (devit->type != DeviceItem::Subvolume) {
+    if (notSub) {
         drvit->labelParts();
         treeSelChange();
     }
