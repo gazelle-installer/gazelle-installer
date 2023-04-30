@@ -247,6 +247,7 @@ void AutoPart::actionTriggered(int action)
     if (pos != oldPos) {
         qApp->beep();
         gui.sliderPart->setSliderPosition(pos);
+        pos = gui.sliderPart->sliderPosition(); // Now snapped to valid range
     }
     // Always refresh if this is a programmatic purposeful action.
     if (action == QSlider::SliderNoAction && pos == gui.sliderPart->value()) valueChanged(pos);
