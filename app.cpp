@@ -22,13 +22,12 @@
 #include <QCommandLineParser>
 #include <QDateTime>
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QFile>
-#include <QFont>
 #include <QLibraryInfo>
 #include <QLocale>
 #include <QLoggingCategory>
 #include <QMessageBox>
+#include <QScreen>
 #include <QString>
 #include <QStringList>
 #include <QTranslator>
@@ -145,7 +144,7 @@ int main(int argc, char *argv[])
     qDebug() << "Installer version:" << VERSION;
     try {
         MInstall minstall(appConf, parser, cfgfile);
-        const QRect &geo = a.desktop()->availableGeometry(&minstall);
+        const QRect &geo = a.primaryScreen()->availableGeometry();
         if (parser.isSet("oobe")) minstall.setGeometry(geo);
         else minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
         minstall.show();

@@ -22,6 +22,7 @@
 #include <QMenu>
 #include <QStringList>
 #include <QString>
+#include <QFile>
 #include "mpassedit.h"
 
 MPassEdit::MPassEdit(QWidget *parent)
