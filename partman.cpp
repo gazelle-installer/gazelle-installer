@@ -1889,7 +1889,7 @@ QString DeviceItem::shownDevice() const
     if (type == Subvolume) return parentItem->device + '[' + label + ']';
     return device;
 }
-QStringList DeviceItem::allowedUsesFor(bool real) const
+QStringList DeviceItem::allowedUsesFor(bool real, bool all) const
 {
     if (!isVolume() && type != Subvolume) return QStringList();
     QStringList list;
@@ -1898,8 +1898,11 @@ QStringList DeviceItem::allowedUsesFor(bool real) const
     else {
         list.prepend("Format");
         if (type != VirtualBD) {
-            if (size <= 16*MB) list << "BIOS-GRUB";
-            if (size <= 8*GB) list << "ESP" << "boot";
+            if (all || size <= 16*MB) list << "BIOS-GRUB";
+            if (all || size <= 8*GB) {
+                if (size < (2*TB - 512)) list << "ESP";
+                list << "boot";
+            }
         }
         list << "swap" << "home";
     }
@@ -2180,7 +2183,7 @@ QSize DeviceItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
         }
         break;
     case PartMan::UseFor:
-        for (const QString &use : item->allowedUsesFor(false)) {
+        for (const QString &use : item->allowedUsesFor(false, false)) {
             const int uw = option.fontMetrics.boundingRect(use).width() + residue;
             if (uw > width) width = uw;
         }
@@ -2251,7 +2254,7 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
             combo->addItem("");
-            combo->addItems(item->allowedUsesFor(false));
+            combo->addItems(item->allowedUsesFor(false, false));
             combo->setCurrentText(item->usefor);
         }
         break;
