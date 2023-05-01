@@ -37,6 +37,13 @@
 #include "msettings.h"
 #include "safecache.h"
 
+#define KB 1024LL
+#define MB 1048576LL
+#define GB 1073741824LL
+#define TB 1099511627776LL
+#define PB 1125899906842624LL
+#define EB 1152921504606846976LL
+
 class DeviceItem
 {
     Q_DECLARE_TR_FUNCTIONS(DeviceItem)
@@ -111,7 +118,7 @@ public:
     QString mappedDevice() const;
     bool willMap() const;
     QString shownDevice() const;
-    QStringList allowedUsesFor(bool real = true) const;
+    QStringList allowedUsesFor(bool real = true, bool all = true) const;
     QStringList allowedFormats() const;
     QString shownFormat(const QString &fmt) const;
     inline bool isVolume() const { return (type == Partition || type == VirtualBD); }
