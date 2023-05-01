@@ -117,7 +117,7 @@ public:
     QString mappedDevice() const;
     bool willMap() const;
     QString shownDevice() const;
-    QStringList allowedUsesFor(bool real = true) const;
+    QStringList allowedUsesFor(bool real = true, bool all = true) const;
     QStringList allowedFormats() const;
     QString shownFormat(const QString &fmt) const;
     inline bool isVolume() const { return (type == Partition || type == VirtualBD); }
