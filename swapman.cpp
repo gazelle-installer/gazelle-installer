@@ -119,6 +119,9 @@ void SwapMan::swapFileEdited(const QString &text)
         gui.labelSwapMax->setText(tr("Maximum: %1 MB").arg(max));
     }
     gui.spinSwapSize->setMaximum(max);
+    const bool canHibernate = (max >= (recommended(true) / MB));
+    gui.checkHibernation->setEnabled(canHibernate);
+    if (!canHibernate) gui.checkHibernation->setChecked(false);
     spinSizeChanged(gui.spinSwapSize->value());
 }
 
@@ -131,9 +134,7 @@ void SwapMan::sizeResetClicked()
 
 void SwapMan::spinSizeChanged(int i)
 {
-    const int recHibMB = (int)(recommended(true) / MB);
-    if (i < recHibMB) gui.checkHibernation->setChecked(false);
-    gui.checkHibernation->setEnabled(gui.spinSwapSize->maximum() >= recHibMB);
+    if (i < (recommended(true) / MB)) gui.checkHibernation->setChecked(false);
 }
 
 void SwapMan::checkHibernationClicked(bool checked)
