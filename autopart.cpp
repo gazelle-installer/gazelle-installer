@@ -32,9 +32,10 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman)
 {
     checkHibernation = gui.checkHibernationReg;
+
     connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
     connect(gui.boxEncryptAuto, &QGroupBox::toggled, this, &AutoPart::toggleEncrypt);
-    connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
+    connect(gui.checkHibernationReg, &QCheckBox::clicked, this,
         [=](bool checked){ setParams(true, gui.boxEncryptAuto->isChecked(), checked, true); });
     connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPressed);
     connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::sliderActionTriggered);
@@ -144,16 +145,16 @@ void AutoPart::builderGUI(DeviceItem *drive)
     QFormLayout layout(&dialog);
     dialog.setWindowTitle("Build Layout");
 
-    QLabel *labelBase = new QLabel(QLocale::system().formattedDataSize(
+    const QLocale &syslocale = QLocale::system();
+    QLabel *labelBase = new QLabel(syslocale.formattedDataSize(
         minRoot, 1, QLocale::DataSizeTraditionalFormat), &dialog);
     QCheckBox *checkEncrypt = new QCheckBox(gui.boxEncryptAuto->title(), &dialog);
-    QCheckBox *checkSwapFile = new QCheckBox(&dialog);
-    checkHibernation = new QCheckBox(&dialog);
-    QCheckBox *checkSnapshot = new QCheckBox(&dialog);
-    checkSwapFile->setText('+' + QLocale::system().formattedDataSize(
-        swapRec, 1, QLocale::DataSizeTraditionalFormat));
-    checkHibernation->setText('+' + QLocale::system().formattedDataSize(
-        swapHiber-swapRec, 1, QLocale::DataSizeTraditionalFormat));
+    QCheckBox *checkSwapFile = new QCheckBox('+' + syslocale.formattedDataSize(
+        swapRec, 1, QLocale::DataSizeTraditionalFormat), &dialog);
+    checkHibernation = new QCheckBox('+' + syslocale.formattedDataSize(
+        swapHiber-swapRec, 1, QLocale::DataSizeTraditionalFormat), &dialog);
+    checkSnapshot = new QCheckBox('+' + syslocale.formattedDataSize(
+        2*minRoot, 1, QLocale::DataSizeTraditionalFormat), &dialog);
     layout.addRow(gui.boxSliderPart);
     layout.addRow(checkEncrypt);
     layout.addRow("Base install size:", labelBase);
@@ -175,12 +176,15 @@ void AutoPart::builderGUI(DeviceItem *drive)
 
         auto check = qobject_cast<QCheckBox *>(sender());
         if (available <= 0) check->setChecked(false);
-        setParams(checkSwapFile->isChecked(), checkEncrypt->isChecked(), checkHibernation->isChecked(), checkSnapshot->isChecked());
+        setParams(checkSwapFile->isChecked(), checkEncrypt->isChecked(),
+            checkHibernation->isChecked(), checkSnapshot->isChecked());
     };
-    connect(checkSwapFile, &QCheckBox::toggled, &dialog, updateUI);
-    connect(checkEncrypt, &QCheckBox::toggled, &dialog, updateUI);
-    connect(checkHibernation, &QCheckBox::toggled, &dialog, updateUI);
-    checkSwapFile->setChecked(true); // Automatically triggers UI update.
+    connect(checkSwapFile, &QCheckBox::clicked, &dialog, updateUI);
+    connect(checkEncrypt, &QCheckBox::clicked, &dialog, updateUI);
+    connect(checkHibernation, &QCheckBox::clicked, &dialog, updateUI);
+    connect(checkSnapshot, &QCheckBox::clicked, &dialog, updateUI);
+    checkSwapFile->setChecked(true);
+    updateUI(true);
 
     QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         Qt::Horizontal, &dialog);
@@ -198,8 +202,11 @@ void AutoPart::builderGUI(DeviceItem *drive)
     diskChanged();
     gui.sliderPart->setSliderPosition(oldPos);
     delete placeholder;
-    qApp->processEvents();
+
+    qApp->processEvents(); // Process residual signals.
+    // Reset pointers to original controls.
     checkHibernation = gui.checkHibernationReg;
+    checkSnapshot = nullptr;
 }
 
 long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool updateTree)
@@ -334,11 +341,15 @@ void AutoPart::sliderValueChanged(int value)
     gui.labelSliderRoot->setPalette(palRoot);
     gui.labelSliderHome->setPalette(palHome);
     sliderPressed(); // For the tool tip.
-    if(checkHibernation->isChecked()
+
+    // Unselect features that won't fit with the current configuration.
+    if (checkHibernation->isChecked()
         && sizeRoot < (minRoot + SwapMan::recommended(true))) {
-        checkHibernation->blockSignals(true);
         checkHibernation->setChecked(false);
-        checkHibernation->blockSignals(false);
+        QApplication::beep();
+    }
+    if (checkSnapshot && checkSnapshot->isChecked() && sizeRoot < (3 * minRoot)) {
+        checkSnapshot->setChecked(false);
         QApplication::beep();
     }
 }
