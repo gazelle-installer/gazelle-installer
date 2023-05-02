@@ -31,12 +31,14 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui)
     connect(ui.checkHibernation, &QCheckBox::clicked, this, &SwapMan::checkHibernationClicked);
 }
 
-void SwapMan::manageConfig(MSettings &config)
+void SwapMan::manageConfig(MSettings &config, bool advanced)
 {
     config.startGroup("Swap", gui.pageBoot);
-    config.manageGroupCheckBox("Install", gui.boxSwap);
-    config.manageLineEdit("File", gui.textSwapFile);
-    config.manageSpinBox("Size", gui.spinSwapSize);
+    if (advanced || !config.isSave()) {
+        config.manageGroupCheckBox("Install", gui.boxSwap);
+        config.manageLineEdit("File", gui.textSwapFile);
+        config.manageSpinBox("Size", gui.spinSwapSize);
+    }
     config.manageCheckBox("Hibernation", gui.checkHibernation);
     config.endGroup();
 }
@@ -122,7 +124,6 @@ void SwapMan::swapFileEdited(const QString &text)
     const bool canHibernate = (max >= (recommended(true) / MB));
     gui.checkHibernation->setEnabled(canHibernate);
     if (!canHibernate) gui.checkHibernation->setChecked(false);
-    spinSizeChanged(gui.spinSwapSize->value());
 }
 
 void SwapMan::sizeResetClicked()

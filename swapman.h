@@ -37,7 +37,7 @@ class SwapMan : public QObject
     void checkHibernationClicked(bool checked);
 public:
     SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui);
-    void manageConfig(MSettings &config);
+    void manageConfig(MSettings &config, bool advanced);
     void setupDefaults();
     void install();
     static long long recommended(bool hibernation);
