@@ -46,7 +46,7 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     strNone = "----";
     minRoot = pman->rootSpaceNeeded;
     minHome = homeNeeded;
-    prefRoot = minRoot + appConf.value("ROOT_BUFFER", 5000).toLongLong() * MB;
+    prefRoot = minRoot + appConf.value("ROOT_BUFFER", 2000).toLongLong() * MB;
     prefHome = minHome + appConf.value("HOME_BUFFER", 2000).toLongLong() * MB;
     installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
     refresh();
@@ -101,11 +101,11 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
     if (available <= minRoot) return;
 
     recRoot = prefRoot;
-    if (swapfile) recRoot += SwapMan::recommended(hibernation);
-    if (snapshot) recRoot += (2 * minRoot); // Root + (squashfs + ISO)
     recHome = prefHome;
+    if (swapfile) recRoot += SwapMan::recommended(hibernation);
+    if (snapshot) recHome += (2 * minRoot); // squashfs + ISO
     recPortionMin = percent(recRoot, available, true); // Recommended root size.
-    recPortionMax = 100 - percent(recHome, available); // Recommended minimum home.
+    recPortionMax = 100 - percent(recHome, available, true); // Recommended minimum home.
 
     gui.labelSliderRoot->setToolTip(tr("Recommended: %1\n"
         "Minimum: %2").arg(sizeString(recRoot), sizeString(minRoot)));
@@ -168,7 +168,7 @@ void AutoPart::builderGUI(DeviceItem *drive)
     if (!canEncrypt) checkEncrypt->setChecked(false);
 
     auto updateUI = [=](bool) {
-        long long available = buildLayout(-1, checkEncrypt->isChecked(), false);
+        available = buildLayout(-1, checkEncrypt->isChecked(), false);
         // Is hibernation possible?
         bool canHibernate = checkSwapFile->isChecked() && (available >= (minRoot + swapHiber));
         checkHibernation->setEnabled(canHibernate);
@@ -249,6 +249,26 @@ long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool upda
 
 // Helpers
 
+int AutoPart::checkPortions(bool hibernation, bool snapshot)
+{
+    long long root = sizeRoot - minRoot;
+    if (root < 0) return -1;
+    if (hibernation) {
+        root -= SwapMan::recommended(true);
+        if (root < 0) return -1;
+    }
+    if (snapshot) {
+        const long long home = available - sizeRoot;
+        const long long minSnap = (2 * minRoot);
+        if (home > 0) {
+            if (home < minSnap) return 1;
+        } else {
+            if (root < minSnap) return -1;
+        }
+    }
+    return 0;
+}
+
 QString AutoPart::sizeString(long long size)
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
@@ -305,11 +325,12 @@ void AutoPart::sliderActionTriggered(int action)
         || action == QSlider::SliderNoAction) {
         if (pos < recPortionMin) pos = recPortionMin;
         else if (pos > recPortionMax) {
-            pos = (action == QSlider::SliderPageStepSub) ? recPortionMax : 100;
+            if (action == QSlider::SliderPageStepAdd) pos = 100;
+            else if (pos < 100) pos = recPortionMax;
         }
     } else {
         const int min = percent(minRoot, available, true);
-        const int max = 100 - percent(minHome, available);
+        const int max = 100 - percent(minHome, available, true);
         if (pos < min) pos = min;
         else if (pos > max) pos = 100;
     }
@@ -329,13 +350,15 @@ void AutoPart::sliderValueChanged(int value)
 
     QPalette palRoot = QApplication::palette();
     QPalette palHome = QApplication::palette();
-    if (value < recPortionMin) palRoot.setColor(QPalette::WindowText, Qt::red);
+    if (sizeRoot < recRoot) palRoot.setColor(QPalette::WindowText, Qt::red);
     const long long newHome = available - sizeRoot;
-    if (newHome == 0) valstr = strNone;
-    else {
+    if (newHome == 0) {
+        valstr = strNone;
+        if (sizeRoot < (recRoot+recHome)) palRoot.setColor(QPalette::WindowText, Qt::red);
+    } else {
         valstr = sizeString(newHome);
         valstr += "\n" + strHome;
-        if (value > recPortionMax) palHome.setColor(QPalette::WindowText, Qt::red);
+        if (newHome < recHome) palHome.setColor(QPalette::WindowText, Qt::red);
     }
     gui.labelSliderHome->setText(valstr);
     gui.labelSliderRoot->setPalette(palRoot);
@@ -343,12 +366,11 @@ void AutoPart::sliderValueChanged(int value)
     sliderPressed(); // For the tool tip.
 
     // Unselect features that won't fit with the current configuration.
-    if (checkHibernation->isChecked()
-        && sizeRoot < (minRoot + SwapMan::recommended(true))) {
+    if (checkHibernation->isChecked() && checkPortions(true, false) != 0) {
         checkHibernation->setChecked(false);
         QApplication::beep();
     }
-    if (checkSnapshot && checkSnapshot->isChecked() && sizeRoot < (3 * minRoot)) {
+    if (checkSnapshot && checkPortions(false, checkSnapshot->isChecked()) != 0) {
         checkSnapshot->setChecked(false);
         QApplication::beep();
     }

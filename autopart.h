@@ -62,7 +62,7 @@ public:
     void builderGUI(class DeviceItem *drive);
     long long buildLayout(long long rootFormatSize, bool crypto, bool updateTree=true);
     // Helpers
-    long long recommended(bool encrypt, bool hibernation, bool snapshots);
+    int checkPortions(bool hibernation, bool snapshot);
     static QString sizeString(long long size);
 };
 
