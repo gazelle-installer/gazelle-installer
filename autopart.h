@@ -28,7 +28,7 @@ class AutoPart : public QObject
     Q_OBJECT
     class MProcess &proc;
     class Ui::MeInstall &gui;
-    class PartMan *partman = nullptr;
+    class PartMan *partman;
     class DeviceItem *drvitem = nullptr;
     QString strRoot, strHome, strNone;
     long long available = 0;
@@ -36,17 +36,24 @@ class AutoPart : public QObject
     long long minRoot = 0, recRoot = 0, sizeRoot = 0;
     long long minHome = 0, recHome = 0, sizeHome = 0;
     int recPortionMin = 0, recPortionMax = 0;
-    bool crypto = false;
+    bool installFromRootDevice = false;
     bool snapToRec = false;
+    // Layout Builder
+    class QCheckBox *checkHibernation = nullptr;
     // Slots
+    void toggleAutoPart(bool checked);
+    void diskChanged();
+    void toggleEncrypt(bool checked);
     void sliderPressed();
-    void actionTriggered(int action);
-    void valueChanged(int value);
+    void sliderActionTriggered(int action);
+    void sliderValueChanged(int value);
 public:
     AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui,
         const class QSettings &appConf, long long homeNeeded);
+    void manageConfig(class MSettings &config);
+    void scan();
     void refresh();
-    void setDrive(class DeviceItem *drive, bool swapfile, bool encrypt, bool hibernation, bool snapshot);
+    void setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot);
     enum Part { Root, Home };
     void setPartSize(Part part, long long nbytes);
     long long partSize(Part part = Root);
@@ -56,8 +63,6 @@ public:
     // Helpers
     long long recommended(bool encrypt, bool hibernation, bool snapshots);
     static QString sizeString(long long size);
-signals:
-    void partsChanged();
 };
 
 // Calculate a percentage without compromising the range of long long.

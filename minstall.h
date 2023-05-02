@@ -49,13 +49,7 @@ public:
     ~MInstall();
 
     // helpers
-    static QString sliderSizeString(long long size);
-
-    bool setUserInfo();
-    void selectBootMain();
     bool processNextPhase();
-
-    bool INSTALL_FROM_ROOT_DEVICE;
 
     QString PROJECTFORUM;
     QString PROJECTNAME;
@@ -77,10 +71,7 @@ private slots:
     void on_pushNext_clicked();
     void on_pushServices_clicked();
 
-    void on_comboDisk_currentIndexChanged(int);
-    void on_boxEncryptAuto_toggled(bool checked);
-    void on_checkHibernationReg_toggled(bool);
-    void on_radioCustomPart_toggled(bool checked);
+    void on_radioEntireDisk_toggled(bool checked);
 
     void on_progInstall_valueChanged(int value);
 
