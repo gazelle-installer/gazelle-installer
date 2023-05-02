@@ -36,6 +36,7 @@ class Base
     Ui::MeInstall &gui;
     QWidget *master;
     PartMan &partman;
+    long long sourceInodes = 1;
     bool nocopy = false, sync = false;
     bool populateMediaMounts = false;
     bool mediacheck = false, nomediacheck = false;

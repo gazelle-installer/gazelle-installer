@@ -29,7 +29,8 @@
 #include <QMessageBox>
 #include "base.h"
 
-#define BASE_SAFETY (8*MB)
+#define BASE_SAFETY (64*MB)
+#define BASE_BLOCK  (4*KB)
 
 Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     const QSettings &appConf, const QCommandLineParser &appArgs)
@@ -102,6 +103,13 @@ void Base::scanMedia()
         // probaby conservative, as rootfs will likely have some overlap with linuxfs.
         partman.rootSpaceNeeded += rootfs_size;
     }
+    // Account for file system formatting
+    struct statvfs svfs;
+    if (statvfs("/live/linux", &svfs) == 0) {
+        sourceInodes = svfs.f_files - svfs.f_ffree; // Will also be used for progress bar.
+    }
+    partman.rootSpaceNeeded += sourceInodes * BASE_BLOCK;
+    qDebug() << "Source inodes:" << sourceInodes << "Assumed block size:" << BASE_BLOCK;
 
     qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
 }
@@ -279,11 +287,6 @@ void Base::copyLinux()
         if (!partman.willFormat("/")) args << "--filter" << "protect home/*";
     }
     args << bootSource << rootSources << "/mnt/antiX";
-    struct statvfs svfs;
-    fsfilcnt_t sourceInodes = 1;
-    if (statvfs("/live/linux", &svfs) == 0) {
-        sourceInodes = svfs.f_files - svfs.f_ffree;
-    }
     proc.advance(80, sourceInodes);
     proc.status(tr("Copying new system"));
     // Placed here so the progress bar moves to the right position before the next step.
