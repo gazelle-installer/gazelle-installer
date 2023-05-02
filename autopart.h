@@ -40,6 +40,7 @@ class AutoPart : public QObject
     bool snapToRec = false;
     // Layout Builder
     class QCheckBox *checkHibernation = nullptr;
+    class QCheckBox *checkSnapshot = nullptr;
     // Slots
     void toggleAutoPart(bool checked);
     void diskChanged();
