@@ -756,7 +756,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
 
     DeviceItem *rootitem = mounts.value("/");
     if (!rootitem || rootitem->size < rootSpaceNeeded) {
-        const QString &tmin = QLocale::system().formattedDataSize(rootSpaceNeeded + 1048575,
+        const QString &tmin = QLocale::system().formattedDataSize(rootSpaceNeeded,
             1, QLocale::DataSizeTraditionalFormat);
         QMessageBox::critical(master, QString(),
             tr("A root partition of at least %1 is required.").arg(tmin));

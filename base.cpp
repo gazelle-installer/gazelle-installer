@@ -29,6 +29,8 @@
 #include <QMessageBox>
 #include "base.h"
 
+#define BASE_SAFETY (8*MB)
+
 Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     const QSettings &appConf, const QCommandLineParser &appArgs)
     : proc(mproc), gui(ui), partman(pman)
@@ -75,20 +77,21 @@ void Base::scanMedia()
 
     // calculate required disk space
     proc.exec("du", {"-scb", bootSource}, nullptr, true);
-    partman.bootSpaceNeeded = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
+    partman.bootSpaceNeeded = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong() + BASE_SAFETY;
 
+    partman.rootSpaceNeeded = BASE_SAFETY;
     bool floatOK = false;
     QString infile = sqtoram + "/linuxfs.info";
     if (!QFile::exists(infile)) infile = sqloc + "/linuxfs.info";
     if (QFile::exists(infile)) {
         const QSettings squashInfo(infile, QSettings::IniFormat);
-        partman.rootSpaceNeeded = squashInfo.value("UncompressedSizeKB").toFloat(&floatOK) * KB;
+        partman.rootSpaceNeeded += squashInfo.value("UncompressedSizeKB").toFloat(&floatOK) * KB;
     }
     if (!floatOK) {
         rootSources.prepend("-scb");
         proc.exec("du", rootSources, nullptr, true);
         rootSources.removeFirst();
-        partman.rootSpaceNeeded = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
+        partman.rootSpaceNeeded += proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
     }
     qDebug() << "Image size:" << partman.rootSpaceNeeded << floatOK << infile;
     // Account for persistent root.
