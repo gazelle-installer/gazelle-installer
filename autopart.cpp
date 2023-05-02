@@ -35,7 +35,7 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
 
     connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
     connect(gui.boxEncryptAuto, &QGroupBox::toggled, this, &AutoPart::toggleEncrypt);
-    connect(gui.checkHibernationReg, &QCheckBox::clicked, this,
+    connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
         [=](bool checked){ setParams(true, gui.boxEncryptAuto->isChecked(), checked, true); });
     connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPressed);
     connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::sliderActionTriggered);
@@ -179,12 +179,11 @@ void AutoPart::builderGUI(DeviceItem *drive)
         setParams(checkSwapFile->isChecked(), checkEncrypt->isChecked(),
             checkHibernation->isChecked(), checkSnapshot->isChecked());
     };
-    connect(checkSwapFile, &QCheckBox::clicked, &dialog, updateUI);
-    connect(checkEncrypt, &QCheckBox::clicked, &dialog, updateUI);
-    connect(checkHibernation, &QCheckBox::clicked, &dialog, updateUI);
-    connect(checkSnapshot, &QCheckBox::clicked, &dialog, updateUI);
-    checkSwapFile->setChecked(true);
-    updateUI(true);
+    connect(checkSwapFile, &QCheckBox::toggled, &dialog, updateUI);
+    connect(checkEncrypt, &QCheckBox::toggled, &dialog, updateUI);
+    connect(checkHibernation, &QCheckBox::toggled, &dialog, updateUI);
+    connect(checkSnapshot, &QCheckBox::toggled, &dialog, updateUI);
+    checkSwapFile->setChecked(true); // Automatically triggers UI update.
 
     QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
         Qt::Horizontal, &dialog);
