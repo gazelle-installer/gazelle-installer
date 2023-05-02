@@ -455,20 +455,20 @@ void MInstall::manageConfig(enum ConfigAction mode)
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {radioEntireDisk, radioCustomPart};
         config->manageRadios("Storage/Target", 2, diskChoices, diskRadios);
-        const bool targetDrive = radioEntireDisk->isChecked();
+        const bool targetIsDrive = radioEntireDisk->isChecked();
 
         // Storage and partition management
-        if(targetDrive || mode!=ConfigSave) autopart->manageConfig(*config);
-        if (!targetDrive || mode!=ConfigSave) {
+        if(targetIsDrive || mode!=ConfigSave) autopart->manageConfig(*config);
+        if (!targetIsDrive || mode!=ConfigSave) {
             config->setGroupWidget(pagePartitions);
             partman->manageConfig(*config, mode==ConfigSave);
         }
 
         // Encryption
-        config->startGroup("Encryption", targetDrive ? pageDisk : pagePartitions);
+        config->startGroup("Encryption", targetIsDrive ? pageDisk : pagePartitions);
         if (mode != ConfigSave) {
             const QString &epass = config->value("Pass").toString();
-            if (targetDrive) {
+            if (targetIsDrive) {
                 textCryptoPass->setText(epass);
                 textCryptoPass2->setText(epass);
             } else {
@@ -480,11 +480,13 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->endGroup();
     }
 
-    const bool confAdvanced = (!modeOOBE && radioCustomPart->isChecked());
-    if (confAdvanced) swapman->manageConfig(*config);
-    if (mode == ConfigSave || mode == ConfigLoadB) {
-        if (confAdvanced) bootman->manageConfig(*config);
-        oobe->manageConfig(*config, mode==ConfigSave);
+    if (!modeOOBE) {
+        const bool advanced = radioCustomPart->isChecked();
+        swapman->manageConfig(*config, advanced);
+        if (mode == ConfigSave || mode == ConfigLoadB) {
+            if (advanced) bootman->manageConfig(*config);
+            oobe->manageConfig(*config, mode==ConfigSave);
+        }
     }
 
     if (mode == ConfigSave) {
@@ -558,9 +560,9 @@ int MInstall::showPage(int curr, int next)
                 return curr;
             }
             bootman->buildBootLists(); // Load default boot options
-            swapman->setupDefaults();
             manageConfig(ConfigLoadB);
             checkHibernation->setChecked(checkHibernationReg->isChecked());
+            swapman->setupDefaults();
             return Step::Network;
         }
     } else if (curr == Step::Partitions && next > curr) {
