@@ -38,6 +38,7 @@ public:
     bool bad = false;
     void dumpDebug();
     void setSave(bool save);
+    bool isSave() { return saving; }
     void startGroup(const QString &prefix, QWidget *wgroup);
     void setGroupWidget(QWidget *wgroup);
     // widget management

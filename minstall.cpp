@@ -123,6 +123,7 @@ MInstall::~MInstall() {
     if (bootman) delete bootman;
     if (swapman) delete swapman;
     if (partman) delete partman;
+    if (autopart) delete autopart;
     if (throbber) delete throbber;
 }
 
@@ -150,8 +151,6 @@ void MInstall::startup()
         swapman = new SwapMan(proc, *partman, *this);
         autopart = new AutoPart(proc, partman, *this, appConf, 16*MB);
         partman->autopart = autopart;
-
-        INSTALL_FROM_ROOT_DEVICE = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
 
         // Unable to get space requirements since there's no media.
         if (!pretend && partman->bootSpaceNeeded==0) {
@@ -194,15 +193,8 @@ void MInstall::startup()
     else {
         // Build disk widgets
         partman->scan();
-        comboDisk->clear();
-        for (DeviceItemIterator it(*partman); DeviceItem *item = *it; it.next()) {
-            if (item->type == DeviceItem::Drive && item->size >= partman->rootSpaceNeeded
-                    && (!item->flags.bootRoot || INSTALL_FROM_ROOT_DEVICE)) {
-                item->addToCombo(comboDisk);
-            }
-        }
-        connect(radioEntireDisk, &QCheckBox::toggled, boxAutoPart, &QGroupBox::setEnabled);
-        if (comboDisk->count() >= 1) {
+        autopart->scan();
+        if (comboDisk->count() > 0) {
             comboDisk->setCurrentIndex(0);
             radioEntireDisk->setChecked(true);
             for (DeviceItemIterator it(*partman); *it; it.next()) {
@@ -217,7 +209,6 @@ void MInstall::startup()
             boxAutoPart->setEnabled(false);
             radioCustomPart->setChecked(true);
         }
-        autopart->refresh();
         // Override with whatever is in the config.
         manageConfig(ConfigLoadA);
         // Hibernation check box (regular install).
@@ -341,14 +332,6 @@ void MInstall::setupAutoMount(bool enabled)
 /////////////////////////////////////////////////////////////////////////
 // util functions
 
-QString MInstall::sliderSizeString(long long size)
-{
-    QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
-    if (strout.length() > 6)
-        return QLocale::system().formattedDataSize(size, 0, QLocale::DataSizeTraditionalFormat);
-    return strout;
-}
-
 void MInstall::updateCursor(const Qt::CursorShape shape)
 {
     if (shape != Qt::ArrowCursor) {
@@ -467,26 +450,15 @@ void MInstall::manageConfig(enum ConfigAction mode)
         config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
     if ((mode == ConfigSave || mode == ConfigLoadA) && !modeOOBE) {
-        config->startGroup("Storage", pageDisk);
+        // Automatic or Manual partitioning
+        config->setGroupWidget(pageDisk);
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {radioEntireDisk, radioCustomPart};
-        config->manageRadios("Target", 2, diskChoices, diskRadios);
+        config->manageRadios("Storage/Target", 2, diskChoices, diskRadios);
         const bool targetDrive = radioEntireDisk->isChecked();
-        if (targetDrive || mode!=ConfigSave) {
-            config->manageComboBox("Drive", comboDisk, true);
-            config->manageGroupCheckBox("DriveEncrypt", boxEncryptAuto);
-            if (mode == ConfigSave) {
-                config->setValue("RootPortion", sliderPart->value());
-            } else if (config->contains("RootPortion")) {
-                 const int portion = config->value("RootPortion").toInt();
-                 sliderPart->setSliderPosition(portion);
-                 if (sliderPart->value() != portion) {
-                     config->markBadWidget(boxSliderPart);
-                 }
-            }
-        }
-        config->endGroup();
-        // Custom partitions page. PartMan handles its config groups automatically.
+
+        // Storage and partition management
+        if(targetDrive || mode!=ConfigSave) autopart->manageConfig(*config);
         if (!targetDrive || mode!=ConfigSave) {
             config->setGroupWidget(pagePartitions);
             partman->manageConfig(*config, mode==ConfigSave);
@@ -1245,26 +1217,8 @@ void MInstall::on_pushSetKeyboard_clicked()
     setupkeyboardbutton();
 }
 
-void MInstall::on_comboDisk_currentIndexChanged(int)
+void MInstall::on_radioEntireDisk_toggled(bool checked)
 {
-    DeviceItem *devit = partman->findByPath("/dev/" + comboDisk->currentData().toString());
-    autopart->setDrive(devit, true, boxEncryptAuto->isChecked(), checkHibernationReg->isChecked(), true);
-}
-
-void MInstall::on_boxEncryptAuto_toggled(bool checked)
-{
-    pushNext->setEnabled(!checked || textCryptoPass->isValid());
-    radioBootPBR->setDisabled(checked);
-    // Account for addition/removal of the boot partition.
-    on_comboDisk_currentIndexChanged(0);
-}
-void MInstall::on_checkHibernationReg_toggled(bool)
-{
-    on_comboDisk_currentIndexChanged(0);
-}
-
-void MInstall::on_radioCustomPart_toggled(bool checked)
-{
-    if (checked) pushNext->setEnabled(true);
-    else on_boxEncryptAuto_toggled(boxEncryptAuto->isChecked());
+    boxAutoPart->setEnabled(checked);
+    pushNext->setEnabled(!checked || !boxEncryptAuto->isChecked() || textCryptoPass->isValid());
 }

@@ -31,9 +31,14 @@
 AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf, long long homeNeeded)
     : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman)
 {
+    checkHibernation = gui.checkHibernationReg;
+    connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
+    connect(gui.boxEncryptAuto, &QGroupBox::toggled, this, &AutoPart::toggleEncrypt);
+    connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
+        [=](bool checked){ setParams(true, gui.boxEncryptAuto->isChecked(), checked, true); });
     connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPressed);
-    connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::actionTriggered);
-    connect(gui.sliderPart, &QSlider::valueChanged, this, &AutoPart::valueChanged);
+    connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::sliderActionTriggered);
+    connect(gui.sliderPart, &QSlider::valueChanged, this, &AutoPart::sliderValueChanged);
 
     strRoot = tr("Root");
     strHome = tr("Home");
@@ -42,9 +47,38 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     minHome = homeNeeded;
     prefRoot = minRoot + appConf.value("ROOT_BUFFER", 5000).toLongLong() * MB;
     prefHome = minHome + appConf.value("HOME_BUFFER", 2000).toLongLong() * MB;
+    installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
     refresh();
 }
 
+void AutoPart::manageConfig(MSettings &config)
+{
+    config.startGroup("Storage", gui.pageDisk);
+    config.manageComboBox("Drive", gui.comboDisk, true);
+    config.manageGroupCheckBox("DriveEncrypt", gui.boxEncryptAuto);
+    if (config.isSave()) {
+        config.setValue("RootPortion", gui.sliderPart->value());
+    } else if (config.contains("RootPortion")) {
+         const int portion = config.value("RootPortion").toInt();
+         gui.sliderPart->setSliderPosition(portion);
+         if (gui.sliderPart->value() != portion) {
+             config.markBadWidget(gui.boxSliderPart);
+         }
+    }
+    config.endGroup();
+}
+
+void AutoPart::scan()
+{
+    gui.comboDisk->clear();
+    for (DeviceItemIterator it(*partman); DeviceItem *item = *it; it.next()) {
+        if (item->type == DeviceItem::Drive && item->size >= partman->rootSpaceNeeded
+                && (!item->flags.bootRoot || installFromRootDevice)) {
+            item->addToCombo(gui.comboDisk);
+        }
+    }
+    refresh();
+}
 void AutoPart::refresh()
 {
     // Allow the slider labels to fit all possible formatted sizes.
@@ -57,16 +91,13 @@ void AutoPart::refresh()
     gui.labelSliderRoot->setText(strNone);
     gui.labelSliderHome->setText(strNone);
     // Refresh visual elements.
-    valueChanged(gui.sliderPart->value());
+    sliderValueChanged(gui.sliderPart->value());
 }
 
-void AutoPart::setDrive(DeviceItem *drive, bool swapfile, bool encrypt, bool hibernation, bool snapshot)
+void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot)
 {
-    drvitem = drive;
-    if (!drvitem) return;
-    crypto = encrypt;
     available = buildLayout(-1, encrypt, false);
-    if (!available) return;
+    if (available <= minRoot) return;
 
     recRoot = prefRoot;
     if (swapfile) recRoot += SwapMan::recommended(hibernation);
@@ -103,7 +134,6 @@ void AutoPart::builderGUI(DeviceItem *drive)
     long long swapRec = SwapMan::recommended(false);
     long long swapHiber = SwapMan::recommended(true);
     // Borrow the partition slider assembly from the disk page.
-    DeviceItem *oldDrive = drvitem;
     drvitem = drive;
     const int oldPos = gui.sliderPart->sliderPosition();
     QWidget *placeholder = new QWidget;
@@ -118,7 +148,7 @@ void AutoPart::builderGUI(DeviceItem *drive)
         minRoot, 1, QLocale::DataSizeTraditionalFormat), &dialog);
     QCheckBox *checkEncrypt = new QCheckBox(gui.boxEncryptAuto->title(), &dialog);
     QCheckBox *checkSwapFile = new QCheckBox(&dialog);
-    QCheckBox *checkHibernation = new QCheckBox(&dialog);
+    checkHibernation = new QCheckBox(&dialog);
     QCheckBox *checkSnapshot = new QCheckBox(&dialog);
     checkSwapFile->setText('+' + QLocale::system().formattedDataSize(
         swapRec, 1, QLocale::DataSizeTraditionalFormat));
@@ -131,19 +161,25 @@ void AutoPart::builderGUI(DeviceItem *drive)
     layout.addRow("Allow for hibernation support", checkHibernation);
     layout.addRow("Allow for one standard snapshot", checkSnapshot);
 
-    auto updateUI = [=](bool) {
-        const bool allocSwap = checkSwapFile->isChecked();
-        checkHibernation->setEnabled(allocSwap);
-        if (!allocSwap) checkHibernation->setChecked(false);
+    // Is encryption possible?
+    const bool canEncrypt = (buildLayout(-1, true, false) >= minRoot);
+    checkEncrypt->setEnabled(canEncrypt);
+    if (!canEncrypt) checkEncrypt->setChecked(false);
 
+    auto updateUI = [=](bool) {
         long long available = buildLayout(-1, checkEncrypt->isChecked(), false);
+        // Is hibernation possible?
+        bool canHibernate = checkSwapFile->isChecked() && (available >= (minRoot + swapHiber));
+        checkHibernation->setEnabled(canHibernate);
+        if (!canHibernate) checkHibernation->setChecked(false);
+
         auto check = qobject_cast<QCheckBox *>(sender());
         if (available <= 0) check->setChecked(false);
-        setDrive(drive, checkSwapFile->isChecked(), checkEncrypt->isChecked(), checkHibernation->isChecked(), checkSnapshot->isChecked());
+        setParams(checkSwapFile->isChecked(), checkEncrypt->isChecked(), checkHibernation->isChecked(), checkSnapshot->isChecked());
     };
-    connect(checkSwapFile, &QCheckBox::toggled, updateUI);
-    connect(checkEncrypt, &QCheckBox::toggled, updateUI);
-    connect(checkHibernation, &QCheckBox::toggled, updateUI);
+    connect(checkSwapFile, &QCheckBox::toggled, &dialog, updateUI);
+    connect(checkEncrypt, &QCheckBox::toggled, &dialog, updateUI);
+    connect(checkHibernation, &QCheckBox::toggled, &dialog, updateUI);
     checkSwapFile->setChecked(true); // Automatically triggers UI update.
 
     QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
@@ -159,9 +195,11 @@ void AutoPart::builderGUI(DeviceItem *drive)
     }
     // Return the partition slider assembly back to the disk page.
     playout->replaceWidget(placeholder, gui.boxSliderPart);
-    setDrive(oldDrive, true, gui.boxEncryptAuto->isChecked(), gui.checkHibernationReg->isChecked(), true);
+    diskChanged();
     gui.sliderPart->setSliderPosition(oldPos);
     delete placeholder;
+    qApp->processEvents();
+    checkHibernation = gui.checkHibernationReg;
 }
 
 long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool updateTree)
@@ -215,6 +253,30 @@ QString AutoPart::sizeString(long long size)
 
 // Slots
 
+void AutoPart::diskChanged()
+{
+    drvitem = partman->findByPath("/dev/" + gui.comboDisk->currentData().toString());
+    if (!drvitem) return;
+
+    // Is encryption possible?
+    const bool canEncrypt = (buildLayout(-1, true, false) >= minRoot);
+    gui.boxEncryptAuto->setEnabled(canEncrypt);
+    if (!canEncrypt) gui.boxEncryptAuto->setChecked(false);
+
+    // Refresh encrypt/hibernate capabilities and cascade to set parameters.
+    toggleEncrypt(gui.boxEncryptAuto->isChecked());
+}
+void AutoPart::toggleEncrypt(bool checked)
+{
+    // Is hibernation possible?
+    const bool canHibernate = (buildLayout(-1, checked, false) >= (minRoot + SwapMan::recommended(true)));
+    gui.checkHibernationReg->setEnabled(canHibernate);
+    if (!canHibernate) gui.checkHibernationReg->setChecked(false);
+
+    setParams(true, checked, gui.checkHibernationReg->isChecked(), true);
+    gui.pushNext->setEnabled(!checked || gui.textCryptoPass->isValid());
+}
+
 void AutoPart::sliderPressed()
 {
     QString tipText(tr("%1% root\n%2% home"));
@@ -228,7 +290,7 @@ void AutoPart::sliderPressed()
     }
 }
 
-void AutoPart::actionTriggered(int action)
+void AutoPart::sliderActionTriggered(int action)
 {
     int pos = gui.sliderPart->sliderPosition();
     const int oldPos = pos;
@@ -250,18 +312,18 @@ void AutoPart::actionTriggered(int action)
         pos = gui.sliderPart->sliderPosition(); // Now snapped to valid range
     }
     // Always refresh if this is a programmatic purposeful action.
-    if (action == QSlider::SliderNoAction && pos == gui.sliderPart->value()) valueChanged(pos);
+    if (action == QSlider::SliderNoAction && pos == gui.sliderPart->value()) sliderValueChanged(pos);
 }
-void AutoPart::valueChanged(int value)
+void AutoPart::sliderValueChanged(int value)
 {
-    const long long newRoot = portion(available, value, MB);
-    QString valstr = sizeString(newRoot);
+    sizeRoot = portion(available, value, MB);
+    QString valstr = sizeString(sizeRoot);
     gui.labelSliderRoot->setText(valstr + "\n" + strRoot);
 
     QPalette palRoot = QApplication::palette();
     QPalette palHome = QApplication::palette();
     if (value < recPortionMin) palRoot.setColor(QPalette::WindowText, Qt::red);
-    const long long newHome = available - newRoot;
+    const long long newHome = available - sizeRoot;
     if (newHome == 0) valstr = strNone;
     else {
         valstr = sizeString(newHome);
@@ -272,8 +334,11 @@ void AutoPart::valueChanged(int value)
     gui.labelSliderRoot->setPalette(palRoot);
     gui.labelSliderHome->setPalette(palHome);
     sliderPressed(); // For the tool tip.
-    if(sizeRoot != newRoot) {
-        sizeRoot = newRoot;
-        emit partsChanged();
+    if(checkHibernation->isChecked()
+        && sizeRoot < (minRoot + SwapMan::recommended(true))) {
+        checkHibernation->blockSignals(true);
+        checkHibernation->setChecked(false);
+        checkHibernation->blockSignals(false);
+        QApplication::beep();
     }
 }
