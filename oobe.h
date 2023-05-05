@@ -1,8 +1,7 @@
 /***************************************************************************
  * Out-of-Box Experience - GUI and related functions of the installer.
- ***************************************************************************
  *
- *   Copyright (C) 2022 by AK-47, along with transplanted code:
+ *   Copyright (C) 2022-2023 by AK-47, along with transplanted code:
  *    - Copyright (C) 2003-2010 by Warren Woodford
  *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
  *    - Heavily revised by dolphin oracle, adrian, and anticaptialista 2018.
@@ -26,13 +25,11 @@
 #include <QObject>
 #include <QStringList>
 #include "ui_meinstall.h"
-#include "mprocess.h"
-#include "msettings.h"
 
 class Oobe : public QObject
 {
     Q_OBJECT
-    MProcess &proc;
+    class MProcess &proc;
     Ui::MeInstall &gui;
     QWidget *master;
     bool containsSystemD = false;
@@ -51,8 +48,9 @@ class Oobe : public QObject
 public:
     bool online = false;
     bool haveSnapshotUserAccounts = false;
-    Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf, bool oem, bool modeOOBE);
-    void manageConfig(MSettings &config, bool save);
+    Oobe(class MProcess &mproc, Ui::MeInstall &ui, QWidget *parent,
+        const class QSettings &appConf, bool oem, bool modeOOBE);
+    void manageConfig(class MSettings &config, bool save);
     void enable();
     void process();
     void stashServices(bool save);

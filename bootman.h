@@ -1,8 +1,7 @@
 /***************************************************************************
  * Boot manager (GRUB) setup for the installer.
- ***************************************************************************
  *
- *   Copyright (C) 2022 by AK-47, along with transplanted code:
+ *   Copyright (C) 2022-2023 by AK-47, along with transplanted code:
  *    - Copyright (C) 2003-2010 by Warren Woodford
  *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
  *    - Heavily revised by dolphin oracle, adrian, and anticaptialista 2018.
@@ -26,17 +25,14 @@
 #include <QObject>
 #include <QCommandLineParser>
 #include "ui_meinstall.h"
-#include "mprocess.h"
-#include "msettings.h"
-#include "partman.h"
 
 class BootMan : public QObject
 {
     Q_OBJECT
-    MProcess &proc;
+    class MProcess &proc;
     Ui::MeInstall &gui;
     QWidget *master;
-    PartMan &partman;
+    class PartMan &partman;
     QString loaderID;
     bool installFromRootDevice, removeNoSplash;
     bool brave;
@@ -47,9 +43,9 @@ class BootMan : public QObject
     void chosenBootPBR();
     void chosenBootESP();
 public:
-    BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
-        const QSettings &appConf, const QCommandLineParser &appArgs);
-    void manageConfig(MSettings &config);
+    BootMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui,
+        const class QSettings &appConf, const QCommandLineParser &appArgs);
+    void manageConfig(class MSettings &config);
     void buildBootLists();
     void install();
 };

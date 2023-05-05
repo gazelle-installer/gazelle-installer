@@ -21,23 +21,21 @@
 
 #include <QObject>
 #include "ui_meinstall.h"
-#include "mprocess.h"
-#include "partman.h"
 
 class SwapMan : public QObject
 {
     Q_OBJECT
-    MProcess &proc;
+    class MProcess &proc;
+    class PartMan &partman;
     Ui::MeInstall &gui;
-    PartMan &partman;
     // Slots
     void swapFileEdited(const QString &text);
     void sizeResetClicked();
     void spinSizeChanged(int i);
     void checkHibernationClicked(bool checked);
 public:
-    SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui);
-    void manageConfig(MSettings &config, bool advanced);
+    SwapMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui);
+    void manageConfig(class MSettings &config, bool advanced);
     void setupDefaults();
     void install();
     static long long recommended(bool hibernation);

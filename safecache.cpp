@@ -1,6 +1,5 @@
 /***************************************************************************
  * SafeCache Class - for temporarily caching sensitive files
- ***************************************************************************
  *
  *   Copyright (C) 2019 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");

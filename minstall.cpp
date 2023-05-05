@@ -16,18 +16,33 @@
  *   limitations under the License.
  ****************************************************************************/
 
-#include <QDebug>
-#include <QFileInfo>
+#include <cstdlib>
+#include <fcntl.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#include <QCommandLineParser>
+#include <QSettings>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QTimer>
 #include <QToolTip>
 #include <QPainter>
-#include <QDir>
+#include <QMessageBox>
+#include <QDebug>
 
-#include <cstdlib>
-#include <fcntl.h>
-#include <sys/stat.h>
+#include "msettings.h"
+#include "partman.h"
+#include "autopart.h"
+#include "base.h"
+#include "oobe.h"
+#include "bootman.h"
+#include "swapman.h"
 
 #include "version.h"
 #include "minstall.h"

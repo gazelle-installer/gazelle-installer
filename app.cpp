@@ -30,6 +30,7 @@
 #include <QScreen>
 #include <QString>
 #include <QStringList>
+#include <QSettings>
 #include <QTranslator>
 #include <QLockFile>
 

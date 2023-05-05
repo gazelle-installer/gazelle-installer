@@ -1,6 +1,6 @@
 /***************************************************************************
  * MSettings class - Installer-specific extensions to QSettings.
- ***************************************************************************
+ *
  *   Copyright (C) 2019 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,43 +16,35 @@
  *
  * This file is part of the gazelle-installer.
  ***************************************************************************/
-
 #ifndef MSETTINGS_H
 #define MSETTINGS_H
 
-#include <QGroupBox>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QLineEdit>
-#include <QSpinBox>
 #include <QSettings>
-#include <QWidget>
 
 class MSettings : public QSettings
 {
     bool saving = false;
-    QWidget *group = nullptr;
+    class QWidget *group = nullptr;
 public:
     MSettings(const QString &fileName, QObject *parent = Q_NULLPTR);
     bool bad = false;
     void dumpDebug();
     void setSave(bool save);
     bool isSave() { return saving; }
-    void startGroup(const QString &prefix, QWidget *wgroup);
-    void setGroupWidget(QWidget *wgroup);
+    void startGroup(const QString &prefix, class QWidget *wgroup);
+    void setGroupWidget(class QWidget *wgroup);
     // widget management
-    void markBadWidget(QWidget *widget);
-    static bool isBadWidget(QWidget *widget);
-    void manageComboBox(const QString &key, QComboBox *combo, const bool useData);
-    void manageCheckBox(const QString &key, QCheckBox *checkbox);
-    void manageGroupCheckBox(const QString &key, QGroupBox *groupbox);
-    void manageLineEdit(const QString &key, QLineEdit *lineedit);
-    void manageSpinBox(const QString &key, QSpinBox *spinbox);
+    void markBadWidget(class QWidget *widget);
+    static bool isBadWidget(class QWidget *widget);
+    void manageComboBox(const QString &key, class QComboBox *combo, const bool useData);
+    void manageCheckBox(const QString &key, class QCheckBox *checkbox);
+    void manageGroupCheckBox(const QString &key, class QGroupBox *groupbox);
+    void manageLineEdit(const QString &key, class QLineEdit *lineedit);
+    void manageSpinBox(const QString &key, class QSpinBox *spinbox);
     int manageEnum(const QString &key, const int nchoices,
             const char *choices[], const int curval);
     void manageRadios(const QString &key, const int nchoices,
-            const char *choices[], QRadioButton *radios[]);
+            const char *choices[], class QRadioButton *radios[]);
 };
 
 #endif // MSETTINGS_H

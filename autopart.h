@@ -16,12 +16,11 @@
  *
  * This file is part of the gazelle-installer.
  ***************************************************************************/
-
 #ifndef AUTOPART_H
 #define AUTOPART_H
 
 #include <QObject>
-#include <ui_meinstall.h>
+#include "ui_meinstall.h"
 
 class AutoPart : public QObject
 {

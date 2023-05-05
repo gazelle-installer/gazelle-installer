@@ -1,7 +1,7 @@
 /***************************************************************************
  * Base operating system software installation and configuration.
  *
- *   Copyright (C) 2022 by AK-47, along with transplanted code:
+ *   Copyright (C) 2022-2023 by AK-47, along with transplanted code:
  *    - Copyright (C) 2003-2010 by Warren Woodford
  *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
  *    - Heavily revised by dolphin oracle, adrian, and anticaptialista 2018.
@@ -19,23 +19,19 @@
  *
  * This file is part of the gazelle-installer.
  ****************************************************************************/
-
 #ifndef BASE_H
 #define BASE_H
 
 #include <QCommandLineParser>
 #include "ui_meinstall.h"
-#include "mprocess.h"
-#include "msettings.h"
-#include "partman.h"
 
 class Base
 {
     Q_DECLARE_TR_FUNCTIONS(Base)
-    MProcess &proc;
+    class MProcess &proc;
     Ui::MeInstall &gui;
     QWidget *master;
-    PartMan &partman;
+    class PartMan &partman;
     long long sourceInodes = 1;
     long long bufferRoot = 0, bufferHome = 0;
     bool pretend = false;
@@ -50,7 +46,7 @@ public:
     QString bootSource;
     QStringList rootSources;
 
-    Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
+    Base(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui,
         const QSettings &appConf, const QCommandLineParser &appArgs);
     void scanMedia();
     void haltCheck(bool silent);
