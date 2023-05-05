@@ -37,9 +37,6 @@ class Base
     bool pretend = false;
     bool nocopy = false, sync = false;
     bool populateMediaMounts = false;
-    bool mediacheck = false, nomediacheck = false;
-    bool checking = false;
-    void checkMediaMD5(const QString &path, const QString &sqfs);
     void copyLinux();
 public:
     // source medium
@@ -48,8 +45,6 @@ public:
 
     Base(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui,
         const QSettings &appConf, const QCommandLineParser &appArgs);
-    void scanMedia();
-    void haltCheck(bool silent);
     void install();
 };
 
