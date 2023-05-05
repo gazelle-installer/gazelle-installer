@@ -171,7 +171,7 @@ void AutoPart::builderGUI(DeviceItem *drive)
 
     QDialog dialog(gui.treePartitions);
     QFormLayout layout(&dialog);
-    dialog.setWindowTitle("Build Layout");
+    dialog.setWindowTitle(tr("Layout Builder"));
 
     const QLocale &syslocale = QLocale::system();
     QLabel *labelBase = new QLabel(syslocale.formattedDataSize(
