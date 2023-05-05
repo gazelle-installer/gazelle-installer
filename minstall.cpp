@@ -161,7 +161,6 @@ void MInstall::startup()
 
         partman = new PartMan(proc, *this, appConf, appArgs);
         base = new Base(proc, *partman, *this, appConf, appArgs);
-        base->scanMedia();
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
         swapman = new SwapMan(proc, *partman, *this);
         autopart = new AutoPart(proc, partman, *this, appConf);
@@ -1043,7 +1042,6 @@ void MInstall::closeEvent(QCloseEvent *event)
     if (abortUI()) {
         event->accept();
         phase = -2;
-        if (base) base->haltCheck(true);
         if (!modeOOBE) cleanup();
         else if (!pretend) {
             proc.unhalt();
@@ -1064,7 +1062,6 @@ void MInstall::closeEvent(QCloseEvent *event)
 // Override QDialog::reject() so Escape won't close the window.
 void MInstall::reject()
 {
-    if (base) base->haltCheck(false);
 }
 
 /////////////////////////////////////////////////////////////////////////

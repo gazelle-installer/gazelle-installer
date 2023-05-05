@@ -24,8 +24,6 @@
 #include <sys/statvfs.h>
 #include <QDebug>
 #include <QFileInfo>
-#include <QCryptographicHash>
-#include <QDirIterator>
 #include <QMessageBox>
 #include "mprocess.h"
 #include "msettings.h"
@@ -39,40 +37,21 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     : proc(mproc), gui(ui), partman(pman)
 {
     pretend = appArgs.isSet("pretend");
-    mediacheck = appArgs.isSet("media-check");
-    if (!mediacheck) nomediacheck = appArgs.isSet("no-media-check");
     populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
     nocopy = appArgs.isSet("nocopy");
     sync = appArgs.isSet("sync");
     bufferRoot = appConf.value("ROOT_BUFFER", 1024).toLongLong() * MB;
     bufferHome = appConf.value("HOME_BUFFER", 1024).toLongLong() * MB;
-}
 
-void Base::scanMedia()
-{
-    QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
-    const QString &sqpath = '/' + liveInfo.value("SQFILE_PATH", "antiX").toString();
-    const QString &sqtoram = liveInfo.value("TORAM_MP", "/live/to-ram").toString() + sqpath;
-    const QString &sqloc = liveInfo.value("SQFILE_DIR", "/live/boot-dev/antiX").toString();
-
-    // Check the installation media for errors (skip if not required).
-    bool checkmd5 = false;
-    if (!mediacheck) {
-        QFile file("/live/config/proc-cmdline");
-        if (file.open(QFile::ReadOnly | QFile::Text)) {
-            while (!file.atEnd()) {
-                if(file.readLine().trimmed() == "checkmd5") {
-                    checkmd5 = true;
-                    break;
-                }
-            }
+    QFile fileCLine("/live/config/proc-cmdline");
+    if (fileCLine.open(QFile::ReadOnly | QFile::Text)) {
+        QString clopts("Live boot options:");
+        while (!fileCLine.atEnd()) {
+            clopts.append(' ');
+            clopts.append(fileCLine.readLine().trimmed());
         }
-    }
-    if(checkmd5) proc.log("No media check (checkmd5)");
-    else if(nomediacheck) proc.log("No media check");
-    else {
-        const QString &sqfile = liveInfo.value("SQFILE_NAME", "linuxfs").toString();
-        checkMediaMD5(QFile::exists(sqtoram+'/'+sqfile) ? sqtoram : sqloc, sqfile);
+        proc.log(clopts);
+        fileCLine.close();
     }
 
     bootSource = "/live/aufs/boot";
@@ -94,6 +73,10 @@ void Base::scanMedia()
     if (vspecBoot.preferred < 1*GB) vspecBoot.preferred = 1*GB;
 
     // Root space required.
+    QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
+    const QString &sqpath = '/' + liveInfo.value("SQFILE_PATH", "antiX").toString();
+    const QString &sqtoram = liveInfo.value("TORAM_MP", "/live/to-ram").toString() + sqpath;
+    const QString &sqloc = liveInfo.value("SQFILE_DIR", "/live/boot-dev/antiX").toString();
     bool floatOK = false;
     QString infile = sqtoram + "/linuxfs.info";
     if (!QFile::exists(infile)) infile = sqloc + "/linuxfs.info";
@@ -108,6 +91,7 @@ void Base::scanMedia()
         vspecRoot.image = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
     }
     qDebug() << "Basic image:" << vspecRoot.image << floatOK << infile;
+
     // Account for persistent root.
     if (QFileInfo::exists("/live/perist-root")) {
         proc.shell("df /live/persist-root --output=used --total |tail -n1", nullptr, true);
@@ -130,81 +114,6 @@ void Base::scanMedia()
     vspecHome.preferred = vspecHome.minimum + bufferHome;
     qDebug() << "Minimum space:" << vspecBoot.image << "(boot)," << vspecRoot.image << "(root)";
     proc.setExceptionMode(nullptr);
-}
-
-void Base::checkMediaMD5(const QString &path, const QString &sqfs)
-{
-    checking = true;
-    const QString osplash = gui.labelSplash->text();
-    const QString &nsplash = tr("Checking installation media.")
-        + "<br/><font size=2>%1% - " + tr("Press ESC to skip.") + "</font>";
-    gui.labelSplash->setText(nsplash.arg(0));
-    qint64 btotal = 0;
-    struct FileHash {
-        QString path;
-        QByteArray hash;
-    };
-    QList<FileHash> hashes;
-    static const char *failmsg = QT_TR_NOOP("The installation media is corrupt.");
-    // Obtain a list of MD5 hashes and their files.
-    QDirIterator it(path, {"*.md5"}, QDir::Files);
-    QStringList missing(sqfs);
-    if (!QFile::exists("/live/config/did-toram") || QFile::exists("/live/config/toram-all")) {
-        missing << "vmlinuz" << "initrd.gz";
-    }
-    while (it.hasNext()) {
-        QFile file(it.next());
-        if (!file.open(QFile::ReadOnly | QFile::Text)) throw failmsg;
-        while (!file.atEnd()) {
-            QString line(file.readLine().trimmed());
-            const QString &fname = line.section(' ', 1, 1, QString::SectionSkipEmpty);
-            missing.removeOne(fname);
-            FileHash sfhash = {
-                .path = it.path() + '/' + fname,
-                .hash = QByteArray::fromHex(line.section(' ', 0, 0, QString::SectionSkipEmpty).toUtf8())
-            };
-            hashes.append(sfhash);
-            btotal += QFileInfo(sfhash.path).size();
-            qApp->processEvents();
-        }
-    }
-    if(!missing.isEmpty()) throw failmsg;
-    // Check the MD5 hash of each file.
-    const size_t bufsize = 65536;
-    std::unique_ptr<char[]> buf(new char[bufsize]);
-    qint64 bprog = 0;
-    for(const FileHash &fh : hashes) {
-        QListWidgetItem *logEntry = proc.log("Check MD5: " + fh.path);
-        QFile file(fh.path);
-        if (!file.open(QFile::ReadOnly)) throw failmsg;
-        QCryptographicHash hash(QCryptographicHash::Md5);
-        while (checking && !file.atEnd()) {
-            const qint64 rlen = file.read(buf.get(), bufsize);
-            if(rlen < 0) throw failmsg;
-            hash.addData(buf.get(), rlen);
-            bprog += rlen;
-            gui.labelSplash->setText(nsplash.arg((bprog * 100) / btotal));
-            qApp->processEvents();
-        }
-        if (!checking) break;
-        if (hash.result() != fh.hash) throw failmsg;
-        proc.log(logEntry);
-    }
-    gui.labelSplash->setText(osplash);
-    if (!checking) proc.log("Check halted");
-    checking = false;
-}
-
-void Base::haltCheck(bool silent)
-{
-    if (!checking) return;
-    if (!silent) {
-        QMessageBox::StandardButton rc = QMessageBox::warning(gui.boxMain, QString(),
-            tr("Are you sure you want to skip checking the installation media?"),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if(rc != QMessageBox::Yes) return;
-    }
-    checking = false;
 }
 
 void Base::install()
