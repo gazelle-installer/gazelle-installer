@@ -29,6 +29,12 @@ MPassEdit::MPassEdit(QWidget *parent)
     : QLineEdit(parent)
 {
 }
+#ifndef NO_PWQUALITY
+MPassEdit::~MPassEdit()
+{
+    if (pwqual) pwquality_free_settings(pwqual);
+}
+#endif
 
 bool MPassEdit::isValid() const
 {
@@ -52,12 +58,25 @@ void MPassEdit::setup(MPassEdit *slave, QProgressBar *meter,
     if (meter) {
         meter->setRange(0, 100);
         meter->setValue(0);
+        meter->setFormat("!!!");
         meter->setTextVisible(false);
     }
     actionEye = addAction(QIcon(":/eye-show"), QLineEdit::TrailingPosition);
     actionEye->setCheckable(true);
     connect(actionEye, &QAction::toggled, this, &MPassEdit::eyeToggled);
     eyeToggled(false); // Initialize the eye.
+
+    // Prime the pwquality API.
+    #ifndef NO_PWQUALITY
+    char buf[PWQ_MAX_ERROR_MESSAGE_LEN];
+    pwqual = pwquality_default_settings();
+    if (!pwqual) throw pwquality_strerror(buf, sizeof(buf), PWQ_ERROR_MEM_ALLOC, NULL);
+    void *auxerror = nullptr;
+    const int rc = pwquality_read_config(pwqual, NULL, &auxerror);
+    if (rc != 0) throw pwquality_strerror(buf, sizeof(buf), rc, auxerror);
+    #endif // NO_PWQUALITY
+
+    masterTextChanged();
 }
 
 void MPassEdit::generate()
@@ -125,6 +144,18 @@ void MPassEdit::masterTextChanged()
     slave->setPalette(QApplication::palette());
     const bool valid = (text().isEmpty() && min == 0);
     if (meter) {
+        #ifndef NO_PWQUALITY
+        char buf[PWQ_MAX_ERROR_MESSAGE_LEN];
+        void *auxerror = nullptr;
+        int score = pwquality_check(pwqual,
+            text().toUtf8().constData(), nullptr, nullptr, &auxerror);
+        meter->setTextVisible(score < 0);
+        if (score >= 0) meter->setToolTip(tr("Score: %1").arg(score));
+        else {
+            meter->setToolTip(pwquality_strerror(buf, sizeof(buf), score, auxerror));
+            score = 0;
+        }
+        #else // !NO_PWQUALITY
         int score = 0;
         const QString &t = text();
         if (!t.isEmpty()) {
@@ -150,6 +181,7 @@ void MPassEdit::masterTextChanged()
             }
             score += textLen <= 30 ? textLen : 30;
         }
+        #endif // NO_PWQUALITY
         meter->setValue(score);
         QPalette pal = meter->palette();
         score = (255 * score) / 100;

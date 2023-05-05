@@ -151,7 +151,7 @@ SOURCES += app.cpp minstall.cpp \
     safecache.cpp \
     mprocess.cpp \
     swapman.cpp
-LIBS +=
+LIBS += -lpwquality
 CONFIG += release warn_on thread qt c++17
 
 RESOURCES += \
