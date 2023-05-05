@@ -503,20 +503,23 @@ void PartMan::treeMenu(const QPoint &)
     } else if (twit->type == DeviceItem::Drive) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.pushPartAdd->isEnabled());
-        QAction *actBuild = menu.addAction(tr("&Build layout..."));
         menu.addSeparator();
         QAction *actClear = menu.addAction(tr("New &layout"));
         QAction *actReset = menu.addAction(tr("&Reset layout"));
+        menu.addSeparator();
+        QAction *actBuilder = menu.addAction(tr("Layout &Builder..."));
 
         const bool locked = twit->isLocked();
         actClear->setDisabled(locked);
         actReset->setDisabled(locked);
-        actBuild->setDisabled(locked);
+
+        const long long minSpace = brave ? 0 : volSpecTotal("/", QStringList()).minimum;
+        actBuilder->setEnabled(!locked && autopart && twit->size >= minSpace);
 
         QAction *action = menu.exec(QCursor::pos());
         if (action == actAdd) partAddClick(true);
         else if (action == actClear) partClearClick(true);
-        else if (action == actBuild) {
+        else if (action == actBuilder) {
             if (autopart) autopart->builderGUI(twit);
             treeSelChange();
         } else if (action == actReset) {
