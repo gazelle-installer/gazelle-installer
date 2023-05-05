@@ -104,12 +104,12 @@ void BootMan::install()
     const QString &val = proc.readOut();
     if (!val.isEmpty()) proc.exec("/bin/rm", {"-f", "/mnt/antiX/boot/" + val});
 
-    bool efivars_isdir = false;
     bool efivars_ismounted = false;
     if (gui.boxBoot->isChecked() && gui.radioBootESP->isChecked()) {
         QString efivars = QStringLiteral("/sys/firmware/efi/efivars");
-        efivars_isdir = QFileInfo(efivars).isDir();
-        if (efivars_isdir) efivars_ismounted = proc.exec("/bin/mountpoint", {"-q", efivars});
+        if (QFileInfo(efivars).isDir()) {
+            efivars_ismounted = proc.exec("/bin/mountpoint", {"-q", efivars});
+        }
         if (!efivars_ismounted) proc.exec("/bin/mount", {"-t", "efivarfs", "efivarfs", efivars});
     }
 
@@ -123,15 +123,36 @@ void BootMan::install()
     proc.exec("/bin/mkdir", {"/mnt/antiX/run/udev"});
     proc.exec("/bin/mount", {"--rbind", "/run/udev", "/mnt/antiX/run/udev"});
 
+    // Trap exceptions here, and re-throw them once the local cleanup is done.
+    const char *failed = nullptr;
+    try {
+        installMain(efivars_ismounted);
+    } catch (const char *msg) {
+        failed = msg;
+    }
+
+    proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
+    proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
+    proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
+    proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
+    if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
+        proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
+    }
+    if (failed) throw failed;
+}
+void BootMan::installMain(bool efivars_ismounted)
+{
     if (gui.boxBoot->isChecked()) {
         proc.status(tr("Installing GRUB"));
+        const char *failGrub = QT_TR_NOOP("GRUB installation failed. You can reboot to"
+            " the live medium and use the GRUB Rescue menu to repair the installation.");
+        proc.setExceptionMode(failGrub);
 
         // install new Grub now
-        bool isOK = false;
         QString arch;
         const QString &boot = "/dev/" + gui.comboBoot->currentData().toString();
         if (!gui.radioBootESP->isChecked()) {
-            isOK = proc.exec("grub-install", {"--target=i386-pc", "--recheck",
+            proc.exec("grub-install", {"--target=i386-pc", "--recheck",
                 "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", boot});
         } else {
             proc.exec("/bin/mount", {boot, "/mnt/antiX/boot/efi"});
@@ -142,25 +163,16 @@ void BootMan::install()
 
             if (efivars_ismounted) {
                 // remove any efivars-dump-entries in NVRAM
+                proc.setExceptionMode(nullptr);
                 proc.shell("/bin/ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
                 const QString &dump = proc.readOut();
+                proc.setExceptionMode(failGrub);
                 if (!dump.isEmpty()) proc.shell("/bin/rm /sys/firmware/efi/efivars/dump*", nullptr, true);
             }
 
-            isOK = proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
+            proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
                 "--target=" + arch + "-efi", "--efi-directory=/boot/efi",
                 "--bootloader-id=" + loaderID, "--recheck"});
-        }
-        if (!isOK) {
-            proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
-            proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
-            proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
-            proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
-            if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
-                proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
-            }
-            throw QT_TR_NOOP("GRUB installation failed. You can reboot to the live"
-                " medium and use the GRUB Rescue menu to repair the installation.");
         }
 
         //get /etc/default/grub codes
@@ -245,6 +257,7 @@ void BootMan::install()
     }
 
     proc.status(tr("Updating initramfs"));
+    proc.setExceptionMode(QT_TR_NOOP("Failed to update initramfs."));
     //if useing f2fs, then add modules to /etc/initramfs-tools/modules
     //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
         //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
@@ -256,14 +269,7 @@ void BootMan::install()
 
     proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
     proc.status();
-    qDebug() << "clear chroot env";
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
-    if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
-        proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
-    }
+    proc.setExceptionMode(nullptr);
 }
 
 /* Slots */

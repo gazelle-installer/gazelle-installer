@@ -41,6 +41,7 @@ class BootMan : public QObject
     bool installFromRootDevice, removeNoSplash;
     bool brave;
     void selectBootMain();
+    void installMain(bool efivars_ismounted);
     // Slots
     void chosenBootMBR();
     void chosenBootPBR();
