@@ -37,6 +37,8 @@ class Base
     QWidget *master;
     PartMan &partman;
     long long sourceInodes = 1;
+    long long bufferRoot = 0, bufferHome = 0;
+    bool pretend = false;
     bool nocopy = false, sync = false;
     bool populateMediaMounts = false;
     bool mediacheck = false, nomediacheck = false;

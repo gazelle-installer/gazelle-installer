@@ -117,7 +117,7 @@ void SwapMan::swapFileEdited(const QString &text)
     int max = 0;
     if (!devit) gui.labelSwapMax->setText(tr("Invalid location"));
     else {
-        max = (int)((devit->size - partman.rootSpaceNeeded) / MB);
+        max = (int)((devit->size - partman.volSpecTotal("/").minimum) / MB);
         gui.labelSwapMax->setText(tr("Maximum: %1 MB").arg(max));
     }
     gui.spinSwapSize->setMaximum(max);

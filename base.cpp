@@ -29,18 +29,20 @@
 #include <QMessageBox>
 #include "base.h"
 
-#define BASE_SAFETY (64*MB)
 #define BASE_BLOCK  (4*KB)
 
 Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     const QSettings &appConf, const QCommandLineParser &appArgs)
     : proc(mproc), gui(ui), partman(pman)
 {
+    pretend = appArgs.isSet("pretend");
     mediacheck = appArgs.isSet("media-check");
     if (!mediacheck) nomediacheck = appArgs.isSet("no-media-check");
     populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
     nocopy = appArgs.isSet("nocopy");
     sync = appArgs.isSet("sync");
+    bufferRoot = appConf.value("ROOT_BUFFER", 1024).toLongLong() * MB;
+    bufferHome = appConf.value("HOME_BUFFER", 1024).toLongLong() * MB;
 }
 
 void Base::scanMedia()
@@ -75,43 +77,56 @@ void Base::scanMedia()
         << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/libx32" << "/live/aufs/lib64"
         << "/live/aufs/media" << "/live/aufs/mnt" << "/live/aufs/opt" << "/live/aufs/root"
         << "/live/aufs/sbin" << "/live/aufs/usr" << "/live/aufs/var" << "/live/aufs/home";
+    PartMan::VolumeSpec &vspecRoot = partman.volSpecs["/"];
+    PartMan::VolumeSpec &vspecBoot = partman.volSpecs["/boot"];
+    PartMan::VolumeSpec &vspecHome = partman.volSpecs["/home"];
 
-    // calculate required disk space
+    if (!pretend) proc.setExceptionMode(QT_TR_NOOP("Cannot access installation media."));
+
+    // Boot space required.
     proc.exec("du", {"-scb", bootSource}, nullptr, true);
-    partman.bootSpaceNeeded = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong() + BASE_SAFETY;
+    vspecBoot.image = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
+    vspecBoot.minimum = vspecBoot.image * 3; // Include 1 backup and 1 new initrd image.
+    vspecBoot.preferred = vspecBoot.minimum;
+    if (vspecBoot.preferred < 1*GB) vspecBoot.preferred = 1*GB;
 
-    partman.rootSpaceNeeded = BASE_SAFETY;
+    // Root space required.
     bool floatOK = false;
     QString infile = sqtoram + "/linuxfs.info";
     if (!QFile::exists(infile)) infile = sqloc + "/linuxfs.info";
     if (QFile::exists(infile)) {
         const QSettings squashInfo(infile, QSettings::IniFormat);
-        partman.rootSpaceNeeded += squashInfo.value("UncompressedSizeKB").toFloat(&floatOK) * KB;
+        vspecRoot.image = squashInfo.value("UncompressedSizeKB").toFloat(&floatOK) * KB;
     }
     if (!floatOK) {
         rootSources.prepend("-scb");
         proc.exec("du", rootSources, nullptr, true);
         rootSources.removeFirst();
-        partman.rootSpaceNeeded += proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
+        vspecRoot.image = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
     }
-    qDebug() << "Image size:" << partman.rootSpaceNeeded << floatOK << infile;
+    qDebug() << "Basic image:" << vspecRoot.image << floatOK << infile;
     // Account for persistent root.
     if (QFileInfo::exists("/live/perist-root")) {
         proc.shell("df /live/persist-root --output=used --total |tail -n1", nullptr, true);
         const long long rootfs_size = proc.readOut().toLongLong() * KB;
         qDebug() << "rootfs size is " << rootfs_size;
         // probaby conservative, as rootfs will likely have some overlap with linuxfs.
-        partman.rootSpaceNeeded += rootfs_size;
+        vspecRoot.image += rootfs_size;
     }
     // Account for file system formatting
     struct statvfs svfs;
     if (statvfs("/live/linux", &svfs) == 0) {
         sourceInodes = svfs.f_files - svfs.f_ffree; // Will also be used for progress bar.
     }
-    partman.rootSpaceNeeded += sourceInodes * BASE_BLOCK;
+    vspecRoot.image += (sourceInodes * BASE_BLOCK);
+    vspecRoot.minimum = vspecRoot.image + (vspecRoot.image / 20); // +5% for general FS shenanigans.
+    vspecRoot.preferred = vspecRoot.minimum + bufferRoot;
     qDebug() << "Source inodes:" << sourceInodes << "Assumed block size:" << BASE_BLOCK;
 
-    qDebug() << "Minimum space:" << partman.bootSpaceNeeded << "(boot)," << partman.rootSpaceNeeded << "(root)";
+    vspecHome.minimum = 64*MB; // TODO: Set minimum home dynamically.
+    vspecHome.preferred = vspecHome.minimum + bufferHome;
+    qDebug() << "Minimum space:" << vspecBoot.image << "(boot)," << vspecRoot.image << "(root)";
+    proc.setExceptionMode(nullptr);
 }
 
 void Base::checkMediaMD5(const QString &path, const QString &sqfs)

@@ -106,7 +106,8 @@ public:
     // Helpers
     static QString realUseFor(const QString &use);
     inline QString realUseFor() const { return realUseFor(usefor); }
-    QString shownUseFor() const;
+    static QString shownUseFor(const QString &use);
+    inline QString shownUseFor() const { return shownUseFor(realUseFor()); }
     void setActive(bool boot);
     bool isActive() const;
     bool isLocked() const;
@@ -164,7 +165,6 @@ class PartMan : public QAbstractItemModel
     Ui::MeInstall &gui;
     QWidget *master;
     SafeCache key;
-    QMap<QString, QString> defaultLabels;
     bool brave, gptoverride;
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit();
@@ -202,9 +202,15 @@ public:
         Pass,
         _TreeColumns_
     };
+    struct VolumeSpec
+    {
+        QString defaultLabel;
+        long long image = 0;
+        long long minimum = 0;
+        long long preferred = 0;
+    };
+    QMap<QString, struct VolumeSpec> volSpecs;
     QString bootUUID;
-    long long rootSpaceNeeded = 0;
-    long long bootSpaceNeeded = 0;
     QMap<QString, DeviceItem *> mounts;
     class AutoPart *autopart = nullptr;
     PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs);
@@ -225,6 +231,8 @@ public:
     int isEncrypt(const QString &point);
     DeviceItem *findByPath(const QString &devpath) const;
     DeviceItem *findHostDev(const QString &path) const;
+    struct VolumeSpec volSpecTotal(const QString &path, const QStringList &vols) const;
+    inline struct VolumeSpec volSpecTotal(const QString &path) const { return volSpecTotal(path, mounts.keys()); }
     // Model View Controller
     QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;

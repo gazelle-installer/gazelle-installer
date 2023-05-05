@@ -32,10 +32,9 @@ class AutoPart : public QObject
     class DeviceItem *drvitem = nullptr;
     QString strRoot, strHome, strNone;
     long long available = 0;
-    long long prefRoot = 0, prefHome = 0;
     long long minRoot = 0, recRoot = 0, sizeRoot = 0;
     long long minHome = 0, recHome = 0, sizeHome = 0;
-    int recPortionMin = 0, recPortionMax = 0;
+    long long addSnapshot = 0;
     bool installFromRootDevice = false;
     bool snapToRec = false;
     // Layout Builder
@@ -49,8 +48,7 @@ class AutoPart : public QObject
     void sliderActionTriggered(int action);
     void sliderValueChanged(int value);
 public:
-    AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui,
-        const class QSettings &appConf, long long homeNeeded);
+    AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf);
     void manageConfig(class MSettings &config);
     void scan();
     void refresh();
@@ -60,9 +58,8 @@ public:
     long long partSize(Part part = Root);
     // Layout Builder
     void builderGUI(class DeviceItem *drive);
-    long long buildLayout(long long rootFormatSize, bool crypto, bool updateTree=true);
+    long long buildLayout(long long rootFormatSize, bool crypto, bool updateTree=true, class QStringList *volList=nullptr);
     // Helpers
-    int checkPortions(bool hibernation, bool snapshot);
     static QString sizeString(long long size);
 };
 

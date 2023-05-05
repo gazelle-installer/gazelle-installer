@@ -28,7 +28,7 @@
 #include "swapman.h"
 #include "autopart.h"
 
-AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf, long long homeNeeded)
+AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf)
     : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman)
 {
     checkHibernation = gui.checkHibernationReg;
@@ -44,10 +44,6 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     strRoot = tr("Root");
     strHome = tr("Home");
     strNone = "----";
-    minRoot = pman->rootSpaceNeeded;
-    minHome = homeNeeded;
-    prefRoot = minRoot + appConf.value("ROOT_BUFFER", 2000).toLongLong() * MB;
-    prefHome = minHome + appConf.value("HOME_BUFFER", 2000).toLongLong() * MB;
     installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
     refresh();
 }
@@ -71,13 +67,19 @@ void AutoPart::manageConfig(MSettings &config)
 
 void AutoPart::scan()
 {
+    long long minSpace = partman->volSpecTotal("/", QStringList()).minimum;
+    gui.comboDisk->blockSignals(true);
     gui.comboDisk->clear();
     for (DeviceItemIterator it(*partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive && item->size >= partman->rootSpaceNeeded
-                && (!item->flags.bootRoot || installFromRootDevice)) {
-            item->addToCombo(gui.comboDisk);
+        if (item->type == DeviceItem::Drive && (!item->flags.bootRoot || installFromRootDevice)) {
+            drvitem = item;
+            if (buildLayout(LLONG_MAX, false, false) >= minSpace) {
+                item->addToCombo(gui.comboDisk);
+            }
         }
     }
+    gui.comboDisk->blockSignals(false);
+    diskChanged();
     refresh();
 }
 void AutoPart::refresh()
@@ -97,15 +99,19 @@ void AutoPart::refresh()
 
 void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot)
 {
-    available = buildLayout(-1, encrypt, false);
-    if (available <= minRoot) return;
+    QStringList volumes;
+    available = buildLayout(-1, encrypt, false, &volumes);
+    const PartMan::VolumeSpec &vspecRoot = partman->volSpecTotal("/", volumes);
+    if (available <= vspecRoot.minimum) return;
+    minRoot = vspecRoot.minimum;
+    recRoot = vspecRoot.preferred;
+    addSnapshot = 2 * vspecRoot.image;
 
-    recRoot = prefRoot;
-    recHome = prefHome;
+    const PartMan::VolumeSpec &vspecHome = partman->volSpecTotal("/home", volumes);
+    minHome = vspecHome.minimum;
+    recHome = vspecHome.preferred;
     if (swapfile) recRoot += SwapMan::recommended(hibernation);
-    if (snapshot) recHome += (2 * minRoot); // squashfs + ISO
-    recPortionMin = percent(recRoot, available, true); // Recommended root size.
-    recPortionMax = 100 - percent(recHome, available, true); // Recommended minimum home.
+    if (snapshot) recHome += addSnapshot; // squashfs + ISO
 
     gui.labelSliderRoot->setToolTip(tr("Recommended: %1\n"
         "Minimum: %2").arg(sizeString(recRoot), sizeString(minRoot)));
@@ -208,7 +214,7 @@ void AutoPart::builderGUI(DeviceItem *drive)
     checkSnapshot = nullptr;
 }
 
-long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool updateTree)
+long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool updateTree, QStringList *volList)
 {
     if (updateTree) drvitem->clear();
     if (rootFormatSize < 0) rootFormatSize = LLONG_MAX;
@@ -217,26 +223,27 @@ long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool upda
     // Boot partitions.
     if (proc.detectEFI()) {
         if (updateTree) drvitem->addPart(256*MB, "ESP", crypto);
+        if (volList) volList->append("ESP");
         remaining -= 256*MB;
     } else if (drvitem->willUseGPT()) {
         if (updateTree) drvitem->addPart(1*MB, "BIOS-GRUB", crypto);
+        if (volList) volList->append("BIOS-GRUB");
         remaining -= 1*MB;
     }
-    long long rootMin = partman->rootSpaceNeeded;
-    const long long bootMin = partman->bootSpaceNeeded;
-    if (!crypto) rootMin += bootMin;
-    else {
-        int bootFormatSize = 1*GB;
-        if (bootFormatSize < bootMin) bootFormatSize = bootMin;
+    if (crypto) {
+        const long long bootFormatSize = partman->volSpecs["/boot"].preferred;
         if (updateTree) drvitem->addPart(bootFormatSize, "boot", crypto);
+        if (volList) volList->append("/boot");
         remaining -= bootFormatSize;
     }
 
-    // Root
+    // Root and Home
     if (rootFormatSize > remaining) rootFormatSize = remaining;
-    if (rootFormatSize < rootMin) return -((drvitem->size - remaining) + rootMin);
     remaining -= rootFormatSize;
-    // Home
+    if (volList) {
+        volList->append("/");
+        if (remaining > 0) volList->append("/home");
+    }
     if (updateTree) {
         drvitem->addPart(rootFormatSize, "root", crypto);
         if (remaining > 0) drvitem->addPart(remaining, "home", crypto);
@@ -247,26 +254,6 @@ long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool upda
 }
 
 // Helpers
-
-int AutoPart::checkPortions(bool hibernation, bool snapshot)
-{
-    long long root = sizeRoot - minRoot;
-    if (root < 0) return -1;
-    if (hibernation) {
-        root -= SwapMan::recommended(true);
-        if (root < 0) return -1;
-    }
-    if (snapshot) {
-        const long long home = available - sizeRoot;
-        const long long minSnap = (2 * minRoot);
-        if (home > 0) {
-            if (home < minSnap) return 1;
-        } else {
-            if (root < minSnap) return -1;
-        }
-    }
-    return 0;
-}
 
 QString AutoPart::sizeString(long long size)
 {
@@ -322,6 +309,8 @@ void AutoPart::sliderActionTriggered(int action)
     const int oldPos = pos;
     if (action == QSlider::SliderPageStepAdd || action == QSlider::SliderPageStepSub
         || action == QSlider::SliderNoAction) {
+        const int recPortionMin = percent(recRoot, available, true); // Recommended root size.
+        const int recPortionMax = percent(available-recHome, available, true); // Recommended minimum home.
         if (pos < recPortionMin) pos = recPortionMin;
         else if (pos > recPortionMax) {
             if (action == QSlider::SliderPageStepAdd) pos = 100;
@@ -365,12 +354,19 @@ void AutoPart::sliderValueChanged(int value)
     sliderPressed(); // For the tool tip.
 
     // Unselect features that won't fit with the current configuration.
-    if (checkHibernation->isChecked() && checkPortions(true, false) != 0) {
+    const QStringList vols(sizeRoot < available ? "/home" : "/");
+    const long long rmin = partman->volSpecTotal("/", vols).minimum;
+    if (checkHibernation->isChecked() && sizeRoot < (rmin + SwapMan::recommended(true))) {
         checkHibernation->setChecked(false);
         QApplication::beep();
     }
-    if (checkSnapshot && checkPortions(false, checkSnapshot->isChecked()) != 0) {
-        checkSnapshot->setChecked(false);
-        QApplication::beep();
+    if (checkSnapshot && checkSnapshot->isChecked()) {
+        bool ok = false;
+        if (!newHome) ok = (sizeRoot >= (rmin + addSnapshot));
+        else ok = (newHome >= (minHome + addSnapshot));
+        if (!ok) {
+            checkSnapshot->setChecked(false);
+            QApplication::beep();
+        }
     }
 }
