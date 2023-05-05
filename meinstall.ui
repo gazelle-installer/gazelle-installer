@@ -566,6 +566,12 @@ QSlider::handle:horizontal:disabled {
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
                       </property>
+                      <property name="accelerated">
+                       <bool>true</bool>
+                      </property>
+                      <property name="correctionMode">
+                       <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+                      </property>
                       <property name="suffix">
                        <string>%</string>
                       </property>
@@ -581,6 +587,12 @@ QSlider::handle:horizontal:disabled {
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
+                      </property>
+                      <property name="accelerated">
+                       <bool>true</bool>
+                      </property>
+                      <property name="correctionMode">
+                       <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
                       </property>
                       <property name="suffix">
                        <string>%</string>
