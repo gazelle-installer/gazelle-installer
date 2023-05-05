@@ -202,21 +202,6 @@
        </item>
        <item row="2" column="0" colspan="6">
         <widget class="QStackedWidget" name="widgetStack">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>160</width>
-           <height>160</height>
-          </size>
-         </property>
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
          <widget class="QWidget" name="pageSplash">
           <layout class="QVBoxLayout">
            <item>
