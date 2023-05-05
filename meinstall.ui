@@ -312,7 +312,7 @@
                    <string>Model:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -327,7 +327,7 @@
                    <string>Variant:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -365,7 +365,7 @@
                    <string>Layout:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignVCenter</set>
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -484,7 +484,7 @@
                    <property name="frameShadow">
                     <enum>QFrame::Sunken</enum>
                    </property>
-                   <layout class="QHBoxLayout">
+                   <layout class="QGridLayout">
                     <property name="leftMargin">
                      <number>0</number>
                     </property>
@@ -497,14 +497,11 @@
                     <property name="bottomMargin">
                      <number>0</number>
                     </property>
-                    <item>
+                    <property name="spacing">
+                     <number>0</number>
+                    </property>
+                    <item row="0" column="0">
                      <widget class="QLabel" name="labelSliderRoot">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
                       <property name="text">
                        <string>Root</string>
                       </property>
@@ -513,7 +510,17 @@
                       </property>
                      </widget>
                     </item>
-                    <item>
+                    <item row="0" column="2">
+                     <widget class="QLabel" name="labelSliderHome">
+                      <property name="text">
+                       <string>Home</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1" rowspan="2">
                      <widget class="QSlider" name="sliderPart">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -566,19 +573,35 @@ QSlider::handle:horizontal:disabled {
                       </property>
                      </widget>
                     </item>
-                    <item>
-                     <widget class="QLabel" name="labelSliderHome">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="text">
-                       <string>Home</string>
+                    <item row="1" column="2">
+                     <widget class="QSpinBox" name="spinHome">
+                      <property name="frame">
+                       <bool>false</bool>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
+                      </property>
+                      <property name="suffix">
+                       <string>%</string>
+                      </property>
+                      <property name="maximum">
+                       <number>100</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QSpinBox" name="spinRoot">
+                      <property name="frame">
+                       <bool>false</bool>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignCenter</set>
+                      </property>
+                      <property name="suffix">
+                       <string>%</string>
+                      </property>
+                      <property name="maximum">
+                       <number>100</number>
                       </property>
                      </widget>
                     </item>

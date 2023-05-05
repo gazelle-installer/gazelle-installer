@@ -43,9 +43,22 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::sliderActionTriggered);
     connect(gui.sliderPart, &QSlider::valueChanged, this, &AutoPart::sliderValueChanged);
 
+    connect(gui.spinRoot, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value){
+        int vmin = gui.spinHome->minimum();
+        vmin = vmin>0 ? 100-vmin-1 : 100; // Snap to avoid forbidden values.
+        if (value < gui.sliderPart->value() && value > vmin) value = vmin;
+        gui.spinRoot->setValue(value);
+        gui.sliderPart->setSliderPosition(value);
+    });
+    connect(gui.spinHome, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value){
+        if (value == gui.spinHome->minimum()) value = 0; // Fake 0% value.
+        gui.sliderPart->setSliderPosition(100-value);
+    });
+
     strRoot = tr("Root");
     strHome = tr("Home");
     strNone = "----";
+    gui.spinHome->setSpecialValueText(strNone);
     installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
     refresh();
 }
@@ -115,10 +128,14 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
     if (swapfile) recRoot += SwapMan::recommended(hibernation);
     if (snapshot) recHome += addSnapshot; // squashfs + ISO
 
+    gui.spinRoot->setMinimum(percent(minRoot, available, true));
+    gui.spinHome->setMinimum(percent(minHome, available, true)-1);
     gui.labelSliderRoot->setToolTip(tr("Recommended: %1\n"
         "Minimum: %2").arg(sizeString(recRoot), sizeString(minRoot)));
     gui.labelSliderHome->setToolTip(tr("Recommended: %1\n"
         "Minimum: %2").arg(sizeString(recHome), sizeString(minHome)));
+    gui.spinRoot->setToolTip(gui.labelSliderRoot->toolTip());
+    gui.spinHome->setToolTip(gui.labelSliderHome->toolTip());
     gui.sliderPart->triggerAction(QSlider::SliderNoAction); // Snap the slider within range.
 }
 void AutoPart::setPartSize(Part part, long long nbytes)
@@ -337,6 +354,9 @@ void AutoPart::sliderValueChanged(int value)
     sizeRoot = portion(available, value, MB);
     QString valstr = sizeString(sizeRoot);
     gui.labelSliderRoot->setText(valstr + "\n" + strRoot);
+
+    gui.spinRoot->setValue(value);
+    gui.spinHome->setValue(100-value);
 
     QPalette palRoot = QApplication::palette();
     QPalette palHome = QApplication::palette();
