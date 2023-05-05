@@ -128,8 +128,11 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
     if (swapfile) recRoot += SwapMan::recommended(hibernation);
     if (snapshot) recHome += addSnapshot; // squashfs + ISO
 
-    gui.spinRoot->setMinimum(percent(minRoot, available, true));
+    const int rootMinPercent = percent(minRoot, available, true);
+    gui.spinRoot->setMinimum(rootMinPercent);
     gui.spinHome->setMinimum(percent(minHome, available, true)-1);
+    gui.spinHome->setMaximum(100 - rootMinPercent);
+
     gui.labelSliderRoot->setToolTip(tr("Recommended: %1\n"
         "Minimum: %2").arg(sizeString(recRoot), sizeString(minRoot)));
     gui.labelSliderHome->setToolTip(tr("Recommended: %1\n"
