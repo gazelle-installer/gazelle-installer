@@ -39,6 +39,7 @@
 #include <QFormLayout>
 #include <QDialogButtonBox>
 
+#include "mprocess.h"
 #include "msettings.h"
 #include "autopart.h"
 #include "partman.h"

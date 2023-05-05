@@ -24,6 +24,8 @@
 #include <QFormLayout>
 #include <QDialogButtonBox>
 
+#include "msettings.h"
+#include "mprocess.h"
 #include "partman.h"
 #include "swapman.h"
 #include "autopart.h"

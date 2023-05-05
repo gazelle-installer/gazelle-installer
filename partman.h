@@ -16,7 +16,6 @@
  *
  * This file is part of the gazelle-installer.
  ***************************************************************************/
-
 #ifndef PARTMAN_H
 #define PARTMAN_H
 
@@ -28,8 +27,6 @@
 #include <QStack>
 
 #include "ui_meinstall.h"
-#include "mprocess.h"
-#include "msettings.h"
 #include "safecache.h"
 
 #define KB 1024LL
@@ -159,7 +156,7 @@ class PartMan : public QAbstractItemModel
     Q_OBJECT
     friend class DeviceItem;
     friend class DeviceItemIterator;
-    MProcess &proc;
+    class MProcess &proc;
     DeviceItem root;
     DeviceItem *changing = nullptr;
     Ui::MeInstall &gui;
@@ -213,9 +210,10 @@ public:
     QString bootUUID;
     QMap<QString, DeviceItem *> mounts;
     class AutoPart *autopart = nullptr;
-    PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs);
+    PartMan(class MProcess &mproc, class Ui::MeInstall &ui,
+        const class QSettings &appConf, const QCommandLineParser &appArgs);
     void scan(DeviceItem *drvstart = nullptr);
-    bool manageConfig(MSettings &config, bool save);
+    bool manageConfig(class MSettings &config, bool save);
     bool composeValidate(bool automatic, const QString &project);
     bool checkTargetDrivesOK();
     DeviceItem *selectedDriveAuto();

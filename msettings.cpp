@@ -1,6 +1,6 @@
 /***************************************************************************
  * MSettings class - Installer-specific extensions to QSettings.
- ***************************************************************************
+ *
  *   Copyright (C) 2019 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -17,7 +17,15 @@
  * This file is part of the gazelle-installer.
  ***************************************************************************/
 
+#include <QGroupBox>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QRadioButton>
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QWidget>
 #include <QDebug>
+
 #include "msettings.h"
 
 MSettings::MSettings(const QString &fileName, QObject *parent)

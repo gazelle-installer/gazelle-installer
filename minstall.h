@@ -15,27 +15,8 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  ****************************************************************************/
-
-#include <QCommandLineParser>
-#include <QFile>
-#include <QMessageBox>
-#include <QProcess>
-#include <QSettings>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <dirent.h>
-
-#include "mprocess.h"
-#include "msettings.h"
-#include "partman.h"
-#include "autopart.h"
-#include "base.h"
-#include "oobe.h"
-#include "bootman.h"
-#include "swapman.h"
-
 #include "ui_meinstall.h"
+#include "mprocess.h"
 
 class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
@@ -45,7 +26,7 @@ protected:
     void reject();
 
 public:
-    MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile);
+    MInstall(class QSettings &acfg, const class QCommandLineParser &args, const QString &cfgfile);
     ~MInstall();
 
     // helpers
@@ -77,15 +58,15 @@ private slots:
 
 private:
     MProcess proc;
-    QSettings &appConf;
-    const QCommandLineParser &appArgs;
+    class QSettings &appConf;
+    const class QCommandLineParser &appArgs;
     int phase = 0;
 
     // command line options
     bool pretend, automatic;
     bool oem, modeOOBE, mountkeep;
     // configuration management
-    MSettings *config = nullptr;
+    class MSettings *config = nullptr;
     enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
 
     // auto-mount setup
@@ -93,13 +74,13 @@ private:
     bool autoMountEnabled = true;
 
     QWidget *nextFocus = nullptr;
-    PartMan *partman = nullptr;
-    AutoPart *autopart = nullptr;
-    Base *base = nullptr;
-    Oobe *oobe = nullptr;
+    class PartMan *partman = nullptr;
+    class AutoPart *autopart = nullptr;
+    class Base *base = nullptr;
+    class Oobe *oobe = nullptr;
+    class BootMan *bootman = nullptr;
+    class SwapMan *swapman = nullptr;
     QStringList listHomes;
-    BootMan *bootman = nullptr;
-    SwapMan *swapman = nullptr;
 
     QPixmap helpBackdrop;
     // Splash screen

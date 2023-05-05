@@ -16,14 +16,18 @@
  *
  * This file is part of the gazelle-installer.
  ***************************************************************************/
+
 #include <math.h>
 #include <sys/sysinfo.h>
 #include <QFileInfo>
 #include <QDir>
+#include "mprocess.h"
+#include "msettings.h"
+#include "partman.h"
 #include "swapman.h"
 
 SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui)
-    : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
+    : QObject(ui.boxMain), proc(mproc), partman(pman), gui(ui)
 {
     connect(ui.textSwapFile, &QLineEdit::textEdited, this, &SwapMan::swapFileEdited);
     connect(ui.spinSwapSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &SwapMan::spinSizeChanged);

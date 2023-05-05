@@ -1,6 +1,5 @@
 /***************************************************************************
  * MProcess class - Installer-specific extensions to QProcess.
- ***************************************************************************
  *
  *   Copyright (C) 2019 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +17,16 @@
  * This file is part of the gazelle-installer.
  ***************************************************************************/
 
+#include <unistd.h>
+
 #include <QApplication>
 #include <QProcessEnvironment>
 #include <QDebug>
 #include <QEventLoop>
 #include <QTimer>
 #include <QDir>
-#include <unistd.h>
+#include <QListWidget>
+#include <QProgressBar>
 
 #include "mprocess.h"
 

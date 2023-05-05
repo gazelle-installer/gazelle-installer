@@ -1,8 +1,7 @@
 /***************************************************************************
  * Boot manager (GRUB) setup for the installer.
- ***************************************************************************
  *
- *   Copyright (C) 2022 by AK-47, along with transplanted code:
+ *   Copyright (C) 2022-2023 by AK-47, along with transplanted code:
  *    - Copyright (C) 2003-2010 by Warren Woodford
  *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
  *    - Heavily revised by dolphin oracle, adrian, and anticaptialista 2018.
@@ -20,10 +19,14 @@
  *
  * This file is part of the gazelle-installer.
  ***************************************************************************/
+
 #include <sys/stat.h>
 #include <QDebug>
 #include <QMessageBox>
 #include <QFileInfo>
+#include "mprocess.h"
+#include "msettings.h"
+#include "partman.h"
 #include "bootman.h"
 
 BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,

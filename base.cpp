@@ -1,7 +1,7 @@
 /***************************************************************************
  * Base operating system software installation and configuration.
  *
- *   Copyright (C) 2022 by AK-47, along with transplanted code:
+ *   Copyright (C) 2022-2023 by AK-47, along with transplanted code:
  *    - Copyright (C) 2003-2010 by Warren Woodford
  *    - Heavily edited, with permision, by anticapitalista for antiX 2011-2014.
  *    - Heavily revised by dolphin oracle, adrian, and anticaptialista 2018.
@@ -27,6 +27,9 @@
 #include <QCryptographicHash>
 #include <QDirIterator>
 #include <QMessageBox>
+#include "mprocess.h"
+#include "msettings.h"
+#include "partman.h"
 #include "base.h"
 
 #define BASE_BLOCK  (4*KB)
