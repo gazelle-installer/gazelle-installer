@@ -57,7 +57,6 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     brave = appArgs.isSet("brave");
     gptoverride = appArgs.isSet("gpt-override");
 
-    master = gui.boxMain;
     root.partman = this;
     gui.treePartitions->setModel(this);
     gui.treePartitions->setItemDelegate(new DeviceItemDelegate);
@@ -593,7 +592,7 @@ void PartMan::partManRunClick()
 // Partition menu items
 void PartMan::partMenuUnlock(DeviceItem *twit)
 {
-    QDialog dialog(master);
+    QDialog dialog(gui.boxMain);
     QFormLayout layout(&dialog);
     dialog.setWindowTitle(tr("Unlock Drive"));
     QLineEdit *editVDev = new QLineEdit(&dialog);
@@ -630,7 +629,7 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
             qDebug() << "partMenuUnlock() failed:" << msg;
             gui.boxMain->setEnabled(true);
             qApp->restoreOverrideCursor();
-            QMessageBox::warning(master, QString(),
+            QMessageBox::warning(gui.boxMain, QString(),
                 tr("Could not unlock device. Possible incorrect password."));
         }
     }
@@ -660,7 +659,7 @@ void PartMan::partMenuLock(DeviceItem *twit)
     qApp->restoreOverrideCursor();
     // If not OK then a command failed, or trying to close a non-LUKS device.
     if (!ok) {
-        QMessageBox::critical(master, QString(), tr("Failed to close %1").arg(twit->device));
+        QMessageBox::critical(gui.boxMain, QString(), tr("Failed to close %1").arg(twit->device));
     }
 }
 
@@ -704,7 +703,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             if (cmptext.count(QRegularExpression("[^A-Z0-9\\/\\@\\.\\-\\_]|\\/\\/"))) ok = false;
             if (cmptext.startsWith('/') || cmptext.endsWith('/')) ok = false;
             if (!ok) {
-                QMessageBox::critical(master, QString(), tr("Invalid subvolume label"));
+                QMessageBox::critical(gui.boxMain, QString(), tr("Invalid subvolume label"));
                 return false;
             }
             // Check for duplicate subvolume label entries.
@@ -715,7 +714,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             for (int ixi = 0; ixi < count; ++ixi) {
                 if (ixi == index) continue;
                 if (pit->child(ixi)->label.trimmed().toUpper() == cmptext) {
-                    QMessageBox::critical(master, QString(), tr("Duplicate subvolume label"));
+                    QMessageBox::critical(gui.boxMain, QString(), tr("Duplicate subvolume label"));
                     return false;
                 }
             }
@@ -723,7 +722,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         QString mount = item->realUseFor();
         if (mount.isEmpty()) continue;
         if (!mount.startsWith("/") && !item->allowedUsesFor().contains(mount)) {
-            QMessageBox::critical(master, QString(),
+            QMessageBox::critical(gui.boxMain, QString(),
                 tr("Invalid use for %1: %2").arg(item->shownDevice(), mount));
             return false;
         }
@@ -735,7 +734,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
 
         // The mount can only be selected once.
         if (twit) {
-            QMessageBox::critical(master, QString(), tr("%1 is already"
+            QMessageBox::critical(gui.boxMain, QString(), tr("%1 is already"
                 " selected for: %2").arg(twit->shownDevice(), twit->shownUseFor()));
             return false;
         } else if(!mount.isEmpty() && mount != "FORMAT" && mount != "ESP" && mount != "BIOS-GRUB"){
@@ -761,20 +760,20 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
     const QString &tMinRoot = QLocale::system().formattedDataSize(rootMin,
         1, QLocale::DataSizeTraditionalFormat);
     if (!rootitem) {
-        QMessageBox::critical(master, QString(),
+        QMessageBox::critical(gui.boxMain, QString(),
             tr("A root partition of at least %1 is required.").arg(tMinRoot));
         return false;
     } else {
         if (!rootitem->willFormat() && mounts.contains("/home")) {
             const QString errmsg = tr("Cannot preserve /home inside root (/) if"
                 " a separate /home partition is also mounted.");
-            QMessageBox::critical(master, QString(), errmsg);
+            QMessageBox::critical(gui.boxMain, QString(), errmsg);
             return false;
         }
         if (rootitem->encrypt) encryptRoot = true;
     }
     if (encryptRoot && !bootitem) {
-        QMessageBox::critical(master, QString(),
+        QMessageBox::critical(gui.boxMain, QString(),
             tr("You must choose a separate boot partition when encrypting root."));
         return false;
     }
@@ -826,7 +825,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
             }
         }
         // Warning messages
-        QMessageBox msgbox(master);
+        QMessageBox msgbox(gui.boxMain);
         msgbox.setIcon(QMessageBox::Warning);
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         msgbox.setDefaultButton(QMessageBox::No);
@@ -907,12 +906,12 @@ bool PartMan::checkTargetDrivesOK()
         msg += tr("If unsure, please exit the Installer and run GSmartControl for more information.") + "\n\n";
         if (!smartFail.isEmpty()) {
             msg += tr("Do you want to abort the installation?");
-            ans = QMessageBox::critical(master, QString(), msg,
+            ans = QMessageBox::critical(gui.boxMain, QString(), msg,
                     QMessageBox::Yes|QMessageBox::Default|QMessageBox::Escape, QMessageBox::No);
             if (ans == QMessageBox::Yes) return false;
         } else {
             msg += tr("Do you want to continue?");
-            ans = QMessageBox::warning(master, QString(), msg,
+            ans = QMessageBox::warning(gui.boxMain, QString(), msg,
                     QMessageBox::Yes|QMessageBox::Default, QMessageBox::No|QMessageBox::Escape);
             if (ans != QMessageBox::Yes) return false;
         }
