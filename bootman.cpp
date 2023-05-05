@@ -140,12 +140,12 @@ void BootMan::install()
             arch = proc.readOut();
             arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
 
-        if (efivars_ismounted) {
-            // remove any efivars-dump-entries in NVRAM
-            proc.shell("/bin/ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
-            const QString &dump = proc.readOut();
-            if (!dump.isEmpty()) proc.shell("/bin/rm /sys/firmware/efi/efivars/dump*", nullptr, true);
-        }
+            if (efivars_ismounted) {
+                // remove any efivars-dump-entries in NVRAM
+                proc.shell("/bin/ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
+                const QString &dump = proc.readOut();
+                if (!dump.isEmpty()) proc.shell("/bin/rm /sys/firmware/efi/efivars/dump*", nullptr, true);
+            }
 
             isOK = proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
                 "--target=" + arch + "-efi", "--efi-directory=/boot/efi",
@@ -179,7 +179,7 @@ void BootMan::install()
         const QStringList confcmdline = proc.readOut().split(" ");
 
         for (const QString &confparameter : confcmdline) {
-        finalcmdline.removeAll(confparameter);
+            finalcmdline.removeAll(confparameter);
         }
 
         //remove any duplicate codes in list (typically splash)
@@ -210,7 +210,6 @@ void BootMan::install()
         finalcmdlinestring.replace('|', "\\|");
 
         //do the replacement in /etc/default/grub
-        qDebug() << "Add cmdline options to Grub";
         const QString cmd = "sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=).*|\\1\"%1\"|' /mnt/antiX/etc/default/grub";
         proc.shell(cmd.arg(finalcmdlinestring));
 
@@ -228,9 +227,9 @@ void BootMan::install()
                 mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-64.efi";
                 mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-64.efi";
             }
-            if (QFileInfo(mtest_ram).exists()) {
+            if (QFileInfo::exists(mtest_ram)) {
                 mtest = mtest_ram;
-            } else if (QFileInfo(mtest_dev).exists()) {
+            } else if (QFileInfo::exists(mtest_dev)) {
                 mtest = mtest_dev;
             }
             if (!mtest.isNull()) {
@@ -251,6 +250,10 @@ void BootMan::install()
         //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
         //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
     //}
+
+    // Use MODULES=dep to trim the initrd, often results in faster boot.
+    proc.exec("sed", {"-i", "-r", "s/MODULES=.*/MODULES=dep/", "/etc/initramfs-tools/initramfs.conf"});
+
     proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
     proc.status();
     qDebug() << "clear chroot env";
