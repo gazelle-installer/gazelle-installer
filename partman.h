@@ -160,7 +160,6 @@ class PartMan : public QAbstractItemModel
     DeviceItem root;
     DeviceItem *changing = nullptr;
     Ui::MeInstall &gui;
-    QWidget *master;
     SafeCache key;
     bool brave, gptoverride;
     void scanVirtualDevices(bool rescan);

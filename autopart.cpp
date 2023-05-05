@@ -38,7 +38,7 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
     connect(gui.boxEncryptAuto, &QGroupBox::toggled, this, &AutoPart::toggleEncrypt);
     connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
-        [=](bool checked){ setParams(true, gui.boxEncryptAuto->isChecked(), checked, true); });
+        [this](bool checked){ setParams(true, gui.boxEncryptAuto->isChecked(), checked, true); });
     connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPressed);
     connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::sliderActionTriggered);
     connect(gui.sliderPart, &QSlider::valueChanged, this, &AutoPart::sliderValueChanged);
@@ -175,7 +175,7 @@ void AutoPart::builderGUI(DeviceItem *drive)
     checkEncrypt->setEnabled(canEncrypt);
     if (!canEncrypt) checkEncrypt->setChecked(false);
 
-    auto updateUI = [=](bool) {
+    auto updateUI = [&]() {
         available = buildLayout(-1, checkEncrypt->isChecked(), false);
         // Is hibernation possible?
         bool canHibernate = checkSwapFile->isChecked() && (available >= (minRoot + swapHiber));
