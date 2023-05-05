@@ -44,14 +44,15 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     connect(gui.sliderPart, &QSlider::valueChanged, this, &AutoPart::sliderValueChanged);
 
     connect(gui.spinRoot, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value){
-        int vmin = gui.spinHome->minimum();
-        vmin = vmin>0 ? 100-vmin-1 : 100; // Snap to avoid forbidden values.
-        if (value < gui.sliderPart->value() && value > vmin) value = vmin;
-        gui.spinRoot->setValue(value);
+        const int vmax = 100 - percent(minHome, available, true);
+        if (value < gui.sliderPart->value() && value > vmax) value = vmax;
+        gui.spinRoot->setValue(value); // Snap to avoid forbidden values.
         gui.sliderPart->setSliderPosition(value);
     });
     connect(gui.spinHome, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value){
-        if (value == gui.spinHome->minimum()) value = 0; // Fake 0% value.
+        const int vmin = percent(minHome, available, true);
+        if (value > (100 - gui.sliderPart->value()) && value < vmin) value = vmin;
+        gui.spinHome->setValue(value); // Snap to avoid forbidden values.
         gui.sliderPart->setSliderPosition(100-value);
     });
 
@@ -116,6 +117,7 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
 {
     QStringList volumes;
     available = buildLayout(-1, encrypt, false, &volumes);
+    volumes.append("/home");
     const PartMan::VolumeSpec &vspecRoot = partman->volSpecTotal("/", volumes);
     if (available <= vspecRoot.minimum) return;
     minRoot = vspecRoot.minimum;
@@ -130,7 +132,6 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
 
     const int rootMinPercent = percent(minRoot, available, true);
     gui.spinRoot->setMinimum(rootMinPercent);
-    gui.spinHome->setMinimum(percent(minHome, available, true)-1);
     gui.spinHome->setMaximum(100 - rootMinPercent);
 
     gui.labelSliderRoot->setToolTip(tr("Recommended: %1\n"
