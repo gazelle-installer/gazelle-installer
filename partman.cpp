@@ -47,12 +47,12 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     : QAbstractItemModel(ui.boxMain), proc(mproc), root(DeviceItem::Unknown), gui(ui)
 {
     const QString &projShort = appConf.value("PROJECT_SHORTNAME").toString();
-    defaultLabels["ESP"] = "EFI System";
-    defaultLabels["BIOS-GRUB"] = "BIOS GRUB";
-    defaultLabels["/boot"] = "boot";
-    defaultLabels["/"] = "root" + projShort + appConf.value("VERSION").toString();
-    defaultLabels["/home"] = "home" + projShort;
-    defaultLabels["SWAP"] = "swap" + projShort;
+    volSpecs["ESP"] = {"EFI System"};
+    volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
+    volSpecs["/boot"] = {"boot"};
+    volSpecs["/"] = {"root" + projShort + appConf.value("VERSION").toString()};
+    volSpecs["/home"] = {"home" + projShort};
+    volSpecs["SWAP"] = {"swap" + projShort};
     brave = appArgs.isSet("brave");
     gptoverride = appArgs.isSet("gpt-override");
 
@@ -755,11 +755,13 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
     }
 
     DeviceItem *rootitem = mounts.value("/");
-    if (!rootitem || rootitem->size < rootSpaceNeeded) {
-        const QString &tmin = QLocale::system().formattedDataSize(rootSpaceNeeded,
-            1, QLocale::DataSizeTraditionalFormat);
+    DeviceItem *bootitem = mounts.value("/boot");
+    const long long rootMin = volSpecTotal("/").minimum;
+    const QString &tMinRoot = QLocale::system().formattedDataSize(rootMin,
+        1, QLocale::DataSizeTraditionalFormat);
+    if (!rootitem) {
         QMessageBox::critical(master, QString(),
-            tr("A root partition of at least %1 is required.").arg(tmin));
+            tr("A root partition of at least %1 is required.").arg(tMinRoot));
         return false;
     } else {
         if (!rootitem->willFormat() && mounts.contains("/home")) {
@@ -770,7 +772,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         }
         if (rootitem->encrypt) encryptRoot = true;
     }
-    if (encryptRoot && !mounts.contains("/boot")) {
+    if (encryptRoot && !bootitem) {
         QMessageBox::critical(master, QString(),
             tr("You must choose a separate boot partition when encrypting root."));
         return false;
@@ -779,6 +781,8 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
     if (!automatic) {
         // Final warnings before the installer starts.
         QString details, biosgpt;
+        QStringList tooSmall;
+        const QString &msgszItem(" - " + tr("%1 (%2) requires %3"));
         for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
             DeviceItem *drvit = root.child(ixdrv);
             const int partCount = drvit->childCount();
@@ -805,6 +809,14 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
                 }
                 details += actmsg.arg(partit->shownDevice(), partit->shownUseFor()) + '\n';
                 if (use == "BIOS-GRUB") hasBiosGrub = true;
+
+                // If this volume is too small, add to the warning list.
+                const long long minSize = volSpecTotal(partit->realUseFor()).minimum;
+                if (partit->size < minSize) {
+                    const QString &mstr = QLocale::system().formattedDataSize(minSize,
+                        1, QLocale::DataSizeTraditionalFormat);
+                    tooSmall.append(msgszItem.arg(partit->shownUseFor(), partit->device, mstr));
+                }
             }
             // Potentially unbootable GPT when on a BIOS-based PC.
             const bool hasBoot = (drvit->active != nullptr);
@@ -817,6 +829,14 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         msgbox.setIcon(QMessageBox::Warning);
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         msgbox.setDefaultButton(QMessageBox::No);
+        if (!tooSmall.isEmpty()) {
+            tooSmall.sort();
+            msgbox.setText(tr("The installation may fail because"
+                " the following volumes are too small:") + "\n\n"
+                + tooSmall.join('\n')
+                + "\n\n" + tr("Are you sure you want to continue?"));
+            if (msgbox.exec() != QMessageBox::Yes) return false;
+        }
         if (!biosgpt.isEmpty()) {
             biosgpt.prepend(tr("The following drives are, or will be, setup with GPT,"
                 " but do not have a BIOS-GRUB partition:") + "\n\n");
@@ -827,7 +847,15 @@ bool PartMan::composeValidate(bool automatic, const QString &project)
         }
         msgbox.setText(tr("The %1 installer will now perform the requested actions.").arg(project));
         msgbox.setInformativeText(tr("These actions cannot be undone. Do you want to continue?"));
+        details.chop(1); // Remove trailing new-line character.
         msgbox.setDetailedText(details);
+        const QList<QAbstractButton *> &btns = msgbox.buttons();
+        for (auto btn : btns) {
+            if (msgbox.buttonRole(btn) == QMessageBox::ActionRole) {
+                btn->click(); // Simulate clicking the "Show Details..." button.
+                break;
+            }
+        }
         if (msgbox.exec() != QMessageBox::Yes) return false;
     }
 
@@ -1442,6 +1470,20 @@ DeviceItem *PartMan::findHostDev(const QString &path) const
     return devit;
 }
 
+struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStringList &vols) const
+{
+    struct VolumeSpec vspec = volSpecs.value(path);
+    const QString &spath = (path!='/' ? path+'/' : path);
+    for (const auto &it : volSpecs.toStdMap()) {
+        if (it.first.size() > 1 && it.first.startsWith(spath) && !vols.contains(it.first)) {
+            vspec.image += it.second.image;
+            vspec.minimum += it.second.minimum;
+            vspec.preferred += it.second.preferred;
+        }
+    }
+    return vspec;
+}
+
 /*************************\
  * Model View Controller *
 \*************************/
@@ -1814,9 +1856,8 @@ QString DeviceItem::realUseFor(const QString &use)
     else if (!use.startsWith('/')) return use.toUpper();
     else return use;
 }
-QString DeviceItem::shownUseFor() const
+QString DeviceItem::shownUseFor(const QString &use)
 {
-    const QString &use = realUseFor();
     if (use == "/") return "/ (root)";
     else if (use == "ESP") return tr("EFI System Partition");
     else if (use == "SWAP") return tr("swap space");
@@ -1893,21 +1934,26 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const
 {
     if (!isVolume() && type != Subvolume) return QStringList();
     QStringList list;
-    if (!partman || size >= partman->rootSpaceNeeded) list << "root";
-    if (type == Subvolume) list << "home"; // swap requires Linux 5.0 or later
+    auto checkAndAdd = [&](const QString &use) {
+        const QString &realUse = realUseFor(use);
+        if (all || !partman || size >= partman->volSpecs.value(realUse).minimum) {
+            list.append(real ? realUse : use);
+        }
+    };
+
+    checkAndAdd("root");
+    if (type == Subvolume) checkAndAdd("home"); // swap requires Linux 5.0 or later
     else {
-        list.prepend("Format");
+        list.prepend("Format"); // No size restrictions for formatting.
         if (type != VirtualBD) {
-            if (all || size <= 16*MB) list << "BIOS-GRUB";
+            if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
             if (all || size <= 8*GB) {
-                if (size < (2*TB - 512)) list << "ESP";
-                list << "boot";
+                if (size < (2*TB - 512)) checkAndAdd("ESP");
+                checkAndAdd("boot");
             }
         }
-        list << "swap" << "home";
-    }
-    if (real) {
-        for(QString &use : list) use = realUseFor(use);
+        checkAndAdd("swap");
+        checkAndAdd("home");
     }
     return list;
 }
@@ -2023,7 +2069,7 @@ void DeviceItem::autoFill(unsigned int changed)
             }
             label = newLabel;
         } else if (partman) {
-            label = partman->defaultLabels.value(use);
+            label = partman->volSpecs.value(use).defaultLabel;
         }
         // Automatic default boot device selection
         if ((type != VirtualBD) && (use == "/boot" || use == "/")) {

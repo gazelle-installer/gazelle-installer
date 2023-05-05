@@ -149,13 +149,8 @@ void MInstall::startup()
         base->scanMedia();
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
         swapman = new SwapMan(proc, *partman, *this);
-        autopart = new AutoPart(proc, partman, *this, appConf, 16*MB);
+        autopart = new AutoPart(proc, partman, *this, appConf);
         partman->autopart = autopart;
-
-        // Unable to get space requirements since there's no media.
-        if (!pretend && partman->bootSpaceNeeded==0) {
-            throw QT_TR_NOOP("Cannot access installation media.");
-        }
 
         autoMountEnabled = true; // disable auto mount by force
         if (!pretend) setupAutoMount(false);
