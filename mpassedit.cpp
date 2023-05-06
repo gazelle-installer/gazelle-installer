@@ -17,24 +17,23 @@
  * This file is part of the gazelle-installer.
  **************************************************************************/
 
+#include <cmath>
 #include <QApplication>
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QStringList>
 #include <QString>
 #include <QFile>
+#include <QDebug>
+#ifndef NO_ZXCVBN
+#include <zxcvbn.h>
+#endif
 #include "mpassedit.h"
 
 MPassEdit::MPassEdit(QWidget *parent)
     : QLineEdit(parent)
 {
 }
-#ifndef NO_PWQUALITY
-MPassEdit::~MPassEdit()
-{
-    if (pwqual) pwquality_free_settings(pwqual);
-}
-#endif
 
 bool MPassEdit::isValid() const
 {
@@ -65,16 +64,6 @@ void MPassEdit::setup(MPassEdit *slave, QProgressBar *meter,
     actionEye->setCheckable(true);
     connect(actionEye, &QAction::toggled, this, &MPassEdit::eyeToggled);
     eyeToggled(false); // Initialize the eye.
-
-    // Prime the pwquality API.
-    #ifndef NO_PWQUALITY
-    char buf[PWQ_MAX_ERROR_MESSAGE_LEN];
-    pwqual = pwquality_default_settings();
-    if (!pwqual) throw pwquality_strerror(buf, sizeof(buf), PWQ_ERROR_MEM_ALLOC, NULL);
-    void *auxerror = nullptr;
-    const int rc = pwquality_read_config(pwqual, NULL, &auxerror);
-    if (rc != 0) throw pwquality_strerror(buf, sizeof(buf), rc, auxerror);
-    #endif // NO_PWQUALITY
 
     masterTextChanged();
 }
@@ -144,18 +133,13 @@ void MPassEdit::masterTextChanged()
     slave->setPalette(QApplication::palette());
     const bool valid = (text().isEmpty() && min == 0);
     if (meter) {
-        #ifndef NO_PWQUALITY
-        char buf[PWQ_MAX_ERROR_MESSAGE_LEN];
-        void *auxerror = nullptr;
-        int score = pwquality_check(pwqual,
-            text().toUtf8().constData(), nullptr, nullptr, &auxerror);
-        meter->setTextVisible(score < 0);
-        if (score >= 0) meter->setToolTip(tr("Score: %1").arg(score));
-        else {
-            meter->setToolTip(pwquality_strerror(buf, sizeof(buf), score, auxerror));
-            score = 0;
-        }
-        #else // !NO_PWQUALITY
+        #ifndef NO_ZXCVBN
+        int score = 4;
+        double entropy = ZxcvbnMatch(text().toUtf8().constData(), nullptr, nullptr);
+        // entropy *= 0.301029996; // Log
+        qDebug() << log10(entropy);
+        #else // !NO_ZXCVBN
+
         int score = 0;
         const QString &t = text();
         if (!t.isEmpty()) {
@@ -181,7 +165,7 @@ void MPassEdit::masterTextChanged()
             }
             score += textLen <= 30 ? textLen : 30;
         }
-        #endif // NO_PWQUALITY
+        #endif // NO_ZXCVBN
         meter->setValue(score);
         QPalette pal = meter->palette();
         score = (255 * score) / 100;
