@@ -268,7 +268,7 @@ void BootMan::installMain(bool efivars_ismounted)
     //}
 
     // Use MODULES=dep to trim the initrd, often results in faster boot.
-    proc.exec("sed", {"-i", "-r", "s/MODULES=.*/MODULES=dep/", "/etc/initramfs-tools/initramfs.conf"});
+    proc.exec("sed", {"-i", "-r", "s/MODULES=.*/MODULES=dep/", "/mnt/antiX/etc/initramfs-tools/initramfs.conf"});
 
     proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
     proc.status();
