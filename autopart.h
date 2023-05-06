@@ -39,6 +39,7 @@ class AutoPart : public QObject
     // Layout Builder
     class QCheckBox *checkHibernation = nullptr;
     class QCheckBox *checkSnapshot = nullptr;
+    bool inBuilder = false;
     // Slots
     void toggleAutoPart(bool checked);
     void diskChanged();
