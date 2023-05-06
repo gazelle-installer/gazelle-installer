@@ -161,6 +161,7 @@ long long AutoPart::partSize(Part part)
 // Layout Builder
 void AutoPart::builderGUI(DeviceItem *drive)
 {
+    inBuilder = true;
     long long swapRec = SwapMan::recommended(false);
     long long swapHiber = SwapMan::recommended(true);
     // Borrow the partition slider assembly from the disk page.
@@ -235,6 +236,7 @@ void AutoPart::builderGUI(DeviceItem *drive)
     // Reset pointers to original controls.
     checkHibernation = gui.checkHibernationReg;
     checkSnapshot = nullptr;
+    inBuilder = false;
 }
 
 long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool updateTree, QStringList *volList)
@@ -310,7 +312,7 @@ void AutoPart::toggleEncrypt(bool checked)
     if (!canHibernate) gui.checkHibernationReg->setChecked(false);
 
     setParams(true, checked, gui.checkHibernationReg->isChecked(), true);
-    gui.pushNext->setEnabled(!checked || gui.textCryptoPass->isValid());
+    if (!inBuilder) gui.pushNext->setEnabled(!checked || gui.textCryptoPass->isValid());
 }
 
 void AutoPart::sliderPressed()
