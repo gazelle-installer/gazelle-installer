@@ -19,9 +19,6 @@
 #ifndef MPASSEDIT_H
 #define MPASSEDIT_H
 
-#ifndef NO_PWQUALITY
-    #include <pwquality.h>
-#endif
 #include <QLineEdit>
 #include <QProgressBar>
 
@@ -35,9 +32,6 @@ private:
     bool lastValid = false;
     QProgressBar *meter = nullptr;
     QAction *actionEye = nullptr;
-    #ifndef NO_PWQUALITY
-    pwquality_settings_t *pwqual = nullptr;
-    #endif
     void generate();
     void masterTextChanged();
     void slaveTextChanged(const QString &slaveText);
@@ -47,9 +41,6 @@ protected:
     void changeEvent(QEvent *event);
 public:
     MPassEdit(QWidget *parent = nullptr);
-    #ifndef NO_PWQUALITY
-    ~MPassEdit();
-    #endif
     void setup(MPassEdit *slave, QProgressBar *meter,
                int min=0, int genMin=16, int wordMax=5);
     bool isValid() const;
