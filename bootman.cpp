@@ -254,9 +254,29 @@ void BootMan::installMain(bool efivars_ismounted)
         proc.status();
 
         //update grub with new config
-
-        qDebug() << "Update Grub";
         proc.exec("chroot", {"/mnt/antiX", "update-grub"});
+
+        if (!gui.radioBootESP->isChecked()) {
+            /* Prevent debconf pestering the user when GRUB gets updated. */
+            proc.exec("udevadm", {"info", boot}, nullptr, true);
+            const QStringList &lines = proc.readOutLines();
+            /* Obtain the best ID to use for the disk or partition. */
+            QByteArray diskpath;
+            static const char *types[] = {"S: disk/by-uuid", "S: disk/by-id", "S: disk/by-path", "S: "};
+            int stop = sizeof(types)/sizeof(const char *);
+            for (const QString &line : lines) {
+                for (int i = 0; i < stop; ++i) {
+                    if (line.startsWith(types[i])) {
+                        diskpath = line.mid(3).toUtf8();
+                        stop = i;
+                    }
+                }
+            }
+            if (diskpath.isEmpty()) throw failGrub;
+            /* Setup debconf to achieve the objective of silence. */
+            diskpath.prepend("grub-pc grub-pc/install_devices multiselect /dev/");
+            proc.exec("chroot", {"/mnt/antiX", "debconf-set-selections"}, &diskpath);
+        }
     }
 
     proc.status(tr("Updating initramfs"));
