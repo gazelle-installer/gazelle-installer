@@ -924,7 +924,7 @@ bool PartMan::checkTargetDrivesOK()
 
 void PartMan::luksFormat(DeviceItem *partit, const QByteArray &password)
 {
-    QStringList cargs({"--batch-mode", "--key-size=512", "--hash=sha512", "--pbkdf=argon2id"});
+    QStringList cargs({"--batch-mode", "--key-size=512", "--hash=sha512"});
     if (partit->physec > 0) cargs.append("--sector-size=" + QString::number(partit->physec));
     cargs << "luksFormat" << partit->path;
     if (!proc.exec("cryptsetup", cargs, &password)) {
