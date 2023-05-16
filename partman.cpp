@@ -1944,10 +1944,10 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const
         }
     };
 
+    if (type != Subvolume) checkAndAdd("Format");
     checkAndAdd("root");
     if (type == Subvolume) checkAndAdd("home"); // swap requires Linux 5.0 or later
     else {
-        list.prepend("Format"); // No size restrictions for formatting.
         if (type != VirtualBD) {
             if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
             if (all || size <= 8*GB) {
