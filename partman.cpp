@@ -1329,7 +1329,7 @@ bool PartMan::makeFstab()
         qDebug() << "Creating fstab entry for:" << it.first << dev;
         // Device ID or UUID
         if (twit->willMap()) out << dev;
-        else out << "UUID=" << twit->uuid;
+        else out << "UUID=" << twit->assocUUID();
         // Mount point, file system
         proc.exec("blkid", {dev, "-o", "value", "-s", "TYPE"}, nullptr, true);
         const QString &fsfmt = proc.readOut();
@@ -1911,6 +1911,11 @@ inline bool DeviceItem::willEncrypt() const
 {
     if (type == Subvolume) return parentItem->encrypt;
     return encrypt;
+}
+QString DeviceItem::assocUUID() const
+{
+    if (type == Subvolume) return parentItem->uuid;
+    return uuid;
 }
 QString DeviceItem::mappedDevice() const
 {
