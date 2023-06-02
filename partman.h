@@ -112,6 +112,7 @@ public:
     bool willFormat() const;
     bool canEncrypt() const;
     bool willEncrypt() const;
+    QString assocUUID() const;
     QString mappedDevice() const;
     bool willMap() const;
     QString shownDevice() const;
