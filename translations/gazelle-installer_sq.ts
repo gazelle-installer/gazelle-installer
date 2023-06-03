@@ -6,60 +6,45 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Rrënjë</translation>
+        <translation>Rrënjë</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Hyrje</translation>
+        <translation>Hyrje</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
         <location filename="../autopart.cpp" line="139"/>
         <source>Recommended: %1
 Minimum: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>E rekomanduar: %1
+Minimumi: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="176"/>
         <source>Layout Builder</source>
-        <translation type="unfinished"></translation>
+        <translation>Ndërtues Skeme</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="320"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished">Rrënja për %1%
+        <translation>Rrënja për %1%
 Shtëpia e %2%</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Rrënjë dhe shtëpi të ndërthurura</translation>
+        <translation>Rrënjë dhe shtëpi të ndërthurura</translation>
     </message>
 </context>
 <context>
     <name>Base</name>
     <message>
-        <source>Checking installation media.</source>
-        <translation type="vanished">Po kontrollohet media instalimi.</translation>
-    </message>
-    <message>
-        <source>Press ESC to skip.</source>
-        <translation type="vanished">Që të anashkalohet, shtypni tastin ESC</translation>
-    </message>
-    <message>
-        <source>The installation media is corrupt.</source>
-        <translation type="vanished">Media e instalimit është e dëmtuar.</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="vanished">Jeni i sigurt se doni të anashkalohet kontrolli i medias së instalimit?</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="66"/>
         <source>Cannot access installation media.</source>
-        <translation type="unfinished">S’hapet dot media e instalimit.</translation>
+        <translation>S’hapet dot media e instalimit.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="128"/>
@@ -80,10 +65,6 @@ Shtëpia e %2%</translation>
         <location filename="../base.cpp" line="148"/>
         <source>Fixing configuration</source>
         <translation>Po ndreqet formësimi</translation>
-    </message>
-    <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">S’u arrit të përfundohet ujdisja e fshehtëzimit.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="218"/>
@@ -116,7 +97,7 @@ Shtëpia e %2%</translation>
     <message>
         <location filename="../bootman.cpp" line="283"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>S’u arrit të përditësohej initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="309"/>
@@ -148,22 +129,22 @@ Shtëpia e %2%</translation>
         <translation>vetëm formatim</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Krijoje</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Ruaje</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Ruaje (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>Ruaje /home (%1)</translation>
     </message>
@@ -171,22 +152,22 @@ Shtëpia e %2%</translation>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation>&amp;Gjedhe</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Ngjeshje (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Ngjeshje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Ngjeshje (&amp;LZO)</translation>
     </message>
@@ -208,10 +189,6 @@ Do you want to continue the installation?</source>
 Këshillojmë të dilni tani dhe ta rinisni nën Nisje e Dikurshme
 
 Doni të vazhdohet instalimi?</translation>
-    </message>
-    <message>
-        <source>Cannot access installation media.</source>
-        <translation type="vanished">S’hapet dot media e instalimit.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="182"/>
@@ -319,10 +296,6 @@ Shijoni përdorimin e %1-it</translation>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Mundësi Instalimi</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">Instalimi lyp afërsisht %1 hapësirë. Parapëlqehen %2 ose më tepër.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -605,24 +578,57 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="732"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thjesht djathtasklikoni mbi një disk dhe përzgjidhni &lt;b&gt;Ndërtues Skeme&lt;/b&gt; që nga menuja. Kjo mund të krijojë një skemë të ngjashme me atë të instalimit të rregullt.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Instalo GRUB për Linux dhe Windows</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
+        <translation>%1 përdor ngarkuesin GRUB të nisjeve, për të nisur %1 dhe Microsoft-in Windows.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation>Si parazgjedhje, GRUB-i instalohet në Master Boot Record - Regjistër i Përgjithshëm Nisjesh - (MBR) ose ESP (EFI System Partition - Pjesë Sistemi EFI - për sisteme nisjeje 64-bit UEFI) të diskut tuaj të nisjes dhe zëvendëson ngarkuesin e nisjeve që përdorni më parë. Kjo është normale.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation>Nëse, në vend të kësaj,  zgjidhni të instaloni GRUB-in te Partition Boot Record - Regjistër Pjesësh Nisjeje - (PBR), atëherë GRUB-i do të instalohet në fillim të pjesës së përcaktuar. Kjo mundësi është vetëm për të sprovuarit.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation>Nëse i hiqni shenjën kutizës Instalo GRUB-in, GRUB-i s’do të instalohet këtë herë. Kjo mundësi është vetëm për ekspertë.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation>Krijo një kartelë “swap”</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation>Një kartelë “swap” është zgjidhje më e zhdërvjellët se sa një pjesë “swap”, është goxha më e lehtë të ripërmasohet një kartelë “swap” për t’ia përshtatur ndryshimeve në përdorimin e sistemit.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation>Si parazgjedhje, kësaj i vihet shenjë nëse s’janë ujdisur pjesë “swap” dhe lihet pa shenjë, nëse janë ujdisur pjesë “swap”. Te kjo mundësi s’duhen futur duart dhe është vetëm për të sprovuar.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation>Caktimi i madhësisë si 0, ka të njëjtin efekt si mosvënia shenjë kësaj mundësie.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="884"/>
         <source>Enjoy using %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">Thjesht djathtasklikoni mbi një disk që të sillet menuja, dhe përzgjidhni një gjedhe skeme. Këto skema janë të ngjashme me atë të instalimit normal.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;Instalim standard&lt;/i&gt; - I përshtatshëm për shumicën e rasteve. Kjo gjedhe nuk shton ndarje më vete për nisjet, ndaj është e papërshtatshme për përdorim me një sistem operativ të fshehtëzuar.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;Sistem i fshehtëzuar&lt;/i&gt; - Përmban ndarjen e nisjeve të domosdoshme për të ngarkuar një sistem operativ të fshehtëzuar. Kjo gjedhe mund të përdoret edhe si bazë për një sistem me disa nisje.</translation>
+        <translation>Shijoni përdorimin e %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -718,55 +724,6 @@ Shijoni përdorimin e %1-it</translation>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Përdorimi i pajijeve virtuale (përtej qëllimit të ruajtjes së sistemeve të fshehtëzuar të kartelave) është një veçori e thelluar. Mund t’ju duhet të përpunoni ca kartela (p.sh., initramfs, crypttab, fstab), për të garantuar se pajisjet virtuale të përdorura krijohen gjatë nisjes to ensure the virtual devices used are created upon boot.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Instalo GRUB për Linux dhe Windows</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Përzgjidhni Metodë Nisjeje&lt;/b&gt;&lt;br/&gt; %1-i ngarkuesin GRUB të nisjeve, për nisjen e %1-it dhe MS-Windows-it. &lt;p&gt;Si parazgjedhje, GRUB2 instalohet në Regjistër i Përgjithshëm Nisjesh (MBR), ose ESP (Pjesë Sistemi EFI, për sisteme 64-bit me nisje UEFI) të diskut tuaj të nisjes dhe zëvendëson ngarkuesin e nisjeve që përdornit më parë. Kjo është normale.&lt;/p&gt;&lt;p&gt;Nëse, në vend të kësaj, zgjidhni të instalohet GRUB2 te Regjistër Nisjesh i Pjesës (PBR), atëherë GRUB2 do të instalohet në fillim të pjesës së specifikuar. Kjo mundësi është vetëm për të sprovuarit.&lt;/p&gt;&lt;p&gt;Nëse e hiqni shenjën nga kutiza “Instalo GRUB-in”, GRUB-i s’do të instalohet këtë herë. Kjo mundësi është vetëm për të sprovuarit.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -939,10 +896,6 @@ Shijoni përdorimin e %1-it</translation>
         <translation>&lt;p&gt;&lt;b&gt;Përgëzime!&lt;/b&gt;&lt;br/&gt;Keni plotësuar instalimin e %1-it&lt;/p&gt;&lt;p&gt;&lt;b&gt;Gjetje Aplikacionesh&lt;/b&gt;&lt;br/&gt;Ka qindra aplikacione të shkëlqyera të instaluara me %1-in Rruga më e mirë për të mësuar rreth tyre është t’i shfletoni përmes Menusë dhe t’i provoni. Mjaft nga aplikacionet janë zhvilluar posaçërisht për projektin %1. Këto shfaqen te menutë kryesore. &lt;p&gt;Veç tyre, %1-i përfshin mjaft aplikacione standarde Linux që përdoren vetëm nga rreshti i urdhrave, ndaj nuk shfaqen te Menuja.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">Kënaquni me përdorimin e %1-it&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -972,14 +925,6 @@ Shijoni përdorimin e %1-it</translation>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Formësim i plotësuar. Po riniset sistemi.</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">Rrënjë</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Hyrje</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -1012,20 +957,6 @@ Doni vërtet të ndalet tani?</translation>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Falënderime të Veçanta&lt;/b&gt;&lt;br/&gt;Falënderime për këdo që ka zgjedhur të përkrahë %1-in me kohë nga e tyrja, para, sugjerime, punë, vlerësim, ide, promovim, dhe/ose inkurajim.&lt;/p&gt;&lt;p&gt;Pa ju, s’do të kish %1.&lt;/p&gt;&lt;p&gt;Ekipi i Zhvillimit të %2-it&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1% root
-%2% home</source>
-        <translation type="vanished">Rrënja për %1%
-Shtëpia e %2%</translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Rrënjë dhe shtëpi të ndërthurura</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1084,25 +1015,9 @@ Shtëpia e %2%</translation>
         <translation>Kushte Përdorimi</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Rregullime Tastiere&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Ndryshoni Rregullime Tastiere</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Skemë:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1147,9 +1062,41 @@ Shtëpia e %2%</translation>
         <translation>Rrënjë</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation>Rregullime Tastiere</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation>Model:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation>Variant:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation>Skemë:</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>Hyrje</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation>%</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation>Aktivizo mbulim kalimi në plogështi</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1239,54 +1186,22 @@ Shtëpia e %2%</translation>
     <message>
         <location filename="../meinstall.ui" line="1030"/>
         <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1067"/>
-        <source>Size:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
+        <translation>Krijo një kartelë “swap”</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1047"/>
         <source> MB</source>
-        <translation type="unfinished"></translation>
+        <translation> MB</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1067"/>
+        <source>Size:</source>
+        <translation>Madhësi:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>Vend:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1591,11 +1506,7 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../oobe.cpp" line="622"/>
         <source>Failed to set ownership or permissions of user directory.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">Na ndjeni, s’u arrit të caktohet pronësi e drejtorisë së përdoruesit.</translation>
+        <translation>S’u arrit të ujdisej pronësi ose leje drejtorie përdoruesi.</translation>
     </message>
 </context>
 <context>
@@ -1656,18 +1567,6 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Riktheje skemën te parazgjedhjet</translation>
-    </message>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Gjedhe</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">Instalim &amp;standard</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">Sistem i &amp;fshehtëzuar</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1783,17 +1682,17 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="510"/>
         <source>Layout &amp;Builder...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ndërtues Skemash…</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="788"/>
         <source>%1 (%2) requires %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2) lyp %3</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="837"/>
         <source>The installation may fail because the following volumes are too small:</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalimi mund të dështojë, ngaqë vëllimet vijuese janë shumë të vegjël:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="851"/>
@@ -1848,7 +1747,7 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">S’u arrit të përfundohet ujdisja e fshehtëzimit.</translation>
+        <translation>S’u arrit të përfundohet ujdisja e fshehtëzimit.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>
@@ -2055,16 +1954,6 @@ Kjo do të instalohet automatikisht, nëse instalimi bëhet me mundësinë --oem
 -- s’formatohet /root dhe s’funksionon me fshehtëzimin.</translation>
     </message>
     <message>
-        <source>Always check the installation media at the beginning.</source>
-        <translation type="vanished">Në fillim kontrollo përherë median e instalimit.</translation>
-    </message>
-    <message>
-        <source>Do not check the installation media at the beginning.
-Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="vanished">Mos e kontrollo median e instalimit në fillim.
-Nuk rekomandohet, veç nëse është e garantuar se media e instalimit është pa gabime.</translation>
-    </message>
-    <message>
         <location filename="../app.cpp" line="91"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Ngarko një kartelë formësimi të specifikuar nga &lt;config-file&gt;.</translation>
@@ -2103,27 +1992,27 @@ Ju lutemi, mbylleni, nëse është e mundur, ose xhironi “pkill minstall” n�
     <message>
         <location filename="../swapman.cpp" line="63"/>
         <source>Failed to create or install swap file.</source>
-        <translation type="unfinished"></translation>
+        <translation>S’u arrit të krijohej ose instalohej “swap”.</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="70"/>
         <source>Creating swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Po krijohet kartelë “swap”</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="80"/>
         <source>Configuring swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Po formësohet “swap”</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="122"/>
         <source>Invalid location</source>
-        <translation type="unfinished"></translation>
+        <translation>Vendndodhje e pavlefshme</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="125"/>
         <source>Maximum: %1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimum: %1 MB</translation>
     </message>
 </context>
 </TS>

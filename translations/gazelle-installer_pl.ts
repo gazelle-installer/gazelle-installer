@@ -6,12 +6,12 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Root</translation>
+        <translation>Root</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Home</translation>
+        <translation>Home</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
@@ -29,13 +29,13 @@ Minimum: %2</source>
         <location filename="../autopart.cpp" line="320"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished">%1% root
+        <translation>%1% root
 %2% home</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Połączony root i home</translation>
+        <translation>Połączony root i home</translation>
     </message>
 </context>
 <context>
@@ -43,7 +43,7 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="66"/>
         <source>Cannot access installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie można uzyskać dostępu do nośnika instalacyjnego.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="128"/>
@@ -53,7 +53,7 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="132"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się usunąć starego systemu w miejscu docelowym.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="138"/>
@@ -66,10 +66,6 @@ Minimum: %2</source>
         <translation>Zapisywanie konfiguracji</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Nie udało się sfinalizować konfiguracji szyfrowania.</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="218"/>
         <source>Copying new system</source>
         <translation>Kopiowanie nowego systemu</translation>
@@ -77,7 +73,7 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="249"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się skopiować nowego systemu.</translation>
     </message>
 </context>
 <context>
@@ -132,22 +128,22 @@ Minimum: %2</source>
         <translation>tylko format</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Utwórz</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Zachowaj</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Zachowaj (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>Zachowaj /home (%1)</translation>
     </message>
@@ -155,22 +151,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation>&amp;Szablony</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Kompresja (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kompresja (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Kompresja (&amp;LZO)</translation>
     </message>
@@ -299,10 +295,6 @@ Miłego korzystania z %1</translation>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Opcje instalacji</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">Instalacja wymaga około %1 miejsca. Zalecane jest %2 lub więcej.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -465,12 +457,12 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../minstall.cpp" line="701"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybieranie &lt;b&gt;Zachowaj /home&lt;/b&gt; dla partycji głównej zachowuje zawartość katalogu /home, usuwając wszystko inne. Tej opcji można użyć tylko wtedy, gdy katalog /home znajduje się na tej samej partycji co katalog główny.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="703"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Obsługiwane są systemy plików Linux ext2, ext3, ext4, jfs, xfs i btrfs, a zalecany jest ext4.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="704"/>
@@ -588,21 +580,54 @@ Miłego korzystania z %1</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="884"/>
-        <source>Enjoy using %1</source>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Zainstaluj GRUB dla Linuksa i Windowsa</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">Wystarczy kliknąć na dysk prawym przyciskiem myszy, aby wyświetlić menu i wybrać szablon układu. Te układy są podobne do standardowej instalacji.</translation>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;Instalacja standardowa&lt;/i&gt; - Odpowiednia dla większości konfiguracji. Ten szablon nie dodaje oddzielnej partycji rozruchowej, dlatego nie nadaje się do użytku z zaszyfrowanym systemem operacyjnym.</translation>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;Zaszyfrowany system&lt;/i&gt; - Zawiera partycję rozruchową wymaganą do załadowania zaszyfrowanego systemu operacyjnego. Ten szablon może być również wykorzystany jako podstawa systemu multi-boot.</translation>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="884"/>
+        <source>Enjoy using %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -627,7 +652,7 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../minstall.cpp" line="738"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dla %1 możesz sformatować partycje jako ext2, ext3, ext4, f2fs, jfs, xfs lub btrfs.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="739"/>
@@ -698,55 +723,6 @@ Miłego korzystania z %1</translation>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Korzystanie z urządzeń wirtualnych (poza zachowaniem zaszyfrowanych systemów plików) to zaawansowana funkcja. Być może trzeba będzie edytować niektóre pliki (np. initramfs, crypttab, fstab), aby upewnić się, że używane urządzenia wirtualne są tworzone podczas uruchamiania.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Zainstaluj GRUB dla Linuksa i Windowsa</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Wybierz Metodę Rozruchu&lt;/b&gt;&lt;br/&gt; %1 używa programu rozruchowego GRUB do uruchamiania %1 i MS-Windows. &lt;p&gt;Domyślnie GRUB2 jest instalowany w Głównym Rekordzie Rozruchowym (MBR - Master Boot Record) lub ESP (Partycja Systemowa EFI dla 64-bitowych systemów z rozruchem UEFI) dysku rozruchowego i zastępuje używany wcześniej program rozruchowy. To normalne.&lt;/p&gt;&lt;p&gt;Jeśli zamiast tego zdecydujesz się zainstalować GRUB2 na Rekordzie Rozruchowym Partycji (PBR - Partition Boot Record), to GRUB2 zostanie zainstalowany na początku określonej partycji. Ta opcja jest przeznaczona tylko dla ekspertów.&lt;/p&gt;&lt;p&gt;Jeśli odznaczysz pole Zainstaluj GRUB, GRUB nie zostanie w tym momencie zainstalowany. Ta opcja jest przeznaczona tylko dla ekspertów.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -919,10 +895,6 @@ Miłego korzystania z %1</translation>
         <translation>&lt;p&gt;&lt;b&gt;Gratulacje!&lt;/b&gt;&lt;br/&gt;Zakończyłeś instalację %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Odkrywanie i poznawanie aplikacji&lt;/b&gt;&lt;br/&gt;Istnieją setki doskonałych aplikacji zainstalowanych w %1. Najlepszym sposobem na ich poznanie jest przeglądanie menu i wypróbowanie ich. Wiele aplikacji zostało opracowanych specjalnie dla projektu %1. Są one wyświetlane w menu głównym. &lt;p&gt;Ponadto %1 zawiera wiele standardowych aplikacji systemu Linux, które uruchamiają się tylko z wiersza poleceń, a zatem nie pojawiają się w menu.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">Miłego korzystania z %1&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -952,14 +924,6 @@ Miłego korzystania z %1</translation>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Konfiguracja zakończona. Ponowne uruchamianie systemu.</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">Root</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Home</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -992,20 +956,6 @@ Czy naprawdę chcesz teraz zakończyć?</translation>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Specjalne podziękowania&lt;/b&gt;&lt;br/&gt; Dziękujemy wszystkim, którzy zdecydowali się wesprzeć %1 swoim czasem, pieniędzmi, sugestiami, pracą, pochwałami, pomysłami, promocją i/lub zachętą.&lt;/p&gt;&lt;p&gt; Bez Was nie byłoby %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1% root
-%2% home</source>
-        <translation type="vanished">%1% root
-%2% home</translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Połączony root i home</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1064,25 +1014,9 @@ Czy naprawdę chcesz teraz zakończyć?</translation>
         <translation>Warunki korzystania</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Ustawienia klawiatury&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Wariant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Zmień ustawienia klawiatury</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Układ:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1127,9 +1061,41 @@ Czy naprawdę chcesz teraz zakończyć?</translation>
         <translation>Root</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>Home</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1222,8 +1188,8 @@ Czy naprawdę chcesz teraz zakończyć?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
+        <location filename="../meinstall.ui" line="1047"/>
+        <source> MB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1232,41 +1198,9 @@ Czy naprawdę chcesz teraz zakończyć?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1047"/>
-        <source> MB</source>
-        <translation type="unfinished"></translation>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>Lokalizacja:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1573,10 +1507,6 @@ Wybierz inną nazwę.</translation>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">Przepraszamy, nie udało się ustawić praw własności do katalogu użytkownika.</translation>
-    </message>
 </context>
 <context>
     <name>PartMan</name>
@@ -1636,18 +1566,6 @@ Wybierz inną nazwę.</translation>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Resetuj układ</translation>
-    </message>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Szablony</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">&amp;Standardowa instalacja</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">&amp;Zaszyfrowany system</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1818,17 +1736,17 @@ Wybierz inną nazwę.</translation>
     <message>
         <location filename="../partman.cpp" line="931"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się sformatować kontenera LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="940"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się otworzyć kontenera LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">Nie udało się sfinalizować konfiguracji szyfrowania.</translation>
+        <translation>Nie udało się sfinalizować konfiguracji szyfrowania.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>
@@ -1858,12 +1776,12 @@ Wybierz inną nazwę.</translation>
     <message>
         <location filename="../partman.cpp" line="1138"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się sformatować partycji.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1196"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się przygotować podwoluminów.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1205"/>
@@ -1873,7 +1791,7 @@ Wybierz inną nazwę.</translation>
     <message>
         <location filename="../partman.cpp" line="1370"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się zamontować partycji.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1373"/>
@@ -1980,7 +1898,7 @@ Uwaga, to jest funkcja eksperymentalna. Przyszłe wersje instalatora mogą narus
     <message>
         <location filename="../app.cpp" line="76"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyłącza się automatycznie po zakończeniu instalacji.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="77"/>
@@ -2025,7 +1943,7 @@ Rozpocznie się automatycznie, jeśli system zostanie zainstalowany z opcją --o
     <message>
         <location filename="../app.cpp" line="88"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Restartuje się automatycznie po zakończeniu instalacji.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="89"/>

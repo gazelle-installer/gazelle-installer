@@ -6,60 +6,45 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Root</translation>
+        <translation>Root</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Home</translation>
+        <translation>Home</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
         <location filename="../autopart.cpp" line="139"/>
         <source>Recommended: %1
 Minimum: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Συνιστάται: %1 
+Ελάχιστο: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="176"/>
         <source>Layout Builder</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout Builder</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="320"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished">%1% root
+        <translation>%1% root
 %2% home</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Συνδυασμένη root και home</translation>
+        <translation>Συνδυασμένη root και home</translation>
     </message>
 </context>
 <context>
     <name>Base</name>
     <message>
-        <source>Checking installation media.</source>
-        <translation type="vanished">Έλεγχος μέσων εγκατάστασης.</translation>
-    </message>
-    <message>
-        <source>Press ESC to skip.</source>
-        <translation type="vanished">Πατήστε ESC για παράλειψη.</translation>
-    </message>
-    <message>
-        <source>The installation media is corrupt.</source>
-        <translation type="vanished">Το μέσο εγκατάστασης είναι κατεστραμμένο.</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="vanished">Είστε βέβαιοι ότι θέλετε να παραλείψετε τον έλεγχο των μέσων εγκατάστασης;</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="66"/>
         <source>Cannot access installation media.</source>
-        <translation type="unfinished">Δεν είναι δυνατή η πρόσβαση στα μέσα εγκατάστασης.</translation>
+        <translation>Δεν είναι δυνατή η πρόσβαση στα μέσα εγκατάστασης.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="128"/>
@@ -80,10 +65,6 @@ Minimum: %2</source>
         <location filename="../base.cpp" line="148"/>
         <source>Fixing configuration</source>
         <translation>Επιδιόρθωση της ρύθμισης</translation>
-    </message>
-    <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Αποτυχία οριστικοποίησης της ρύθμισης κρυπτογράφησης.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="218"/>
@@ -116,7 +97,7 @@ Minimum: %2</source>
     <message>
         <location filename="../bootman.cpp" line="283"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Η ενημέρωση του initramfs απέτυχε.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="309"/>
@@ -148,22 +129,22 @@ Minimum: %2</source>
         <translation>μορφή μόνο</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Δημιουργία</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Διατήρηση</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Διατήρηση (%1) </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>Διατήρηση /home (%1)</translation>
     </message>
@@ -171,22 +152,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation>&amp;Πρότυπα</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Συμπίεση (&amp; ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Συμπίεση (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Συμπίεση (&amp;LZO)</translation>
     </message>
@@ -208,10 +189,6 @@ Do you want to continue the installation?</source>
 Σας προτείνουμε να κλείσετε τώρα και να επανεκκινήσετε σε Legacy Boot.
 
 Θέλετε να συνεχίσετε την εγκατάσταση;</translation>
-    </message>
-    <message>
-        <source>Cannot access installation media.</source>
-        <translation type="vanished">Δεν είναι δυνατή η πρόσβαση στα μέσα εγκατάστασης.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="182"/>
@@ -319,10 +296,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Επιλογές εγκατάστασης</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">Η εγκατάσταση απαιτεί περίπου %1. %2 ή περισσότερο προτιμάται.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -605,24 +578,57 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="732"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
-        <translation type="unfinished"></translation>
+        <translation>Απλώς κάντε δεξί κλικ σε μια μονάδα δίσκου και επιλέξτε &lt;b&gt;Layout Builder&lt;/b&gt; από το μενού. Αυτό μπορεί να δημιουργήσει μια διάταξη παρόμοια με αυτή της κανονικής εγκατάστασης.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Εγκατάσταση του GRUB για το Linux και τα Windows</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
+        <translation>Το %1 χρησιμοποιεί το πρόγραμμα εκκίνησης GRUB για την εκκίνηση του %1 και των Microsoft Windows.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation>Από προεπιλογή, το GRUB είναι εγκατεστημένο στο Master Boot Record (MBR) ή στο ESP (EFI System Partition για συστήματα εκκίνησης UEFI 64-bit) της μονάδας εκκίνησης και αντικαθιστά το boot loader που χρησιμοποιούσατε πριν. Αυτό είναι φυσιολογικό.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation>Αν επιλέξετε να εγκαταστήσετε το GRUB σε Partition Boot Record (PBR), τότε το GRUB θα εγκατασταθεί στην αρχή του καθορισμένου διαμερίσματος. Αυτή η επιλογή είναι μόνο για ειδικούς.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation>Εάν καταργήσετε την επιλογή του πλαισίου Εγκατάσταση GRUB, το GRUB δεν θα εγκατασταθεί αυτήν τη στιγμή. Αυτή η επιλογή είναι μόνο για ειδικούς.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation>Δημιουργία αρχείου swap</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation>Ένα αρχείο swap είναι πιο ευέλικτο από ένα διαμέρισμα ανταλλαγής. είναι πολύ πιο εύκολο να αλλάξετε το μέγεθος ενός αρχείου ανταλλαγής ώστε να προσαρμοστεί στις αλλαγές στη χρήση του συστήματος.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation>Από προεπιλογή, αυτό ελέγχεται εάν δεν έχουν οριστεί διαμερίσματα ανταλλαγής και δεν επιλέγεται εάν έχουν οριστεί διαμερίσματα ανταλλαγής. Αυτή η επιλογή θα πρέπει να μείνει ανέγγιχτη και είναι μόνο για ειδικούς.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation>Η ρύθμιση του μεγέθους σε 0 έχει το ίδιο αποτέλεσμα με την αποεπιλογή αυτής της επιλογής.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="884"/>
         <source>Enjoy using %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">Απλώς κάντε δεξί κλικ σε μια μονάδα δίσκου για να εμφανιστεί ένα μενού και επιλέξτε ένα πρότυπο διάταξης. Αυτές οι διατάξεις είναι παρόμοιες με εκείνες της κανονικής εγκατάστασης.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;Τυπική εγκατάσταση&lt;/i&gt; - Κατάλληλο για τις περισσότερες ρυθμίσεις. Αυτό το πρότυπο δεν προσθέτει ξεχωριστό διαμέρισμα εκκίνησης και επομένως είναι ακατάλληλο για χρήση με κρυπτογραφημένο λειτουργικό σύστημα.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;Κρυπτογραφημένο σύστημα&lt;/i&gt; - Περιέχει το διαμέρισμα εκκίνησης που απαιτείται για τη φόρτωση ενός κρυπτογραφημένου λειτουργικού συστήματος. Αυτό το πρότυπο μπορεί επίσης να χρησιμοποιηθεί ως βάση για ένα σύστημα πολλαπλών εκκινήσεων.</translation>
+        <translation>Απολαύστε τη χρήση του %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -718,55 +724,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Η χρήση εικονικών συσκευών (πέρα από τη διατήρηση κρυπτογραφημένων συστημάτων αρχείων) είναι μια προηγμένη δυνατότητα. Μπορεί να χρειαστεί να επεξεργαστείτε κάποια αρχεία (π.χ.. Initramfs, crypttab, fstab) για να εξασφαλίσει τις εικονικές συσκευές που χρησιμοποιούνται δημιουργούνται κατά την εκκίνηση.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Εγκατάσταση του GRUB για το Linux και τα Windows</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Επιλέξτε Μέθοδο Εκκίνησης&lt;/b&gt;&lt;br/&gt;Το %1 χρησιμοποιεί τον εκκινητή φόρτωσης GRUB, για να ξεκινήσει το %1 και τα MS-Windows. &lt;p&gt;Αν εγκαταστήσετε τον GRUB2 εδώ, τότε αυτός θα μπει εκ προεπιλογής στο Master Boot Record η στο ESP (EFI Σύστημα εκκίνησης UEFI συστήματα 64-bit)του boot drive και θα αντικαταστήσει τον οποιονδήποτε άλλον εκκινητή φόρτωσης (boot loader) που ίσως είχατε πριν. Αυτό είναι φυσιολογικό.&lt;/p&gt;&lt;p&gt;Αν, αντιθέτως, επιλέξετε να εγκαταστήσετε τον GRUB2 στο PBR, αντί για το MBR, τότε ο GRUB θα εγκατασταθεί στην αρχή της συγκεκριμένης κατάτμησης συστήματος. Αυτή η επιλογή προορίζεται μόνο για τους πιο έμπειρους.&lt;/p&gt;&lt;p&gt;Αν δεν επιλέξετε το κουτάκι για την εγκατάσταση του GRUB, τότε ο GRUB δεν θα εγκατασταθεί προς το παρόν. Αυτή η επιλογή προορίζεται μόνο για τους πιο έμπειρους.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -939,10 +896,6 @@ Enjoy using %1</source>
         <translation>&lt;p&gt;&lt;b&gt;Συγχαρητήρια!&lt;/b&gt;&lt;br/&gt;Ολοκληρώσατε την εγκατάσταση του %1.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Εύρεση Εφαρμογών&lt;/b&gt;&lt;br/&gt;Υπάρχουν εκατοντάδες εξαιρετικών εφαρμογών που εγκαθίστανται με το %1. Ο καλύτερος τρόπος για να μάθετε γι&apos; αυτές είναι εξερευνώντας το Μενού και δοκιμάζοντας τες. Πολλές από αυτές αναπτύχθηκαν ειδικά για το %1. Αυτές εμφανίζονται στα Κεντρικά Μενού. Μπορείτε να βρείτε άλλες εφαρμογές Linux στο Μενού &gt; Εφαρμογές;&lt;/p&gt;&lt;p&gt;Επιπλέον, το %1 περιλαμβάνει πολλλές standard εφαρμογές linux που τρέχουν μόνον από τη γραμμή εντολών και, συνεπώς, δεν εμφανίζονται στο Μενού.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Απολαύστε τη χρήση του %1!&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -976,14 +929,6 @@ Enjoy using %1</source>
         <translation>Η διαμόρφωση ολοκληρώθηκε. Επανεκκίνηση συστήματος.</translation>
     </message>
     <message>
-        <source>Root</source>
-        <translation type="vanished">Root</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Home</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="1102"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
@@ -1014,20 +959,6 @@ Do you really want to stop now?</source>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ιδιαίτερες Ευχαριστίες&lt;/b&gt;&lt;br/&gt;Τις ευχαριστίες μας προς όλους εκείνους που επέλεξαν να υποστηρίξουν το %1 με τον χρόνο τους, χρήμα, υποδείξεις, εργασία, επαίνους, ιδέες, προώθηση και/ή ενθάρρυνση.&lt;/p&gt;&lt;p&gt;Χωρίς εσάς, δεν θα υπήρχε καθόλου το %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1% root
-%2% home</source>
-        <translation type="vanished">%1% root
-%2% home</translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Συνδυασμένη root και home</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1086,25 +1017,9 @@ Do you really want to stop now?</source>
         <translation>Όροι Χρήσεως</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Ρύθμιση Γλώσσας&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Ρύθμιση Γλώσσας</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1149,9 +1064,41 @@ Do you really want to stop now?</source>
         <translation>Root</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation>Ρυθμίσεις πληκτρολογίου</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation>Μοντέλο:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation>Παραλαγή:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation>Διάταξη:</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>Home</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation>%</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation>Ενεργοποίηση υποστήριξης αδρανοποίησης</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1241,54 +1188,22 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1030"/>
         <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1067"/>
-        <source>Size:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
+        <translation>Δημιουργία αρχείου swap</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1047"/>
         <source> MB</source>
-        <translation type="unfinished"></translation>
+        <translation>MB</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1067"/>
+        <source>Size:</source>
+        <translation>Μέγεθος:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>Τοποθεσία:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1593,11 +1508,7 @@ Please select a different name.</source>
     <message>
         <location filename="../oobe.cpp" line="622"/>
         <source>Failed to set ownership or permissions of user directory.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">Συγγνώμη, αποτυχία καθορισμού δικαιωμάτων ιδιοκτησίας για τον Φάκελλο Χρήστη.</translation>
+        <translation>Απέτυχε ο ορισμός της ιδιοκτησίας ή των δικαιωμάτων του καταλόγου χρηστών.</translation>
     </message>
 </context>
 <context>
@@ -1658,18 +1569,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Επαναφορά διάταξης </translation>
-    </message>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Πρότυπα</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">&amp;Τυπική εγκατάσταση</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">&amp;Κρυπτογραφημένο σύστημα</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1785,17 +1684,17 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="510"/>
         <source>Layout &amp;Builder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout &amp;Builder...</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="788"/>
         <source>%1 (%2) requires %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Το %1 (%2) απαιτεί %3</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="837"/>
         <source>The installation may fail because the following volumes are too small:</source>
-        <translation type="unfinished"></translation>
+        <translation>Η εγκατάσταση ενδέχεται να αποτύχει επειδή οι ακόλουθοι τόμοι είναι πολύ μικροί:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="851"/>
@@ -1853,7 +1752,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">Αποτυχία οριστικοποίησης της ρύθμισης κρυπτογράφησης.</translation>
+        <translation>Αποτυχία οριστικοποίησης της ρύθμισης κρυπτογράφησης.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>
@@ -2060,16 +1959,6 @@ This will start automatically if installed with --oem option.</source>
 -- δεν διαμορφώνει /root και δεν λειτουργεί με κρυπτογράφηση.</translation>
     </message>
     <message>
-        <source>Always check the installation media at the beginning.</source>
-        <translation type="vanished">Ελέγχετε πάντα τα μέσα εγκατάστασης στην αρχή.</translation>
-    </message>
-    <message>
-        <source>Do not check the installation media at the beginning.
-Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="vanished">Μην ελέγχετε τα μέσα εγκατάστασης στην αρχή. 
-Δεν συνιστάται, εκτός εάν το μέσο εγκατάστασης είναι εγγυημένο ότι δεν περιέχει σφάλματα.</translation>
-    </message>
-    <message>
         <location filename="../app.cpp" line="91"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Φορτώστε ένα αρχείο διαμόρφωσης όπως καθορίζεται από το &lt;config-file&gt;.</translation>
@@ -2109,27 +1998,27 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
     <message>
         <location filename="../swapman.cpp" line="63"/>
         <source>Failed to create or install swap file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Αποτυχία δημιουργίας ή εγκατάστασης αρχείου swap.</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="70"/>
         <source>Creating swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Δημιουργία αρχείου swap</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="80"/>
         <source>Configuring swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ρύθμιση του αρχείου swap</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="122"/>
         <source>Invalid location</source>
-        <translation type="unfinished"></translation>
+        <translation>Μη έγκυρη τοποθεσία</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="125"/>
         <source>Maximum: %1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>Μέγιστο: %1 MB</translation>
     </message>
 </context>
 </TS>
