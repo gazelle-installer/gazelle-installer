@@ -6,60 +6,45 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Root</translation>
+        <translation>Root</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Hem</translation>
+        <translation>Hem</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
         <location filename="../autopart.cpp" line="139"/>
         <source>Recommended: %1
 Minimum: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Rekommenderat: %1
+Minimum: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="176"/>
         <source>Layout Builder</source>
-        <translation type="unfinished"></translation>
+        <translation>Layoutbyggare</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="320"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished">%1% root
+        <translation>%1% root
 %2% home</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Kombinerad root och home</translation>
+        <translation>Kombinerad root och home</translation>
     </message>
 </context>
 <context>
     <name>Base</name>
     <message>
-        <source>Checking installation media.</source>
-        <translation type="vanished">Kontrollerar installationsmedia.</translation>
-    </message>
-    <message>
-        <source>Press ESC to skip.</source>
-        <translation type="vanished">Tryck på ESC för att hoppa över.</translation>
-    </message>
-    <message>
-        <source>The installation media is corrupt.</source>
-        <translation type="vanished">Installationsmedia är skadat.</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="vanished">Är du säker på att du vill hoppa över kontroll av installationsmedia?</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="66"/>
         <source>Cannot access installation media.</source>
-        <translation type="unfinished">Har inte tillgång till installationsmedia.</translation>
+        <translation>Har inte tillgång till installationsmedia.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="128"/>
@@ -80,10 +65,6 @@ Minimum: %2</source>
         <location filename="../base.cpp" line="148"/>
         <source>Fixing configuration</source>
         <translation>Ordnar konfigurationen</translation>
-    </message>
-    <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Misslyckades med att slutföra krypterings-upplägget</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="218"/>
@@ -116,7 +97,7 @@ Minimum: %2</source>
     <message>
         <location filename="../bootman.cpp" line="283"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades med att uppdatera initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="309"/>
@@ -148,22 +129,22 @@ Minimum: %2</source>
         <translation>formatera enbart</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Skapa</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Bevara</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Bevara (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>Bevara /home (%1)</translation>
     </message>
@@ -171,22 +152,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation>&amp;Mallar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Kompression (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Kompression (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Kompression (&amp;LZO)</translation>
     </message>
@@ -208,10 +189,6 @@ Do you want to continue the installation?</source>
 Vi rekommenderar att du avslutar nu och startar om i Legacy Boot
 
 Vill du fortsätta installationen?</translation>
-    </message>
-    <message>
-        <source>Cannot access installation media.</source>
-        <translation type="vanished">Har inte tillgång till installationsmedia.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="182"/>
@@ -319,10 +296,6 @@ Ha det så trevligt med %1</translation>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Installations-alternativ</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">Installationen kräver ungefär %1 utrymme. %2 eller mer är att föredra.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -605,24 +578,57 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../minstall.cpp" line="732"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bara högerklicka på en lagringsenhet och välj &lt;b&gt;Layoutbyggare&lt;/b&gt; från menyn. Detta kan skapa en layout liknande den i en vanlig installation.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Installera GRUB för Linux och Windows </translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
+        <translation>%1 använder GRUB bootloader för att starta %1 och Microsoft Windows.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation>Som standard är GRUB installerad på Master Boot Record (MBR) eller ESP (EFI Systempartition för 64-bit UEFI boot system) på din boot-disk och ersätter den boot loader du tidigare använde. Detta är normalt.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation>Om du istället valde att installera GRUB på Partition Boot Record (PBR), då kommer GRUB att installeras i början av den specificerade partitionen. Detta alternativ är enbart för experter.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation>Om du avmarkerar Installera GRUB boxen, kommer inte GRUB att installeras denna gång. Detta alternativ är enbart för experter.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation>Skapa en swapfil</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation>En swapfil är mer flexibel än en swap-partition, det är avsevärt enklare att ändra storlek på en swapfil för att anpassa till ändringar i systemanvändning.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation>Som standard är denna markerad om inga swap-partitioner har använts och omarkerad om swap-partitioner används. Detta alternativ ska lämnas orört och är enbart för experter.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation>Ställa in storleken på 0 har samma effekt som att avmarkera detta alternativ..</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="884"/>
         <source>Enjoy using %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">Bara höger-klicka på en disk för att få upp en meny och välj en layout-mall. Dessa layouter är lika den som används vid standard-installation.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;Standardinstallation&lt;/i&gt; - Lämplig för de flesta system. Denna mall lägger inte till en separat boot-partition och passar därför inte för krypterade operativsystem.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;Krypterat system&lt;/i&gt; - Innehåller den boot-partition som behövs för att starta ett krypterat operativsystem.  Denna mall kan också användas som grund för ett multi-boot system.</translation>
+        <translation>Ha det så trevligt med %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -718,55 +724,6 @@ Ha det så trevligt med %1</translation>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Användning av virtuella enheter (utöver bevarande av krypterade filsystem) är en avancerad funktion. Du kan behöva redigera några filer (ex. initramfs, crypttab, fstab) för att se till att de använda virtuella enheterna skapas vid start.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Installera GRUB för Linux och Windows </translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Välj Boot Metod&lt;/b&gt;&lt;br/&gt; %1 använder GRUB bootloader för att starta %1 och MS-Windows. &lt;p&gt;Som standard är GRUB2 installerad på Master Boot Record (MBR) eller ESP (EFI System Partition för 64-bit UEFI boot system) på din boot disk och ersätter den boot loader du använt tidigare. Detta är normalt.&lt;/p&gt;&lt;p&gt;Om du väljer att installera GRUB2 vid Partition Boot Record (PBR) istället, kommer GRUB2 att installeras i början av den angivna partitionen. Denna valmöjlighet är enbart till för experter.&lt;/p&gt;&lt;p&gt;Om du avmarkerar Installera GRUB rutan, kommer GRUB inte att installeras denna gång. Denna valmöjlighet är enbart till för experter.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -939,10 +896,6 @@ Ha det så trevligt med %1</translation>
         <translation>&lt;p&gt;&lt;b&gt;Gratulerar!&lt;/b&gt;&lt;br/&gt;Du har slutfört installationen av %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Hitta Program&lt;/b&gt;&lt;br/&gt;Det finns hundratals utmärkta program installerade i %1 Det bästa sättet att lära känna dem är att ögna igenom menyn och prova dem. Många av programmen har framtagits speciellt för %1 projektet. Dessa visas i huvudmenyerna. &lt;/p&gt;Dessutom inkluderar %1 många standard Linux program som bara körs från kommandoraden och därför inte visas i Menyn.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">Ha det så trevligt med %1&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -972,14 +925,6 @@ Ha det så trevligt med %1</translation>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Konfigurationen klar. Startar om systemet.</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">Root</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Hem</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -1012,20 +957,6 @@ Vill du verkligen sluta nu?</translation>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Speciellt Tack&lt;/b&gt;&lt;br/&gt;Tack till alla som valt att stöda %1 med sin tid, pengar, förslag, arbete, lovord, ideéer, reklam, och/eller uppmuntran.&lt;/p&gt;&lt;p&gt;Utan er skulle det inte finnas något %1&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1% root
-%2% home</source>
-        <translation type="vanished">%1% root
-%2% home</translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Kombinerad root och home</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1084,25 +1015,9 @@ Vill du verkligen sluta nu?</translation>
         <translation>Användarvillkor</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tangentbordets Inställningar&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Ändra Tangentbordets Inställningar</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1147,9 +1062,41 @@ Vill du verkligen sluta nu?</translation>
         <translation>Root</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation>Tangentbordsinställningar</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation>Modell:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation>Variant:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation>Layout:</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>Hem</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation>%</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation>Aktivera stöd för viloläge</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1239,54 +1186,22 @@ Vill du verkligen sluta nu?</translation>
     <message>
         <location filename="../meinstall.ui" line="1030"/>
         <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1067"/>
-        <source>Size:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa en swapfil</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1047"/>
         <source> MB</source>
-        <translation type="unfinished"></translation>
+        <translation> MB</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1067"/>
+        <source>Size:</source>
+        <translation>Storlek:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>Plats:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1591,11 +1506,7 @@ Var vänlig välj ett annat namn.</translation>
     <message>
         <location filename="../oobe.cpp" line="622"/>
         <source>Failed to set ownership or permissions of user directory.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">Ledsen, misslyckades med ägandet av användar-katalogen.</translation>
+        <translation>Misslyckades med att ställa in ägande eller behörighet för användarkatalogen.</translation>
     </message>
 </context>
 <context>
@@ -1656,18 +1567,6 @@ Var vänlig välj ett annat namn.</translation>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Återställ layout</translation>
-    </message>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Mallar</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">&amp;Standard installation</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">&amp;Krypterat system</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1783,17 +1682,17 @@ Var vänlig välj ett annat namn.</translation>
     <message>
         <location filename="../partman.cpp" line="510"/>
         <source>Layout &amp;Builder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout &amp;byggare...</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="788"/>
         <source>%1 (%2) requires %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2) kräver %3</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="837"/>
         <source>The installation may fail because the following volumes are too small:</source>
-        <translation type="unfinished"></translation>
+        <translation>Installationen kan misslyckas därför att följande volymer är för små:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="851"/>
@@ -1848,7 +1747,7 @@ Var vänlig välj ett annat namn.</translation>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">Misslyckades med att slutföra krypterings-upplägget</translation>
+        <translation>Misslyckades med att slutföra krypterings-upplägget</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>
@@ -2055,16 +1954,6 @@ Detta startar automatiskt om det installeras med --oem alternativet.</translatio
 -- formaterar inte /root och fungerar inte med kryptering.</translation>
     </message>
     <message>
-        <source>Always check the installation media at the beginning.</source>
-        <translation type="vanished">Kontrollera alltid installationsmedia i början.</translation>
-    </message>
-    <message>
-        <source>Do not check the installation media at the beginning.
-Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="vanished">Kontrollera inte installationsmedia i början.
-Ej rekommenderat om inte installationsmedia är garanterat felfri.</translation>
-    </message>
-    <message>
         <location filename="../app.cpp" line="91"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Ladda en konfigurations-fil som specifieras av &lt;config-file&gt;.</translation>
@@ -2104,27 +1993,27 @@ Var vänlig stäng om möjligt, eller kör &apos;pkill minstall&apos; i en termi
     <message>
         <location filename="../swapman.cpp" line="63"/>
         <source>Failed to create or install swap file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Misslyckades med att skapa eller installera swapfil.</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="70"/>
         <source>Creating swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapar swapfil</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="80"/>
         <source>Configuring swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurerar swapfil</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="122"/>
         <source>Invalid location</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogiltig plats</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="125"/>
         <source>Maximum: %1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum: %1 MB</translation>
     </message>
 </context>
 </TS>

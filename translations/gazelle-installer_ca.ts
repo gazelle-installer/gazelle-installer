@@ -6,60 +6,45 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Arrel</translation>
+        <translation>Arrel</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Inici </translation>
+        <translation>Inici </translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
         <location filename="../autopart.cpp" line="139"/>
         <source>Recommended: %1
 Minimum: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Recomanat: %1
+Mínim: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="176"/>
         <source>Layout Builder</source>
-        <translation type="unfinished"></translation>
+        <translation>Creador de disposició</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="320"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished">%1% root
+        <translation>%1% root
 %2% home </translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Root i home combinades</translation>
+        <translation>Root i home combinades</translation>
     </message>
 </context>
 <context>
     <name>Base</name>
     <message>
-        <source>Checking installation media.</source>
-        <translation type="vanished">Comprovant el suport d&apos;instal·lació</translation>
-    </message>
-    <message>
-        <source>Press ESC to skip.</source>
-        <translation type="vanished">Premeu ESC per ometre.</translation>
-    </message>
-    <message>
-        <source>The installation media is corrupt.</source>
-        <translation type="vanished">El suport d&apos;instal·lació està malmès.</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="vanished">Esteu segur de voler ometre la comprovació del suport d&apos;instal·lació?</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="66"/>
         <source>Cannot access installation media.</source>
-        <translation type="unfinished">No puc accedir al suport d&apos;instal·lació.</translation>
+        <translation>No puc accedir al suport d&apos;instal·lació.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="128"/>
@@ -80,10 +65,6 @@ Minimum: %2</source>
         <location filename="../base.cpp" line="148"/>
         <source>Fixing configuration</source>
         <translation>Arranjant la configuració</translation>
-    </message>
-    <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Ha fallat en acabar la instal·lació de l&apos;encriptatge.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="218"/>
@@ -116,7 +97,7 @@ Minimum: %2</source>
     <message>
         <location filename="../bootman.cpp" line="283"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha fallat en actualitzar initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="309"/>
@@ -148,22 +129,22 @@ Minimum: %2</source>
         <translation>només formata </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Crea</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Preserva</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Conserva (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>Preserva /home (%1)</translation>
     </message>
@@ -171,22 +152,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation>Plan&amp;tilles</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compressió (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compressió (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compressió (&amp;LZO)</translation>
     </message>
@@ -208,10 +189,6 @@ Do you want to continue the installation?</source>
 Us recomanem que sortiu ara i torneu a arrencar en mode Legacy Boot.
 
 Voleu continuar la instal·lació?</translation>
-    </message>
-    <message>
-        <source>Cannot access installation media.</source>
-        <translation type="vanished">No puc accedir al suport d&apos;instal·lació.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="182"/>
@@ -319,10 +296,6 @@ Gaudiu usant %1</translation>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Opcions d&apos;instal·lació</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">La instal·lació necessita al voltant de %1 d&apos;espai. Preferiblement,  %2 o més.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -605,24 +578,57 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="732"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
-        <translation type="unfinished"></translation>
+        <translation>Feu clic dret sobre una unitat i trieu&lt;b&gt;Creador de disposició&lt;/b&gt; del menú. Això crearà una disposició similar a la d&apos;una instal·lació normal.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Instal·la GRUB per Linux i Windows</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
+        <translation>%1 usa el carregador GRUB per arrencar %1 i Microsoft Windows.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation>Per omissió GRUB s&apos;instal·la al Master Boot Record (MBR) o l&apos;ESP (EFI System Partition per sistemes UEFI de 64-bit) del vostre disc d&apos;arrencada i reemplaça el carregador que estàveu usant fins llavors. Això és normal.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation>Si trieu instal·lar el GRUB al Partition Boot Record (PBR) en lloc del MBR, llavors el GRUB s&apos;instal·larà a l&apos;inici de la partició especificada. Aquesta opció és només per experts.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation>Si desactiveu la casella d&apos;instal·lar el GRUB, aquest no s&apos;instal·larà en aquest moment. Aquesta opció és només per experts.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation>Crea un fitxer d&apos;intercanvi</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation>Un fitxer d&apos;intercanvi és més flexible que una partició d&apos;intercanvi; és molt més fàcil redimensionar un fitxer d&apos;intercanvi per adaptar-se als canvis en l&apos;ús del sistema.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation>Per omissió, està activat si no s&apos;han definit particions d&apos;intercanvi, i desactivat si hi ha particions d&apos;intercanvi definides. Aquesta opció s&apos;hauria de deixar tal com està, i és només per experts.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation>Definir la mida a 0 té el mateix efecte que desactivar aquesta opció.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="884"/>
         <source>Enjoy using %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">Només cal clicar sobre una unitat per fer aparèixer un menú i seleccionar una plantilla de disposició. Aquestes disposicions són semblants a la de la instal·lació normal.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;instal·lació estàndard&lt;/i&gt; - Adequada per la majoria de casos. Aquesta plantilla no crea una partició d&apos;arrencada separada, i per tant no é adient per a usar amb un Sistema Operatiu encriptat.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;Sistema encriptat&lt;/i&gt; - Conté la necessària partició d&apos;arrencada per a carregar el Sistema Operatiu encriptat. Aquesta plantilla també es pot usar com a base per a un sistema d&apos;arrencada múltiple.</translation>
+        <translation>Gaudiu de l&apos;ús de %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -718,55 +724,6 @@ Gaudiu usant %1</translation>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>L&apos;ús de dispositius virtuals (més enllà de de preservar els sistemes de fitxers) és una característica avançada. Potser us cal editar algun fitxer (ex: initramfs, crypttab, fstab) per assegurar-vos que s&apos;han creat els dispositius virtuals en arrencar.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Instal·la GRUB per Linux i Windows</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Trieu el mètode d&apos;arrencada&lt;/b&gt;&lt;br/&gt; %1 usa el carregador GRUB per arrencar %1 i MS-Windows. &lt;p&gt;Per omissió s&apos;instal·la GRUB2 al Master Boot Record (MBR) o ESP (EFI System Partition per sistemes d&apos;arrencada UEFI de 64-bit) del vostre disc d&apos;arrencada i substitueix el carregador que havíeu usat abans. Això és normal.&lt;/p&gt;&lt;p&gt;Si, en canvi, trieu instal·lar GRUB2 al Partition Boot Record (PBR), llavors GRUB2 s&apos;instal·larà al començament de la partició especificada. Aquesta opció es reserva per a experts.&lt;/p&gt;&lt;p&gt;Si desactiveu la casella [Instal·la  GRUB], el GRUB no s&apos;instal·larà ara. Aquesta opció és només per a experts.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -939,10 +896,6 @@ Gaudiu usant %1</translation>
         <translation>&lt;p&gt;&lt;b&gt;Enhorabona!&lt;/b&gt;&lt;br/&gt;Heu acomplert la instal·lació de %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Trobar Aplicacions&lt;/b&gt;&lt;br/&gt;Ja hi ha centenars d&apos;aplicacions instal·lades a %1 . La millor manera de familiaritzar-s&apos;hi és fullejar el Menú i provar-les. Moltes de les aplicacions s&apos;han desenvolupat especialment per al projecte %1. Aquestes es mostren als menús principals.&lt;p&gt;Però a més,  %1 inclou moltes aplicacions estàndard de Linux que s&apos;executen des de la línia d&apos;ordres i, per tant, no surten al Menú.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">Gaudiu usant %1&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -972,14 +925,6 @@ Gaudiu usant %1</translation>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Configuració completa. Reiniciant el sistema.</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">Arrel</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Inici </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -1012,20 +957,6 @@ De debò voleu aturar-la ara?</translation>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Agraïments&lt;/b&gt;&lt;br/&gt;Gràcies a tothom que ha triat donar suport a  %1 amb el seu temps, diners, suggeriments, treball, lloances, idees, promoció i/o ànims.&lt;/p&gt;&lt;p&gt;Sense vosaltres no hi hauria %1.&lt;/p&gt;&lt;p&gt;L&apos;Equip de Desenvolupament de %2.&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1% root
-%2% home</source>
-        <translation type="vanished">%1% root
-%2% home </translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Root i home combinades</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1084,25 +1015,9 @@ De debò voleu aturar-la ara?</translation>
         <translation>Condicions d&apos;ús</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Disposició del teclat&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Canvia la disposició del teclat</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Disposició:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1147,9 +1062,41 @@ De debò voleu aturar-la ara?</translation>
         <translation>Arrel</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation>Paràmetres del teclat</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation>Model:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation>Variant:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation>Disposició: </translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>Inici </translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation>%</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation>Activa el suport per a la hibernació</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1239,54 +1186,22 @@ De debò voleu aturar-la ara?</translation>
     <message>
         <location filename="../meinstall.ui" line="1030"/>
         <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1067"/>
-        <source>Size:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea un fitxer d&apos;intercanvi</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1047"/>
         <source> MB</source>
-        <translation type="unfinished"></translation>
+        <translation> MB</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1067"/>
+        <source>Size:</source>
+        <translation>Mida:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>Ubicació: </translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1591,11 +1506,7 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../oobe.cpp" line="622"/>
         <source>Failed to set ownership or permissions of user directory.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">Ho sento, ha fallat en establir la propietat del directori d&apos;usuari.</translation>
+        <translation>Ha fallat en definir el propietari o permisos del directori d&apos;usuari.</translation>
     </message>
 </context>
 <context>
@@ -1656,18 +1567,6 @@ Si us plau, trieu un nom diferent. </translation>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Reinicia la disposició</translation>
-    </message>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">Plan&amp;tilles</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">Instal·lació e&amp;stàndard</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">Sistema &amp;Encriptat</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1783,17 +1682,17 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="510"/>
         <source>Layout &amp;Builder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Creador de &amp;Disposició...</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="788"/>
         <source>%1 (%2) requires %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2) necessita %3</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="837"/>
         <source>The installation may fail because the following volumes are too small:</source>
-        <translation type="unfinished"></translation>
+        <translation>La instal·lació pot fallar perquè aquests volums són massa petits:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="851"/>
@@ -1848,7 +1747,7 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">Ha fallat en acabar la instal·lació de l&apos;encriptatge.</translation>
+        <translation>Ha fallat en acabar la instal·lació de l&apos;encriptatge.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>
@@ -2053,16 +1952,6 @@ Arrencarà automàticament si s&apos;ha instal·lat amb l&apos;opció --oem.</tr
 -- No formata /root i no funciona amb encriptació.</translation>
     </message>
     <message>
-        <source>Always check the installation media at the beginning.</source>
-        <translation type="vanished">Comproveu sempre el suport d&apos;instal·lació en començar.</translation>
-    </message>
-    <message>
-        <source>Do not check the installation media at the beginning.
-Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="vanished">No comprova el suport d&apos;instal·lació en començar.
-No es recomana, llevat que el suport d&apos;instal·lació garanteixi estar lliure d&apos;errors.</translation>
-    </message>
-    <message>
         <location filename="../app.cpp" line="91"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Carrega un fitxer de configuració tal com s&apos;especifica a &lt;config-file&gt;.</translation>
@@ -2103,27 +1992,27 @@ Si us plau, tanqueu-lo si podeu, o executeu &apos;pkill minstall&apos; en un ter
     <message>
         <location filename="../swapman.cpp" line="63"/>
         <source>Failed to create or install swap file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha fallat en crear o instal·lar el fitxer d&apos;intercanvi.</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="70"/>
         <source>Creating swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Creant un fitxer d&apos;intercanvi</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="80"/>
         <source>Configuring swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurant el fitxer d&apos;intercanvi</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="122"/>
         <source>Invalid location</source>
-        <translation type="unfinished"></translation>
+        <translation>Ubicació no vàlida</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="125"/>
         <source>Maximum: %1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>Màxim: %1 MB</translation>
     </message>
 </context>
 </TS>

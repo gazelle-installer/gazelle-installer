@@ -6,12 +6,12 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">रूट</translation>
+        <translation>रूट</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">होम</translation>
+        <translation>होम</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
@@ -127,22 +127,22 @@ Minimum: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>बनाएँ</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>संरक्षण (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -150,22 +150,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -293,10 +293,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>इंस्टॉल प्रक्रिया विकल्प</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">इंस्टॉल हेतु लगभग %1 स्पेस आवश्यक। %2 या अधिक इच्छित।</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -582,21 +578,54 @@ Enjoy using %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="884"/>
-        <source>Enjoy using %1</source>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>लिनक्स व विंडोज हेतु GRUB इंस्टॉल करें</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">ड्राइव पर दायां-क्लिक कर प्रदर्शित मेन्यू से अभिन्यास हेतु नमूना चुनें। ये नमूने सामान्य इंस्टॉल के समान हैं।</translation>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;सामान्य इंस्टॉल&lt;/i&gt; - अधिकतर सेटअप हेतु उपयुक्त। इस नमूने से पृथक बूट विभाजन जोड़ना संभव नहीं है अतः यह एन्क्रिप्शन युक्त ऑपरेटिंग सिस्टम हेतु अयोग्य है।</translation>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;एन्क्रिप्शन युक्त सिस्टम&lt;/i&gt; - एन्क्रिप्शन युक्त ऑपरेटिंग सिस्टम लोड करने हेतु आवश्यक बूट विभाजन सम्मिलित करता है। इस नमूने का उपयोग एकाधिक-बूट सिस्टम हेतु भी संभव है।</translation>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="884"/>
+        <source>Enjoy using %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -692,55 +721,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">लिनक्स व विंडोज हेतु GRUB इंस्टॉल करें</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;बूट विधि चयन&lt;/b&gt;&lt;br/&gt;%1 व माइक्रोसॉफ्ट विंडोज बूट करने हेतु %1 GRUB बूट लोड साधन का उपयोग करता है। &lt;p&gt;डिफ़ॉल्ट रूप से GRUB2 आपके पूर्व प्रयुक्त बूट लोड साधन के स्थान पर आपकी हार्ड ड्राइव में मास्टर बूट रिकॉर्ड (MBR) या ESP (64-बिट UEFI बूट सिस्टम हेतु EFI सिस्टम विभाजन) पर इंस्टॉल होता है। यह एक सामान्य प्रक्रिया है।&lt;/p&gt;&lt;p&gt;यदि GRUB2 को विभाजन बूट रिकॉर्ड (PBR) पर इंस्टॉल करते है तो GRUB2 रूट विभाजन के आरंभ पर इंस्टॉल होगा। यह विकल्प केवल विशेषज्ञों हेतु है।&lt;/p&gt;&lt;p&gt;आप द्वारा GRUB विकल्प अचयनित करने पर, इस समय GRUB इंस्टॉल नहीं होगा। यह विकल्प केवल विशेषज्ञों हेतु है।&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -913,10 +893,6 @@ Enjoy using %1</source>
         <translation>&lt;p&gt;&lt;b&gt;शुभकामनाएँ!&lt;/b&gt;&lt;br/&gt;आप द्वारा %1 का इंस्टॉल पूर्ण किया गया&lt;/p&gt;&lt;p&gt;&lt;b&gt;अनुप्रयोग खोज&lt;/b&gt;&lt;br/&gt; %1 में सैंकड़ों उत्कृष्ट अनुप्रयोग इंस्टॉल हैं। उनके बारे में जानने हेतु मेन्यू द्वारा उन्हें देखें व उपयोग करें। इनमें से कई अनुप्रयोग विशिष्ट रूप से %1 परियोजना हेतु विकसित किए गए हैं। ये मुख्य मेन्यू में प्रदर्शित हैं। &lt;p&gt;इसके अतिरिक्त %1 में कई मानक लिनक्स अनुप्रयोग सम्मिलित हैं जिनका निष्पादन केवल कमांड लाइन से संभव है, अतः ये मेन्यू में प्रदर्शित नहीं होते हैं।&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">%1 के उपयोग का आनंद लें &lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -946,14 +922,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>विन्यास प्रक्रिया पूर्ण। अब सिस्टम पुनः आरंभ होगा।</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">रूट</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">होम</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -986,10 +954,6 @@ Do you really want to stop now?</source>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;विशिष्ट आभार&lt;/b&gt;&lt;br/&gt;उन सभी का धन्यवाद जिन्होंने अपने समय, धन राशि, सुझावों, कार्यों, प्रशंसा, विचारों, प्रचार व/या प्रोत्साहन के रूप में %1 का समर्थन किया।&lt;/p&gt;&lt;p&gt;आपके सहयोग के बिना %1 का अस्तित्व संभव नहीं था।&lt;/p&gt;&lt;p&gt;%2 सॉफ्टवेयर विकासकर्ता टीम&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1048,25 +1012,9 @@ Do you really want to stop now?</source>
         <translation>उपयोग की शर्तें</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;कुंजीपटल सेटिंग्स&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;मॉडल :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;मॉडल :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>कुंजीपटल सेटिंग्स बदलें</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;अभिन्यास :&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1111,9 +1059,41 @@ Do you really want to stop now?</source>
         <translation>रूट</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>होम</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1206,8 +1186,8 @@ Do you really want to stop now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
+        <location filename="../meinstall.ui" line="1047"/>
+        <source> MB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1216,41 +1196,9 @@ Do you really want to stop now?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1047"/>
-        <source> MB</source>
-        <translation type="unfinished"></translation>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>स्थान :</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1557,10 +1505,6 @@ Please select a different name.</source>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">क्षमा करें, उपयोक्ता डायरेक्टरी हेतु स्वामित्व सेट करना विफल।</translation>
-    </message>
 </context>
 <context>
     <name>PartMan</name>
@@ -1620,14 +1564,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>अभिन्यास पुनः सेट करें (&amp;R)</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">सामान्य इंस्टॉल (&amp;S)</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">एन्क्रिप्शन युक्त सिस्टम (&amp;E)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>

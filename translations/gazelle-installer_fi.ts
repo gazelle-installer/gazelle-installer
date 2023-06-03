@@ -6,12 +6,12 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Root-juurikäyttö</translation>
+        <translation>Root-juurikäyttö</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Kotihakemisto</translation>
+        <translation>Kotihakemisto</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
@@ -34,7 +34,7 @@ Minimum: %2</source>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Yhdistetty juuri- sekä kotihakemisto</translation>
+        <translation>Yhdistetty juuri- sekä kotihakemisto</translation>
     </message>
 </context>
 <context>
@@ -63,10 +63,6 @@ Minimum: %2</source>
         <location filename="../base.cpp" line="148"/>
         <source>Fixing configuration</source>
         <translation>Korjataan rakennetta</translation>
-    </message>
-    <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Salauksen viimeistely epäonnistui.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="218"/>
@@ -131,22 +127,22 @@ Minimum: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Luo</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Säilytä</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Säilytä (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>Säilytä /home (%1)</translation>
     </message>
@@ -154,22 +150,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Pakkaus (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Pakkaus (&amp;LZO)</translation>
     </message>
@@ -298,10 +294,6 @@ Pidä hauskaa käyttäessäsi %1:ia</translation>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Asennusvalinnat</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">Asennus vaatii noin %1 tilaa. %2 tai enemmän vaaditaan.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -587,6 +579,51 @@ Pidä hauskaa käyttäessäsi %1:ia</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Asenna GRUB Linuxille ja Windowsille</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="884"/>
         <source>Enjoy using %1</source>
         <translation type="unfinished"></translation>
@@ -685,55 +722,6 @@ Pidä hauskaa käyttäessäsi %1:ia</translation>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Asenna GRUB Linuxille ja Windowsille</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Valitse Käynnistysmenetelmä&lt;/b&gt;&lt;br/&gt;%1 käyttää GRUB-käynnistyslatainta käynnistääkseen %1 ja MS-Windowsin. &lt;p&gt;Oletuksena GRUB2 asennetaan Pääkäynnistystaltioon (MBR) tai ESP:n (EFI-järjestelmäosio 64-bittisissä UEFI-käynnistyvissä järjestelmissä) käynnistysasemassasi ja korvaa käynnistyslataimen jota käytit aiemmin. Tämä on tavanomaista. &lt;/p&gt;&lt;p&gt; Jos valitset asentaa GRUB2 osiokäynnistystaltioon (PBR) sen sijaan, sitten GRUB2 asennetaan määritetyn osion alkuosaan. Tämä vaihtoehto on tarkoitettu vain kokeneille käyttäjille.&lt;/p&gt;&lt;p&gt; Mikäli ruksaat pois GRUB.in asentamisen, GRUB:ia ei tällä erää asenneta. Tämä on tarkoitettu vain kokeneille käyttäjille.&lt;/p&gt;   </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -906,10 +894,6 @@ Pidä hauskaa käyttäessäsi %1:ia</translation>
         <translation>&lt;p&gt;&lt;b&gt;Onnittelut! &lt;/b&gt;&lt;br/&gt; Olet suorittanut asennuksen %1 &lt;/p&gt;&lt;p&gt;&lt;b&gt; Ohjelmien löytäminen &lt;/b&gt;&lt;br/&gt; Tarjolla on satoja erinomaisia ohjelmia asennettavaksi %1 Paras tapa oppia niistä on on selata käynnistysvalikkoa ja kokeilla. Monet näistä ohjelmista ovat kehitetyt yksinomaan %1 projektia varten. Nämä löytyvät päävalikoista. &lt;p&gt; Lisäksi %1 sisältää monia vakiollisia Linux-sovelluksia joita ajetaan komentokehotteesta ja täten eivät näy ohjelmien käynnistysvalikossa. &lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">Pidä hauskaa käyttäessäsi %1:ia&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -939,14 +923,6 @@ Pidä hauskaa käyttäessäsi %1:ia</translation>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Järjestelmän määritys valmistui. Käynnistetään järjestelmä uudelleen.</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">Root-juurikäyttö</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Kotihakemisto</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -979,14 +955,6 @@ Haluatko varmasti lopettaa nyt?</translation>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Erityiskiitokset&lt;/b&gt;&lt;br/&gt;Kiitokset kaikille jotka ovat valinneet tukevansa %1 omalla ajalla, rahalla, ehdotuksilla, työllä, kehuilla, ideoilla, mainonnalla, ja/tai sitoutumisella.&lt;/p&gt;&lt;p&gt;Ilman teitä %1 ei olisi olemassa.&lt;/p&gt;&lt;p&gt;%2 Kehitystiimi&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Yhdistetty juuri- sekä kotihakemisto</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1045,25 +1013,9 @@ Haluatko varmasti lopettaa nyt?</translation>
         <translation>Käyttöehdot</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Näppäimistön asetukset&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Malli:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Muunnos:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Muuta näppäimistön asetuksia</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Asettelu:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1108,9 +1060,41 @@ Haluatko varmasti lopettaa nyt?</translation>
         <translation>Root-juurikäyttö</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>Kotihakemisto</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1203,8 +1187,8 @@ Haluatko varmasti lopettaa nyt?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
+        <location filename="../meinstall.ui" line="1047"/>
+        <source> MB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1213,41 +1197,9 @@ Haluatko varmasti lopettaa nyt?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1047"/>
-        <source> MB</source>
-        <translation type="unfinished"></translation>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>Sijainti:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1554,10 +1506,6 @@ Valitse eri nimi.</translation>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">Valitettavasti omistusoikeuksien asettaminen käyttäjäkansiolle ei onnistunut.</translation>
-    </message>
 </context>
 <context>
     <name>PartMan</name>
@@ -1617,14 +1565,6 @@ Valitse eri nimi.</translation>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Nollaa asettelu</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">&amp;Normaali asennus</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">&amp;Salattu järjestelmä</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1805,7 +1745,7 @@ Valitse eri nimi.</translation>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">Salauksen viimeistely epäonnistui.</translation>
+        <translation>Salauksen viimeistely epäonnistui.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>

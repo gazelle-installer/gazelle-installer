@@ -6,7 +6,7 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Root</translation>
+        <translation>Root</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
@@ -127,22 +127,22 @@ Minimum: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Aanmaken</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -150,22 +150,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -916,10 +916,6 @@ Enjoy using %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Root</source>
-        <translation type="vanished">Root</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="1102"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
@@ -1193,7 +1189,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1090"/>
         <source>Location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Locatie:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>

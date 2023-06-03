@@ -6,12 +6,12 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Kök</translation>
+        <translation>Kök</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Home</translation>
+        <translation>Home</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
@@ -29,13 +29,13 @@ Minimum: %2</source>
         <location filename="../autopart.cpp" line="320"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished">%1% root
+        <translation>%1% root
 %2% home</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Birleştirilmiş root ve home</translation>
+        <translation>Birleştirilmiş root ve home</translation>
     </message>
 </context>
 <context>
@@ -64,10 +64,6 @@ Minimum: %2</source>
         <location filename="../base.cpp" line="148"/>
         <source>Fixing configuration</source>
         <translation>Yapılandırma onarılıyor</translation>
-    </message>
-    <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Şifreleme kurulumu tamamlanamadı.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="218"/>
@@ -100,7 +96,7 @@ Minimum: %2</source>
     <message>
         <location filename="../bootman.cpp" line="283"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>initramfs güncellenemedi.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="309"/>
@@ -132,22 +128,22 @@ Minimum: %2</source>
         <translation>sadece biçimlendir</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Oluştur</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Koru</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Koru (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>/home (%1) dizinini Koru</translation>
     </message>
@@ -155,22 +151,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation>&amp;Şablonlar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Sıkıştırma (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Sıkıştırma (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Sıkıştırma (&amp;LZO)</translation>
     </message>
@@ -299,10 +295,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Kurulum Seçenekleri</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">Kurulum yaklaşık %1 alan gerektirir. %2 veya üzeri tercih edilir. </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -588,21 +580,54 @@ Enjoy using %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="884"/>
-        <source>Enjoy using %1</source>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Windows ve Linux için GRUB kur</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">Bir menüyü büyütmek için bir sürücüye sağ tıklayın ve bir düzen kalıbı seçin.  Bu düzenler normal yüklemenin düzenine benzer.</translation>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;Standart kurulum&lt;/i&gt; - Çoğu kurulum için uygundur. Bu şablon ayrı bir önyükleme bölümü eklemez ve bu nedenle şifreli bir işletim sistemiyle kullanım için uygun değildir.</translation>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;Şifreli sistem&lt;/i&gt; - Şifreli bir işletim sistemi yüklemek için gereken önyükleme bölümünü içerir. Bu şablon aynı zamanda çoklu önyükleme sisteminin temeli olarak da kullanılabilir.</translation>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="884"/>
+        <source>Enjoy using %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -698,55 +723,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Sanal aygıtların kullanımı (şifreli dosya sistemlerini korumanın ötesinde) gelişmiş bir özelliktir. Kullanılan sanal aygıtların önyükleme sırasında oluşturulmasını sağlamak için bazı dosyaları (örn. initramfs, crypttab, fstab) düzenlemeniz gerekebilir.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Windows ve Linux için GRUB kur</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Önyükleme Yöntemi Seçimi&lt;/b&gt;&lt;br/&gt; %1 kendisi ve MS-Windows&apos;u birlikte açmak için GRUB önyükleyici kullanır.&lt;p&gt;GRUB2 öntanımlı olarak, önyükleme sürücünüzün Ana Önyükleme Kaydı&apos;na(MBR) veya ESP&apos;ye (64 bit UEFI önyükleme sistemleri için EFI Sistem Bölümü) yüklenir ve daha önce kullandığınız önyükleme yükleyicisinin yerini alır. Bu olağandır.&lt;/p&gt;&lt;p&gt;Eğer GRUB2&apos;yi Bölüm Önyükleme Kaydı (PBR)&apos;na kurmayı seçerseniz GRUB2 belirtilen bölümün başlangıcına kurulacaktır. Bu seçenek yalnızca uzmanlar içindir.&lt;/p&gt;&lt;p&gt;GRUB&apos;u Yükle kutusunun işaretini kaldırırsanız, GRUB şu anda yüklenmeyecektir. Bu seçenek yalnızca uzmanlar içindir.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -919,10 +895,6 @@ Enjoy using %1</source>
         <translation>&lt;p&gt;&lt;b&gt;Kutlarız!&lt;/b&gt;&lt;br/&gt;%1 kurulumunu tamamladınız&lt;/p&gt;&lt;p&gt;&lt;b&gt;Uygulamaları Bulma&lt;/b&gt;&lt;br/&gt;%1 ile yüklenmiş yüzlerce mükemmel uygulama var. Onlar hakkında bilgi edinmenin en iyi yolu Menü&apos;ye göz atmak ve onları denemektir. Uygulamaların çoğu, %1 tasarımı için özel olarak geliştirilmiştir. Bunlar ana menülerde gösterilmektedir. &lt;p&gt;Ek olarak, antiX Linux, yalnızca komut satırından çalıştırılan ve bu nedenle Menüde görünmeyen birçok standart Linux uygulamasını içerir.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">%1 kullanmanın tadını çıkarın&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -952,14 +924,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Yapılandırma tamamlandı. Sistem yeniden başlatılıyor. </translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">Kök</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Home</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -992,20 +956,6 @@ Gerçekten şimdi durdurmak istiyor musunuz?</translation>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Teşekkürler&lt;/b&gt;&lt;br/&gt;%1&apos;i zamanı, parası, önerileri, çalışmaları, övgüleri, düşünceleri, tanıtımları ve/veya teşvikleriyle desteklemeyi seçen herkese teşekkürler.&lt;/p&gt;&lt;p&gt;Siz olmadan %1 olamazdı.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1% root
-%2% home</source>
-        <translation type="vanished">%1% root
-%2% home</translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Birleştirilmiş root ve home</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1064,25 +1014,9 @@ Gerçekten şimdi durdurmak istiyor musunuz?</translation>
         <translation>Kullanım Koşulları</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Klavye Ayarları&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt; </translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Alt Çeşit:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Klavye Ayarlarını Değiştir</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Düzen:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1127,9 +1061,41 @@ Gerçekten şimdi durdurmak istiyor musunuz?</translation>
         <translation>Kök</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>Home</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1222,8 +1188,8 @@ Gerçekten şimdi durdurmak istiyor musunuz?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
+        <location filename="../meinstall.ui" line="1047"/>
+        <source> MB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1232,41 +1198,9 @@ Gerçekten şimdi durdurmak istiyor musunuz?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1047"/>
-        <source> MB</source>
-        <translation type="unfinished"></translation>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>Konum:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1573,10 +1507,6 @@ Farklı bir ad seçin.</translation>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">Üzgünüz, kullanıcı dizininin aidiyeti ayarlanırken hata oluştu.</translation>
-    </message>
 </context>
 <context>
     <name>PartMan</name>
@@ -1636,18 +1566,6 @@ Farklı bir ad seçin.</translation>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Düzeni sıfırla</translation>
-    </message>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Şablonlar</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">&amp;Standart yükleme</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">&amp;Şifreli sistem</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1828,7 +1746,7 @@ Farklı bir ad seçin.</translation>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">Şifreleme kurulumu tamamlanamadı.</translation>
+        <translation>Şifreleme kurulumu tamamlanamadı.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>

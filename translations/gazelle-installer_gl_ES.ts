@@ -6,12 +6,12 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Root</translation>
+        <translation>Root</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Inicio</translation>
+        <translation>Inicio</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
@@ -29,13 +29,13 @@ Minimum: %2</source>
         <location filename="../autopart.cpp" line="320"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished">%1% raíz
+        <translation>%1% raíz
 %2% inicio</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Raíz e inicio combinados</translation>
+        <translation>Raíz e inicio combinados</translation>
     </message>
 </context>
 <context>
@@ -64,10 +64,6 @@ Minimum: %2</source>
         <location filename="../base.cpp" line="148"/>
         <source>Fixing configuration</source>
         <translation>Reparando a configuración</translation>
-    </message>
-    <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Produciuse un erro ao finalizar a configuración do cifrado.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="218"/>
@@ -132,22 +128,22 @@ Minimum: %2</source>
         <translation>só formato</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Crear</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Preservar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Preservar (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>Preservar /casa (%1)</translation>
     </message>
@@ -155,22 +151,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation>&amp;Modelos</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compresión (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compresión (&amp;LZO)</translation>
     </message>
@@ -299,10 +295,6 @@ Disfruta usando %1.</translation>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Opcións da instalación</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">A instalación require aproximadamente %1 de espazo. Prefírese %2 ou máis.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -590,7 +582,7 @@ Disfruta usando %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="766"/>
         <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Instalar GRUB para Linux e Windows</translation>
+        <translation>Instalar GRUB para Linux e Windows</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="767"/>
@@ -636,18 +628,6 @@ Disfruta usando %1.</translation>
         <location filename="../minstall.cpp" line="884"/>
         <source>Enjoy using %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">Só tes que premer co botón dereito nunha unidade para abrir un menú e seleccionar un modelo de deseño. Estes deseños son similares aos da instalación normal.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;Instalación estándar&lt;/i&gt; - Apta para a maioría das configuracións. Este modelo non engade unha partición de arranque separada, polo que non é adecuado para o seu uso cun sistema operativo cifrado.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;Sistema cifrado&lt;/i&gt; - Contén a partición de arranque necesaria para cargar un sistema operativo cifrado. Este modelo tamén se pode usar como base para un sistema de arranque múltiple.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -743,10 +723,6 @@ Disfruta usando %1.</translation>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>O uso de dispositivos virtuais (alén de preservar os sistemas de ficheiros cifrados) é unha característica avanzada. Pode que teña que editar algúns ficheiros (por exemplo, initramfs, crypttab, fstab) para asegurarse de que os dispositivos virtuais utilizados se cren ao iniciar.</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Opcions do arranque&lt;/b&gt;&lt;br/&gt;O %1 usa o cargador do arranque GRUB2 para cargar o arranque do sistema a usar %1 e MS-Windows.&lt;p&gt;Predeterminadamente o GRUB2 será instalado no (MBR) ou ESP do disco e substituirá a ocargador do arranque aí instalado. isto é normal.&lt;/p&gt;&lt;p&gt; Optando por instalar o GRUB2 na raíz do sistema, el será instalado no inicio da partición escollida. Usuarios inexpertos non deben usar esta opción.&lt;/p&gt;&lt;p&gt; Desmarcando a caixa &apos;Instalar GRUB&apos;, o GRUB non será instalado. Usuarios inexpertos non deben usar esta opción.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -920,10 +896,6 @@ Disfruta usando %1.</translation>
         <translation>&lt;b&gt;Parabéns!&lt;/b&gt;&lt;br/&gt; a instalación de % 1 completouse. &lt;p&gt;&lt;p&gt;&lt;b&gt;Buscando aplicacións &lt;/b&gt;&lt;br/&gt;Con% 1 instaláronse centos de excelentes aplicacións. A mellor forma de familiarizarse con eles é navegar polo menú e probalos. Moitos deles foron desenvolvidos especificamente para o proxecto% 1. Accédese a estes a través dos menús principais. &lt;p&gt;% 1 tamén inclúe moitas aplicacións Linux que só se poden executar desde a liña de comandos, polo que non aparecen no menú.</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">Disfruta usando %1&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -953,14 +925,6 @@ Disfruta usando %1.</translation>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Configuración completa. Reiniciando o sistema.</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">Root</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Inicio</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -993,20 +957,6 @@ Interromper realmente o proceso agora?</translation>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Agradecementos&lt;/b&gt;&lt;br/&gt; a todos os que decidiron apoiar a% 1 co seu tempo, doazóns, suxestións, traballo, loanzas, ideas, promocionalo e / ou animándonos. &lt;/p&gt;&lt;p&gt;Sen eles% 1 non existiría.&lt;/p&gt;&lt;p&gt;O equipo de desenvolvemento% 2&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1% root
-%2% home</source>
-        <translation type="vanished">%1% raíz
-%2% inicio</translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Raíz e inicio combinados</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1065,25 +1015,9 @@ Interromper realmente o proceso agora?</translation>
         <translation>Termos de uso</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Configuracións do teclado&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Modelo:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variante:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Cambiar a configuración do teclado</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Esquema:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1267,7 +1201,7 @@ Interromper realmente o proceso agora?</translation>
     <message>
         <location filename="../meinstall.ui" line="1090"/>
         <source>Location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Localización:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1569,10 +1503,6 @@ Escoller un nome diferente.</translation>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">A atribución de detención/propiedade ao cartafol do usuario fallou.</translation>
-    </message>
 </context>
 <context>
     <name>PartMan</name>
@@ -1632,18 +1562,6 @@ Escoller un nome diferente.</translation>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Restablecer deseño</translation>
-    </message>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Modelos</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">&amp;Instalación estándar</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">&amp;Sistema cifrado</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1824,7 +1742,7 @@ Escoller un nome diferente.</translation>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">Produciuse un erro ao finalizar a configuración do cifrado.</translation>
+        <translation>Produciuse un erro ao finalizar a configuración do cifrado.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>

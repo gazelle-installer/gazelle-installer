@@ -6,60 +6,45 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Koren</translation>
+        <translation>Koren</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Domov</translation>
+        <translation>Domov</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
         <location filename="../autopart.cpp" line="139"/>
         <source>Recommended: %1
 Minimum: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Priporočeno: %1
+Najmanj: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="176"/>
         <source>Layout Builder</source>
-        <translation type="unfinished"></translation>
+        <translation>Graditelj razporedov</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="320"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished">%1% root
+        <translation>%1% root
 %2% home</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Kombinirani korenski root in domači home</translation>
+        <translation>Kombinirani korenski root in domači home</translation>
     </message>
 </context>
 <context>
     <name>Base</name>
     <message>
-        <source>Checking installation media.</source>
-        <translation type="vanished">Preverjanje namestitvenega nosilca.</translation>
-    </message>
-    <message>
-        <source>Press ESC to skip.</source>
-        <translation type="vanished">Pritisniti ESC za preskok.</translation>
-    </message>
-    <message>
-        <source>The installation media is corrupt.</source>
-        <translation type="vanished">Namestitveni nosilec je okvarjen.</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="vanished">Ali želite res preskočiti preverjanje namestitvenega nosilca?</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="66"/>
         <source>Cannot access installation media.</source>
-        <translation type="unfinished">Ne moremo dostopati do namestitvenega nosilca.</translation>
+        <translation>Ne moremo dostopati do namestitvenega nosilca.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="128"/>
@@ -80,10 +65,6 @@ Minimum: %2</source>
         <location filename="../base.cpp" line="148"/>
         <source>Fixing configuration</source>
         <translation>Popravljanje konfiguracije</translation>
-    </message>
-    <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Ni bilo mogoče dokončati namestitve šifriranja.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="218"/>
@@ -116,7 +97,7 @@ Minimum: %2</source>
     <message>
         <location filename="../bootman.cpp" line="283"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ni bilo mogoče posodopbiti initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="309"/>
@@ -148,22 +129,22 @@ Minimum: %2</source>
         <translation>zgolj formatiranje</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Ustvari</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Ohrani</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Ohrani (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>Ohrani /home (%1)</translation>
     </message>
@@ -171,22 +152,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation>&amp;Predloge</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Stiskanje (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Stiskanje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Stiskanje (&amp;LZO)</translation>
     </message>
@@ -208,10 +189,6 @@ Do you want to continue the installation?</source>
 Priporočamo, da zdaj končate in sistem ponovno zaženete z Legacy zagonom
 
 Ali želite nadaljevati z namestitvijo?</translation>
-    </message>
-    <message>
-        <source>Cannot access installation media.</source>
-        <translation type="vanished">Ne moremo dostopati do namestitvenega nosilca.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="182"/>
@@ -319,10 +296,6 @@ Uživajte v sistemu %1!</translation>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Možnosti namestitve</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">Namestitev potrtebuje okoli %1 prostora. Priporočeno je %2 ali več.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -605,24 +578,57 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="732"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zgolj kliknite na pogon in izberite &lt;b&gt;Graditelj razporedov&lt;/b&gt; iz menija. To lahko ustvari razpored, ki je pododben običajni namestitvi.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Namesti GRUB za Linux in Windows</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
+        <translation>%1 uporablja GRUB zagonski nalagalnik za zagon %1 in Microsoft Windows.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation>Privzeto je GRUB nameščen na Master Boot Record (MBR) ali ESP (EFI System Partition za 64-bitne UEFI zagonske sisteme) razdelku zagonskega nosilca in nadomešča zagonski nalagalnik, ki je bil prej v uporabi. To je normalno.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation>Če izberete namesto tega namestitev GRUB v Partition Boot Record (PBR), bo GRUB nameščen na začetku določenega razdelaka. Le za izkušene uporabnike.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation>Če ste odznačili namesitev GRUB, ta ne bo nameščen. Le za izkušene uporabnike.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation>Ustvari izmenjevalno swap datoteko</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation>Izmenjevalna datoteka je bolj fleksibilna kot izmenjevalni razdelek, saj ji je mogoče lažje spreminjati velikost, če se pojavi potreba zaradi rabe sistema.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation>To je provzeto označeno, če ni bil določen noben izmenjevalni razdelek. To možnost naj spreminjajo le izkušeni uporabniki.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation>Nastavitev velikosti na 0 ima enak učinek, kot odznačitev te možnosti.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="884"/>
         <source>Enjoy using %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">Desno kliknite na pogon, ki odpre meni in izberite predlogo razporeda. Predloge so podobne tistim, ki se uporabijo ob navadni namestitvi.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;Standardna namestitev&lt;/i&gt; - Ustreza večini potreb. Ta predloga ne ustvari ločenega zagonskega razdelka, zato ni primerna za šifriran operacijski sistem.</translation>
-    </message>
-    <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;Šifriran sistem&lt;/i&gt; - vsebuje zagonski razdelek, ki je potreben za nalaganje šifriranega operacijskega sistema. To predlogo je mogoče uporabiti tudi kot osnovo za večzagonski sistem.</translation>
+        <translation>Uživajte v uporabi %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -718,55 +724,6 @@ Uživajte v sistemu %1!</translation>
         <location filename="../minstall.cpp" line="761"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Raba virtualnih naprav (z izjemo ohranjanja šifriranih datotečni sistemov) je napredna funkcija, za katero je mogoče potrebno urediti nekaj datotek (npr.initramfs, crypttab, fstab), ki zagotavljajo, da so virtualne naprave ustvarjene ob zagonu.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Namesti GRUB za Linux in Windows</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Izberite način zaganjana&lt;/b&gt;&lt;br/&gt;%1 uporablja zaganjalnik GRUB za zagon boot %1 in MS-Windows. &lt;p&gt;Privzeto se namesti GRUB2 v Master Boot Record ali ESP (EFI sistemska particija za 64-bitni sisteme z UEFI zagonom) vašega zagonskega diska, ki nadomesti zaganjalnik, ki ste ga uporabljali do tedaj. Tako je običajno.&lt;/p&gt;&lt;p&gt;Če želite namestiti GRUB2 v koren oz. root, bo GRUB2 nameščen na začetku korenske root particije. Ta možnost je pimerna le za strokovnjake.&lt;/p&gt;&lt;p&gt;Če odznačite Namesti GRUB, se GRUB ne bo namestil. Ta možnost je primerna le za strokovnjake.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="785"/>
@@ -881,7 +838,7 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="840"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
-        <translation>Star direktorij bo imel na koncu številko, ki je odvisna od tega, kolikokrat poprej je bil direktorij že preimenovan.</translation>
+        <translation>Stari direktorij bo imel na koncu številko, ki je odvisna od tega, kolikokrat poprej je bil direktorij že preimenovan.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="841"/>
@@ -939,10 +896,6 @@ Uživajte v sistemu %1!</translation>
         <translation>&lt;p&gt;&lt;b&gt;Čestitke!&lt;/b&gt;&lt;br/&gt;Uspešno ste zaključili namestitev za %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Iskanje programov&lt;/b&gt;&lt;br/&gt;Skupaj z %1 je nameščenih na stotine odličnih programov. Najbolje je, da jih spoznavate tako, da jih poiščete v menuju in preizkusite. Mnogo aplikacij je bilo razvitih posebej za %1 projekt. Te so prikazane v glavnem menuju.&lt;p&gt;Poleg tega %1 vsebuje mnogo standardnih Linux programov, ki jih je mogoče zagnati le iz terminala in zato niso prikazani v menuju.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">Naj vam bo %1 v užitek&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -972,14 +925,6 @@ Uživajte v sistemu %1!</translation>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Konfiguriranje je končasno. Ponovno zaganjam sistem.</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">Koren</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Domov</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -1012,20 +957,6 @@ Ali bi jo res radi zaustavili?</translation>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Posebna zahvala&lt;/b&gt;&lt;br/&gt;Hvala vsem, ki se odločili podpreti %1 s svojim časom, denarjem, predlogi, delom, pohvalami, idejami, promoviranjem in/ali spodbujanjem.&lt;/p&gt;&lt;p&gt;Brez vas %1 ne bi obstajal.&lt;/p&gt;&lt;p&gt;%2 ravojna skupina&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1% root
-%2% home</source>
-        <translation type="vanished">%1% root
-%2% home</translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Kombinirani korenski root in domači home</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1084,25 +1015,9 @@ Ali bi jo res radi zaustavili?</translation>
         <translation>Pogoji uporabe</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Nastavitve tipkovnice&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Različica:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Spremeni nastavitve tipkovnice</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Razpored:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1147,9 +1062,41 @@ Ali bi jo res radi zaustavili?</translation>
         <translation>Koren</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation>Nastavitve tipkovnice</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation>Model:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation>Izvedba:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation>Razpored:</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>Domov</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation>%</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation>Vklopi podporo za spanje</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1239,54 +1186,22 @@ Ali bi jo res radi zaustavili?</translation>
     <message>
         <location filename="../meinstall.ui" line="1030"/>
         <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1067"/>
-        <source>Size:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustvari izmenjevalno swap datoteko</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1047"/>
         <source> MB</source>
-        <translation type="unfinished"></translation>
+        <translation>MB</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1067"/>
+        <source>Size:</source>
+        <translation>Velikost:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>Lokacija:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
@@ -1555,8 +1470,8 @@ Prosimo, izberite drugo ime pred nadaljevanjem.</translation>
         <location filename="../oobe.cpp" line="494"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
-        <translation>Oprostite, to ime je že v rabi.
-Prosimo, izberite drugo ime.</translation>
+        <translation>Oprostite, to ime se že uporablja.
+Izberite drugo ime.</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="503"/>
@@ -1591,11 +1506,7 @@ Prosimo, izberite drugo ime.</translation>
     <message>
         <location filename="../oobe.cpp" line="622"/>
         <source>Failed to set ownership or permissions of user directory.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">Določitev lastništva za uporabnikov direktorij ni bilo uspešno.</translation>
+        <translation>Določitev lastništva ali dovoljenja za uproabniško mapo ni bilo uspešno.</translation>
     </message>
 </context>
 <context>
@@ -1656,18 +1567,6 @@ Prosimo, izberite drugo ime.</translation>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>Po&amp;nastavi razpored</translation>
-    </message>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Predloge</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">&amp;Standardna namestitev</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">&amp;Šifrirana namestitev</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1783,17 +1682,17 @@ Prosimo, izberite drugo ime.</translation>
     <message>
         <location filename="../partman.cpp" line="510"/>
         <source>Layout &amp;Builder...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Graditelj razporedov...</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="788"/>
         <source>%1 (%2) requires %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2) potrebuje %3</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="837"/>
         <source>The installation may fail because the following volumes are too small:</source>
-        <translation type="unfinished"></translation>
+        <translation>Namestitev morda ne bo uspela, ker so ti pogoni premajhni:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="851"/>
@@ -1848,7 +1747,7 @@ Prosimo, izberite drugo ime.</translation>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">Ni bilo mogoče dokončati namestitve šifriranja.</translation>
+        <translation>Ni bilo mogoče dokončati namestitve šifriranja.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>
@@ -2007,9 +1906,9 @@ Pomnite, da je to eksperimentalno. Prihodnji namestilniki so lahko nezdružljivi
         <source>Always use GPT when doing a whole-drive installation regardlesss of capacity.
 Without this option, GPT will only be used on drives with at least 2TB capacity.
 GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.</source>
-        <translation>Vedno uporabite GPT, ko opravite namestitev na celotni pogon, ne glede na zmogljivost.
+        <translation>Ko opravite namestitev na celotni pogon, vedno uporabite GPT,  ne glede na zmogljivost.
 V nasprotnem primeru bo GPT uporabljen le na diskih, ki so večji od 2TB.
-GPT je vedno uporabljen na namestitvah na celotni pogon v UEFI sistemih, ne glede na zmogljivost ali izbiro te možnosti.</translation>
+V UEFI sistemih je GPT vedno uporabljen ob namestitvi na celotni pogon, ne glede na zmogljivost, tudi brez te izbire.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="80"/>
@@ -2026,9 +1925,9 @@ GPT je vedno uporabljen na namestitvah na celotni pogon v UEFI sistemih, ne gled
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
-        <translation>Namesti operacijski sistem in počakaj na ukaznih vrsticah za uporabniške izbore, dokler ne sledi prvi ponovni zagon.
-Ob zagonu bo namestilnik zagnan z --oobe, tako da lahko uproabnik poda pte podrobnosti.
-To je uporabno za OEM namestitve, v namen prodaje ali oddaje računalnika, ki bo imel nameščen OS.</translation>
+        <translation>Namesti operacijski sistem in na ukaznih vrsticah počakaj na izbore uporabnika, dokler ne sledi prvi ponovni zagon.
+Ob zagonu bo namestilnik zagnan z --oobe, tako da lahko uporabnik poda pte podrobnosti.
+To je uporabno za OEM namestitve, z namenom prodaje ali oddaje računalnika, ki bo imel prednameščen OS.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="85"/>
@@ -2051,18 +1950,8 @@ To bo samodejno zagnano ob namestitvi z --oem možnostjo.</translation>
         <location filename="../app.cpp" line="89"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
-        <translation>Namestitev z rsync namesto cp ob prilagojenem razdeljevanju razdelkov.
-- ne gformatira korena /root in ne deluje s šifriranjem.</translation>
-    </message>
-    <message>
-        <source>Always check the installation media at the beginning.</source>
-        <translation type="vanished">Vedno na začetku preveri namestitveni nosilec.</translation>
-    </message>
-    <message>
-        <source>Do not check the installation media at the beginning.
-Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="vanished">Na začetku ne preveri namestitvenega nosilca.
-Ni priporočljivo, razen v primerih, ko je nosilec zagotovo brez napak.</translation>
+        <translation>Namestitev z rsync namesto cp na prilagojeni razdelitvi razdelkov.
+- ne formatira korena /root in ne deluje s šifriranjem.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="91"/>
@@ -2091,12 +1980,12 @@ Prosimo, zaprite ga, če je to mogoče, ali v terminalu zaženite &apos;pkill mi
     <message>
         <location filename="../app.cpp" line="115"/>
         <source>This operation requires root access.</source>
-        <translation>To dejanje potrebuje korenski dostop.</translation>
+        <translation>To dejanje zahteva korenski dostop.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="136"/>
         <source>Configuration file (%1) not found.</source>
-        <translation>Kongiracijska datoteka (%1) ni bila najdena.</translation>
+        <translation>Konfiguracijska datoteka (%1) ni bila najdena.</translation>
     </message>
 </context>
 <context>
@@ -2104,27 +1993,27 @@ Prosimo, zaprite ga, če je to mogoče, ali v terminalu zaženite &apos;pkill mi
     <message>
         <location filename="../swapman.cpp" line="63"/>
         <source>Failed to create or install swap file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Namesitev izmenjevalne datoteke ni bilo uspešno.</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="70"/>
         <source>Creating swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ustvarjanje izmenjevalne datoteke.</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="80"/>
         <source>Configuring swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfiguriranje izmenjevalne datoteke</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="122"/>
         <source>Invalid location</source>
-        <translation type="unfinished"></translation>
+        <translation>Napačna lokacija</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="125"/>
         <source>Maximum: %1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>Največ: %1 MB</translation>
     </message>
 </context>
 </TS>

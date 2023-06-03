@@ -6,12 +6,12 @@
     <message>
         <location filename="../autopart.cpp" line="59"/>
         <source>Root</source>
-        <translation type="unfinished">Корень</translation>
+        <translation>Корень</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="60"/>
         <source>Home</source>
-        <translation type="unfinished">Пользователи</translation>
+        <translation>Пользователи</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="137"/>
@@ -29,13 +29,13 @@ Minimum: %2</source>
         <location filename="../autopart.cpp" line="320"/>
         <source>%1% root
 %2% home</source>
-        <translation type="unfinished">%1% корень
+        <translation>%1% корень
 %2% пользователи</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="322"/>
         <source>Combined root and home</source>
-        <translation type="unfinished">Совмещенный root и home</translation>
+        <translation>Совмещенный root и home</translation>
     </message>
 </context>
 <context>
@@ -43,7 +43,7 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="66"/>
         <source>Cannot access installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удаётся получить доступ к установочному носителю.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="128"/>
@@ -66,10 +66,6 @@ Minimum: %2</source>
         <translation>Исправление конфигурации</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Не удалось завершить настройку шифрования.</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="218"/>
         <source>Copying new system</source>
         <translation>Копирование новой системы</translation>
@@ -90,7 +86,7 @@ Minimum: %2</source>
     <message>
         <location filename="../bootman.cpp" line="149"/>
         <source>Installing GRUB</source>
-        <translation>Установка GRUB</translation>
+        <translation>Устанавливается GRUB</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="150"/>
@@ -100,7 +96,7 @@ Minimum: %2</source>
     <message>
         <location filename="../bootman.cpp" line="283"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось обновить initramfs.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="309"/>
@@ -132,22 +128,22 @@ Minimum: %2</source>
         <translation>только отформатировать</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1997"/>
+        <location filename="../partman.cpp" line="2002"/>
         <source>Create</source>
         <translation>Создать</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2000"/>
+        <location filename="../partman.cpp" line="2005"/>
         <source>Preserve</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2001"/>
+        <location filename="../partman.cpp" line="2006"/>
         <source>Preserve (%1)</source>
         <translation>Сохранить (%1)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2002"/>
+        <location filename="../partman.cpp" line="2007"/>
         <source>Preserve /home (%1)</source>
         <translation>Сохранить /home (%1)</translation>
     </message>
@@ -155,22 +151,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2384"/>
+        <location filename="../partman.cpp" line="2389"/>
         <source>&amp;Templates</source>
         <translation>&amp;Шаблоны</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2391"/>
+        <location filename="../partman.cpp" line="2396"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Сжатие (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2393"/>
+        <location filename="../partman.cpp" line="2398"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Сжатие (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2395"/>
+        <location filename="../partman.cpp" line="2400"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Сжатие (&amp;LZO)</translation>
     </message>
@@ -200,7 +196,7 @@ Do you want to continue the installation?</source>
 %1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.</source>
         <translation>Поддержите %1
 
-%1 поддерживается людьми, такими как и Вы. Некоторые оказывают другим поддержку на форуме - %2, переводят файлы справки на разные языки, оставляют пожелания, пишут документацию или участвуют в тестировании нового ПО.</translation>
+%1 поддерживается людьми, такими как и вы. Некоторые оказывают другим поддержку на форуме — %2, переводят файлы справки на разные языки, оставляют пожелания, пишут документацию или участвуют в тестировании нового ПО.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="231"/>
@@ -228,7 +224,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="397"/>
         <source>Paused for required operator input</source>
-        <translation>Пауза для ввода пользователя</translation>
+        <translation>Пауза в ожидании ввода от оператора</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="408"/>
@@ -253,7 +249,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="551"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
-        <translation>OK  для форматирования и использования диска целиком (%1) для %2?</translation>
+        <translation>Форматировать и использовать весь диск (%1) для %2?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="555"/>
@@ -278,12 +274,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="645"/>
         <source>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</source>
-        <translation>ЗАКРОЙТЕ ВСЕ ОСТАЛЬНЫЕ ПРИЛОЖЕНИЯ, ПРЕЖДЕ ЧЕМ ПРОДОЛЖИТЬ.</translation>
+        <translation>ЗАКРОЙТЕ ВСЕ ОСТАЛЬНЫЕ ПРИЛОЖЕНИЯ ПЕРЕД ПРОДОЛЖЕНИЕМ.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="646"/>
         <source>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.</source>
-        <translation>На каждой странице, пожалуйста, внимательно читайте инструкции, делайте ваш выбор и жмите &quot;Дальше&quot; для продолжения. Вам будет предложено подтвердить, прежде чем будут выполнены какие-либо деструктивные действия.</translation>
+        <translation>Пожалуйста, внимательно читайте инструкции на страницах, делайте выбор и жмите «Дальше» для продолжения. Вам будет предложено подтверждение перед выполнением любых опасных действий.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="648"/>
@@ -293,16 +289,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="649"/>
         <source>Remember, this software is provided AS-IS with no warranty what-so-ever. It is solely your responsibility to backup your data before proceeding.</source>
-        <translation>Помните, что это программное обеспечение предоставляется КАК ЕСТЬ без каких-либо гарантий. Вы сами несете ответственность за резервное копирование ваших данных ДО начала установки.</translation>
+        <translation>Помните, это программное обеспечение поставляется КАК ЕСТЬ без каких-либо гарантий. Вы сами несёте ответственность за резервное копирование ваших данных ДО начала установки.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="654"/>
         <source>Installation Options</source>
         <translation>Параметры установки</translation>
-    </message>
-    <message>
-        <source>Installation requires about %1 of space. %2 or more is preferred.</source>
-        <translation type="vanished">Для установки требуется не менее %1 свободного места. Рекомендуется не менее %2.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="655"/>
@@ -588,21 +580,54 @@ Enjoy using %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="884"/>
-        <source>Enjoy using %1</source>
+        <location filename="../minstall.cpp" line="766"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Установить GRUB для Linux и Windows</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="767"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Just right-click on a drive to bring up a menu, and select a layout template. These layouts are similar to that of the regular install.</source>
-        <translation type="vanished">Просто щелкните правой кнопкой мыши на диске, чтобы открыть меню, и выберите шаблон таблицы разделов. Эти шаблоны подходят для обычной установки.</translation>
+        <location filename="../minstall.cpp" line="768"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;i&gt;Standard install&lt;/i&gt; - Suited to most setups. This template does not add a separate boot partition, and so it is unsuitable for use with an encrypted operating system.</source>
-        <translation type="vanished">&lt;i&gt;Стандартная установка&lt;/i&gt; - Подходит для большинства установок. Этот шаблон не добавляет отдельный загрузочный раздел, поэтому он не подходит для использования с зашифрованной операционной системой.</translation>
+        <location filename="../minstall.cpp" line="769"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;i&gt;Encrypted system&lt;/i&gt; - Contains the boot partition required to load an encrypted operating system. This template can also be used as the basis for a multi-boot system.</source>
-        <translation type="vanished">&lt;i&gt;Зашифрованная система&lt;/i&gt; - Содержит загрузочный /boot раздел, необходимый для загрузки зашифрованной операционной системы. Этот шаблон также может быть использован в качестве основы для системы с несколькими загрузками.</translation>
+        <location filename="../minstall.cpp" line="770"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="771"/>
+        <source>Create a swap file</source>
+        <translation>Создать файла подкачки</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="772"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="773"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="774"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="884"/>
+        <source>Enjoy using %1</source>
+        <translation>Приятного использования %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="733"/>
@@ -700,55 +725,6 @@ Enjoy using %1</source>
         <translation>Использование виртуальных устройств (помимо сохранения зашифрованных файловых систем) является расширенной функцией. Возможно, вам придётся изменить некоторые файлы (например, initramfs, crypttab, fstab), чтобы убедиться, что используемые виртуальные устройства создаются при загрузке.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="766"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation type="unfinished">Установить GRUB для Linux и Windows</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="767"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="768"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="769"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="770"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="771"/>
-        <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="772"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="773"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="774"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;b&gt;Select Boot Method&lt;/b&gt;&lt;br/&gt; %1 uses the GRUB bootloader to boot %1 and MS-Windows. &lt;p&gt;By default GRUB2 is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.&lt;/p&gt;&lt;p&gt;If you choose to install GRUB2 to Partition Boot Record (PBR) instead, then GRUB2 will be installed at the beginning of the specified partition. This option is for experts only.&lt;/p&gt;&lt;p&gt;If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Выберите способ загрузки&lt;/b&gt;&lt;br/&gt;%1 использует загрузчик GRUB для загрузки %1 и MS-Windows. &lt;p&gt;По умолчанию GRUB2 устанавливается в Master Boot Record (MBR) или ESP (системный раздел EFI для 64-битных систем с загрузкой UEFI) Вашего загрузочного диска и заменяет загрузчик, который Вы использовали ранее. Это нормально.&lt;/p&gt;&lt;p&gt;Если Вы решите установить GRUB2 в Partition Boot Record (PBR), то GRUB2 будет установлен в начало указанного раздела. Эта опция только для экспертов.&lt;/p&gt;&lt;p&gt;Если Вы снимите флажок &quot;Установить GRUB&quot;, GRUB сейчас не будет установлен. Эта опция только для экспертов.&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="785"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Включить общие службы&lt;/b&gt;&lt;br/&gt;Выберите любые из этих служб, которые могут Вам понадобиться в конфигурации вашей системы, и эти службы будут включаться автоматически при запуске %1.&lt;/p&gt;</translation>
@@ -756,7 +732,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="789"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Идентификация компьютерa&lt;/b&gt;&lt;br/&gt;Имя компьютера - уникальное имя, которое будет идентифицировать ваш компьютер, когда он находится в сети. Домен компьютера вряд ли будет использоваться, только если ваш провайдер или локальная сеть этого требуют.&lt;/p&gt;&lt;p&gt;Имена компьютера и домена могут содержать только английские буквы и цифры, точки и дефисы. Они не могут содержать пробелов, начинаться или заканчиваться дефисом&lt;/p&gt;&lt;p&gt;Samba-сервер должен быть активирован, если вы хотите использовать ваши каталоги или принтеры совместно с локальными компьютерами, на которых запущена MS Windows или MacOS.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Идентификация компьютерa&lt;/b&gt;&lt;br/&gt;Имя компьютера — уникальное имя, которое будет идентифицировать ваш компьютер, когда он находится в сети. Домен компьютера вряд ли будет использоваться, только если ваш провайдер или локальная сеть этого требуют.&lt;/p&gt;&lt;p&gt;Имена компьютера и домена могут содержать только английские буквы и цифры, точки и дефисы. Они не могут содержать пробелов, начинаться или заканчиваться дефисом&lt;/p&gt;&lt;p&gt;Samba-сервер должен быть активирован, если вы хотите использовать ваши каталоги или принтеры совместно с локальными компьютерами, на которых запущена MS Windows или MacOS.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="799"/>
@@ -821,12 +797,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="822"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
-        <translation>Если Вы хотите, чтобы учетная запись пользователя по умолчанию не имела пароля, оставьте ее поля для ввода пароля пустыми. Это позволит Вам входить в систему без пароля.</translation>
+        <translation>Если вы хотите, чтобы учётная запись пользователя по умолчанию не имела пароля, оставьте её поля для ввода пароля пустыми. Это позволит вам входить в систему без пароля.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="824"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
-        <translation>Очевидно, что это следует делать только в ситуациях, когда учетная запись пользователя не должна быть защищена, например, в общедоступном терминале.</translation>
+        <translation>Очевидно, что это следует делать только в ситуациях, когда учётная запись пользователя не должна быть защищена, например, в общедоступном терминале.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="831"/>
@@ -886,7 +862,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="860"/>
         <source>Installation in Progress</source>
-        <translation>Идет установка</translation>
+        <translation>Идёт установка</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="861"/>
@@ -919,14 +895,10 @@ Enjoy using %1</source>
         <translation>&lt;p&gt;&lt;b&gt;Поздравляем!&lt;/b&gt;&lt;br/&gt;Вы завершили установку %1.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Поиск приложений&lt;/b&gt;&lt;br/&gt;Есть сотни великолепных приложений, установленных с %1. Лучший способ узнать о них - просмотреть Меню и попробовать их в работе. Многие из приложений были разработаны специально для проекта %1. Они показаны в основном меню. &lt;p&gt;Кроме того, %1 включает в себя множество стандартных приложений Linux, которые выполняются только из командной строки, и потому не отображены в Меню.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>Enjoy using %1&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="vanished">Приятного использования %1&lt;/b&gt;&lt;/p&gt;</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="885"/>
         <location filename="../minstall.cpp" line="1167"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Поддержка %1&lt;/b&gt;&lt;br/&gt;%1 поддерживается такими же людьми, как Вы. Некоторые помогают другим на форуме поддержки - %2, переводят файлы справки на различные языки, вносят предложения, пишут документацию или помогают в тестировании нового программного обеспечения.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Поддержка %1&lt;/b&gt;&lt;br/&gt;%1 поддерживается такими же людьми, как вы. Некоторые помогают другим на форуме поддержки — %2, переводят файлы справки на различные языки, вносят предложения, пишут документацию или помогают в тестировании нового программного обеспечения.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="915"/>
@@ -946,20 +918,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="958"/>
         <source>Configuring sytem. Please wait.</source>
-        <translation>Идет настройка системы. Пожалуйста, подождите.</translation>
+        <translation>Идёт настройка системы. Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="962"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Настройка завершена. Перезагрузка системы.</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation type="vanished">Корень</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="vanished">Пользователи</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -971,12 +935,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../minstall.cpp" line="1153"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Получение помощи&lt;/b&gt;&lt;br/&gt;Основная информация о %1 находится на %2.&lt;/p&gt;&lt;p&gt; Есть добровольцы, которые помогут Вам на  %3 Форуме, %4.&lt;/p&gt;&lt;p&gt;Если обращаетесь за помощью, то не забудьте достаточно подробно описать Вашу проблему и Ваш компьютер. Обращения, подобные &quot;это не работает&quot;, обычно малополезны.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Получение помощи&lt;/b&gt;&lt;br/&gt;Основная информация о %1 находится на %2.&lt;/p&gt;&lt;p&gt; Ищите добровольцев, которые могут помочь вам, на форуме %3, %4.&lt;/p&gt;&lt;p&gt;Если обращаетесь за помощью, то не забудьте подробно описать вашу проблему и ваш компьютер. Сообщения вида «что-то не работает» обычно бесполезны.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1161"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Ремонт установленной системы&lt;/b&gt;&lt;br/&gt;Если %1 перестает работать с жёсткого диска, иногда можно исправить эту проблему, загрузившись с DVD-диска или USB-носителя и запуская утилиты из %1, или используя стандартные Linux-инструменты для восстановления системы.&lt;/p&gt;&lt;p&gt;Также загрузочный %1 DVD-диск или USB-носитель можно использовать для восстановления данных из компьютеров с MS-Windows!&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Ремонт установленной системы&lt;/b&gt;&lt;br/&gt;Если %1 перестает работать с жёсткого диска, иногда можно исправить эту проблему, загрузившись с DVD-диска или USB-носителя и запуская утилиты из %1, или используя стандартные Linux-инструменты для восстановления системы.&lt;/p&gt;&lt;p&gt;Также загрузочный %1 DVD-диск или USB-носитель можно использовать для восстановления данных из компьютеров с MS Windows!&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1175"/>
@@ -992,20 +956,6 @@ Do you really want to stop now?</source>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Особая благодарность&lt;/b&gt;&lt;br/&gt;Спасибо всем, кто поддержал %1 времeнем, деньгaми, предложениями, работой, похвалaми, идеями, продвижением в сообществах и/или поощрениями.&lt;/p&gt;&lt;p&gt;Без Вас не было бы %1.&lt;/p&gt;&lt;p&gt;Команда разработчиков %2&lt;/p&gt;</translation>
-    </message>
-    <message>
-        <source>%1% root
-%2% home</source>
-        <translation type="vanished">%1% корень
-%2% пользователи</translation>
-    </message>
-    <message>
-        <source>Combined root and home</source>
-        <translation type="vanished">Совмещенный root и home</translation>
-    </message>
-    <message>
-        <source>----</source>
-        <translation type="vanished">----</translation>
     </message>
 </context>
 <context>
@@ -1056,7 +1006,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="215"/>
         <source>Gathering Information, please stand by.</source>
-        <translation>Идет сбор информации. Пожалуйста, подождите.</translation>
+        <translation>Идёт сбор информации. Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="250"/>
@@ -1064,25 +1014,9 @@ Do you really want to stop now?</source>
         <translation>Условия использования</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Keyboard Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Настройки клавиатуры&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Model:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Модель:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Variant:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Вариант:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="338"/>
         <source>Change Keyboard Settings</source>
         <translation>Изменить настройки клавиатуры</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Layout:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Раскладка:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="416"/>
@@ -1127,9 +1061,41 @@ Do you really want to stop now?</source>
         <translation>Корень</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="282"/>
+        <source>Keyboard Settings</source>
+        <translation>Настройки клавиатуры</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="297"/>
+        <source>Model:</source>
+        <translation>Модель:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="312"/>
+        <source>Variant:</source>
+        <translation>Вариант:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="350"/>
+        <source>Layout:</source>
+        <translation>Раскладка:</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="501"/>
         <source>Home</source>
         <translation>Пользователи</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="576"/>
+        <location filename="../meinstall.ui" line="598"/>
+        <source>%</source>
+        <translation>%</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="673"/>
+        <location filename="../meinstall.ui" line="1097"/>
+        <source>Enable hibernation support</source>
+        <translation>Включить поддержку гибернации</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="708"/>
@@ -1219,59 +1185,27 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1030"/>
         <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1090"/>
-        <source>Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1067"/>
-        <source>Size:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="282"/>
-        <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="297"/>
-        <source>Model:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="312"/>
-        <source>Variant:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="350"/>
-        <source>Layout:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="576"/>
-        <location filename="../meinstall.ui" line="598"/>
-        <source>%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="673"/>
-        <location filename="../meinstall.ui" line="1097"/>
-        <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
+        <translation>Создать файла подкачки</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1047"/>
         <source> MB</source>
-        <translation type="unfinished"></translation>
+        <translation> МБ</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1067"/>
+        <source>Size:</source>
+        <translation>Размер:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="1090"/>
+        <source>Location:</source>
+        <translation>Местоположение:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1129"/>
         <source>Common Services to Enable</source>
-        <translation>Включить общие службы</translation>
+        <translation>Включение общих служб</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1148"/>
@@ -1301,7 +1235,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1239"/>
         <source>SaMBa Server for MS Networking</source>
-        <translation>Samba-сервер для MS сетей</translation>
+        <translation>Сервер Samba для сетевых служб Microsoft</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1255"/>
@@ -1361,7 +1295,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1584"/>
         <source>View</source>
-        <translation>Вид</translation>
+        <translation>Обзор</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1629"/>
@@ -1371,7 +1305,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1632"/>
         <source>Save live desktop changes</source>
-        <translation>Сохранить изменения рабочей среды</translation>
+        <translation>Сохранить изменения рабочей среды из live-режима</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1645"/>
@@ -1401,7 +1335,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1763"/>
         <source>Root (administrator) Account</source>
-        <translation>Учетная запись администратора (root)</translation>
+        <translation>Учётная запись администратора (root)</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1781"/>
@@ -1416,7 +1350,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1855"/>
         <source>Autologin</source>
-        <translation>Автологин</translation>
+        <translation>Входить автоматически</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1891"/>
@@ -1456,7 +1390,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="2016"/>
         <source>Automatically reboot the system when the installer is closed</source>
-        <translation>Автоматически перезагрузить систему после закрытия установщика</translation>
+        <translation>Автоматически перезагрузить систему по закрытии установщика</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="2035"/>
@@ -1476,7 +1410,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="157"/>
         <source>Installation in progress</source>
-        <translation>Идет установка</translation>
+        <translation>Идёт установка</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="172"/>
@@ -1567,10 +1501,6 @@ Please select a different name.</source>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Sorry, failed to set ownership of user directory.</source>
-        <translation type="vanished">К сожалению, не удалось задать владельца для директории пользователя.</translation>
-    </message>
 </context>
 <context>
     <name>PartMan</name>
@@ -1630,18 +1560,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="508"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Сброс таблицы разделов</translation>
-    </message>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Шаблоны</translation>
-    </message>
-    <message>
-        <source>&amp;Standard install</source>
-        <translation type="vanished">&amp;Обычная установка</translation>
-    </message>
-    <message>
-        <source>&amp;Encrypted system</source>
-        <translation type="vanished">&amp;Зашифрованная система</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="531"/>
@@ -1822,7 +1740,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1010"/>
         <source>Failed to finalize encryption setup.</source>
-        <translation type="unfinished">Не удалось завершить настройку шифрования.</translation>
+        <translation>Не удалось завершить настройку шифрования.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1017"/>
@@ -2073,22 +1991,22 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
     <message>
         <location filename="../swapman.cpp" line="70"/>
         <source>Creating swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Создание файла подкачки</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="80"/>
         <source>Configuring swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройка файла подкачки</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="122"/>
         <source>Invalid location</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимое расположение</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="125"/>
         <source>Maximum: %1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимум: %1 МБ</translation>
     </message>
 </context>
 </TS>
