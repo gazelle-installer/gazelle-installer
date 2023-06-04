@@ -1,5 +1,5 @@
 /***************************************************************************
- * MPassEdit class - QLineEdit modified for passwords.
+ * PassEdit class - QLineEdit operating as a pair for editing passwords.
  *
  *   Copyright (C) 2021 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,22 +16,23 @@
  *
  * This file is part of the gazelle-installer.
  ***************************************************************************/
-#ifndef MPASSEDIT_H
-#define MPASSEDIT_H
+#ifndef PASSEDIT_H
+#define PASSEDIT_H
 
 #include <QLineEdit>
-#include <QProgressBar>
 
-class MPassEdit : public QLineEdit
+class PassEdit : public QLineEdit
 {
     Q_OBJECT
 private:
-    MPassEdit *slave = nullptr;
+    PassEdit *slave = nullptr;
     QString genText;
     int min, genMin, wordMax;
     bool lastValid = false;
-    QProgressBar *meter = nullptr;
     QAction *actionEye = nullptr;
+    #ifndef NO_ZXCVBN
+    QAction *actionMeter = nullptr;
+    #endif
     void generate();
     void masterTextChanged();
     void slaveTextChanged(const QString &slaveText);
@@ -40,12 +41,11 @@ protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void changeEvent(QEvent *event);
 public:
-    MPassEdit(QWidget *parent = nullptr);
-    void setup(MPassEdit *slave, QProgressBar *meter,
-               int min=0, int genMin=16, int wordMax=5);
+    PassEdit(QWidget *parent = nullptr);
+    void setup(PassEdit *slave, int min=0, int genMin=16, int wordMax=5);
     bool isValid() const;
 signals:
     void validationChanged(bool valid);
 };
 
-#endif // MPASSEDIT_H
+#endif // PASSEDIT_H

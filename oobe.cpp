@@ -37,10 +37,10 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings 
     enableServices = appConf.value("ENABLE_SERVICES").toStringList();
 
     // User accounts
-    gui.textUserPass->setup(gui.textUserPass2, gui.progUserPassMeter);
-    gui.textRootPass->setup(gui.textRootPass2, gui.progRootPassMeter);
-    connect(gui.textUserPass, &MPassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
-    connect(gui.textRootPass, &MPassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
+    gui.textUserPass->setup(gui.textUserPass2);
+    gui.textRootPass->setup(gui.textRootPass2);
+    connect(gui.textUserPass, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
+    connect(gui.textRootPass, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
     connect(gui.textUserName, &QLineEdit::textChanged, this, &Oobe::userPassValidationChanged);
     connect(gui.boxRootAccount, &QGroupBox::toggled, this, &Oobe::userPassValidationChanged);
     // Old home
