@@ -184,10 +184,10 @@ void MInstall::startup()
     }
 
     // Password box setup
-    textCryptoPass->setup(textCryptoPass2, progCryptoPassMeter, 1, 32, 9);
-    textCryptoPassCust->setup(textCryptoPassCust2, progCryptoPassMeterCust, 1, 32, 9);
-    connect(textCryptoPass, &MPassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
-    connect(textCryptoPassCust, &MPassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
+    textCryptoPass->setup(textCryptoPass2, 1, 32, 9);
+    textCryptoPassCust->setup(textCryptoPassCust2, 1, 32, 9);
+    connect(textCryptoPass, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
+    connect(textCryptoPassCust, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
 
     setupkeyboardbutton();
 

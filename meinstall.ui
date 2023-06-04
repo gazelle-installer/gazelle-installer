@@ -444,7 +444,7 @@
               </item>
               <item row="1" column="0" colspan="2">
                <widget class="QGroupBox" name="boxAutoPart">
-                <layout class="QFormLayout" name="formLayout">
+                <layout class="QFormLayout">
                  <item row="0" column="1">
                   <widget class="QLabel" name="labelDisk">
                    <property name="font">
@@ -457,9 +457,6 @@
                     <bool>false</bool>
                    </property>
                   </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QComboBox" name="comboDisk"/>
                  </item>
                  <item row="2" column="1">
                   <widget class="QFrame" name="boxSliderPart">
@@ -616,7 +613,7 @@ QSlider::handle:horizontal:disabled {
                    <property name="checked">
                     <bool>false</bool>
                    </property>
-                   <layout class="QGridLayout">
+                   <layout class="QFormLayout">
                     <item row="0" column="0">
                      <widget class="QLabel" name="labelCryptoPass">
                       <property name="text">
@@ -625,25 +622,12 @@ QSlider::handle:horizontal:disabled {
                      </widget>
                     </item>
                     <item row="0" column="1">
-                     <widget class="MPassEdit" name="textCryptoPass">
+                     <widget class="PassEdit" name="textCryptoPass">
                       <property name="maxLength">
                        <number>512</number>
                       </property>
                       <property name="echoMode">
                        <enum>QLineEdit::Password</enum>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="2" rowspan="2">
-                     <widget class="QProgressBar" name="progCryptoPassMeter">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
                       </property>
                      </widget>
                     </item>
@@ -655,7 +639,7 @@ QSlider::handle:horizontal:disabled {
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="MPassEdit" name="textCryptoPass2">
+                     <widget class="PassEdit" name="textCryptoPass2">
                       <property name="maxLength">
                        <number>512</number>
                       </property>
@@ -673,6 +657,9 @@ QSlider::handle:horizontal:disabled {
                     <string>Enable hibernation support</string>
                    </property>
                   </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QComboBox" name="comboDisk"/>
                  </item>
                 </layout>
                </widget>
@@ -799,42 +786,16 @@ QSlider::handle:horizontal:disabled {
              <property name="title">
               <string>Encryption options</string>
              </property>
-             <layout class="QGridLayout">
-              <item row="0" column="2" colspan="2">
-               <widget class="MPassEdit" name="textCryptoPassCust">
-                <property name="maxLength">
-                 <number>512</number>
-                </property>
-                <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="0" colspan="2">
+             <layout class="QFormLayout">
+              <item row="0" column="0">
                <widget class="QLabel" name="labelCryptoPassCust">
                 <property name="text">
                  <string>Encryption password:</string>
                 </property>
                </widget>
               </item>
-              <item row="0" column="4" rowspan="2">
-               <widget class="QProgressBar" name="progCryptoPassMeterCust">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="value">
-                 <number>24</number>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2" colspan="2">
-               <widget class="MPassEdit" name="textCryptoPassCust2">
+              <item row="0" column="1">
+               <widget class="PassEdit" name="textCryptoPassCust">
                 <property name="maxLength">
                  <number>512</number>
                 </property>
@@ -843,10 +804,20 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
-              <item row="1" column="0" colspan="2">
+              <item row="1" column="0">
                <widget class="QLabel" name="labelCryptoPassCust2">
                 <property name="text">
                  <string>Confirm password:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="PassEdit" name="textCryptoPassCust2">
+                <property name="maxLength">
+                 <number>512</number>
+                </property>
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
                 </property>
                </widget>
               </item>
@@ -1034,7 +1005,7 @@ QSlider::handle:horizontal:disabled {
              </property>
              <layout class="QGridLayout">
               <item row="2" column="1">
-               <layout class="QHBoxLayout" name="horizontalLayout">
+               <layout class="QHBoxLayout">
                 <property name="spacing">
                  <number>0</number>
                 </property>
@@ -1128,8 +1099,8 @@ QSlider::handle:horizontal:disabled {
              <property name="title">
               <string>Common Services to Enable</string>
              </property>
-             <layout class="QGridLayout">
-              <item row="0" column="0">
+             <layout class="QVBoxLayout">
+              <item>
                <widget class="QTreeWidget" name="treeServices">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -1644,7 +1615,7 @@ QSlider::handle:horizontal:disabled {
              <property name="title">
               <string>Default User Account</string>
              </property>
-             <layout class="QGridLayout">
+             <layout class="QFormLayout">
               <item row="0" column="0">
                <widget class="QLabel" name="labelUserName">
                 <property name="sizePolicy">
@@ -1661,6 +1632,22 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="textUserName">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>username</string>
+                </property>
+               </widget>
+              </item>
               <item row="1" column="0">
                <widget class="QLabel" name="labelUserPass">
                 <property name="sizePolicy">
@@ -1671,6 +1658,22 @@ QSlider::handle:horizontal:disabled {
                 </property>
                 <property name="text">
                  <string>Default user password:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="PassEdit" name="textUserPass">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
                 </property>
                </widget>
               </item>
@@ -1687,24 +1690,8 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
-               <widget class="MPassEdit" name="textUserPass">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="1">
-               <widget class="MPassEdit" name="textUserPass2">
+               <widget class="PassEdit" name="textUserPass2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1716,35 +1703,6 @@ QSlider::handle:horizontal:disabled {
                 </property>
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2" rowspan="2">
-               <widget class="QProgressBar" name="progUserPassMeter">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1" colspan="2">
-               <widget class="QLineEdit" name="textUserName">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="placeholderText">
-                 <string>username</string>
                 </property>
                </widget>
               </item>
@@ -1768,7 +1726,7 @@ QSlider::handle:horizontal:disabled {
              <property name="checked">
               <bool>false</bool>
              </property>
-             <layout class="QGridLayout">
+             <layout class="QFormLayout">
               <item row="0" column="0">
                <widget class="QLabel" name="labelRootPass">
                 <property name="sizePolicy">
@@ -1783,23 +1741,7 @@ QSlider::handle:horizontal:disabled {
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="MPassEdit" name="textRootPass">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="MPassEdit" name="textRootPass2">
+               <widget class="PassEdit" name="textRootPass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1827,16 +1769,19 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
-              <item row="0" column="2" rowspan="2">
-               <widget class="QProgressBar" name="progRootPassMeter">
+              <item row="1" column="1">
+               <widget class="PassEdit" name="textRootPass2">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Ignored">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="echoMode">
+                 <enum>QLineEdit::Password</enum>
                 </property>
                </widget>
               </item>
@@ -2073,9 +2018,9 @@ QSlider::handle:horizontal:disabled {
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>MPassEdit</class>
+   <class>PassEdit</class>
    <extends>QLineEdit</extends>
-   <header>mpassedit.h</header>
+   <header>passedit.h</header>
   </customwidget>
   <customwidget>
    <class>MTreeView</class>

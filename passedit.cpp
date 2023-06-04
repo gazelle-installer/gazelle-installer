@@ -1,5 +1,5 @@
 /***************************************************************************
- * MPassEdit class - QLineEdit modified for passwords.
+ * PassEdit class - QLineEdit operating as a pair for editing passwords.
  *
  *   Copyright (C) 2021 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,50 +17,54 @@
  * This file is part of the gazelle-installer.
  **************************************************************************/
 
+#include <cmath>
 #include <QApplication>
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QStringList>
 #include <QString>
 #include <QFile>
-#include "mpassedit.h"
+#include <QDebug>
+#ifndef NO_ZXCVBN
+    #include <zxcvbn.h>
+#endif
+#include "passedit.h"
 
-MPassEdit::MPassEdit(QWidget *parent)
+PassEdit::PassEdit(QWidget *parent)
     : QLineEdit(parent)
 {
 }
 
-bool MPassEdit::isValid() const
+bool PassEdit::isValid() const
 {
     return lastValid;
 }
 
-void MPassEdit::setup(MPassEdit *slave, QProgressBar *meter,
-                      int min, int genMin, int wordMax)
+void PassEdit::setup(PassEdit *slave, int min, int genMin, int wordMax)
 {
     this->slave = slave;
     this->min = min;
     this->genMin = genMin;
     this->wordMax = wordMax;
-    this->meter = meter;
     disconnect(this);
     disconnect(slave);
-    connect(this, &QLineEdit::textChanged, this, &MPassEdit::masterTextChanged);
-    connect(slave, &QLineEdit::textChanged, this, &MPassEdit::slaveTextChanged);
+    connect(this, &QLineEdit::textChanged, this, &PassEdit::masterTextChanged);
+    connect(slave, &QLineEdit::textChanged, this, &PassEdit::slaveTextChanged);
     if (min == 0) lastValid = true; // Control starts with no text
     generate(); // Pre-load the generator
-    if (meter) {
-        meter->setRange(0, 100);
-        meter->setValue(0);
-        meter->setTextVisible(false);
-    }
+
     actionEye = addAction(QIcon(":/eye-show"), QLineEdit::TrailingPosition);
     actionEye->setCheckable(true);
-    connect(actionEye, &QAction::toggled, this, &MPassEdit::eyeToggled);
+    connect(actionEye, &QAction::toggled, this, &PassEdit::eyeToggled);
     eyeToggled(false); // Initialize the eye.
+    #ifndef NO_ZXCVBN
+    actionMeter = slave->addAction(QIcon(":/meter/0"), QLineEdit::TrailingPosition);
+    #endif
+
+    masterTextChanged();
 }
 
-void MPassEdit::generate()
+void PassEdit::generate()
 {
     static QStringList words;
     static int pos;
@@ -92,7 +96,7 @@ void MPassEdit::generate()
     genText.append(QString::number(std::rand() % 10));
 }
 
-void MPassEdit::contextMenuEvent(QContextMenuEvent *event)
+void PassEdit::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = createStandardContextMenu();
     QAction *actGenPass = nullptr;
@@ -109,7 +113,7 @@ void MPassEdit::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
-void MPassEdit::changeEvent(QEvent *event)
+void PassEdit::changeEvent(QEvent *event)
 {
     const QEvent::Type etype = event->type();
     if(etype == QEvent::EnabledChange || etype == QEvent::Hide) {
@@ -118,51 +122,34 @@ void MPassEdit::changeEvent(QEvent *event)
     QLineEdit::changeEvent(event);
 }
 
-void MPassEdit::masterTextChanged()
+void PassEdit::masterTextChanged()
 {
     slave->clear();
-    setPalette(QApplication::palette());
-    slave->setPalette(QApplication::palette());
+    setPalette(QPalette());
+    slave->setPalette(QPalette());
     const bool valid = (text().isEmpty() && min == 0);
-    if (meter) {
-        int score = 0;
-        const QString &t = text();
-        if (!t.isEmpty()) {
-            int changes = 0;
-            int cats = 0;
-            QChar oldchar = '\0';
-            for (const QChar &c : t) {
-                if (oldchar != c) {
-                    ++changes;
-                    oldchar = c;
-                }
-                if (c.isUpper()) cats |= 1;
-                else if (c.isLower()) cats |= 2;
-                else if (c.isSpace()) cats |= 4;
-                else if (c.isPunct()) cats |= 8;
-                else cats |= 16;
-            }
-            int textLen = t.length();
-            changes = (changes * 14) / textLen;
-            for (int i = 0; i < 5; ++i) {
-                score += (cats&1) * changes;
-                cats >>= 1;
-            }
-            score += textLen <= 30 ? textLen : 30;
-        }
-        meter->setValue(score);
-        QPalette pal = meter->palette();
-        score = (255 * score) / 100;
-        pal.setColor(QPalette::Highlight, QColor(255 - score, score, 0, 70));
-        meter->setPalette(pal);
-    }
+
+    #ifndef NO_ZXCVBN
+    // Similar to https://keepassxc.org/blog/2020-08-15-keepassxc-password-healthcheck/
+    const double entropy = ZxcvbnMatch(text().toUtf8().constData(), nullptr, nullptr);
+    int score;
+    if (entropy <= 0) score = 0; // Bad
+    else if(entropy < 40) score = 1; // Poor
+    else if(entropy < 65) score = 2; // Weak
+    else if(entropy < 80) score = 3; // OK
+    else if(entropy < 100) score = 4; // Good
+    else score = 5; // Excellent
+    actionMeter->setIcon(QIcon(":/meter/" + QString::number(score)));
+    #endif
+
+    // The validation could change if the box is empty and no minimum is set.
     if (valid != lastValid) {
         lastValid = valid;
         emit validationChanged(valid);
     }
 }
 
-void MPassEdit::slaveTextChanged(const QString &slaveText)
+void PassEdit::slaveTextChanged(const QString &slaveText)
 {
     QPalette pal = palette();
     bool valid = true;
@@ -183,7 +170,7 @@ void MPassEdit::slaveTextChanged(const QString &slaveText)
     }
 }
 
-void MPassEdit::eyeToggled(bool checked)
+void PassEdit::eyeToggled(bool checked)
 {
     actionEye->setIcon(QIcon(checked ? ":/eye-hide" : ":/eye-show"));
     actionEye->setToolTip(checked ? tr("Hide the password") : tr("Show the password"));
