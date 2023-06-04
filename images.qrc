@@ -11,17 +11,11 @@
         <file alias="partitionmanager">icons/partitionmanager.svg</file>
     </qresource>
     <qresource prefix="/meter">
-        <file alias="right-0">meter/right-0.svg</file>
-        <file alias="right-1">meter/right-1.svg</file>
-        <file alias="right-2">meter/right-2.svg</file>
-        <file alias="right-3">meter/right-3.svg</file>
-        <file alias="right-4">meter/right-4.svg</file>
-        <file alias="right-5">meter/right-5.svg</file>
-        <file alias="wrong-0">meter/wrong-0.svg</file>
-        <file alias="wrong-1">meter/wrong-1.svg</file>
-        <file alias="wrong-2">meter/wrong-2.svg</file>
-        <file alias="wrong-3">meter/wrong-3.svg</file>
-        <file alias="wrong-4">meter/wrong-4.svg</file>
-        <file alias="wrong-5">meter/wrong-5.svg</file>
+        <file alias="0">meter/0.svg</file>
+        <file alias="1">meter/1.svg</file>
+        <file alias="2">meter/2.svg</file>
+        <file alias="3">meter/3.svg</file>
+        <file alias="4">meter/4.svg</file>
+        <file alias="5">meter/5.svg</file>
     </qresource>
 </RCC>
