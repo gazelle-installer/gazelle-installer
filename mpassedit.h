@@ -31,7 +31,8 @@ private:
     int min, genMin, wordMax;
     bool lastValid = false;
     QProgressBar *meter = nullptr;
-    QAction *actionEye = nullptr;
+    QAction *actionEye = nullptr, *actionMeter = nullptr;
+    int score = 0;
     void generate();
     void masterTextChanged();
     void slaveTextChanged(const QString &slaveText);
@@ -41,8 +42,7 @@ protected:
     void changeEvent(QEvent *event);
 public:
     MPassEdit(QWidget *parent = nullptr);
-    void setup(MPassEdit *slave, QProgressBar *meter,
-               int min=0, int genMin=16, int wordMax=5);
+    void setup(MPassEdit *slave, int min=0, int genMin=16, int wordMax=5);
     bool isValid() const;
 signals:
     void validationChanged(bool valid);
