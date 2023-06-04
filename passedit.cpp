@@ -1,5 +1,5 @@
 /***************************************************************************
- * MPassEdit class - QLineEdit modified for passwords.
+ * PassEdit class - QLineEdit operating as a pair for editing passwords.
  *
  *   Copyright (C) 2021 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,19 +28,19 @@
 #ifndef NO_ZXCVBN
     #include <zxcvbn.h>
 #endif
-#include "mpassedit.h"
+#include "passedit.h"
 
-MPassEdit::MPassEdit(QWidget *parent)
+PassEdit::PassEdit(QWidget *parent)
     : QLineEdit(parent)
 {
 }
 
-bool MPassEdit::isValid() const
+bool PassEdit::isValid() const
 {
     return lastValid;
 }
 
-void MPassEdit::setup(MPassEdit *slave, int min, int genMin, int wordMax)
+void PassEdit::setup(PassEdit *slave, int min, int genMin, int wordMax)
 {
     this->slave = slave;
     this->min = min;
@@ -49,14 +49,14 @@ void MPassEdit::setup(MPassEdit *slave, int min, int genMin, int wordMax)
     this->meter = meter;
     disconnect(this);
     disconnect(slave);
-    connect(this, &QLineEdit::textChanged, this, &MPassEdit::masterTextChanged);
-    connect(slave, &QLineEdit::textChanged, this, &MPassEdit::slaveTextChanged);
+    connect(this, &QLineEdit::textChanged, this, &PassEdit::masterTextChanged);
+    connect(slave, &QLineEdit::textChanged, this, &PassEdit::slaveTextChanged);
     if (min == 0) lastValid = true; // Control starts with no text
     generate(); // Pre-load the generator
 
     actionEye = addAction(QIcon(":/eye-show"), QLineEdit::TrailingPosition);
     actionEye->setCheckable(true);
-    connect(actionEye, &QAction::toggled, this, &MPassEdit::eyeToggled);
+    connect(actionEye, &QAction::toggled, this, &PassEdit::eyeToggled);
     eyeToggled(false); // Initialize the eye.
     #ifndef NO_ZXCVBN
     actionMeter = slave->addAction(QIcon(":/meter/0"), QLineEdit::TrailingPosition);
@@ -65,7 +65,7 @@ void MPassEdit::setup(MPassEdit *slave, int min, int genMin, int wordMax)
     masterTextChanged();
 }
 
-void MPassEdit::generate()
+void PassEdit::generate()
 {
     static QStringList words;
     static int pos;
@@ -97,7 +97,7 @@ void MPassEdit::generate()
     genText.append(QString::number(std::rand() % 10));
 }
 
-void MPassEdit::contextMenuEvent(QContextMenuEvent *event)
+void PassEdit::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = createStandardContextMenu();
     QAction *actGenPass = nullptr;
@@ -114,7 +114,7 @@ void MPassEdit::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
-void MPassEdit::changeEvent(QEvent *event)
+void PassEdit::changeEvent(QEvent *event)
 {
     const QEvent::Type etype = event->type();
     if(etype == QEvent::EnabledChange || etype == QEvent::Hide) {
@@ -123,7 +123,7 @@ void MPassEdit::changeEvent(QEvent *event)
     QLineEdit::changeEvent(event);
 }
 
-void MPassEdit::masterTextChanged()
+void PassEdit::masterTextChanged()
 {
     slave->clear();
     setPalette(QPalette());
@@ -149,7 +149,7 @@ void MPassEdit::masterTextChanged()
     }
 }
 
-void MPassEdit::slaveTextChanged(const QString &slaveText)
+void PassEdit::slaveTextChanged(const QString &slaveText)
 {
     QPalette pal = palette();
     bool valid = true;
@@ -170,7 +170,7 @@ void MPassEdit::slaveTextChanged(const QString &slaveText)
     }
 }
 
-void MPassEdit::eyeToggled(bool checked)
+void PassEdit::eyeToggled(bool checked)
 {
     actionEye->setIcon(QIcon(checked ? ":/eye-hide" : ":/eye-show"));
     actionEye->setToolTip(checked ? tr("Hide the password") : tr("Show the password"));

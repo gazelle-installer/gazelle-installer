@@ -130,9 +130,9 @@ HEADERS += minstall.h \
     autopart.h \
     base.h \
     bootman.h \
-    mpassedit.h \
     mtreeview.h \
     oobe.h \
+    passedit.h \
     swapman.h \
     version.h \
     msettings.h \
@@ -143,11 +143,11 @@ SOURCES += app.cpp minstall.cpp \
     autopart.cpp \
     base.cpp \
     bootman.cpp \
-    mpassedit.cpp \
     msettings.cpp \
     mtreeview.cpp \
     oobe.cpp \
     partman.cpp \
+    passedit.cpp \
     safecache.cpp \
     mprocess.cpp \
     swapman.cpp
