@@ -26,8 +26,8 @@
 #include <QFile>
 #include <QDebug>
 #ifndef NO_ZXCVBN
-#include <zxcvbn.h>
-#endif
+    #include <zxcvbn.h>
+#endif // NO_ZXCVBN
 #include "mpassedit.h"
 
 MPassEdit::MPassEdit(QWidget *parent)
@@ -40,8 +40,7 @@ bool MPassEdit::isValid() const
     return lastValid;
 }
 
-void MPassEdit::setup(MPassEdit *slave, QProgressBar *meter,
-                      int min, int genMin, int wordMax)
+void MPassEdit::setup(MPassEdit *slave, int min, int genMin, int wordMax)
 {
     this->slave = slave;
     this->min = min;
@@ -54,16 +53,13 @@ void MPassEdit::setup(MPassEdit *slave, QProgressBar *meter,
     connect(slave, &QLineEdit::textChanged, this, &MPassEdit::slaveTextChanged);
     if (min == 0) lastValid = true; // Control starts with no text
     generate(); // Pre-load the generator
-    if (meter) {
-        meter->setRange(0, 100);
-        meter->setValue(0);
-        meter->setFormat("!!!");
-        meter->setTextVisible(false);
-    }
+
     actionEye = addAction(QIcon(":/eye-show"), QLineEdit::TrailingPosition);
     actionEye->setCheckable(true);
     connect(actionEye, &QAction::toggled, this, &MPassEdit::eyeToggled);
     eyeToggled(false); // Initialize the eye.
+    actionMeter = slave->addAction(QIcon(":/meter/wrong-0"), QLineEdit::TrailingPosition);
+    connect(actionMeter, &QAction::triggered, slave, &QLineEdit::clear);
 
     masterTextChanged();
 }
@@ -128,71 +124,25 @@ void MPassEdit::changeEvent(QEvent *event)
 
 void MPassEdit::masterTextChanged()
 {
+    slave->blockSignals(true);
     slave->clear();
-    setPalette(QApplication::palette());
-    slave->setPalette(QApplication::palette());
-    const bool valid = (text().isEmpty() && min == 0);
-    if (meter) {
-        #ifndef NO_ZXCVBN
-        int score = 4;
-        double entropy = ZxcvbnMatch(text().toUtf8().constData(), nullptr, nullptr);
-        // entropy *= 0.301029996; // Log
-        qDebug() << log10(entropy);
-        #else // !NO_ZXCVBN
-
-        int score = 0;
-        const QString &t = text();
-        if (!t.isEmpty()) {
-            int changes = 0;
-            int cats = 0;
-            QChar oldchar = '\0';
-            for (const QChar &c : t) {
-                if (oldchar != c) {
-                    ++changes;
-                    oldchar = c;
-                }
-                if (c.isUpper()) cats |= 1;
-                else if (c.isLower()) cats |= 2;
-                else if (c.isSpace()) cats |= 4;
-                else if (c.isPunct()) cats |= 8;
-                else cats |= 16;
-            }
-            int textLen = t.length();
-            changes = (changes * 14) / textLen;
-            for (int i = 0; i < 5; ++i) {
-                score += (cats&1) * changes;
-                cats >>= 1;
-            }
-            score += textLen <= 30 ? textLen : 30;
-        }
-        #endif // NO_ZXCVBN
-        meter->setValue(score);
-        QPalette pal = meter->palette();
-        score = (255 * score) / 100;
-        pal.setColor(QPalette::Highlight, QColor(255 - score, score, 0, 70));
-        meter->setPalette(pal);
-    }
-    if (valid != lastValid) {
-        lastValid = valid;
-        emit validationChanged(valid);
-    }
+    slave->blockSignals(false);
+    #ifndef NO_ZXCVBN
+    const double entropy = ZxcvbnMatch(text().toUtf8().constData(), nullptr, nullptr);
+    if (entropy <= 0) score = 0; // Bad
+    else if(entropy < 40) score = 1; // Poor
+    else if(entropy < 65) score = 2; // Weak
+    else if(entropy < 80) score = 3; // OK
+    else if(entropy < 100) score = 4; // Good
+    else score = 5; // Excellent
+    #endif // NO_ZXCVBN
+    slaveTextChanged(slave->text());
 }
 
 void MPassEdit::slaveTextChanged(const QString &slaveText)
 {
-    QPalette pal = palette();
-    bool valid = true;
-    if (slaveText == text()) {
-        QColor col(255, 255, 0, 40);
-        if (slaveText.length() >= min) col.setRgb(0, 255, 0, 40);
-        else valid = false;
-        pal.setColor(QPalette::Base, col);
-    } else {
-        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
-        valid = false;
-    }
-    setPalette(pal);
-    slave->setPalette(pal);
+    bool valid = (slaveText.length() >= min && slaveText == text());
+    actionMeter->setIcon(QIcon((valid?":/meter/right-":":/meter/wrong-") + QString::number(score)));
     if (valid != lastValid) {
         lastValid = valid;
         emit validationChanged(valid);

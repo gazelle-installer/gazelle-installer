@@ -1,6 +1,5 @@
-<!DOCTYPE RCC>
-<RCC version="1.0">
-    <qresource>
+<RCC>
+    <qresource prefix="/">
         <file alias="eye-show">icons/eye-show.svg</file>
         <file alias="eye-hide">icons/eye-hide.svg</file>
         <file alias="appointment-soon">icons/appointment-soon.svg</file>
@@ -10,5 +9,19 @@
         <file alias="edit-clear-all">icons/edit-clear-all.svg</file>
         <file alias="view-refresh">icons/view-refresh.svg</file>
         <file alias="partitionmanager">icons/partitionmanager.svg</file>
+    </qresource>
+    <qresource prefix="/meter">
+        <file alias="right-0">meter/right-0.svg</file>
+        <file alias="right-1">meter/right-1.svg</file>
+        <file alias="right-2">meter/right-2.svg</file>
+        <file alias="right-3">meter/right-3.svg</file>
+        <file alias="right-4">meter/right-4.svg</file>
+        <file alias="right-5">meter/right-5.svg</file>
+        <file alias="wrong-0">meter/wrong-0.svg</file>
+        <file alias="wrong-1">meter/wrong-1.svg</file>
+        <file alias="wrong-2">meter/wrong-2.svg</file>
+        <file alias="wrong-3">meter/wrong-3.svg</file>
+        <file alias="wrong-4">meter/wrong-4.svg</file>
+        <file alias="wrong-5">meter/wrong-5.svg</file>
     </qresource>
 </RCC>
