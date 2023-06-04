@@ -136,10 +136,15 @@ void PassEdit::masterTextChanged()
     if (entropy <= 0) score = 0; // Bad
     else if(entropy < 40) score = 1; // Poor
     else if(entropy < 65) score = 2; // Weak
-    else if(entropy < 80) score = 3; // OK
+    else if(entropy < 80) score = 3; // Fair
     else if(entropy < 100) score = 4; // Good
     else score = 5; // Excellent
     actionMeter->setIcon(QIcon(":/meter/" + QString::number(score)));
+    static const char *strengths[] = {
+        QT_TR_NOOP("Bad"), QT_TR_NOOP("Poor"), QT_TR_NOOP("Weak"),
+        QT_TR_NOOP("Fair"), QT_TR_NOOP("Good"), QT_TR_NOOP("Excellent")
+    };
+    actionMeter->setToolTip(tr("Password strength: %1").arg(tr(strengths[score])));
     #endif
 
     // The validation could change if the box is empty and no minimum is set.
