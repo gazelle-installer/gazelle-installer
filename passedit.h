@@ -20,7 +20,6 @@
 #define PASSEDIT_H
 
 #include <QLineEdit>
-#include <QProgressBar>
 
 class PassEdit : public QLineEdit
 {
@@ -30,7 +29,6 @@ private:
     QString genText;
     int min, genMin, wordMax;
     bool lastValid = false;
-    QProgressBar *meter = nullptr;
     QAction *actionEye = nullptr;
     #ifndef NO_ZXCVBN
     QAction *actionMeter = nullptr;
