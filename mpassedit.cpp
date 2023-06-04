@@ -27,7 +27,7 @@
 #include <QDebug>
 #ifndef NO_ZXCVBN
     #include <zxcvbn.h>
-#endif // NO_ZXCVBN
+#endif
 #include "mpassedit.h"
 
 MPassEdit::MPassEdit(QWidget *parent)
@@ -58,8 +58,9 @@ void MPassEdit::setup(MPassEdit *slave, int min, int genMin, int wordMax)
     actionEye->setCheckable(true);
     connect(actionEye, &QAction::toggled, this, &MPassEdit::eyeToggled);
     eyeToggled(false); // Initialize the eye.
-    actionMeter = slave->addAction(QIcon(":/meter/wrong-0"), QLineEdit::TrailingPosition);
-    connect(actionMeter, &QAction::triggered, slave, &QLineEdit::clear);
+    #ifndef NO_ZXCVBN
+    actionMeter = slave->addAction(QIcon(":/meter/0"), QLineEdit::TrailingPosition);
+    #endif
 
     masterTextChanged();
 }
@@ -124,25 +125,45 @@ void MPassEdit::changeEvent(QEvent *event)
 
 void MPassEdit::masterTextChanged()
 {
-    slave->blockSignals(true);
     slave->clear();
-    slave->blockSignals(false);
+    setPalette(QPalette());
+    slave->setPalette(QPalette());
+    const bool valid = (text().isEmpty() && min == 0);
+
     #ifndef NO_ZXCVBN
     const double entropy = ZxcvbnMatch(text().toUtf8().constData(), nullptr, nullptr);
+    int score;
     if (entropy <= 0) score = 0; // Bad
     else if(entropy < 40) score = 1; // Poor
     else if(entropy < 65) score = 2; // Weak
     else if(entropy < 80) score = 3; // OK
     else if(entropy < 100) score = 4; // Good
     else score = 5; // Excellent
-    #endif // NO_ZXCVBN
-    slaveTextChanged(slave->text());
+    actionMeter->setIcon(QIcon(":/meter/" + QString::number(score)));
+    #endif
+
+    // The validation could change if the box is empty and no minimum is set.
+    if (valid != lastValid) {
+        lastValid = valid;
+        emit validationChanged(valid);
+    }
 }
 
 void MPassEdit::slaveTextChanged(const QString &slaveText)
 {
-    bool valid = (slaveText.length() >= min && slaveText == text());
-    actionMeter->setIcon(QIcon((valid?":/meter/right-":":/meter/wrong-") + QString::number(score)));
+    QPalette pal = palette();
+    bool valid = true;
+    if (slaveText == text()) {
+        QColor col(255, 255, 0, 40);
+        if (slaveText.length() >= min) col.setRgb(0, 255, 0, 40);
+        else valid = false;
+        pal.setColor(QPalette::Base, col);
+    } else {
+        pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
+        valid = false;
+    }
+    setPalette(pal);
+    slave->setPalette(pal);
     if (valid != lastValid) {
         lastValid = valid;
         emit validationChanged(valid);
