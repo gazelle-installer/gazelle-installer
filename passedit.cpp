@@ -46,7 +46,6 @@ void PassEdit::setup(PassEdit *slave, int min, int genMin, int wordMax)
     this->min = min;
     this->genMin = genMin;
     this->wordMax = wordMax;
-    this->meter = meter;
     disconnect(this);
     disconnect(slave);
     connect(this, &QLineEdit::textChanged, this, &PassEdit::masterTextChanged);
