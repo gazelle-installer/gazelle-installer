@@ -39,8 +39,8 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings 
     // User accounts
     gui.textUserPass->setup(gui.textUserPass2);
     gui.textRootPass->setup(gui.textRootPass2);
-    connect(gui.textUserPass, &MPassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
-    connect(gui.textRootPass, &MPassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
+    connect(gui.textUserPass, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
+    connect(gui.textRootPass, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
     connect(gui.textUserName, &QLineEdit::textChanged, this, &Oobe::userPassValidationChanged);
     connect(gui.boxRootAccount, &QGroupBox::toggled, this, &Oobe::userPassValidationChanged);
     // Old home
