@@ -30,9 +30,7 @@ private:
     int min, genMin, wordMax;
     bool lastValid = false;
     QAction *actionEye = nullptr;
-    #ifndef NO_ZXCVBN
     QAction *actionMeter = nullptr;
-    #endif
     void generate();
     void masterTextChanged();
     void slaveTextChanged(const QString &slaveText);

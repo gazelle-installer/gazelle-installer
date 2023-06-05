@@ -25,9 +25,7 @@
 #include <QString>
 #include <QFile>
 #include <QDebug>
-#ifndef NO_ZXCVBN
-    #include <zxcvbn.h>
-#endif
+#include <zxcvbn.h>
 #include "passedit.h"
 
 PassEdit::PassEdit(QWidget *parent)
@@ -57,9 +55,7 @@ void PassEdit::setup(PassEdit *slave, int min, int genMin, int wordMax)
     actionEye->setCheckable(true);
     connect(actionEye, &QAction::toggled, this, &PassEdit::eyeToggled);
     eyeToggled(false); // Initialize the eye.
-    #ifndef NO_ZXCVBN
     actionMeter = slave->addAction(QIcon(":/meter/0"), QLineEdit::TrailingPosition);
-    #endif
 
     masterTextChanged();
 }
@@ -129,7 +125,6 @@ void PassEdit::masterTextChanged()
     slave->setPalette(QPalette());
     const bool valid = (text().isEmpty() && min == 0);
 
-    #ifndef NO_ZXCVBN
     const double entropy = ZxcvbnMatch(text().toUtf8().constData(), nullptr, nullptr);
     int score;
     if (entropy <= 0) score = 0; // Negligible
@@ -144,7 +139,6 @@ void PassEdit::masterTextChanged()
         QT_TR_NOOP("Moderate"), QT_TR_NOOP("Strong"), QT_TR_NOOP("Very strong")
     };
     actionMeter->setToolTip(tr("Password strength: %1").arg(tr(ratings[score])));
-    #endif
 
     // The validation could change if the box is empty and no minimum is set.
     if (valid != lastValid) {
