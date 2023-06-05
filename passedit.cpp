@@ -130,21 +130,20 @@ void PassEdit::masterTextChanged()
     const bool valid = (text().isEmpty() && min == 0);
 
     #ifndef NO_ZXCVBN
-    // Similar to https://keepassxc.org/blog/2020-08-15-keepassxc-password-healthcheck/
     const double entropy = ZxcvbnMatch(text().toUtf8().constData(), nullptr, nullptr);
     int score;
-    if (entropy <= 0) score = 0; // Bad
-    else if(entropy < 40) score = 1; // Poor
-    else if(entropy < 65) score = 2; // Weak
-    else if(entropy < 80) score = 3; // Fair
-    else if(entropy < 100) score = 4; // Good
-    else score = 5; // Excellent
+    if (entropy <= 0) score = 0; // Negligible
+    else if(entropy < 40) score = 1; // Very weak
+    else if(entropy < 70) score = 2; // Weak
+    else if(entropy < 100) score = 3; // Moderate
+    else if(entropy < 130) score = 4; // Strong
+    else score = 5; // Very strong
     actionMeter->setIcon(QIcon(":/meter/" + QString::number(score)));
-    static const char *strengths[] = {
-        QT_TR_NOOP("Bad"), QT_TR_NOOP("Poor"), QT_TR_NOOP("Weak"),
-        QT_TR_NOOP("Fair"), QT_TR_NOOP("Good"), QT_TR_NOOP("Excellent")
+    static const char *ratings[] = {
+        QT_TR_NOOP("Negligible"), QT_TR_NOOP("Very weak"), QT_TR_NOOP("Weak"),
+        QT_TR_NOOP("Moderate"), QT_TR_NOOP("Strong"), QT_TR_NOOP("Very strong")
     };
-    actionMeter->setToolTip(tr("Password strength: %1").arg(tr(strengths[score])));
+    actionMeter->setToolTip(tr("Password strength: %1").arg(tr(ratings[score])));
     #endif
 
     // The validation could change if the box is empty and no minimum is set.
