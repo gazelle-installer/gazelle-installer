@@ -10,12 +10,12 @@
         <file alias="view-refresh">icons/view-refresh.svg</file>
         <file alias="partitionmanager">icons/partitionmanager.svg</file>
     </qresource>
-    <qresource prefix="/meter">
-        <file alias="0">meter/0.svg</file>
-        <file alias="1">meter/1.svg</file>
-        <file alias="2">meter/2.svg</file>
-        <file alias="3">meter/3.svg</file>
-        <file alias="4">meter/4.svg</file>
-        <file alias="5">meter/5.svg</file>
+    <qresource prefix="/gauge">
+        <file alias="0">gauge/0.svg</file>
+        <file alias="1">gauge/1.svg</file>
+        <file alias="2">gauge/2.svg</file>
+        <file alias="3">gauge/3.svg</file>
+        <file alias="4">gauge/4.svg</file>
+        <file alias="5">gauge/5.svg</file>
     </qresource>
 </RCC>
