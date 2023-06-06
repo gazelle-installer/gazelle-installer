@@ -55,7 +55,7 @@ void PassEdit::setup(PassEdit *slave, int min, int genMin, int wordMax)
     actionEye->setCheckable(true);
     connect(actionEye, &QAction::toggled, this, &PassEdit::eyeToggled);
     eyeToggled(false); // Initialize the eye.
-    actionMeter = slave->addAction(QIcon(":/meter/0"), QLineEdit::TrailingPosition);
+    actionGauge = slave->addAction(QIcon(":/gauge/0"), QLineEdit::TrailingPosition);
 
     masterTextChanged();
 }
@@ -133,12 +133,12 @@ void PassEdit::masterTextChanged()
     else if(entropy < 100) score = 3; // Moderate
     else if(entropy < 130) score = 4; // Strong
     else score = 5; // Very strong
-    actionMeter->setIcon(QIcon(":/meter/" + QString::number(score)));
+    actionGauge->setIcon(QIcon(":/gauge/" + QString::number(score)));
     static const char *ratings[] = {
         QT_TR_NOOP("Negligible"), QT_TR_NOOP("Very weak"), QT_TR_NOOP("Weak"),
         QT_TR_NOOP("Moderate"), QT_TR_NOOP("Strong"), QT_TR_NOOP("Very strong")
     };
-    actionMeter->setToolTip(tr("Password strength: %1").arg(tr(ratings[score])));
+    actionGauge->setToolTip(tr("Password strength: %1").arg(tr(ratings[score])));
 
     // The validation could change if the box is empty and no minimum is set.
     if (valid != lastValid) {

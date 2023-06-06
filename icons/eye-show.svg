@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="16" height="16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-	<path style="fill:none;stroke:#ffffff;stroke-width:1;stroke-linejoin:miter;stroke-opacity:1" d="M 8 3.5 C 3 3.5 1 8 1 8 C 1 8 3 12.5 8 12.5 C 12 12.5 15 8 15 8 C 15 8 12 3.5 8 3.5 z " />
-	<path style="fill:none;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-opacity:1" d="M 8 4.5 C 4 4.5 2 8 2 8 C 2 8 4 11.5 8 11.5 C 11 11.5 14 8 14 8 C 14 8 11 4.5 8 4.5 z " />
-	<circle style="fill:none;stroke:#ffffff;stroke-width:1;stroke-opacity:1" cx="8" cy="8" r="2.5" />
-	<circle style="fill:none;stroke:#000000;stroke-width:1;stroke-opacity:1" cx="8" cy="8" r="1.5" />
+<svg width="16" height="16" version="1.1" xmlns="http://www.w3.org/2000/svg">
+	<g fill="none" stroke-width="1">
+		<path d="M8,3.5C3 3.5 1 8 1 8 C 1 8 3 12.5 8 12.5 C 12 12.5 15 8 15 8 C 15 8 12 3.5 8 3.5" stroke="#FFF" stroke-linejoin="miter"/>
+		<path d="M8,4.5C4 4.5 2 8 2 8C2 8 4 11.5 8 11.5C11 11.5 14 8 14 8C14 8 11 4.5 8 4.5" stroke="#000" stroke-linejoin="miter"/>
+		<circle cx="8" cy="8" r="2.5" stroke="#FFF"/>
+		<circle cx="8" cy="8" r="1.5" stroke="#000"/>
+	</g>
 </svg>
