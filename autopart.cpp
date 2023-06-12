@@ -30,7 +30,7 @@
 #include "swapman.h"
 #include "autopart.h"
 
-AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf)
+AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf) noexcept
     : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman)
 {
     checkHibernation = gui.checkHibernationReg;
@@ -64,7 +64,7 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     refresh();
 }
 
-void AutoPart::manageConfig(MSettings &config)
+void AutoPart::manageConfig(MSettings &config) noexcept
 {
     config.startGroup("Storage", gui.pageDisk);
     config.manageComboBox("Drive", gui.comboDisk, true);
@@ -81,7 +81,7 @@ void AutoPart::manageConfig(MSettings &config)
     config.endGroup();
 }
 
-void AutoPart::scan()
+void AutoPart::scan() noexcept
 {
     long long minSpace = partman->volSpecTotal("/", QStringList()).minimum;
     gui.comboDisk->blockSignals(true);
@@ -98,7 +98,7 @@ void AutoPart::scan()
     diskChanged();
     refresh();
 }
-void AutoPart::refresh()
+void AutoPart::refresh() noexcept
 {
     // Allow the slider labels to fit all possible formatted sizes.
     const QString &strMB = sizeString(1023*GB) + '\n';
@@ -113,7 +113,7 @@ void AutoPart::refresh()
     sliderValueChanged(gui.sliderPart->value());
 }
 
-void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot)
+void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot) noexcept
 {
     QStringList volumes;
     available = buildLayout(-1, encrypt, false, &volumes);
@@ -142,7 +142,7 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
     gui.spinHome->setToolTip(gui.labelSliderHome->toolTip());
     gui.sliderPart->triggerAction(QSlider::SliderNoAction); // Snap the slider within range.
 }
-void AutoPart::setPartSize(Part part, long long nbytes)
+void AutoPart::setPartSize(Part part, long long nbytes) noexcept
 {
     if (part == Root) {
         sizeRoot = (nbytes >= minRoot) ? nbytes : minRoot;
@@ -153,13 +153,13 @@ void AutoPart::setPartSize(Part part, long long nbytes)
     }
     gui.sliderPart->setValue(percent(sizeRoot, available, part==Root));
 }
-long long AutoPart::partSize(Part part)
+long long AutoPart::partSize(Part part) const noexcept
 {
     return part==Root ? sizeRoot : (available - sizeRoot);
 }
 
 // Layout Builder
-void AutoPart::builderGUI(DeviceItem *drive)
+void AutoPart::builderGUI(DeviceItem *drive) noexcept
 {
     inBuilder = true;
     long long swapRec = SwapMan::recommended(false);
@@ -239,7 +239,8 @@ void AutoPart::builderGUI(DeviceItem *drive)
     inBuilder = false;
 }
 
-long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool updateTree, QStringList *volList)
+long long AutoPart::buildLayout(long long rootFormatSize, bool crypto,
+    bool updateTree, QStringList *volList) noexcept
 {
     if (updateTree) drvitem->clear();
     if (rootFormatSize < 0) rootFormatSize = LLONG_MAX;
@@ -280,7 +281,7 @@ long long AutoPart::buildLayout(long long rootFormatSize, bool crypto, bool upda
 
 // Helpers
 
-QString AutoPart::sizeString(long long size)
+QString AutoPart::sizeString(long long size) noexcept
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
     if (strout.length() > 6) { // "10.0 GB" or greater -> "10 GB"
@@ -291,7 +292,7 @@ QString AutoPart::sizeString(long long size)
 
 // Slots
 
-void AutoPart::diskChanged()
+void AutoPart::diskChanged() noexcept
 {
     drvitem = partman->findByPath("/dev/" + gui.comboDisk->currentData().toString());
     if (!drvitem) return;
@@ -304,7 +305,7 @@ void AutoPart::diskChanged()
     // Refresh encrypt/hibernate capabilities and cascade to set parameters.
     toggleEncrypt(gui.boxEncryptAuto->isChecked());
 }
-void AutoPart::toggleEncrypt(bool checked)
+void AutoPart::toggleEncrypt(bool checked) noexcept
 {
     // Is hibernation possible?
     const bool canHibernate = (buildLayout(-1, checked, false) >= (minRoot + SwapMan::recommended(true)));
@@ -315,7 +316,7 @@ void AutoPart::toggleEncrypt(bool checked)
     if (!inBuilder) gui.pushNext->setEnabled(!checked || gui.textCryptoPass->isValid());
 }
 
-void AutoPart::sliderPressed()
+void AutoPart::sliderPressed() noexcept
 {
     QString tipText(tr("%1% root\n%2% home"));
     const int val = gui.sliderPart->value();
@@ -328,7 +329,7 @@ void AutoPart::sliderPressed()
     }
 }
 
-void AutoPart::sliderActionTriggered(int action)
+void AutoPart::sliderActionTriggered(int action) noexcept
 {
     int pos = gui.sliderPart->sliderPosition();
     const int oldPos = pos;
@@ -355,7 +356,7 @@ void AutoPart::sliderActionTriggered(int action)
     // Always refresh if this is a programmatic purposeful action.
     if (action == QSlider::SliderNoAction && pos == gui.sliderPart->value()) sliderValueChanged(pos);
 }
-void AutoPart::sliderValueChanged(int value)
+void AutoPart::sliderValueChanged(int value) noexcept
 {
     sizeRoot = portion(available, value, MB);
     QString valstr = sizeString(sizeRoot);

@@ -38,32 +38,32 @@ class Oobe : public QObject
     bool oem = false;
     QStringList timeZones; // cached time zone list
     QStringList enableServices;
-    void buildServiceList();
-    int selectTimeZone(const QString &zone);
+    void buildServiceList() noexcept;
+    int selectTimeZone(const QString &zone) noexcept;
     void resetBlueman();
     // Slots
-    void localeIndexChanged(int index);
-    void timeAreaIndexChanged(int index);
+    void localeIndexChanged(int index) noexcept;
+    void timeAreaIndexChanged(int index) noexcept;
 
 public:
     bool online = false;
     bool haveSnapshotUserAccounts = false;
     Oobe(class MProcess &mproc, Ui::MeInstall &ui, QWidget *parent,
         const class QSettings &appConf, bool oem, bool modeOOBE);
-    void manageConfig(class MSettings &config, bool save);
+    void manageConfig(class MSettings &config, bool save) noexcept;
     void enable();
     void process();
-    void stashServices(bool save);
+    void stashServices(bool save) noexcept;
     void setService(const QString &service, bool enabled);
-    QWidget *validateComputerName();
-    QWidget *validateUserInfo(bool automatic);
+    QWidget *validateComputerName() noexcept;
+    QWidget *validateUserInfo(bool automatic) noexcept;
     void setComputerName();
     void setLocale();
     void setUserInfo();
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
     // Slots
-    void userPassValidationChanged();
-    void oldHomeToggled();
+    void userPassValidationChanged() noexcept;
+    void oldHomeToggled() noexcept;
 };
 
 #endif // OOBE_H

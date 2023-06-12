@@ -62,7 +62,7 @@ enum Step {
     End
 };
 
-MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile)
+MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
     : proc(this), appConf(acfg), appArgs(args), helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
     setupUi(this);
@@ -143,7 +143,7 @@ MInstall::~MInstall() {
 }
 
 // meant to be run after the installer becomes visible
-void MInstall::startup()
+void MInstall::startup() noexcept
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     connect(pushClose, &QPushButton::clicked, this, &MInstall::close);
@@ -239,7 +239,7 @@ void MInstall::startup()
     if (automatic) pushNext->click();
 }
 
-void MInstall::splashSetThrobber(bool active)
+void MInstall::splashSetThrobber(bool active) noexcept
 {
     if (active) {
         if (throbber) return;
@@ -255,7 +255,7 @@ void MInstall::splashSetThrobber(bool active)
     }
     labelSplash->update();
 }
-void MInstall::splashThrob()
+void MInstall::splashThrob() noexcept
 {
     ++throbPos;
     labelSplash->update();
@@ -341,7 +341,7 @@ void MInstall::setupAutoMount(bool enabled)
 /////////////////////////////////////////////////////////////////////////
 // util functions
 
-void MInstall::updateCursor(const Qt::CursorShape shape)
+void MInstall::updateCursor(const Qt::CursorShape shape) noexcept
 {
     if (shape != Qt::ArrowCursor) {
         qApp->setOverrideCursor(QCursor(shape));
@@ -353,7 +353,7 @@ void MInstall::updateCursor(const Qt::CursorShape shape)
     qApp->processEvents();
 }
 
-bool MInstall::pretendToInstall(int space, long steps)
+bool MInstall::pretendToInstall(int space, long steps) noexcept
 {
     proc.advance(space, steps);
     proc.status(tr("Pretending to install %1").arg(PROJECTNAME));
@@ -366,7 +366,7 @@ bool MInstall::pretendToInstall(int space, long steps)
 }
 
 // process the next phase of installation if possible
-bool MInstall::processNextPhase()
+bool MInstall::processNextPhase() noexcept
 {
     try {
         widgetStack->setEnabled(true);
@@ -431,6 +431,7 @@ bool MInstall::processNextPhase()
             gotoPage(Step::End);
         }
     } catch (const char *msg) {
+        proc.setExceptionMode(nullptr);
         proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::Fail);
         if (!proc.halted()) {
             boxMain->setEnabled(false);
@@ -443,7 +444,7 @@ bool MInstall::processNextPhase()
     return true;
 }
 
-void MInstall::manageConfig(enum ConfigAction mode)
+void MInstall::manageConfig(enum ConfigAction mode) noexcept
 {
     if (mode == ConfigSave) {
         delete config;
@@ -539,7 +540,7 @@ bool MInstall::saveHomeBasic()
 }
 
 // logic displaying pages
-int MInstall::showPage(int curr, int next)
+int MInstall::showPage(int curr, int next) noexcept
 {
     if (next == Step::Splash) { // Enter splash screen
         splashSetThrobber(appConf.value("SPLASH_THROBBER", true).toBool());
@@ -628,7 +629,7 @@ int MInstall::showPage(int curr, int next)
     return next;
 }
 
-void MInstall::pageDisplayed(int next)
+void MInstall::pageDisplayed(int next) noexcept
 {
     bool enableBack = true, enableNext = true;
     if (!modeOOBE) {
@@ -894,7 +895,7 @@ void MInstall::pageDisplayed(int next)
     pushNext->setEnabled(enableNext);
 }
 
-void MInstall::gotoPage(int next)
+void MInstall::gotoPage(int next) noexcept
 {
     pushBack->setEnabled(false);
     pushNext->setEnabled(false);
@@ -980,7 +981,7 @@ void MInstall::gotoPage(int next)
 /////////////////////////////////////////////////////////////////////////
 // event handlers
 
-bool MInstall::eventFilter(QObject *watched, QEvent *event)
+bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
 {
     if (event->type() != QEvent::Paint) return false;
     else if (watched == labelSplash) {
@@ -1022,7 +1023,7 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event)
     return false;
 }
 
-void MInstall::changeEvent(QEvent *event)
+void MInstall::changeEvent(QEvent *event) noexcept
 {
     const QEvent::Type etype = event->type();
     if (etype == QEvent::ApplicationPaletteChange || etype == QEvent::PaletteChange || etype == QEvent::StyleChange) {
@@ -1035,7 +1036,7 @@ void MInstall::changeEvent(QEvent *event)
     }
 }
 
-void MInstall::closeEvent(QCloseEvent *event)
+void MInstall::closeEvent(QCloseEvent *event) noexcept
 {
     if (abortUI()) {
         event->accept();
@@ -1058,23 +1059,23 @@ void MInstall::closeEvent(QCloseEvent *event)
 }
 
 // Override QDialog::reject() so Escape won't close the window.
-void MInstall::reject()
+void MInstall::reject() noexcept
 {
 }
 
 /////////////////////////////////////////////////////////////////////////
 // slots
 
-void MInstall::on_pushNext_clicked()
+void MInstall::on_pushNext_clicked() noexcept
 {
     gotoPage(widgetStack->currentIndex() + 1);
 }
-void MInstall::on_pushBack_clicked()
+void MInstall::on_pushBack_clicked() noexcept
 {
     gotoPage(widgetStack->currentIndex() - 1);
 }
 
-void MInstall::on_pushAbort_clicked()
+void MInstall::on_pushAbort_clicked() noexcept
 {
     if(abortUI()) {
         if (!modeOOBE) cleanup();
@@ -1087,12 +1088,12 @@ void MInstall::on_pushAbort_clicked()
 }
 
 // clicking advanced button to go to Services page
-void MInstall::on_pushServices_clicked()
+void MInstall::on_pushServices_clicked() noexcept
 {
     gotoPage(Step::Services);
 }
 
-bool MInstall::abortUI()
+bool MInstall::abortUI() noexcept
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     boxMain->setEnabled(false);
@@ -1132,7 +1133,7 @@ void MInstall::cleanup(bool endclean)
     if (endclean && !mountkeep) partman->unmount();
 }
 
-void MInstall::on_progInstall_valueChanged(int value)
+void MInstall::on_progInstall_valueChanged(int value) noexcept
 {
     if (ixTipStart < 0 || widgetStack->currentWidget() != pageProgress) {
         return; // no point displaying a new hint if it will be invisible
@@ -1192,7 +1193,7 @@ void MInstall::on_progInstall_valueChanged(int value)
     }
 }
 
-void MInstall::setupkeyboardbutton()
+void MInstall::setupkeyboardbutton() noexcept
 {
     QFile file("/etc/default/keyboard");
     if (!file.open(QFile::ReadOnly | QFile::Text)) return;
@@ -1212,7 +1213,7 @@ void MInstall::setupkeyboardbutton()
     file.close();
 }
 
-void MInstall::on_pushSetKeyboard_clicked()
+void MInstall::on_pushSetKeyboard_clicked() noexcept
 {
     hide();
     if (proc.shell("command -v  system-keyboard-qt >/dev/null 2>&1")) {
@@ -1224,7 +1225,7 @@ void MInstall::on_pushSetKeyboard_clicked()
     setupkeyboardbutton();
 }
 
-void MInstall::on_radioEntireDisk_toggled(bool checked)
+void MInstall::on_radioEntireDisk_toggled(bool checked) noexcept
 {
     boxAutoPart->setEnabled(checked);
     pushNext->setEnabled(!checked || !boxEncryptAuto->isChecked() || textCryptoPass->isValid());

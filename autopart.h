@@ -41,26 +41,26 @@ class AutoPart : public QObject
     class QCheckBox *checkSnapshot = nullptr;
     bool inBuilder = false;
     // Slots
-    void toggleAutoPart(bool checked);
-    void diskChanged();
-    void toggleEncrypt(bool checked);
-    void sliderPressed();
-    void sliderActionTriggered(int action);
-    void sliderValueChanged(int value);
+    void diskChanged() noexcept;
+    void toggleEncrypt(bool checked) noexcept;
+    void sliderPressed() noexcept;
+    void sliderActionTriggered(int action) noexcept;
+    void sliderValueChanged(int value) noexcept;
 public:
-    AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf);
-    void manageConfig(class MSettings &config);
-    void scan();
-    void refresh();
-    void setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot);
+    AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf) noexcept;
+    void manageConfig(class MSettings &config) noexcept;
+    void scan() noexcept;
+    void refresh() noexcept;
+    void setParams(bool swapfile, bool encrypt, bool hibernation, bool snapshot) noexcept;
     enum Part { Root, Home };
-    void setPartSize(Part part, long long nbytes);
-    long long partSize(Part part = Root);
+    void setPartSize(Part part, long long nbytes) noexcept;
+    long long partSize(Part part = Root) const noexcept;
     // Layout Builder
-    void builderGUI(class DeviceItem *drive);
-    long long buildLayout(long long rootFormatSize, bool crypto, bool updateTree=true, class QStringList *volList=nullptr);
+    void builderGUI(class DeviceItem *drive) noexcept;
+    long long buildLayout(long long rootFormatSize, bool crypto,
+        bool updateTree=true, class QStringList *volList=nullptr) noexcept;
     // Helpers
-    static QString sizeString(long long size);
+    static QString sizeString(long long size) noexcept;
 };
 
 // Calculate a percentage without compromising the range of long long.

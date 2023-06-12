@@ -31,17 +31,17 @@ private:
     bool lastValid = false;
     QAction *actionEye = nullptr;
     QAction *actionGauge = nullptr;
-    void generate();
-    void masterTextChanged();
-    void slaveTextChanged(const QString &slaveText);
-    void eyeToggled(bool checked);
+    void generate() noexcept;
+    void masterTextChanged() noexcept;
+    void slaveTextChanged(const QString &slaveText) noexcept;
+    void eyeToggled(bool checked) noexcept;
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
     void changeEvent(QEvent *event);
 public:
     PassEdit(QWidget *parent = nullptr);
-    void setup(PassEdit *slave, int min=0, int genMin=16, int wordMax=5);
-    bool isValid() const;
+    void setup(PassEdit *slave, int min=0, int genMin=16, int wordMax=5) noexcept;
+    bool isValid() const noexcept;
 signals:
     void validationChanged(bool valid);
 };

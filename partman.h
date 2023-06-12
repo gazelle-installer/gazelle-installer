@@ -49,7 +49,7 @@ class DeviceItem
     DeviceItem *parentItem = nullptr;
     class PartMan *partman = nullptr;
     int order = -1;
-    void autoFill(unsigned int changed = 0xFFFF);
+    void autoFill(unsigned int changed = 0xFFFF) noexcept;
 public:
     DeviceItem *active = nullptr;
     DeviceItem *origin = nullptr;
@@ -87,45 +87,45 @@ public:
     bool dump = false;
     bool addToCrypttab = false;
 
-    DeviceItem(enum DeviceType type, DeviceItem *parent = nullptr, DeviceItem *preceding = nullptr);
+    DeviceItem(enum DeviceType type, DeviceItem *parent = nullptr, DeviceItem *preceding = nullptr) noexcept;
     ~DeviceItem();
-    void clear();
-    int row() const;
-    DeviceItem *parent() const;
-    DeviceItem *child(int row) const;
-    int indexOfChild(DeviceItem *child);
-    int childCount() const;
-    void sortChildren();
+    void clear() noexcept;
+    int row() const noexcept;
+    DeviceItem *parent() const noexcept;
+    DeviceItem *child(int row) const noexcept;
+    int indexOfChild(DeviceItem *child) noexcept;
+    int childCount() const noexcept;
+    void sortChildren() noexcept;
     // Layout finishing
-    DeviceItem *addPart(long long defaultSize, const QString &defaultUse, bool crypto);
-    void driveAutoSetActive();
-    void labelParts();
+    DeviceItem *addPart(long long defaultSize, const QString &defaultUse, bool crypto) noexcept;
+    void driveAutoSetActive() noexcept;
+    void labelParts() noexcept;
     // Helpers
-    static QString realUseFor(const QString &use);
-    inline QString realUseFor() const { return realUseFor(usefor); }
-    static QString shownUseFor(const QString &use);
-    inline QString shownUseFor() const { return shownUseFor(realUseFor()); }
-    void setActive(bool boot);
-    bool isActive() const;
-    bool isLocked() const;
-    bool willUseGPT() const;
-    bool willFormat() const;
-    bool canEncrypt() const;
-    bool willEncrypt() const;
-    QString assocUUID() const;
-    QString mappedDevice() const;
-    bool willMap() const;
-    QString shownDevice() const;
-    QStringList allowedUsesFor(bool real = true, bool all = true) const;
-    QStringList allowedFormats() const;
-    QString shownFormat(const QString &fmt) const;
-    inline bool isVolume() const { return (type == Partition || type == VirtualBD); }
-    bool canMount() const;
-    long long driveFreeSpace(bool inclusive = false) const;
+    static QString realUseFor(const QString &use) noexcept;
+    inline QString realUseFor() const noexcept { return realUseFor(usefor); }
+    static QString shownUseFor(const QString &use) noexcept;
+    inline QString shownUseFor() const noexcept { return shownUseFor(realUseFor()); }
+    void setActive(bool boot) noexcept;
+    bool isActive() const noexcept;
+    bool isLocked() const noexcept;
+    bool willUseGPT() const noexcept;
+    bool willFormat() const noexcept;
+    bool canEncrypt() const noexcept;
+    bool willEncrypt() const noexcept;
+    QString assocUUID() const noexcept;
+    QString mappedDevice() const noexcept;
+    bool willMap() const noexcept;
+    QString shownDevice() const noexcept;
+    QStringList allowedUsesFor(bool real = true, bool all = true) const noexcept;
+    QStringList allowedFormats() const noexcept;
+    QString shownFormat(const QString &fmt) const noexcept;
+    inline bool isVolume() const noexcept { return (type == Partition || type == VirtualBD); }
+    bool canMount() const noexcept;
+    long long driveFreeSpace(bool inclusive = false) const noexcept;
     /* Convenience */
-    void addToCombo(QComboBox *combo, bool warnNasty = false) const;
-    static QStringList split(const QString &devname);
-    static QString join(const QString &drive, int partnum);
+    void addToCombo(QComboBox *combo, bool warnNasty = false) const noexcept;
+    static QStringList split(const QString &devname) noexcept;
+    static QString join(const QString &drive, int partnum) noexcept;
 };
 class DeviceItemIterator
 {
@@ -133,10 +133,10 @@ class DeviceItemIterator
     int ixPos = 0;
     QStack<int> ixParents;
 public:
-    DeviceItemIterator(DeviceItem *item) : pos(item) {}
-    DeviceItemIterator(const PartMan &partman);
-    inline DeviceItem *operator*() const { return pos; }
-    void next();
+    DeviceItemIterator(DeviceItem *item) noexcept : pos(item) {}
+    DeviceItemIterator(const PartMan &partman) noexcept;
+    inline DeviceItem *operator*() const noexcept { return pos; }
+    void next() noexcept;
 };
 
 class DeviceItemDelegate : public QStyledItemDelegate
@@ -148,8 +148,8 @@ class DeviceItemDelegate : public QStyledItemDelegate
         const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
-    void emitCommit();
-    void partOptionsMenu();
+    void emitCommit() noexcept;
+    void partOptionsMenu() noexcept;
 };
 
 class PartMan : public QAbstractItemModel
@@ -164,20 +164,20 @@ class PartMan : public QAbstractItemModel
     SafeCache key;
     bool brave, gptoverride;
     void scanVirtualDevices(bool rescan);
-    void resizeColumnsToFit();
+    void resizeColumnsToFit() noexcept;
     void preparePartitions();
     void formatPartitions();
     void prepareSubvolumes(DeviceItem *partit);
     bool fixCryptoSetup();
     bool makeFstab();
     void mountPartitions();
-    void treeItemChange();
-    void treeSelChange();
+    void treeItemChange() noexcept;
+    void treeSelChange() noexcept;
     void treeMenu(const QPoint &);
     void partOptionsMenu(const QPoint &);
     void partClearClick(bool);
-    void partAddClick(bool);
-    void partRemoveClick(bool);
+    void partAddClick(bool) noexcept;
+    void partRemoveClick(bool) noexcept;
     void partReloadClick();
     void partManRunClick();
     void partMenuUnlock(DeviceItem *twit);
@@ -213,24 +213,27 @@ public:
     PartMan(class MProcess &mproc, class Ui::MeInstall &ui,
         const class QSettings &appConf, const QCommandLineParser &appArgs);
     void scan(DeviceItem *drvstart = nullptr);
-    bool manageConfig(class MSettings &config, bool save);
-    bool composeValidate(bool automatic, const QString &project);
+    bool manageConfig(class MSettings &config, bool save) noexcept;
+    bool composeValidate(bool automatic, const QString &project) noexcept;
     bool checkTargetDrivesOK();
-    DeviceItem *selectedDriveAuto();
-    void clearAllUses();
-    int countPrepSteps();
+    DeviceItem *selectedDriveAuto() noexcept;
+    void clearAllUses() noexcept;
+    int countPrepSteps() noexcept;
     void prepStorage();
     void installTabs();
     void loadKeyMaterial(const QString &keyfile);
     void unmount();
-    bool willFormat(const QString &point);
-    QString getMountDev(const QString &point, const bool mapped=true);
-    int swapCount();
-    int isEncrypt(const QString &point);
-    DeviceItem *findByPath(const QString &devpath) const;
-    DeviceItem *findHostDev(const QString &path) const;
-    struct VolumeSpec volSpecTotal(const QString &path, const QStringList &vols) const;
-    inline struct VolumeSpec volSpecTotal(const QString &path) const { return volSpecTotal(path, mounts.keys()); }
+    bool willFormat(const QString &point) const noexcept;
+    QString getMountDev(const QString &point, const bool mapped=true) const noexcept;
+    int swapCount() const noexcept;
+    int isEncrypt(const QString &point) const noexcept;
+    DeviceItem *findByPath(const QString &devpath) const noexcept;
+    DeviceItem *findHostDev(const QString &path) const noexcept;
+    struct VolumeSpec volSpecTotal(const QString &path, const QStringList &vols) const noexcept;
+    inline struct VolumeSpec volSpecTotal(const QString &path) const noexcept
+    {
+        return volSpecTotal(path, mounts.keys());
+    }
     // Model View Controller
     QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;

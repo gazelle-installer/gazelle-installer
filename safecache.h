@@ -27,9 +27,9 @@ class SafeCache : public QByteArray
 public:
     SafeCache();
     ~SafeCache();
-    bool load(const char *filename, int length);
-    bool save(const char *filename, mode_t mode = 0400);
-    void erase();
+    bool load(const char *filename, int length) noexcept;
+    bool save(const char *filename, mode_t mode = 0400) noexcept;
+    void erase() noexcept;
 };
 
 #endif // SAFECACHE_H

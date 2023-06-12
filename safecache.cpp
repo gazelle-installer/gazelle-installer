@@ -32,7 +32,7 @@ SafeCache::~SafeCache()
 }
 
 // to completely free the key use parameters nullptr, 0
-bool SafeCache::load(const char *filename, int length)
+bool SafeCache::load(const char *filename, int length) noexcept
 {
     bool ok = false;
     erase();
@@ -65,7 +65,7 @@ bool SafeCache::load(const char *filename, int length)
     return ok;
 }
 
-bool SafeCache::save(const char *filename, mode_t mode)
+bool SafeCache::save(const char *filename, mode_t mode) noexcept
 {
     bool ok = false;
     int fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY, mode);
@@ -79,7 +79,7 @@ bool SafeCache::save(const char *filename, mode_t mode)
     return ok;
 }
 
-void SafeCache::erase()
+void SafeCache::erase() noexcept
 {
     fill(0xAA);
     fill(0x55);

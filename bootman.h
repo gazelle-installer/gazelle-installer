@@ -36,17 +36,17 @@ class BootMan : public QObject
     QString loaderID;
     bool installFromRootDevice, removeNoSplash;
     bool brave;
-    void selectBootMain();
+    void selectBootMain() noexcept;
     void installMain(bool efivars_ismounted);
     // Slots
-    void chosenBootMBR();
-    void chosenBootPBR();
-    void chosenBootESP();
+    void chosenBootMBR() noexcept;
+    void chosenBootPBR() noexcept;
+    void chosenBootESP() noexcept;
 public:
     BootMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui,
-        const class QSettings &appConf, const QCommandLineParser &appArgs);
-    void manageConfig(class MSettings &config);
-    void buildBootLists();
+        const class QSettings &appConf, const QCommandLineParser &appArgs) noexcept;
+    void manageConfig(class MSettings &config) noexcept;
+    void buildBootLists() noexcept;
     void install();
 };
 

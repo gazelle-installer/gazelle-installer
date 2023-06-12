@@ -29,16 +29,16 @@ class SwapMan : public QObject
     class PartMan &partman;
     Ui::MeInstall &gui;
     // Slots
-    void swapFileEdited(const QString &text);
-    void sizeResetClicked();
-    void spinSizeChanged(int i);
-    void checkHibernationClicked(bool checked);
+    void swapFileEdited(const QString &text) noexcept;
+    void sizeResetClicked() noexcept;
+    void spinSizeChanged(int i) noexcept;
+    void checkHibernationClicked(bool checked) noexcept;
 public:
-    SwapMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui);
-    void manageConfig(class MSettings &config, bool advanced);
-    void setupDefaults();
+    SwapMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui) noexcept;
+    void manageConfig(class MSettings &config, bool advanced) noexcept;
+    void setupDefaults() noexcept;
     void install();
-    static long long recommended(bool hibernation);
+    static long long recommended(bool hibernation) noexcept;
 };
 
 #endif // SWAPMAN_H
