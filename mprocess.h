@@ -40,7 +40,7 @@ class MProcess : public QProcess
     int testMac = -1;
     // Common execution core
     bool exec(const QString &program, const QStringList &arguments,
-        const QByteArray *input, bool needRead, class QListWidgetItem *logEntry);
+        const QByteArray *input, bool needRead, class QListWidgetItem *logEntry) noexcept(false);
 protected:
     void setupChildProcess() override;
 public:
@@ -53,28 +53,28 @@ public:
     };
     QString chRoot;
     MProcess(QObject *parent = Q_NULLPTR);
-    void setupUI(class QListWidget *listLog, class QProgressBar *progInstall);
-    void setChRoot(const QString &newroot = QString());
+    void setupUI(class QListWidget *listLog, class QProgressBar *progInstall) noexcept;
+    void setChRoot(const QString &newroot = QString()) noexcept;
     bool exec(const QString &program, const QStringList &arguments = {},
-        const QByteArray *input = nullptr, bool needRead = false);
-    bool shell(const QString &cmd, const QByteArray *input = nullptr, bool needRead = false);
-    QString readOut(bool everything = false);
-    QStringList readOutLines();
+        const QByteArray *input = nullptr, bool needRead = false) noexcept(false);
+    bool shell(const QString &cmd, const QByteArray *input = nullptr, bool needRead = false) noexcept(false);
+    QString readOut(bool everything = false) noexcept;
+    QStringList readOutLines() noexcept;
     // Miscellaneous
-    void halt();
-    void unhalt();
-    bool halted() const { return halting; }
+    void halt() noexcept;
+    void unhalt() noexcept;
+    bool halted() const noexcept { return halting; }
     // User interface
-    static QString joinCommand(const QString &program, const QStringList &arguments);
-    class QListWidgetItem *log(const QString &text, const enum LogType type = Standard);
-    void log(class QListWidgetItem *entry, const int status = 1);
-    void status(const QString &text, long progress = -1);
-    void status(long progress = -1);
-    void advance(int space, long steps);
-    void setExceptionMode(const char *failInfo);
+    static QString joinCommand(const QString &program, const QStringList &arguments) noexcept;
+    class QListWidgetItem *log(const QString &text, const enum LogType type = Standard) noexcept;
+    void log(class QListWidgetItem *entry, const int status = 1) noexcept;
+    void status(const QString &text, long progress = -1) noexcept;
+    void status(long progress = -1) noexcept;
+    void advance(int space, long steps) noexcept;
+    void setExceptionMode(const char *failInfo) noexcept;
     // Common functions that are traditionally carried out by processes.
-    void sleep(const int msec, const bool silent = false);
-    bool mkpath(const QString &path);
+    void sleep(const int msec, const bool silent = false) noexcept;
+    bool mkpath(const QString &path) noexcept(false);
     // Operating system
     const QString &detectArch();
     int detectEFI(bool noTest = false);

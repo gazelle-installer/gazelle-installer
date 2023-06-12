@@ -286,7 +286,7 @@ void PartMan::scanVirtualDevices(bool rescan)
     gui.treePartitions->expand(index(vdlit));
 }
 
-bool PartMan::manageConfig(MSettings &config, bool save)
+bool PartMan::manageConfig(MSettings &config, bool save) noexcept
 {
     const int driveCount = root.childCount();
     for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
@@ -385,14 +385,14 @@ bool PartMan::manageConfig(MSettings &config, bool save)
     return true;
 }
 
-void PartMan::resizeColumnsToFit()
+void PartMan::resizeColumnsToFit() noexcept
 {
     for (int ixi = _TreeColumns_ - 1; ixi >= 0; --ixi) {
         gui.treePartitions->resizeColumnToContents(ixi);
     }
 }
 
-void PartMan::treeItemChange()
+void PartMan::treeItemChange() noexcept
 {
     // Encryption and bad blocks controls
     bool cryptoAny = false;
@@ -408,7 +408,7 @@ void PartMan::treeItemChange()
     treeSelChange();
 }
 
-void PartMan::treeSelChange()
+void PartMan::treeSelChange() noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
     DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
@@ -543,7 +543,7 @@ void PartMan::partClearClick(bool)
     treeSelChange();
 }
 
-void PartMan::partAddClick(bool)
+void PartMan::partAddClick(bool) noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
     DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
@@ -559,7 +559,7 @@ void PartMan::partAddClick(bool)
         QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
-void PartMan::partRemoveClick(bool)
+void PartMan::partRemoveClick(bool) noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
     DeviceItem *devit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
@@ -690,7 +690,7 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
     qApp->restoreOverrideCursor();
 }
 
-bool PartMan::composeValidate(bool automatic, const QString &project)
+bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
 {
     bool encryptRoot = false;
     mounts.clear();
@@ -941,7 +941,7 @@ void PartMan::luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArr
     }
 }
 
-DeviceItem *PartMan::selectedDriveAuto()
+DeviceItem *PartMan::selectedDriveAuto() noexcept
 {
     QString drv(gui.comboDisk->currentData().toString());
     if (!findByPath("/dev/" + drv)) return nullptr;
@@ -952,7 +952,7 @@ DeviceItem *PartMan::selectedDriveAuto()
     return nullptr;
 }
 
-void PartMan::clearAllUses()
+void PartMan::clearAllUses() noexcept
 {
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         item->usefor.clear();
@@ -961,7 +961,7 @@ void PartMan::clearAllUses()
     }
 }
 
-int PartMan::countPrepSteps()
+int PartMan::countPrepSteps() noexcept
 {
     int nstep = 0;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
@@ -1413,14 +1413,14 @@ void PartMan::unmount()
 }
 
 // Public properties
-bool PartMan::willFormat(const QString &point)
+bool PartMan::willFormat(const QString &point) const noexcept
 {
     DeviceItem *twit = mounts.value(point);
     if (twit) return twit->willFormat();
     return false;
 }
 
-QString PartMan::getMountDev(const QString &point, const bool mapped)
+QString PartMan::getMountDev(const QString &point, const bool mapped) const noexcept
 {
     const DeviceItem *twit = mounts.value(point);
     if (!twit) return QString();
@@ -1428,7 +1428,7 @@ QString PartMan::getMountDev(const QString &point, const bool mapped)
     return twit->path;
 }
 
-int PartMan::swapCount()
+int PartMan::swapCount() const noexcept
 {
     int count = 0;
     for (const auto &mount : mounts.toStdMap()) {
@@ -1437,7 +1437,7 @@ int PartMan::swapCount()
     return count;
 }
 
-int PartMan::isEncrypt(const QString &point)
+int PartMan::isEncrypt(const QString &point) const noexcept
 {
     int count = 0;
     if (point.isEmpty()) {
@@ -1455,14 +1455,14 @@ int PartMan::isEncrypt(const QString &point)
     return count;
 }
 
-DeviceItem *PartMan::findByPath(const QString &devpath) const
+DeviceItem *PartMan::findByPath(const QString &devpath) const noexcept
 {
     for (DeviceItemIterator it(*this); *it; it.next()) {
         if ((*it)->path == devpath) return *it;
     }
     return nullptr;
 }
-DeviceItem *PartMan::findHostDev(const QString &path) const
+DeviceItem *PartMan::findHostDev(const QString &path) const noexcept
 {
     QString spath = path;
     DeviceItem *devit = nullptr;
@@ -1473,7 +1473,7 @@ DeviceItem *PartMan::findHostDev(const QString &path) const
     return devit;
 }
 
-struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStringList &vols) const
+struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStringList &vols) const noexcept
 {
     struct VolumeSpec vspec = volSpecs.value(path);
     const QString &spath = (path!='/' ? path+'/' : path);
@@ -1766,7 +1766,7 @@ void PartMan::notifyChange(class DeviceItem *item, int first, int last)
 
 /* Model element */
 
-DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *preceding)
+DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *preceding) noexcept
     : parentItem(parent), type(type)
 {
     if (type == Partition) size = 1*MB;
@@ -1803,7 +1803,7 @@ DeviceItem::~DeviceItem()
         }
     }
 }
-void DeviceItem::clear()
+void DeviceItem::clear() noexcept
 {
     const int chcount = children.count();
     if (partman && chcount > 0) partman->beginRemoveRows(partman->index(this), 0, chcount - 1);
@@ -1817,29 +1817,29 @@ void DeviceItem::clear()
     flags.oldLayout = false;
     if (partman && chcount > 0) partman->endRemoveRows();
 }
-inline int DeviceItem::row() const
+inline int DeviceItem::row() const noexcept
 {
     return parentItem ? parentItem->children.indexOf(const_cast<DeviceItem *>(this)) : 0;
 }
-DeviceItem *DeviceItem::parent() const
+DeviceItem *DeviceItem::parent() const noexcept
 {
     if (parentItem && !parentItem->parentItem) return nullptr; // Invisible root
     return parentItem;
 }
-inline DeviceItem *DeviceItem::child(int row) const
+inline DeviceItem *DeviceItem::child(int row) const noexcept
 {
     if (row < 0 || row >= children.count()) return nullptr;
     return children.at(row);
 }
-inline int DeviceItem::indexOfChild(DeviceItem *child)
+inline int DeviceItem::indexOfChild(DeviceItem *child) noexcept
 {
     return children.indexOf(child);
 }
-inline int DeviceItem::childCount() const
+inline int DeviceItem::childCount() const noexcept
 {
     return children.count();
 }
-void DeviceItem::sortChildren()
+void DeviceItem::sortChildren() noexcept
 {
     auto cmp = [](DeviceItem *l, DeviceItem *r) {
         if (l->order != r->order) return l->order < r->order;
@@ -1851,7 +1851,7 @@ void DeviceItem::sortChildren()
     }
 }
 /* Helpers */
-QString DeviceItem::realUseFor(const QString &use)
+QString DeviceItem::realUseFor(const QString &use) noexcept
 {
     if (use == "root") return QStringLiteral("/");
     else if (use == "boot") return QStringLiteral("/boot");
@@ -1859,7 +1859,7 @@ QString DeviceItem::realUseFor(const QString &use)
     else if (!use.startsWith('/')) return use.toUpper();
     else return use;
 }
-QString DeviceItem::shownUseFor(const QString &use)
+QString DeviceItem::shownUseFor(const QString &use) noexcept
 {
     if (use == "/") return "/ (root)";
     else if (use == "ESP") return tr("EFI System Partition");
@@ -1867,7 +1867,7 @@ QString DeviceItem::shownUseFor(const QString &use)
     else if (use == "FORMAT") return tr("format only");
     return use;
 }
-void DeviceItem::setActive(bool boot)
+void DeviceItem::setActive(bool boot) noexcept
 {
     if (!parentItem) return;
     if (partman && parentItem->active != this) {
@@ -1876,12 +1876,12 @@ void DeviceItem::setActive(bool boot)
     parentItem->active = boot ? this : nullptr;
     if (partman) partman->notifyChange(this);
 }
-inline bool DeviceItem::isActive() const
+inline bool DeviceItem::isActive() const noexcept
 {
     if (!parentItem) return false;
     return (parentItem->active == this);
 }
-bool DeviceItem::isLocked() const
+bool DeviceItem::isLocked() const noexcept
 {
     const int partCount = children.count();
     for (int ixPart = 0; ixPart < partCount; ++ixPart) {
@@ -1889,7 +1889,7 @@ bool DeviceItem::isLocked() const
     }
     return (mapCount != 0);
 }
-bool DeviceItem::willUseGPT() const
+bool DeviceItem::willUseGPT() const noexcept
 {
     if (type != Drive) return false;
     if (flags.oldLayout) return flags.curGPT;
@@ -1897,27 +1897,27 @@ bool DeviceItem::willUseGPT() const
     else if (partman) return (partman->gptoverride || partman->proc.detectEFI());
     return false;
 }
-inline bool DeviceItem::willFormat() const
+inline bool DeviceItem::willFormat() const noexcept
 {
     return format != "PRESERVE" && !usefor.isEmpty();
 }
-bool DeviceItem::canEncrypt() const
+bool DeviceItem::canEncrypt() const noexcept
 {
     if (type != Partition) return false;
     const QString &use = realUseFor();
     return !(use.isEmpty() || use == "ESP" || use == "BIOS-GRUB" || use == "/boot");
 }
-inline bool DeviceItem::willEncrypt() const
+inline bool DeviceItem::willEncrypt() const noexcept
 {
     if (type == Subvolume) return parentItem->encrypt;
     return encrypt;
 }
-QString DeviceItem::assocUUID() const
+QString DeviceItem::assocUUID() const noexcept
 {
     if (type == Subvolume) return parentItem->uuid;
     return uuid;
 }
-QString DeviceItem::mappedDevice() const
+QString DeviceItem::mappedDevice() const noexcept
 {
     const DeviceItem *twit = this;
     if (twit->type == Subvolume) twit = twit->parentItem;
@@ -1927,18 +1927,18 @@ QString DeviceItem::mappedDevice() const
     }
     return twit->path;
 }
-inline bool DeviceItem::willMap() const
+inline bool DeviceItem::willMap() const noexcept
 {
     if (type == Drive || type == VirtualDevices) return false;
     else if (type == Subvolume) return !parentItem->devMapper.isEmpty();
     return !devMapper.isEmpty();
 }
-QString DeviceItem::shownDevice() const
+QString DeviceItem::shownDevice() const noexcept
 {
     if (type == Subvolume) return parentItem->device + '[' + label + ']';
     return device;
 }
-QStringList DeviceItem::allowedUsesFor(bool real, bool all) const
+QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
 {
     if (!isVolume() && type != Subvolume) return QStringList();
     QStringList list;
@@ -1965,7 +1965,7 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const
     }
     return list;
 }
-QStringList DeviceItem::allowedFormats() const
+QStringList DeviceItem::allowedFormats() const noexcept
 {
     QStringList list;
     const QString &use = realUseFor();
@@ -1997,7 +1997,7 @@ QStringList DeviceItem::allowedFormats() const
     }
     return list;
 }
-QString DeviceItem::shownFormat(const QString &fmt) const
+QString DeviceItem::shownFormat(const QString &fmt) const noexcept
 {
     if (fmt == "CREATE") return tr("Create");
     else if (fmt != "PRESERVE") return fmt;
@@ -2007,12 +2007,12 @@ QString DeviceItem::shownFormat(const QString &fmt) const
         else return tr("Preserve /home (%1)").arg(curFormat);
     }
 }
-bool DeviceItem::canMount() const
+bool DeviceItem::canMount() const noexcept
 {
     const QString &use = realUseFor();
     return !(use.isEmpty() || use == "FORMAT" || use == "ESP" || use == "SWAP");
 }
-long long DeviceItem::driveFreeSpace(bool inclusive) const
+long long DeviceItem::driveFreeSpace(bool inclusive) const noexcept
 {
     const DeviceItem *drvit = parent();
     if (!drvit) drvit = this;
@@ -2024,7 +2024,7 @@ long long DeviceItem::driveFreeSpace(bool inclusive) const
     return free;
 }
 /* Convenience */
-DeviceItem *DeviceItem::addPart(long long defaultSize, const QString &defaultUse, bool crypto)
+DeviceItem *DeviceItem::addPart(long long defaultSize, const QString &defaultUse, bool crypto) noexcept
 {
     DeviceItem *partit = new DeviceItem(DeviceItem::Partition, this);
     if (!defaultUse.isEmpty()) partit->usefor = defaultUse;
@@ -2034,7 +2034,7 @@ DeviceItem *DeviceItem::addPart(long long defaultSize, const QString &defaultUse
     if (partman) partman->notifyChange(partit);
     return partit;
 }
-void DeviceItem::driveAutoSetActive()
+void DeviceItem::driveAutoSetActive() noexcept
 {
     if (active) return;
     if (partman && partman->proc.detectEFI() && willUseGPT()) return;
@@ -2049,7 +2049,7 @@ void DeviceItem::driveAutoSetActive()
         }
     }
 }
-void DeviceItem::autoFill(unsigned int changed)
+void DeviceItem::autoFill(unsigned int changed) noexcept
 {
     const QString &use = realUseFor();
     if (changed & (1 << PartMan::UseFor)) {
@@ -2114,7 +2114,7 @@ void DeviceItem::autoFill(unsigned int changed)
         }
     }
 }
-void DeviceItem::labelParts()
+void DeviceItem::labelParts() noexcept
 {
     for (int ixi = childCount() - 1; ixi >= 0; --ixi) {
         DeviceItem *chit = children.at(ixi);
@@ -2126,7 +2126,7 @@ void DeviceItem::labelParts()
 }
 
 // Return block device info that is suitable for a combo box.
-void DeviceItem::addToCombo(QComboBox *combo, bool warnNasty) const
+void DeviceItem::addToCombo(QComboBox *combo, bool warnNasty) const noexcept
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
     if (!curFormat.isEmpty()) strout += ' ' + curFormat;
@@ -2139,7 +2139,7 @@ void DeviceItem::addToCombo(QComboBox *combo, bool warnNasty) const
     combo->addItem(QIcon(stricon), device + " (" + strout + ")", device);
 }
 // Split a device name into its drive and partition.
-QStringList DeviceItem::split(const QString &devname)
+QStringList DeviceItem::split(const QString &devname) noexcept
 {
     const QRegularExpression rxdev1("^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$");
     const QRegularExpression rxdev2("^(?:\\/dev\\/)*([a-z]*)([0-9]*)$");
@@ -2149,7 +2149,7 @@ QStringList DeviceItem::split(const QString &devname)
     if (!list.isEmpty()) list.removeFirst();
     return list;
 }
-QString DeviceItem::join(const QString &drive, int partnum)
+QString DeviceItem::join(const QString &drive, int partnum) noexcept
 {
     QString name = drive;
     if (name.startsWith("nvme") || name.startsWith("mmcblk")) name += 'p';
@@ -2157,13 +2157,13 @@ QString DeviceItem::join(const QString &drive, int partnum)
 }
 
 /* A very slimmed down and non-standard one-way tree iterator. */
-DeviceItemIterator::DeviceItemIterator(const PartMan &partman)
+DeviceItemIterator::DeviceItemIterator(const PartMan &partman) noexcept
 {
     if (partman.root.childCount() < 1) return;
     ixParents.push(0);
     pos = partman.root.child(0);
 }
-void DeviceItemIterator::next()
+void DeviceItemIterator::next() noexcept
 {
     if (!pos) return;
     if (pos->childCount()) {
@@ -2373,12 +2373,12 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     item->autoFill(changed);
     if (changed) partman->notifyChange(item);
 }
-void DeviceItemDelegate::emitCommit()
+void DeviceItemDelegate::emitCommit() noexcept
 {
     emit commitData(qobject_cast<QWidget *>(sender()));
 }
 
-void DeviceItemDelegate::partOptionsMenu()
+void DeviceItemDelegate::partOptionsMenu() noexcept
 {
     QLineEdit *edit = static_cast<QLineEdit *>(sender());
     if (!edit) return;

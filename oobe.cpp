@@ -117,7 +117,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings 
     buildServiceList();
 }
 
-void Oobe::manageConfig(MSettings &config, bool save)
+void Oobe::manageConfig(MSettings &config, bool save) noexcept
 {
     // Services page
     config.startGroup("Services", gui.pageServices);
@@ -231,7 +231,7 @@ void Oobe::process()
 
 /* Services */
 
-void Oobe::buildServiceList()
+void Oobe::buildServiceList() noexcept
 {
     //setup treeServices
     gui.treeServices->header()->setMinimumSectionSize(150);
@@ -246,8 +246,7 @@ void Oobe::buildServiceList()
         QStringList list = services_desc.value(service + lang_str).toStringList();
         if (list.size() != 2) {
             list = services_desc.value(service).toStringList(); // Use English definition
-            if (list.size() != 2)
-                continue;
+            if (list.size() != 2) continue;
         }
         QString category, description;
         category = list.at(0);
@@ -276,7 +275,7 @@ void Oobe::buildServiceList()
     gui.treeServices->resizeColumnToContents(1);
 }
 
-void Oobe::stashServices(bool save)
+void Oobe::stashServices(bool save) noexcept
 {
     QTreeWidgetItemIterator it(gui.treeServices);
     while (*it) {
@@ -316,7 +315,7 @@ void Oobe::setService(const QString &service, bool enabled)
     }
 }
 
-QWidget *Oobe::validateComputerName()
+QWidget *Oobe::validateComputerName() noexcept
 {
     // see if name is reasonable
     if (gui.textComputerName->text().isEmpty()) {
@@ -375,7 +374,7 @@ void Oobe::setComputerName()
 }
 
 // return 0 = success, 1 = bad area, 2 = bad zone
-int Oobe::selectTimeZone(const QString &zone)
+int Oobe::selectTimeZone(const QString &zone) noexcept
 {
     int index = gui.comboTimeArea->findData(QVariant(zone.section('/', 0, 0)));
     if (index < 0) return 1;
@@ -474,7 +473,7 @@ void Oobe::setLocale()
     else proc.exec("chroot", {"/mnt/antiX", "localize-repo", "default"});
 }
 
-QWidget *Oobe::validateUserInfo(bool automatic)
+QWidget *Oobe::validateUserInfo(bool automatic) noexcept
 {
     const QString &userName = gui.textUserName->text();
     // see if username is reasonable length
@@ -654,7 +653,7 @@ void Oobe::resetBlueman()
 
 /* Slots */
 
-void Oobe::localeIndexChanged(int index)
+void Oobe::localeIndexChanged(int index) noexcept
 {
     // riot control
     QLocale locale(gui.comboLocale->itemData(index).toString());
@@ -662,7 +661,7 @@ void Oobe::localeIndexChanged(int index)
     else gui.radioClock24->setChecked(true);
 }
 
-void Oobe::timeAreaIndexChanged(int index)
+void Oobe::timeAreaIndexChanged(int index) noexcept
 {
     if (index < 0 || index >= gui.comboTimeArea->count()) return;
     const QString &area = gui.comboTimeArea->itemData(index).toString();
@@ -677,7 +676,7 @@ void Oobe::timeAreaIndexChanged(int index)
     gui.comboTimeZone->model()->sort(0);
 }
 
-void Oobe::userPassValidationChanged()
+void Oobe::userPassValidationChanged() noexcept
 {
     bool ok = !gui.textUserName->text().isEmpty();
     if (ok) ok = gui.textUserPass->isValid() || gui.textUserName->text().isEmpty();
@@ -687,7 +686,7 @@ void Oobe::userPassValidationChanged()
     gui.pushNext->setEnabled(ok);
 }
 
-void Oobe::oldHomeToggled()
+void Oobe::oldHomeToggled() noexcept
 {
     gui.pushNext->setEnabled(gui.radioOldHomeUse->isChecked()
         || gui.radioOldHomeSave->isChecked() || gui.radioOldHomeDelete->isChecked());

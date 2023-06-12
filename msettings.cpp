@@ -28,12 +28,12 @@
 
 #include "msettings.h"
 
-MSettings::MSettings(const QString &fileName, QObject *parent)
+MSettings::MSettings(const QString &fileName, QObject *parent) noexcept
     : QSettings(fileName, QSettings::IniFormat, parent)
 {
 }
 
-void MSettings::dumpDebug()
+void MSettings::dumpDebug() noexcept
 {
     qDebug().noquote() << "Configuration:" << fileName();
     // top-level settings (version, etc)
@@ -60,23 +60,23 @@ void MSettings::dumpDebug()
     qDebug() << "End of configuration.";
 }
 
-void MSettings::setSave(bool save)
+void MSettings::setSave(bool save) noexcept
 {
     saving = save;
 }
 
-void MSettings::startGroup(const QString &prefix, QWidget *wgroup)
+void MSettings::startGroup(const QString &prefix, QWidget *wgroup) noexcept
 {
     beginGroup(prefix);
     group = wgroup;
 }
 
-void MSettings::setGroupWidget(QWidget *wgroup)
+void MSettings::setGroupWidget(QWidget *wgroup) noexcept
 {
     group = wgroup;
 }
 
-void MSettings::markBadWidget(QWidget *widget)
+void MSettings::markBadWidget(QWidget *widget) noexcept
 {
     if (widget) {
         widget->setStyleSheet("QWidget { background: maroon; border: 2px inset red; }\n"
@@ -86,12 +86,12 @@ void MSettings::markBadWidget(QWidget *widget)
     if (group) group->setProperty("BAD", true);
     bad = true;
 }
-bool MSettings::isBadWidget(QWidget *widget)
+bool MSettings::isBadWidget(QWidget *widget) noexcept
 {
     return widget->property("BAD").toBool();
 }
 
-void MSettings::manageComboBox(const QString &key, QComboBox *combo, const bool useData)
+void MSettings::manageComboBox(const QString &key, QComboBox *combo, const bool useData) noexcept
 {
     const QVariant &comboval = useData ? combo->currentData() : QVariant(combo->currentText());
     if (saving) setValue(key, comboval);
@@ -104,28 +104,28 @@ void MSettings::manageComboBox(const QString &key, QComboBox *combo, const bool 
     }
 }
 
-void MSettings::manageCheckBox(const QString &key, QCheckBox *checkbox)
+void MSettings::manageCheckBox(const QString &key, QCheckBox *checkbox) noexcept
 {
     const QVariant state(checkbox->isChecked());
     if (saving) setValue(key, state);
     else if (contains(key)) checkbox->setChecked(value(key, state).toBool());
 }
 
-void MSettings::manageGroupCheckBox(const QString &key, QGroupBox *groupbox)
+void MSettings::manageGroupCheckBox(const QString &key, QGroupBox *groupbox) noexcept
 {
     const QVariant state(groupbox->isChecked());
     if (saving) setValue(key, state);
     else if (contains(key)) groupbox->setChecked(value(key, state).toBool());
 }
 
-void MSettings::manageLineEdit(const QString &key, QLineEdit *lineedit)
+void MSettings::manageLineEdit(const QString &key, QLineEdit *lineedit) noexcept
 {
     const QString &text = lineedit->text();
     if (saving) setValue(key, text);
     else if (contains(key)) lineedit->setText(value(key, text).toString());
 }
 
-void MSettings::manageSpinBox(const QString &key, QSpinBox *spinbox)
+void MSettings::manageSpinBox(const QString &key, QSpinBox *spinbox) noexcept
 {
     const QVariant spinval(spinbox->value());
     if (saving) setValue(key, spinval);
@@ -137,7 +137,7 @@ void MSettings::manageSpinBox(const QString &key, QSpinBox *spinbox)
 }
 
 int MSettings::manageEnum(const QString &key, const int nchoices,
-        const char *choices[], const int curval)
+        const char *choices[], const int curval) noexcept
 {
     QVariant choice(curval >= 0 ? choices[curval] : "");
     if (saving) {
@@ -155,7 +155,7 @@ int MSettings::manageEnum(const QString &key, const int nchoices,
 }
 
 void MSettings::manageRadios(const QString &key, const int nchoices,
-        const char *choices[], QRadioButton *radios[])
+        const char *choices[], QRadioButton *radios[]) noexcept
 {
     // obtain the current choice
     int ixradio = -1;

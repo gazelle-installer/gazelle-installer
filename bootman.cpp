@@ -30,7 +30,7 @@
 #include "bootman.h"
 
 BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
-    const QSettings &appConf, const QCommandLineParser &appArgs)
+    const QSettings &appConf, const QCommandLineParser &appArgs) noexcept
     : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
     loaderID = appConf.value("PROJECT_SHORTNAME").toString() + appConf.value("VERSION").toString();
@@ -43,7 +43,7 @@ BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     connect(gui.radioBootESP, &QRadioButton::toggled, this, &BootMan::chosenBootESP);
 }
 
-void BootMan::manageConfig(MSettings &config)
+void BootMan::manageConfig(MSettings &config) noexcept
 {
     config.startGroup("GRUB", gui.pageBoot);
     config.manageGroupCheckBox("Install", gui.boxBoot);
@@ -54,7 +54,7 @@ void BootMan::manageConfig(MSettings &config)
     config.endGroup();
 }
 
-void BootMan::selectBootMain()
+void BootMan::selectBootMain() noexcept
 {
     const DeviceItem *twit = partman.mounts.value("/boot");
     if (!twit) twit = partman.mounts.value("/");
@@ -71,7 +71,7 @@ void BootMan::selectBootMain()
 }
 
 // build ESP list available to install GRUB
-void BootMan::buildBootLists()
+void BootMan::buildBootLists() noexcept
 {
     // refresh lists and enable or disable options according to device presence
     chosenBootMBR();
@@ -297,7 +297,7 @@ void BootMan::installMain(bool efivars_ismounted)
 
 /* Slots */
 
-void BootMan::chosenBootMBR()
+void BootMan::chosenBootMBR() noexcept
 {
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
@@ -309,7 +309,7 @@ void BootMan::chosenBootMBR()
     gui.labelBoot->setText(tr("System boot disk:"));
 }
 
-void BootMan::chosenBootPBR()
+void BootMan::chosenBootPBR() noexcept
 {
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
@@ -328,7 +328,7 @@ void BootMan::chosenBootPBR()
     gui.labelBoot->setText(tr("Partition to use:"));
 }
 
-void BootMan::chosenBootESP()
+void BootMan::chosenBootESP() noexcept
 {
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {

@@ -21,16 +21,16 @@
 class MInstall : public QDialog, public Ui::MeInstall {
     Q_OBJECT
 protected:
-    void changeEvent(QEvent *event);
-    void closeEvent(QCloseEvent * event);
-    void reject();
+    void changeEvent(QEvent *event) noexcept;
+    void closeEvent(QCloseEvent * event) noexcept;
+    void reject() noexcept;
 
 public:
-    MInstall(class QSettings &acfg, const class QCommandLineParser &args, const QString &cfgfile);
+    MInstall(class QSettings &acfg, const class QCommandLineParser &args, const QString &cfgfile) noexcept;
     ~MInstall();
 
     // helpers
-    bool processNextPhase();
+    bool processNextPhase() noexcept;
 
     QString PROJECTFORUM;
     QString PROJECTNAME;
@@ -38,23 +38,23 @@ public:
     QString PROJECTURL;
     QString PROJECTVERSION;
 
-    int showPage(int curr, int next);
-    void gotoPage(int next);
-    void pageDisplayed(int next);
-    void setupkeyboardbutton();
-    bool abortUI();
+    int showPage(int curr, int next) noexcept;
+    void gotoPage(int next) noexcept;
+    void pageDisplayed(int next) noexcept;
+    void setupkeyboardbutton() noexcept;
+    bool abortUI() noexcept;
     void cleanup(bool endclean = true);
 
 private slots:
-    void on_pushAbort_clicked();
-    void on_pushBack_clicked();
-    void on_pushSetKeyboard_clicked();
-    void on_pushNext_clicked();
-    void on_pushServices_clicked();
+    void on_pushAbort_clicked() noexcept;
+    void on_pushBack_clicked() noexcept;
+    void on_pushSetKeyboard_clicked() noexcept;
+    void on_pushNext_clicked() noexcept;
+    void on_pushServices_clicked() noexcept;
 
-    void on_radioEntireDisk_toggled(bool checked);
+    void on_radioEntireDisk_toggled(bool checked) noexcept;
 
-    void on_progInstall_valueChanged(int value);
+    void on_progInstall_valueChanged(int value) noexcept;
 
 private:
     MProcess proc;
@@ -94,14 +94,14 @@ private:
     // info needed for Phase 2 of the process
     bool haveOldHome = false;
 
-    void startup();
-    void splashSetThrobber(bool active);
-    void splashThrob();
+    void startup() noexcept;
+    void splashSetThrobber(bool active) noexcept;
+    void splashThrob() noexcept;
     // private functions
-    void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor);
+    void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor) noexcept;
     void setupAutoMount(bool enabled);
-    bool pretendToInstall(int space, long steps);
+    bool pretendToInstall(int space, long steps) noexcept;
     bool saveHomeBasic();
-    void manageConfig(enum ConfigAction mode);
-    bool eventFilter(QObject *watched, QEvent *event);
+    void manageConfig(enum ConfigAction mode) noexcept;
+    bool eventFilter(QObject *watched, QEvent *event) noexcept;
 };

@@ -39,7 +39,7 @@ MProcess::MProcess(QObject *parent)
     setProcessEnvironment(env);
 }
 
-void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall)
+void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall) noexcept
 {
     logView = listLog;
     progBar = progInstall;
@@ -55,7 +55,7 @@ void MProcess::setupChildProcess()
     chroot(chRoot.toUtf8().constData());
     chdir("/");
 }
-void MProcess::setChRoot(const QString &newroot)
+void MProcess::setChRoot(const QString &newroot) noexcept
 {
     if (!newroot.isEmpty()) log("Set chroot: " + newroot, Standard);
     else if (!chRoot.isEmpty() && newroot.isEmpty()) log("End chroot: " + chRoot, Standard);
@@ -63,7 +63,7 @@ void MProcess::setChRoot(const QString &newroot)
 }
 
 bool MProcess::exec(const QString &program, const QStringList &arguments,
-    const QByteArray *input, bool needRead, QListWidgetItem *logEntry)
+    const QByteArray *input, bool needRead, QListWidgetItem *logEntry) noexcept(false)
 {
     QEventLoop eloop;
     connect(this, QOverload<QProcess::ProcessError>::of(&QProcess::errorOccurred), &eloop, &QEventLoop::quit);
@@ -114,7 +114,7 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     return true;
 }
 
-bool MProcess::exec(const QString &program, const QStringList &arguments, const QByteArray *input, bool needRead)
+bool MProcess::exec(const QString &program, const QStringList &arguments, const QByteArray *input, bool needRead) noexcept(false)
 {
     if (halting) return false;
     ++execount;
@@ -122,7 +122,7 @@ bool MProcess::exec(const QString &program, const QStringList &arguments, const 
     qDebug().nospace().noquote() << "Exec #" << execount << ": " << cmd;
     return exec(program, arguments, input, needRead, log(cmd, Exec));
 }
-bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead)
+bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead) noexcept(false)
 {
     if (halting) return false;
     ++execount;
@@ -130,18 +130,18 @@ bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead
     return exec("/bin/bash", {"-c", cmd}, input, needRead, log(cmd, Exec));
 }
 
-QString MProcess::readOut(bool everything)
+QString MProcess::readOut(bool everything) noexcept
 {
     QString strout(readAllStandardOutput().trimmed());
     if (everything) return strout;
     return strout.section("\n", 0, 0);
 }
-QStringList MProcess::readOutLines()
+QStringList MProcess::readOutLines() noexcept
 {
     return QString(readAllStandardOutput().trimmed()).split('\n', Qt::SkipEmptyParts);
 }
 
-void MProcess::halt()
+void MProcess::halt() noexcept
 {
     halting = true;
     terminate();
@@ -149,7 +149,7 @@ void MProcess::halt()
     setChRoot();
 }
 
-void MProcess::unhalt()
+void MProcess::unhalt() noexcept
 {
     QEventLoop eloop;
     connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
@@ -163,7 +163,7 @@ void MProcess::unhalt()
     halting = false;
 }
 
-QString MProcess::joinCommand(const QString &program, const QStringList &arguments)
+QString MProcess::joinCommand(const QString &program, const QStringList &arguments) noexcept
 {
     QString text = program;
     for(QString arg : arguments) {
@@ -181,7 +181,7 @@ QString MProcess::joinCommand(const QString &program, const QStringList &argumen
     return text;
 }
 
-QListWidgetItem *MProcess::log(const QString &text, const LogType type)
+QListWidgetItem *MProcess::log(const QString &text, const LogType type) noexcept
 {
     if (type == Standard) qDebug().noquote() << text;
     else if (type == Section) qDebug().noquote() << "<<" << text << ">>";
@@ -200,7 +200,7 @@ QListWidgetItem *MProcess::log(const QString &text, const LogType type)
     logView->scrollToBottom();
     return entry;
 }
-void MProcess::log(QListWidgetItem *entry, const int status)
+void MProcess::log(QListWidgetItem *entry, const int status) noexcept
 {
     if (!entry) return;
     if (status > 0) entry->setForeground(Qt::green);
@@ -208,7 +208,7 @@ void MProcess::log(QListWidgetItem *entry, const int status)
     else entry->setForeground(Qt::yellow);
 }
 
-void MProcess::status(const QString &text, long progress)
+void MProcess::status(const QString &text, long progress) noexcept
 {
     if (!progBar) log(text, Status);
     else {
@@ -220,7 +220,7 @@ void MProcess::status(const QString &text, long progress)
         status(progress);
     }
 }
-void MProcess::status(long progress)
+void MProcess::status(long progress) noexcept
 {
     if (progress < 0) ++progSlicePos;
     else progSlicePos = progress;
@@ -232,7 +232,7 @@ void MProcess::status(long progress)
     if (progBar) progBar->setValue(progSliceStart + slice);
     qApp->processEvents();
 }
-void MProcess::advance(int space, long steps)
+void MProcess::advance(int space, long steps) noexcept
 {
     if (space < 0) steps = progSliceSpace = progSliceStart = space = 0; // Reset progress
     progSliceStart += progSliceSpace;
@@ -243,14 +243,14 @@ void MProcess::advance(int space, long steps)
     qApp->processEvents();
 }
 
-void MProcess::setExceptionMode(const char *failInfo)
+void MProcess::setExceptionMode(const char *failInfo) noexcept
 {
     exceptionInfo = failInfo;
 }
 
 // Common functions that are traditionally carried out by processes.
 
-void MProcess::sleep(const int msec, const bool silent)
+void MProcess::sleep(const int msec, const bool silent) noexcept
 {
     if (halting) return;
     QListWidgetItem *logEntry = nullptr;
@@ -269,7 +269,7 @@ void MProcess::sleep(const int msec, const bool silent)
         log(logEntry, rc == 0 ? 1 : -1);
     }
 }
-bool MProcess::mkpath(const QString &path)
+bool MProcess::mkpath(const QString &path) noexcept(false)
 {
     QListWidgetItem *logEntry = log("MKPATH: "+path, Exec);
     const bool rc = QDir().mkpath(path);

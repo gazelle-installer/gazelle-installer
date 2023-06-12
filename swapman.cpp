@@ -26,7 +26,7 @@
 #include "partman.h"
 #include "swapman.h"
 
-SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui)
+SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
     : QObject(ui.boxMain), proc(mproc), partman(pman), gui(ui)
 {
     connect(ui.textSwapFile, &QLineEdit::textEdited, this, &SwapMan::swapFileEdited);
@@ -35,7 +35,7 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui)
     connect(ui.checkHibernation, &QCheckBox::clicked, this, &SwapMan::checkHibernationClicked);
 }
 
-void SwapMan::manageConfig(MSettings &config, bool advanced)
+void SwapMan::manageConfig(MSettings &config, bool advanced) noexcept
 {
     config.startGroup("Swap", gui.pageBoot);
     if (advanced || !config.isSave()) {
@@ -46,7 +46,7 @@ void SwapMan::manageConfig(MSettings &config, bool advanced)
     config.manageCheckBox("Hibernation", gui.checkHibernation);
     config.endGroup();
 }
-void SwapMan::setupDefaults()
+void SwapMan::setupDefaults() noexcept
 {
     gui.boxSwap->setChecked(partman.swapCount() <= 0);
     swapFileEdited(gui.textSwapFile->text());
@@ -102,7 +102,7 @@ void SwapMan::install()
     proc.setExceptionMode(nullptr);
 }
 
-long long SwapMan::recommended(bool hibernation)
+long long SwapMan::recommended(bool hibernation) noexcept
 {
     struct sysinfo sinfo;
     if (sysinfo(&sinfo) != 0) return 0;
@@ -115,7 +115,7 @@ long long SwapMan::recommended(bool hibernation)
 
 /* Slots */
 
-void SwapMan::swapFileEdited(const QString &text)
+void SwapMan::swapFileEdited(const QString &text) noexcept
 {
     const DeviceItem *devit = partman.findHostDev(text);
     int max = 0;
@@ -130,19 +130,19 @@ void SwapMan::swapFileEdited(const QString &text)
     if (!canHibernate) gui.checkHibernation->setChecked(false);
 }
 
-void SwapMan::sizeResetClicked()
+void SwapMan::sizeResetClicked() noexcept
 {
     const int irec = (int)(recommended(gui.checkHibernation->isChecked()) / MB);
     gui.spinSwapSize->setValue(irec);
     spinSizeChanged(gui.spinSwapSize->value());
 }
 
-void SwapMan::spinSizeChanged(int i)
+void SwapMan::spinSizeChanged(int i) noexcept
 {
     if (i < (recommended(true) / MB)) gui.checkHibernation->setChecked(false);
 }
 
-void SwapMan::checkHibernationClicked(bool checked)
+void SwapMan::checkHibernationClicked(bool checked) noexcept
 {
     if (checked) {
         const int irec = (int)(recommended(gui.checkHibernation->isChecked()) / MB);

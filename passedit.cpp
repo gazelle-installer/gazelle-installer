@@ -33,12 +33,12 @@ PassEdit::PassEdit(QWidget *parent)
 {
 }
 
-bool PassEdit::isValid() const
+bool PassEdit::isValid() const noexcept
 {
     return lastValid;
 }
 
-void PassEdit::setup(PassEdit *slave, int min, int genMin, int wordMax)
+void PassEdit::setup(PassEdit *slave, int min, int genMin, int wordMax) noexcept
 {
     this->slave = slave;
     this->min = min;
@@ -60,7 +60,7 @@ void PassEdit::setup(PassEdit *slave, int min, int genMin, int wordMax)
     masterTextChanged();
 }
 
-void PassEdit::generate()
+void PassEdit::generate() noexcept
 {
     static QStringList words;
     static int pos;
@@ -118,7 +118,7 @@ void PassEdit::changeEvent(QEvent *event)
     QLineEdit::changeEvent(event);
 }
 
-void PassEdit::masterTextChanged()
+void PassEdit::masterTextChanged() noexcept
 {
     slave->clear();
     setPalette(QPalette());
@@ -147,7 +147,7 @@ void PassEdit::masterTextChanged()
     }
 }
 
-void PassEdit::slaveTextChanged(const QString &slaveText)
+void PassEdit::slaveTextChanged(const QString &slaveText) noexcept
 {
     QPalette pal = palette();
     bool valid = true;
@@ -168,7 +168,7 @@ void PassEdit::slaveTextChanged(const QString &slaveText)
     }
 }
 
-void PassEdit::eyeToggled(bool checked)
+void PassEdit::eyeToggled(bool checked) noexcept
 {
     actionEye->setIcon(QIcon(checked ? ":/eye-hide" : ":/eye-show"));
     actionEye->setToolTip(checked ? tr("Hide the password") : tr("Show the password"));

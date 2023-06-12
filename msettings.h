@@ -26,25 +26,25 @@ class MSettings : public QSettings
     bool saving = false;
     class QWidget *group = nullptr;
 public:
-    MSettings(const QString &fileName, QObject *parent = Q_NULLPTR);
+    MSettings(const QString &fileName, QObject *parent = Q_NULLPTR) noexcept;
     bool bad = false;
-    void dumpDebug();
-    void setSave(bool save);
-    bool isSave() { return saving; }
-    void startGroup(const QString &prefix, class QWidget *wgroup);
-    void setGroupWidget(class QWidget *wgroup);
+    void dumpDebug() noexcept;
+    void setSave(bool save) noexcept;
+    bool isSave() const noexcept { return saving; }
+    void startGroup(const QString &prefix, class QWidget *wgroup) noexcept;
+    void setGroupWidget(class QWidget *wgroup) noexcept;
     // widget management
-    void markBadWidget(class QWidget *widget);
-    static bool isBadWidget(class QWidget *widget);
-    void manageComboBox(const QString &key, class QComboBox *combo, const bool useData);
-    void manageCheckBox(const QString &key, class QCheckBox *checkbox);
-    void manageGroupCheckBox(const QString &key, class QGroupBox *groupbox);
-    void manageLineEdit(const QString &key, class QLineEdit *lineedit);
-    void manageSpinBox(const QString &key, class QSpinBox *spinbox);
+    void markBadWidget(class QWidget *widget) noexcept;
+    static bool isBadWidget(class QWidget *widget) noexcept;
+    void manageComboBox(const QString &key, class QComboBox *combo, const bool useData) noexcept;
+    void manageCheckBox(const QString &key, class QCheckBox *checkbox) noexcept;
+    void manageGroupCheckBox(const QString &key, class QGroupBox *groupbox) noexcept;
+    void manageLineEdit(const QString &key, class QLineEdit *lineedit) noexcept;
+    void manageSpinBox(const QString &key, class QSpinBox *spinbox) noexcept;
     int manageEnum(const QString &key, const int nchoices,
-            const char *choices[], const int curval);
+            const char *choices[], const int curval) noexcept;
     void manageRadios(const QString &key, const int nchoices,
-            const char *choices[], class QRadioButton *radios[]);
+            const char *choices[], class QRadioButton *radios[]) noexcept;
 };
 
 #endif // MSETTINGS_H
