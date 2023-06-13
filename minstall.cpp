@@ -581,7 +581,7 @@ int MInstall::showPage(int curr, int next)
             }
             bootman->buildBootLists(); // Load default boot options
             manageConfig(ConfigLoadB);
-            return Step::Network;
+            return oem ? Step::Progress : Step::Network;
         }
     } else if (curr == Step::Partitions && next > curr) {
         if (!partman->composeValidate(automatic, PROJECTNAME)) {
@@ -596,8 +596,16 @@ int MInstall::showPage(int curr, int next)
         }
         return Step::Boot;
     } else if (curr == Step::Boot && next > curr) {
-        if (oem) return Step::Progress;
-        return Step::Services + 1;
+        return oem ? Step::Progress : Step::Network;
+    } else if (curr == Step::Network && next > curr) {
+        nextFocus = oobe->validateComputerName();
+        if (nextFocus) return curr;
+    } else if (curr == Step::Network && next < curr) { // Backward
+        return Step::Boot; // Skip pageServices
+    } else if (curr == Step::Localization && next > curr) {
+        if (!pretend && oobe->haveSnapshotUserAccounts) {
+            return Step::Progress; // Skip pageUserAccounts and pageOldHome
+        }
     } else if (curr == Step::UserAccounts && next > curr) {
         nextFocus = oobe->validateUserInfo(automatic);
         if (nextFocus) return curr;
@@ -607,15 +615,6 @@ int MInstall::showPage(int curr, int next)
         else {
             const QString &str = tr("The home directory for %1 already exists.");
             labelOldHome->setText(str.arg(textUserName->text()));
-        }
-    } else if (curr == Step::Network && next > curr) {
-        nextFocus = oobe->validateComputerName();
-        if (nextFocus) return curr;
-    } else if (curr == Step::Network && next < curr) { // Backward
-        return Step::Boot; // Skip pageServices
-    } else if (curr == Step::Localization && next > curr) {
-        if (!pretend && oobe->haveSnapshotUserAccounts) {
-            return Step::Progress; // Skip pageUserAccounts and pageOldHome
         }
     } else if (curr == Step::OldHome && next < curr) { // Backward
         if (!pretend && oobe->haveSnapshotUserAccounts) {
@@ -884,6 +883,7 @@ void MInstall::pageDisplayed(int next)
             + "</p><p>"
             + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
             + "</p>");
+        enableBack = !oem || radioCustomPart->isChecked();
         enableNext = false;
         break;
 
