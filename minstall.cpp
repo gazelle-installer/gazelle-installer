@@ -166,9 +166,6 @@ void MInstall::startup() noexcept
         autopart = new AutoPart(proc, partman, *this, appConf);
         partman->autopart = autopart;
 
-        autoMountEnabled = true; // disable auto mount by force
-        if (!pretend) setupAutoMount(false);
-
         // Link block
         QString link_block;
         appConf.beginGroup("LINKS");
@@ -379,6 +376,9 @@ bool MInstall::processNextPhase() noexcept
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
             if (!partman->checkTargetDrivesOK()) return false;
             phase = 1; // installation.
+
+            autoMountEnabled = true; // disable auto mount by force
+            if (!pretend) setupAutoMount(false);
 
             // cleanup previous mounts
             cleanup(false);
