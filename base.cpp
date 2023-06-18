@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <QDebug>
+#include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>
 #include "mprocess.h"
@@ -116,13 +117,46 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     proc.setExceptionMode(nullptr);
 }
 
+bool Base::saveHomeBasic() noexcept
+{
+    proc.setExceptionMode(nullptr);
+    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    QString homedir("/");
+    const DeviceItem *mntit = partman.mounts.value("/home");
+    if (!mntit || mntit->willFormat()) {
+        mntit = partman.mounts.value("/");
+        homedir = "/home";
+    }
+    if (!mntit || mntit->willFormat()) return true;
+    const QString &homedev = mntit->mappedDevice();
+
+    // Just in case the device or mount point is in use elsewhere.
+    proc.exec("/usr/bin/umount", {"-q", homedev});
+    proc.exec("/usr/bin/umount", {"-q", "/mnt/antiX"});
+
+    // Store a listing of /home to compare with the user name given later.
+    mkdir("/mnt/antiX", 0755);
+    QString opts = "ro";
+    if (mntit->type == DeviceItem::Subvolume) opts += ",subvol="+mntit->curLabel;
+    bool ok = proc.exec("/bin/mount", {"-o", opts, homedev, "/mnt/antiX"});
+    if (ok) {
+        QDir hd("/mnt/antiX" + homedir);
+        ok = hd.exists() && hd.isReadable();
+        homes = hd.entryList(QDir::Dirs);
+        proc.exec("/usr/bin/umount", {"-l", "/mnt/antiX"});
+    }
+    return ok;
+}
+
 void Base::install()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     if (proc.halted()) return;
     proc.advance(1, 2);
 
-    if (!partman.willFormat("/")) {
+    const DeviceItem *mntit = partman.mounts.value("/");
+    const bool skiphome = !(mntit && mntit->willFormat());
+    if (skiphome) {
         // if root was not formatted and not using --sync option then re-use it
         // remove all folders in root except for /home
         proc.status(tr("Deleting old system"));
@@ -142,7 +176,7 @@ void Base::install()
     mkdir("/mnt/antiX/sys", 0755);
     mkdir("/mnt/antiX/run", 0755);
 
-    copyLinux();
+    copyLinux(skiphome);
 
     proc.advance(1, 1);
     proc.status(tr("Fixing configuration"));
@@ -197,7 +231,7 @@ void Base::install()
     }
 }
 
-void Base::copyLinux()
+void Base::copyLinux(bool skiphome)
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     if (proc.halted()) return;
@@ -211,7 +245,7 @@ void Base::copyLinux()
     if (sync) {
         prog = "rsync";
         args << "--delete";
-        if (!partman.willFormat("/")) args << "--filter" << "protect home/*";
+        if (skiphome) args << "--filter" << "protect home/*";
     }
     args << bootSource << rootSources << "/mnt/antiX";
     proc.advance(80, sourceInodes);

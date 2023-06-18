@@ -37,14 +37,16 @@ class Base
     bool pretend = false;
     bool nocopy = false, sync = false;
     bool populateMediaMounts = false;
-    void copyLinux();
+    void copyLinux(bool skiphome);
 public:
     // source medium
     QString bootSource;
     QStringList rootSources;
+    QStringList homes;
 
     Base(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui,
         const QSettings &appConf, const QCommandLineParser &appArgs);
+    bool saveHomeBasic() noexcept;
     void install();
 };
 
