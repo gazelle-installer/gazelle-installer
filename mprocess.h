@@ -27,7 +27,7 @@ class MProcess : public QProcess
     Q_OBJECT
     int execount = 0;
     int sleepcount = 0;
-    bool halting = false;
+    enum HaltMode { NoHalt, ThrowHalt, Halted } halting = NoHalt;
     bool debugUnusedOutput = true;
     class QListWidget *logView = nullptr;
     class QProgressBar *progBar = nullptr;
@@ -40,7 +40,8 @@ class MProcess : public QProcess
     int testMac = -1;
     // Common execution core
     bool exec(const QString &program, const QStringList &arguments,
-        const QByteArray *input, bool needRead, class QListWidgetItem *logEntry) noexcept(false);
+        const QByteArray *input, bool needRead, class QListWidgetItem *logEntry);
+    bool checkHalt();
 protected:
     void setupChildProcess() override;
 public:
@@ -56,14 +57,14 @@ public:
     void setupUI(class QListWidget *listLog, class QProgressBar *progInstall) noexcept;
     void setChRoot(const QString &newroot = QString()) noexcept;
     bool exec(const QString &program, const QStringList &arguments = {},
-        const QByteArray *input = nullptr, bool needRead = false) noexcept(false);
-    bool shell(const QString &cmd, const QByteArray *input = nullptr, bool needRead = false) noexcept(false);
+        const QByteArray *input = nullptr, bool needRead = false);
+    bool shell(const QString &cmd, const QByteArray *input = nullptr, bool needRead = false);
     QString readOut(bool everything = false) noexcept;
     QStringList readOutLines() noexcept;
-    // Miscellaneous
-    void halt() noexcept;
+    // Killer functions
+    void halt(bool exception = false) noexcept;
     void unhalt() noexcept;
-    bool halted() const noexcept { return halting; }
+    bool halted() const noexcept { return halting!=NoHalt; }
     // User interface
     static QString joinCommand(const QString &program, const QStringList &arguments) noexcept;
     class QListWidgetItem *log(const QString &text, const enum LogType type = Standard) noexcept;
@@ -74,7 +75,7 @@ public:
     void setExceptionMode(const char *failInfo) noexcept;
     // Common functions that are traditionally carried out by processes.
     void sleep(const int msec, const bool silent = false) noexcept;
-    bool mkpath(const QString &path) noexcept(false);
+    bool mkpath(const QString &path);
     // Operating system
     const QString &detectArch();
     int detectEFI(bool noTest = false);

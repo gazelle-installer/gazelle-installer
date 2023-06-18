@@ -62,8 +62,15 @@ void MProcess::setChRoot(const QString &newroot) noexcept
     chRoot = newroot;
 }
 
+inline bool MProcess::checkHalt()
+{
+    if (halting == ThrowHalt) throw("");
+    else if (halting == Halted) return true;
+    return false;
+}
+
 bool MProcess::exec(const QString &program, const QStringList &arguments,
-    const QByteArray *input, bool needRead, QListWidgetItem *logEntry) noexcept(false)
+    const QByteArray *input, bool needRead, QListWidgetItem *logEntry)
 {
     QEventLoop eloop;
     connect(this, QOverload<QProcess::ProcessError>::of(&QProcess::errorOccurred), &eloop, &QEventLoop::quit);
@@ -76,8 +83,7 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     if (input && !(input->isEmpty())) write(*input);
     closeWriteChannel();
     eloop.exec();
-    disconnect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
-    disconnect(this, QOverload<QProcess::ProcessError>::of(&QProcess::errorOccurred), nullptr, nullptr);
+    disconnect(&eloop);
 
     if (debugUnusedOutput) {
         bool hasOut = false;
@@ -114,17 +120,17 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
     return true;
 }
 
-bool MProcess::exec(const QString &program, const QStringList &arguments, const QByteArray *input, bool needRead) noexcept(false)
+bool MProcess::exec(const QString &program, const QStringList &arguments, const QByteArray *input, bool needRead)
 {
-    if (halting) return false;
+    if (checkHalt()) return false;
     ++execount;
     const QString &cmd = joinCommand(program, arguments);
     qDebug().nospace().noquote() << "Exec #" << execount << ": " << cmd;
     return exec(program, arguments, input, needRead, log(cmd, Exec));
 }
-bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead) noexcept(false)
+bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead)
 {
-    if (halting) return false;
+    if (checkHalt()) return false;
     ++execount;
     qDebug().nospace().noquote() << "Bash #" << execount << ": " << cmd;
     return exec("/bin/bash", {"-c", cmd}, input, needRead, log(cmd, Exec));
@@ -141,16 +147,25 @@ QStringList MProcess::readOutLines() noexcept
     return QString(readAllStandardOutput().trimmed()).split('\n', Qt::SkipEmptyParts);
 }
 
-void MProcess::halt() noexcept
+void MProcess::halt(bool exception) noexcept
 {
-    halting = true;
-    terminate();
-    QTimer::singleShot(5000, this, &QProcess::kill);
+    log(__PRETTY_FUNCTION__, Section);
+    halting = exception ? ThrowHalt : Halted;
+    if(state() != QProcess::NotRunning) {
+        QEventLoop eloop;
+        connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
+        closeReadChannel(QProcess::StandardOutput);
+        closeReadChannel(QProcess::StandardError);
+        closeWriteChannel();
+        this->terminate();
+        QTimer::singleShot(5000, this, &QProcess::kill);
+        eloop.exec();
+    }
     setChRoot();
 }
-
 void MProcess::unhalt() noexcept
 {
+    if (halting == NoHalt) return;
     QEventLoop eloop;
     connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (state() != QProcess::NotRunning) {
@@ -159,8 +174,7 @@ void MProcess::unhalt() noexcept
         closeWriteChannel();
         eloop.exec();
     }
-    disconnect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
-    halting = false;
+    halting = NoHalt;
 }
 
 QString MProcess::joinCommand(const QString &program, const QStringList &arguments) noexcept
@@ -252,7 +266,6 @@ void MProcess::setExceptionMode(const char *failInfo) noexcept
 
 void MProcess::sleep(const int msec, const bool silent) noexcept
 {
-    if (halting) return;
     QListWidgetItem *logEntry = nullptr;
     if (!silent) {
         ++sleepcount;
@@ -269,8 +282,9 @@ void MProcess::sleep(const int msec, const bool silent) noexcept
         log(logEntry, rc == 0 ? 1 : -1);
     }
 }
-bool MProcess::mkpath(const QString &path) noexcept(false)
+bool MProcess::mkpath(const QString &path)
 {
+    if (checkHalt()) return false;
     QListWidgetItem *logEntry = log("MKPATH: "+path, Exec);
     const bool rc = QDir().mkpath(path);
     qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;

@@ -41,9 +41,6 @@ public:
     int showPage(int curr, int next) noexcept;
     void gotoPage(int next) noexcept;
     void pageDisplayed(int next) noexcept;
-    void setupkeyboardbutton() noexcept;
-    bool abortUI() noexcept;
-    void cleanup(bool endclean = true);
 
 private slots:
     void on_pushAbort_clicked() noexcept;
@@ -60,7 +57,22 @@ private:
     MProcess proc;
     class QSettings &appConf;
     const class QCommandLineParser &appArgs;
-    int phase = 0;
+    enum Phase {
+        StartingUp = -1, // Must be less than Ready. -1 for log cosmetics.
+        Ready, // Must be less than all install phases. 0 for log cosmetics.
+        Preparing,
+        Installing,
+        WaitingForInfo,
+        Configuring,
+        OutOfBox,
+        Finished = 99 // Must be the largest. 99 for log cosmetics.
+    } phase = StartingUp;
+    enum Abortion {
+        NoAbort,
+        Aborting,
+        Closing,
+        Aborted
+    } abortion = NoAbort;
 
     // command line options
     bool pretend, automatic;
@@ -94,9 +106,11 @@ private:
     // info needed for Phase 2 of the process
     bool haveOldHome = false;
 
-    void startup() noexcept;
+    void startup();
     void splashSetThrobber(bool active) noexcept;
-    void splashThrob() noexcept;
+    void setupkeyboardbutton() noexcept;
+    void abortUI(bool manual, bool closing) noexcept;
+    void cleanup(bool endclean = true);
     // private functions
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor) noexcept;
     void setupAutoMount(bool enabled);
