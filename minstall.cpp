@@ -182,20 +182,15 @@ void MInstall::startup()
         // set some distro-centric text
         textReminders->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
                             + "\n" + link_block);
+
+        // Password box setup
+        textCryptoPass->setup(textCryptoPass2, 1, 32, 9);
+        textCryptoPassCust->setup(textCryptoPassCust2, 1, 32, 9);
+        connect(textCryptoPass, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
+        connect(textCryptoPassCust, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
     }
 
-    // Password box setup
-    textCryptoPass->setup(textCryptoPass2, 1, 32, 9);
-    textCryptoPassCust->setup(textCryptoPassCust2, 1, 32, 9);
-    connect(textCryptoPass, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
-    connect(textCryptoPassCust, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
-
     setupkeyboardbutton();
-
-    // Guess if hardware clock is UTC or local time
-    proc.shell("guess-hwclock", nullptr, true);
-    if (proc.readOut() == "localtime") checkLocalClock->setChecked(true);
-    else if (proc.detectMac()) checkLocalClock->setChecked(true);
 
     oobe = new Oobe(proc, *this, this, appConf, oem, modeOOBE);
 
@@ -439,7 +434,7 @@ bool MInstall::processNextPhase() noexcept
         // This OOBE phase is only run under --oobe mode.
         if (modeOOBE && phase == Ready) {
             phase = OutOfBox;
-            updateCursor(Qt::BusyCursor);
+            updateCursor(Qt::WaitCursor);
             labelSplash->setText(tr("Configuring sytem. Please wait."));
             gotoPage(Step::Splash);
 
@@ -449,7 +444,6 @@ bool MInstall::processNextPhase() noexcept
             phase = Finished;
             labelSplash->setText(tr("Configuration complete. Restarting system."));
             proc.exec("/usr/sbin/reboot");
-            qApp->exit(EXIT_SUCCESS);
         }
     } catch (const char *msg) {
         if (!msg || !msg[0] || abortion) {
@@ -534,6 +528,8 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
             if (advanced) bootman->manageConfig(*config);
             oobe->manageConfig(*config, mode==ConfigSave);
         }
+    } else if (mode == ConfigLoadB) {
+        oobe->manageConfig(*config, false);
     }
 
     if (mode == ConfigSave) {
