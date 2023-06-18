@@ -478,7 +478,8 @@ void PartMan::treeMenu(const QPoint &)
             actActive->setCheckable(true);
             actActive->setChecked(twit->isActive());
         }
-        if (twit->format == "btrfs") {
+        if (twit->format == "btrfs"
+            || ((twit->usefor.isEmpty() || twit->format == "PRESERVE") && twit->curFormat == "btrfs")) {
             menu.addSeparator();
             actNewSubvolume = menu.addAction(tr("New subvolume"));
             actScanSubvols = menu.addAction(tr("Scan subvolumes"));
@@ -529,6 +530,7 @@ void PartMan::treeMenu(const QPoint &)
         }
     } else if (twit->type == DeviceItem::Subvolume) {
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
+        actRemSubvolume->setDisabled(twit->flags.oldLayout);
         if (menu.exec(QCursor::pos()) == actRemSubvolume) delete twit;
     }
 }
@@ -671,9 +673,9 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
     qApp->setOverrideCursor(Qt::WaitCursor);
     gui.boxMain->setEnabled(false);
     while (partit->childCount()) delete partit->child(0);
-    mkdir("/mnt/btrfs-scratch", 0755);
+    proc.mkpath("/mnt/btrfs-scratch");
     QStringList lines;
-    if (!proc.exec("mount", {"-o", "noatime",
+    if (!proc.exec("mount", {"-o", "subvolid=5,ro",
         partit->mappedDevice(), "/mnt/btrfs-scratch"})) goto END;
     proc.exec("btrfs", {"subvolume", "list", "/mnt/btrfs-scratch"}, nullptr, true);
     lines = proc.readOutLines();
@@ -682,7 +684,9 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
         const int start = line.indexOf("path") + 5;
         if (line.length() <= start) goto END;
         DeviceItem *svit = new DeviceItem(DeviceItem::Subvolume, partit);
-        svit->label = line.mid(start);
+        svit->flags.oldLayout = true;
+        svit->label = svit->curLabel = line.mid(start);
+        svit->format = "PRESERVE";
         notifyChange(svit);
     }
  END:
@@ -795,11 +799,13 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                 if (drvit->flags.oldLayout) {
                     if (use.isEmpty()) {
                         if (partit->curFormat == "BIOS-GRUB") hasBiosGrub = true;
-                        continue;
+                        if (partit->curFormat == "btrfs") actmsg = tr("Reuse %1");
+                        else continue;
+                    } else {
+                        if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
+                        else if (use != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
+                        else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
                     }
-                    if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
-                    else if (use != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
-                    else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
                 } else {
                     if (use.isEmpty()) actmsg = tr("Create %1 without formatting");
                     else actmsg = tr("Create %1, format to use for %2");
@@ -807,6 +813,28 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                 details += actmsg.arg(partit->shownDevice(), partit->shownUseFor()) + '\n';
                 if (use == "BIOS-GRUB") hasBiosGrub = true;
 
+                if (partit->format == "btrfs" || partit->curFormat == "btrfs") {
+                    for (int ixsv = 0; ixsv < partit->childCount(); ++ixsv) {
+                        DeviceItem *svit = partit->child(ixsv);
+                        const QString &svuse = svit->realUseFor();
+                        const bool nouse = svuse.isEmpty();
+                        if (svit->format == "PRESERVE") {
+                            if (nouse) continue;
+                            else actmsg = tr("Reuse subvolume %1 as %2");
+                        } else if (svit->format == "DELETE") {
+                            actmsg = tr("Delete subvolume %1");
+                        } else if (svit->format == "CREATE") {
+                            if (svit->flags.oldLayout) {
+                                if (nouse) actmsg = tr("Overwrite subvolume %1");
+                                else actmsg = tr("Overwrite subvolume %1 to use for %2");
+                            } else {
+                                if (nouse) actmsg = tr("Create subvolume %1");
+                                else actmsg = tr("Create subvolume %1 to use for %2");
+                            }
+                        }
+                        details += " + " + actmsg.arg(svit->label, svuse) + '\n';
+                    }
+                }
                 // If this volume is too small, add to the warning list.
                 const long long minSize = volSpecTotal(partit->realUseFor()).minimum;
                 if (partit->size < minSize) {
@@ -1187,30 +1215,36 @@ void PartMan::formatPartitions()
 
 void PartMan::prepareSubvolumes(DeviceItem *partit)
 {
-    static const char *const msgfail = QT_TR_NOOP("Failed to prepare subvolumes.");
-    const int svcount = partit->childCount();
-    QStringList svlist;
-    for (int ixi = 0; ixi < svcount; ++ixi) {
-        DeviceItem *svit = partit->child(ixi);
-        if (svit->willFormat()) svlist << svit->label;
-    }
-
-    if (svlist.isEmpty()) return;
+    proc.setExceptionMode(QT_TR_NOOP("Failed to prepare subvolumes."));
     proc.status(tr("Preparing subvolumes"));
-    svlist.sort(); // This ensures nested subvolumes are created in the right order.
-    mkdir("/mnt/btrfs-scratch", 0755);
-    if (!proc.exec("mount", {"-o", "noatime", partit->mappedDevice(), "/mnt/btrfs-scratch"})) {
-        throw msgfail;
+
+    proc.mkpath("/mnt/btrfs-scratch");
+    proc.exec("mount", {"-o", "subvolid=5,noatime", partit->mappedDevice(), "/mnt/btrfs-scratch"});
+    const char *errmsg = nullptr;
+    try {
+        // Since the default subvolume cannot be deleted, ensure the default is set to the top.
+        proc.exec("btrfs", {"subvolume", "set-default", "5", "/mnt/btrfs-scratch"});
+        for (int ixsv = 0; ixsv < partit->childCount(); ++ixsv) {
+            DeviceItem *svit = partit->child(ixsv);
+            const QString &svpath = "/mnt/btrfs-scratch/" + svit->label;
+            if (svit->format != "PRESERVE" && QFileInfo::exists(svpath)) {
+                proc.exec("btrfs", {"subvolume", "delete", svpath});
+            }
+            if (svit->format == "CREATE") proc.exec("btrfs", {"subvolume", "create", svpath});
+            proc.status();
+        }
+        // Make the root subvolume the default again.
+        DeviceItem *devit = mounts.value("/");
+        assert (devit != nullptr);
+        if (devit->type == DeviceItem::Subvolume) {
+            proc.exec("btrfs", {"subvolume", "set-default", "/mnt/btrfs-scratch/"+devit->label});
+        }
+    } catch(const char *msg) {
+        errmsg = msg;
     }
-    bool ok = true;
-    for (const QString &subvol : qAsConst(svlist)) {
-        proc.exec("btrfs", {"subvolume", "delete", "/mnt/btrfs-scratch/" + subvol});
-        ok = proc.exec("btrfs", {"subvolume", "create", "/mnt/btrfs-scratch/" + subvol});
-        if (!ok) break;
-        proc.status();
-    }
-    if (!proc.exec("umount", {"/mnt/btrfs-scratch"})) throw msgfail;
-    if (!ok) throw msgfail;
+    proc.exec("umount", {"/mnt/btrfs-scratch"});
+    if (errmsg) throw errmsg;
+    proc.setExceptionMode(nullptr);
 }
 
 void PartMan::loadKeyMaterial(const QString &keyfile)
@@ -1333,11 +1367,6 @@ bool PartMan::makeFstab()
         const QString &mountopts = twit->options;
         if (twit->type == DeviceItem::Subvolume) {
             out << " subvol=" << twit->label;
-            //make root subvol default
-            if (it.first == "/") {
-                proc.shell("btrfs subvolume list /mnt/antiX | grep -w " + twit->label + " | cut -d\\  -f2", nullptr, true);
-                proc.exec("btrfs", {"subvolume", "set-default", proc.readOut(), "/mnt/antiX"});
-            }
             if (!mountopts.isEmpty()) out << ',' << mountopts;
         } else {
             if (mountopts.isEmpty()) out << " defaults";
@@ -1359,16 +1388,16 @@ bool PartMan::makeFstab()
 void PartMan::mountPartitions()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.setExceptionMode(QT_TR_NOOP("Failed to mount partition."));
     for (auto &it : mounts.toStdMap()) {
         if (it.first.at(0) != '/') continue;
-        static const char *const msgfail = QT_TR_NOOP("Failed to mount partition.");
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = it.second->mappedDevice();
         proc.status(tr("Mounting: %1").arg(dev));
-        if (!proc.mkpath(point)) throw msgfail;
+        proc.mkpath(point);
         if (it.first == "/boot") {
              // needed to run fsck because sfdisk --part-type can mess up the partition
-            if (!proc.exec("fsck.ext4", {"-y", dev})) throw msgfail;
+            proc.exec("fsck.ext4", {"-y", dev});
         }
         QStringList opts;
         if (it.second->type == DeviceItem::Subvolume) {
@@ -1381,8 +1410,9 @@ void PartMan::mountPartitions()
         opts.removeAll("atime");
         opts.removeAll("relatime");
         if (!opts.contains("noatime")) opts << "noatime";
-        if (!proc.exec("/bin/mount", {dev, point, "-o", opts.join(',')})) throw msgfail;
+        proc.exec("/bin/mount", {dev, point, "-o", opts.join(',')});
     }
+    proc.setExceptionMode(nullptr);
 }
 
 void PartMan::unmount()
@@ -1407,21 +1437,6 @@ void PartMan::unmount()
 }
 
 // Public properties
-bool PartMan::willFormat(const QString &point) const noexcept
-{
-    DeviceItem *twit = mounts.value(point);
-    if (twit) return twit->willFormat();
-    return false;
-}
-
-QString PartMan::getMountDev(const QString &point, const bool mapped) const noexcept
-{
-    const DeviceItem *twit = mounts.value(point);
-    if (!twit) return QString();
-    if (mapped) return twit->mappedDevice();
-    return twit->path;
-}
-
 int PartMan::swapCount() const noexcept
 {
     int count = 0;
@@ -1531,6 +1546,8 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
             if (item->type == DeviceItem::Drive) {
                 if (item->willUseGPT()) return "GPT";
                 else if (item->flags.curMBR || !item->flags.oldLayout) return "MBR";
+            } else if (item->type == DeviceItem::Subvolume) {
+                return item->shownFormat(item->format);
             } else {
                 if (item->usefor.isEmpty()) return item->curFormat;
                 else return item->shownFormat(item->format);
@@ -1563,7 +1580,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
         }
         return item->shownDevice();
     } else if (role == Qt::DecorationRole && index.column() == Device) {
-        if (item->type == DeviceItem::Drive && !item->flags.oldLayout) {
+        if ((item->type == DeviceItem::Drive || item->type == DeviceItem::Subvolume) && !item->flags.oldLayout) {
             return QIcon(":/appointment-soon");
         } else if (item->type == DeviceItem::VirtualBD && item->flags.volCrypto) {
             return QIcon::fromTheme("unlock");
@@ -1603,10 +1620,12 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
         }
         break;
     case UseFor:
-        if (item->allowedUsesFor().count() >= 1) flagsOut |= Qt::ItemIsEditable;
+        if (item->allowedUsesFor().count() >= 1 && item->format != "DELETE") {
+            flagsOut |= Qt::ItemIsEditable;
+        }
         break;
     case Label:
-        if (item->format != "PRESERVE") {
+        if (item->format != "PRESERVE" && item->format != "DELETE") {
             if (item->type == DeviceItem::Subvolume) flagsOut |= Qt::ItemIsEditable;
             else if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
         }
@@ -1891,7 +1910,7 @@ bool DeviceItem::willUseGPT() const noexcept
     else if (partman) return (partman->gptoverride || partman->proc.detectEFI());
     return false;
 }
-inline bool DeviceItem::willFormat() const noexcept
+bool DeviceItem::willFormat() const noexcept
 {
     return format != "PRESERVE" && !usefor.isEmpty();
 }
@@ -1964,8 +1983,7 @@ QStringList DeviceItem::allowedFormats() const noexcept
     QStringList list;
     const QString &use = realUseFor();
     bool allowPreserve = false;
-    if (type == Subvolume) list.append("CREATE");
-    else if (isVolume()) {
+    if (isVolume()) {
         if (use.isEmpty()) return QStringList();
         else if (use == "/boot") list.append("ext4");
         else if (use == "BIOS-GRUB") list.append("GRUB");
@@ -1983,7 +2001,14 @@ QStringList DeviceItem::allowedFormats() const noexcept
             list << "f2fs" << "jfs" << "xfs" << "btrfs";
             if (use != "FORMAT") allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         }
+    } else if (type == Subvolume) {
+        list.append("CREATE");
+        if (flags.oldLayout) {
+            list.append("DELETE");
+            allowPreserve = true;
+        }
     }
+
     if (encrypt) allowPreserve = false;
     if (allowPreserve) {
         if (use != "/") list.prepend("PRESERVE");
@@ -1993,7 +2018,8 @@ QStringList DeviceItem::allowedFormats() const noexcept
 }
 QString DeviceItem::shownFormat(const QString &fmt) const noexcept
 {
-    if (fmt == "CREATE") return tr("Create");
+    if (fmt == "CREATE") return flags.oldLayout ? tr("Overwrite") : tr("Create");
+    else if (fmt == "DELETE") return tr("Delete");
     else if (fmt != "PRESERVE") return fmt;
     else {
         if (type == Subvolume) return tr("Preserve");

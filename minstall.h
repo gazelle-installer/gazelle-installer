@@ -92,7 +92,6 @@ private:
     class Oobe *oobe = nullptr;
     class BootMan *bootman = nullptr;
     class SwapMan *swapman = nullptr;
-    QStringList listHomes;
 
     QPixmap helpBackdrop;
     // Splash screen
@@ -115,7 +114,6 @@ private:
     void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor) noexcept;
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int space, long steps) noexcept;
-    bool saveHomeBasic();
     void manageConfig(enum ConfigAction mode) noexcept;
     bool eventFilter(QObject *watched, QEvent *event) noexcept;
 };

@@ -223,8 +223,6 @@ public:
     void installTabs();
     void loadKeyMaterial(const QString &keyfile);
     void unmount();
-    bool willFormat(const QString &point) const noexcept;
-    QString getMountDev(const QString &point, const bool mapped=true) const noexcept;
     int swapCount() const noexcept;
     int isEncrypt(const QString &point) const noexcept;
     DeviceItem *findByPath(const QString &devpath) const noexcept;

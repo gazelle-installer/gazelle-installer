@@ -27,7 +27,6 @@
 #include <QSettings>
 #include <QProcess>
 #include <QProcessEnvironment>
-#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QTimer>
@@ -301,7 +300,7 @@ void MInstall::setupAutoMount(bool enabled)
         }
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
-        if (!QDir().exists("/run/udev/rules.d")) proc.mkpath("/run/udev/rules.d");
+        proc.mkpath("/run/udev/rules.d");
         for (const QString &rule : qAsConst(udev_temp_mdadm_rules)) {
             proc.exec("touch", {rule});
         }
@@ -545,33 +544,6 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     }
 }
 
-bool MInstall::saveHomeBasic()
-{
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
-    QString homedir("/");
-    QString homedev = partman->getMountDev("/home", true);
-    if (homedev.isEmpty() || partman->willFormat("/home")) {
-        if (partman->willFormat("/")) return true;
-        homedev = partman->getMountDev("/", true);
-        homedir = "/home";
-    }
-
-    // Just in case the device or mount point is in use elsewhere.
-    proc.exec("/usr/bin/umount", {"-q", homedev});
-    proc.exec("/usr/bin/umount", {"-q", "/mnt/antiX"});
-
-    // Store a listing of /home to compare with the user name given later.
-    mkdir("/mnt/antiX", 0755);
-    bool ok = proc.exec("/bin/mount", {"-o", "ro", homedev, "/mnt/antiX"});
-    if (ok) {
-        QDir hd("/mnt/antiX" + homedir);
-        ok = hd.exists() && hd.isReadable();
-        listHomes = hd.entryList(QDir::Dirs);
-        proc.exec("/usr/bin/umount", {"-l", "/mnt/antiX"});
-    }
-    return ok;
-}
-
 // logic displaying pages
 int MInstall::showPage(int curr, int next) noexcept
 {
@@ -614,7 +586,7 @@ int MInstall::showPage(int curr, int next) noexcept
             nextFocus = treePartitions;
             return curr;
         }
-        if (!pretend && !saveHomeBasic()) {
+        if (!pretend && !(base && base->saveHomeBasic())) {
             QMessageBox::critical(this, windowTitle(),
                 tr("The data in /home cannot be preserved because"
                     " the required information could not be obtained."));
@@ -636,7 +608,7 @@ int MInstall::showPage(int curr, int next) noexcept
         nextFocus = oobe->validateUserInfo(automatic);
         if (nextFocus) return curr;
         // Check for pre-existing /home directory, see if user directory already exists.
-        haveOldHome = listHomes.contains(textUserName->text());
+        haveOldHome = base && base->homes.contains(textUserName->text());
         if (!haveOldHome) return Step::Progress; // Skip pageOldHome
         else {
             const QString &str = tr("The home directory for %1 already exists.");
