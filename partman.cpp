@@ -692,7 +692,6 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
 
 bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
 {
-    bool encryptRoot = false;
     mounts.clear();
     // Partition use and other validation
     int mapnum = 0, swapnum = 0, volnum = 0;
@@ -766,18 +765,13 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         QMessageBox::critical(gui.boxMain, QString(),
             tr("A root partition of at least %1 is required.").arg(tMinRoot));
         return false;
-    } else {
-        if (!rootitem->willFormat() && mounts.contains("/home")) {
-            const QString errmsg = tr("Cannot preserve /home inside root (/) if"
-                " a separate /home partition is also mounted.");
-            QMessageBox::critical(gui.boxMain, QString(), errmsg);
-            return false;
-        }
-        if (rootitem->encrypt) encryptRoot = true;
-    }
-    if (encryptRoot && !bootitem) {
+    } else if (rootitem->willEncrypt() && !bootitem) {
         QMessageBox::critical(gui.boxMain, QString(),
             tr("You must choose a separate boot partition when encrypting root."));
+        return false;
+    } else if (!rootitem->willFormat() && mounts.contains("/home")) {
+        QMessageBox::critical(gui.boxMain, QString(),
+            tr("Cannot preserve /home inside root (/) if a separate /home partition is also mounted."));
         return false;
     }
 
