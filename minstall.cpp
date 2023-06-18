@@ -82,7 +82,6 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     } else {
         automatic = oem = false;
         pushClose->setText(tr("Shutdown"));
-        phase = 2;
         // dark palette for the OOBE screen
         QColor charcoal(56, 56, 56);
         QPalette pal;
@@ -121,12 +120,17 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
     qApp->postEvent(this, new QEvent(QEvent::PaletteChange));
-    QTimer::singleShot(0, this, [this]() {
+    QTimer::singleShot(0, this, [this]() noexcept {
         try {
             startup();
+            phase = Ready;
         } catch (const char *msg) {
-            proc.log(QStringLiteral("FAILED START - ") + msg, MProcess::Fail);
-            QMessageBox::critical(this, windowTitle(), tr(msg));
+            if(msg[0]) {
+                proc.log(QStringLiteral("FAILED START - ") + msg, MProcess::Fail);
+                QMessageBox::critical(this, windowTitle(), tr(msg));
+            }
+            proc.unhalt();
+            setupAutoMount(true);
             exit(EXIT_FAILURE);
         }
     });
@@ -143,7 +147,7 @@ MInstall::~MInstall() {
 }
 
 // meant to be run after the installer becomes visible
-void MInstall::startup() noexcept
+void MInstall::startup()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     connect(pushClose, &QPushButton::clicked, this, &MInstall::close);
@@ -242,7 +246,10 @@ void MInstall::splashSetThrobber(bool active) noexcept
         if (throbber) return;
         labelSplash->installEventFilter(this);
         throbber = new QTimer(this);
-        connect(throbber, &QTimer::timeout, this, &MInstall::splashThrob);
+        connect(throbber, &QTimer::timeout, this, [=]() noexcept {
+            ++throbPos;
+            labelSplash->update();
+        });
         throbber->start(100);
     } else {
         if (!throbber) return;
@@ -250,11 +257,6 @@ void MInstall::splashSetThrobber(bool active) noexcept
         throbber = nullptr;
         labelSplash->removeEventFilter(this);
     }
-    labelSplash->update();
-}
-void MInstall::splashThrob() noexcept
-{
-    ++throbPos;
     labelSplash->update();
 }
 
@@ -367,16 +369,18 @@ bool MInstall::processNextPhase() noexcept
 {
     try {
         widgetStack->setEnabled(true);
-        // Phase < 0 = install has been aborted (Phase -2 on close)
-        if (proc.halted()) return false;
-        // Phase 0 = install not started yet, Phase 1 = install in progress
-        // Phase 2 = waiting for operator input, Phase 3 = post-install steps
-        if (phase == 0) { // no install started yet
+        if (proc.halted()) throw ""; // Abortion
+        if (!modeOOBE && phase == Ready) { // no install started yet
+            phase = Preparing;
             proc.advance(-1, -1);
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
-            if (!partman->checkTargetDrivesOK()) return false;
-            phase = 1; // installation.
 
+            // Load defaults for configuration phase
+            bootman->buildBootLists();
+            swapman->setupDefaults();
+            manageConfig(ConfigLoadB);
+
+            if (!partman->checkTargetDrivesOK()) return false;
             autoMountEnabled = true; // disable auto mount by force
             if (!pretend) setupAutoMount(false);
 
@@ -384,23 +388,24 @@ bool MInstall::processNextPhase() noexcept
             cleanup(false);
 
             // the core of the installation
+            phase = Installing;
             if (!pretend) {
                 proc.advance(11, partman->countPrepSteps());
                 partman->prepStorage();
                 base->install();
             } else {
-                if (!pretendToInstall(14, 200)) return false;
-                if (!pretendToInstall(80, 500)) return false;
+                if (!pretendToInstall(14, 100)) throw "";
+                if (!pretendToInstall(80, 100)) throw "";
             }
             if (widgetStack->currentWidget() != pageProgress) {
                 progInstall->setEnabled(false);
                 proc.status(tr("Paused for required operator input"));
                 QApplication::beep();
             }
-            phase = 2;
+            phase = WaitingForInfo;
         }
-        if (phase == 2 && widgetStack->currentWidget() == pageProgress) {
-            phase = 3;
+        if (phase == WaitingForInfo && widgetStack->currentWidget() == pageProgress) {
+            phase = Configuring;
             progInstall->setEnabled(true);
             pushBack->setEnabled(false);
             if (!pretend) {
@@ -415,12 +420,13 @@ bool MInstall::processNextPhase() noexcept
                 bootman->install();
                 if (oem) proc.shell("sed -i 's/splash\\b/nosplash/g' /mnt/antiX/boot/grub/grub.cfg");
             } else if (!pretendToInstall(5, 100)) {
-                return false;
+                throw "";
             }
-            phase = 4;
             proc.advance(1, 1);
             proc.status(tr("Cleaning up"));
             cleanup();
+
+            phase = Finished;
             proc.status(tr("Finished"));
             if (!pretend && appArgs.isSet("reboot")) {
                 proc.shell("/usr/local/bin/persist-config --shutdown --command reboot &");
@@ -430,13 +436,44 @@ bool MInstall::processNextPhase() noexcept
             }
             gotoPage(Step::End);
         }
+        // This OOBE phase is only run under --oobe mode.
+        if (modeOOBE && phase == Ready) {
+            phase = OutOfBox;
+            updateCursor(Qt::BusyCursor);
+            labelSplash->setText(tr("Configuring sytem. Please wait."));
+            gotoPage(Step::Splash);
+
+            if (!pretend) oobe->process();
+            else if (!pretendToInstall(1, 100)) throw "";
+
+            phase = Finished;
+            labelSplash->setText(tr("Configuration complete. Restarting system."));
+            proc.exec("/usr/sbin/reboot");
+            qApp->exit(EXIT_SUCCESS);
+        }
     } catch (const char *msg) {
-        proc.setExceptionMode(nullptr);
+        if (!msg || !msg[0] || abortion) {
+            msg = QT_TR_NOOP("The installation was aborted.");
+        }
         proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::Fail);
-        if (!proc.halted()) {
-            boxMain->setEnabled(false);
-            QMessageBox::critical(this, windowTitle(), tr(msg));
-            updateCursor(Qt::WaitCursor);
+        proc.setExceptionMode(nullptr);
+
+        const bool closing = (abortion == Closing);
+        labelSplash->setText(tr(msg));
+        abortUI(false, closing);
+        proc.unhalt();
+        if (!modeOOBE) cleanup();
+
+        abortion = Aborted;
+        if (closing) this->close();
+        else {
+            splashSetThrobber(false);
+            updateCursor();
+            // Close should be the right button at this stage.
+            disconnect(pushNext);
+            connect(pushNext, &QPushButton::clicked, this, &MInstall::close);
+            pushNext->setText(pushClose->text());
+            pushNext->show();
         }
         return false;
     }
@@ -545,6 +582,7 @@ int MInstall::showPage(int curr, int next) noexcept
     if (next == Step::Splash) { // Enter splash screen
         splashSetThrobber(appConf.value("SPLASH_THROBBER", true).toBool());
     } else if (curr == Step::Splash) { // Leave splash screen
+        labelSplash->clear();
         splashSetThrobber(false);
     } else if (curr == Step::Disk && next > curr) {
         if (radioEntireDisk->isChecked()) {
@@ -669,12 +707,6 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
                 " partitions you need.").arg(PROJECTNAME, radioCustomPart->text().remove('&')) + "</p>");
-        if (proc.halted()) {
-            updateCursor(Qt::WaitCursor);
-            phase = 0;
-            proc.unhalt();
-            updateCursor();
-        }
         enableNext = radioCustomPart->isChecked()
             || !boxEncryptAuto->isChecked() || textCryptoPass->isValid();
         break;
@@ -774,11 +806,6 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("Setting the size to 0 has the same effect as unchecking this option.") + "</p>");
 
         enableBack = false;
-        if (phase <= 0) {
-            bootman->buildBootLists();
-            swapman->setupDefaults();
-            manageConfig(ConfigLoadB);
-        }
         break;
 
     case Step::Services:
@@ -954,26 +981,7 @@ void MInstall::gotoPage(int next) noexcept
     // process next installation phase
     if (next == Step::Boot || next == Step::Progress
         || (radioEntireDisk->isChecked() && next == Step::Network)) {
-        if (modeOOBE) {
-            updateCursor(Qt::BusyCursor);
-            labelSplash->setText(tr("Configuring sytem. Please wait."));
-            gotoPage(Step::Splash);
-            try {
-                oobe->process();
-                labelSplash->setText(tr("Configuration complete. Restarting system."));
-                proc.exec("/usr/sbin/reboot");
-                qApp->exit(EXIT_SUCCESS);
-            } catch (const char *msg) {
-                splashSetThrobber(false);
-                proc.log(QString("FAILED OOBE - ") + msg, MProcess::Fail);
-                labelSplash->setText(tr(msg));
-                pushClose->show();
-            }
-        } else if (!processNextPhase() && phase > -2) {
-            cleanup(false);
-            gotoPage(Step::Disk);
-            boxMain->setEnabled(true);
-        }
+        processNextPhase();
         updateCursor();
     }
 }
@@ -1038,23 +1046,22 @@ void MInstall::changeEvent(QEvent *event) noexcept
 
 void MInstall::closeEvent(QCloseEvent *event) noexcept
 {
-    if (abortUI()) {
-        event->accept();
-        phase = -2;
-        if (!modeOOBE) cleanup();
-        else if (!pretend) {
-            proc.unhalt();
-            proc.exec("/usr/sbin/shutdown", {"-hP", "now"});
-        }
-        QWidget::closeEvent(event);
-        if (widgetStack->currentWidget() != pageEnd) {
-            qApp->exit(EXIT_FAILURE);
-        } else {
-            proc.waitForFinished();
-            qApp->exit(EXIT_SUCCESS);
-        }
-    } else {
+    if (phase > Ready && phase < Finished && abortion != Aborted) {
+        // Currently installing, could be pending abortion (but not finished aborting).
         event->ignore();
+        abortUI(true, true);
+    } else if (modeOOBE) {
+        // Shutdown for pending or fully aborted OOBE
+        event->ignore();
+        updateCursor(Qt::WaitCursor);
+        labelSplash->clear();
+        gotoPage(Step::Splash);
+        proc.unhalt();
+        proc.exec("/usr/sbin/shutdown", {"-hP", "now"});
+    } else {
+        // Fully aborted installation (but not OOBE).
+        event->accept();
+        if (phase == StartingUp) proc.halt(true);
     }
 }
 
@@ -1077,14 +1084,7 @@ void MInstall::on_pushBack_clicked() noexcept
 
 void MInstall::on_pushAbort_clicked() noexcept
 {
-    if(abortUI()) {
-        if (!modeOOBE) cleanup();
-        phase = -1;
-        gotoPage(Step::Terms);
-    }
-    QApplication::beep();
-    boxMain->setEnabled(true);
-    updateCursor();
+    abortUI(true, false);
 }
 
 // clicking advanced button to go to Services page
@@ -1093,24 +1093,26 @@ void MInstall::on_pushServices_clicked() noexcept
     gotoPage(Step::Services);
 }
 
-bool MInstall::abortUI() noexcept
+void MInstall::abortUI(bool manual, bool closing) noexcept
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
-    boxMain->setEnabled(false);
     // ask for confirmation when installing (except for some steps that don't need confirmation)
-    if (phase > 0 && phase < 4) {
-        const QMessageBox::StandardButton rc = QMessageBox::warning(this, QString(),
-            tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (rc == QMessageBox::No) {
-            boxMain->setEnabled(true);
-            return false;
+    if (abortion != NoAbort) return; // Don't abort an abortion.
+    else if (phase > Ready && phase < Finished) {
+        if (manual) {
+            const QMessageBox::StandardButton rc = QMessageBox::warning(this, QString(),
+                tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
+                QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+            if (rc == QMessageBox::No) return;
+            proc.log("MANUALLY ABORTED", MProcess::Fail);
         }
     }
+    // At this point the abortion has not been cancelled.
+    abortion = closing ? Closing : Aborting;
     updateCursor(Qt::WaitCursor);
-    proc.log("Manual abort", MProcess::Fail);
-    proc.halt();
-    return true;
+    gotoPage(Step::Splash);
+    proc.halt(true);
+    // Early phase bump if waiting on input to trigger abortion cleanup.
+    if (manual && phase == WaitingForInfo) processNextPhase();
 }
 
 // run before closing the app, do some cleanup
@@ -1120,7 +1122,6 @@ void MInstall::cleanup(bool endclean)
     if (pretend) return;
 
     if (endclean) {
-        proc.unhalt();
         setupAutoMount(true);
         proc.exec("/usr/bin/cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
         proc.exec("/usr/bin/rm", {"-rf", "/mnt/antiX/mnt/antiX"});
