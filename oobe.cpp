@@ -64,6 +64,10 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings 
         }
     }
     gui.comboTimeArea->model()->sort(0);
+    // Guess if hardware clock is UTC or local time
+    proc.shell("guess-hwclock", nullptr, true);
+    if (proc.readOut() == "localtime") gui.checkLocalClock->setChecked(true);
+    else if (proc.detectMac()) gui.checkLocalClock->setChecked(true);
 
     // locale list
     connect(gui.comboLocale, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Oobe::localeIndexChanged);
@@ -172,7 +176,7 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
     QRadioButton *oldHomeRadios[] = {gui.radioOldHomeUse, gui.radioOldHomeSave, gui.radioOldHomeDelete};
     config.manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
     config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);
-    if (!save) {
+    if (!save || oem) { // Transfer default passwords under OEM mode.
         const QString &upass = config.value("UserPass").toString();
         gui.textUserPass->setText(upass);
         gui.textUserPass2->setText(upass);
