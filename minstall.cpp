@@ -260,13 +260,11 @@ void MInstall::setupAutoMount(bool enabled)
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
 
     if (autoMountEnabled == enabled) return;
-    QFileInfo finfo;
     // check if the systemctl program is present
     bool have_sysctl = false;
     const QStringList &envpath = QProcessEnvironment::systemEnvironment().value("PATH").split(':');
     for (const QString &path : envpath) {
-        finfo.setFile(path + "/systemctl");
-        if (finfo.isExecutable()) {
+        if (QFileInfo(path + "/systemctl").isExecutable()) {
             have_sysctl = true;
             break;
         }
@@ -276,8 +274,7 @@ void MInstall::setupAutoMount(bool enabled)
     if (proc.shell("ps -e | grep 'udisksd'")) udisksd_running = true;
     // create a list of rules files that are being temporarily overridden
     QStringList udev_temp_mdadm_rules;
-    finfo.setFile("/run/udev");
-    if (finfo.isDir()) {
+    if (QFileInfo("/run/udev").isDir()) {
         proc.shell("grep -El '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d/*", nullptr, true);
         udev_temp_mdadm_rules = proc.readOutLines();
         for (QString &rule : udev_temp_mdadm_rules) {
@@ -408,7 +405,6 @@ bool MInstall::processNextPhase() noexcept
                 if (oem) oobe->enable();
                 oobe->process();
                 manageConfig(ConfigSave);
-                config->dumpDebug();
                 proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
                 swapman->install();
                 bootman->install();
@@ -455,7 +451,10 @@ bool MInstall::processNextPhase() noexcept
         labelSplash->setText(tr(msg));
         abortUI(false, closing);
         proc.unhalt();
-        if (!modeOOBE) cleanup();
+        if (!modeOOBE) {
+            manageConfig(ConfigSave);
+            cleanup();
+        }
 
         abortion = Aborted;
         if (closing) this->close();
@@ -535,6 +534,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         config->sync();
         QFile::remove("/etc/minstalled.conf");
         QFile::copy(config->fileName(), "/etc/minstalled.conf");
+        config->dumpDebug();
     }
 
     if (config->bad) {
@@ -1090,7 +1090,6 @@ void MInstall::cleanup(bool endclean)
     if (pretend) return;
 
     if (endclean) {
-        setupAutoMount(true);
         proc.exec("/usr/bin/cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
         proc.exec("/usr/bin/rm", {"-rf", "/mnt/antiX/mnt/antiX"});
     }
@@ -1099,7 +1098,10 @@ void MInstall::cleanup(bool endclean)
     if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/sys"}))      proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/sys"});
     if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/dev/shm"}))  proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev/shm"});
     if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/dev"}))      proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev"});
-    if (endclean && !mountkeep) partman->unmount();
+    if (endclean) {
+        if (!mountkeep) partman->unmount();
+        setupAutoMount(true);
+    }
 }
 
 void MInstall::on_progInstall_valueChanged(int value) noexcept
