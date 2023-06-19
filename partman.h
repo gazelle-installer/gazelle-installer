@@ -118,6 +118,7 @@ public:
     QString shownDevice() const noexcept;
     QStringList allowedUsesFor(bool real = true, bool all = true) const noexcept;
     QStringList allowedFormats() const noexcept;
+    QString finalFormat() const noexcept;
     QString shownFormat(const QString &fmt) const noexcept;
     inline bool isVolume() const noexcept { return (type == Partition || type == VirtualBD); }
     bool canMount() const noexcept;

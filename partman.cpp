@@ -478,8 +478,7 @@ void PartMan::treeMenu(const QPoint &)
             actActive->setCheckable(true);
             actActive->setChecked(twit->isActive());
         }
-        if (twit->format == "btrfs"
-            || ((twit->usefor.isEmpty() || twit->format == "PRESERVE") && twit->curFormat == "btrfs")) {
+        if (twit->finalFormat() == "btrfs") {
             menu.addSeparator();
             actNewSubvolume = menu.addAction(tr("New subvolume"));
             actScanSubvols = menu.addAction(tr("Scan subvolumes"));
@@ -1208,13 +1207,14 @@ void PartMan::formatPartitions()
     }
     // Prepare subvolumes on all that (are to) contain them.
     for (DeviceItemIterator it(*this); *it; it.next()) {
-        if ((*it)->type != DeviceItem::Partition) continue;
-        else prepareSubvolumes(*it);
+        if ((*it)->finalFormat() == "btrfs") prepareSubvolumes(*it);
     }
 }
 
 void PartMan::prepareSubvolumes(DeviceItem *partit)
 {
+    const int subvolcount = partit->childCount();
+    if (subvolcount <= 0) return;
     proc.setExceptionMode(QT_TR_NOOP("Failed to prepare subvolumes."));
     proc.status(tr("Preparing subvolumes"));
 
@@ -1224,7 +1224,7 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
     try {
         // Since the default subvolume cannot be deleted, ensure the default is set to the top.
         proc.exec("btrfs", {"subvolume", "set-default", "5", "/mnt/btrfs-scratch"});
-        for (int ixsv = 0; ixsv < partit->childCount(); ++ixsv) {
+        for (int ixsv = 0; ixsv < subvolcount; ++ixsv) {
             DeviceItem *svit = partit->child(ixsv);
             const QString &svpath = "/mnt/btrfs-scratch/" + svit->label;
             if (svit->format != "PRESERVE" && QFileInfo::exists(svpath)) {
@@ -2015,6 +2015,11 @@ QStringList DeviceItem::allowedFormats() const noexcept
         else list.append("PRESERVE");
     }
     return list;
+}
+QString DeviceItem::finalFormat() const noexcept
+{
+    if (type == Subvolume) return format;
+    return (usefor.isEmpty() || format == "PRESERVE") ? curFormat : format;
 }
 QString DeviceItem::shownFormat(const QString &fmt) const noexcept
 {
