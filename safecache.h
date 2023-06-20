@@ -25,7 +25,7 @@
 class SafeCache : public QByteArray
 {
 public:
-    SafeCache();
+    SafeCache() noexcept;
     ~SafeCache();
     bool load(const char *filename, int length) noexcept;
     bool save(const char *filename, mode_t mode = 0400) noexcept;

@@ -28,7 +28,7 @@
 #include <zxcvbn.h>
 #include "passedit.h"
 
-PassEdit::PassEdit(QWidget *parent)
+PassEdit::PassEdit(QWidget *parent) noexcept
     : QLineEdit(parent)
 {
 }
@@ -92,7 +92,7 @@ void PassEdit::generate() noexcept
     genText.append(QString::number(std::rand() % 10));
 }
 
-void PassEdit::contextMenuEvent(QContextMenuEvent *event)
+void PassEdit::contextMenuEvent(QContextMenuEvent *event) noexcept
 {
     QMenu *menu = createStandardContextMenu();
     QAction *actGenPass = nullptr;
@@ -109,7 +109,7 @@ void PassEdit::contextMenuEvent(QContextMenuEvent *event)
     delete menu;
 }
 
-void PassEdit::changeEvent(QEvent *event)
+void PassEdit::changeEvent(QEvent *event) noexcept
 {
     const QEvent::Type etype = event->type();
     if(etype == QEvent::EnabledChange || etype == QEvent::Hide) {

@@ -234,19 +234,20 @@ public:
         return volSpecTotal(path, mounts.keys());
     }
     // Model View Controller
-    QVariant data(const QModelIndex &index, int role) const override;
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-    Qt::ItemFlags flags(const QModelIndex &index) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex &index, int role) const noexcept override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) noexcept override;
+    Qt::ItemFlags flags(const QModelIndex &index) const noexcept override;
+    QVariant headerData(int section, Qt::Orientation orientation,
+        int role = Qt::DisplayRole) const noexcept override;
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-    QModelIndex index(DeviceItem *item) const;
-    QModelIndex parent(const QModelIndex &index) const override;
-    DeviceItem *item(const QModelIndex &index) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    inline int columnCount(const QModelIndex &) const override { return _TreeColumns_; }
-    bool changeBegin(DeviceItem *item);
-    int changeEnd(bool notify = true);
-    void notifyChange(class DeviceItem *item, int first = -1, int last = -1);
+    QModelIndex index(DeviceItem *item) const noexcept;
+    QModelIndex parent(const QModelIndex &index) const noexcept override;
+    DeviceItem *item(const QModelIndex &index) const noexcept;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const noexcept override;
+    inline int columnCount(const QModelIndex &) const noexcept override { return _TreeColumns_; }
+    bool changeBegin(DeviceItem *item) noexcept;
+    int changeEnd(bool notify = true) noexcept;
+    void notifyChange(class DeviceItem *item, int first = -1, int last = -1) noexcept;
 };
 
 #endif // PARTMAN_H
