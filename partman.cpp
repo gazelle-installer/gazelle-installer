@@ -742,8 +742,8 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
             QMessageBox::critical(gui.boxMain, QString(), tr("%1 is already"
                 " selected for: %2").arg(twit->shownDevice(), twit->shownUseFor()));
             return false;
-        } else if(!mount.isEmpty() && mount != "FORMAT" && mount != "ESP" && mount != "BIOS-GRUB"){
-            mounts.insert(mount, *it);
+        } else if(item->canMount(false)) {
+            mounts.insert(mount, item);
         }
         if (item->type != DeviceItem::VirtualBD) {
             if (!item->encrypt) item->devMapper.clear();
@@ -793,12 +793,13 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
             bool hasBiosGrub = false;
             for (int ixdev = 0; ixdev < partCount; ++ixdev) {
                 DeviceItem *partit = drvit->child(ixdev);
+                const int subcount = partit->childCount();
                 const QString &use = partit->realUseFor();
                 QString actmsg;
                 if (drvit->flags.oldLayout) {
                     if (use.isEmpty()) {
                         if (partit->curFormat == "BIOS-GRUB") hasBiosGrub = true;
-                        if (partit->curFormat == "btrfs") actmsg = tr("Reuse %1");
+                        else if (subcount > 0) actmsg = tr("Reuse (no reformat) %1");
                         else continue;
                     } else {
                         if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
@@ -812,8 +813,8 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                 details += actmsg.arg(partit->shownDevice(), partit->shownUseFor()) + '\n';
                 if (use == "BIOS-GRUB") hasBiosGrub = true;
 
-                if (partit->format == "btrfs" || partit->curFormat == "btrfs") {
-                    for (int ixsv = 0; ixsv < partit->childCount(); ++ixsv) {
+                if (partit->finalFormat() == "btrfs") {
+                    for (int ixsv = 0; ixsv < subcount; ++ixsv) {
                         DeviceItem *svit = partit->child(ixsv);
                         const QString &svuse = svit->realUseFor();
                         const bool nouse = svuse.isEmpty();
@@ -1554,7 +1555,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
             }
             break;
         case Options:
-            if (item->canMount() || item->realUseFor() == "SWAP") return item->options;
+            if (item->canMount(false)) return item->options;
             else if (!isDriveOrVD) return "--------";
             break;
         case Pass:
@@ -1643,7 +1644,7 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
         }
         break;
     case Options:
-        if (item->canMount() || item->realUseFor() == "SWAP") flagsOut |= Qt::ItemIsEditable;
+        if (item->canMount(false)) flagsOut |= Qt::ItemIsEditable;
         break;
     case Dump:
         if (item->canMount()) flagsOut |= Qt::ItemIsUserCheckable;
@@ -2032,10 +2033,11 @@ QString DeviceItem::shownFormat(const QString &fmt) const noexcept
         else return tr("Preserve /home (%1)").arg(curFormat);
     }
 }
-bool DeviceItem::canMount() const noexcept
+bool DeviceItem::canMount(bool pointonly) const noexcept
 {
     const QString &use = realUseFor();
-    return !(use.isEmpty() || use == "FORMAT" || use == "ESP" || use == "SWAP");
+    return !use.isEmpty() && use != "FORMAT" && use != "ESP" && use != "BIOS-GRUB"
+        && (!pointonly || use != "SWAP");
 }
 long long DeviceItem::driveFreeSpace(bool inclusive) const noexcept
 {
@@ -2120,7 +2122,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
     }
     if (changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format))) {
         // Default options, dump and pass
-        if (!(use.isEmpty() || use == "FORMAT" || use == "ESP")) {
+        if (canMount(false)) {
             if (format == "SWAP") options = discgran ? "discard" : "defaults";
             else {
                 if (use == "/boot" || use == "/") {
