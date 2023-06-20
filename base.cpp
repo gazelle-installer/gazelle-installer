@@ -44,17 +44,6 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     bufferRoot = appConf.value("ROOT_BUFFER", 1024).toLongLong() * MB;
     bufferHome = appConf.value("HOME_BUFFER", 1024).toLongLong() * MB;
 
-    QFile fileCLine("/live/config/proc-cmdline");
-    if (fileCLine.open(QFile::ReadOnly | QFile::Text)) {
-        QString clopts("Live boot options:");
-        while (!fileCLine.atEnd()) {
-            clopts.append(' ');
-            clopts.append(fileCLine.readLine().trimmed());
-        }
-        proc.log(clopts);
-        fileCLine.close();
-    }
-
     bootSource = "/live/aufs/boot";
     rootSources << "/live/aufs/bin" << "/live/aufs/dev"
         << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/libx32" << "/live/aufs/lib64"

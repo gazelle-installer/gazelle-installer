@@ -36,6 +36,7 @@
 #include <QDebug>
 
 #include "msettings.h"
+#include "checkmd5.h"
 #include "partman.h"
 #include "autopart.h"
 #include "base.h"
@@ -160,6 +161,26 @@ void MInstall::startup()
                     "We recommend you quit now and restart in Legacy Boot\n\n"
                     "Do you want to continue the installation?"), QMessageBox::Yes, QMessageBox::No);
             if (ans != QMessageBox::Yes) exit(EXIT_FAILURE);
+        }
+
+        // Log live boot command line, looking for the "checkmd5" option.
+        bool nocheck = pretend;
+        QFile fileCLine("/live/config/proc-cmdline");
+        if (fileCLine.open(QFile::ReadOnly | QFile::Text)) {
+            QByteArray data = fileCLine.readAll();
+            nocheck = data.contains("checkmd5\n");
+            proc.log("Live boot: " + data.simplified());
+            fileCLine.close();
+        }
+        // Check the installation media for errors (skip if not required).
+        if (appArgs.isSet("media-check")) nocheck = false;
+        else if (appArgs.isSet("no-media-check")) nocheck = true;
+        if(nocheck) proc.log("No media check");
+        else {
+            checkmd5 = new CheckMD5(proc, labelSplash);
+            checkmd5->check(); // Must be separate from constructor for halt() to work.
+            delete checkmd5;
+            checkmd5 = nullptr;
         }
 
         partman = new PartMan(proc, *this, appConf, appArgs);
@@ -1030,12 +1051,14 @@ void MInstall::closeEvent(QCloseEvent *event) noexcept
         // Fully aborted installation (but not OOBE).
         event->accept();
         if (phase == StartingUp) proc.halt(true);
+        if (checkmd5) checkmd5->halt(true);
     }
 }
 
 // Override QDialog::reject() so Escape won't close the window.
 void MInstall::reject() noexcept
 {
+    if (checkmd5) checkmd5->halt();
 }
 
 /////////////////////////////////////////////////////////////////////////
