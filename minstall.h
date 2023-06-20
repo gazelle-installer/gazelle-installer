@@ -86,6 +86,7 @@ private:
     bool autoMountEnabled = true;
 
     QWidget *nextFocus = nullptr;
+    class CheckMD5 *checkmd5 = nullptr;
     class PartMan *partman = nullptr;
     class AutoPart *autopart = nullptr;
     class Base *base = nullptr;

@@ -130,6 +130,7 @@ HEADERS += minstall.h \
     autopart.h \
     base.h \
     bootman.h \
+    checkmd5.h \
     mtreeview.h \
     oobe.h \
     passedit.h \
@@ -143,6 +144,7 @@ SOURCES += app.cpp minstall.cpp \
     autopart.cpp \
     base.cpp \
     bootman.cpp \
+    checkmd5.cpp \
     msettings.cpp \
     mtreeview.cpp \
     oobe.cpp \
