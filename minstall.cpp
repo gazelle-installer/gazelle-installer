@@ -66,9 +66,9 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     : proc(this), appConf(acfg), appArgs(args), helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
     setupUi(this);
+    labelSplash->setCursor(Qt::WaitCursor);
     listLog->addItem("Version " VERSION);
     proc.setupUI(listLog, progInstall);
-    updateCursor(Qt::WaitCursor);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     textHelp->installEventFilter(this);
     boxInstall->hide();
@@ -249,7 +249,6 @@ void MInstall::startup()
             " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
         gotoPage(Step::Terms);
     }
-    updateCursor();
 
     // automatic installation
     if (automatic) pushNext->click();
@@ -349,21 +348,7 @@ void MInstall::setupAutoMount(bool enabled)
     autoMountEnabled = enabled;
 }
 
-/////////////////////////////////////////////////////////////////////////
-// util functions
-
-void MInstall::updateCursor(const Qt::CursorShape shape) noexcept
-{
-    if (shape != Qt::ArrowCursor) {
-        qApp->setOverrideCursor(QCursor(shape));
-    } else {
-        while (qApp->overrideCursor() != nullptr) {
-            qApp->restoreOverrideCursor();
-        }
-    }
-    qApp->processEvents();
-}
-
+// Installation simulation
 bool MInstall::pretendToInstall(int space, long steps) noexcept
 {
     proc.advance(space, steps);
@@ -450,7 +435,6 @@ bool MInstall::processNextPhase() noexcept
         // This OOBE phase is only run under --oobe mode.
         if (modeOOBE && phase == Ready) {
             phase = OutOfBox;
-            updateCursor(Qt::WaitCursor);
             labelSplash->setText(tr("Configuring sytem. Please wait."));
             gotoPage(Step::Splash);
 
@@ -481,7 +465,7 @@ bool MInstall::processNextPhase() noexcept
         if (closing) this->close();
         else {
             splashSetThrobber(false);
-            updateCursor();
+            labelSplash->unsetCursor();
             // Close should be the right button at this stage.
             disconnect(pushNext);
             connect(pushNext, &QPushButton::clicked, this, &MInstall::close);
@@ -939,7 +923,7 @@ void MInstall::gotoPage(int next) noexcept
     pushNext->setIconSize(isize);
     if (next > Step::End) {
         // finished
-        updateCursor(Qt::WaitCursor);
+        qApp->setOverrideCursor(Qt::WaitCursor);
         if (!pretend && checkExitReboot->isChecked()) {
             proc.shell("/usr/local/bin/persist-config --shutdown --command reboot &");
         }
@@ -971,7 +955,6 @@ void MInstall::gotoPage(int next) noexcept
     if (next == Step::Boot || next == Step::Progress
         || (radioEntireDisk->isChecked() && next == Step::Network)) {
         processNextPhase();
-        updateCursor();
     }
 }
 
@@ -1042,7 +1025,6 @@ void MInstall::closeEvent(QCloseEvent *event) noexcept
     } else if (modeOOBE) {
         // Shutdown for pending or fully aborted OOBE
         event->ignore();
-        updateCursor(Qt::WaitCursor);
         labelSplash->clear();
         gotoPage(Step::Splash);
         proc.unhalt();
@@ -1099,7 +1081,6 @@ void MInstall::abortUI(bool manual, bool closing) noexcept
     }
     // At this point the abortion has not been cancelled.
     abortion = closing ? Closing : Aborting;
-    updateCursor(Qt::WaitCursor);
     gotoPage(Step::Splash);
     proc.halt(true);
     // Early phase bump if waiting on input to trigger abortion cleanup.

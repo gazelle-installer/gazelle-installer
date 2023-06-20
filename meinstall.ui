@@ -202,27 +202,21 @@
        </item>
        <item row="2" column="0" colspan="6">
         <widget class="QStackedWidget" name="widgetStack">
-         <widget class="QWidget" name="pageSplash">
-          <layout class="QVBoxLayout">
-           <item>
-            <widget class="QLabel" name="labelSplash">
-             <property name="font">
-              <font>
-               <pointsize>36</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Gathering Information, please stand by.</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-             <property name="wordWrap">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
+         <widget class="QLabel" name="labelSplash">
+          <property name="font">
+           <font>
+            <pointsize>36</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Gathering Information, please stand by.</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
          </widget>
          <widget class="QWidget" name="pageTerms">
           <layout class="QGridLayout">
