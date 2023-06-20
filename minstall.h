@@ -112,7 +112,6 @@ private:
     void abortUI(bool manual, bool closing) noexcept;
     void cleanup(bool endclean = true);
     // private functions
-    void updateCursor(const Qt::CursorShape shape = Qt::ArrowCursor) noexcept;
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int space, long steps) noexcept;
     void manageConfig(enum ConfigAction mode) noexcept;
