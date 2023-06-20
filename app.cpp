@@ -96,6 +96,29 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    // The default style in the OOBE environment is hideous and unusable.
+    if (parser.isSet("oobe")) {
+        a.setStyle("windows");
+        QPalette pal;
+        pal.setColor(QPalette::Window, Qt::black);
+        pal.setColor(QPalette::WindowText, Qt::white);
+        pal.setColor(QPalette::Base, Qt::black);
+        pal.setColor(QPalette::AlternateBase, Qt::black);
+        pal.setColor(QPalette::Text, Qt::white);
+        pal.setColor(QPalette::Button, Qt::black);
+        pal.setColor(QPalette::ButtonText, Qt::white);
+        pal.setColor(QPalette::BrightText, Qt::white);
+        pal.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
+        pal.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGray);
+        pal.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
+        pal.setColor(QPalette::Highlight, Qt::lightGray);
+        pal.setColor(QPalette::HighlightedText, Qt::black);
+        pal.setColor(QPalette::ToolTipBase, Qt::black);
+        pal.setColor(QPalette::ToolTipText, Qt::white);
+        pal.setColor(QPalette::Link, Qt::cyan);
+        a.setPalette(pal);
+    }
+
     QSettings appConf("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
     a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.value("PROJECT_NAME").toString()));
 

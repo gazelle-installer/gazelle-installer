@@ -82,27 +82,6 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     } else {
         automatic = oem = false;
         pushClose->setText(tr("Shutdown"));
-        // dark palette for the OOBE screen
-        QColor charcoal(56, 56, 56);
-        QPalette pal;
-        pal.setColor(QPalette::Window, charcoal);
-        pal.setColor(QPalette::WindowText, Qt::white);
-        pal.setColor(QPalette::Base, charcoal.darker());
-        pal.setColor(QPalette::AlternateBase, charcoal);
-        pal.setColor(QPalette::Text, Qt::white);
-        pal.setColor(QPalette::Button, charcoal);
-        pal.setColor(QPalette::ButtonText, Qt::white);
-        pal.setColor(QPalette::Active, QPalette::Button, charcoal);
-        pal.setColor(QPalette::Disabled, QPalette::Light, charcoal.darker());
-        pal.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
-        pal.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGray);
-        pal.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
-        pal.setColor(QPalette::Highlight, Qt::lightGray);
-        pal.setColor(QPalette::HighlightedText, Qt::black);
-        pal.setColor(QPalette::ToolTipBase, Qt::black);
-        pal.setColor(QPalette::ToolTipText, Qt::white);
-        pal.setColor(QPalette::Link, Qt::cyan);
-        qApp->setPalette(pal);
     }
 
     // setup system variables
@@ -970,26 +949,25 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
         const int lW = labelSplash->width(), lH = labelSplash->height();
         painter.translate(lW / 2, lH / 2);
         painter.scale(lW / 200.0, lH / 200.0);
-        QColor color = labelSplash->palette().text().color();
-        color.setRed(255 - color.red());
-        color.setAlpha(70);
-        QPen pen(color.darker());
-        pen.setWidth(3);
-        pen.setJoinStyle(Qt::MiterJoin);
-        painter.setPen(pen);
         // Draw the load indicator on the splash screen.
         const int count = 16;
-        const int alphaMin = 0, alphaMax = 70;
         const QPoint blade[] = {
-            QPoint(0, -6), QPoint(9, -75),
+            QPoint(-9, -6), QPoint(9, -75),
             QPoint(0, -93), QPoint(-9, -75)
         };
         const qreal angle = 360.0 / count;
         painter.rotate(angle * throbPos);
-        const int astep = (alphaMax - alphaMin) / count;
-        for (int ixi = alphaMin; ixi <= alphaMax; ixi += astep) {
-            color.setAlpha(ixi);
+        float hue = 1.0, alpha = 0.18;
+        const float huestep = (120.0/360.0) / count, alphastep = 0.18 / count;
+        QPen pen;
+        pen.setWidth(3);
+        pen.setJoinStyle(Qt::MiterJoin);
+        for (int ixi=0; ixi<count; ++ixi) {
+            const QColor &color = QColor::fromHsvF(hue, 1.0, 1.0, alpha);
+            hue -= huestep, alpha += alphastep;
             painter.setBrush(color);
+            pen.setColor(color.darker());
+            painter.setPen(pen);
             painter.drawConvexPolygon(blade, 4);
             painter.rotate(angle);
         }
