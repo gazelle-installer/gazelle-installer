@@ -25,11 +25,12 @@ class MTreeView : public QTreeView
 {
     Q_OBJECT
     int lastColumn = 0;
-    void drawRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    void drawRow(QPainter *painter,
+        const QStyleOptionViewItem &option, const QModelIndex &index) const noexcept;
+    virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) noexcept;
 public:
-    MTreeView(QWidget *parent = nullptr);
-    QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
+    MTreeView(QWidget *parent = nullptr) noexcept;
+    QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) noexcept;
 };
 
 #endif // MTREEVIEW_H

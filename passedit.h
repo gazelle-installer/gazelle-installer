@@ -36,10 +36,10 @@ private:
     void slaveTextChanged(const QString &slaveText) noexcept;
     void eyeToggled(bool checked) noexcept;
 protected:
-    void contextMenuEvent(QContextMenuEvent *event);
-    void changeEvent(QEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event) noexcept;
+    void changeEvent(QEvent *event) noexcept;
 public:
-    PassEdit(QWidget *parent = nullptr);
+    PassEdit(QWidget *parent = nullptr) noexcept;
     void setup(PassEdit *slave, int min=0, int genMin=16, int wordMax=5) noexcept;
     bool isValid() const noexcept;
 signals:

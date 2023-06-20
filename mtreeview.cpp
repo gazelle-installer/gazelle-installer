@@ -21,7 +21,7 @@
 #include <QHeaderView>
 #include "mtreeview.h"
 
-MTreeView::MTreeView(QWidget *parent)
+MTreeView::MTreeView(QWidget *parent) noexcept
     : QTreeView(parent)
 {
     setTabKeyNavigation(true);
@@ -29,7 +29,7 @@ MTreeView::MTreeView(QWidget *parent)
     setEditTriggers(CurrentChanged | DoubleClicked | SelectedClicked | EditKeyPressed | AnyKeyPressed);
 }
 
-QModelIndex MTreeView::moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers)
+QModelIndex MTreeView::moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) noexcept
 {
     // Usability improvement: move horizontally instead of vertically.
     // Also, only move to the next cell that is editable.
@@ -96,7 +96,8 @@ QModelIndex MTreeView::moveCursor(CursorAction cursorAction, Qt::KeyboardModifie
 }
 
 // Draw the grid.
-void MTreeView::drawRow(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void MTreeView::drawRow(QPainter *painter,
+    const QStyleOptionViewItem &option, const QModelIndex &index) const noexcept
 {
     QTreeView::drawRow(painter, option, index);
     QColor color = option.palette.color(QPalette::Active, QPalette::Text);
@@ -143,7 +144,7 @@ void MTreeView::drawRow(QPainter *painter, const QStyleOptionViewItem &option, c
     }
 }
 
-void MTreeView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+void MTreeView::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) noexcept
 {
     viewport()->update();
     QTreeView::selectionChanged(selected, deselected);

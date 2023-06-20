@@ -1501,7 +1501,7 @@ struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStr
  * Model View Controller *
 \*************************/
 
-QVariant PartMan::data(const QModelIndex &index, int role) const
+QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
 {
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
     const bool isDriveOrVD = (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices);
@@ -1591,7 +1591,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const
     }
     return QVariant();
 }
-bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
+bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role) noexcept
 {
     if (role == Qt::CheckStateRole) {
         DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
@@ -1606,7 +1606,7 @@ bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
     if(!changeEnd()) emit dataChanged(index, index);
     return true;
 }
-Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
+Qt::ItemFlags PartMan::flags(const QModelIndex &index) const noexcept
 {
     DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
     if (item->type == DeviceItem::VirtualDevices) return Qt::ItemIsEnabled;
@@ -1655,7 +1655,7 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const
     }
     return flagsOut;
 }
-QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role) const noexcept
 {
     assert(orientation == Qt::Horizontal);
     if (role == Qt::DisplayRole) {
@@ -1679,7 +1679,7 @@ QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role)
     }
     return QVariant();
 }
-QModelIndex PartMan::index(DeviceItem *item) const
+QModelIndex PartMan::index(DeviceItem *item) const noexcept
 {
     if (item == &root) return QModelIndex();
     return createIndex(item->row(), 0, item);
@@ -1692,7 +1692,7 @@ QModelIndex PartMan::index(int row, int column, const QModelIndex &parent) const
     if (cit) return createIndex(row, column, cit);
     return QModelIndex();
 }
-QModelIndex PartMan::parent(const QModelIndex &index) const
+QModelIndex PartMan::parent(const QModelIndex &index) const noexcept
 {
     if (!index.isValid()) return QModelIndex();
     DeviceItem *cit = static_cast<DeviceItem *>(index.internalPointer());
@@ -1700,11 +1700,11 @@ QModelIndex PartMan::parent(const QModelIndex &index) const
     if (!pit || pit == &root) return QModelIndex();
     return createIndex(pit->row(), 0, pit);
 }
-inline DeviceItem *PartMan::item(const QModelIndex &index) const
+inline DeviceItem *PartMan::item(const QModelIndex &index) const noexcept
 {
     return static_cast<DeviceItem *>(index.internalPointer());
 }
-int PartMan::rowCount(const QModelIndex &parent) const
+int PartMan::rowCount(const QModelIndex &parent) const noexcept
 {
     if (parent.column() > 0) return 0;
     if (parent.isValid()) {
@@ -1713,7 +1713,7 @@ int PartMan::rowCount(const QModelIndex &parent) const
     return root.childCount();
 }
 
-bool PartMan::changeBegin(DeviceItem *item)
+bool PartMan::changeBegin(DeviceItem *item) noexcept
 {
     if (changing) return false;
     root.flags = item->flags;
@@ -1728,7 +1728,7 @@ bool PartMan::changeBegin(DeviceItem *item)
     changing = item;
     return true;
 }
-int PartMan::changeEnd(bool notify)
+int PartMan::changeEnd(bool notify) noexcept
 {
     if (!changing) return false;
     int changed = 0;
@@ -1770,7 +1770,7 @@ int PartMan::changeEnd(bool notify)
     changing = nullptr;
     return changed;
 }
-void PartMan::notifyChange(class DeviceItem *item, int first, int last)
+void PartMan::notifyChange(class DeviceItem *item, int first, int last) noexcept
 {
     if (first < 0) first = 0;
     if (last < 0) last = _TreeColumns_ - 1;

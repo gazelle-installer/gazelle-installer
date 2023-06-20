@@ -64,7 +64,7 @@ public:
 };
 
 // Calculate a percentage without compromising the range of long long.
-static inline long long portion(long long range, int percent, long round = -1)
+static inline long long portion(long long range, int percent, long round = -1) noexcept
 {
     const bool roundUp = (round > 0);
     if (roundUp) percent = 100 - percent;
@@ -80,7 +80,7 @@ static inline long long portion(long long range, int percent, long round = -1)
     }
     return r;
 }
-static inline int percent(long long portion, long long range, bool roundUp = false)
+static inline int percent(long long portion, long long range, bool roundUp = false) noexcept
 {
     if (roundUp) portion = range - portion;
     const int percent = portion / (double)(range / 100.0L);

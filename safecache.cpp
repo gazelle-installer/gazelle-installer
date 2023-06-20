@@ -21,7 +21,7 @@
 #include <fcntl.h>
 #include "safecache.h"
 
-SafeCache::SafeCache()
+SafeCache::SafeCache() noexcept
 {
     reserve(16384);
 }
