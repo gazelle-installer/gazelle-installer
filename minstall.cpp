@@ -221,13 +221,10 @@ void MInstall::startup()
     }
     oobe->stashServices(true);
 
-    if (modeOOBE) gotoPage(Step::Network);
-    else {
-        textCopyright->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
-            "%1 uses some components from MEPIS Linux which are released under an Apache free license."
-            " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
-        gotoPage(Step::Terms);
-    }
+    textCopyright->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
+        "%1 uses some components from MEPIS Linux which are released under an Apache free license."
+        " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
+    gotoPage(Step::Terms);
 
     // automatic installation
     if (automatic) pushNext->click();
@@ -535,6 +532,8 @@ int MInstall::showPage(int curr, int next) noexcept
     } else if (curr == Step::Splash) { // Leave splash screen
         labelSplash->clear();
         splashSetThrobber(false);
+    } else if (curr == Step::Terms && next > curr) {
+        if (modeOOBE) return Step::Network;
     } else if (curr == Step::Disk && next > curr) {
         if (radioEntireDisk->isChecked()) {
             if (!automatic) {
@@ -582,7 +581,8 @@ int MInstall::showPage(int curr, int next) noexcept
         nextFocus = oobe->validateComputerName();
         if (nextFocus) return curr;
     } else if (curr == Step::Network && next < curr) { // Backward
-        return Step::Boot; // Skip pageServices
+        if (modeOOBE) return Step::Terms;
+        else return Step::Boot; // Skip pageServices
     } else if (curr == Step::Localization && next > curr) {
         if (!pretend && oobe->haveSnapshotUserAccounts) {
             return Step::Progress; // Skip pageUserAccounts and pageOldHome
@@ -603,7 +603,7 @@ int MInstall::showPage(int curr, int next) noexcept
         }
     } else if (curr == Step::Progress && next < curr) { // Backward
         if (oem) return Step::Boot;
-        if (!haveOldHome) {
+        else if (!haveOldHome) {
             // skip pageOldHome
             if (!pretend && oobe->haveSnapshotUserAccounts) {
                 return Step::Localization;
@@ -631,8 +631,8 @@ void MInstall::pageDisplayed(int next) noexcept
     switch (next) {
     case Step::Terms:
         textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
-            + tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p>"
-            "<p>" + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
+            + (modeOOBE ? "" : (tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p><p>"))
+            + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
                 " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
             + "<p><b>" + tr("Limitations") + "</b><br/>"
             + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
@@ -769,7 +769,7 @@ void MInstall::pageDisplayed(int next) noexcept
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
-        if (modeOOBE) enableBack = false;
+        if (modeOOBE) enableBack = true;
         else enableBack = radioCustomPart->isChecked();
         break;
 
@@ -803,6 +803,7 @@ void MInstall::pageDisplayed(int next) noexcept
             " does not need to be secure, such as a public terminal.") + "</p>");
         if (!nextFocus) nextFocus = textUserName;
         oobe->userPassValidationChanged();
+        enableNext = pushNext->isEnabled();
         break;
 
     case Step::OldHome:
@@ -1167,14 +1168,16 @@ void MInstall::setupkeyboardbutton() noexcept
 
 void MInstall::on_pushSetKeyboard_clicked() noexcept
 {
-    hide();
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    this->setEnabled(false);
     if (proc.shell("command -v  system-keyboard-qt >/dev/null 2>&1")) {
         proc.exec("system-keyboard-qt");
     } else {
         proc.shell("env GTK_THEME='Adwaita' fskbsetting");
     }
-    show();
     setupkeyboardbutton();
+    this->setEnabled(true);
+    QGuiApplication::restoreOverrideCursor();
 }
 
 void MInstall::on_radioEntireDisk_toggled(bool checked) noexcept
