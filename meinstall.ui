@@ -616,7 +616,7 @@ QSlider::handle:horizontal:disabled {
                      </widget>
                     </item>
                     <item row="0" column="1">
-                     <widget class="PassEdit" name="textCryptoPass">
+                     <widget class="QLineEdit" name="textCryptoPass">
                       <property name="maxLength">
                        <number>512</number>
                       </property>
@@ -633,7 +633,7 @@ QSlider::handle:horizontal:disabled {
                      </widget>
                     </item>
                     <item row="1" column="1">
-                     <widget class="PassEdit" name="textCryptoPass2">
+                     <widget class="QLineEdit" name="textCryptoPass2">
                       <property name="maxLength">
                        <number>512</number>
                       </property>
@@ -789,7 +789,7 @@ QSlider::handle:horizontal:disabled {
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="PassEdit" name="textCryptoPassCust">
+               <widget class="QLineEdit" name="textCryptoPassCust">
                 <property name="maxLength">
                  <number>512</number>
                 </property>
@@ -806,7 +806,7 @@ QSlider::handle:horizontal:disabled {
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="PassEdit" name="textCryptoPassCust2">
+               <widget class="QLineEdit" name="textCryptoPassCust2">
                 <property name="maxLength">
                  <number>512</number>
                 </property>
@@ -1656,7 +1656,7 @@ QSlider::handle:horizontal:disabled {
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="PassEdit" name="textUserPass">
+               <widget class="QLineEdit" name="textUserPass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1685,7 +1685,7 @@ QSlider::handle:horizontal:disabled {
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="PassEdit" name="textUserPass2">
+               <widget class="QLineEdit" name="textUserPass2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1735,7 +1735,7 @@ QSlider::handle:horizontal:disabled {
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="PassEdit" name="textRootPass">
+               <widget class="QLineEdit" name="textRootPass">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -1764,7 +1764,7 @@ QSlider::handle:horizontal:disabled {
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="PassEdit" name="textRootPass2">
+               <widget class="QLineEdit" name="textRootPass2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
                   <horstretch>0</horstretch>
@@ -2011,11 +2011,6 @@ QSlider::handle:horizontal:disabled {
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>PassEdit</class>
-   <extends>QLineEdit</extends>
-   <header>passedit.h</header>
-  </customwidget>
   <customwidget>
    <class>MTreeView</class>
    <extends>QTreeView</extends>

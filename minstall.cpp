@@ -122,6 +122,7 @@ MInstall::~MInstall() {
     if (partman) delete partman;
     if (autopart) delete autopart;
     if (throbber) delete throbber;
+    if (passCryptoCust) delete passCryptoCust;
 }
 
 // meant to be run after the installer becomes visible
@@ -182,10 +183,8 @@ void MInstall::startup()
                             + "\n" + link_block);
 
         // Password box setup
-        textCryptoPass->setup(textCryptoPass2, 1, 32, 9);
-        textCryptoPassCust->setup(textCryptoPassCust2, 1, 32, 9);
-        connect(textCryptoPass, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
-        connect(textCryptoPassCust, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
+        passCryptoCust = new PassEdit(textCryptoPassCust, textCryptoPassCust2, 1, 32, 9, this);
+        connect(passCryptoCust, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
     }
 
     setupkeyboardbutton();
@@ -659,8 +658,7 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
                 " partitions you need.").arg(PROJECTNAME, radioCustomPart->text().remove('&')) + "</p>");
-        enableNext = radioCustomPart->isChecked()
-            || !boxEncryptAuto->isChecked() || textCryptoPass->isValid();
+        enableNext = radioCustomPart->isChecked() || !boxEncryptAuto->isChecked() || autopart->passCrypto.isValid();
         break;
 
     case Step::Partitions:
@@ -743,7 +741,7 @@ void MInstall::pageDisplayed(int next) noexcept
             "<p><b>" + tr("Virtual Devices") + "</b><br/>"
             + tr("If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
             "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
-        enableNext = !(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || textCryptoPassCust->isValid();
+        enableNext = !(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || passCryptoCust->isValid();
         break;
 
     case Step::Boot: // Start of installation.
@@ -1181,5 +1179,5 @@ void MInstall::on_pushSetKeyboard_clicked() noexcept
 void MInstall::on_radioEntireDisk_toggled(bool checked) noexcept
 {
     boxAutoPart->setEnabled(checked);
-    pushNext->setEnabled(!checked || !boxEncryptAuto->isChecked() || textCryptoPass->isValid());
+    pushNext->setEnabled(!checked || !boxEncryptAuto->isChecked() || autopart->passCrypto.isValid());
 }

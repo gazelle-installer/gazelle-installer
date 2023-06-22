@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QStringList>
 #include "ui_meinstall.h"
+#include "passedit.h"
 
 class Oobe : public QObject
 {
@@ -36,8 +37,10 @@ class Oobe : public QObject
     bool containsRunit = false;
     bool haveSamba = false;
     bool oem = false;
+    bool online = false;
     QStringList timeZones; // cached time zone list
     QStringList enableServices;
+    PassEdit passUser, passRoot;
     void buildServiceList() noexcept;
     int selectTimeZone(const QString &zone) noexcept;
     void resetBlueman();
@@ -46,7 +49,6 @@ class Oobe : public QObject
     void timeAreaIndexChanged(int index) noexcept;
 
 public:
-    bool online = false;
     bool haveSnapshotUserAccounts = false;
     Oobe(class MProcess &mproc, Ui::MeInstall &ui, QWidget *parent,
         const class QSettings &appConf, bool oem, bool modeOOBE);

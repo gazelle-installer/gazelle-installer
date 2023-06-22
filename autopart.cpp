@@ -31,12 +31,14 @@
 #include "autopart.h"
 
 AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf) noexcept
-    : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman)
+    : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman),
+      passCrypto(ui.textCryptoPass, ui.textCryptoPass2, 1, 32, 9, this)
 {
     checkHibernation = gui.checkHibernationReg;
 
     connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
     connect(gui.boxEncryptAuto, &QGroupBox::toggled, this, &AutoPart::toggleEncrypt);
+    connect(&passCrypto, &PassEdit::validationChanged, gui.pushNext, &QPushButton::setEnabled);
     connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
         [this](bool checked){ setParams(true, gui.boxEncryptAuto->isChecked(), checked, true); });
     connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPressed);
@@ -313,7 +315,7 @@ void AutoPart::toggleEncrypt(bool checked) noexcept
     if (!canHibernate) gui.checkHibernationReg->setChecked(false);
 
     setParams(true, checked, gui.checkHibernationReg->isChecked(), true);
-    if (!inBuilder) gui.pushNext->setEnabled(!checked || gui.textCryptoPass->isValid());
+    if (!inBuilder) gui.pushNext->setEnabled(!checked || passCrypto.isValid());
 }
 
 void AutoPart::sliderPressed() noexcept

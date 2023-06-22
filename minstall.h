@@ -93,6 +93,7 @@ private:
     class Oobe *oobe = nullptr;
     class BootMan *bootman = nullptr;
     class SwapMan *swapman = nullptr;
+    class PassEdit *passCryptoCust = nullptr;
 
     QPixmap helpBackdrop;
     // Splash screen

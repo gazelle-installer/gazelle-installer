@@ -21,26 +21,26 @@
 
 #include <QLineEdit>
 
-class PassEdit : public QLineEdit
+class PassEdit : public QObject
 {
     Q_OBJECT
 private:
-    PassEdit *slave = nullptr;
+    QLineEdit *master = nullptr;
+    QLineEdit *slave = nullptr;
     QString genText;
     int min, genMin, wordMax;
     bool lastValid = false;
     QAction *actionEye = nullptr;
     QAction *actionGauge = nullptr;
     void generate() noexcept;
-    void masterTextChanged() noexcept;
-    void slaveTextChanged(const QString &slaveText) noexcept;
+    void masterContextMenu(const QPoint &pos) noexcept;
+    void masterTextChanged(const QString &text) noexcept;
+    void slaveTextChanged(const QString &text) noexcept;
     void eyeToggled(bool checked) noexcept;
-protected:
-    void contextMenuEvent(QContextMenuEvent *event) noexcept;
-    void changeEvent(QEvent *event) noexcept;
+    bool eventFilter(QObject *watched, QEvent *event) noexcept;
 public:
-    PassEdit(QWidget *parent = nullptr) noexcept;
-    void setup(PassEdit *slave, int min=0, int genMin=16, int wordMax=5) noexcept;
+    PassEdit(QLineEdit *master, QLineEdit *slave,
+        int min=0, int genMin=16, int wordMax=5, QObject *parent = nullptr) noexcept;
     bool isValid() const noexcept;
 signals:
     void validationChanged(bool valid);
