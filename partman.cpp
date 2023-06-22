@@ -75,6 +75,9 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     gui.pushPartClear->setEnabled(false);
     gui.boxCryptoPass->setEnabled(false);
 
+    gui.pushGrid->setChecked(gui.treePartitions->grid());
+    connect(gui.pushGrid, &QToolButton::toggled, gui.treePartitions, &MTreeView::setGrid);
+
     // Hide encryption options if cryptsetup not present.
     QFileInfo cryptsetup("/sbin/cryptsetup");
     QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");

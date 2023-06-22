@@ -106,7 +106,7 @@ void MTreeView::drawRow(QPainter *painter,
     pen.setColor(color);
     pen.setStyle(Qt::DashDotDotLine);
     pen.setJoinStyle(Qt::MiterJoin);
-    if (!isFirstColumnSpanned(index.row(), index.parent())) {
+    if (gridon && !isFirstColumnSpanned(index.row(), index.parent())) {
         painter->save();
         painter->setPen(pen);
         const int x = visualRect(index).x();
@@ -148,4 +148,12 @@ void MTreeView::selectionChanged(const QItemSelection &selected, const QItemSele
 {
     viewport()->update();
     QTreeView::selectionChanged(selected, deselected);
+}
+
+void MTreeView::setGrid(bool on) noexcept
+{
+    if (gridon != on) {
+        gridon = on;
+        viewport()->update();
+    }
 }
