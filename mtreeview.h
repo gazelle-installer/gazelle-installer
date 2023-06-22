@@ -25,12 +25,15 @@ class MTreeView : public QTreeView
 {
     Q_OBJECT
     int lastColumn = 0;
+    bool gridon = true;
     void drawRow(QPainter *painter,
         const QStyleOptionViewItem &option, const QModelIndex &index) const noexcept;
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) noexcept;
 public:
     MTreeView(QWidget *parent = nullptr) noexcept;
     QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers) noexcept;
+    void setGrid(bool on) noexcept;
+    inline bool grid() noexcept { return gridon; }
 };
 
 #endif // MTREEVIEW_H
