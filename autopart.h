@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include "ui_meinstall.h"
+#include "passedit.h"
 
 class AutoPart : public QObject
 {
@@ -47,6 +48,7 @@ class AutoPart : public QObject
     void sliderActionTriggered(int action) noexcept;
     void sliderValueChanged(int value) noexcept;
 public:
+    PassEdit passCrypto;
     AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void scan() noexcept;

@@ -31,16 +31,15 @@
 #include "oobe.h"
 
 Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf, bool oem, bool modeOOBE)
-    : QObject(parent), proc(mproc), gui(ui), master(parent), oem(oem), online(modeOOBE)
+    : QObject(parent), proc(mproc), gui(ui), master(parent), oem(oem), online(modeOOBE),
+    passUser(ui.textUserPass, ui.textUserPass2), passRoot(ui.textRootPass, ui.textRootPass2)
 {
     gui.textComputerName->setText(appConf.value("DEFAULT_HOSTNAME").toString());
     enableServices = appConf.value("ENABLE_SERVICES").toStringList();
 
     // User accounts
-    gui.textUserPass->setup(gui.textUserPass2);
-    gui.textRootPass->setup(gui.textRootPass2);
-    connect(gui.textUserPass, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
-    connect(gui.textRootPass, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
+    connect(&passUser, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
+    connect(&passRoot, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
     connect(gui.textUserName, &QLineEdit::textChanged, this, &Oobe::userPassValidationChanged);
     connect(gui.boxRootAccount, &QGroupBox::toggled, this, &Oobe::userPassValidationChanged);
     // Old home
@@ -683,9 +682,9 @@ void Oobe::timeAreaIndexChanged(int index) noexcept
 void Oobe::userPassValidationChanged() noexcept
 {
     bool ok = !gui.textUserName->text().isEmpty();
-    if (ok) ok = gui.textUserPass->isValid() || gui.textUserName->text().isEmpty();
+    if (ok) ok = passUser.isValid() || gui.textUserName->text().isEmpty();
     if (ok && gui.boxRootAccount->isChecked()) {
-        ok = gui.textRootPass->isValid() || gui.textRootPass->text().isEmpty();
+        ok = passRoot.isValid() || gui.textRootPass->text().isEmpty();
     }
     gui.pushNext->setEnabled(ok);
 }

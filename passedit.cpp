@@ -28,36 +28,36 @@
 #include <zxcvbn.h>
 #include "passedit.h"
 
-PassEdit::PassEdit(QWidget *parent) noexcept
-    : QLineEdit(parent)
-{
-}
-
-bool PassEdit::isValid() const noexcept
-{
-    return lastValid;
-}
-
-void PassEdit::setup(PassEdit *slave, int min, int genMin, int wordMax) noexcept
+PassEdit::PassEdit(QLineEdit *master, QLineEdit *slave,
+    int min, int genMin, int wordMax, QObject *parent) noexcept
+    : QObject(parent), master(master), slave(slave), min(min), genMin(genMin), wordMax(wordMax)
 {
     this->slave = slave;
     this->min = min;
     this->genMin = genMin;
     this->wordMax = wordMax;
-    disconnect(this);
+    disconnect(master);
     disconnect(slave);
-    connect(this, &QLineEdit::textChanged, this, &PassEdit::masterTextChanged);
+    master->installEventFilter(this);
+    master->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(master, &QLineEdit::textChanged, this, &PassEdit::masterTextChanged);
     connect(slave, &QLineEdit::textChanged, this, &PassEdit::slaveTextChanged);
+    connect(master, &QWidget::customContextMenuRequested, this, &PassEdit::masterContextMenu);
     if (min == 0) lastValid = true; // Control starts with no text
     generate(); // Pre-load the generator
 
-    actionEye = addAction(QIcon(":/eye-show"), QLineEdit::TrailingPosition);
+    actionEye = master->addAction(QIcon(":/eye-show"), QLineEdit::TrailingPosition);
     actionEye->setCheckable(true);
     connect(actionEye, &QAction::toggled, this, &PassEdit::eyeToggled);
     eyeToggled(false); // Initialize the eye.
     actionGauge = slave->addAction(QIcon(":/gauge/0"), QLineEdit::TrailingPosition);
 
-    masterTextChanged();
+    masterTextChanged(master->text());
+}
+
+bool PassEdit::isValid() const noexcept
+{
+    return lastValid;
 }
 
 void PassEdit::generate() noexcept
@@ -92,40 +92,36 @@ void PassEdit::generate() noexcept
     genText.append(QString::number(std::rand() % 10));
 }
 
-void PassEdit::contextMenuEvent(QContextMenuEvent *event) noexcept
+void PassEdit::masterContextMenu(const QPoint &pos) noexcept
 {
-    QMenu *menu = createStandardContextMenu();
-    QAction *actGenPass = nullptr;
-    if (slave != nullptr) {
-        generate();
-        menu->addSeparator();
-        actGenPass = menu->addAction(tr("Use password") + ": " + genText);
-    }
-    const QAction *action = menu->exec(event->globalPos());
-    if (actGenPass && action == actGenPass) {
-        setText(genText);
+    QMenu *menu = master->createStandardContextMenu();
+    generate();
+    menu->addSeparator();
+    QAction *actGenPass = menu->addAction(tr("Use password") + ": " + genText);
+    if (menu->exec(master->mapToGlobal(pos)) == actGenPass) {
+        master->setText(genText);
         slave->setText(genText);
     }
-    delete menu;
 }
 
-void PassEdit::changeEvent(QEvent *event) noexcept
+bool PassEdit::eventFilter(QObject *watched, QEvent *event) noexcept
 {
     const QEvent::Type etype = event->type();
     if(etype == QEvent::EnabledChange || etype == QEvent::Hide) {
-        if(actionEye && !(isVisible() && isEnabled())) actionEye->setChecked(false);
+        QLineEdit *w = qobject_cast<QLineEdit *>(watched);
+        if(actionEye && !(w->isVisible() && w->isEnabled())) actionEye->setChecked(false);
     }
-    QLineEdit::changeEvent(event);
+    return false;
 }
 
-void PassEdit::masterTextChanged() noexcept
+void PassEdit::masterTextChanged(const QString &text) noexcept
 {
     slave->clear();
-    setPalette(QPalette());
+    master->setPalette(QPalette());
     slave->setPalette(QPalette());
-    const bool valid = (text().isEmpty() && min == 0);
+    const bool valid = (text.isEmpty() && min == 0);
 
-    const double entropy = ZxcvbnMatch(text().toUtf8().constData(), nullptr, nullptr);
+    const double entropy = ZxcvbnMatch(text.toUtf8().constData(), nullptr, nullptr);
     int score;
     if (entropy <= 0) score = 0; // Negligible
     else if(entropy < 40) score = 1; // Very weak
@@ -147,20 +143,20 @@ void PassEdit::masterTextChanged() noexcept
     }
 }
 
-void PassEdit::slaveTextChanged(const QString &slaveText) noexcept
+void PassEdit::slaveTextChanged(const QString &text) noexcept
 {
-    QPalette pal = palette();
+    QPalette pal = master->palette();
     bool valid = true;
-    if (slaveText == text()) {
+    if (text == master->text()) {
         QColor col(255, 255, 0, 40);
-        if (slaveText.length() >= min) col.setRgb(0, 255, 0, 40);
+        if (text.length() >= min) col.setRgb(0, 255, 0, 40);
         else valid = false;
         pal.setColor(QPalette::Base, col);
     } else {
         pal.setColor(QPalette::Base, QColor(255, 0, 0, 70));
         valid = false;
     }
-    setPalette(pal);
+    master->setPalette(pal);
     slave->setPalette(pal);
     if (valid != lastValid) {
         lastValid = valid;
@@ -172,5 +168,5 @@ void PassEdit::eyeToggled(bool checked) noexcept
 {
     actionEye->setIcon(QIcon(checked ? ":/eye-hide" : ":/eye-show"));
     actionEye->setToolTip(checked ? tr("Hide the password") : tr("Show the password"));
-    setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
+    master->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
 }
