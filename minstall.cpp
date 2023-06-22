@@ -66,7 +66,6 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     : proc(this), appConf(acfg), appArgs(args), helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
     setupUi(this);
-    labelSplash->setCursor(Qt::WaitCursor);
     listLog->addItem("Version " VERSION);
     proc.setupUI(listLog, progInstall);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
@@ -240,7 +239,7 @@ void MInstall::splashSetThrobber(bool active) noexcept
             ++throbPos;
             labelSplash->update();
         });
-        throbber->start(100);
+        throbber->start(120);
     } else {
         if (!throbber) return;
         delete throbber;
@@ -440,7 +439,7 @@ bool MInstall::processNextPhase() noexcept
         if (closing) this->close();
         else {
             splashSetThrobber(false);
-            labelSplash->unsetCursor();
+            boxMain->unsetCursor();
             // Close should be the right button at this stage.
             disconnect(pushNext);
             connect(pushNext, &QPushButton::clicked, this, &MInstall::close);
@@ -528,10 +527,12 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
 int MInstall::showPage(int curr, int next) noexcept
 {
     if (next == Step::Splash) { // Enter splash screen
+        boxMain->setCursor(Qt::WaitCursor);
         splashSetThrobber(appConf.value("SPLASH_THROBBER", true).toBool());
     } else if (curr == Step::Splash) { // Leave splash screen
         labelSplash->clear();
         splashSetThrobber(false);
+        boxMain->unsetCursor();
     } else if (curr == Step::Terms && next > curr) {
         if (modeOOBE) return Step::Network;
     } else if (curr == Step::Disk && next > curr) {
@@ -951,24 +952,23 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
         painter.translate(lW / 2, lH / 2);
         painter.scale(lW / 200.0, lH / 200.0);
         // Draw the load indicator on the splash screen.
-        const int count = 16;
-        const QPoint blade[] = {
-            QPoint(-9, -6), QPoint(9, -75),
-            QPoint(0, -93), QPoint(-9, -75)
-        };
-        const qreal angle = 360.0 / count;
+        const int blades = 12;
+        const qreal angle = 360.0 / blades;
         painter.rotate(angle * throbPos);
         float hue = 1.0, alpha = 0.18;
-        const float huestep = (120.0/360.0) / count, alphastep = 0.18 / count;
+        const float revs = throbPos / blades;
+        const float huestep = ((120.0 + (revs<240 ? revs : 240))/360.0) / blades;
+        const float alphastep = 0.18 / blades;
         QPen pen;
         pen.setWidth(3);
         pen.setJoinStyle(Qt::MiterJoin);
-        for (int ixi=0; ixi<count; ++ixi) {
+        for (int ixi=0; ixi<blades; ++ixi) {
             const QColor &color = QColor::fromHsvF(hue, 1.0, 1.0, alpha);
             hue -= huestep, alpha += alphastep;
             painter.setBrush(color);
             pen.setColor(color.darker());
             painter.setPen(pen);
+            const QPoint blade[] = {{-15, -6}, {15, -75}, {0, -93}, {-15, -75}};
             painter.drawConvexPolygon(blade, 4);
             painter.rotate(angle);
         }
@@ -1168,7 +1168,6 @@ void MInstall::setupkeyboardbutton() noexcept
 
 void MInstall::on_pushSetKeyboard_clicked() noexcept
 {
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     this->setEnabled(false);
     if (proc.shell("command -v  system-keyboard-qt >/dev/null 2>&1")) {
         proc.exec("system-keyboard-qt");
@@ -1177,7 +1176,6 @@ void MInstall::on_pushSetKeyboard_clicked() noexcept
     }
     setupkeyboardbutton();
     this->setEnabled(true);
-    QGuiApplication::restoreOverrideCursor();
 }
 
 void MInstall::on_radioEntireDisk_toggled(bool checked) noexcept
