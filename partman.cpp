@@ -1331,10 +1331,8 @@ bool PartMan::fixCryptoSetup()
             out << ' ' << keyfile;
         }
         out << " luks";
-        if (!it.second->flags.rotational) {
-            //out << ",no-read-workqueue,no-write-workqueue"; // TODO: cryptsetup 2.3.4 or later.
-            if (it.second->discgran) out << ",discard";
-        }
+        if (!it.second->flags.rotational) out << ",no-read-workqueue,no-write-workqueue";
+        if (it.second->discgran) out << ",discard";
         out << '\n';
     }
     // Update cryptdisks if the key is not in the root file system.
@@ -2123,24 +2121,21 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             changed |= (1 << PartMan::Format);
         }
     }
-    if (changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format))) {
+    if (changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format)) && canMount(false)) {
         // Default options, dump and pass
-        if (canMount(false)) {
-            if (format == "SWAP") options = discgran ? "discard" : "defaults";
-            else {
-                if (use == "/boot" || use == "/") {
-                    pass = (format == "btrfs") ? 0 : 1;
-                }
-                options.clear();
-                if (!flags.rotational) {
-                    const bool btrfs = (format == "btrfs" || type == Subvolume);
-                    if (discgran && (format == "ext4" || format == "xfs")) options = "discard,";
-                    else if (discgran && btrfs) options = "ssd,discard=async,";
-                    else if (btrfs) options = "ssd,";
-                }
-                options += "noatime";
-                dump = true;
+        if (format == "SWAP") options = discgran ? "discard" : "defaults";
+        else {
+            if (use == "/boot" || use == "/") {
+                pass = (format == "btrfs") ? 0 : 1;
             }
+            options.clear();
+            const bool btrfs = (format == "btrfs" || type == Subvolume);
+            if (!flags.rotational && btrfs) options += "ssd,";
+            if (discgran && (format == "ext4" || format == "xfs")) options += "discard,";
+            else if (discgran && btrfs) options += "discard=async,";
+            options += "noatime";
+            if (btrfs) options += ",compress=zstd:1";
+            dump = true;
         }
     }
 }
@@ -2420,15 +2415,16 @@ void DeviceItemDelegate::partOptionsMenu() noexcept
     QString selFS = partit->format;
     if (selFS == "PRESERVE") selFS = partit->curFormat;
     if ((partit->type == DeviceItem::Partition && selFS == "btrfs") || partit->type == DeviceItem::Subvolume) {
-        QString tcommon = "noatime";
-        if (partit->discgran) tcommon.prepend("discard=async,");
-        if (!partit->flags.rotational) tcommon.prepend("ssd,");
-        QAction *action = menuTemplates->addAction(tr("Compression (&ZLIB)"));
-        action->setData(tcommon + ",compress=zlib");
-        action = menuTemplates->addAction(tr("Compression (Z&STD)"));
+        QString tcommon;
+        if (!partit->flags.rotational) tcommon = "ssd,";
+        if (partit->discgran) tcommon = "discard=async,";
+        tcommon += "noatime";
+        QAction *action = menuTemplates->addAction(tr("Compression (Z&STD)"));
         action->setData(tcommon + ",compress=zstd");
         action = menuTemplates->addAction(tr("Compression (&LZO)"));
         action->setData(tcommon + ",compress=lzo");
+        action = menuTemplates->addAction(tr("Compression (&ZLIB)"));
+        action->setData(tcommon + ",compress=zlib");
     }
     menuTemplates->setDisabled(menuTemplates->isEmpty());
     QAction *action = menu->exec(QCursor::pos());
