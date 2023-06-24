@@ -69,12 +69,13 @@ void SwapMan::install()
 
     proc.status(tr("Creating swap file"));
     // Create a blank swap file.
-    if (devit->format == "btrfs") {
+    const bool btrfs = (devit->type == DeviceItem::Subvolume || devit->finalFormat() == "btrfs");
+    if (btrfs) {
         proc.exec("truncate", {"--size=0", realpath});
         proc.exec("chattr", {"+C", realpath});
     }
     proc.exec("fallocate", {"-l", QStringLiteral("%1M").arg(size), realpath});
-    chmod(instpath.toUtf8().constData(), 0600);
+    chmod(realpath.toUtf8().constData(), 0600);
     proc.exec("mkswap", {realpath});
 
     proc.status(tr("Configuring swap file"));
@@ -86,7 +87,7 @@ void SwapMan::install()
     file.close();
     // Hibernation.
     if (gui.checkHibernation->isChecked()) {
-        if (devit->format == "btrfs") {
+        if (btrfs) {
             proc.exec("btrfs", {"inspect-internal", "map-swapfile", "-r", realpath}, nullptr, true);
         } else {
             proc.shell("filefrag -v " + realpath + " | awk 'NR==4 {print $4}' | tr -d .", nullptr, true);
