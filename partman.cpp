@@ -675,9 +675,8 @@ void PartMan::scanSubvolumes(DeviceItem *partit)
     qApp->setOverrideCursor(Qt::WaitCursor);
     gui.boxMain->setEnabled(false);
     while (partit->childCount()) delete partit->child(0);
-    proc.mkpath("/mnt/btrfs-scratch");
     QStringList lines;
-    if (!proc.exec("mount", {"-o", "subvolid=5,ro",
+    if (!proc.exec("mount", {"--mkdir", "-o", "subvolid=5,ro",
         partit->mappedDevice(), "/mnt/btrfs-scratch"})) goto END;
     proc.exec("btrfs", {"subvolume", "list", "/mnt/btrfs-scratch"}, nullptr, true);
     lines = proc.readOutLines();
@@ -1398,7 +1397,6 @@ void PartMan::mountPartitions()
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = it.second->mappedDevice();
         proc.status(tr("Mounting: %1").arg(dev));
-        proc.mkpath(point);
         if (it.first == "/boot") {
              // needed to run fsck because sfdisk --part-type can mess up the partition
             proc.exec("fsck.ext4", {"-y", dev});
@@ -1413,8 +1411,10 @@ void PartMan::mountPartitions()
         opts.removeAll("defaults");
         opts.removeAll("atime");
         opts.removeAll("relatime");
-        if (!opts.contains("noatime")) opts << "noatime";
-        proc.exec("/bin/mount", {dev, point, "-o", opts.join(',')});
+        if (!opts.contains("async")) opts.append("async");
+        if (!opts.contains("noiversion")) opts.append("noiversion");
+        if (!opts.contains("noatime")) opts.append("noatime");
+        proc.exec("/bin/mount", {"--mkdir", "-o", opts.join(','), dev, point});
     }
     proc.setExceptionMode(nullptr);
 }
