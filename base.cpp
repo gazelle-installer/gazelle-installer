@@ -156,21 +156,16 @@ void Base::install()
         }
     }
 
-    // make empty dirs for opt, dev, proc, sys, run,
-    // home already done
+    // make empty dir for opt. home already done.
+    // dev, proc, sys, run will be made at mount.
     proc.status(tr("Creating system directories"));
-    mkdir("/mnt/antiX/opt", 0755);
-    mkdir("/mnt/antiX/dev", 0755);
-    mkdir("/mnt/antiX/proc", 0755);
-    mkdir("/mnt/antiX/sys", 0755);
-    mkdir("/mnt/antiX/run", 0755);
+    proc.mkpath("/mnt/antiX/opt", 0755);
 
     copyLinux(skiphome);
 
     proc.advance(1, 1);
     proc.status(tr("Fixing configuration"));
-    mkdir("/mnt/antiX/tmp", 01777);
-    chmod("/mnt/antiX/tmp", 01777);
+    proc.mkpath("/mnt/antiX/tmp", 01777, true);
 
     // Copy live set up to install and clean up.
     proc.shell("/usr/sbin/live-to-installed /mnt/antiX");
@@ -256,8 +251,7 @@ void Base::copyLinux(bool skiphome)
         ncopy += proc.readAllStandardOutput().count('\n');
         proc.status(ncopy);
     }
-    QObject::disconnect(&proc, &QProcess::readyRead, nullptr, nullptr);
-    QObject::disconnect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), nullptr, nullptr);
+    proc.disconnect(&eloop);
 
     const QByteArray &StdErr = proc.readAllStandardError();
     if (!StdErr.isEmpty()) {

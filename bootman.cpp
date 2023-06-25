@@ -119,12 +119,11 @@ void BootMan::install()
     if (gui.radioBootESP->isChecked()) mkdir("/mnt/antiX/boot/efi", 0755);
 
     // set mounts for chroot
-    proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
-    proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
-    proc.exec("/bin/mount", {"--rbind", "/proc", "/mnt/antiX/proc"});
-    proc.exec("/bin/mount", {"-t", "tmpfs", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
-    proc.exec("/bin/mkdir", {"/mnt/antiX/run/udev"});
-    proc.exec("/bin/mount", {"--rbind", "/run/udev", "/mnt/antiX/run/udev"});
+    proc.exec("/bin/mount", {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
+    proc.exec("/bin/mount", {"--mkdir", "--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
+    proc.exec("/bin/mount", {"--mkdir", "--rbind", "/proc", "/mnt/antiX/proc"});
+    proc.exec("/bin/mount", {"-t", "tmpfs", "--mkdir", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
+    proc.exec("/bin/mount", {"--mkdir", "--rbind", "/run/udev", "/mnt/antiX/run/udev"});
 
     // Trap exceptions here, and re-throw them once the local cleanup is done.
     const char *failed = nullptr;
