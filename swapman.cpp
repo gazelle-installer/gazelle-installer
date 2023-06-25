@@ -33,6 +33,10 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
     connect(ui.spinSwapSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &SwapMan::spinSizeChanged);
     connect(ui.pushSwapSizeReset, &QToolButton::clicked, this, &SwapMan::sizeResetClicked);
     connect(ui.checkHibernation, &QCheckBox::clicked, this, &SwapMan::checkHibernationClicked);
+    connect(ui.boxSwap, &QGroupBox::toggled, this, [=](bool on) {
+        if (on) ui.pushNext->setEnabled(true);
+        else swapFileEdited(ui.textSwapFile->text());
+    });
 }
 
 void SwapMan::manageConfig(MSettings &config, bool advanced) noexcept
@@ -62,13 +66,14 @@ void SwapMan::install()
     if (!gui.boxSwap->isChecked() || size <= 0) return;
     static const char *const msgfail = QT_TR_NOOP("Failed to create or install swap file.");
     proc.setExceptionMode(msgfail);
-    const QString &instpath = gui.textSwapFile->text().trimmed();
+    const QString &instpath = QDir::cleanPath(gui.textSwapFile->text().trimmed());
     const QString &realpath = "/mnt/antiX" + instpath;
     const DeviceItem *devit = partman.findHostDev(instpath);
     if (!devit) throw msgfail;
 
     proc.status(tr("Creating swap file"));
     // Create a blank swap file.
+    proc.mkpath(QFileInfo(realpath).path(), 0700, true);
     const bool btrfs = (devit->type == DeviceItem::Subvolume || devit->finalFormat() == "btrfs");
     if (btrfs) {
         proc.exec("truncate", {"--size=0", realpath});
@@ -129,6 +134,7 @@ void SwapMan::swapFileEdited(const QString &text) noexcept
     const bool canHibernate = (max >= (recommended(true) / MB));
     gui.checkHibernation->setEnabled(canHibernate);
     if (!canHibernate) gui.checkHibernation->setChecked(false);
+    gui.pushNext->setEnabled(devit != nullptr);
 }
 
 void SwapMan::sizeResetClicked() noexcept

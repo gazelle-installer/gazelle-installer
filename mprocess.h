@@ -75,7 +75,7 @@ public:
     void setExceptionMode(const char *failInfo) noexcept;
     // Common functions that are traditionally carried out by processes.
     void sleep(const int msec, const bool silent = false) noexcept;
-    bool mkpath(const QString &path);
+    bool mkpath(const QString &path, mode_t mode = 0, bool force = false);
     // Operating system
     const QString &detectArch();
     int detectEFI(bool noTest = false);

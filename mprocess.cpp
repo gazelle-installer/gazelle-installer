@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <QApplication>
 #include <QProcessEnvironment>
@@ -282,11 +283,14 @@ void MProcess::sleep(const int msec, const bool silent) noexcept
         log(logEntry, rc == 0 ? 1 : -1);
     }
 }
-bool MProcess::mkpath(const QString &path)
+bool MProcess::mkpath(const QString &path, mode_t mode, bool force)
 {
     if (checkHalt()) return false;
+    if (!force && QFileInfo::exists(path)) return true;
+
     QListWidgetItem *logEntry = log("MKPATH: "+path, Exec);
-    const bool rc = QDir().mkpath(path);
+    bool rc = QDir().mkpath(path);
+    if (mode && rc) rc = (chmod(path.toUtf8().constData(), mode) == 0);
     qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
     log(logEntry, rc ? 1 : -1);
     if(!rc && exceptionInfo) throw exceptionInfo;
