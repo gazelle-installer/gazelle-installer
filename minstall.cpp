@@ -382,7 +382,7 @@ bool MInstall::processNextPhase() noexcept
                 if (oem) oobe->enable();
                 oobe->process();
                 manageConfig(ConfigSave);
-                proc.exec("/bin/sync"); // the sync(2) system call will block the GUI
+                proc.exec("sync"); // the sync(2) system call will block the GUI
                 swapman->install();
                 bootman->install();
             } else if (!pretendToInstall(5, 100)) {
@@ -1070,6 +1070,7 @@ void MInstall::cleanup(bool endclean)
         proc.exec("cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
         proc.exec("rm", {"-rf", "/mnt/antiX/mnt/antiX"});
     }
+    // umount with -q checks that the path is a mount point first, without error messages.
     proc.exec("umount", {"-lq", "/mnt/antiX/boot/efi"});
     proc.exec("umount", {"-lq", "/mnt/antiX/proc"});
     proc.exec("umount", {"-lq", "/mnt/antiX/sys"});
