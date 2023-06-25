@@ -35,7 +35,7 @@ if [ "$EUID" != 0 ]; then
     fi
 
     ###end Xfce automount feature
-    # wayland fix (chkboom)
+    # wayland fix (AK-47)
     if [ x"$WAYLAND_DISPLAY" != "x" ] && [ -n "${WAYLAND_DISPLAY##/*}" ]; then
       export WAYLAND_DISPLAY=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
     fi
@@ -69,8 +69,8 @@ else
       chmod 700 $XDG_RUNTIME_DIR
       chown 0:0 $XDG_RUNTIME_DIR
     fi
-    # add /usr/local/bin as first entry if not already
-    [ -z "${PATH##/usr/local/bin:*}" ] || PATH="/usr/local/bin:$PATH"
+    # restrict PATH for security
+    PATH="/usr/bin:/usr/sbin:/usr/local/bin"
 
     # put pattern list of environment variables we want get from users environment into array
     __ENVIRONEMENT_PATTERN__=(
@@ -79,7 +79,6 @@ else
         LANG=
         LANGUAGE=
         LC_
-        PWD=
         QT_
         XDG_CURRENT_DESKTOP=
         XDG_SESSION_TYPE
@@ -95,8 +94,6 @@ else
         IFS='=' read -r  k v  <<<"$REPLY" 
         # remove any 'bad' special char's like back-quotes and dollar sign
         v="${v//[\`\$]/}"
-        # change to user working dir
-        [ -z "${k##PWD*}" ] && cd "$v" && continue
         export $k="$v"  
     done < <( xargs -0 -L1 -a /proc/$PPID/environ \
             | grep -E "${__ENVIRONEMENT_PATTERN__}")
@@ -104,8 +101,10 @@ else
     unset k v
     unset __ENVIRONEMENT_PATTERN__
 
-    RUN="/sbin/minstall"
-    echo Starting  "$RUN" 
+    RUN="/usr/sbin/minstall"
+    echo Starting "$RUN"
+    # always change working directory to /usr/sbin for security
+    cd "/usr/sbin"
     command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
     exec "$RUN" 
 fi
