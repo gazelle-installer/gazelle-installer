@@ -1478,9 +1478,9 @@ DeviceItem *PartMan::findHostDev(const QString &path) const noexcept
     QString spath = path;
     DeviceItem *devit = nullptr;
     do {
-        spath = QDir(QFileInfo(spath).absolutePath()).path();
+        spath = QDir::cleanPath(QFileInfo(spath).path());
         devit = mounts.value(spath);
-    } while(!devit && !spath.isEmpty() && spath != '/');
+    } while(!devit && !spath.isEmpty() && spath != '/' && spath != '.');
     return devit;
 }
 
@@ -1966,18 +1966,16 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
 
     if (type != Subvolume) checkAndAdd("Format");
     checkAndAdd("root");
-    if (type == Subvolume) checkAndAdd("home"); // swap requires Linux 5.0 or later
-    else {
-        if (type != VirtualBD) {
-            if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
-            if (all || size <= 8*GB) {
-                if (size < (2*TB - 512)) checkAndAdd("ESP");
-                checkAndAdd("boot");
-            }
+    if (type != VirtualBD) {
+        if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
+        if (all || size <= 8*GB) {
+            if (size < (2*TB - 512)) checkAndAdd("ESP");
+            checkAndAdd("boot");
         }
-        checkAndAdd("swap");
-        checkAndAdd("home");
     }
+    checkAndAdd("home");
+    if (type != Subvolume) checkAndAdd("swap");
+    else checkAndAdd("/swap");
     return list;
 }
 QStringList DeviceItem::allowedFormats() const noexcept
@@ -2121,7 +2119,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             changed |= (1 << PartMan::Format);
         }
     }
-    if (changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format)) && canMount(false)) {
+    if ((changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format))) && canMount(false)) {
         // Default options, dump and pass
         if (format == "SWAP") options = discgran ? "discard" : "defaults";
         else {
@@ -2134,7 +2132,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             if (discgran && (format == "ext4" || format == "xfs")) options += "discard,";
             else if (discgran && btrfs) options += "discard=async,";
             options += "noatime";
-            if (btrfs) options += ",compress=zstd:1";
+            if (btrfs && use != "/swap") options += ",compress=zstd:1";
             dump = true;
         }
     }
