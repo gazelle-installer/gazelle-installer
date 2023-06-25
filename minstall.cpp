@@ -1067,14 +1067,14 @@ void MInstall::cleanup(bool endclean)
     if (pretend) return;
 
     if (endclean) {
-        proc.exec("/usr/bin/cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
-        proc.exec("/usr/bin/rm", {"-rf", "/mnt/antiX/mnt/antiX"});
+        proc.exec("cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
+        proc.exec("rm", {"-rf", "/mnt/antiX/mnt/antiX"});
     }
-    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/boot/efi"})) proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/boot/efi"});
-    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/proc"}))     proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/proc"});
-    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/sys"}))      proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/sys"});
-    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/dev/shm"}))  proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev/shm"});
-    if (proc.exec("/usr/bin/mountpoint", {"-q", "/mnt/antiX/dev"}))      proc.exec("/usr/bin/umount", {"-lq", "/mnt/antiX/dev"});
+    proc.exec("umount", {"-lq", "/mnt/antiX/boot/efi"});
+    proc.exec("umount", {"-lq", "/mnt/antiX/proc"});
+    proc.exec("umount", {"-lq", "/mnt/antiX/sys"});
+    proc.exec("umount", {"-lq", "/mnt/antiX/dev/shm"});
+    proc.exec("umount", {"-lq", "/mnt/antiX/dev"});
     if (endclean) {
         if (!mountkeep) partman->unmount();
         setupAutoMount(true);
