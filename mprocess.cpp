@@ -97,12 +97,14 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
             logEntry->setFont(logFont);
         }
     }
-    qDebug().nospace() << "Exit #" << execount << ": " << exitCode() << " " << exitStatus() << " " << error();
 
     int status = 1;
     if (exitStatus() != QProcess::NormalExit) status = -1;
     else if (error() != QProcess::UnknownError) status = -2;
     else if (exitCode() != 0) status = 0;
+
+    QDebug dbg(qDebug().nospace() << "Exit #" << execount << ": " << exitCode());
+    if (status < 0) dbg << " " << exitStatus() << " " << error();
 
     log(logEntry, status);
     return (status > 0);
