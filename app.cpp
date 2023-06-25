@@ -15,6 +15,7 @@
  *   limitations under the License.
  ***************************************************************************/
 
+#include <cstdlib>
 #include <cstdio>
 #include <unistd.h>
 
@@ -43,6 +44,29 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 
 int main(int argc, char *argv[])
 {
+    if (!getenv("XDG_CURRENT_DESKTOP")) {
+        // The default style in the OOBE environment is hideous and unusable.
+        QApplication::setStyle("windows"); // Qt docs say do this before the QApplication instance.
+        QPalette pal;
+        pal.setColor(QPalette::Window, Qt::black);
+        pal.setColor(QPalette::WindowText, Qt::white);
+        pal.setColor(QPalette::Base, Qt::black);
+        pal.setColor(QPalette::AlternateBase, Qt::black);
+        pal.setColor(QPalette::Text, Qt::white);
+        pal.setColor(QPalette::Button, Qt::black);
+        pal.setColor(QPalette::ButtonText, Qt::white);
+        pal.setColor(QPalette::BrightText, Qt::white);
+        pal.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
+        pal.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGray);
+        pal.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
+        pal.setColor(QPalette::Highlight, Qt::lightGray);
+        pal.setColor(QPalette::HighlightedText, Qt::black);
+        pal.setColor(QPalette::ToolTipBase, Qt::black);
+        pal.setColor(QPalette::ToolTipText, Qt::white);
+        pal.setColor(QPalette::Link, Qt::cyan);
+        QApplication::setPalette(pal); // Qt docs say do this after setting the style.
+    }
+
     QApplication a(argc, argv);
     a.setApplicationVersion(VERSION);
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
@@ -94,29 +118,6 @@ int main(int argc, char *argv[])
     if (parser.positionalArguments().size() > 1) {
         qDebug() << QObject::tr("Too many arguments. Please check the command format by running the program with --help");
         return EXIT_FAILURE;
-    }
-
-    // The default style in the OOBE environment is hideous and unusable.
-    if (parser.isSet("oobe")) {
-        a.setStyle("windows");
-        QPalette pal;
-        pal.setColor(QPalette::Window, Qt::black);
-        pal.setColor(QPalette::WindowText, Qt::white);
-        pal.setColor(QPalette::Base, Qt::black);
-        pal.setColor(QPalette::AlternateBase, Qt::black);
-        pal.setColor(QPalette::Text, Qt::white);
-        pal.setColor(QPalette::Button, Qt::black);
-        pal.setColor(QPalette::ButtonText, Qt::white);
-        pal.setColor(QPalette::BrightText, Qt::white);
-        pal.setColor(QPalette::Disabled, QPalette::Text, Qt::darkGray);
-        pal.setColor(QPalette::Disabled, QPalette::WindowText, Qt::darkGray);
-        pal.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::darkGray);
-        pal.setColor(QPalette::Highlight, Qt::lightGray);
-        pal.setColor(QPalette::HighlightedText, Qt::black);
-        pal.setColor(QPalette::ToolTipBase, Qt::black);
-        pal.setColor(QPalette::ToolTipText, Qt::white);
-        pal.setColor(QPalette::Link, Qt::cyan);
-        a.setPalette(pal);
     }
 
     QSettings appConf("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);

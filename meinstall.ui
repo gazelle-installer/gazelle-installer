@@ -698,8 +698,8 @@ QSlider::handle:horizontal:disabled {
                  <string>Show Grid</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="show-grid">
-                  <normaloff>.</normaloff>.</iconset>
+                 <iconset resource="images.qrc">
+                  <normaloff>:/show-grid</normaloff>:/show-grid</iconset>
                 </property>
                 <property name="shortcut">
                  <string>Ctrl+G</string>
