@@ -134,7 +134,7 @@ bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead
     if (checkHalt()) return false;
     ++execount;
     qDebug().nospace().noquote() << "Bash #" << execount << ": " << cmd;
-    return exec("/bin/bash", {"-c", cmd}, input, needRead, log(cmd, Exec));
+    return exec("/usr/bin/bash", {"-c", cmd}, input, needRead, log(cmd, Exec));
 }
 
 QString MProcess::readOut(bool everything) noexcept

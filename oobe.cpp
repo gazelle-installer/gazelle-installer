@@ -85,20 +85,20 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings 
     else timeAreaIndexChanged(ixLocale);
 
     if (online) {
-        containsSystemD = QFileInfo("/usr/bin/systemctl").isExecutable();
+        containsSystemD = QFileInfo("/usr/usr/bin/systemctl").isExecutable();
         if (QFile::exists("/etc/service") && QFile::exists("/lib/runit/runit-init")) {
             containsRunit = true;
         }
         gui.checkSaveDesktop->hide();
     } else {
-        containsSystemD = QFileInfo("/live/aufs/bin/systemctl").isExecutable();
+        containsSystemD = QFileInfo("/live/aufs/usr/bin/systemctl").isExecutable();
         if (QFile::exists("/live/aufs/etc/service") && QFile::exists("/live/aufs/sbin/runit")) {
             containsRunit = true;
         }
         // Detect snapshot-backup account(s)
         // test if there's another user other than demo in /home,
         // indicating a possible snapshot or complicated live-usb
-        haveSnapshotUserAccounts = proc.shell("/bin/ls -1 /home"
+        haveSnapshotUserAccounts = proc.shell("ls -1 /home"
             " | grep -Ev '^(lost\\+found|demo|snapshot)$' | grep -q '[a-zA-Z0-9]'");
         qDebug() << "check for possible snapshot:" << haveSnapshotUserAccounts;
     }
@@ -367,7 +367,7 @@ void Oobe::setComputerName()
     if (!online) proc.shell(cmd + "/mnt/antiX/etc/hosts");
     else {
         proc.shell(cmd + "/tmp/hosts");
-        proc.shell("/bin/mv -f /tmp/hosts " + etcpath);
+        proc.shell("mv -f /tmp/hosts " + etcpath);
     }
     proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/hostname");
     proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/mailname");
@@ -404,9 +404,9 @@ void Oobe::setLocale()
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
     //replace with link
     if (!online) {
-        proc.exec("/bin/ln", {"-nfs", "/usr/share/zoneinfo/" + selTimeZone, "/mnt/antiX/etc/localtime"});
+        proc.exec("ln", {"-nfs", "/usr/share/zoneinfo/" + selTimeZone, "/mnt/antiX/etc/localtime"});
     }
-    proc.exec("/bin/ln", {"-nfs", "/usr/share/zoneinfo/" + selTimeZone, "/etc/localtime"});
+    proc.exec("ln", {"-nfs", "/usr/share/zoneinfo/" + selTimeZone, "/etc/localtime"});
     // /etc/timezone is text file with the timezone written in it. Write the user-selected timezone in it now.
     if (!online) proc.shell("echo " + selTimeZone + " > /mnt/antiX/etc/timezone");
     proc.shell("echo " + selTimeZone + " > /etc/timezone");
@@ -419,8 +419,8 @@ void Oobe::setLocale()
     }
     proc.exec("hwclock", {"--hctosys"});
     if (!online) {
-        proc.exec("/bin/cp", {"-f", "/etc/adjtime", "/mnt/antiX/etc/"});
-        proc.exec("/bin/cp", {"-f", "/etc/default/rcS", "/mnt/antiX/etc/default"});
+        proc.exec("cp", {"-f", "/etc/adjtime", "/mnt/antiX/etc/"});
+        proc.exec("cp", {"-f", "/etc/default/rcS", "/mnt/antiX/etc/default"});
     }
 
     // Set clock format
@@ -547,17 +547,17 @@ void Oobe::setUserInfo()
             QStringList cargs({"-f", dpath, dpath});
             for (int ixi = 1; ixi < 10 && !ok; ++ixi) {
                 cargs.last() = dpath + ".00" + QString::number(ixi);
-                ok = proc.exec("/bin/mv", cargs);
+                ok = proc.exec("mv", cargs);
             }
             if (!ok) {
                 throw QT_TR_NOOP("Failed to save old home directory.");
             }
         } else if (gui.radioOldHomeDelete->isChecked()) {
-            if (!proc.exec("/bin/rm", {"-rf", dpath})) {
+            if (!proc.exec("rm", {"-rf", dpath})) {
                 throw QT_TR_NOOP("Failed to delete old home directory.");
             }
         }
-        proc.exec("/bin/sync"); // The sync(2) system call will block the GUI.
+        proc.exec("sync"); // The sync(2) system call will block the GUI.
     }
 
     // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
@@ -565,20 +565,20 @@ void Oobe::setUserInfo()
     qDebug() << "check for remastered home demo folder:" << remasteredDemo;
 
     if (QFileInfo::exists(dpath.toUtf8())) { // Still exists.
-        proc.exec("/bin/cp", {"-n", skelpath + "/.bash_profile", dpath});
-        proc.exec("/bin/cp", {"-n", skelpath + "/.bashrc", dpath});
-        proc.exec("/bin/cp", {"-n", skelpath + "/.gtkrc", dpath});
-        proc.exec("/bin/cp", {"-n", skelpath + "/.gtkrc-2.0", dpath});
-        proc.exec("/bin/cp", {"-Rn", skelpath + "/.config", dpath});
-        proc.exec("/bin/cp", {"-Rn", skelpath + "/.local", dpath});
+        proc.exec("cp", {"-n", skelpath + "/.bash_profile", dpath});
+        proc.exec("cp", {"-n", skelpath + "/.bashrc", dpath});
+        proc.exec("cp", {"-n", skelpath + "/.gtkrc", dpath});
+        proc.exec("cp", {"-n", skelpath + "/.gtkrc-2.0", dpath});
+        proc.exec("cp", {"-Rn", skelpath + "/.config", dpath});
+        proc.exec("cp", {"-Rn", skelpath + "/.local", dpath});
     } else { // dir does not exist, must create it
         // Copy skel to demo, unless demo folder exists in remastered linuxfs.
         if (!remasteredDemo) {
-            if (!proc.exec("/bin/cp", {"-a", skelpath, dpath})) {
+            if (!proc.exec("cp", {"-a", skelpath, dpath})) {
                 throw QT_TR_NOOP("Sorry, failed to create user directory.");
             }
         } else { // still rename the demo directory even if remastered demo home folder is detected
-            if (!proc.exec("/bin/mv", {"-f", rootpath + "/home/demo", dpath})) {
+            if (!proc.exec("mv", {"-f", rootpath + "/home/demo", dpath})) {
                 throw QT_TR_NOOP("Sorry, failed to name user directory.");
             }
         }

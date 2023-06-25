@@ -120,19 +120,19 @@ bool Base::saveHomeBasic() noexcept
     const QString &homedev = mntit->mappedDevice();
 
     // Just in case the device or mount point is in use elsewhere.
-    proc.exec("/usr/bin/umount", {"-q", homedev});
-    proc.exec("/usr/bin/umount", {"-q", "/mnt/antiX"});
+    proc.exec("umount", {"-q", homedev});
+    proc.exec("umount", {"-q", "/mnt/antiX"});
 
     // Store a listing of /home to compare with the user name given later.
     mkdir("/mnt/antiX", 0755);
     QString opts = "ro";
     if (mntit->type == DeviceItem::Subvolume) opts += ",subvol="+mntit->curLabel;
-    bool ok = proc.exec("/bin/mount", {"-o", opts, homedev, "/mnt/antiX"});
+    bool ok = proc.exec("mount", {"-o", opts, homedev, "/mnt/antiX"});
     if (ok) {
         QDir hd("/mnt/antiX" + homedir);
         ok = hd.exists() && hd.isReadable();
         homes = hd.entryList(QDir::Dirs);
-        proc.exec("/usr/bin/umount", {"-l", "/mnt/antiX"});
+        proc.exec("umount", {"-l", "/mnt/antiX"});
     }
     return ok;
 }
@@ -185,33 +185,33 @@ void Base::install()
 
     //remove home unless a demo home is found in remastered linuxfs
     if (!QFileInfo("/live/linux/home/demo").isDir())
-        proc.exec("/bin/rm", {"-rf", "/mnt/antiX/home/demo"});
+        proc.exec("rm", {"-rf", "/mnt/antiX/home/demo"});
 
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
-    proc.exec("/bin/mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
+    proc.exec("mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
     proc.setChRoot("/mnt/antiX");
     proc.exec("rm", {"/var/lib/dbus/machine-id", "/etc/machine-id"});
     proc.exec("dbus-uuidgen", {"--ensure=/etc/machine-id"});
     proc.exec("dbus-uuidgen", {"--ensure"});
     proc.setChRoot();
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
+    proc.exec("umount", {"-R", "/mnt/antiX/dev"});
 
     // Disable VirtualBox Guest Additions if not running in VirtualBox.
     if(!proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'")) {
-        proc.shell("/bin/mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-        proc.shell("/bin/mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-        proc.shell("/bin/mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-        proc.shell("/bin/mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
-        proc.shell("/bin/mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
+        proc.shell("mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        proc.shell("mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        proc.shell("mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        proc.shell("mv -f /mnt/antiX/etc/rc2.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc2.d/K01virtualbox-guest-utils >/dev/null 2>&1");
+        proc.shell("mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
     }
 
     partman.installTabs();
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     if (populateMediaMounts) {
-        proc.shell("/sbin/make-fstab -O --install=/mnt/antiX --mntpnt=/media");
+        proc.shell("make-fstab -O --install=/mnt/antiX --mntpnt=/media");
     } else {
         // Otherwise, clean /media folder - modification to preserve points that are still mounted.
-        proc.shell("/bin/rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*");
+        proc.shell("rmdir --ignore-fail-on-non-empty /mnt/antiX/media/sd*");
     }
 }
 
@@ -224,7 +224,7 @@ void Base::copyLinux(bool skiphome)
     // must copy boot even if saving, the new files are required
     // media is already ok, usr will be done next, home will be done later
     // setup and start the process
-    QString prog = "/bin/cp";
+    QString prog = "cp";
     QStringList args("-av");
     if (sync) {
         prog = "rsync";

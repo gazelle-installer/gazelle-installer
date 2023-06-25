@@ -79,7 +79,7 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     connect(gui.pushGrid, &QToolButton::toggled, gui.treePartitions, &MTreeView::setGrid);
 
     // Hide encryption options if cryptsetup not present.
-    QFileInfo cryptsetup("/sbin/cryptsetup");
+    QFileInfo cryptsetup("/usr/sbin/cryptsetup");
     QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
     if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
         gui.boxEncryptAuto->hide();
@@ -590,7 +590,7 @@ void PartMan::partManRunClick()
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     gui.boxMain->setEnabled(false);
     if (QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted");
-    else proc.exec("/usr/bin/partitionmanager");
+    else proc.exec("partitionmanager");
     scan();
     gui.boxMain->setEnabled(true);
     QGuiApplication::restoreOverrideCursor();
@@ -1062,7 +1062,7 @@ void PartMan::preparePartitions()
     const QStringList swaps = proc.readOutLines();
     for (const QString &devpath : qAsConst(listToUnmount)) {
         if (swaps.contains(devpath)) proc.shell("grep -q " + devpath + " /proc/swaps && swapoff " + devpath);
-        else proc.exec("/usr/bin/umount", {"-q", devpath});
+        else proc.exec("umount", {"-q", devpath});
     }
 
     // Prepare partition tables on devices which will have a new layout.
@@ -1094,8 +1094,8 @@ void PartMan::preparePartitions()
         if (drvit->flags.oldLayout) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
-            if (useGPT) cmd = "/sbin/sgdisk /dev/%1 --typecode=%2:%3";
-            else cmd = "/sbin/sfdisk /dev/%1 --part-type %2 %3";
+            if (useGPT) cmd = "sgdisk /dev/%1 --typecode=%2:%3";
+            else cmd = "sfdisk /dev/%1 --part-type %2 %3";
             // Set the type for partitions that will be used in this installation.
             for (int ixdev = 0; ixdev < devCount; ++ixdev) {
                 DeviceItem *twit = drvit->child(ixdev);
@@ -1178,14 +1178,14 @@ void PartMan::formatPartitions()
         } else if (useFor == "SWAP") {
             QStringList cargs(dev);
             if (!twit->label.isEmpty()) cargs << "-L" << twit->label;
-            if (!proc.exec("/sbin/mkswap", cargs)) throw msgfail;
+            if (!proc.exec("mkswap", cargs)) throw msgfail;
         } else {
             // Transplanted from minstall.cpp and modified to suit.
             const QString &format = twit->format;
             QStringList cargs;
             if (format == "btrfs") {
                 cargs.append("-f");
-                proc.exec("/bin/cp", {"-fp", "/bin/true", "/sbin/fsck.auto"});
+                proc.exec("cp", {"-fp", "/usr/bin/true", "/usr/sbin/fsck.auto"});
                 if (twit->size < 6000000000) {
                     cargs << "-M" << "-O" << "skinny-metadata"; // Mixed mode (-M)
                 }
@@ -1204,7 +1204,7 @@ void PartMan::formatPartitions()
             }
             if (!proc.exec("mkfs." + format, cargs)) throw msgfail;
             if (format.startsWith("ext")) {
-                proc.exec("/sbin/tune2fs", {"-c0", "-C0", "-i1m", dev}); // ext4 tuning
+                proc.exec("tune2fs", {"-c0", "-C0", "-i1m", dev}); // ext4 tuning
             }
         }
     }
@@ -1412,7 +1412,7 @@ void PartMan::mountPartitions()
         if (!opts.contains("async")) opts.append("async");
         if (!opts.contains("noiversion")) opts.append("noiversion");
         if (!opts.contains("noatime")) opts.append("noatime");
-        proc.exec("/bin/mount", {"--mkdir", "-o", opts.join(','), dev, point});
+        proc.exec("mount", {"--mkdir", "-o", opts.join(','), dev, point});
     }
     proc.setExceptionMode(nullptr);
 }
@@ -1428,7 +1428,7 @@ void PartMan::unmount()
         if (mit.key().startsWith("SWAP")) {
             proc.shell("grep -q " + twit->mappedDevice() + " /proc/swaps &&  swapoff " + twit->mappedDevice());
         } else if (mit.key().at(0) == '/') {
-            proc.exec("/bin/umount", {"-l", "/mnt/antiX" + mit.key()});
+            proc.exec("umount", {"-l", "/mnt/antiX" + mit.key()});
         }
     }
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {

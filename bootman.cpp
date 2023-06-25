@@ -103,27 +103,27 @@ void BootMan::install()
     proc.advance(4, 4);
 
     // the old initrd is not valid for this hardware
-    proc.shell("/bin/ls /mnt/antiX/boot | grep 'initrd.img-3.6'", nullptr, true);
+    proc.shell("ls /mnt/antiX/boot | grep 'initrd.img-3.6'", nullptr, true);
     const QString &val = proc.readOut();
-    if (!val.isEmpty()) proc.exec("/bin/rm", {"-f", "/mnt/antiX/boot/" + val});
+    if (!val.isEmpty()) proc.exec("rm", {"-f", "/mnt/antiX/boot/" + val});
 
     bool efivars_ismounted = false;
     if (gui.boxBoot->isChecked() && gui.radioBootESP->isChecked()) {
         QString efivars = QStringLiteral("/sys/firmware/efi/efivars");
         if (QFileInfo(efivars).isDir()) {
-            efivars_ismounted = proc.exec("/bin/mountpoint", {"-q", efivars});
+            efivars_ismounted = proc.exec("mountpoint", {"-q", efivars});
         }
-        if (!efivars_ismounted) proc.exec("/bin/mount", {"-t", "efivarfs", "efivarfs", efivars});
+        if (!efivars_ismounted) proc.exec("mount", {"-t", "efivarfs", "efivarfs", efivars});
     }
 
     if (gui.radioBootESP->isChecked()) mkdir("/mnt/antiX/boot/efi", 0755);
 
     // set mounts for chroot
-    proc.exec("/bin/mount", {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
-    proc.exec("/bin/mount", {"--mkdir", "--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
-    proc.exec("/bin/mount", {"--mkdir", "--rbind", "/proc", "/mnt/antiX/proc"});
-    proc.exec("/bin/mount", {"-t", "tmpfs", "--mkdir", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
-    proc.exec("/bin/mount", {"--mkdir", "--rbind", "/run/udev", "/mnt/antiX/run/udev"});
+    proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
+    proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
+    proc.exec("mount", {"--mkdir", "--rbind", "/proc", "/mnt/antiX/proc"});
+    proc.exec("mount", {"-t", "tmpfs", "--mkdir", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
+    proc.exec("mount", {"--mkdir", "--rbind", "/run/udev", "/mnt/antiX/run/udev"});
 
     // Trap exceptions here, and re-throw them once the local cleanup is done.
     const char *failed = nullptr;
@@ -133,12 +133,12 @@ void BootMan::install()
         failed = msg;
     }
 
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/run"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/proc"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/sys"});
-    proc.exec("/bin/umount", {"-R", "/mnt/antiX/dev"});
+    proc.exec("umount", {"-R", "/mnt/antiX/run"});
+    proc.exec("umount", {"-R", "/mnt/antiX/proc"});
+    proc.exec("umount", {"-R", "/mnt/antiX/sys"});
+    proc.exec("umount", {"-R", "/mnt/antiX/dev"});
     if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
-        proc.exec("/bin/umount", {"/mnt/antiX/boot/efi"});
+        proc.exec("umount", {"/mnt/antiX/boot/efi"});
     }
     if (failed) throw failed;
 }
@@ -157,7 +157,7 @@ void BootMan::installMain(bool efivars_ismounted)
             proc.exec("grub-install", {"--target=i386-pc", "--recheck",
                 "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", boot});
         } else {
-            proc.exec("/bin/mount", {boot, "/mnt/antiX/boot/efi"});
+            proc.exec("mount", {boot, "/mnt/antiX/boot/efi"});
             // rename arch to match grub-install target
             proc.exec("cat", {"/sys/firmware/efi/fw_platform_size"}, nullptr, true);
             arch = proc.readOut();
@@ -166,10 +166,10 @@ void BootMan::installMain(bool efivars_ismounted)
             if (efivars_ismounted) {
                 // remove any efivars-dump-entries in NVRAM
                 proc.setExceptionMode(nullptr);
-                proc.shell("/bin/ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
+                proc.shell("ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
                 const QString &dump = proc.readOut();
                 proc.setExceptionMode(failGrub);
-                if (!dump.isEmpty()) proc.shell("/bin/rm /sys/firmware/efi/efivars/dump*", nullptr, true);
+                if (!dump.isEmpty()) proc.shell("rm /sys/firmware/efi/efivars/dump*", nullptr, true);
             }
 
             proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
@@ -247,7 +247,7 @@ void BootMan::installMain(bool efivars_ismounted)
                 mtest = mtest_dev;
             }
             if (!mtest.isNull()) {
-                proc.exec("/bin/cp", {mtest, "/mnt/antiX/boot/uefi-mt"});
+                proc.exec("cp", {mtest, "/mnt/antiX/boot/uefi-mt"});
             }
         }
         proc.status();
