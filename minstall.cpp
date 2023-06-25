@@ -223,9 +223,6 @@ void MInstall::startup()
         "%1 uses some components from MEPIS Linux which are released under an Apache free license."
         " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
     gotoPage(Step::Terms);
-
-    // automatic installation
-    if (automatic) pushNext->click();
 }
 
 void MInstall::splashSetThrobber(bool active) noexcept
@@ -923,7 +920,7 @@ void MInstall::gotoPage(int next) noexcept
     // automatic installation
     if (automatic) {
         if (!MSettings::isBadWidget(widgetStack->currentWidget()) && next > curr) {
-            pushNext->click();
+            QTimer::singleShot(0, pushNext, &QPushButton::click);
         } else if (curr!=0) { // failed validation
             automatic = false;
         }
