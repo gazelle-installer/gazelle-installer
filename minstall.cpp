@@ -509,7 +509,6 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         config->sync();
         QFile::remove("/etc/minstalled.conf");
         QFile::copy(config->fileName(), "/etc/minstalled.conf");
-        config->dumpDebug();
     }
 
     if (config->bad) {
@@ -1067,6 +1066,8 @@ void MInstall::cleanup(bool endclean)
     if (pretend) return;
 
     if (endclean) {
+        if (config) config->dumpDebug();
+        else qDebug() << "NO CONFIG";
         proc.exec("cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
         proc.exec("rm", {"-rf", "/mnt/antiX/mnt/antiX"});
     }
