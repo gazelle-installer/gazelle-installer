@@ -25,6 +25,7 @@
 class MProcess : public QProcess
 {
     Q_OBJECT
+    friend class ExceptionInfo;
     int execount = 0;
     int sleepcount = 0;
     enum HaltMode { NoHalt, ThrowHalt, Halted } halting = NoHalt;
@@ -33,7 +34,6 @@ class MProcess : public QProcess
     class QProgressBar *progBar = nullptr;
     int progSliceStart = 0, progSliceSpace = 0;
     long progSlicePos = 0, progSliceSteps = 0;
-    const char *exceptionInfo = nullptr;
     // System detection results
     QString testArch;
     int testEFI = -1;
@@ -72,7 +72,6 @@ public:
     void status(const QString &text, long progress = -1) noexcept;
     void status(long progress = -1) noexcept;
     void advance(int space, long steps) noexcept;
-    void setExceptionMode(const char *failInfo) noexcept;
     // Common functions that are traditionally carried out by processes.
     void sleep(const int msec, const bool silent = false) noexcept;
     bool mkpath(const QString &path, mode_t mode = 0, bool force = false);
@@ -80,6 +79,25 @@ public:
     const QString &detectArch();
     int detectEFI(bool noTest = false);
     bool detectMac();
+
+    // Exception on execution errors
+    class ExceptionMode {
+        friend class MProcess;
+        class MProcess &proc;
+        class ExceptionMode *oldmode;
+        const char *failmsg = nullptr;
+    public:
+        ExceptionMode(class MProcess &mproc, const char *message) noexcept
+            : proc(mproc), oldmode(mproc.exmode), failmsg(message) { proc.exmode = this; }
+        ~ExceptionMode() { proc.exmode = oldmode; }
+        ExceptionMode(const ExceptionMode &) = delete;
+        ExceptionMode &operator=(const ExceptionMode &) = delete;
+        inline const char *message() noexcept { return failmsg; }
+        inline void setMessage(const char *message) { failmsg = message; }
+        inline void end() { proc.exmode = oldmode; }
+    };
+private:
+    class ExceptionMode *exmode = nullptr;
 };
 
 #endif // MPROCESS_H

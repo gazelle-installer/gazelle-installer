@@ -420,7 +420,6 @@ bool MInstall::processNextPhase() noexcept
             msg = QT_TR_NOOP("The installation was aborted.");
         }
         proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::Fail);
-        proc.setExceptionMode(nullptr);
 
         const bool closing = (abortion == Closing);
         labelSplash->setText(tr(msg));

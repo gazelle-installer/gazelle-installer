@@ -61,16 +61,14 @@ void SwapMan::setupDefaults() noexcept
 void SwapMan::install()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
-    if (proc.halted()) return;
     proc.advance(1, 2);
     const int size = gui.spinSwapSize->value();
     if (!gui.boxSwap->isChecked() || size <= 0) return;
-    static const char *const msgfail = QT_TR_NOOP("Failed to create or install swap file.");
-    proc.setExceptionMode(msgfail);
+    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("Failed to create or install swap file."));
     const QString &swapfile = QDir::cleanPath(gui.textSwapFile->text().trimmed());
     const QString &instpath = "/mnt/antiX" + swapfile;
     const DeviceItem *devit = partman.findHostDev(swapfile);
-    if (!devit) throw msgfail;
+    if (!devit) throw exmode.message();
 
     proc.status(tr("Creating swap file"));
     // Create a blank swap file.
@@ -87,7 +85,7 @@ void SwapMan::install()
     proc.status(tr("Configuring swap file"));
     // Append the fstab with the swap file entry.
     QFile file("/mnt/antiX/etc/fstab");
-    if (!file.open(QIODevice::Append | QIODevice::WriteOnly)) throw msgfail;
+    if (!file.open(QIODevice::Append | QIODevice::WriteOnly)) throw exmode.message();
     file.write(swapfile.toUtf8());
     file.write(" swap swap defaults 0 0\n");
     file.close();
@@ -105,8 +103,6 @@ void SwapMan::install()
         grubDefault += " resume=UUID=" + devit->uuid + " resume_offset=" + offset;
         grubSettings.setValue("GRUB_CMDLINE_LINUX_DEFAULT", grubDefault);
     }
-
-    proc.setExceptionMode(nullptr);
 }
 
 long long SwapMan::recommended(bool hibernation) noexcept

@@ -53,7 +53,8 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     PartMan::VolumeSpec &vspecBoot = partman.volSpecs["/boot"];
     PartMan::VolumeSpec &vspecHome = partman.volSpecs["/home"];
 
-    if (!pretend) proc.setExceptionMode(QT_TR_NOOP("Cannot access installation media."));
+    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("Cannot access installation media."));
+    if (pretend) exmode.end();
 
     // Boot space required.
     proc.exec("du", {"-scb", bootSource}, nullptr, true);
@@ -103,12 +104,11 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     vspecHome.minimum = 64*MB; // TODO: Set minimum home dynamically.
     vspecHome.preferred = vspecHome.minimum + bufferHome;
     qDebug() << "Minimum space:" << vspecBoot.image << "(boot)," << vspecRoot.image << "(root)";
-    proc.setExceptionMode(nullptr);
 }
 
 bool Base::saveHomeBasic() noexcept
 {
-    proc.setExceptionMode(nullptr);
+    MProcess::ExceptionMode exmode(proc, nullptr);
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
     QString homedir("/");
     const DeviceItem *mntit = partman.mounts.value("/home");
