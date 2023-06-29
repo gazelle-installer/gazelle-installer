@@ -488,7 +488,6 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
                 textCryptoPassCust->setText(epass);
                 textCryptoPassCust2->setText(epass);
             }
-            partman->loadKeyMaterial(config->value("KeyMaterial").toString());
         }
         config->endGroup();
     }

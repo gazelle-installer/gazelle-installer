@@ -27,7 +27,6 @@
 #include <QStack>
 
 #include "ui_meinstall.h"
-#include "safecache.h"
 
 #define KB 1024LL
 #define MB 1048576LL
@@ -162,14 +161,13 @@ class PartMan : public QAbstractItemModel
     DeviceItem root;
     DeviceItem *changing = nullptr;
     Ui::MeInstall &gui;
-    SafeCache key;
     bool brave, gptoverride;
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit() noexcept;
     void preparePartitions();
     void formatPartitions();
     void prepareSubvolumes(DeviceItem *partit);
-    bool fixCryptoSetup();
+    void fixCryptoSetup();
     bool makeFstab();
     void mountPartitions();
     void treeItemChange() noexcept;
@@ -222,7 +220,6 @@ public:
     int countPrepSteps() noexcept;
     void prepStorage();
     void installTabs();
-    void loadKeyMaterial(const QString &keyfile);
     void unmount();
     int swapCount() const noexcept;
     int isEncrypt(const QString &point) const noexcept;

@@ -1,5 +1,5 @@
 /***************************************************************************
- * SafeCache Class - for temporarily caching sensitive files
+ * A managed buffer for sensitive information.
  *
  *   Copyright (C) 2019 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,17 +19,19 @@
 #ifndef SAFECACHE_H
 #define SAFECACHE_H
 
-#include <sys/stat.h>
-#include <QByteArray>
+#include <cstddef>
+#include <sys/types.h>
 
-class SafeCache : public QByteArray
+class SafeCache
 {
+    void *buf = nullptr;
+    size_t bufsize = 0;
 public:
-    SafeCache() noexcept;
+    SafeCache(size_t nbytes);
     ~SafeCache();
-    bool load(const char *filename, int length) noexcept;
-    bool save(const char *filename, mode_t mode = 0400) noexcept;
-    void erase() noexcept;
+    inline void *buffer() noexcept { return buf; }
+    inline size_t size() noexcept { return bufsize; }
+    bool save(const char *filename, mode_t mode, bool generate) noexcept;
 };
 
 #endif // SAFECACHE_H
