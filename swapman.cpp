@@ -19,6 +19,7 @@
 
 #include <math.h>
 #include <sys/sysinfo.h>
+#include <sys/stat.h>
 #include <QFileInfo>
 #include <QDir>
 #include "mprocess.h"
@@ -66,36 +67,36 @@ void SwapMan::install()
     if (!gui.boxSwap->isChecked() || size <= 0) return;
     static const char *const msgfail = QT_TR_NOOP("Failed to create or install swap file.");
     proc.setExceptionMode(msgfail);
-    const QString &instpath = QDir::cleanPath(gui.textSwapFile->text().trimmed());
-    const QString &realpath = "/mnt/antiX" + instpath;
-    const DeviceItem *devit = partman.findHostDev(instpath);
+    const QString &swapfile = QDir::cleanPath(gui.textSwapFile->text().trimmed());
+    const QString &instpath = "/mnt/antiX" + swapfile;
+    const DeviceItem *devit = partman.findHostDev(swapfile);
     if (!devit) throw msgfail;
 
     proc.status(tr("Creating swap file"));
     // Create a blank swap file.
-    proc.mkpath(QFileInfo(realpath).path(), 0700, true);
+    proc.mkpath(QFileInfo(instpath).path(), 0700);
     const bool btrfs = (devit->type == DeviceItem::Subvolume || devit->finalFormat() == "btrfs");
     if (btrfs) {
-        proc.exec("truncate", {"--size=0", realpath});
-        proc.exec("chattr", {"+C", realpath});
+        proc.exec("truncate", {"--size=0", instpath});
+        proc.exec("chattr", {"+C", instpath});
     }
-    proc.exec("fallocate", {"-l", QStringLiteral("%1M").arg(size), realpath});
-    chmod(realpath.toUtf8().constData(), 0600);
-    proc.exec("mkswap", {realpath});
+    proc.exec("fallocate", {"-l", QStringLiteral("%1M").arg(size), instpath});
+    chmod(instpath.toUtf8().constData(), 0600);
+    proc.exec("mkswap", {instpath});
 
     proc.status(tr("Configuring swap file"));
     // Append the fstab with the swap file entry.
     QFile file("/mnt/antiX/etc/fstab");
     if (!file.open(QIODevice::Append | QIODevice::WriteOnly)) throw msgfail;
-    file.write(instpath.toUtf8());
+    file.write(swapfile.toUtf8());
     file.write(" swap swap defaults 0 0\n");
     file.close();
     // Hibernation.
     if (gui.checkHibernation->isChecked()) {
         if (btrfs) {
-            proc.exec("btrfs", {"inspect-internal", "map-swapfile", "-r", realpath}, nullptr, true);
+            proc.exec("btrfs", {"inspect-internal", "map-swapfile", "-r", instpath}, nullptr, true);
         } else {
-            proc.shell("filefrag -v " + realpath + " | awk 'NR==4 {print $4}' | tr -d .", nullptr, true);
+            proc.shell("filefrag -v " + instpath + " | awk 'NR==4 {print $4}' | tr -d .", nullptr, true);
         }
         QString offset = proc.readAll().trimmed();
 
@@ -127,7 +128,7 @@ void SwapMan::swapFileEdited(const QString &text) noexcept
     int max = 0;
     if (!devit) gui.labelSwapMax->setText(tr("Invalid location"));
     else {
-        max = (int)((devit->size - partman.volSpecTotal("/").minimum) / MB);
+        max = (int)((devit->size - partman.volSpecTotal(devit->usefor).minimum) / MB);
         gui.labelSwapMax->setText(tr("Maximum: %1 MB").arg(max));
     }
     gui.spinSwapSize->setMaximum(max);
