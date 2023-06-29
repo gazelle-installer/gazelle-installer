@@ -1,5 +1,5 @@
 /***************************************************************************
- * SafeCache Class - for temporarily caching sensitive files
+ * A managed buffer for sensitive information.
  *
  *   Copyright (C) 2019 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,70 +17,38 @@
  * This file is part of the gazelle-installer.
  ***************************************************************************/
 
+#include <new>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/random.h>
 #include "safecache.h"
 
-SafeCache::SafeCache() noexcept
+SafeCache::SafeCache(size_t nbytes)
 {
-    reserve(16384);
+    const size_t pagesize = sysconf(_SC_PAGESIZE);
+    bufsize = pagesize * (1 + ((nbytes-1)/pagesize)); // Integer multiple of pagesize.
+    buf = aligned_alloc(pagesize, bufsize);
+    if (!buf) throw std::bad_alloc();
+    if (mlock2(buf, bufsize, MLOCK_ONFAULT) != 0) throw std::bad_alloc();
 }
-
 SafeCache::~SafeCache()
 {
-    erase();
+    getrandom(buf, bufsize, 0);
+    explicit_bzero(buf, bufsize);
+    munlock(buf, bufsize);
+    free(buf);
 }
 
-// to completely free the key use parameters nullptr, 0
-bool SafeCache::load(const char *filename, int length) noexcept
+bool SafeCache::save(const char *filename, mode_t mode, bool generate) noexcept
 {
-    bool ok = false;
-    erase();
+    if (generate && getrandom(buf, bufsize, 0) != static_cast<ssize_t>(bufsize)) return false;
 
-    // open and stat the file if specified
-    int fd = open(filename, O_RDONLY);
+    const int fd = open(filename, O_CREAT|O_TRUNC|O_WRONLY|O_DIRECT|O_SYNC, mode);
     if (fd == -1) return false;
-    struct stat statbuf;
-    if (fstat(fd, &statbuf) == 0) {
-        if (statbuf.st_size > 0 && (length < 0 || length > statbuf.st_size)) {
-            if (statbuf.st_size > capacity()) length = capacity();
-            else length = static_cast<int>(statbuf.st_size);
-        }
-    }
-    if (length >= 0) resize(length);
-
-    // read the the file (if specified) into the buffer
-    length = size();
-    int remain = length;
-    while (remain > 0) {
-        ssize_t chunk = read(fd, data() + (length - remain), static_cast<size_t>(remain));
-        if (chunk < 0) goto ending;
-        remain -= chunk;
-        fsync(fd);
-    }
-    ok = true;
-
- ending:
+    const bool ok = (write(fd, buf, bufsize) == static_cast<ssize_t>(bufsize));
     close(fd);
     return ok;
-}
-
-bool SafeCache::save(const char *filename, mode_t mode) noexcept
-{
-    bool ok = false;
-    int fd = open(filename, O_CREAT | O_TRUNC | O_WRONLY, mode);
-    if (fd == -1) return false;
-    if (write(fd, constData(), static_cast<size_t>(size())) == size()) goto ending;
-    if (fchmod(fd, mode) != 0) goto ending;
-    ok = true;
-
- ending:
-    close(fd);
-    return ok;
-}
-
-void SafeCache::erase() noexcept
-{
-    fill(0xAA);
-    fill(0x55);
 }

@@ -41,6 +41,7 @@
 
 #include "mprocess.h"
 #include "msettings.h"
+#include "safecache.h"
 #include "autopart.h"
 #include "partman.h"
 
@@ -1030,9 +1031,7 @@ void PartMan::prepStorage()
 void PartMan::installTabs()
 {
     makeFstab();
-    if (!fixCryptoSetup()) {
-        throw QT_TR_NOOP("Failed to finalize encryption setup.");
-    }
+    fixCryptoSetup();
 }
 
 void PartMan::preparePartitions()
@@ -1249,55 +1248,15 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
     if (errmsg) throw errmsg;
 }
 
-void PartMan::loadKeyMaterial(const QString &keyfile)
-{
-    if (keyfile.isEmpty()) return;
-    key.load(keyfile.toUtf8().constData(), -1);
-    const int keylen = key.length();
-    if (keylen > 0) {
-        proc.log(QStringLiteral("Loaded %1-byte key material: ").arg(keylen) + keyfile);
-    }
-}
-
 // write out crypttab if encrypting for auto-opening
-bool PartMan::fixCryptoSetup()
+void PartMan::fixCryptoSetup()
 {
-    if (proc.halted()) return false;
+    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("Failed to finalize encryption setup."));
 
     const QLineEdit *passedit = gui.radioEntireDisk->isChecked()
         ? gui.textCryptoPass : gui.textCryptoPassCust;
     const QByteArray password(passedit->text().toUtf8());
-    // Write the key file.
-    static const char *const rngfile = "/dev/urandom";
-    const unsigned int keylength = 4096;
-    QString keyfile;
-    bool isNewKey = true;
-    if (isEncrypt("/")) { // if encrypting root
-        isNewKey = (key.length() == 0);
-        keyfile = "/mnt/antiX/root/keyfile";
-        if (isNewKey) key.load(rngfile, keylength);
-        key.save(keyfile.toUtf8().constData(), 0400);
-    } else if (isEncrypt("/home") && isEncrypt(QString())>1) {
-        // if encrypting /home without encrypting root
-        keyfile = "/mnt/antiX/home/.keyfileDONOTdelete";
-        key.load(rngfile, keylength);
-        key.save(keyfile.toUtf8().constData(), 0400);
-        key.erase();
-    }
-    keyfile.remove(0,10); // Eliminate "/mnt/antiX"
 
-    // Find the file system and device which contains the key.
-    QString keyMount('/'); // If no mount point matches, it's in a directory on the root.
-    QString keyDev;
-    const bool noKey = keyfile.isEmpty();
-    if (!noKey) {
-        for (const auto &it : mounts.toStdMap()) {
-            if (keyfile.startsWith(it.first+'/')) keyMount = it.first;
-        }
-        DeviceItem *devit = mounts.value(keyMount);
-        if (devit && devit->type == DeviceItem::Subvolume) devit = devit->parentItem;
-        if (devit) keyDev = devit->device;
-    }
     // Find extra devices
     QMap<QString, DeviceItem *> cryptAdd;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
@@ -1315,18 +1274,30 @@ bool PartMan::fixCryptoSetup()
         }
     }
 
+    // Find the device which will contain the keys. This device must be encrypted.
+    const QString keydir("/etc/volkeys/"); // Leading slash is for this findHostDev() call.
+    DeviceItem *keydev = findHostDev(keydir);
+    proc.mkpath("/mnt/antiX"+keydir, 0500, true); // Always make for "plausible confirmability"
+    if (keydev && !keydev->willEncrypt()) keydev = nullptr;
+
     QFile file("/mnt/antiX/etc/crypttab");
-    if (!file.open(QIODevice::WriteOnly)) return false;
+    if (!file.open(QIODevice::WriteOnly)) throw exmode.message();
     QTextStream out(&file);
     // Add devices to crypttab.
-    for (auto &it : cryptAdd.toStdMap()) {
+    SafeCache keycache(4096);
+    for (const auto &it : cryptAdd.toStdMap()) {
         out << it.second->devMapper << " /dev/disk/by-uuid/" << it.second->uuid;
-        if (noKey || it.first == keyDev) out << " none";
+        if (!keydev || it.first == keydev->device) out << " none";
         else {
-            if (isNewKey) {
-                if (!proc.exec("cryptsetup", {"luksAddKey",
-                    "/dev/"+it.first, "/mnt/antiX"+keyfile}, &password)) return false;
+            const QString &keyfile = keydir + it.second->uuid + ".KEY";
+            // Create a new key if there is no existing usable key.
+            const QByteArray &keydest = "/mnt/antiX" + keyfile.toUtf8();
+            if (it.second->willFormat() || QFileInfo(keydest).size() < 16) {
+                if (!keycache.save(keydest.constData(), 0400, true)) throw exmode.message();
+                proc.exec("cryptsetup", {"luksAddKey", "/dev/"+it.first, keydest}, &password);
             }
+            chmod(keydest.constData(), 0400);
+            // Add the (new or existing) key to crypttab.
             out << ' ' << keyfile;
         }
         out << " luks";
@@ -1335,12 +1306,11 @@ bool PartMan::fixCryptoSetup()
         out << '\n';
     }
     // Update cryptdisks if the key is not in the root file system.
-    if (keyMount != '/') {
-        if (!proc.shell("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\"
-            + keyMount + "\"/' /mnt/antiX/etc/default/cryptdisks")) return false;
+    if (keydev && keydev->realUseFor() != '/') {
+        proc.shell("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\"
+            + keydev->realUseFor() + "\"/' /mnt/antiX/etc/default/cryptdisks");
     }
     file.close();
-    return true;
 }
 
 // create /etc/fstab file
