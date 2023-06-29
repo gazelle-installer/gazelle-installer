@@ -117,7 +117,7 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
 
     log(logEntry, status);
     if (status <= 0) {
-        if (exceptionInfo) throw exceptionInfo;
+        if (exmode) throw exmode->failmsg;
         return false;
     }
     return true;
@@ -260,11 +260,6 @@ void MProcess::advance(int space, long steps) noexcept
     qApp->processEvents();
 }
 
-void MProcess::setExceptionMode(const char *failInfo) noexcept
-{
-    exceptionInfo = failInfo;
-}
-
 // Common functions that are traditionally carried out by processes.
 
 void MProcess::sleep(const int msec, const bool silent) noexcept
@@ -295,7 +290,7 @@ bool MProcess::mkpath(const QString &path, mode_t mode, bool force)
     if (mode && rc) rc = (chmod(path.toUtf8().constData(), mode) == 0);
     qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
     log(logEntry, rc ? 1 : -1);
-    if(!rc && exceptionInfo) throw exceptionInfo;
+    if(!rc && exmode) throw exmode->failmsg;
     return rc;
 }
 

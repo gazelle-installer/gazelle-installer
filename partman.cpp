@@ -1218,7 +1218,7 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
 {
     const int subvolcount = partit->childCount();
     if (subvolcount <= 0) return;
-    proc.setExceptionMode(QT_TR_NOOP("Failed to prepare subvolumes."));
+    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("Failed to prepare subvolumes."));
     proc.status(tr("Preparing subvolumes"));
 
     proc.mkpath("/mnt/btrfs-scratch");
@@ -1247,7 +1247,6 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
     }
     proc.exec("umount", {"/mnt/btrfs-scratch"});
     if (errmsg) throw errmsg;
-    proc.setExceptionMode(nullptr);
 }
 
 void PartMan::loadKeyMaterial(const QString &keyfile)
@@ -1389,7 +1388,7 @@ bool PartMan::makeFstab()
 void PartMan::mountPartitions()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::Section);
-    proc.setExceptionMode(QT_TR_NOOP("Failed to mount partition."));
+    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("Failed to mount partition."));
     for (auto &it : mounts.toStdMap()) {
         if (it.first.at(0) != '/') continue;
         const QString point("/mnt/antiX" + it.first);
@@ -1414,7 +1413,6 @@ void PartMan::mountPartitions()
         if (!opts.contains("noatime")) opts.append("noatime");
         proc.exec("mount", {"--mkdir", "-o", opts.join(','), dev, point});
     }
-    proc.setExceptionMode(nullptr);
 }
 
 void PartMan::unmount()

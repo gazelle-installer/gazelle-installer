@@ -144,11 +144,10 @@ void BootMan::install()
 }
 void BootMan::installMain(bool efivars_ismounted)
 {
+    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("GRUB installation failed. You can"
+        " reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
     if (gui.boxBoot->isChecked()) {
         proc.status(tr("Installing GRUB"));
-        const char *failGrub = QT_TR_NOOP("GRUB installation failed. You can reboot to"
-            " the live medium and use the GRUB Rescue menu to repair the installation.");
-        proc.setExceptionMode(failGrub);
 
         // install new Grub now
         QString arch;
@@ -165,10 +164,10 @@ void BootMan::installMain(bool efivars_ismounted)
 
             if (efivars_ismounted) {
                 // remove any efivars-dump-entries in NVRAM
-                proc.setExceptionMode(nullptr);
+                MProcess::ExceptionMode exmode2(proc, nullptr);
                 proc.shell("ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
                 const QString &dump = proc.readOut();
-                proc.setExceptionMode(failGrub);
+                exmode2.end();
                 if (!dump.isEmpty()) proc.shell("rm /sys/firmware/efi/efivars/dump*", nullptr, true);
             }
 
@@ -271,7 +270,7 @@ void BootMan::installMain(bool efivars_ismounted)
                     }
                 }
             }
-            if (diskpath.isEmpty()) throw failGrub;
+            if (diskpath.isEmpty()) throw exmode.message();
             /* Setup debconf to achieve the objective of silence. */
             diskpath.prepend("grub-pc grub-pc/install_devices multiselect /dev/");
             proc.exec("chroot", {"/mnt/antiX", "debconf-set-selections"}, &diskpath);
@@ -279,7 +278,7 @@ void BootMan::installMain(bool efivars_ismounted)
     }
 
     proc.status(tr("Updating initramfs"));
-    proc.setExceptionMode(QT_TR_NOOP("Failed to update initramfs."));
+    exmode.setMessage(QT_TR_NOOP("Failed to update initramfs."));
     //if useing f2fs, then add modules to /etc/initramfs-tools/modules
     //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
         //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
@@ -291,7 +290,6 @@ void BootMan::installMain(bool efivars_ismounted)
 
     proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
     proc.status();
-    proc.setExceptionMode(nullptr);
 }
 
 /* Slots */
