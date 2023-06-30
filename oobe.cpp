@@ -188,7 +188,8 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
 
 void Oobe::enable()
 {
-    proc.setChRoot("/mnt/antiX");
+    MProcess::Section sect(proc);
+    sect.setRoot("/mnt/antiX");
     QTreeWidgetItemIterator it(gui.treeServices);
     for (; *it; ++it) {
         if ((*it)->parent()) setService((*it)->text(0), false); // Speed up the OOBE boot.
@@ -197,13 +198,13 @@ void Oobe::enable()
     setService("nmbd", false);
     setService("samba-ad-dc", false);
     proc.exec("update-rc.d", {"oobe", "defaults"});
-    proc.setChRoot();
 }
 
 void Oobe::process()
 {
     if (!oem) {
-        if (!online) proc.setChRoot("/mnt/antiX");
+        MProcess::Section sect(proc);
+        if (!online) sect.setRoot("/mnt/antiX");
 
         QTreeWidgetItemIterator it(gui.treeServices);
         for (; *it; ++it) {
@@ -215,7 +216,7 @@ void Oobe::process()
             setService("nmbd", enable);
             setService("samba-ad-dc", enable);
         }
-        proc.setChRoot();
+        sect.setRoot(nullptr);
         setComputerName();
         setLocale();
     }
@@ -292,13 +293,15 @@ void Oobe::stashServices(bool save) noexcept
 void Oobe::setService(const QString &service, bool enabled)
 {
     qDebug() << "Set service:" << service << enabled;
+    MProcess::Section sect(proc);
+    const QString chroot(sect.root());
     if (enabled) {
         proc.exec("update-rc.d", {service, "defaults"});
         if (containsSystemD) proc.exec("systemctl", {"enable", service});
         if (containsRunit) {
-            QFile::remove(proc.chRoot + "/etc/sv/" + service + "/down");
-            if (!QFile::exists(proc.chRoot + "/etc/sv/" + service)) {
-                proc.mkpath(proc.chRoot + "/etc/sv/" + service);
+            QFile::remove(chroot + "/etc/sv/" + service + "/down");
+            if (!QFile::exists(chroot + "/etc/sv/" + service)) {
+                proc.mkpath(chroot + "/etc/sv/" + service);
                 proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
             }
         }
@@ -309,8 +312,8 @@ void Oobe::setService(const QString &service, bool enabled)
             proc.exec("systemctl", {"mask", service});
         }
         if (containsRunit) {
-            if (!QFile::exists(proc.chRoot + "/etc/sv/" + service)) {
-                proc.mkpath(proc.chRoot + "/etc/sv/" + service);
+            if (!QFile::exists(chroot + "/etc/sv/" + service)) {
+                proc.mkpath(chroot + "/etc/sv/" + service);
                 proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
             }
             proc.exec("touch", {"/etc/sv/" + service + "/down"});
@@ -391,7 +394,7 @@ int Oobe::selectTimeZone(const QString &zone) noexcept
 
 void Oobe::setLocale()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
 
     //locale
     qDebug() << "Update locale";
@@ -515,7 +518,8 @@ void Oobe::setUserInfo()
 {
     // set the user passwords first
     bool ok = true;
-    if (!online) proc.setChRoot("/mnt/antiX");
+    MProcess::Section sect(proc);
+    if (!online) sect.setRoot("/mnt/antiX");
     const QString &userPass = gui.textUserPass->text();
     QByteArray userinfo;
     if (!(gui.boxRootAccount->isChecked())) ok = proc.exec("passwd", {"-l", "root"});
@@ -533,7 +537,7 @@ void Oobe::setUserInfo()
     if (!ok) {
         throw QT_TR_NOOP("Failed to set user account passwords.");
     }
-    proc.setChRoot();
+    sect.setRoot(nullptr);
 
     QString rootpath;
     if (!online) rootpath = "/mnt/antiX";

@@ -98,7 +98,7 @@ void BootMan::buildBootLists() noexcept
 // build a grub configuration and install grub
 void BootMan::install()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     if (proc.halted()) return;
     proc.advance(4, 4);
 
@@ -144,7 +144,7 @@ void BootMan::install()
 }
 void BootMan::installMain(bool efivars_ismounted)
 {
-    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("GRUB installation failed. You can"
+    MProcess::Section sect(proc, QT_TR_NOOP("GRUB installation failed. You can"
         " reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
     if (gui.boxBoot->isChecked()) {
         proc.status(tr("Installing GRUB"));
@@ -164,10 +164,10 @@ void BootMan::installMain(bool efivars_ismounted)
 
             if (efivars_ismounted) {
                 // remove any efivars-dump-entries in NVRAM
-                MProcess::ExceptionMode exmode2(proc, nullptr);
+                MProcess::Section sect2(proc, nullptr);
                 proc.shell("ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
                 const QString &dump = proc.readOut();
-                exmode2.end();
+                sect2.end();
                 if (!dump.isEmpty()) proc.shell("rm /sys/firmware/efi/efivars/dump*", nullptr, true);
             }
 
@@ -270,7 +270,7 @@ void BootMan::installMain(bool efivars_ismounted)
                     }
                 }
             }
-            if (diskpath.isEmpty()) throw exmode.message();
+            if (diskpath.isEmpty()) throw sect.failMessage();
             /* Setup debconf to achieve the objective of silence. */
             diskpath.prepend("grub-pc grub-pc/install_devices multiselect /dev/");
             proc.exec("chroot", {"/mnt/antiX", "debconf-set-selections"}, &diskpath);
@@ -278,7 +278,7 @@ void BootMan::installMain(bool efivars_ismounted)
     }
 
     proc.status(tr("Updating initramfs"));
-    exmode.setMessage(QT_TR_NOOP("Failed to update initramfs."));
+    sect.setExceptionMode(QT_TR_NOOP("Failed to update initramfs."));
     //if useing f2fs, then add modules to /etc/initramfs-tools/modules
     //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
         //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
