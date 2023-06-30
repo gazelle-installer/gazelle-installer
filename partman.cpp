@@ -1036,7 +1036,7 @@ void PartMan::installTabs()
 
 void PartMan::preparePartitions()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     static const char *const msgfail = QT_TR_NOOP("Failed to prepare required partitions.");
 
     // Detach all existing partitions.
@@ -1138,7 +1138,7 @@ void PartMan::preparePartitions()
 
 void PartMan::formatPartitions()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
 
     const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
         ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
@@ -1217,7 +1217,7 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
 {
     const int subvolcount = partit->childCount();
     if (subvolcount <= 0) return;
-    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("Failed to prepare subvolumes."));
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to prepare subvolumes."));
     proc.status(tr("Preparing subvolumes"));
 
     proc.mkpath("/mnt/btrfs-scratch");
@@ -1251,7 +1251,7 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
 // write out crypttab if encrypting for auto-opening
 void PartMan::fixCryptoSetup()
 {
-    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("Failed to finalize encryption setup."));
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to finalize encryption setup."));
 
     const QLineEdit *passedit = gui.radioEntireDisk->isChecked()
         ? gui.textCryptoPass : gui.textCryptoPassCust;
@@ -1281,7 +1281,7 @@ void PartMan::fixCryptoSetup()
     if (keydev && !keydev->willEncrypt()) keydev = nullptr;
 
     QFile file("/mnt/antiX/etc/crypttab");
-    if (!file.open(QIODevice::WriteOnly)) throw exmode.message();
+    if (!file.open(QIODevice::WriteOnly)) throw sect.failMessage();
     QTextStream out(&file);
     // Add devices to crypttab.
     SafeCache keycache(4096);
@@ -1293,7 +1293,7 @@ void PartMan::fixCryptoSetup()
             // Create a new key if there is no existing usable key.
             const QByteArray &keydest = "/mnt/antiX" + keyfile.toUtf8();
             if (it.second->willFormat() || QFileInfo(keydest).size() < 16) {
-                if (!keycache.save(keydest.constData(), 0400, true)) throw exmode.message();
+                if (!keycache.save(keydest.constData(), 0400, true)) throw sect.failMessage();
                 proc.exec("cryptsetup", {"luksAddKey", "/dev/"+it.first, keydest}, &password);
             }
             chmod(keydest.constData(), 0400);
@@ -1357,8 +1357,8 @@ bool PartMan::makeFstab()
 
 void PartMan::mountPartitions()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
-    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("Failed to mount partition."));
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to mount partition."));
     for (auto &it : mounts.toStdMap()) {
         if (it.first.at(0) != '/') continue;
         const QString point("/mnt/antiX" + it.first);

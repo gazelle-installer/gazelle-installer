@@ -50,17 +50,12 @@ void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall) noexcept
     listLog->setPalette(pal);
 }
 
-void MProcess::setupChildProcess()
+void MProcess::setupChildProcess() noexcept
 {
-    if (chRoot.isEmpty()) return;
-    chroot(chRoot.toUtf8().constData());
-    chdir("/");
-}
-void MProcess::setChRoot(const QString &newroot) noexcept
-{
-    if (!newroot.isEmpty()) log("Set chroot: " + newroot, Standard);
-    else if (!chRoot.isEmpty() && newroot.isEmpty()) log("End chroot: " + chRoot, Standard);
-    chRoot = newroot;
+    if (section && section->rootdir) {
+        if (chroot(section->rootdir) != 0) exit(255);
+        if (chdir("/") != 0) exit(255);
+    }
 }
 
 inline bool MProcess::checkHalt()
@@ -117,7 +112,7 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
 
     log(logEntry, status);
     if (status <= 0) {
-        if (exmode) throw exmode->failmsg;
+        if (section && section->failmsg) throw section->failmsg;
         return false;
     }
     return true;
@@ -152,7 +147,7 @@ QStringList MProcess::readOutLines() noexcept
 
 void MProcess::halt(bool exception) noexcept
 {
-    log(__PRETTY_FUNCTION__, Section);
+    log(__PRETTY_FUNCTION__, LogFunction);
     halting = exception ? ThrowHalt : Halted;
     if(state() != QProcess::NotRunning) {
         QEventLoop eloop;
@@ -164,7 +159,6 @@ void MProcess::halt(bool exception) noexcept
         QTimer::singleShot(5000, this, &QProcess::kill);
         eloop.exec();
     }
-    setChRoot();
 }
 void MProcess::unhalt() noexcept
 {
@@ -201,10 +195,10 @@ QString MProcess::joinCommand(const QString &program, const QStringList &argumen
 QListWidgetItem *MProcess::log(const QString &text, const LogType type) noexcept
 {
     if (type == Standard) qDebug().noquote() << text;
-    else if (type == Section) qDebug().noquote() << "<<" << text << ">>";
+    else if (type == LogFunction) qDebug().noquote() << "<<" << text << ">>";
     else if (type == Status) qDebug().noquote() << "++" << text << "++";
     else if (type == Fail) qDebug().noquote() << "--" << text << "--";
-    if (!logView || type == Section) return nullptr;
+    if (!logView || type == LogFunction) return nullptr;
     QListWidgetItem *entry = new QListWidgetItem(text, logView);
     logView->addItem(entry);
     if (type == Exec) entry->setForeground(Qt::cyan);
@@ -290,7 +284,7 @@ bool MProcess::mkpath(const QString &path, mode_t mode, bool force)
     if (mode && rc) rc = (chmod(path.toUtf8().constData(), mode) == 0);
     qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
     log(logEntry, rc ? 1 : -1);
-    if(!rc && exmode) throw exmode->failmsg;
+    if(!rc && section && section->failmsg) throw section->failmsg;
     return rc;
 }
 
@@ -330,4 +324,29 @@ bool MProcess::detectMac()
         qDebug() << "Detect Mac:" << rc;
     }
     return rc;
+}
+
+// Local execution environment
+
+MProcess::Section::Section(class MProcess &mproc) noexcept
+    : proc(mproc), oldsection(mproc.section)
+{
+    if (oldsection) {
+        failmsg = oldsection->failmsg;
+        rootdir = oldsection->rootdir;
+    }
+    mproc.section = this;
+}
+void MProcess::Section::end() noexcept
+{
+    const char *oldroot = oldsection ? oldsection->rootdir : nullptr;
+    if (qstrcmp(oldroot, rootdir)) proc.log(QString("Revert root: ")+oldroot, Standard);
+    proc.section = oldsection;
+}
+
+// Note: newroot must be valid and unchanged for the life of the chroot.
+void MProcess::Section::setRoot(const char *newroot) noexcept
+{
+    if (qstrcmp(newroot, rootdir)) proc.log(QString("Change root: ")+newroot, Standard);
+    rootdir = newroot; // Might be different pointers to the same text.
 }

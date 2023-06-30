@@ -43,19 +43,17 @@ class MProcess : public QProcess
         const QByteArray *input, bool needRead, class QListWidgetItem *logEntry);
     bool checkHalt();
 protected:
-    void setupChildProcess() override;
+    void setupChildProcess() noexcept override;
 public:
     enum LogType {
         Standard,
-        Section,
+        LogFunction,
         Status,
         Fail,
         Exec
     };
-    QString chRoot;
     MProcess(QObject *parent = Q_NULLPTR);
     void setupUI(class QListWidget *listLog, class QProgressBar *progInstall) noexcept;
-    void setChRoot(const QString &newroot = QString()) noexcept;
     bool exec(const QString &program, const QStringList &arguments = {},
         const QByteArray *input = nullptr, bool needRead = false);
     bool shell(const QString &cmd, const QByteArray *input = nullptr, bool needRead = false);
@@ -80,24 +78,30 @@ public:
     int detectEFI(bool noTest = false);
     bool detectMac();
 
-    // Exception on execution errors
-    class ExceptionMode {
+    // A section with specific error handling or chroot requirements.
+    // When destroyed, the original process properties are restored.
+    // This is useful where exception handlers have cleanup routines.
+    class Section {
         friend class MProcess;
         class MProcess &proc;
-        class ExceptionMode *oldmode;
+        class Section *oldsection;
         const char *failmsg = nullptr;
+        const char *rootdir = nullptr;
     public:
-        ExceptionMode(class MProcess &mproc, const char *message) noexcept
-            : proc(mproc), oldmode(mproc.exmode), failmsg(message) { proc.exmode = this; }
-        ~ExceptionMode() { proc.exmode = oldmode; }
-        ExceptionMode(const ExceptionMode &) = delete;
-        ExceptionMode &operator=(const ExceptionMode &) = delete;
-        inline const char *message() noexcept { return failmsg; }
-        inline void setMessage(const char *message) { failmsg = message; }
-        inline void end() { proc.exmode = oldmode; }
+        Section(class MProcess &mproc) noexcept;
+        Section(class MProcess &mproc, const char *failmsg) noexcept
+            : Section(mproc) { failmsg = failmsg; }
+        ~Section() { end(); }
+        Section(const Section &) = delete;
+        Section &operator=(const Section &) = delete;
+        inline const char *failMessage() noexcept { return failmsg; }
+        inline void setExceptionMode(const char *message) noexcept { failmsg = message; }
+        void setRoot(const char *newroot) noexcept;
+        inline const char *root() noexcept { return rootdir; }
+        void end() noexcept;
     };
 private:
-    class ExceptionMode *exmode = nullptr;
+    class Section *section = nullptr;
 };
 
 #endif // MPROCESS_H

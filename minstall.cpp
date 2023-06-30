@@ -128,7 +128,7 @@ MInstall::~MInstall() {
 // meant to be run after the installer becomes visible
 void MInstall::startup()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     connect(pushClose, &QPushButton::clicked, this, &MInstall::close);
 
     if (!modeOOBE) {
@@ -248,7 +248,7 @@ void MInstall::splashSetThrobber(bool active) noexcept
 // turn auto-mount off and on
 void MInstall::setupAutoMount(bool enabled)
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
 
     if (autoMountEnabled == enabled) return;
     // check if the systemctl program is present
@@ -1060,7 +1060,7 @@ void MInstall::abortUI(bool manual, bool closing) noexcept
 // run before closing the app, do some cleanup
 void MInstall::cleanup(bool endclean)
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     if (pretend) return;
 
     if (endclean) {

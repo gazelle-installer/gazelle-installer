@@ -53,8 +53,8 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     PartMan::VolumeSpec &vspecBoot = partman.volSpecs["/boot"];
     PartMan::VolumeSpec &vspecHome = partman.volSpecs["/home"];
 
-    MProcess::ExceptionMode exmode(proc, QT_TR_NOOP("Cannot access installation media."));
-    if (pretend) exmode.end();
+    MProcess::Section sect(proc, QT_TR_NOOP("Cannot access installation media."));
+    if (pretend) sect.end();
 
     // Boot space required.
     proc.exec("du", {"-scb", bootSource}, nullptr, true);
@@ -108,8 +108,8 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
 
 bool Base::saveHomeBasic() noexcept
 {
-    MProcess::ExceptionMode exmode(proc, nullptr);
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    MProcess::Section sect(proc, nullptr);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     QString homedir("/");
     const DeviceItem *mntit = partman.mounts.value("/home");
     if (!mntit || mntit->willFormat()) {
@@ -139,23 +139,21 @@ bool Base::saveHomeBasic() noexcept
 
 void Base::install()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     if (proc.halted()) return;
     proc.advance(1, 2);
 
     const DeviceItem *mntit = partman.mounts.value("/");
     const bool skiphome = !(mntit && mntit->willFormat());
     if (skiphome) {
+        MProcess::Section sect(proc, QT_TR_NOOP("Failed to delete old system on destination."));
         // if root was not formatted and not using --sync option then re-use it
         // remove all folders in root except for /home
         proc.status(tr("Deleting old system"));
         proc.shell("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;");
-
-        if (proc.exitStatus() != QProcess::NormalExit) {
-            throw QT_TR_NOOP("Failed to delete old system on destination.");
-        }
     }
 
+    MProcess::Section sect(proc);
     // make empty dir for opt. home already done.
     // dev, proc, sys, run will be made at mount.
     proc.status(tr("Creating system directories"));
@@ -189,11 +187,11 @@ void Base::install()
 
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
     proc.exec("mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
-    proc.setChRoot("/mnt/antiX");
+    sect.setRoot("/mnt/antiX");
     proc.exec("rm", {"/var/lib/dbus/machine-id", "/etc/machine-id"});
     proc.exec("dbus-uuidgen", {"--ensure=/etc/machine-id"});
     proc.exec("dbus-uuidgen", {"--ensure"});
-    proc.setChRoot();
+    sect.setRoot(nullptr);
     proc.exec("umount", {"-R", "/mnt/antiX/dev"});
 
     // Disable VirtualBox Guest Additions if not running in VirtualBox.
@@ -217,7 +215,7 @@ void Base::install()
 
 void Base::copyLinux(bool skiphome)
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::Section);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     if (proc.halted()) return;
 
     // copy most except usr, mnt and home
