@@ -182,6 +182,8 @@ class PartMan : public QAbstractItemModel
     void partMenuUnlock(DeviceItem *twit);
     void partMenuLock(DeviceItem *twit);
     void scanSubvolumes(DeviceItem *partit);
+    bool confirmSpace(class QMessageBox &msgbox) noexcept;
+    bool confirmBootable(class QMessageBox &msgbox) noexcept;
     void luksFormat(DeviceItem *partit, const QByteArray &password);
     void luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password);
 public:
