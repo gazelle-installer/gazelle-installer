@@ -33,7 +33,7 @@ class BootMan : public QObject
     Ui::MeInstall &gui;
     QWidget *master;
     class PartMan &partman;
-    QString loaderID;
+    QString loaderID, loaderLabel;
     bool installFromRootDevice, removeNoSplash;
     bool brave;
     void selectBootMain() noexcept;

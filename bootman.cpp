@@ -33,7 +33,8 @@ BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     const QSettings &appConf, const QCommandLineParser &appArgs) noexcept
     : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
-    loaderID = appConf.value("PROJECT_SHORTNAME").toString() + appConf.value("VERSION").toString();
+    loaderID = appConf.value("PROJECT_SHORTNAME").toString();
+    loaderLabel = appConf.value("PROJECT_NAME").toString();
     installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
     removeNoSplash = appConf.value("REMOVE_NOSPLASH").toBool();
     brave = appArgs.isSet("brave");
@@ -150,17 +151,15 @@ void BootMan::installMain(bool efivars_ismounted)
         proc.status(tr("Installing GRUB"));
 
         // install new Grub now
-        QString arch;
-        const QString &boot = "/dev/" + gui.comboBoot->currentData().toString();
+        const int efisize = proc.detectEFI(true);
+        const QString &bootdev = "/dev/" + gui.comboBoot->currentData().toString();
         if (!gui.radioBootESP->isChecked()) {
             proc.exec("grub-install", {"--target=i386-pc", "--recheck",
-                "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", boot});
+                "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", bootdev});
         } else {
-            proc.exec("mount", {boot, "/mnt/antiX/boot/efi"});
+            proc.exec("mount", {bootdev, "/mnt/antiX/boot/efi"});
             // rename arch to match grub-install target
             proc.exec("cat", {"/sys/firmware/efi/fw_platform_size"}, nullptr, true);
-            arch = proc.readOut();
-            arch = (arch == "32") ? "i386" : "x86_64";  // fix arch name for 32bit
 
             if (efivars_ismounted) {
                 // remove any efivars-dump-entries in NVRAM
@@ -171,14 +170,32 @@ void BootMan::installMain(bool efivars_ismounted)
                 if (!dump.isEmpty()) proc.shell("rm /sys/firmware/efi/efivars/dump*", nullptr, true);
             }
 
-            proc.exec("chroot", {"/mnt/antiX", "grub-install", "--force-extra-removable",
-                "--target=" + arch + "-efi", "--efi-directory=/boot/efi",
-                "--bootloader-id=" + loaderID, "--recheck"});
+            MProcess::Section sect2(proc);
+            sect2.setRoot("/mnt/antiX");
+            proc.exec("grub-install", {"--no-nvram", "--force-extra-removable",
+                (efisize==32 ? "--target=i386-efi" : "--target=x86_64-efi"),
+                "--efi-directory=/boot/efi", "--bootloader-id=" + loaderID, "--recheck"});
+
+            // Update the boot NVRAM variables. Non-critial step so no need to fail.
+            sect2.setExceptionMode(nullptr);
+            // Remove old boot variables of the same label.
+            proc.exec("efibootmgr", {}, nullptr, true);
+            const QStringList &existing = proc.readOutLines();
+            const QRegularExpression regex("^Boot([0-9A-F]{4})\\*?\\s(.*)$");
+            for (const QString &entry : existing) {
+                const QRegularExpressionMatch &match = regex.match(entry);
+                if (match.hasMatch() && match.captured(2) == loaderLabel) {
+                    proc.exec("efibootmgr", {"-qBb", match.captured(1)});
+                }
+            }
+            // Add a new NVRAM boot variable.
+            proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", bootdev,
+                "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
         }
 
         //get /etc/default/grub codes
-        QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
-        QString grubDefault=grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
+        const QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
+        const QString &grubDefault = grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
         qDebug() << "grubDefault is " << grubDefault;
 
         //added non-live boot codes to those in /etc/default/grub, remove duplicates
@@ -227,25 +244,14 @@ void BootMan::installMain(bool efivars_ismounted)
         proc.shell(cmd.arg(finalcmdlinestring));
 
         //copy memtest efi files if needed
-
-        if (proc.detectEFI()) {
-            mkdir("/mnt/antiX/boot/uefi-mt", 0755);
-            QString mtest;
-            QString mtest_dev;
-            QString mtest_ram;
-            if (arch == "i386") {
-                mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-32.efi";
-                mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-32.efi";
-            } else {
-                mtest_dev = "/live/boot-dev/boot/uefi-mt/mtest-64.efi";
-                mtest_ram = "/live/to-ram/boot/uefi-mt/mtest-64.efi";
+        if (efisize) {
+            QString mtest = QString("/live/to-ram/boot/uefi-mt/mtest-%1.efi").arg(efisize);
+            if (!QFileInfo::exists(mtest)) {
+                mtest = QString("/live/boot-dev/boot/uefi-mt/mtest-%1.efi").arg(efisize);
+                if (!QFileInfo::exists(mtest)) mtest.clear();
             }
-            if (QFileInfo::exists(mtest_ram)) {
-                mtest = mtest_ram;
-            } else if (QFileInfo::exists(mtest_dev)) {
-                mtest = mtest_dev;
-            }
-            if (!mtest.isNull()) {
+            if (!mtest.isEmpty()) {
+                proc.mkpath("/mnt/antiX/boot/uefi-mt", 0755);
                 proc.exec("cp", {mtest, "/mnt/antiX/boot/uefi-mt"});
             }
         }
@@ -256,7 +262,7 @@ void BootMan::installMain(bool efivars_ismounted)
 
         if (!gui.radioBootESP->isChecked()) {
             /* Prevent debconf pestering the user when GRUB gets updated. */
-            proc.exec("udevadm", {"info", boot}, nullptr, true);
+            proc.exec("udevadm", {"info", bootdev}, nullptr, true);
             const QStringList &lines = proc.readOutLines();
             /* Obtain the best ID to use for the disk or partition. */
             QByteArray diskpath;
