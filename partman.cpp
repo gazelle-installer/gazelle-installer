@@ -783,26 +783,24 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
 
     if (!automatic) {
         // Final warnings before the installer starts.
-        QString details, biosgpt;
-        QStringList tooSmall;
-        const QString &msgszItem(" - " + tr("%1 (%2) requires %3"));
+        QString details;
         for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
             DeviceItem *drvit = root.child(ixdrv);
+            assert(drvit != nullptr);
             const int partCount = drvit->childCount();
-            bool setupGPT = drvit->willUseGPT();
             if (!drvit->flags.oldLayout && drvit->type != DeviceItem::VirtualDevices) {
-                details += tr("Prepare %1 partition table on %2").arg(setupGPT?"GPT":"MBR", drvit->device) + '\n';
+                const char *pttype = drvit->willUseGPT() ? "GPT" : "MBR";
+                details += tr("Prepare %1 partition table on %2").arg(pttype, drvit->device) + '\n';
             }
-            bool hasBiosGrub = false;
             for (int ixdev = 0; ixdev < partCount; ++ixdev) {
                 DeviceItem *partit = drvit->child(ixdev);
+                assert(partit != nullptr);
                 const int subcount = partit->childCount();
                 const QString &use = partit->realUseFor();
                 QString actmsg;
                 if (drvit->flags.oldLayout) {
                     if (use.isEmpty()) {
-                        if (partit->curFormat == "BIOS-GRUB") hasBiosGrub = true;
-                        else if (subcount > 0) actmsg = tr("Reuse (no reformat) %1");
+                        if (subcount > 0) actmsg = tr("Reuse (no reformat) %1");
                         else continue;
                     } else {
                         if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
@@ -813,43 +811,31 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                     if (use.isEmpty()) actmsg = tr("Create %1 without formatting");
                     else actmsg = tr("Create %1, format to use for %2");
                 }
-                details += actmsg.arg(partit->shownDevice(), partit->shownUseFor()) + '\n';
-                if (use == "BIOS-GRUB") hasBiosGrub = true;
+                // QString::arg() emits warnings if a marker is not in the string.
+                details += actmsg.replace("%1", partit->shownDevice()).replace("%2", partit->shownUseFor()) + '\n';
 
-                if (partit->finalFormat() == "btrfs") {
-                    for (int ixsv = 0; ixsv < subcount; ++ixsv) {
-                        DeviceItem *svit = partit->child(ixsv);
-                        const QString &svuse = svit->realUseFor();
-                        const bool nouse = svuse.isEmpty();
-                        if (svit->format == "PRESERVE") {
-                            if (nouse) continue;
-                            else actmsg = tr("Reuse subvolume %1 as %2");
-                        } else if (svit->format == "DELETE") {
-                            actmsg = tr("Delete subvolume %1");
-                        } else if (svit->format == "CREATE") {
-                            if (svit->flags.oldLayout) {
-                                if (nouse) actmsg = tr("Overwrite subvolume %1");
-                                else actmsg = tr("Overwrite subvolume %1 to use for %2");
-                            } else {
-                                if (nouse) actmsg = tr("Create subvolume %1");
-                                else actmsg = tr("Create subvolume %1 to use for %2");
-                            }
+                for (int ixsv = 0; ixsv < subcount; ++ixsv) {
+                    DeviceItem *svit = partit->child(ixsv);
+                    assert(svit != nullptr);
+                    const QString &svuse = svit->realUseFor();
+                    const bool svnouse = svuse.isEmpty();
+                    if (svit->format == "PRESERVE") {
+                        if (svnouse) continue;
+                        else actmsg = tr("Reuse subvolume %1 as %2");
+                    } else if (svit->format == "DELETE") {
+                        actmsg = tr("Delete subvolume %1");
+                    } else if (svit->format == "CREATE") {
+                        if (svit->flags.oldLayout) {
+                            if (svnouse) actmsg = tr("Overwrite subvolume %1");
+                            else actmsg = tr("Overwrite subvolume %1 to use for %2");
+                        } else {
+                            if (svnouse) actmsg = tr("Create subvolume %1");
+                            else actmsg = tr("Create subvolume %1 to use for %2");
                         }
-                        details += " + " + actmsg.arg(svit->label, svuse) + '\n';
                     }
+                    // QString::arg() emits warnings if a marker is not in the string.
+                    details += " + " + actmsg.replace("%1", svit->label).replace("%2", svit->shownUseFor()) + '\n';
                 }
-                // If this volume is too small, add to the warning list.
-                const long long minSize = volSpecTotal(partit->realUseFor()).minimum;
-                if (partit->size < minSize) {
-                    const QString &mstr = QLocale::system().formattedDataSize(minSize,
-                        1, QLocale::DataSizeTraditionalFormat);
-                    tooSmall.append(msgszItem.arg(partit->shownUseFor(), partit->device, mstr));
-                }
-            }
-            // Potentially unbootable GPT when on a BIOS-based PC.
-            const bool hasBoot = (drvit->active != nullptr);
-            if (!proc.detectEFI() && setupGPT && hasBoot && !hasBiosGrub) {
-                biosgpt += ' ' + drvit->device;
             }
         }
         // Warning messages
@@ -857,22 +843,10 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         msgbox.setIcon(QMessageBox::Warning);
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         msgbox.setDefaultButton(QMessageBox::No);
-        if (!tooSmall.isEmpty()) {
-            tooSmall.sort();
-            msgbox.setText(tr("The installation may fail because"
-                " the following volumes are too small:") + "\n\n"
-                + tooSmall.join('\n')
-                + "\n\n" + tr("Are you sure you want to continue?"));
-            if (msgbox.exec() != QMessageBox::Yes) return false;
-        }
-        if (!biosgpt.isEmpty()) {
-            biosgpt.prepend(tr("The following drives are, or will be, setup with GPT,"
-                " but do not have a BIOS-GRUB partition:") + "\n\n");
-            biosgpt += "\n\n" + tr("This system may not boot from GPT drives without a BIOS-GRUB partition.")
-                + '\n' + tr("Are you sure you want to continue?");
-            msgbox.setText(biosgpt);
-            if (msgbox.exec() != QMessageBox::Yes) return false;
-        }
+
+        if (!confirmSpace(msgbox)) return false;
+        if (!confirmBootable(msgbox)) return false;
+
         msgbox.setText(tr("The %1 installer will now perform the requested actions.").arg(project));
         msgbox.setInformativeText(tr("These actions cannot be undone. Do you want to continue?"));
         details.chop(1); // Remove trailing new-line character.
@@ -889,11 +863,110 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
 
     return true;
 }
+bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
+{
+    // Isolate used points from each other in total calculations
+    QStringList vols;
+    for (DeviceItemIterator it(*this); *it; it.next()) {
+        const QString &use = (*it)->usefor;
+        if (!use.isEmpty()) vols.append(DeviceItem::realUseFor(use));
+    }
+
+    QStringList toosmall;
+    for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
+        DeviceItem *drvit = root.child(ixdrv);
+        const int partCount = drvit->childCount();
+        for (int ixdev = 0; ixdev < partCount; ++ixdev) {
+            DeviceItem *partit = drvit->child(ixdev);
+            assert(partit != nullptr);
+            const int subcount = partit->childCount();
+            const QString &partuse = partit->realUseFor();
+            bool isused = !partuse.isEmpty();
+            long long minsize = isused ? volSpecTotal(partuse, vols).minimum : 0;
+
+            // First pass = get the total minimum required for all subvolumes.
+            for (int ixsv = 0; ixsv < subcount; ++ixsv) {
+                DeviceItem *svit = partit->child(ixsv);
+                assert(svit != nullptr);
+                if(!svit->usefor.isEmpty()) {
+                    minsize += volSpecTotal(svit->realUseFor(), vols).minimum;
+                    isused = true;
+                }
+            }
+            // If this volume is too small, add to the warning list.
+            if (isused && partit->size < minsize) {
+                const QString &msgsz = tr("%1 (%2) requires %3");
+                toosmall << msgsz.arg(partit->shownUseFor(), partit->shownDevice(),
+                    QLocale::system().formattedDataSize(minsize, 1, QLocale::DataSizeTraditionalFormat));
+
+                // Add all subvolumes (sorted) to the warning list as one string.
+                QStringList svsmall;
+                for (int ixsv = 0; ixsv < subcount; ++ixsv) {
+                    DeviceItem *svit = partit->child(ixsv);
+                    assert(svit != nullptr);
+                    if (svit->usefor.isEmpty()) continue;
+
+                    const long long svmin = volSpecTotal(svit->realUseFor(), vols).minimum;
+                    if (svmin > 0) {
+                        svsmall << msgsz.arg(svit->shownUseFor(), svit->shownDevice(),
+                            QLocale::system().formattedDataSize(svmin, 1, QLocale::DataSizeTraditionalFormat));
+                    }
+                }
+                if (!svsmall.isEmpty()) {
+                    svsmall.sort();
+                    toosmall.last() += "<ul style='margin:0; list-style-type:circle'><li>"
+                        + svsmall.join("</li><li>") + "</li></ul>";
+                }
+            }
+        }
+    }
+
+    if (!toosmall.isEmpty()) {
+        toosmall.sort();
+        msgbox.setText(tr("The installation may fail because the following volumes are too small:")
+            + "<br/><ul style='margin:0'><li>" + toosmall.join("</li><li>") + "</li></ul><br/>"
+            + tr("Are you sure you want to continue?"));
+        if (msgbox.exec() != QMessageBox::Yes) return false;
+    }
+    return true;
+}
+bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
+{
+    QString biosgpt;
+    for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
+        DeviceItem *drvit = root.child(ixdrv);
+        const int partCount = drvit->childCount();
+        bool hasBiosGrub = false;
+        for (int ixdev = 0; ixdev < partCount; ++ixdev) {
+            DeviceItem *partit = drvit->child(ixdev);
+            assert(partit != nullptr);
+            if (partit->finalFormat() == "BIOS-GRUB") {
+                hasBiosGrub = true;
+                break;
+            }
+        }
+        // Potentially unbootable GPT when on a BIOS-based PC.
+        const bool hasBoot = (drvit->active != nullptr);
+        if (!proc.detectEFI() && drvit->willUseGPT() && hasBoot && !hasBiosGrub) {
+            biosgpt += ' ' + drvit->device;
+        }
+    }
+    if (!biosgpt.isEmpty()) {
+        biosgpt.prepend(tr("The following drives are, or will be, setup with GPT,"
+            " but do not have a BIOS-GRUB partition:") + "\n\n");
+        biosgpt += "\n\n" + tr("This system may not boot from GPT drives without a BIOS-GRUB partition.")
+            + '\n' + tr("Are you sure you want to continue?");
+        msgbox.setText(biosgpt);
+        if (msgbox.exec() != QMessageBox::Yes) return false;
+    }
+    return true;
+}
 
 // Checks SMART status of the selected drives.
 // Returns false if it detects errors and user chooses to abort.
 bool PartMan::checkTargetDrivesOK()
 {
+    MProcess::Section sect(proc, nullptr); // No exception on execution error for this block.
     QString smartFail, smartWarn;
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
         DeviceItem *drvit =  root.child(ixi);
@@ -1228,6 +1301,7 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
         proc.exec("btrfs", {"subvolume", "set-default", "5", "/mnt/btrfs-scratch"});
         for (int ixsv = 0; ixsv < subvolcount; ++ixsv) {
             DeviceItem *svit = partit->child(ixsv);
+            assert(svit != nullptr);
             const QString &svpath = "/mnt/btrfs-scratch/" + svit->label;
             if (svit->format != "PRESERVE" && QFileInfo::exists(svpath)) {
                 proc.exec("btrfs", {"subvolume", "delete", svpath});
@@ -1237,7 +1311,7 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
         }
         // Make the root subvolume the default again.
         DeviceItem *devit = mounts.value("/");
-        assert (devit != nullptr);
+        assert(devit != nullptr);
         if (devit->type == DeviceItem::Subvolume) {
             proc.exec("btrfs", {"subvolume", "set-default", "/mnt/btrfs-scratch/"+devit->label});
         }
@@ -1954,7 +2028,7 @@ QStringList DeviceItem::allowedFormats() const noexcept
     if (isVolume()) {
         if (use.isEmpty()) return QStringList();
         else if (use == "/boot") list.append("ext4");
-        else if (use == "BIOS-GRUB") list.append("GRUB");
+        else if (use == "BIOS-GRUB") list.append("BIOS-GRUB");
         else if (use == "ESP") {
             list.append("FAT32");
             if (size <= (4*GB - 64*KB)) list.append("FAT16");
@@ -2079,6 +2153,8 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             while (drvit && drvit->type != Drive) drvit = drvit->parentItem;
             if (drvit) drvit->driveAutoSetActive();
         }
+
+        if (encrypt) encrypt = canEncrypt();
     }
     if (format.isEmpty()) {
         const QStringList &af = allowedFormats();
