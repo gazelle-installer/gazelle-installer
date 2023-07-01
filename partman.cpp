@@ -588,10 +588,10 @@ void PartMan::partReloadClick()
 }
 void PartMan::partManRunClick()
 {
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     gui.boxMain->setEnabled(false);
     if (QFile::exists("/usr/sbin/gparted")) proc.exec("/usr/sbin/gparted");
     else proc.exec("partitionmanager");
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     scan();
     gui.boxMain->setEnabled(true);
     QGuiApplication::restoreOverrideCursor();
