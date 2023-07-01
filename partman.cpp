@@ -2006,15 +2006,17 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
         }
     };
 
-    if (type != Subvolume) checkAndAdd("Format");
-    checkAndAdd("root");
-    if (type != VirtualBD) {
-        if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
-        if (all || size <= 8*GB) {
-            if (size < (2*TB - 512)) checkAndAdd("ESP");
-            checkAndAdd("boot");
+    if (type != Subvolume) {
+        checkAndAdd("Format");
+        if (type != VirtualBD) {
+            if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
+            if (all || size <= 8*GB) {
+                if (size < (2*TB - 512)) checkAndAdd("ESP");
+                checkAndAdd("boot");
+            }
         }
     }
+    checkAndAdd("root");
     checkAndAdd("home");
     if (type != Subvolume) checkAndAdd("swap");
     else checkAndAdd("/swap");
