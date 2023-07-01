@@ -763,17 +763,12 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
     }
 
     DeviceItem *rootitem = mounts.value("/");
-    DeviceItem *bootitem = mounts.value("/boot");
     const long long rootMin = volSpecTotal("/").minimum;
     const QString &tMinRoot = QLocale::system().formattedDataSize(rootMin,
         1, QLocale::DataSizeTraditionalFormat);
     if (!rootitem) {
         QMessageBox::critical(gui.boxMain, QString(),
             tr("A root partition of at least %1 is required.").arg(tMinRoot));
-        return false;
-    } else if (rootitem->willEncrypt() && !bootitem) {
-        QMessageBox::critical(gui.boxMain, QString(),
-            tr("You must choose a separate boot partition when encrypting root."));
         return false;
     } else if (!rootitem->willFormat() && mounts.contains("/home")) {
         QMessageBox::critical(gui.boxMain, QString(),
@@ -844,6 +839,11 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         msgbox.setDefaultButton(QMessageBox::No);
 
+        if (rootitem->willEncrypt() && !mounts.contains("/boot")) {
+            msgbox.setText(tr("You must choose a separate boot partition when encrypting root.")
+                + '\n' + tr("Are you sure you want to continue?"));
+            if (msgbox.exec() != QMessageBox::Yes) return false;
+        }
         if (!confirmSpace(msgbox)) return false;
         if (!confirmBootable(msgbox)) return false;
 
