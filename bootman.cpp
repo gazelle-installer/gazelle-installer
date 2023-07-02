@@ -100,9 +100,11 @@ void BootMan::buildBootLists() noexcept
 void BootMan::install(const QStringList &cmdextra)
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
-    if (proc.halted()) return;
+    MProcess::Section sect(proc, QT_TR_NOOP("GRUB installation failed. You can reboot to"
+        " the live medium and use the GRUB Rescue menu to repair the installation."));
     proc.advance(4, 4);
 
+    sect.setExceptionMode(false);
     // the old initrd is not valid for this hardware
     proc.shell("ls /mnt/antiX/boot | grep 'initrd.img-3.6'", nullptr, true);
     const QString &val = proc.readOut();
@@ -123,9 +125,8 @@ void BootMan::install(const QStringList &cmdextra)
     proc.exec("mount", {"--mkdir", "--rbind", "/proc", "/mnt/antiX/proc"});
     proc.exec("mount", {"--mkdir", "-t", "tmpfs", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
     proc.exec("mount", {"--mkdir", "--rbind", "/run/udev", "/mnt/antiX/run/udev"});
+    sect.setExceptionMode(true);
 
-    MProcess::Section sect(proc, QT_TR_NOOP("GRUB installation failed. You can"
-        " reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
     if (gui.boxBoot->isChecked()) {
         proc.status(tr("Installing GRUB"));
 
@@ -142,21 +143,20 @@ void BootMan::install(const QStringList &cmdextra)
 
             if (efivars_ismounted) {
                 // remove any efivars-dump-entries in NVRAM
-                MProcess::Section sect2(proc, nullptr);
+                sect.setExceptionMode(false);
                 proc.shell("ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
                 const QString &dump = proc.readOut();
-                sect2.end();
+                sect.setExceptionMode(true);
                 if (!dump.isEmpty()) proc.shell("rm /sys/firmware/efi/efivars/dump*", nullptr, true);
             }
 
-            MProcess::Section sect2(proc);
-            sect2.setRoot("/mnt/antiX");
+            sect.setRoot("/mnt/antiX");
             proc.exec("grub-install", {"--no-nvram", "--force-extra-removable",
                 (efisize==32 ? "--target=i386-efi" : "--target=x86_64-efi"),
                 "--efi-directory=/boot/efi", "--bootloader-id=" + loaderID, "--recheck"});
 
             // Update the boot NVRAM variables. Non-critial step so no need to fail.
-            sect2.setExceptionMode(nullptr);
+            sect.setExceptionMode(false);
             // Remove old boot variables of the same label.
             proc.exec("efibootmgr", {}, nullptr, true);
             const QStringList &existing = proc.readOutLines();
@@ -170,6 +170,8 @@ void BootMan::install(const QStringList &cmdextra)
             // Add a new NVRAM boot variable.
             proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", bootdev,
                 "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
+            sect.setExceptionMode(true);
+            sect.setRoot(nullptr);
         }
 
         //get /etc/default/grub codes
@@ -237,8 +239,9 @@ void BootMan::install(const QStringList &cmdextra)
         }
         proc.status();
 
+        sect.setRoot("/mnt/antiX");
         //update grub with new config
-        proc.exec("chroot", {"/mnt/antiX", "update-grub"});
+        proc.exec("update-grub");
 
         if (!gui.radioBootESP->isChecked()) {
             /* Prevent debconf pestering the user when GRUB gets updated. */
@@ -259,7 +262,7 @@ void BootMan::install(const QStringList &cmdextra)
             if (diskpath.isEmpty()) throw sect.failMessage();
             /* Setup debconf to achieve the objective of silence. */
             diskpath.prepend("grub-pc grub-pc/install_devices multiselect /dev/");
-            proc.exec("chroot", {"/mnt/antiX", "debconf-set-selections"}, &diskpath);
+            proc.exec("debconf-set-selections", {}, &diskpath);
         }
     }
 
@@ -267,14 +270,14 @@ void BootMan::install(const QStringList &cmdextra)
     sect.setExceptionMode(QT_TR_NOOP("Failed to update initramfs."));
     //if useing f2fs, then add modules to /etc/initramfs-tools/modules
     //if (rootTypeCombo->currentText() == "f2fs" || homeTypeCombo->currentText() == "f2fs") {
-        //proc.shell("grep -q f2fs /mnt/antiX/etc/initramfs-tools/modules || echo f2fs >> /mnt/antiX/etc/initramfs-tools/modules");
-        //proc.shell("grep -q crypto-crc32 /mnt/antiX/etc/initramfs-tools/modules || echo crypto-crc32 >> /mnt/antiX/etc/initramfs-tools/modules");
+        //proc.shell("grep -q f2fs /etc/initramfs-tools/modules || echo f2fs >> /etc/initramfs-tools/modules");
+        //proc.shell("grep -q crypto-crc32 /etc/initramfs-tools/modules || echo crypto-crc32 >> /etc/initramfs-tools/modules");
     //}
 
     // Use MODULES=dep to trim the initrd, often results in faster boot.
-    proc.exec("sed", {"-i", "-r", "s/MODULES=.*/MODULES=dep/", "/mnt/antiX/etc/initramfs-tools/initramfs.conf"});
+    proc.exec("sed", {"-i", "-r", "s/MODULES=.*/MODULES=dep/", "/etc/initramfs-tools/initramfs.conf"});
 
-    proc.exec("chroot", {"/mnt/antiX", "update-initramfs", "-u", "-t", "-k", "all"});
+    proc.exec("update-initramfs", {"-u", "-t", "-k", "all"});
     proc.status();
 }
 
