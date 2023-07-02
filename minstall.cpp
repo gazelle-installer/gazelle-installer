@@ -383,8 +383,9 @@ bool MInstall::processNextPhase() noexcept
                 oobe->process();
                 manageConfig(ConfigSave);
                 proc.exec("sync"); // the sync(2) system call will block the GUI
-                swapman->install();
-                bootman->install();
+                QStringList grubextra;
+                swapman->install(grubextra);
+                bootman->install(grubextra);
             } else if (!pretendToInstall(5, 100)) {
                 throw "";
             }
@@ -1069,16 +1070,8 @@ void MInstall::cleanup(bool endclean)
         proc.exec("cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
         proc.exec("rm", {"-rf", "/mnt/antiX/mnt/antiX"});
     }
-    // umount with -q checks that the path is a mount point first, without error messages.
-    proc.exec("umount", {"-lq", "/mnt/antiX/boot/efi"});
-    proc.exec("umount", {"-lq", "/mnt/antiX/proc"});
-    proc.exec("umount", {"-lq", "/mnt/antiX/sys"});
-    proc.exec("umount", {"-lq", "/mnt/antiX/dev/shm"});
-    proc.exec("umount", {"-lq", "/mnt/antiX/dev"});
-    if (endclean) {
-        if (!mountkeep) partman->unmount();
-        setupAutoMount(true);
-    }
+    if (!endclean || !mountkeep) partman->clearWorkArea();
+    if (endclean) setupAutoMount(true);
 }
 
 void MInstall::on_progInstall_valueChanged(int value) noexcept

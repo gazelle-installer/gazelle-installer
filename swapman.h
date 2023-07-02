@@ -37,7 +37,7 @@ public:
     SwapMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui) noexcept;
     void manageConfig(class MSettings &config, bool advanced) noexcept;
     void setupDefaults() noexcept;
-    void install();
+    void install(QStringList &cmdboot_out);
     static long long recommended(bool hibernation) noexcept;
 };
 

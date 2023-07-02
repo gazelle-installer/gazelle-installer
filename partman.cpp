@@ -1130,11 +1130,15 @@ void PartMan::preparePartitions()
             listToUnmount << proc.readOutLines();
         }
     }
+
+    // Detach swap and file systems of targets which may have been auto-mounted.
     proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
     const QStringList swaps = proc.readOutLines();
+    proc.exec("findmnt", {"--raw", "-o", "SOURCE"}, nullptr, true);
+    const QStringList mounts = proc.readOutLines();
     for (const QString &devpath : qAsConst(listToUnmount)) {
-        if (swaps.contains(devpath)) proc.shell("grep -q " + devpath + " /proc/swaps && swapoff " + devpath);
-        else proc.exec("umount", {"-q", devpath});
+        if (swaps.contains(devpath)) proc.exec("swapoff", {devpath});
+        if (mounts.contains(devpath)) proc.exec("umount", {"-q", devpath});
     }
 
     // Prepare partition tables on devices which will have a new layout.
@@ -1459,22 +1463,20 @@ void PartMan::mountPartitions()
     }
 }
 
-void PartMan::unmount()
+void PartMan::clearWorkArea()
 {
-    QMapIterator<QString, DeviceItem *> mit(mounts);
-    mit.toBack();
-    while (mit.hasPrevious()) {
-        mit.previous();
-        DeviceItem *twit = mit.value();
-        if (!twit) continue;
-        if (mit.key().startsWith("SWAP")) {
-            proc.shell("grep -q " + twit->mappedDevice() + " /proc/swaps &&  swapoff " + twit->mappedDevice());
-        } else if (mit.key().at(0) == '/') {
-            proc.exec("umount", {"-l", "/mnt/antiX" + mit.key()});
-        }
+    // Close swap files that may have been opened (should not have swap opened in the first place)
+    proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
+    QStringList swaps = proc.readOutLines();
+    for (DeviceItemIterator it(*this); *it; it.next()) {
+        const QString &dev = (*it)->mappedDevice();
+        if (swaps.contains(dev)) proc.exec("swapoff", {dev});
     }
+    // Unmount everything in /mnt/antiX which is only to be for working on the target system.
+    if (QFileInfo::exists("/mnt/antiX")) proc.exec("umount", {"-qlR", "/mnt/antiX"});
+    // Close encrypted containers that were opened by the installer.
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->encrypt && item->type != DeviceItem::VirtualBD) {
+        if (item->encrypt && item->type != DeviceItem::VirtualBD && QFile::exists(item->mappedDevice())) {
             proc.exec("cryptsetup", {"close", item->devMapper});
         }
     }

@@ -58,7 +58,7 @@ void SwapMan::setupDefaults() noexcept
     sizeResetClicked();
 }
 
-void SwapMan::install()
+void SwapMan::install(QStringList &cmdboot_out)
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     proc.advance(1, 2);
@@ -91,17 +91,13 @@ void SwapMan::install()
     file.close();
     // Hibernation.
     if (gui.checkHibernation->isChecked()) {
+        cmdboot_out.append("resume=UUID=" + devit->uuid);
         if (btrfs) {
             proc.exec("btrfs", {"inspect-internal", "map-swapfile", "-r", instpath}, nullptr, true);
         } else {
             proc.shell("filefrag -v " + instpath + " | awk 'NR==4 {print $4}' | tr -d .", nullptr, true);
         }
-        QString offset = proc.readAll().trimmed();
-
-        QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
-        QString grubDefault = grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
-        grubDefault += " resume=UUID=" + devit->uuid + " resume_offset=" + offset;
-        grubSettings.setValue("GRUB_CMDLINE_LINUX_DEFAULT", grubDefault);
+        cmdboot_out.append("resume_offset=" + proc.readAll().trimmed());
     }
 }
 

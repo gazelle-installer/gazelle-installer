@@ -37,7 +37,6 @@ class BootMan : public QObject
     bool installFromRootDevice, removeNoSplash;
     bool brave;
     void selectBootMain() noexcept;
-    void installMain(bool efivars_ismounted);
     // Slots
     void chosenBootMBR() noexcept;
     void chosenBootPBR() noexcept;
@@ -47,7 +46,7 @@ public:
         const class QSettings &appConf, const QCommandLineParser &appArgs) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void buildBootLists() noexcept;
-    void install();
+    void install(const QStringList &cmdextra = {});
 };
 
 #endif // BOOTMAN_H
