@@ -38,6 +38,8 @@ PassEdit::PassEdit(QLineEdit *master, QLineEdit *slave,
     this->wordMax = wordMax;
     disconnect(master);
     disconnect(slave);
+    master->setClearButtonEnabled(true);
+    slave->setClearButtonEnabled(true);
     master->installEventFilter(this);
     master->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(master, &QLineEdit::textChanged, this, &PassEdit::masterTextChanged);
@@ -85,7 +87,7 @@ void PassEdit::generate() noexcept
         const QString &word = words.at(pos);
         if (word.length() < wordMax) {
             genText.append(words.at(pos));
-            genText.append('-');
+            genText.append(' ');
         }
         ++pos;
     } while (genText.length() <= genMin);
@@ -95,12 +97,11 @@ void PassEdit::generate() noexcept
 void PassEdit::masterContextMenu(const QPoint &pos) noexcept
 {
     QMenu *menu = master->createStandardContextMenu();
-    generate();
     menu->addSeparator();
-    QAction *actGenPass = menu->addAction(tr("Use password") + ": " + genText);
+    QAction *actGenPass = menu->addAction(genText);
     if (menu->exec(master->mapToGlobal(pos)) == actGenPass) {
         master->setText(genText);
-        slave->setText(genText);
+        generate();
     }
 }
 
