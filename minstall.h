@@ -111,7 +111,7 @@ private:
     void splashSetThrobber(bool active) noexcept;
     void setupkeyboardbutton() noexcept;
     void abortUI(bool manual, bool closing) noexcept;
-    void cleanup(bool endclean = true);
+    void cleanup();
     // private functions
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int space, long steps) noexcept;

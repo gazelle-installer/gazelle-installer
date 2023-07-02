@@ -352,9 +352,6 @@ bool MInstall::processNextPhase() noexcept
             autoMountEnabled = true; // disable auto mount by force
             if (!pretend) setupAutoMount(false);
 
-            // cleanup previous mounts
-            cleanup(false);
-
             // the core of the installation
             phase = Installing;
             if (!pretend) {
@@ -1059,19 +1056,17 @@ void MInstall::abortUI(bool manual, bool closing) noexcept
 }
 
 // run before closing the app, do some cleanup
-void MInstall::cleanup(bool endclean)
+void MInstall::cleanup()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     if (pretend) return;
 
-    if (endclean) {
-        if (config) config->dumpDebug();
-        else qDebug() << "NO CONFIG";
-        proc.exec("cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
-        proc.exec("rm", {"-rf", "/mnt/antiX/mnt/antiX"});
-    }
-    if (!endclean || !mountkeep) partman->clearWorkArea();
-    if (endclean) setupAutoMount(true);
+    if (config) config->dumpDebug();
+    else qDebug() << "NO CONFIG";
+    proc.exec("cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
+    proc.exec("rm", {"-rf", "/mnt/antiX/mnt/antiX"});
+    if (!mountkeep) partman->clearWorkArea();
+    setupAutoMount(true);
 }
 
 void MInstall::on_progInstall_valueChanged(int value) noexcept
