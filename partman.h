@@ -222,7 +222,7 @@ public:
     int countPrepSteps() noexcept;
     void prepStorage();
     void installTabs();
-    void unmount();
+    void clearWorkArea();
     int swapCount() const noexcept;
     int isEncrypt(const QString &point) const noexcept;
     DeviceItem *findByPath(const QString &devpath) const noexcept;

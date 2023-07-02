@@ -97,7 +97,7 @@ void BootMan::buildBootLists() noexcept
 }
 
 // build a grub configuration and install grub
-void BootMan::install()
+void BootMan::install(const QStringList &cmdextra)
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     if (proc.halted()) return;
@@ -117,34 +117,13 @@ void BootMan::install()
         if (!efivars_ismounted) proc.exec("mount", {"-t", "efivarfs", "efivarfs", efivars});
     }
 
-    if (gui.radioBootESP->isChecked()) mkdir("/mnt/antiX/boot/efi", 0755);
-
     // set mounts for chroot
     proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
     proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
     proc.exec("mount", {"--mkdir", "--rbind", "/proc", "/mnt/antiX/proc"});
-    proc.exec("mount", {"-t", "tmpfs", "--mkdir", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
+    proc.exec("mount", {"--mkdir", "-t", "tmpfs", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
     proc.exec("mount", {"--mkdir", "--rbind", "/run/udev", "/mnt/antiX/run/udev"});
 
-    // Trap exceptions here, and re-throw them once the local cleanup is done.
-    const char *failed = nullptr;
-    try {
-        installMain(efivars_ismounted);
-    } catch (const char *msg) {
-        failed = msg;
-    }
-
-    proc.exec("umount", {"-R", "/mnt/antiX/run"});
-    proc.exec("umount", {"-R", "/mnt/antiX/proc"});
-    proc.exec("umount", {"-R", "/mnt/antiX/sys"});
-    proc.exec("umount", {"-R", "/mnt/antiX/dev"});
-    if (proc.exec("mountpoint", {"-q", "/mnt/antiX/boot/efi"})) {
-        proc.exec("umount", {"/mnt/antiX/boot/efi"});
-    }
-    if (failed) throw failed;
-}
-void BootMan::installMain(bool efivars_ismounted)
-{
     MProcess::Section sect(proc, QT_TR_NOOP("GRUB installation failed. You can"
         " reboot to the live medium and use the GRUB Rescue menu to repair the installation."));
     if (gui.boxBoot->isChecked()) {
@@ -157,7 +136,7 @@ void BootMan::installMain(bool efivars_ismounted)
             proc.exec("grub-install", {"--target=i386-pc", "--recheck",
                 "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", bootdev});
         } else {
-            proc.exec("mount", {bootdev, "/mnt/antiX/boot/efi"});
+            proc.exec("mount", {"--mkdir", bootdev, "/mnt/antiX/boot/efi"});
             // rename arch to match grub-install target
             proc.exec("cat", {"/sys/firmware/efi/fw_platform_size"}, nullptr, true);
 
@@ -202,6 +181,7 @@ void BootMan::installMain(bool efivars_ismounted)
         proc.shell("/live/bin/non-live-cmdline", nullptr, true); // Get non-live boot codes
         QStringList finalcmdline = proc.readOut().split(" ");
         finalcmdline.append(grubDefault.split(" "));
+        finalcmdline.append(cmdextra);
         qDebug() << "intermediate" << finalcmdline;
 
         //get built-in config_cmdline
