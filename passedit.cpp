@@ -17,6 +17,7 @@
  * This file is part of the gazelle-installer.
  **************************************************************************/
 
+#include <algorithm>
 #include <cmath>
 #include <QApplication>
 #include <QContextMenuEvent>
@@ -28,14 +29,14 @@
 #include <zxcvbn.h>
 #include "passedit.h"
 
-PassEdit::PassEdit(QLineEdit *master, QLineEdit *slave,
-    int min, int genMin, int wordMax, QObject *parent) noexcept
-    : QObject(parent), master(master), slave(slave), min(min), genMin(genMin), wordMax(wordMax)
+// Password generator parameters applicable accross every PassEdit instance.
+static const int GEN_WORD_MAX       = 6;    // Maximum number of characters per word.
+static const int GEN_NUMBER_MAX     = 999;  // Numbers will go from 0 to GEN_NUMBER_MAX without duplicates.
+static const int GEN_WORD_NUM_RATIO = 3;    // Ratio N:1 of words to numbers (if less than GEN_NUMBER_MAX).
+
+PassEdit::PassEdit(QLineEdit *master, QLineEdit *slave, int min, QObject *parent) noexcept
+    : QObject(parent), master(master), slave(slave), min(min)
 {
-    this->slave = slave;
-    this->min = min;
-    this->genMin = genMin;
-    this->wordMax = wordMax;
     disconnect(master);
     disconnect(slave);
     master->setClearButtonEnabled(true);
@@ -69,29 +70,40 @@ void PassEdit::generate() noexcept
     if (words.isEmpty()) {
         QFile file("/usr/share/dict/words");
         if (file.open(QFile::ReadOnly | QFile::Text)) {
-            while (!file.atEnd()) words.append(file.readLine().trimmed());
+            while (!file.atEnd()) {
+                const QByteArray &word = file.readLine().trimmed();
+                if (word.size() <= GEN_WORD_MAX) words.append(word);
+            }
             file.close();
         } else {
-            words << "tuls" << "tihs" << "yssup" << "ssip" << "kcuf" << "gaf" << "ehcuod" << "kcid";
-            words << "nmad" << "tnuc" << "parc" << "kcoc" << "hctib" << "dratsab" << "elohssa";
+            words << "TULS" << "TIHS" << "YSSUP" << "SSIP" << "KCUF" << "GAF" << "EHCUOD" << "KCID";
+            words << "NMAD" << "TNUC" << "PARC" << "KCOC" << "HCTIB" << "DRATSAB" << "ELOHSSA";
+        }
+        for (int i = std::min(GEN_NUMBER_MAX, (words.count()/GEN_WORD_NUM_RATIO)-1); i >= 0; --i) {
+            words.append(QString::number(i));
         }
         std::srand(unsigned(std::time(nullptr)));
         pos = words.count();
     }
     genText.clear();
+    double entropy = 0;
+    const int genmax = master->maxLength();
     do {
         if (pos >= words.count()) {
             std::random_shuffle(words.begin(), words.end());
             pos = 0;
         }
         const QString &word = words.at(pos);
-        if (word.length() < wordMax) {
-            genText.append(words.at(pos));
-            genText.append(' ');
+        const int origlen = genText.length();
+        if (origlen) genText.append(' ');
+        genText.append(word);
+        if (genText.length() > genmax) {
+            genText.truncate(origlen);
+            break;
         }
+        entropy = ZxcvbnMatch(genText.toUtf8().constData(), nullptr, nullptr);
         ++pos;
-    } while (genText.length() <= genMin);
-    genText.append(QString::number(std::rand() % 10));
+    } while (genText.length() <= min || entropy <= 130); // Very strong
 }
 
 void PassEdit::masterContextMenu(const QPoint &pos) noexcept

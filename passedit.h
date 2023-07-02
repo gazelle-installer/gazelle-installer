@@ -28,7 +28,7 @@ private:
     QLineEdit *master = nullptr;
     QLineEdit *slave = nullptr;
     QString genText;
-    int min, genMin, wordMax;
+    int min, wordMax;
     bool lastValid = false;
     QAction *actionEye = nullptr;
     QAction *actionGauge = nullptr;
@@ -39,8 +39,7 @@ private:
     void eyeToggled(bool checked) noexcept;
     bool eventFilter(QObject *watched, QEvent *event) noexcept;
 public:
-    PassEdit(QLineEdit *master, QLineEdit *slave,
-        int min=0, int genMin=16, int wordMax=5, QObject *parent = nullptr) noexcept;
+    PassEdit(QLineEdit *master, QLineEdit *slave, int min=0, QObject *parent = nullptr) noexcept;
     bool isValid() const noexcept;
 signals:
     void validationChanged(bool valid);

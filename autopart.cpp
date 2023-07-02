@@ -32,7 +32,7 @@
 
 AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf) noexcept
     : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman),
-      passCrypto(ui.textCryptoPass, ui.textCryptoPass2, 1, 32, 9, this)
+      passCrypto(ui.textCryptoPass, ui.textCryptoPass2, 1, this)
 {
     checkHibernation = gui.checkHibernationReg;
 

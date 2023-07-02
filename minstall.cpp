@@ -183,7 +183,7 @@ void MInstall::startup()
                             + "\n" + link_block);
 
         // Password box setup
-        passCryptoCust = new PassEdit(textCryptoPassCust, textCryptoPassCust2, 1, 32, 9, this);
+        passCryptoCust = new PassEdit(textCryptoPassCust, textCryptoPassCust2, 1, this);
         connect(passCryptoCust, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
     }
 
