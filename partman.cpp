@@ -1131,6 +1131,11 @@ void PartMan::preparePartitions()
         }
     }
 
+    // Clean up any leftovers.
+    if (QFileInfo::exists("/mnt/antiX")) {
+        proc.exec("umount", {"-qR", "/mnt/antiX"});
+        proc.exec("rm", {"-rf", "/mnt/antiX"});
+    }
     // Detach swap and file systems of targets which may have been auto-mounted.
     proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
     const QStringList swaps = proc.readOutLines();
@@ -1473,7 +1478,7 @@ void PartMan::clearWorkArea()
         if (swaps.contains(dev)) proc.exec("swapoff", {dev});
     }
     // Unmount everything in /mnt/antiX which is only to be for working on the target system.
-    if (QFileInfo::exists("/mnt/antiX")) proc.exec("umount", {"-qlR", "/mnt/antiX"});
+    if (QFileInfo::exists("/mnt/antiX")) proc.exec("umount", {"-qR", "/mnt/antiX"});
     // Close encrypted containers that were opened by the installer.
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         if (item->encrypt && item->type != DeviceItem::VirtualBD && QFile::exists(item->mappedDevice())) {

@@ -112,7 +112,9 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
 
     log(logEntry, status);
     if (status <= 0) {
-        if (section && section->failmsg) throw section->failmsg;
+        if (section && section->failmsg && (status<0 || section->strictfail)) {
+            throw section->failmsg;
+        }
         return false;
     }
     return true;
@@ -334,6 +336,7 @@ MProcess::Section::Section(class MProcess &mproc) noexcept
     if (oldsection) {
         failmsg = oldsection->failmsg;
         rootdir = oldsection->rootdir;
+        strictfail = oldsection->strictfail;
     }
     mproc.section = this;
 }

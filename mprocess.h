@@ -87,18 +87,26 @@ public:
         class Section *oldsection;
         const char *failmsg = nullptr;
         const char *rootdir = nullptr;
+        bool strictfail = true;
     public:
         Section(class MProcess &mproc) noexcept;
-        Section(class MProcess &mproc, const char *failmsg) noexcept
-            : Section(mproc) { failmsg = failmsg; }
-        ~Section() { end(); }
-        Section(const Section &) = delete;
-        Section &operator=(const Section &) = delete;
+        inline Section(class MProcess &mproc, const char *failmessage) noexcept
+            : Section(mproc) { failmsg = failmessage; }
+        inline ~Section() { end(); }
+        void end() noexcept;
         inline const char *failMessage() noexcept { return failmsg; }
+        inline bool strict() noexcept { return strictfail; }
         inline void setExceptionMode(const char *message) noexcept { failmsg = message; }
+        inline void setExceptionMode(bool strict) noexcept { strictfail = strict; }
+        inline void setExceptionMode(const char *message, bool strict) noexcept
+        {
+            failmsg = message;
+            strictfail = strict;
+        }
         void setRoot(const char *newroot) noexcept;
         inline const char *root() noexcept { return rootdir; }
-        void end() noexcept;
+        Section(const Section &) = delete;
+        Section &operator=(const Section &) = delete;
     };
 private:
     class Section *section = nullptr;
