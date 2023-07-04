@@ -57,8 +57,9 @@ void BootMan::manageConfig(MSettings &config) noexcept
 
 void BootMan::selectBootMain() noexcept
 {
-    const DeviceItem *twit = partman.mounts.value("/boot");
-    if (!twit) twit = partman.mounts.value("/");
+    const auto fit = partman.mounts.find("/boot");
+    const DeviceItem *twit = (fit != partman.mounts.end() ? fit->second : partman.mounts.at("/"));
+
     if (twit->origin) twit = twit->origin;
     while (twit && twit->type != DeviceItem::Partition) twit = twit->parent();
     if (!gui.radioBootPBR->isChecked() && twit) twit = twit->parent();

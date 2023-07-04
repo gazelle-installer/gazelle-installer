@@ -202,7 +202,7 @@ void PartMan::scan(DeviceItem *drvstart)
 void PartMan::scanVirtualDevices(bool rescan)
 {
     DeviceItem *vdlit = nullptr;
-    QMap<QString, DeviceItem *> listed;
+    std::map<QString, DeviceItem *> listed;
     if (rescan) {
         for (int ixi = root.childCount() - 1; ixi >= 0; --ixi) {
             DeviceItem *twit = root.child(ixi);
@@ -211,7 +211,7 @@ void PartMan::scanVirtualDevices(bool rescan)
                 const int vdcount = vdlit->childCount();
                 for (int ixVD = 0; ixVD < vdcount; ++ixVD) {
                     DeviceItem *devit = vdlit->child(ixVD);
-                    listed.insert(devit->path, devit);
+                    listed[devit->path] = devit;
                 }
                 break;
             }
@@ -240,8 +240,10 @@ void PartMan::scanVirtualDevices(bool rescan)
         const QString &label = jsonDev["label"].toString();
         const bool crypto = (jsonDev["type"].toString() == "crypt");
         // Check if the device is already in the list.
-        DeviceItem *devit = listed.value(path);
-        if (devit) {
+        DeviceItem *devit = nullptr;
+        const auto fit = listed.find(path);
+        if (fit != listed.cend()) {
+            devit = fit->second;
             if (rota != devit->flags.rotational || discgran != devit->discgran
                 || size != devit->size || physec != devit->physec
                 || label != devit->curLabel || crypto != devit->flags.volCrypto) {
@@ -249,7 +251,7 @@ void PartMan::scanVirtualDevices(bool rescan)
                 delete devit;
                 devit = nullptr;
             }
-            listed.remove(path);
+            listed.erase(fit);
         }
         // Create a new list entry if needed.
         if (!devit) {
@@ -268,7 +270,7 @@ void PartMan::scanVirtualDevices(bool rescan)
             devit->flags.oldLayout = true;
         }
     }
-    for (const auto &it : listed.toStdMap()) delete it.second;
+    for (const auto &it : listed) delete it.second;
     vdlit->sortChildren();
     for(int ixi = 0; ixi < vdlit->childCount(); ++ixi) {
         const QString &name = vdlit->child(ixi)->device;
@@ -700,7 +702,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
 {
     mounts.clear();
     // Partition use and other validation
-    int mapnum = 0, swapnum = 0, volnum = 0;
+    int swapnum = 0;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices) continue;
         if (item->type == DeviceItem::Subvolume) {
@@ -738,39 +740,29 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
             ++swapnum;
             if (swapnum > 1) mount+=QString::number(swapnum);
         }
-        DeviceItem *twit = mounts.value(mount);
 
         // The mount can only be selected once.
-        if (twit) {
+        const auto fit = mounts.find(mount);
+        if (fit != mounts.cend()) {
             QMessageBox::critical(gui.boxMain, QString(), tr("%1 is already"
-                " selected for: %2").arg(twit->shownDevice(), twit->shownUseFor()));
+                " selected for: %2").arg(fit->second->shownDevice(), fit->second->shownUseFor()));
             return false;
         } else if(item->canMount(false)) {
-            mounts.insert(mount, item);
+            mounts[mount] = item;
         }
-        if (item->type != DeviceItem::VirtualBD) {
-            if (!item->encrypt) item->devMapper.clear();
-            else if (mount == "FORMAT") item->devMapper = "vol" + QString::number(++volnum);
-            else if (mount == "/") item->devMapper = "root.fsm";
-            else if (mount.startsWith("SWAP")) item->devMapper = mount.toLower();
-            else item->devMapper = QString::number(++mapnum) + mount.replace('/','.') + ".fsm";
-        }
-    }
-    qDebug() << "Mount points:";
-    for (const auto &it : mounts.toStdMap()) {
-        qDebug() << " -" << it.first << '-' << it.second->shownDevice()
-            << it.second->devMapper << it.second->path;
     }
 
-    DeviceItem *rootitem = mounts.value("/");
-    const long long rootMin = volSpecTotal("/").minimum;
-    const QString &tMinRoot = QLocale::system().formattedDataSize(rootMin,
-        1, QLocale::DataSizeTraditionalFormat);
-    if (!rootitem) {
+    const auto fitroot = mounts.find("/");
+    if (fitroot == mounts.cend()) {
+        const long long rootMin = volSpecTotal("/").minimum;
+        const QString &tMinRoot = QLocale::system().formattedDataSize(rootMin,
+            1, QLocale::DataSizeTraditionalFormat);
         QMessageBox::critical(gui.boxMain, QString(),
             tr("A root partition of at least %1 is required.").arg(tMinRoot));
         return false;
-    } else if (!rootitem->willFormat() && mounts.contains("/home")) {
+    }
+
+    if (!fitroot->second->willFormat() && mounts.count("/home")>0) {
         QMessageBox::critical(gui.boxMain, QString(),
             tr("Cannot preserve /home inside root (/) if a separate /home partition is also mounted."));
         return false;
@@ -839,7 +831,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         msgbox.setDefaultButton(QMessageBox::No);
 
-        if (rootitem->willEncrypt() && !mounts.contains("/boot")) {
+        if (fitroot->second->willEncrypt() && mounts.count("/boot")==0) {
             msgbox.setText(tr("You must choose a separate boot partition when encrypting root.")
                 + '\n' + tr("Are you sure you want to continue?"));
             if (msgbox.exec() != QMessageBox::Yes) return false;
@@ -1083,6 +1075,29 @@ int PartMan::countPrepSteps() noexcept
 }
 void PartMan::prepStorage()
 {
+    // Populate required device mapper fields.
+    int mapnum = 0, volnum = 0;
+    for (const auto &it : mounts) {
+        DeviceItem *item = it.second;
+        if (item->encrypt) {
+            const QString &mount = it.first;
+            if (mount == "FORMAT") item->devMapper = QString("vol%1.luks").arg(++volnum);
+            else if (mount == "/") item->devMapper = "root.luks";
+            else if (mount.startsWith("SWAP")) item->devMapper = mount.toLower();
+            else {
+                item->devMapper = QString::number(++mapnum) + mount + ".luks";
+                item->devMapper.replace('/','.');
+            }
+        }
+    }
+    // For debugging
+    qDebug() << "Mount points:";
+    for (const auto &it : mounts) {
+        qDebug() << " -" << it.first << '-' << it.second->shownDevice()
+            << it.second->devMapper << it.second->path;
+    }
+
+    // Prepare and mount storage
     preparePartitions();
     formatPartitions();
     mountPartitions();
@@ -1092,13 +1107,13 @@ void PartMan::prepStorage()
     proc.exec("lsblk", {"--list", "-bJo", "PATH,UUID"}, nullptr, true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
-    QMap<QString, DeviceItem *> alldevs;
+    std::map<QString, DeviceItem *> alldevs;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        alldevs.insert(item->path, item);
+        alldevs[item->path] = item;
     }
     for (const QJsonValue &jsonDev : jsonBD) {
-        DeviceItem *devit = alldevs.value(jsonDev["path"].toString());
-        if (devit) devit->uuid = jsonDev["uuid"].toString();
+        const auto fit = alldevs.find(jsonDev["path"].toString());
+        if (fit != alldevs.cend()) fit->second->uuid = jsonDev["uuid"].toString();
     }
 }
 void PartMan::installTabs()
@@ -1140,10 +1155,10 @@ void PartMan::preparePartitions()
     proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
     const QStringList swaps = proc.readOutLines();
     proc.exec("findmnt", {"--raw", "-o", "SOURCE"}, nullptr, true);
-    const QStringList mounts = proc.readOutLines();
+    const QStringList fsmounts = proc.readOutLines();
     for (const QString &devpath : qAsConst(listToUnmount)) {
         if (swaps.contains(devpath)) proc.exec("swapoff", {devpath});
-        if (mounts.contains(devpath)) proc.exec("umount", {"-q", devpath});
+        if (fsmounts.contains(devpath)) proc.exec("umount", {"-q", devpath});
     }
 
     // Prepare partition tables on devices which will have a new layout.
@@ -1319,8 +1334,7 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
             proc.status();
         }
         // Make the root subvolume the default again.
-        DeviceItem *devit = mounts.value("/");
-        assert(devit != nullptr);
+        DeviceItem *devit = mounts.at("/");
         if (devit->type == DeviceItem::Subvolume) {
             proc.exec("btrfs", {"subvolume", "set-default", "/mnt/btrfs-scratch/"+devit->label});
         }
@@ -1341,18 +1355,18 @@ void PartMan::fixCryptoSetup()
     const QByteArray password(passedit->text().toUtf8());
 
     // Find extra devices
-    QMap<QString, DeviceItem *> cryptAdd;
+    std::map<QString, DeviceItem *> cryptAdd;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->addToCrypttab) cryptAdd.insert(item->device, item);
+        if (item->addToCrypttab) cryptAdd[item->device] = item;
     }
     // File systems
-    for (auto &it : mounts.toStdMap()) {
-        if (it.second->encrypt) cryptAdd.insert(it.second->device, it.second);
+    for (auto &it : mounts) {
+        if (it.second->encrypt) cryptAdd[it.second->device] = it.second;
         else if (it.second->type == DeviceItem::Subvolume) {
             // Treat format-only, encrypted parent BTRFS partition as an extra device.
             DeviceItem *partit = it.second->parent();
             if (partit->encrypt && partit->realUseFor() == "FORMAT") {
-                cryptAdd.insert(partit->device, partit);
+                cryptAdd[partit->device] = partit;
             }
         }
     }
@@ -1368,8 +1382,8 @@ void PartMan::fixCryptoSetup()
     QTextStream out(&file);
     // Add devices to crypttab.
     SafeCache keycache(4096);
-    for (const auto &it : cryptAdd.toStdMap()) {
-        out << it.second->devMapper << " /dev/disk/by-uuid/" << it.second->uuid;
+    for (const auto &it : cryptAdd) {
+        out << it.second->devMapper << " UUID=" << it.second->uuid;
         if (!keydev || it.first == keydev->device) out << " none";
         else {
             const QString &keyfile = keydir + it.second->uuid + ".KEY";
@@ -1404,7 +1418,7 @@ bool PartMan::makeFstab()
     QTextStream out(&file);
     out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
     // File systems and swap space.
-    for (auto &it : mounts.toStdMap()) {
+    for (auto &it : mounts) {
         const DeviceItem *twit = it.second;
         const QString &dev = twit->mappedDevice();
         qDebug() << "Creating fstab entry for:" << it.first << dev;
@@ -1442,7 +1456,7 @@ void PartMan::mountPartitions()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to mount partition."));
-    for (auto &it : mounts.toStdMap()) {
+    for (auto &it : mounts) {
         if (it.first.at(0) != '/') continue;
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = it.second->mappedDevice();
@@ -1491,7 +1505,7 @@ void PartMan::clearWorkArea()
 int PartMan::swapCount() const noexcept
 {
     int count = 0;
-    for (const auto &mount : mounts.toStdMap()) {
+    for (const auto &mount : mounts) {
         if (mount.first.startsWith("SWAP")) ++count;
     }
     return count;
@@ -1501,16 +1515,16 @@ int PartMan::isEncrypt(const QString &point) const noexcept
 {
     int count = 0;
     if (point.isEmpty()) {
-        for (DeviceItem *twit : qAsConst(mounts)) {
-            if (twit->willEncrypt()) ++count;
+        for (const auto &mount : mounts) {
+            if (mount.second->willEncrypt()) ++count;
         }
     } else if (point == "SWAP") {
-        for (const auto &mount : mounts.toStdMap()) {
+        for (const auto &mount : mounts) {
             if (mount.first.startsWith("SWAP") && mount.second->willEncrypt()) ++count;
         }
     } else {
-        const DeviceItem *twit = mounts.value(point);
-        if (twit && twit->willEncrypt()) ++count;
+        const auto fit = mounts.find(point);
+        if (fit != mounts.cend() && fit->second->willEncrypt()) ++count;
     }
     return count;
 }
@@ -1528,16 +1542,19 @@ DeviceItem *PartMan::findHostDev(const QString &path) const noexcept
     DeviceItem *devit = nullptr;
     do {
         spath = QDir::cleanPath(QFileInfo(spath).path());
-        devit = mounts.value(spath);
+        const auto fit = mounts.find(spath);
+        if (fit != mounts.cend()) devit = mounts.at(spath);
     } while(!devit && !spath.isEmpty() && spath != '/' && spath != '.');
     return devit;
 }
 
 struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStringList &vols) const noexcept
 {
-    struct VolumeSpec vspec = volSpecs.value(path);
+    struct VolumeSpec vspec = {0};
+    const auto fit = volSpecs.find(path);
+    if (fit != volSpecs.cend()) vspec = fit->second;
     const QString &spath = (path!='/' ? path+'/' : path);
-    for (const auto &it : volSpecs.toStdMap()) {
+    for (const auto &it : volSpecs) {
         if (it.first.size() > 1 && it.first.startsWith(spath) && !vols.contains(it.first)) {
             vspec.image += it.second.image;
             vspec.minimum += it.second.minimum;
@@ -1545,6 +1562,12 @@ struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStr
         }
     }
     return vspec;
+}
+struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path) const noexcept
+{
+    QStringList vols;
+    for (const auto &mount : mounts) vols.append(mount.first);
+    return volSpecTotal(path, vols);
 }
 
 /*************************\
@@ -2008,7 +2031,8 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
     QStringList list;
     auto checkAndAdd = [&](const QString &use) {
         const QString &realUse = realUseFor(use);
-        if (all || !partman || size >= partman->volSpecs.value(realUse).minimum) {
+        const auto fit = partman->volSpecs.find(realUse);
+        if (all || !partman || fit == partman->volSpecs.end() || size >= fit->second.minimum) {
             list.append(real ? realUse : use);
         }
     };
@@ -2095,7 +2119,7 @@ long long DeviceItem::driveFreeSpace(bool inclusive) const noexcept
     if (!drvit) drvit = this;
     long long free = drvit->size - PARTMAN_SAFETY;
     for (int ixi = drvit->children.count() - 1; ixi >= 0; --ixi) {
-        DeviceItem *partit = drvit->children.at(ixi);
+        const DeviceItem *partit = drvit->children[ixi];
         if (inclusive || partit != this) free -= partit->size;
     }
     return free;
@@ -2154,7 +2178,9 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             }
             label = newLabel;
         } else if (partman) {
-            label = partman->volSpecs.value(use).defaultLabel;
+            const auto fit = partman->volSpecs.find(use);
+            if (fit == partman->volSpecs.cend()) label.clear();
+            else label = fit->second.defaultLabel;
         }
         // Automatic default boot device selection
         if ((type != VirtualBD) && (use == "/boot" || use == "/")) {
@@ -2256,7 +2282,8 @@ void DeviceItemIterator::next() noexcept
         while (!chnext && parent) {
             parent = parent->parentItem;
             if (!parent) break;
-            ixPos = ixParents.pop();
+            ixPos = ixParents.top();
+            ixParents.pop();
             chnext = parent->child(ixPos+1);
         }
         if (chnext) ++ixPos;
