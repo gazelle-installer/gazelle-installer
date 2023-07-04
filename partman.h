@@ -19,12 +19,13 @@
 #ifndef PARTMAN_H
 #define PARTMAN_H
 
+#include <map>
+#include <stack>
+#include <vector>
 #include <QCommandLineParser>
 #include <QAbstractItemModel>
 #include <QStyledItemDelegate>
 #include <QString>
-#include <QMap>
-#include <QStack>
 
 #include "ui_meinstall.h"
 
@@ -131,7 +132,7 @@ class DeviceItemIterator
 {
     DeviceItem *pos = nullptr;
     int ixPos = 0;
-    QStack<int> ixParents;
+    std::stack<int, std::vector<int>> ixParents;
 public:
     DeviceItemIterator(DeviceItem *item) noexcept : pos(item) {}
     DeviceItemIterator(const PartMan &partman) noexcept;
@@ -207,9 +208,9 @@ public:
         long long minimum = 0;
         long long preferred = 0;
     };
-    QMap<QString, struct VolumeSpec> volSpecs;
+    std::map<QString, struct VolumeSpec> volSpecs;
     QString bootUUID;
-    QMap<QString, DeviceItem *> mounts;
+    std::map<QString, DeviceItem *> mounts;
     class AutoPart *autopart = nullptr;
     PartMan(class MProcess &mproc, class Ui::MeInstall &ui,
         const class QSettings &appConf, const QCommandLineParser &appArgs);
@@ -228,10 +229,7 @@ public:
     DeviceItem *findByPath(const QString &devpath) const noexcept;
     DeviceItem *findHostDev(const QString &path) const noexcept;
     struct VolumeSpec volSpecTotal(const QString &path, const QStringList &vols) const noexcept;
-    inline struct VolumeSpec volSpecTotal(const QString &path) const noexcept
-    {
-        return volSpecTotal(path, mounts.keys());
-    }
+    struct VolumeSpec volSpecTotal(const QString &path) const noexcept;
     // Model View Controller
     QVariant data(const QModelIndex &index, int role) const noexcept override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) noexcept override;

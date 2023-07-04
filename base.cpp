@@ -111,12 +111,16 @@ bool Base::saveHomeBasic() noexcept
     MProcess::Section sect(proc, nullptr);
     proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
     QString homedir("/");
-    const DeviceItem *mntit = partman.mounts.value("/home");
-    if (!mntit || mntit->willFormat()) {
-        mntit = partman.mounts.value("/");
+    const auto fit = partman.mounts.find("/home");
+    const DeviceItem *mntit = nullptr;
+    if (fit != partman.mounts.cend() && !fit->second->willFormat()) {
+        mntit = fit->second;
+    } else {
+        mntit = partman.mounts.at("/"); // Must have '/' at this point.
         homedir = "/home";
     }
-    if (!mntit || mntit->willFormat()) return true;
+    assert(mntit != nullptr);
+    if (mntit->willFormat()) return true;
     const QString &homedev = mntit->mappedDevice();
 
     // Just in case the device or mount point is in use elsewhere.
@@ -143,8 +147,8 @@ void Base::install()
     if (proc.halted()) return;
     proc.advance(1, 2);
 
-    const DeviceItem *mntit = partman.mounts.value("/");
-    const bool skiphome = !(mntit && mntit->willFormat());
+    const DeviceItem *mntit = partman.mounts.at("/");
+    const bool skiphome = !mntit->willFormat();
     if (skiphome) {
         MProcess::Section sect(proc, QT_TR_NOOP("Failed to delete old system on destination."));
         // if root was not formatted and not using --sync option then re-use it
