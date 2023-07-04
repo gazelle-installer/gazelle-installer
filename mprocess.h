@@ -92,8 +92,7 @@ public:
         Section(class MProcess &mproc) noexcept;
         inline Section(class MProcess &mproc, const char *failmessage) noexcept
             : Section(mproc) { failmsg = failmessage; }
-        inline ~Section() { end(); }
-        void end() noexcept;
+        ~Section() noexcept;
         inline const char *failMessage() noexcept { return failmsg; }
         inline bool strict() noexcept { return strictfail; }
         inline void setExceptionMode(const char *message) noexcept { failmsg = message; }

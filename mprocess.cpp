@@ -340,7 +340,7 @@ MProcess::Section::Section(class MProcess &mproc) noexcept
     }
     mproc.section = this;
 }
-void MProcess::Section::end() noexcept
+MProcess::Section::~Section() noexcept
 {
     const char *oldroot = oldsection ? oldsection->rootdir : nullptr;
     if (qstrcmp(oldroot, rootdir)) proc.log(QString("Revert root: ")+oldroot, Standard);

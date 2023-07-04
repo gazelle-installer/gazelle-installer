@@ -54,7 +54,7 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     PartMan::VolumeSpec &vspecHome = partman.volSpecs["/home"];
 
     MProcess::Section sect(proc, QT_TR_NOOP("Cannot access installation media."));
-    if (pretend) sect.end();
+    if (pretend) sect.setExceptionMode(nullptr);
 
     // Boot space required.
     proc.exec("du", {"-scb", bootSource}, nullptr, true);

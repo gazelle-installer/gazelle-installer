@@ -244,7 +244,8 @@ void BootMan::install(const QStringList &cmdextra)
         proc.exec("update-grub");
 
         if (!gui.radioBootESP->isChecked()) {
-            /* Prevent debconf pestering the user when GRUB gets updated. */
+            /* Prevent debconf pestering the user when GRUB gets updated. Non-critical. */
+            MProcess::Section(proc, nullptr);
             proc.exec("udevadm", {"info", bootdev}, nullptr, true);
             const QStringList &lines = proc.readOutLines();
             /* Obtain the best ID to use for the disk or partition. */
@@ -259,10 +260,11 @@ void BootMan::install(const QStringList &cmdextra)
                     }
                 }
             }
-            if (diskpath.isEmpty()) throw sect.failMessage();
-            /* Setup debconf to achieve the objective of silence. */
-            diskpath.prepend("grub-pc grub-pc/install_devices multiselect /dev/");
-            proc.exec("debconf-set-selections", {}, &diskpath);
+            if (!diskpath.isEmpty()) {
+                /* Setup debconf to achieve the objective of silence. */
+                diskpath.prepend("grub-pc grub-pc/install_devices multiselect /dev/");
+                proc.exec("debconf-set-selections", {}, &diskpath);
+            }
         }
     }
 
