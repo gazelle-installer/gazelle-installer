@@ -30,13 +30,10 @@
 #include "msettings.h"
 #include "oobe.h"
 
-Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings &appConf, bool oem, bool modeOOBE)
+Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, QSettings &appConf, bool oem, bool modeOOBE)
     : QObject(parent), proc(mproc), gui(ui), master(parent), oem(oem), online(modeOOBE),
     passUser(ui.textUserPass, ui.textUserPass2), passRoot(ui.textRootPass, ui.textRootPass2)
 {
-    gui.textComputerName->setText(appConf.value("DEFAULT_HOSTNAME").toString());
-    enableServices = appConf.value("ENABLE_SERVICES").toStringList();
-
     // User accounts
     connect(&passUser, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
     connect(&passRoot, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
@@ -117,7 +114,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, const QSettings 
     QString val = proc.readOut();
     haveSamba = (val.compare("installed") == 0);
 
-    buildServiceList();
+    buildServiceList(appConf);
 }
 
 void Oobe::manageConfig(MSettings &config, bool save) noexcept
@@ -235,7 +232,7 @@ void Oobe::process()
 
 /* Services */
 
-void Oobe::buildServiceList() noexcept
+void Oobe::buildServiceList(QSettings &appconf) noexcept
 {
     //setup treeServices
     gui.treeServices->header()->setMinimumSectionSize(150);
@@ -244,10 +241,11 @@ void Oobe::buildServiceList() noexcept
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
     services_desc.setIniCodec("UTF-8");
 
-    for (const QString &service : qAsConst(enableServices)) {
+    gui.textComputerName->setText(appconf.value("DEFAULT_HOSTNAME").toString());
+    appconf.beginGroup("SERVICES");
+    for (const QString &service : appconf.allKeys()) {
         const QString &lang = QLocale::system().bcp47Name().toLower();
-        QString lang_str = (lang == "en")? "" : "_" + lang;
-        QStringList list = services_desc.value(service + lang_str).toStringList();
+        QStringList list = services_desc.value(lang + '/' + service).toStringList();
         if (list.size() != 2) {
             list = services_desc.value(service).toStringList(); // Use English definition
             if (list.size() != 2) continue;
@@ -271,9 +269,11 @@ void Oobe::buildServiceList() noexcept
             item = new QTreeWidgetItem(parent);
             item->setText(0, service);
             item->setText(1, description);
-            item->setCheckState(0, Qt::Checked);
+            item->setCheckState(0, appconf.value(service).toBool() ? Qt::Checked : Qt::Unchecked);
         }
     }
+    appconf.endGroup();
+
     gui.treeServices->expandAll();
     gui.treeServices->resizeColumnToContents(0);
     gui.treeServices->resizeColumnToContents(1);
@@ -284,6 +284,7 @@ void Oobe::stashServices(bool save) noexcept
     QTreeWidgetItemIterator it(gui.treeServices);
     while (*it) {
         if ((*it)->parent() != nullptr) {
+            // Use an invisible column as a service check state cache.
             (*it)->setCheckState(save?2:0, (*it)->checkState(save?0:2));
         }
         ++it;
