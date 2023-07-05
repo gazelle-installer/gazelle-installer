@@ -80,7 +80,7 @@ void SwapMan::install(QStringList &cmdboot_out)
     }
     proc.exec("fallocate", {"-l", QStringLiteral("%1M").arg(size), instpath});
     chmod(instpath.toUtf8().constData(), 0600);
-    proc.exec("mkswap", {instpath});
+    proc.exec("mkswap", {"-q", instpath});
 
     proc.status(tr("Configuring swap file"));
     // Append the fstab with the swap file entry.
