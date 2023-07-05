@@ -60,7 +60,7 @@ void SwapMan::setupDefaults() noexcept
 
 void SwapMan::install(QStringList &cmdboot_out)
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     proc.advance(1, 2);
     const int size = gui.spinSwapSize->value();
     if (!gui.boxSwap->isChecked() || size <= 0) return;

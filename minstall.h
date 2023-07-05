@@ -111,6 +111,7 @@ private:
     void splashSetThrobber(bool active) noexcept;
     void setupkeyboardbutton() noexcept;
     void abortUI(bool manual, bool closing) noexcept;
+    void abortEndUI(bool closenow) noexcept;
     void cleanup();
     // private functions
     void setupZRam();

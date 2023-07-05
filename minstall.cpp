@@ -104,13 +104,14 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
             startup();
             phase = Ready;
         } catch (const char *msg) {
-            if(msg[0]) {
-                proc.log(QStringLiteral("FAILED START - ") + msg, MProcess::Fail);
-                QMessageBox::critical(this, windowTitle(), tr(msg));
-            }
             proc.unhalt();
             setupAutoMount(true);
-            exit(EXIT_FAILURE);
+            const bool closenow = (!msg || !*msg);
+            if(!closenow) {
+                proc.log(QStringLiteral("FAILED START - ") + msg, MProcess::LOG_FAIL);
+                labelSplash->setText(tr(msg));
+            }
+            abortEndUI(closenow);
         }
     });
 }
@@ -129,7 +130,7 @@ MInstall::~MInstall() {
 // meant to be run after the installer becomes visible
 void MInstall::startup()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     connect(pushClose, &QPushButton::clicked, this, &MInstall::close);
 
     if (!modeOOBE) {
@@ -264,7 +265,7 @@ void MInstall::setupZRam()
 // turn auto-mount off and on
 void MInstall::setupAutoMount(bool enabled)
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
 
     if (autoMountEnabled == enabled) return;
     // check if the systemctl program is present
@@ -382,7 +383,7 @@ bool MInstall::processNextPhase() noexcept
                 progInstall->setEnabled(false);
                 // Using proc.status() prepends the percentage to the text.
                 progInstall->setFormat(tr("Paused for required operator input"));
-                proc.log(progInstall->format(), MProcess::Status);
+                proc.log(progInstall->format(), MProcess::LOG_STATUS);
                 QApplication::beep();
             }
             phase = WaitingForInfo;
@@ -435,7 +436,7 @@ bool MInstall::processNextPhase() noexcept
         if (!msg || !msg[0] || abortion) {
             msg = QT_TR_NOOP("The installation was aborted.");
         }
-        proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::Fail);
+        proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::LOG_FAIL);
 
         const bool closing = (abortion == Closing);
         labelSplash->setText(tr(msg));
@@ -447,16 +448,7 @@ bool MInstall::processNextPhase() noexcept
         }
 
         abortion = Aborted;
-        if (closing) qApp->exit(EXIT_FAILURE); // this->close() doesn't work.
-        else {
-            splashSetThrobber(false);
-            boxMain->unsetCursor();
-            // Close should be the right button at this stage.
-            disconnect(pushNext);
-            connect(pushNext, &QPushButton::clicked, this, &MInstall::close);
-            pushNext->setText(pushClose->text());
-            pushNext->show();
-        }
+        abortEndUI(closing);
         return false;
     }
 
@@ -1062,7 +1054,7 @@ void MInstall::abortUI(bool manual, bool closing) noexcept
                 tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
                 QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
             if (rc == QMessageBox::No) return;
-            proc.log("MANUALLY ABORTED", MProcess::Fail);
+            proc.log("MANUALLY ABORTED", MProcess::LOG_FAIL);
         }
     }
     // At this point the abortion has not been cancelled.
@@ -1072,11 +1064,24 @@ void MInstall::abortUI(bool manual, bool closing) noexcept
     // Early phase bump if waiting on input to trigger abortion cleanup.
     if (manual && phase == WaitingForInfo) processNextPhase();
 }
+void MInstall::abortEndUI(bool closenow) noexcept
+{
+    if (closenow) qApp->exit(EXIT_FAILURE); // this->close() doesn't work.
+    else {
+        splashSetThrobber(false);
+        boxMain->unsetCursor();
+        // Close should be the right button at this stage.
+        disconnect(pushNext);
+        connect(pushNext, &QPushButton::clicked, this, &MInstall::close);
+        pushNext->setText(pushClose->text());
+        pushNext->show();
+    }
+}
 
 // run before closing the app, do some cleanup
 void MInstall::cleanup()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     if (pretend) return;
 
     if (config) config->dumpDebug();

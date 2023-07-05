@@ -109,7 +109,7 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
 bool Base::saveHomeBasic() noexcept
 {
     MProcess::Section sect(proc, nullptr);
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     QString homedir("/");
     const auto fit = partman.mounts.find("/home");
     const DeviceItem *mntit = nullptr;
@@ -143,7 +143,7 @@ bool Base::saveHomeBasic() noexcept
 
 void Base::install()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     if (proc.halted()) return;
     proc.advance(1, 2);
 
@@ -221,7 +221,7 @@ void Base::install()
 
 void Base::copyLinux(bool skiphome)
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     if (proc.halted()) return;
 
     // copy most except usr, mnt and home
@@ -243,7 +243,7 @@ void Base::copyLinux(bool skiphome)
 
     const QString &joined = MProcess::joinCommand(prog, args);
     qDebug().noquote() << "Exec COPY:" << joined;
-    QListWidgetItem *logEntry = proc.log(joined, MProcess::Exec);
+    QListWidgetItem *logEntry = proc.log(joined, MProcess::LOG_EXEC);
 
     QEventLoop eloop;
     QObject::connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
@@ -266,8 +266,8 @@ void Base::copyLinux(bool skiphome)
     }
     qDebug() << "Exit COPY:" << proc.exitCode() << proc.exitStatus();
     if (proc.exitStatus() != QProcess::NormalExit) {
-        proc.log(logEntry, -1);
+        proc.log(logEntry, MProcess::STATUS_CRITICAL);
         throw QT_TR_NOOP("Failed to copy the new system.");
     }
-    proc.log(logEntry, proc.exitCode() ? 0 : 1);
+    proc.log(logEntry, proc.exitCode() ? MProcess::STATUS_ERROR : MProcess::STATUS_OK);
 }
