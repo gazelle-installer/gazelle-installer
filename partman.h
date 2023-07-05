@@ -45,7 +45,7 @@ class DeviceItem
     friend class PartMan;
     friend class DeviceItemIterator;
     friend class DeviceItemDelegate;
-    QVector<DeviceItem *> children;
+    std::vector<DeviceItem *> children;
     DeviceItem *parentItem = nullptr;
     class PartMan *partman = nullptr;
     int order = -1;
@@ -93,7 +93,7 @@ public:
     int row() const noexcept;
     DeviceItem *parent() const noexcept;
     DeviceItem *child(int row) const noexcept;
-    int indexOfChild(DeviceItem *child) noexcept;
+    int indexOfChild(const DeviceItem *child) const noexcept;
     int childCount() const noexcept;
     void sortChildren() noexcept;
     // Layout finishing

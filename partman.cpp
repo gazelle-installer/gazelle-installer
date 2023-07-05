@@ -21,6 +21,7 @@
  * This file is part of the gazelle-installer.
  ***************************************************************************/
 
+#include <iterator>
 #include <sys/stat.h>
 #include <QDebug>
 #include <QLocale>
@@ -1832,9 +1833,9 @@ DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *pre
         if (type == Subvolume) size = parent->size;
         physec = parent->physec;
         partman = parent->partman;
-        const int i = preceding ? (parentItem->children.indexOf(preceding) + 1) : parentItem->childCount();
+        const int i = preceding ? (parentItem->indexOfChild(preceding) + 1) : parentItem->childCount();
         if (partman) partman->beginInsertRows(partman->index(parent), i, i);
-        parent->children.insert(i, this);
+        parent->children.insert(std::next(parent->children.begin(), i), this);
         if (partman) partman->endInsertRows();
     }
 }
@@ -1852,7 +1853,10 @@ DeviceItem::~DeviceItem()
     children.clear();
     if (parentItem) {
         if (parentItem->active == this) parentItem->active = nullptr;
-        parentItem->children.removeAll(this);
+        for (auto it = parentItem->children.begin(); it != parentItem->children.end();) {
+            if (*it == this) it = parentItem->children.erase(it);
+            else ++it;
+        }
         if (partman) {
             partman->endRemoveRows();
             partman->notifyChange(parentItem);
@@ -1861,7 +1865,7 @@ DeviceItem::~DeviceItem()
 }
 void DeviceItem::clear() noexcept
 {
-    const int chcount = children.count();
+    const int chcount = children.size();
     if (partman && chcount > 0) partman->beginRemoveRows(partman->index(this), 0, chcount - 1);
     for (DeviceItem *cit : qAsConst(children)) {
         cit->partman = nullptr; // Stop unnecessary signals.
@@ -1875,7 +1879,7 @@ void DeviceItem::clear() noexcept
 }
 inline int DeviceItem::row() const noexcept
 {
-    return parentItem ? parentItem->children.indexOf(const_cast<DeviceItem *>(this)) : 0;
+    return parentItem ? parentItem->indexOfChild(this) : 0;
 }
 DeviceItem *DeviceItem::parent() const noexcept
 {
@@ -1884,16 +1888,19 @@ DeviceItem *DeviceItem::parent() const noexcept
 }
 inline DeviceItem *DeviceItem::child(int row) const noexcept
 {
-    if (row < 0 || row >= children.count()) return nullptr;
-    return children.at(row);
+    if (row < 0 || row >= static_cast<int>(children.size())) return nullptr;
+    return children[row];
 }
-inline int DeviceItem::indexOfChild(DeviceItem *child) noexcept
+inline int DeviceItem::indexOfChild(const DeviceItem *child) const noexcept
 {
-    return children.indexOf(child);
+    for (size_t ixi = 0; ixi < children.size(); ++ixi) {
+        if (children[ixi] == child) return ixi;
+    }
+    return -1;
 }
 inline int DeviceItem::childCount() const noexcept
 {
-    return children.count();
+    return children.size();
 }
 void DeviceItem::sortChildren() noexcept
 {
@@ -1939,17 +1946,16 @@ inline bool DeviceItem::isActive() const noexcept
 }
 bool DeviceItem::isLocked() const noexcept
 {
-    const int partCount = children.count();
-    for (int ixPart = 0; ixPart < partCount; ++ixPart) {
-        if (children.at(ixPart)->isLocked()) return true;
+    for (const DeviceItem *child : children) {
+        if (child->isLocked()) return true;
     }
-    return (mapCount != 0);
+    return (mapCount != 0); // In use by at least one virtual device.
 }
 bool DeviceItem::willUseGPT() const noexcept
 {
     if (type != Drive) return false;
     if (flags.oldLayout) return flags.curGPT;
-    else if (size >= 2*TB || children.count() > 4) return true;
+    else if (size >= 2*TB || children.size() > 4) return true;
     else if (partman) return (partman->gptoverride || partman->proc.detectEFI());
     return false;
 }
@@ -2094,9 +2100,8 @@ long long DeviceItem::driveFreeSpace(bool inclusive) const noexcept
     const DeviceItem *drvit = parent();
     if (!drvit) drvit = this;
     long long free = drvit->size - PARTMAN_SAFETY;
-    for (int ixi = drvit->children.count() - 1; ixi >= 0; --ixi) {
-        const DeviceItem *partit = drvit->children[ixi];
-        if (inclusive || partit != this) free -= partit->size;
+    for (const DeviceItem *child : drvit->children) {
+        if (inclusive || child != this) free -= child->size;
     }
     return free;
 }
@@ -2194,8 +2199,9 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
 }
 void DeviceItem::labelParts() noexcept
 {
-    for (int ixi = childCount() - 1; ixi >= 0; --ixi) {
-        DeviceItem *chit = children.at(ixi);
+    const size_t nchildren = childCount();
+    for (size_t ixi = 0; ixi < nchildren; ++ixi) {
+        DeviceItem *chit = children[ixi];
         chit->device = join(device, ixi + 1);
         chit->path = "/dev/" + chit->device;
         if (partman) partman->notifyChange(chit, PartMan::Device, PartMan::Device);
