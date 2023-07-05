@@ -298,7 +298,10 @@ void Oobe::setService(const QString &service, bool enabled)
     const QString chroot(sect.root());
     if (enabled) {
         proc.exec("update-rc.d", {service, "defaults"});
-        if (containsSystemD) proc.exec("systemctl", {"enable", service});
+        if (containsSystemD) {
+            proc.exec("systemctl", {"unmask", service});
+            proc.exec("systemctl", {"enable", service});
+        }
         if (containsRunit) {
             QFile::remove(chroot + "/etc/sv/" + service + "/down");
             if (!QFile::exists(chroot + "/etc/sv/" + service)) {

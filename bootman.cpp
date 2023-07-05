@@ -120,12 +120,6 @@ void BootMan::install(const QStringList &cmdextra)
         if (!efivars_ismounted) proc.exec("mount", {"-t", "efivarfs", "efivarfs", efivars});
     }
 
-    // set mounts for chroot
-    proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
-    proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
-    proc.exec("mount", {"--mkdir", "--rbind", "/proc", "/mnt/antiX/proc"});
-    proc.exec("mount", {"--mkdir", "-t", "tmpfs", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
-    proc.exec("mount", {"--mkdir", "--rbind", "/run/udev", "/mnt/antiX/run/udev"});
     sect.setExceptionMode(true);
 
     if (gui.boxBoot->isChecked()) {
