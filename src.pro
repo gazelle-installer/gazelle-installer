@@ -138,7 +138,6 @@ HEADERS += minstall.h \
     version.h \
     msettings.h \
     partman.h \
-    safecache.h \
     mprocess.h
 SOURCES += app.cpp minstall.cpp \
     autopart.cpp \
@@ -150,7 +149,6 @@ SOURCES += app.cpp minstall.cpp \
     oobe.cpp \
     partman.cpp \
     passedit.cpp \
-    safecache.cpp \
     mprocess.cpp \
     swapman.cpp
 LIBS += -lzxcvbn

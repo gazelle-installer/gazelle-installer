@@ -41,7 +41,6 @@
 
 #include "mprocess.h"
 #include "msettings.h"
-#include "safecache.h"
 #include "autopart.h"
 #include "partman.h"
 
@@ -1350,10 +1349,6 @@ void PartMan::fixCryptoSetup()
 {
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to finalize encryption setup."));
 
-    const QLineEdit *passedit = gui.radioEntireDisk->isChecked()
-        ? gui.textCryptoPass : gui.textCryptoPassCust;
-    const QByteArray password(passedit->text().toUtf8());
-
     // Find extra devices
     std::map<QString, DeviceItem *> cryptAdd;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
@@ -1371,43 +1366,17 @@ void PartMan::fixCryptoSetup()
         }
     }
 
-    // Find the device which will contain the keys. This device must be encrypted.
-    const QString keydir("/etc/volkeys/"); // Leading slash is for this findHostDev() call.
-    DeviceItem *keydev = findHostDev(keydir);
-    proc.mkpath("/mnt/antiX"+keydir, 0500, true); // Always make for "plausible confirmability"
-    if (keydev && !keydev->willEncrypt()) keydev = nullptr;
-
+    // Add devices to crypttab.
     QFile file("/mnt/antiX/etc/crypttab");
     if (!file.open(QIODevice::WriteOnly)) throw sect.failMessage();
     QTextStream out(&file);
-    // Add devices to crypttab.
-    SafeCache keycache(4096);
     for (const auto &it : cryptAdd) {
-        out << it.second->devMapper << " UUID=" << it.second->uuid;
-        if (!keydev || it.first == keydev->device) out << " none";
-        else {
-            const QString &keyfile = keydir + it.second->uuid + ".KEY";
-            // Create a new key if there is no existing usable key.
-            const QByteArray &keydest = "/mnt/antiX" + keyfile.toUtf8();
-            if (it.second->willFormat() || QFileInfo(keydest).size() < 16) {
-                if (!keycache.save(keydest.constData(), 0400, true)) throw sect.failMessage();
-                proc.exec("cryptsetup", {"luksAddKey", "/dev/"+it.first, keydest}, &password);
-            }
-            chmod(keydest.constData(), 0400);
-            // Add the (new or existing) key to crypttab.
-            out << ' ' << keyfile;
-        }
-        out << " luks";
+        out << it.second->devMapper << " UUID=" << it.second->uuid << " none luks";
+        if (cryptAdd.size() > 1) out << ",keyscript=decrypt_keyctl";
         if (!it.second->flags.rotational) out << ",no-read-workqueue,no-write-workqueue";
         if (it.second->discgran) out << ",discard";
         out << '\n';
     }
-    // Update cryptdisks if the key is not in the root file system.
-    if (keydev && keydev->realUseFor() != '/') {
-        proc.shell("sed -i 's/^CRYPTDISKS_MOUNT.*$/CRYPTDISKS_MOUNT=\"\\"
-            + keydev->realUseFor() + "\"/' /mnt/antiX/etc/default/cryptdisks");
-    }
-    file.close();
 }
 
 // create /etc/fstab file
