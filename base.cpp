@@ -158,17 +158,21 @@ void Base::install()
     }
 
     MProcess::Section sect(proc);
-    // make empty dir for opt. home already done.
-    // dev, proc, sys, run will be made at mount.
-    proc.status(tr("Creating system directories"));
-    proc.mkpath("/mnt/antiX/opt", 0755);
-
     copyLinux(skiphome);
 
     proc.advance(1, 1);
-    proc.status(tr("Fixing configuration"));
+    proc.status(tr("Creating system directories"));
+    // make empty dir for opt. home already done.
+    proc.mkpath("/mnt/antiX/opt", 0755);
     proc.mkpath("/mnt/antiX/tmp", 01777, true);
+    // Create a chroot environment.
+    proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
+    proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
+    proc.exec("mount", {"--mkdir", "--rbind", "/proc", "/mnt/antiX/proc"});
+    proc.exec("mount", {"--mkdir", "-t", "tmpfs", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
+    proc.exec("mount", {"--mkdir", "--rbind", "/run/udev", "/mnt/antiX/run/udev"});
 
+    proc.status(tr("Fixing configuration"));
     // Copy live set up to install and clean up.
     proc.shell("/usr/sbin/live-to-installed /mnt/antiX");
     qDebug() << "Desktop menu";
@@ -190,13 +194,11 @@ void Base::install()
         proc.exec("rm", {"-rf", "/mnt/antiX/home/demo"});
 
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
-    proc.exec("mount", {"--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
     sect.setRoot("/mnt/antiX");
     proc.exec("rm", {"/var/lib/dbus/machine-id", "/etc/machine-id"});
     proc.exec("dbus-uuidgen", {"--ensure=/etc/machine-id"});
     proc.exec("dbus-uuidgen", {"--ensure"});
     sect.setRoot(nullptr);
-    proc.exec("umount", {"-R", "/mnt/antiX/dev"});
 
     // Disable VirtualBox Guest Additions if not running in VirtualBox.
     if(!proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'")) {
