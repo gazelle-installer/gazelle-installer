@@ -1123,7 +1123,7 @@ void PartMan::installTabs()
 
 void PartMan::preparePartitions()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     static const char *const msgfail = QT_TR_NOOP("Failed to prepare required partitions.");
 
     // Detach all existing partitions.
@@ -1234,7 +1234,7 @@ void PartMan::preparePartitions()
 
 void PartMan::formatPartitions()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
 
     const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
         ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
@@ -1423,7 +1423,7 @@ bool PartMan::makeFstab()
 
 void PartMan::mountPartitions()
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to mount partition."));
     for (auto &it : mounts) {
         if (it.first.at(0) != '/') continue;

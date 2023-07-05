@@ -46,12 +46,19 @@ protected:
     void setupChildProcess() noexcept override;
 public:
     enum LogType {
-        Standard,
-        LogFunction,
-        Status,
-        Fail,
-        Exec
+        LOG_LOG,
+        LOG_MARKER,
+        LOG_STATUS,
+        LOG_FAIL,
+        LOG_EXEC
     };
+    enum Status {
+        STATUS_OK,
+        STATUS_ERROR,
+        STATUS_CRITICAL,
+        STATUS_INFORMATIVE
+    };
+
     MProcess(QObject *parent = Q_NULLPTR);
     void setupUI(class QListWidget *listLog, class QProgressBar *progInstall) noexcept;
     bool exec(const QString &program, const QStringList &arguments = {},
@@ -65,8 +72,8 @@ public:
     bool halted() const noexcept { return halting!=NoHalt; }
     // User interface
     static QString joinCommand(const QString &program, const QStringList &arguments) noexcept;
-    class QListWidgetItem *log(const QString &text, const enum LogType type = Standard) noexcept;
-    void log(class QListWidgetItem *entry, const int status = 1) noexcept;
+    class QListWidgetItem *log(const QString &text, const enum LogType type = LOG_LOG) noexcept;
+    void log(class QListWidgetItem *entry, enum Status status = STATUS_OK) noexcept;
     void status(const QString &text, long progress = -1) noexcept;
     void status(long progress = -1) noexcept;
     void advance(int space, long steps) noexcept;

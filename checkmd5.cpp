@@ -82,25 +82,33 @@ void CheckMD5::check()
     std::unique_ptr<char[]> buf(new char[bufsize]);
     qint64 bprog = 0;
     for(const FileHash &fh : hashes) {
-        QListWidgetItem *logEntry = proc.log("Check MD5: " + fh.path);
+        auto logEntry = proc.log("Check MD5: " + fh.path, MProcess::LOG_EXEC);
         QFile file(fh.path);
-        if (!file.open(QFile::ReadOnly)) throw failmsg;
-        QCryptographicHash hash(QCryptographicHash::Md5);
-        while (checking && !file.atEnd()) {
-            const qint64 rlen = file.read(buf.get(), bufsize);
-            if(rlen < 0) throw failmsg;
-            hash.addData(buf.get(), rlen);
-            bprog += rlen;
-            labelSplash->setText(nsplash.arg((bprog * 100) / btotal));
-            qApp->processEvents();
+        MProcess::Status status = MProcess::STATUS_OK;
+        if (!file.open(QFile::ReadOnly)) status = MProcess::STATUS_CRITICAL;
+        else {
+            QCryptographicHash hash(QCryptographicHash::Md5);
+            while (checking && !file.atEnd()) {
+                const qint64 rlen = file.read(buf.get(), bufsize);
+                if(rlen < 0) break; // I/O error
+                hash.addData(buf.get(), rlen);
+                bprog += rlen;
+                labelSplash->setText(nsplash.arg((bprog * 100) / btotal));
+                qApp->processEvents();
+            }
+
+            if (!checking) status = MProcess::STATUS_ERROR; // Halted
+            else if (!file.atEnd() || hash.result() != fh.hash) {
+                status = MProcess::STATUS_CRITICAL; // I/O error or hash mismatch
+            }
         }
-        if (!checking) break;
-        if (hash.result() != fh.hash) throw failmsg;
-        proc.log(logEntry);
+        proc.log(logEntry, status);
+        if (status == MProcess::STATUS_CRITICAL) throw failmsg;
+        else if (!checking) break;
     }
 
     labelSplash->setText(osplash);
-    if (!checking) proc.log("Check halted");
+    if (!checking) proc.log("Check halted", MProcess::LOG_FAIL);
     checking = false;
 }
 

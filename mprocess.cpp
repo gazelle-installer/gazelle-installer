@@ -102,17 +102,17 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
         }
     }
 
-    int status = 1;
-    if (exitStatus() != QProcess::NormalExit) status = -1; // Process crash
-    else if (error() != QProcess::UnknownError) status = -2; // Start error
-    else if (exitCode() != 0) status = 0; // Process error
+    enum Status status = STATUS_OK;
+    if (exitStatus() != QProcess::NormalExit) status = STATUS_CRITICAL; // Process crash
+    else if (error() != QProcess::UnknownError) status = STATUS_CRITICAL; // Start error
+    else if (exitCode() != 0) status = STATUS_ERROR; // Process error
 
     QDebug dbg(qDebug().nospace() << "Exit #" << execount << ": " << exitCode());
     if (status < 0) dbg << " " << exitStatus() << " " << error();
 
     log(logEntry, status);
-    if (status <= 0) {
-        if (section && section->failmsg && (status<0 || section->strictfail)) {
+    if (status != STATUS_OK) {
+        if (section && section->failmsg && (status==STATUS_CRITICAL || section->strictfail)) {
             throw section->failmsg;
         }
         return false;
@@ -126,14 +126,14 @@ bool MProcess::exec(const QString &program, const QStringList &arguments, const 
     ++execount;
     const QString &cmd = joinCommand(program, arguments);
     qDebug().nospace().noquote() << "Exec #" << execount << ": " << cmd;
-    return exec(program, arguments, input, needRead, log(cmd, Exec));
+    return exec(program, arguments, input, needRead, log(cmd, LOG_EXEC));
 }
 bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead)
 {
     if (checkHalt()) return false;
     ++execount;
     qDebug().nospace().noquote() << "Bash #" << execount << ": " << cmd;
-    return exec("/usr/bin/bash", {"-c", cmd}, input, needRead, log(cmd, Exec));
+    return exec("/usr/bin/bash", {"-c", cmd}, input, needRead, log(cmd, LOG_EXEC));
 }
 
 QString MProcess::readOut(bool everything) noexcept
@@ -149,7 +149,7 @@ QStringList MProcess::readOutLines() noexcept
 
 void MProcess::halt(bool exception) noexcept
 {
-    log(__PRETTY_FUNCTION__, LogFunction);
+    log(__PRETTY_FUNCTION__, LOG_MARKER);
     halting = exception ? ThrowHalt : Halted;
     if(state() != QProcess::NotRunning) {
         QEventLoop eloop;
@@ -196,38 +196,41 @@ QString MProcess::joinCommand(const QString &program, const QStringList &argumen
 
 QListWidgetItem *MProcess::log(const QString &text, const LogType type) noexcept
 {
-    if (type == Standard) qDebug().noquote() << text;
-    else if (type == LogFunction) qDebug().noquote() << "<<" << text << ">>";
-    else if (type == Status) qDebug().noquote() << "++" << text << "++";
-    else if (type == Fail) qDebug().noquote() << "--" << text << "--";
-    if (!logView || type == LogFunction) return nullptr;
+    if (type == LOG_LOG) qDebug().noquote() << text;
+    else if (type == LOG_MARKER) qDebug().noquote() << "<<" << text << ">>";
+    else if (type == LOG_STATUS) qDebug().noquote() << "++" << text << "++";
+    else if (type == LOG_FAIL) qDebug().noquote() << "--" << text << "--";
+    if (!logView || type == LOG_MARKER) return nullptr;
     QListWidgetItem *entry = new QListWidgetItem(text, logView);
     logView->addItem(entry);
-    if (type == Exec) entry->setForeground(Qt::cyan);
-    else if (type == Status || type == Fail) {
+    if (type == LOG_EXEC) entry->setForeground(Qt::cyan);
+    else if (type == LOG_STATUS || type == LOG_FAIL) {
         QFont font(entry->font());
         font.setBold(true);
         entry->setFont(font);
-        if (type == Fail) entry->setForeground(Qt::magenta);
+        if (type == LOG_FAIL) entry->setForeground(Qt::magenta);
     }
     logView->scrollToBottom();
     return entry;
 }
-void MProcess::log(QListWidgetItem *entry, const int status) noexcept
+void MProcess::log(QListWidgetItem *entry, enum Status status) noexcept
 {
     if (!entry) return;
-    if (status > 0) entry->setForeground(Qt::green);
-    else if (status < 0) entry->setForeground(Qt::red);
-    else entry->setForeground(Qt::yellow);
+    switch (status) {
+        case STATUS_CRITICAL: entry->setForeground(Qt::red); break;
+        case STATUS_OK: entry->setForeground(Qt::green); break;
+        case STATUS_ERROR: entry->setForeground(Qt::yellow); break;
+        default: entry->setForeground(Qt::blue); break;
+    }
 }
 
 void MProcess::status(const QString &text, long progress) noexcept
 {
-    if (!progBar) log(text, Status);
+    if (!progBar) log(text, LOG_STATUS);
     else {
         QString fmt = "%p% - " + text;
         if (progBar->format() != fmt) {
-            log(text, Status);
+            log(text, LOG_STATUS);
             progBar->setFormat(fmt);
         }
         status(progress);
@@ -263,7 +266,7 @@ void MProcess::sleep(const int msec, const bool silent) noexcept
     QListWidgetItem *logEntry = nullptr;
     if (!silent) {
         ++sleepcount;
-        logEntry = log(QString("SLEEP: %1ms").arg(msec), Exec);
+        logEntry = log(QString("SLEEP: %1ms").arg(msec), LOG_EXEC);
         qDebug().nospace() << "Sleep #" << sleepcount << ": " << msec << "ms";
     }
     QTimer cstimer(this);
@@ -273,7 +276,7 @@ void MProcess::sleep(const int msec, const bool silent) noexcept
     const int rc = eloop.exec();
     if (!silent) {
         qDebug().nospace() << "Sleep #" << sleepcount << ": exit " << rc;
-        log(logEntry, rc == 0 ? 1 : -1);
+        log(logEntry, rc == 0 ? STATUS_OK : STATUS_CRITICAL);
     }
 }
 bool MProcess::mkpath(const QString &path, mode_t mode, bool force)
@@ -281,11 +284,11 @@ bool MProcess::mkpath(const QString &path, mode_t mode, bool force)
     if (checkHalt()) return false;
     if (!force && QFileInfo::exists(path)) return true;
 
-    QListWidgetItem *logEntry = log("MKPATH: "+path, Exec);
+    QListWidgetItem *logEntry = log("MKPATH: "+path, LOG_EXEC);
     bool rc = QDir().mkpath(path);
     if (mode && rc) rc = (chmod(path.toUtf8().constData(), mode) == 0);
     qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
-    log(logEntry, rc ? 1 : -1);
+    log(logEntry, rc ? STATUS_OK : STATUS_CRITICAL);
     if(!rc && section && section->failmsg) throw section->failmsg;
     return rc;
 }
@@ -343,13 +346,13 @@ MProcess::Section::Section(class MProcess &mproc) noexcept
 MProcess::Section::~Section() noexcept
 {
     const char *oldroot = oldsection ? oldsection->rootdir : nullptr;
-    if (qstrcmp(oldroot, rootdir)) proc.log(QString("Revert root: ")+oldroot, Standard);
+    if (qstrcmp(oldroot, rootdir)) proc.log(QString("Revert root: ")+oldroot, LOG_LOG);
     proc.section = oldsection;
 }
 
 // Note: newroot must be valid and unchanged for the life of the chroot.
 void MProcess::Section::setRoot(const char *newroot) noexcept
 {
-    if (qstrcmp(newroot, rootdir)) proc.log(QString("Change root: ")+newroot, Standard);
+    if (qstrcmp(newroot, rootdir)) proc.log(QString("Change root: ")+newroot, LOG_LOG);
     rootdir = newroot; // Might be different pointers to the same text.
 }

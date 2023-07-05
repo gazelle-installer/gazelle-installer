@@ -100,7 +100,7 @@ void BootMan::buildBootLists() noexcept
 // build a grub configuration and install grub
 void BootMan::install(const QStringList &cmdextra)
 {
-    proc.log(__PRETTY_FUNCTION__, MProcess::LogFunction);
+    proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     MProcess::Section sect(proc, QT_TR_NOOP("GRUB installation failed. You can reboot to"
         " the live medium and use the GRUB Rescue menu to repair the installation."));
     proc.advance(4, 4);
