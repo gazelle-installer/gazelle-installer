@@ -315,7 +315,7 @@ void AutoPart::toggleEncrypt(bool checked) noexcept
     if (!canHibernate) gui.checkHibernationReg->setChecked(false);
 
     setParams(true, checked, gui.checkHibernationReg->isChecked(), true);
-    if (!inBuilder) gui.pushNext->setEnabled(!checked || passCrypto.isValid());
+    if (!inBuilder) gui.pushNext->setEnabled(!checked || passCrypto.valid());
 }
 
 void AutoPart::sliderPressed() noexcept

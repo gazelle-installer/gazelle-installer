@@ -32,7 +32,7 @@
 
 Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, QSettings &appConf, bool oem, bool modeOOBE)
     : QObject(parent), proc(mproc), gui(ui), master(parent), oem(oem), online(modeOOBE),
-    passUser(ui.textUserPass, ui.textUserPass2), passRoot(ui.textRootPass, ui.textRootPass2)
+    passUser(ui.textUserPass, ui.textUserPass2, 0, this), passRoot(ui.textRootPass, ui.textRootPass2, 0, this)
 {
     // User accounts
     connect(&passUser, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
@@ -503,12 +503,19 @@ QWidget *Oobe::validateUserInfo(bool automatic) noexcept
         }
     }
 
-    if (!automatic && gui.boxRootAccount->isChecked() && gui.textRootPass->text().isEmpty()) {
+    if (!automatic && passUser.length()==0) {
+        // Confirm that an empty user password is not accidental.
+        const QMessageBox::StandardButton ans = QMessageBox::warning(master, master->windowTitle(),
+            tr("You did not provide a passphrase for %1.").arg(gui.textUserName->text()) + '\n'
+            + tr("Are you sure you want to continue?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (ans != QMessageBox::Yes) return gui.textUserPass;
+    }
+    if (!automatic && gui.boxRootAccount->isChecked() && passRoot.length()==0) {
         // Confirm that an empty root password is not accidental.
         const QMessageBox::StandardButton ans = QMessageBox::warning(master,
             master->windowTitle(), tr("You did not provide a password for the root account."
                 " Do you want to continue?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (ans != QMessageBox::Yes) return gui.textUserName;
+        if (ans != QMessageBox::Yes) return gui.textRootPass;
     }
 
     return nullptr;
@@ -687,9 +694,9 @@ void Oobe::timeAreaIndexChanged(int index) noexcept
 void Oobe::userPassValidationChanged() noexcept
 {
     bool ok = !gui.textUserName->text().isEmpty();
-    if (ok) ok = passUser.isValid() || gui.textUserName->text().isEmpty();
+    if (ok) ok = passUser.valid() || gui.textUserName->text().isEmpty();
     if (ok && gui.boxRootAccount->isChecked()) {
-        ok = passRoot.isValid() || gui.textRootPass->text().isEmpty();
+        ok = passRoot.valid() || gui.textRootPass->text().isEmpty();
     }
     gui.pushNext->setEnabled(ok);
 }
