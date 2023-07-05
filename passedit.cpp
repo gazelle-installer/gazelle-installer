@@ -107,10 +107,11 @@ void PassEdit::masterContextMenu(const QPoint &pos) noexcept
     QMenu *menu = master->createStandardContextMenu();
     menu->addSeparator();
     QAction *actGenPass = menu->addAction(gentext);
-    if (menu->exec(master->mapToGlobal(pos)) == actGenPass) {
+    connect(actGenPass, &QAction::triggered, this, [this]() {
         master->setText(gentext);
         generate();
-    }
+    });
+    menu->popup(master->mapToGlobal(pos));
 }
 
 bool PassEdit::eventFilter(QObject *watched, QEvent *event) noexcept
