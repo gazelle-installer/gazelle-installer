@@ -432,7 +432,7 @@ bool MInstall::processNextPhase() noexcept
         }
 
         abortion = Aborted;
-        if (closing) this->close();
+        if (closing) qApp->exit(EXIT_FAILURE); // this->close() doesn't work.
         else {
             splashSetThrobber(false);
             boxMain->unsetCursor();
