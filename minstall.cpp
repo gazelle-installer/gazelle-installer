@@ -367,7 +367,9 @@ bool MInstall::processNextPhase() noexcept
             }
             if (widgetStack->currentWidget() != pageProgress) {
                 progInstall->setEnabled(false);
-                proc.status(tr("Paused for required operator input"));
+                // Using proc.status() prepends the percentage to the text.
+                progInstall->setFormat(tr("Paused for required operator input"));
+                proc.log(progInstall->format(), MProcess::Status);
                 QApplication::beep();
             }
             phase = WaitingForInfo;
