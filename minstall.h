@@ -113,6 +113,7 @@ private:
     void abortUI(bool manual, bool closing) noexcept;
     void cleanup();
     // private functions
+    void setupZRam();
     void setupAutoMount(bool enabled);
     bool pretendToInstall(int space, long steps) noexcept;
     void manageConfig(enum ConfigAction mode) noexcept;

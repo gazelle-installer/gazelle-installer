@@ -1271,7 +1271,7 @@ void PartMan::formatPartitions()
             if (!proc.exec("parted", {"-s", "/dev/" + devsplit.at(0),
                 "set", devsplit.at(1), "bios_grub", "on"})) throw msgfail;
         } else if (useFor == "SWAP") {
-            QStringList cargs(dev);
+            QStringList cargs({"-q", dev});
             if (!twit->label.isEmpty()) cargs << "-L" << twit->label;
             if (!proc.exec("mkswap", cargs)) throw msgfail;
         } else {
