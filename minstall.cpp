@@ -653,7 +653,7 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
                 " partitions you need.").arg(PROJECTNAME, radioCustomPart->text().remove('&')) + "</p>");
-        enableNext = radioCustomPart->isChecked() || !boxEncryptAuto->isChecked() || autopart->passCrypto.isValid();
+        enableNext = radioCustomPart->isChecked() || !boxEncryptAuto->isChecked() || autopart->passCrypto.valid();
         break;
 
     case Step::Partitions:
@@ -736,7 +736,7 @@ void MInstall::pageDisplayed(int next) noexcept
             "<p><b>" + tr("Virtual Devices") + "</b><br/>"
             + tr("If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
             "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
-        enableNext = !(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || passCryptoCust->isValid();
+        enableNext = !(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || passCryptoCust->valid();
         break;
 
     case Step::Boot: // Start of installation.
@@ -1167,5 +1167,5 @@ void MInstall::on_pushSetKeyboard_clicked() noexcept
 void MInstall::on_radioEntireDisk_toggled(bool checked) noexcept
 {
     boxAutoPart->setEnabled(checked);
-    pushNext->setEnabled(!checked || !boxEncryptAuto->isChecked() || autopart->passCrypto.isValid());
+    pushNext->setEnabled(!checked || !boxEncryptAuto->isChecked() || autopart->passCrypto.valid());
 }
