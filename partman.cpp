@@ -2043,12 +2043,19 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
             if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
             if (all || size <= 8*GB) {
                 if (size < (2*TB - 512)) checkAndAdd("ESP");
-                checkAndAdd("boot");
+                checkAndAdd("/boot"); // static files of the boot loader
             }
         }
     }
-    checkAndAdd("root");
-    checkAndAdd("home");
+    // Debian 12 installer order: / /boot /home /tmp /usr /var /srv /opt /usr/local
+    checkAndAdd("/"); // the root file system
+    checkAndAdd("/home"); // user home directories
+    checkAndAdd("/usr"); // static data
+    // checkAndAdd("/usr/local"); // local hierarchy
+    checkAndAdd("/var"); // variable data
+    // checkAndAdd("/tmp"); // temporary files
+    // checkAndAdd("/srv"); // data for services provided by this system
+    // checkAndAdd("/opt"); // add-on application software packages
     if (type != Subvolume) checkAndAdd("swap");
     else checkAndAdd("/swap");
     return list;

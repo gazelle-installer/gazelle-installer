@@ -162,6 +162,9 @@ void MInstall::startup()
             checkmd5 = nullptr;
         }
 
+        // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
+        if (QFileInfo::exists("/usr/sbin/zramswap")) proc.exec("zramswap", {"start"});
+
         partman = new PartMan(proc, *this, appConf, appArgs);
         base = new Base(proc, *partman, *this, appConf, appArgs);
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
