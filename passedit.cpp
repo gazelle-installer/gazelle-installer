@@ -45,9 +45,12 @@ PassEdit::PassEdit(QLineEdit *master, QLineEdit *slave, int min, QObject *parent
     master->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(master, &QLineEdit::textChanged, this, &PassEdit::masterTextChanged);
     connect(slave, &QLineEdit::textChanged, this, &PassEdit::slaveTextChanged);
-    connect(master, &QWidget::customContextMenuRequested, this, &PassEdit::masterContextMenu);
     if (min == 0) lastValid = true; // Control starts with no text
+
     generate(); // Pre-load the generator
+    if (!gentext.isEmpty()) {
+        connect(master, &QWidget::customContextMenuRequested, this, &PassEdit::masterContextMenu);
+    }
 
     actionEye = master->addAction(QIcon(":/eye-show"), QLineEdit::TrailingPosition);
     actionEye->setCheckable(true);
@@ -56,11 +59,6 @@ PassEdit::PassEdit(QLineEdit *master, QLineEdit *slave, int min, QObject *parent
     actionGauge = slave->addAction(QIcon(":/gauge/0"), QLineEdit::TrailingPosition);
 
     masterTextChanged(master->text());
-}
-
-bool PassEdit::isValid() const noexcept
-{
-    return lastValid;
 }
 
 void PassEdit::generate() noexcept
@@ -75,17 +73,15 @@ void PassEdit::generate() noexcept
                 if (word.size() <= GEN_WORD_MAX) words.append(word);
             }
             file.close();
-        } else {
-            words << "TULS" << "TIHS" << "YSSUP" << "SSIP" << "KCUF" << "GAF" << "EHCUOD" << "KCID";
-            words << "NMAD" << "TNUC" << "PARC" << "KCOC" << "HCTIB" << "DRATSAB" << "ELOHSSA";
         }
+        if (words.isEmpty()) return;
         for (int i = std::min(GEN_NUMBER_MAX, (words.count()/GEN_WORD_NUM_RATIO)-1); i >= 0; --i) {
             words.append(QString::number(i));
         }
         std::srand(unsigned(std::time(nullptr)));
         pos = words.count();
     }
-    genText.clear();
+    gentext.clear();
     double entropy = 0;
     const int genmax = master->maxLength();
     do {
@@ -94,25 +90,25 @@ void PassEdit::generate() noexcept
             pos = 0;
         }
         const QString &word = words.at(pos);
-        const int origlen = genText.length();
-        if (origlen) genText.append(' ');
-        genText.append(word);
-        if (genText.length() > genmax) {
-            genText.truncate(origlen);
+        const int origlen = gentext.length();
+        if (origlen) gentext.append(' ');
+        gentext.append(word);
+        if (gentext.length() > genmax) {
+            gentext.truncate(origlen);
             break;
         }
-        entropy = ZxcvbnMatch(genText.toUtf8().constData(), nullptr, nullptr);
+        entropy = ZxcvbnMatch(gentext.toUtf8().constData(), nullptr, nullptr);
         ++pos;
-    } while (genText.length() <= min || entropy <= 130); // Very strong
+    } while (gentext.length() <= min || entropy <= 130); // Very strong
 }
 
 void PassEdit::masterContextMenu(const QPoint &pos) noexcept
 {
     QMenu *menu = master->createStandardContextMenu();
     menu->addSeparator();
-    QAction *actGenPass = menu->addAction(genText);
+    QAction *actGenPass = menu->addAction(gentext);
     if (menu->exec(master->mapToGlobal(pos)) == actGenPass) {
-        master->setText(genText);
+        master->setText(gentext);
         generate();
     }
 }
