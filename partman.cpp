@@ -421,25 +421,22 @@ void PartMan::treeSelChange() noexcept
     if (twit && twit->type != DeviceItem::Subvolume) {
         const bool isdrive = (twit->type == DeviceItem::Drive);
         bool isold = twit->flags.oldLayout;
-        bool islocked = true;
-        if (isdrive) {
-            islocked = twit->isLocked();
-            if (twit->flags.curEmpty) isold = false;
-        }
-        gui.pushPartClear->setEnabled(!islocked);
+        const bool islocked = twit->isLocked();
+        if (isdrive && twit->flags.curEmpty) isold = false;
+        gui.pushPartClear->setEnabled(isdrive && !islocked);
         gui.pushPartRemove->setEnabled(!isold && !isdrive);
         // Only allow adding partitions if there is enough space.
         DeviceItem *drvit = twit->parent();
         if (!drvit) drvit = twit;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
-        else if (!isold) {
-            gui.pushPartAdd->setEnabled(drvit->childCount() < PARTMAN_MAX_PARTS
-                && twit->driveFreeSpace(true) > 1*MB);
+        else {
+            gui.pushPartAdd->setEnabled(twit->driveFreeSpace(true) > 1*MB
+                && !isold && drvit->childCount() < PARTMAN_MAX_PARTS);
         }
     } else {
         gui.pushPartClear->setEnabled(false);
-        gui.pushPartAdd->setEnabled(false);
-        gui.pushPartRemove->setEnabled(twit && twit->type == DeviceItem::Subvolume);
+        gui.pushPartAdd->setEnabled(twit != nullptr);
+        gui.pushPartRemove->setEnabled(twit != nullptr && !twit->flags.oldLayout);
     }
 }
 
@@ -553,16 +550,21 @@ void PartMan::partClearClick(bool)
 void PartMan::partAddClick(bool) noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (!twit) return;
-    DeviceItem *drive = twit->parent();
-    if (!drive) drive = twit;
+    DeviceItem *selitem = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
+    if (!selitem) return;
+    DeviceItem *volume = selitem->parent();
+    if (!volume) volume = selitem;
 
-    DeviceItem *part = new DeviceItem(DeviceItem::Partition, drive, twit);
-    drive->labelParts();
-    drive->flags.oldLayout = false;
-    notifyChange(drive);
-    gui.treePartitions->selectionModel()->select(index(part),
+    DeviceItem::DeviceType newtype = DeviceItem::Partition;
+    if (selitem->type == DeviceItem::Subvolume) newtype = DeviceItem::Subvolume;
+
+    DeviceItem *newitem = new DeviceItem(newtype, volume, selitem);
+    if (newtype == DeviceItem::Partition) {
+        volume->labelParts();
+        volume->flags.oldLayout = false;
+        notifyChange(volume);
+    }
+    gui.treePartitions->selectionModel()->select(index(newitem),
         QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
