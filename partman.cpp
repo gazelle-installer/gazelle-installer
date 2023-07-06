@@ -634,9 +634,8 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
             treeSelChange();
             gui.boxMain->setEnabled(true);
             qApp->restoreOverrideCursor();
-        } catch(const char *msg) {
+        } catch(...) {
             // This time, failure is not a dealbreaker.
-            qDebug() << "partMenuUnlock() failed:" << msg;
             gui.boxMain->setEnabled(true);
             qApp->restoreOverrideCursor();
             QMessageBox::warning(gui.boxMain, QString(),
@@ -1014,21 +1013,19 @@ bool PartMan::checkTargetDrivesOK()
 
 void PartMan::luksFormat(DeviceItem *partit, const QByteArray &password)
 {
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to format LUKS container."));
     QStringList cargs({"--batch-mode", "--key-size=512", "--hash=sha512"});
     if (partit->physec > 0) cargs.append("--sector-size=" + QString::number(partit->physec));
     cargs << "luksFormat" << partit->path;
-    if (!proc.exec("cryptsetup", cargs, &password)) {
-        throw QT_TR_NOOP("Failed to format LUKS container.");
-    }
+    proc.exec("cryptsetup", cargs, &password);
 }
 
 void PartMan::luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password)
 {
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to open LUKS container."));
     QStringList cargs({"open", partit->path, luksfs, "--type", "luks"});
     if (partit->discgran) cargs.prepend("--allow-discards");
-    if (!proc.exec("cryptsetup", cargs, &password)) {
-        throw QT_TR_NOOP("Failed to open LUKS container.");
-    }
+    proc.exec("cryptsetup", cargs, &password);
 }
 
 DeviceItem *PartMan::selectedDriveAuto() noexcept
@@ -1125,7 +1122,7 @@ void PartMan::installTabs()
 void PartMan::preparePartitions()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
-    static const char *const msgfail = QT_TR_NOOP("Failed to prepare required partitions.");
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to prepare required partitions."));
 
     // Detach all existing partitions.
     QStringList listToUnmount;
@@ -1147,18 +1144,21 @@ void PartMan::preparePartitions()
     }
 
     // Clean up any leftovers.
-    if (QFileInfo::exists("/mnt/antiX")) {
-        proc.exec("umount", {"-qR", "/mnt/antiX"});
-        proc.exec("rm", {"-rf", "/mnt/antiX"});
-    }
-    // Detach swap and file systems of targets which may have been auto-mounted.
-    proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
-    const QStringList swaps = proc.readOutLines();
-    proc.exec("findmnt", {"--raw", "-o", "SOURCE"}, nullptr, true);
-    const QStringList fsmounts = proc.readOutLines();
-    for (const QString &devpath : qAsConst(listToUnmount)) {
-        if (swaps.contains(devpath)) proc.exec("swapoff", {devpath});
-        if (fsmounts.contains(devpath)) proc.exec("umount", {"-q", devpath});
+    {
+        MProcess::Section sect2(proc, nullptr);
+        if (QFileInfo::exists("/mnt/antiX")) {
+            proc.exec("umount", {"-qR", "/mnt/antiX"});
+            proc.exec("rm", {"-rf", "/mnt/antiX"});
+        }
+        // Detach swap and file systems of targets which may have been auto-mounted.
+        proc.exec("swapon", {"--show=NAME", "--noheadings"}, nullptr, true);
+        const QStringList swaps = proc.readOutLines();
+        proc.exec("findmnt", {"--raw", "-o", "SOURCE"}, nullptr, true);
+        const QStringList fsmounts = proc.readOutLines();
+        for (const QString &devpath : qAsConst(listToUnmount)) {
+            if (swaps.contains(devpath)) proc.exec("swapoff", {devpath});
+            if (fsmounts.contains(devpath)) proc.exec("umount", {"-q", devpath});
+        }
     }
 
     // Prepare partition tables on devices which will have a new layout.
@@ -1166,18 +1166,19 @@ void PartMan::preparePartitions()
         DeviceItem *drvit = root.child(ixi);
         if (drvit->flags.oldLayout || drvit->type == DeviceItem::VirtualDevices) continue;
         proc.status(tr("Preparing partition tables"));
-
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
-        const long long offset = (drvit->size / 65536) - 63; // Account for integer rounding.
-        QStringList cargs({"conv=notrunc", "bs=64K", "count=64", "if=/dev/zero", "of=" + drvit->path});
-        // First 17KB = primary partition table (accounts for both MBR and GPT disks).
-        // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
-        proc.exec("dd", cargs);
-        // Last 17KB = secondary partition table (for GPT disks).
-        cargs.append("seek=" + QString::number(offset));
-        proc.exec("dd", cargs);
-        if (!proc.exec("parted", {"-s", drvit->path, "mklabel",
-            (drvit->willUseGPT() ? "gpt" : "msdos")})) throw msgfail;
+        {
+            MProcess::Section sect2(proc, nullptr);
+            const long long offset = (drvit->size / 65536) - 63; // Account for integer rounding.
+            QStringList cargs({"conv=notrunc", "bs=64K", "count=64", "if=/dev/zero", "of=" + drvit->path});
+            // First 17KB = primary partition table (accounts for both MBR and GPT disks).
+            // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
+            proc.exec("dd", cargs);
+            // Last 17KB = secondary partition table (for GPT disks).
+            cargs.append("seek=" + QString::number(offset));
+            proc.exec("dd", cargs);
+        }
+        proc.exec("parted", {"-s", drvit->path, "mklabel", (drvit->willUseGPT() ? "gpt" : "msdos")});
     }
 
     // Prepare partition tables, creating tables and partitions when needed.
@@ -1200,7 +1201,7 @@ void PartMan::preparePartitions()
                 if (useFor.isEmpty()) continue;
                 else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
                 const QStringList &devsplit = DeviceItem::split(twit->device);
-                if (!proc.shell(cmd.arg(devsplit.at(0), devsplit.at(1), ptype))) throw msgfail;
+                proc.shell(cmd.arg(devsplit.at(0), devsplit.at(1), ptype));
                 proc.status();
             }
         } else {
@@ -1209,9 +1210,8 @@ void PartMan::preparePartitions()
             for (int ixdev = 0; ixdev<devCount; ++ixdev) {
                 DeviceItem *twit = drvit->child(ixdev);
                 const long long end = start + twit->size / MB;
-                const bool rc = proc.exec("parted", {"-s", "--align", "optimal", drvit->path,
+                proc.exec("parted", {"-s", "--align", "optimal", drvit->path,
                     "mkpart" , "primary", QString::number(start) + "MiB", QString::number(end) + "MiB"});
-                if (!rc) throw msgfail;
                 start = end;
                 proc.status();
             }
@@ -1225,7 +1225,7 @@ void PartMan::preparePartitions()
                 QStringList cargs({"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1)});
                 cargs.append(useGPT ? "legacy_boot" : "boot");
                 cargs.append("on");
-                if(!proc.exec("parted", cargs)) throw msgfail;
+                proc.exec("parted", cargs);
             }
             proc.status();
         }
@@ -1236,6 +1236,7 @@ void PartMan::preparePartitions()
 void PartMan::formatPartitions()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to format partition."));
 
     const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
         ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
@@ -1255,26 +1256,23 @@ void PartMan::formatPartitions()
         const QString &fmtstatus = tr("Formatting: %1");
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(dev));
         else proc.status(fmtstatus.arg(twit->shownUseFor()));
-        static const char *const msgfail = QT_TR_NOOP("Failed to format partition.");
         if (useFor == "ESP") {
             QStringList cargs({"-F", twit->format.mid(3)});
             if (twit->chkbadblk) cargs.append("-c");
             if (!twit->label.isEmpty()) cargs << "-n" << twit->label.trimmed().left(11);
             cargs.append(dev);
-            if (!proc.exec("mkfs.msdos", cargs)) throw msgfail;
+            proc.exec("mkfs.msdos", cargs);
             // Sets boot flag and ESP flag.
             const QStringList &devsplit = DeviceItem::split(dev);
-            if (!proc.exec("parted", {"-s", "/dev/" + devsplit.at(0),
-                "set", devsplit.at(1), "esp", "on"})) throw msgfail;
+            proc.exec("parted", {"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1), "esp", "on"});
         } else if (useFor == "BIOS-GRUB") {
             proc.exec("dd", {"bs=64K", "if=/dev/zero", "of=" + dev});
             const QStringList &devsplit = DeviceItem::split(dev);
-            if (!proc.exec("parted", {"-s", "/dev/" + devsplit.at(0),
-                "set", devsplit.at(1), "bios_grub", "on"})) throw msgfail;
+            proc.exec("parted", {"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1), "bios_grub", "on"});
         } else if (useFor == "SWAP") {
             QStringList cargs({"-q", dev});
             if (!twit->label.isEmpty()) cargs << "-L" << twit->label;
-            if (!proc.exec("mkswap", cargs)) throw msgfail;
+            proc.exec("mkswap", cargs);
         } else {
             // Transplanted from minstall.cpp and modified to suit.
             const QString &format = twit->format;
@@ -1298,7 +1296,7 @@ void PartMan::formatPartitions()
                 else cargs.append("-L");
                 cargs.append(twit->label);
             }
-            if (!proc.exec("mkfs." + format, cargs)) throw msgfail;
+            proc.exec("mkfs." + format, cargs);
             if (format.startsWith("ext")) {
                 proc.exec("tune2fs", {"-c0", "-C0", "-i1m", dev}); // ext4 tuning
             }

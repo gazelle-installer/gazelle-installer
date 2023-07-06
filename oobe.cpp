@@ -529,25 +529,22 @@ void Oobe::setUserInfo()
 {
     // set the user passwords first
     bool ok = true;
-    MProcess::Section sect(proc);
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to set user account passwords."));
     if (!online) sect.setRoot("/mnt/antiX");
     const QString &userPass = gui.textUserPass->text();
     QByteArray userinfo;
-    if (!(gui.boxRootAccount->isChecked())) ok = proc.exec("passwd", {"-l", "root"});
+    if (!gui.boxRootAccount->isChecked()) proc.exec("passwd", {"-l", "root"});
     else {
         const QString &rootPass = gui.textRootPass->text();
-        if (rootPass.isEmpty()) ok = proc.exec("passwd", {"-d", "root"});
+        if (rootPass.isEmpty()) proc.exec("passwd", {"-d", "root"});
         else userinfo.append(QString("root:" + rootPass).toUtf8());
     }
-    if (ok && userPass.isEmpty()) ok = proc.exec("passwd", {"-d", "demo"});
+    if (userPass.isEmpty()) proc.exec("passwd", {"-d", "demo"});
     else {
         if (!userinfo.isEmpty()) userinfo.append('\n');
         userinfo.append(QString("demo:" + userPass).toUtf8());
     }
-    if (ok && !userinfo.isEmpty()) ok = proc.exec("chpasswd", {}, &userinfo);
-    if (!ok) {
-        throw QT_TR_NOOP("Failed to set user account passwords.");
-    }
+    if (!userinfo.isEmpty()) proc.exec("chpasswd", {}, &userinfo);
     sect.setRoot(nullptr);
 
     QString rootpath;
@@ -558,19 +555,17 @@ void Oobe::setUserInfo()
 
     if (QFileInfo::exists(dpath)) {
         if (gui.radioOldHomeSave->isChecked()) {
-            ok = false;
-            QStringList cargs({"-f", dpath, dpath});
-            for (int ixi = 1; ixi < 10 && !ok; ++ixi) {
-                cargs.last() = dpath + ".00" + QString::number(ixi);
-                ok = proc.exec("mv", cargs);
-            }
-            if (!ok) {
-                throw QT_TR_NOOP("Failed to save old home directory.");
+            sect.setExceptionMode(QT_TR_NOOP("Failed to save old home directory."));
+            for (int ixi = 1; ; ++ixi) {
+                const QString &dest(dpath + ".00" + QString::number(ixi));
+                if (!QFileInfo::exists(dest)) {
+                    proc.exec("mv", {"-f", dpath, dest});
+                    break;
+                }
             }
         } else if (gui.radioOldHomeDelete->isChecked()) {
-            if (!proc.exec("rm", {"-rf", dpath})) {
-                throw QT_TR_NOOP("Failed to delete old home directory.");
-            }
+            sect.setExceptionMode(QT_TR_NOOP("Failed to delete old home directory."));
+            proc.exec("rm", {"-rf", dpath});
         }
         proc.exec("sync"); // The sync(2) system call will block the GUI.
     }
@@ -589,15 +584,15 @@ void Oobe::setUserInfo()
     } else { // dir does not exist, must create it
         // Copy skel to demo, unless demo folder exists in remastered linuxfs.
         if (!remasteredDemo) {
-            if (!proc.exec("cp", {"-a", skelpath, dpath})) {
-                throw QT_TR_NOOP("Sorry, failed to create user directory.");
-            }
+            sect.setExceptionMode(QT_TR_NOOP("Sorry, failed to create user directory."));
+            proc.exec("cp", {"-a", skelpath, dpath});
         } else { // still rename the demo directory even if remastered demo home folder is detected
-            if (!proc.exec("mv", {"-f", rootpath + "/home/demo", dpath})) {
-                throw QT_TR_NOOP("Sorry, failed to name user directory.");
-            }
+            sect.setExceptionMode(QT_TR_NOOP("Sorry, failed to name user directory."));
+            proc.exec("mv", {"-f", rootpath + "/home/demo", dpath});
         }
     }
+
+    sect.setExceptionMode(nullptr); // TODO: Make the following shell script minefield more robust.
 
     // saving Desktop changes
     if (gui.checkSaveDesktop->isChecked()) {
@@ -628,18 +623,15 @@ void Oobe::setUserInfo()
     }
 
     // fix the ownership, demo=newuser
-    ok = proc.exec("chown", {"-R", "demo:demo", dpath});
-    if (ok) {
-        // Set permissions according to /etc/adduser.conf
-        QSettings addusercfg("/etc/adduser.conf", QSettings::NativeFormat);
-        mode_t mode = addusercfg.value("DIR_MODE", "0700").toString().toUInt(&ok, 8);
-        if (ok) ok = (chmod(dpath.toUtf8().constData(), mode) == 0);
-    }
-    if (!ok) {
-        throw QT_TR_NOOP("Failed to set ownership or permissions of user directory.");
-    }
+    sect.setExceptionMode(QT_TR_NOOP("Failed to set ownership or permissions of user directory."));
+    proc.exec("chown", {"-R", "demo:demo", dpath});
+    // Set permissions according to /etc/adduser.conf
+    QSettings addusercfg("/etc/adduser.conf", QSettings::NativeFormat);
+    mode_t mode = addusercfg.value("DIR_MODE", "0700").toString().toUInt(&ok, 8);
+    if (chmod(dpath.toUtf8().constData(), mode) != 0) throw sect.failMessage();
 
     // change in files
+    sect.setExceptionMode(nullptr);
     replaceStringInFile("demo", username, rootpath + "/etc/group");
     replaceStringInFile("demo", username, rootpath + "/etc/gshadow");
     replaceStringInFile("demo", username, rootpath + "/etc/passwd");
