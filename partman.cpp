@@ -2432,6 +2432,10 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
         item->size = qobject_cast<QSpinBox *>(editor)->value();
         item->size *= 1048576; // Separate step to prevent int overflow.
         if (item->size == 0) item->size = item->driveFreeSpace();
+        // Set subvolume sizes to keep allowed uses accurate.
+        for (DeviceItem *subvol : item->children) {
+            subvol->size = item->size;
+        }
         break;
     case PartMan::UseFor:
         item->usefor = qobject_cast<QComboBox *>(editor)->currentText().trimmed();
