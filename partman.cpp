@@ -497,7 +497,8 @@ void PartMan::treeMenu(const QPoint &)
         else if (action == actActive) twit->setActive(action->isChecked());
         else if (action == actAddCrypttab) twit->addToCrypttab = action->isChecked();
         else if (action == actNewSubvolume) {
-            new DeviceItem(DeviceItem::Subvolume, twit);
+            DeviceItem *subvol = new DeviceItem(DeviceItem::Subvolume, twit);
+            subvol->autoFill();
             gui.treePartitions->expand(selIndex);
         } else if (action == actScanSubvols) {
             scanSubvolumes(twit);
@@ -563,6 +564,8 @@ void PartMan::partAddClick(bool) noexcept
         volume->labelParts();
         volume->flags.oldLayout = false;
         notifyChange(volume);
+    } else {
+        newitem->autoFill();
     }
     gui.treePartitions->selectionModel()->select(index(newitem),
         QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
@@ -2148,7 +2151,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
                 for (int ixi = 2; chklist.contains(newLabel, Qt::CaseInsensitive); ++ixi) {
                     newLabel = QString::number(ixi) + '@' + base;
                 }
-            } else {
+            } else if (!use.isEmpty()) {
                 newLabel = use;
                 for (int ixi = 2; chklist.contains(newLabel, Qt::CaseInsensitive); ++ixi) {
                     newLabel = usefor + QString::number(ixi);
