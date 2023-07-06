@@ -1011,23 +1011,6 @@ bool PartMan::checkTargetDrivesOK()
     return true;
 }
 
-void PartMan::luksFormat(DeviceItem *partit, const QByteArray &password)
-{
-    MProcess::Section sect(proc, QT_TR_NOOP("Failed to format LUKS container."));
-    QStringList cargs({"--batch-mode", "--key-size=512", "--hash=sha512"});
-    if (partit->physec > 0) cargs.append("--sector-size=" + QString::number(partit->physec));
-    cargs << "luksFormat" << partit->path;
-    proc.exec("cryptsetup", cargs, &password);
-}
-
-void PartMan::luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password)
-{
-    MProcess::Section sect(proc, QT_TR_NOOP("Failed to open LUKS container."));
-    QStringList cargs({"open", partit->path, luksfs, "--type", "luks"});
-    if (partit->discgran) cargs.prepend("--allow-discards");
-    proc.exec("cryptsetup", cargs, &password);
-}
-
 DeviceItem *PartMan::selectedDriveAuto() noexcept
 {
     QString drv(gui.comboDisk->currentData().toString());
@@ -1096,6 +1079,7 @@ void PartMan::prepStorage()
 
     // Prepare and mount storage
     preparePartitions();
+    luksFormat();
     formatPartitions();
     mountPartitions();
     // Run blkid -c /dev/null to freshen UUID cache
@@ -1233,13 +1217,32 @@ void PartMan::preparePartitions()
     proc.exec("partprobe", {"-s"});
 }
 
+void PartMan::luksFormat()
+{
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to format LUKS container."));
+    const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
+        ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
+    for (DeviceItemIterator it(*this); DeviceItem *part = *it; it.next()) {
+        if (!part->encrypt || !part->willFormat()) continue;
+        proc.status(tr("Creating encrypted volume: %1").arg(part->device));
+        proc.exec("cryptsetup", {"--batch-mode", "--key-size=512",
+            "--hash=sha512", "luksFormat", part->path}, &encPass);
+        proc.status();
+        luksOpen(part, part->devMapper, encPass);
+    }
+}
+void PartMan::luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password)
+{
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to open LUKS container."));
+    QStringList cargs({"open", partit->path, luksfs, "--type", "luks"});
+    if (partit->discgran) cargs.prepend("--allow-discards");
+    proc.exec("cryptsetup", cargs, &password);
+}
+
 void PartMan::formatPartitions()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to format partition."));
-
-    const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
-        ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
 
     // Format partitions.
     for (DeviceItemIterator it(*this); DeviceItem *twit = *it; it.next()) {
@@ -1247,12 +1250,6 @@ void PartMan::formatPartitions()
         if (!twit->willFormat()) continue;
         const QString &dev = twit->mappedDevice();
         const QString &useFor = twit->realUseFor();
-        if (twit->encrypt) {
-            proc.status(tr("Creating encrypted volume: %1").arg(twit->device));
-            luksFormat(twit, encPass);
-            proc.status();
-            luksOpen(twit, twit->devMapper, encPass);
-        }
         const QString &fmtstatus = tr("Formatting: %1");
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(dev));
         else proc.status(fmtstatus.arg(twit->shownUseFor()));
@@ -2435,6 +2432,10 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
         item->size = qobject_cast<QSpinBox *>(editor)->value();
         item->size *= 1048576; // Separate step to prevent int overflow.
         if (item->size == 0) item->size = item->driveFreeSpace();
+        // Set subvolume sizes to keep allowed uses accurate.
+        for (DeviceItem *subvol : item->children) {
+            subvol->size = item->size;
+        }
         break;
     case PartMan::UseFor:
         item->usefor = qobject_cast<QComboBox *>(editor)->currentText().trimmed();
