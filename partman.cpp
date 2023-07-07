@@ -1066,11 +1066,11 @@ void PartMan::prepStorage()
         DeviceItem *item = it.second;
         if (item->encrypt) {
             const QString &mount = it.first;
-            if (mount == "FORMAT") item->devMapper = QString("vol%1.luks").arg(++volnum);
-            else if (mount == "/") item->devMapper = "root.luks";
+            if (mount == "FORMAT") item->devMapper = QString("vol%1.fsm").arg(++volnum);
+            else if (mount == "/") item->devMapper = "root.fsm";
             else if (mount.startsWith("SWAP")) item->devMapper = mount.toLower();
             else {
-                item->devMapper = QString::number(++mapnum) + mount + ".luks";
+                item->devMapper = QString::number(++mapnum) + mount + ".fsm";
                 item->devMapper.replace('/','.');
             }
         }
