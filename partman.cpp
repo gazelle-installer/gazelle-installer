@@ -1180,8 +1180,8 @@ void PartMan::preparePartitions()
         if (drvit->flags.oldLayout) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
-            if (useGPT) cmd = "sgdisk /dev/%1 --typecode=%2:%3";
-            else cmd = "sfdisk /dev/%1 --part-type %2 %3";
+            if (useGPT) cmd = "sgdisk /dev/%1 -q --typecode=%2:%3";
+            else cmd = "sfdisk /dev/%1 -q --part-type %2 %3";
             // Set the type for partitions that will be used in this installation.
             for (int ixdev = 0; ixdev < devCount; ++ixdev) {
                 DeviceItem *twit = drvit->child(ixdev);
@@ -1189,8 +1189,8 @@ void PartMan::preparePartitions()
                 const char *ptype = useGPT ? "8303" : "83";
                 if (useFor.isEmpty()) continue;
                 else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
-                const QStringList &devsplit = DeviceItem::split(twit->device);
-                proc.shell(cmd.arg(devsplit.at(0), devsplit.at(1), ptype));
+                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
+                proc.shell(cmd.arg(devsplit.drive, devsplit.partition, ptype));
                 proc.status();
             }
         } else {
@@ -1210,8 +1210,8 @@ void PartMan::preparePartitions()
             DeviceItem *twit = drvit->child(ixdev);
             if (twit->usefor.isEmpty()) continue;
             if (twit->isActive()) {
-                QStringList devsplit(DeviceItem::split(twit->device));
-                QStringList cargs({"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1)});
+                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
+                QStringList cargs({"-s", "/dev/" + devsplit.drive, "set", devsplit.partition});
                 cargs.append(useGPT ? "legacy_boot" : "boot");
                 cargs.append("on");
                 proc.exec("parted", cargs);
@@ -1265,12 +1265,12 @@ void PartMan::formatPartitions()
             cargs.append(dev);
             proc.exec("mkfs.msdos", cargs);
             // Sets boot flag and ESP flag.
-            const QStringList &devsplit = DeviceItem::split(dev);
-            proc.exec("parted", {"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1), "esp", "on"});
+            const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
+            proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "esp", "on"});
         } else if (useFor == "BIOS-GRUB") {
             proc.exec("dd", {"bs=64K", "if=/dev/zero", "of=" + dev});
-            const QStringList &devsplit = DeviceItem::split(dev);
-            proc.exec("parted", {"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1), "bios_grub", "on"});
+            const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
+            proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
         } else if (useFor == "SWAP") {
             QStringList cargs({"-q", dev});
             if (!twit->label.isEmpty()) cargs << "-L" << twit->label;
@@ -2223,15 +2223,13 @@ void DeviceItem::addToCombo(QComboBox *combo, bool warnNasty) const noexcept
     combo->addItem(QIcon(stricon), device + " (" + strout + ")", device);
 }
 // Split a device name into its drive and partition.
-QStringList DeviceItem::split(const QString &devname) noexcept
+DeviceItem::NameParts DeviceItem::split(const QString &devname) noexcept
 {
     const QRegularExpression rxdev1("^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$");
     const QRegularExpression rxdev2("^(?:\\/dev\\/)*([a-z]*)([0-9]*)$");
     QRegularExpressionMatch rxmatch(rxdev1.match(devname));
     if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
-    QStringList list(rxmatch.capturedTexts());
-    if (!list.isEmpty()) list.removeFirst();
-    return list;
+    return {rxmatch.captured(1), rxmatch.captured(2)};
 }
 QString DeviceItem::join(const QString &drive, int partnum) noexcept
 {
