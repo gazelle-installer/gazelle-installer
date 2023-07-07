@@ -421,25 +421,22 @@ void PartMan::treeSelChange() noexcept
     if (twit && twit->type != DeviceItem::Subvolume) {
         const bool isdrive = (twit->type == DeviceItem::Drive);
         bool isold = twit->flags.oldLayout;
-        bool islocked = true;
-        if (isdrive) {
-            islocked = twit->isLocked();
-            if (twit->flags.curEmpty) isold = false;
-        }
-        gui.pushPartClear->setEnabled(!islocked);
+        const bool islocked = twit->isLocked();
+        if (isdrive && twit->flags.curEmpty) isold = false;
+        gui.pushPartClear->setEnabled(isdrive && !islocked);
         gui.pushPartRemove->setEnabled(!isold && !isdrive);
         // Only allow adding partitions if there is enough space.
         DeviceItem *drvit = twit->parent();
         if (!drvit) drvit = twit;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
-        else if (!isold) {
-            gui.pushPartAdd->setEnabled(drvit->childCount() < PARTMAN_MAX_PARTS
-                && twit->driveFreeSpace(true) > 1*MB);
+        else {
+            gui.pushPartAdd->setEnabled(twit->driveFreeSpace(true) > 1*MB
+                && !isold && drvit->childCount() < PARTMAN_MAX_PARTS);
         }
     } else {
         gui.pushPartClear->setEnabled(false);
-        gui.pushPartAdd->setEnabled(false);
-        gui.pushPartRemove->setEnabled(twit && twit->type == DeviceItem::Subvolume);
+        gui.pushPartAdd->setEnabled(twit != nullptr);
+        gui.pushPartRemove->setEnabled(twit != nullptr && !twit->flags.oldLayout);
     }
 }
 
@@ -500,7 +497,8 @@ void PartMan::treeMenu(const QPoint &)
         else if (action == actActive) twit->setActive(action->isChecked());
         else if (action == actAddCrypttab) twit->addToCrypttab = action->isChecked();
         else if (action == actNewSubvolume) {
-            new DeviceItem(DeviceItem::Subvolume, twit);
+            DeviceItem *subvol = new DeviceItem(DeviceItem::Subvolume, twit);
+            subvol->autoFill();
             gui.treePartitions->expand(selIndex);
         } else if (action == actScanSubvols) {
             scanSubvolumes(twit);
@@ -553,16 +551,23 @@ void PartMan::partClearClick(bool)
 void PartMan::partAddClick(bool) noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (!twit) return;
-    DeviceItem *drive = twit->parent();
-    if (!drive) drive = twit;
+    DeviceItem *selitem = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
+    if (!selitem) return;
+    DeviceItem *volume = selitem->parent();
+    if (!volume) volume = selitem;
 
-    DeviceItem *part = new DeviceItem(DeviceItem::Partition, drive, twit);
-    drive->labelParts();
-    drive->flags.oldLayout = false;
-    notifyChange(drive);
-    gui.treePartitions->selectionModel()->select(index(part),
+    DeviceItem::DeviceType newtype = DeviceItem::Partition;
+    if (selitem->type == DeviceItem::Subvolume) newtype = DeviceItem::Subvolume;
+
+    DeviceItem *newitem = new DeviceItem(newtype, volume, selitem);
+    if (newtype == DeviceItem::Partition) {
+        volume->labelParts();
+        volume->flags.oldLayout = false;
+        notifyChange(volume);
+    } else {
+        newitem->autoFill();
+    }
+    gui.treePartitions->selectionModel()->select(index(newitem),
         QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
@@ -1061,11 +1066,11 @@ void PartMan::prepStorage()
         DeviceItem *item = it.second;
         if (item->encrypt) {
             const QString &mount = it.first;
-            if (mount == "FORMAT") item->devMapper = QString("vol%1.luks").arg(++volnum);
-            else if (mount == "/") item->devMapper = "root.luks";
+            if (mount == "FORMAT") item->devMapper = QString("vol%1.fsm").arg(++volnum);
+            else if (mount == "/") item->devMapper = "root.fsm";
             else if (mount.startsWith("SWAP")) item->devMapper = mount.toLower();
             else {
-                item->devMapper = QString::number(++mapnum) + mount + ".luks";
+                item->devMapper = QString::number(++mapnum) + mount + ".fsm";
                 item->devMapper.replace('/','.');
             }
         }
@@ -1175,8 +1180,8 @@ void PartMan::preparePartitions()
         if (drvit->flags.oldLayout) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
-            if (useGPT) cmd = "sgdisk /dev/%1 --typecode=%2:%3";
-            else cmd = "sfdisk /dev/%1 --part-type %2 %3";
+            if (useGPT) cmd = "sgdisk /dev/%1 -q --typecode=%2:%3";
+            else cmd = "sfdisk /dev/%1 -q --part-type %2 %3";
             // Set the type for partitions that will be used in this installation.
             for (int ixdev = 0; ixdev < devCount; ++ixdev) {
                 DeviceItem *twit = drvit->child(ixdev);
@@ -1184,8 +1189,8 @@ void PartMan::preparePartitions()
                 const char *ptype = useGPT ? "8303" : "83";
                 if (useFor.isEmpty()) continue;
                 else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
-                const QStringList &devsplit = DeviceItem::split(twit->device);
-                proc.shell(cmd.arg(devsplit.at(0), devsplit.at(1), ptype));
+                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
+                proc.shell(cmd.arg(devsplit.drive, devsplit.partition, ptype));
                 proc.status();
             }
         } else {
@@ -1205,8 +1210,8 @@ void PartMan::preparePartitions()
             DeviceItem *twit = drvit->child(ixdev);
             if (twit->usefor.isEmpty()) continue;
             if (twit->isActive()) {
-                QStringList devsplit(DeviceItem::split(twit->device));
-                QStringList cargs({"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1)});
+                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
+                QStringList cargs({"-s", "/dev/" + devsplit.drive, "set", devsplit.partition});
                 cargs.append(useGPT ? "legacy_boot" : "boot");
                 cargs.append("on");
                 proc.exec("parted", cargs);
@@ -1260,12 +1265,12 @@ void PartMan::formatPartitions()
             cargs.append(dev);
             proc.exec("mkfs.msdos", cargs);
             // Sets boot flag and ESP flag.
-            const QStringList &devsplit = DeviceItem::split(dev);
-            proc.exec("parted", {"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1), "esp", "on"});
+            const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
+            proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "esp", "on"});
         } else if (useFor == "BIOS-GRUB") {
             proc.exec("dd", {"bs=64K", "if=/dev/zero", "of=" + dev});
-            const QStringList &devsplit = DeviceItem::split(dev);
-            proc.exec("parted", {"-s", "/dev/" + devsplit.at(0), "set", devsplit.at(1), "bios_grub", "on"});
+            const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
+            proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
         } else if (useFor == "SWAP") {
             QStringList cargs({"-q", dev});
             if (!twit->label.isEmpty()) cargs << "-L" << twit->label;
@@ -2146,7 +2151,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
                 for (int ixi = 2; chklist.contains(newLabel, Qt::CaseInsensitive); ++ixi) {
                     newLabel = QString::number(ixi) + '@' + base;
                 }
-            } else {
+            } else if (!use.isEmpty()) {
                 newLabel = use;
                 for (int ixi = 2; chklist.contains(newLabel, Qt::CaseInsensitive); ++ixi) {
                     newLabel = usefor + QString::number(ixi);
@@ -2218,15 +2223,13 @@ void DeviceItem::addToCombo(QComboBox *combo, bool warnNasty) const noexcept
     combo->addItem(QIcon(stricon), device + " (" + strout + ")", device);
 }
 // Split a device name into its drive and partition.
-QStringList DeviceItem::split(const QString &devname) noexcept
+DeviceItem::NameParts DeviceItem::split(const QString &devname) noexcept
 {
     const QRegularExpression rxdev1("^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$");
     const QRegularExpression rxdev2("^(?:\\/dev\\/)*([a-z]*)([0-9]*)$");
     QRegularExpressionMatch rxmatch(rxdev1.match(devname));
     if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
-    QStringList list(rxmatch.capturedTexts());
-    if (!list.isEmpty()) list.removeFirst();
-    return list;
+    return {rxmatch.captured(1), rxmatch.captured(2)};
 }
 QString DeviceItem::join(const QString &drive, int partnum) noexcept
 {

@@ -124,8 +124,12 @@ public:
     bool canMount(bool pointonly = true) const noexcept;
     long long driveFreeSpace(bool inclusive = false) const noexcept;
     /* Convenience */
+    struct NameParts {
+        QString drive;
+        QString partition;
+    };
     void addToCombo(QComboBox *combo, bool warnNasty = false) const noexcept;
-    static QStringList split(const QString &devname) noexcept;
+    static NameParts split(const QString &devname) noexcept;
     static QString join(const QString &drive, int partnum) noexcept;
 };
 class DeviceItemIterator

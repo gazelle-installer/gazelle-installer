@@ -452,7 +452,7 @@ void Oobe::setLocale()
         //antix systems
         proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.icewm/preferences");
         proc.shell("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.fluxbox/init");
-        proc.shell("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.jwm/tray");
+        proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.jwm/tray");
     } else {
         //mx systems
         proc.shell("sed -i '/data0=/c\\data0=%H:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
@@ -474,7 +474,7 @@ void Oobe::setLocale()
         //antix systems
         proc.shell("sed -i 's/%H:%M/%H:%M/g' " + skelpath + "/.icewm/preferences");
         proc.shell("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.fluxbox/init");
-        proc.shell("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.jwm/tray");
+        proc.shell("sed -i 's/%H:%M/%k:%M/g' " + skelpath + "/.jwm/tray");
     }
 
     // localize repo

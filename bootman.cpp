@@ -66,8 +66,8 @@ void BootMan::selectBootMain() noexcept
     if (!twit) return;
     int ixsel = gui.comboBoot->findData(twit->device); // Boot drive or partition
     for(int ixi = 0; ixsel < 0 && ixi < gui.comboBoot->count(); ++ixi) {
-        const QStringList &s = DeviceItem::split(gui.comboBoot->itemData(ixi).toString());
-        if (s.at(0) == twit->device) ixsel = ixi; // Partition on boot drive
+        const DeviceItem::NameParts &s = DeviceItem::split(gui.comboBoot->itemData(ixi).toString());
+        if (s.drive == twit->device) ixsel = ixi; // Partition on boot drive
     }
     if (ixsel >= 0) gui.comboBoot->setCurrentIndex(ixsel);
 }
@@ -163,7 +163,8 @@ void BootMan::install(const QStringList &cmdextra)
                 }
             }
             // Add a new NVRAM boot variable.
-            proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", bootdev,
+            const DeviceItem::NameParts &bs = DeviceItem::split(bootdev);
+            proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", "/dev/"+bs.drive, "-p", bs.partition,
                 "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
             sect.setExceptionMode(true);
             sect.setRoot(nullptr);
