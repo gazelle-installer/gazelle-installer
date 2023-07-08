@@ -80,7 +80,7 @@ Mínimo: %2</translation>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="266"/>
+        <location filename="../bootman.cpp" line="267"/>
         <source>Updating initramfs</source>
         <translation>A actualizar o initramfs</translation>
     </message>
@@ -95,18 +95,18 @@ Mínimo: %2</translation>
         <translation>A instalação do GRUB falhou. É possível reparar a instalação do GRUB reiniciando o computador com o sistema externo e usando o menu &apos;Recuperação do GRUB&apos;.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="267"/>
+        <location filename="../bootman.cpp" line="268"/>
         <source>Failed to update initramfs.</source>
         <translation>Falha ao actualizar o initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="292"/>
+        <location filename="../bootman.cpp" line="293"/>
         <source>System boot disk:</source>
         <translation>Disco de arranque do sistema:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="311"/>
-        <location filename="../bootman.cpp" line="323"/>
+        <location filename="../bootman.cpp" line="312"/>
+        <location filename="../bootman.cpp" line="324"/>
         <source>Partition to use:</source>
         <translation>Partição a usar:</translation>
     </message>
@@ -137,17 +137,17 @@ Mínimo: %2</translation>
 <context>
     <name>DeviceItem</name>
     <message>
-        <location filename="../partman.cpp" line="1926"/>
+        <location filename="../partman.cpp" line="1919"/>
         <source>EFI System Partition</source>
         <translation>Partição de Sistema EFI</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1927"/>
+        <location filename="../partman.cpp" line="1920"/>
         <source>swap space</source>
         <translation>espaço swap</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1928"/>
+        <location filename="../partman.cpp" line="1921"/>
         <source>format only</source>
         <translation>apenas formatar</translation>
     </message>
@@ -171,22 +171,22 @@ Mínimo: %2</translation>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2472"/>
+        <location filename="../partman.cpp" line="2467"/>
         <source>&amp;Templates</source>
         <translation>&amp;Modelos</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2479"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compressão (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2480"/>
+        <location filename="../partman.cpp" line="2475"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compressão (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2482"/>
+        <location filename="../partman.cpp" line="2477"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compressão (&amp;LZO)</translation>
     </message>
@@ -1558,321 +1558,321 @@ Escolher um nome diferente.</translation>
         <translation>Dispositivos Virtuais</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="456"/>
-        <location filename="../partman.cpp" line="510"/>
+        <location filename="../partman.cpp" line="453"/>
+        <location filename="../partman.cpp" line="508"/>
         <source>&amp;Add partition</source>
         <translation>&amp;Adicionar partição</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="458"/>
+        <location filename="../partman.cpp" line="455"/>
         <source>&amp;Remove partition</source>
         <translation>&amp;Remover partição</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="468"/>
+        <location filename="../partman.cpp" line="465"/>
         <source>&amp;Lock</source>
         <translation>&amp;Bloquear</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="472"/>
+        <location filename="../partman.cpp" line="469"/>
         <source>&amp;Unlock</source>
         <translation>&amp;Desbloquear</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="477"/>
-        <location filename="../partman.cpp" line="610"/>
+        <location filename="../partman.cpp" line="474"/>
+        <location filename="../partman.cpp" line="615"/>
         <source>Add to crypttab</source>
         <translation>Adicionar a crypttab</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="483"/>
+        <location filename="../partman.cpp" line="480"/>
         <source>Active partition</source>
         <translation>Partição ativa</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="489"/>
+        <location filename="../partman.cpp" line="486"/>
         <source>New subvolume</source>
         <translation>Novo sub-volume</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="490"/>
+        <location filename="../partman.cpp" line="487"/>
         <source>Scan subvolumes</source>
         <translation>Procurar sub-volumes</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="513"/>
+        <location filename="../partman.cpp" line="511"/>
         <source>New &amp;layout</source>
         <translation>Nova &amp;organização</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="514"/>
+        <location filename="../partman.cpp" line="512"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Restabelecer organização</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="537"/>
+        <location filename="../partman.cpp" line="535"/>
         <source>Remove subvolume</source>
         <translation>Remover sub-volume</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="607"/>
+        <location filename="../partman.cpp" line="612"/>
         <source>Unlock Drive</source>
         <translation>Desbloquear Unidade</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="613"/>
+        <location filename="../partman.cpp" line="618"/>
         <source>Virtual Device:</source>
         <translation>Dispositivo Virtual:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="614"/>
+        <location filename="../partman.cpp" line="619"/>
         <source>Password:</source>
         <translation>Palavra-passe:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="642"/>
+        <location filename="../partman.cpp" line="647"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>Não foi possível desbloquear o dispositivo. Palavra-passe incorreta, possivelmente.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="671"/>
+        <location filename="../partman.cpp" line="676"/>
         <source>Failed to close %1</source>
         <translation>Falha ao fechar %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="715"/>
+        <location filename="../partman.cpp" line="720"/>
         <source>Invalid subvolume label</source>
         <translation>Rótulo de sub-volume inválido</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="726"/>
+        <location filename="../partman.cpp" line="731"/>
         <source>Duplicate subvolume label</source>
         <translation>Rótulo de sub-volume duplicado</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="735"/>
+        <location filename="../partman.cpp" line="740"/>
         <source>Invalid use for %1: %2</source>
         <translation>Uso inválido de %1: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="746"/>
+        <location filename="../partman.cpp" line="751"/>
         <source>%1 is already selected for: %2</source>
         <translation>%1 já está selecionado para: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="760"/>
+        <location filename="../partman.cpp" line="765"/>
         <source>A root partition of at least %1 is required.</source>
         <translation>É necessária uma partição root de pelo menos %1.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="766"/>
+        <location filename="../partman.cpp" line="771"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>É impossível preservar /home em root (/) se uma partição /home separada estiver montada.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="789"/>
+        <location filename="../partman.cpp" line="794"/>
         <source>Reuse (no reformat) %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="810"/>
+        <location filename="../partman.cpp" line="815"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="812"/>
+        <location filename="../partman.cpp" line="817"/>
         <source>Delete subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="815"/>
+        <location filename="../partman.cpp" line="820"/>
         <source>Overwrite subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="816"/>
+        <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="818"/>
+        <location filename="../partman.cpp" line="823"/>
         <source>Create subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="819"/>
+        <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="834"/>
+        <location filename="../partman.cpp" line="839"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Tem que ser escolhida uma partição de arranque (boot) diferente quando a raiz (root) for encriptada.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="779"/>
+        <location filename="../partman.cpp" line="784"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>Preparar a tabela de partições %1 em %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="792"/>
+        <location filename="../partman.cpp" line="797"/>
         <source>Format %1 to use for %2</source>
         <translation>Formatar %1 a utilizar para %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="793"/>
+        <location filename="../partman.cpp" line="798"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Reutilizar (sem reformatar) %1 como %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="794"/>
+        <location filename="../partman.cpp" line="799"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>Apagar os dados em %1, excepto os dados de /home a usar em %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="797"/>
+        <location filename="../partman.cpp" line="802"/>
         <source>Create %1 without formatting</source>
         <translation>Criar %1 sem formatação</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="798"/>
+        <location filename="../partman.cpp" line="803"/>
         <source>Create %1, format to use for %2</source>
         <translation>Criar %1, formato a utilizar para %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="946"/>
+        <location filename="../partman.cpp" line="951"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>As unidades seguintes estão, ou serão, formatadas em GPT, mas não têm uma partição BIOS-GRUB:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="948"/>
+        <location filename="../partman.cpp" line="953"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>Este sistema não pode arrancar a partir de unidades formatadas em GPT que não tenham uma partição BIOS-GRUB.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="835"/>
-        <location filename="../partman.cpp" line="919"/>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="840"/>
+        <location filename="../partman.cpp" line="924"/>
+        <location filename="../partman.cpp" line="954"/>
         <source>Are you sure you want to continue?</source>
         <translation>Continuar?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="516"/>
+        <location filename="../partman.cpp" line="514"/>
         <source>Layout &amp;Builder...</source>
         <translation>&amp;Criador de esquemas...</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="889"/>
+        <location filename="../partman.cpp" line="894"/>
         <source>%1 (%2) requires %3</source>
         <translation>%1 (%2) requer %3</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="917"/>
+        <location filename="../partman.cpp" line="922"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>A instalação pode falhar porque os seguintes volumes são demasiado pequenos:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="841"/>
+        <location filename="../partman.cpp" line="846"/>
         <source>The %1 installer will now perform the requested actions.</source>
         <translation>O instalador do %1 irá agora executar as acções solicitadas.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="842"/>
+        <location filename="../partman.cpp" line="847"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation>Estas acções não podem ser revertidas. Continuar?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="988"/>
+        <location filename="../partman.cpp" line="993"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Os discos com as partições seleccionadas para a instalação estão a falhar:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="992"/>
+        <location filename="../partman.cpp" line="997"/>
         <source>Smartmon tool output:</source>
         <translation>Resultados da ferramenta Smartmon:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="993"/>
+        <location filename="../partman.cpp" line="998"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Os discos com as partições seleccionadas para instalação passaram no teste de monitorização SMART (smartctl), mas os testes indicam que terão  uma taxa de falha superior à média no futuro próximo.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="998"/>
+        <location filename="../partman.cpp" line="1003"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>Na dúvida, sair do Instalador e executar o GSmartControl para mais informação.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1000"/>
+        <location filename="../partman.cpp" line="1005"/>
         <source>Do you want to abort the installation?</source>
         <translation>Abortar a instalação?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1005"/>
+        <location filename="../partman.cpp" line="1010"/>
         <source>Do you want to continue?</source>
         <translation>Continuar?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1016"/>
+        <location filename="../partman.cpp" line="1212"/>
         <source>Failed to format LUKS container.</source>
         <translation>Falha ao formatar o contentor LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1025"/>
+        <location filename="../partman.cpp" line="1232"/>
         <source>Failed to open LUKS container.</source>
         <translation>Falha ao abrir o contentor LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1349"/>
+        <location filename="../partman.cpp" line="1342"/>
         <source>Failed to finalize encryption setup.</source>
         <translation>Falha ao finalizar a configuração de encriptação.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1125"/>
+        <location filename="../partman.cpp" line="1099"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Falha ao preparar as partições requeridas.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1168"/>
+        <location filename="../partman.cpp" line="1142"/>
         <source>Preparing partition tables</source>
         <translation>A preparar as tabelas de partições</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1185"/>
+        <location filename="../partman.cpp" line="1159"/>
         <source>Preparing required partitions</source>
         <translation>A preparar as partições necessárias</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1251"/>
+        <location filename="../partman.cpp" line="1217"/>
         <source>Creating encrypted volume: %1</source>
         <translation>A criar volume encriptado: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1256"/>
+        <location filename="../partman.cpp" line="1249"/>
         <source>Formatting: %1</source>
         <translation>A formatar: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1239"/>
+        <location filename="../partman.cpp" line="1241"/>
         <source>Failed to format partition.</source>
         <translation>Falha ao formatar a partição.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1315"/>
+        <location filename="../partman.cpp" line="1308"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>Falha ao preparar os sub-volumes.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1316"/>
+        <location filename="../partman.cpp" line="1309"/>
         <source>Preparing subvolumes</source>
         <translation>A preparar os sub-volumes</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1426"/>
+        <location filename="../partman.cpp" line="1419"/>
         <source>Failed to mount partition.</source>
         <translation>Falha ao montar a partição.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1431"/>
+        <location filename="../partman.cpp" line="1424"/>
         <source>Mounting: %1</source>
         <translation>A montar: %1</translation>
     </message>
