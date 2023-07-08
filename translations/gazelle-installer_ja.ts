@@ -80,7 +80,7 @@ home %2%</translation>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="266"/>
+        <location filename="../bootman.cpp" line="267"/>
         <source>Updating initramfs</source>
         <translation>initramfs を更新中</translation>
     </message>
@@ -95,18 +95,18 @@ home %2%</translation>
         <translation>GRUB のインストールに失敗しました。Live メディアから再起動し、GRUB Rescueメニューを使用してインストールを修復できます。</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="267"/>
+        <location filename="../bootman.cpp" line="268"/>
         <source>Failed to update initramfs.</source>
         <translation>initramfs の更新に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="292"/>
+        <location filename="../bootman.cpp" line="293"/>
         <source>System boot disk:</source>
         <translation>システム起動ディスク:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="311"/>
-        <location filename="../bootman.cpp" line="323"/>
+        <location filename="../bootman.cpp" line="312"/>
+        <location filename="../bootman.cpp" line="324"/>
         <source>Partition to use:</source>
         <translation>使用するパーティション:</translation>
     </message>
@@ -137,17 +137,17 @@ home %2%</translation>
 <context>
     <name>DeviceItem</name>
     <message>
-        <location filename="../partman.cpp" line="1926"/>
+        <location filename="../partman.cpp" line="1919"/>
         <source>EFI System Partition</source>
         <translation>EFI システムパーティション</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1927"/>
+        <location filename="../partman.cpp" line="1920"/>
         <source>swap space</source>
         <translation>スワップ領域</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1928"/>
+        <location filename="../partman.cpp" line="1921"/>
         <source>format only</source>
         <translation>初期化のみ実行</translation>
     </message>
@@ -171,22 +171,22 @@ home %2%</translation>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2472"/>
+        <location filename="../partman.cpp" line="2467"/>
         <source>&amp;Templates</source>
         <translation>テンプレート(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2479"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>圧縮 (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2480"/>
+        <location filename="../partman.cpp" line="2475"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>圧縮 (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2482"/>
+        <location filename="../partman.cpp" line="2477"/>
         <source>Compression (&amp;LZO)</source>
         <translation>圧縮 (&amp;LZO)</translation>
     </message>
@@ -1556,321 +1556,321 @@ Please select a different name.</source>
         <translation>仮想デバイス</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="456"/>
-        <location filename="../partman.cpp" line="510"/>
+        <location filename="../partman.cpp" line="453"/>
+        <location filename="../partman.cpp" line="508"/>
         <source>&amp;Add partition</source>
         <translation>パーティション追加(&amp;A)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="458"/>
+        <location filename="../partman.cpp" line="455"/>
         <source>&amp;Remove partition</source>
         <translation>パーティション削除(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="468"/>
+        <location filename="../partman.cpp" line="465"/>
         <source>&amp;Lock</source>
         <translation>ロック(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="472"/>
+        <location filename="../partman.cpp" line="469"/>
         <source>&amp;Unlock</source>
         <translation>ロック解除(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="477"/>
-        <location filename="../partman.cpp" line="610"/>
+        <location filename="../partman.cpp" line="474"/>
+        <location filename="../partman.cpp" line="615"/>
         <source>Add to crypttab</source>
         <translation>crypttab へ追加</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="483"/>
+        <location filename="../partman.cpp" line="480"/>
         <source>Active partition</source>
         <translation>アクティブパーティション</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="489"/>
+        <location filename="../partman.cpp" line="486"/>
         <source>New subvolume</source>
         <translation>新規サブボリューム</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="490"/>
+        <location filename="../partman.cpp" line="487"/>
         <source>Scan subvolumes</source>
         <translation>サブボリュームのスキャン</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="513"/>
+        <location filename="../partman.cpp" line="511"/>
         <source>New &amp;layout</source>
         <translation>新規レイアウト(_&amp;)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="514"/>
+        <location filename="../partman.cpp" line="512"/>
         <source>&amp;Reset layout</source>
         <translation>レイアウトのリセット(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="537"/>
+        <location filename="../partman.cpp" line="535"/>
         <source>Remove subvolume</source>
         <translation>サブボリュームの削除</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="607"/>
+        <location filename="../partman.cpp" line="612"/>
         <source>Unlock Drive</source>
         <translation>ドライブのロック解除</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="613"/>
+        <location filename="../partman.cpp" line="618"/>
         <source>Virtual Device:</source>
         <translation>仮想デバイス</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="614"/>
+        <location filename="../partman.cpp" line="619"/>
         <source>Password:</source>
         <translation>パスワード</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="642"/>
+        <location filename="../partman.cpp" line="647"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>デバイスをロック解除できません。パスワードが正しくないようです。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="671"/>
+        <location filename="../partman.cpp" line="676"/>
         <source>Failed to close %1</source>
         <translation>%1 の近くで失敗しました</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="715"/>
+        <location filename="../partman.cpp" line="720"/>
         <source>Invalid subvolume label</source>
         <translation>無効なサブボリュームラベル</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="726"/>
+        <location filename="../partman.cpp" line="731"/>
         <source>Duplicate subvolume label</source>
         <translation>重複したサブボリュームラベル</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="735"/>
+        <location filename="../partman.cpp" line="740"/>
         <source>Invalid use for %1: %2</source>
         <translation>無効な %1: %2 の利用</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="746"/>
+        <location filename="../partman.cpp" line="751"/>
         <source>%1 is already selected for: %2</source>
         <translation>%1 はすでに %2 で選択されています。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="760"/>
+        <location filename="../partman.cpp" line="765"/>
         <source>A root partition of at least %1 is required.</source>
         <translation>少なくとも %1の root パーティションが必要です。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="766"/>
+        <location filename="../partman.cpp" line="771"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>別の独立した /home パーティションがマウントされている場合、root (/) 内に /home を保持することはできません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="789"/>
+        <location filename="../partman.cpp" line="794"/>
         <source>Reuse (no reformat) %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="810"/>
+        <location filename="../partman.cpp" line="815"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="812"/>
+        <location filename="../partman.cpp" line="817"/>
         <source>Delete subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="815"/>
+        <location filename="../partman.cpp" line="820"/>
         <source>Overwrite subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="816"/>
+        <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="818"/>
+        <location filename="../partman.cpp" line="823"/>
         <source>Create subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="819"/>
+        <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="834"/>
+        <location filename="../partman.cpp" line="839"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>暗号化するには別の独立した boot パーティションを選択する必要があります。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="779"/>
+        <location filename="../partman.cpp" line="784"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>%2 で %1 パーティションテーブルを準備します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="792"/>
+        <location filename="../partman.cpp" line="797"/>
         <source>Format %1 to use for %2</source>
         <translation>%2 に使用する %1 を初期化します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="793"/>
+        <location filename="../partman.cpp" line="798"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>%1 を %2 として再利用（再フォーマット不要）</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="794"/>
+        <location filename="../partman.cpp" line="799"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>/home 以外の %1 のデータを削除して %2 に使用します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="797"/>
+        <location filename="../partman.cpp" line="802"/>
         <source>Create %1 without formatting</source>
         <translation>初期化しないで %1 を作成します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="798"/>
+        <location filename="../partman.cpp" line="803"/>
         <source>Create %1, format to use for %2</source>
         <translation>%1 を作成し、%2 に使用するため初期化します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="946"/>
+        <location filename="../partman.cpp" line="951"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>以下のドライブは現在 GPT で設定されているか、または設定される予定ですが、BIOS-GRUB パーティションが存在しません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="948"/>
+        <location filename="../partman.cpp" line="953"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>このシステムでは、BIOS-GRUB パーティションが存在しないので、GPT ドライブから起動しないかもしれません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="835"/>
-        <location filename="../partman.cpp" line="919"/>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="840"/>
+        <location filename="../partman.cpp" line="924"/>
+        <location filename="../partman.cpp" line="954"/>
         <source>Are you sure you want to continue?</source>
         <translation>本当に作業を続けてもよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="516"/>
+        <location filename="../partman.cpp" line="514"/>
         <source>Layout &amp;Builder...</source>
         <translation>Layout &amp;Builder...</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="889"/>
+        <location filename="../partman.cpp" line="894"/>
         <source>%1 (%2) requires %3</source>
         <translation>%1 (%2) には %3 が必要です</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="917"/>
+        <location filename="../partman.cpp" line="922"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>以下のボリュームが小さすぎるので、インストールに失敗する可能性があります。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="841"/>
+        <location filename="../partman.cpp" line="846"/>
         <source>The %1 installer will now perform the requested actions.</source>
         <translation>%1 インストーラは今から指示された動作を実行します。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="842"/>
+        <location filename="../partman.cpp" line="847"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation>これから先の操作は元に戻すことができません。続けますか？</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="988"/>
+        <location filename="../partman.cpp" line="993"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>インストール用に選択したディスクのパーディションに障害が発生しています：</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="992"/>
+        <location filename="../partman.cpp" line="997"/>
         <source>Smartmon tool output:</source>
         <translation>Smartmonツールの出力：</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="993"/>
+        <location filename="../partman.cpp" line="998"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>インストール用に選択したディスクのパーディションは SMART モニターテスト (smartctl)に合格しましたが、テストは近い将来、平均よりも高い故障率になることを示しています。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="998"/>
+        <location filename="../partman.cpp" line="1003"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>よく分からないのであれば、このインストーラを終了し、GSmartControl を起動して詳細をつかんでください。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1000"/>
+        <location filename="../partman.cpp" line="1005"/>
         <source>Do you want to abort the installation?</source>
         <translation>インストールを中止してよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1005"/>
+        <location filename="../partman.cpp" line="1010"/>
         <source>Do you want to continue?</source>
         <translation>作業を続けてもよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1016"/>
+        <location filename="../partman.cpp" line="1212"/>
         <source>Failed to format LUKS container.</source>
         <translation> LUKS コンテナの初期化に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1025"/>
+        <location filename="../partman.cpp" line="1232"/>
         <source>Failed to open LUKS container.</source>
         <translation>LUKS コンテナを開くことができません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1349"/>
+        <location filename="../partman.cpp" line="1342"/>
         <source>Failed to finalize encryption setup.</source>
         <translation>暗号化の設定を完了できませんでした。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1125"/>
+        <location filename="../partman.cpp" line="1099"/>
         <source>Failed to prepare required partitions.</source>
         <translation>必要なパーティションを準備できません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1168"/>
+        <location filename="../partman.cpp" line="1142"/>
         <source>Preparing partition tables</source>
         <translation>パーティションテーブルを準備しています</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1185"/>
+        <location filename="../partman.cpp" line="1159"/>
         <source>Preparing required partitions</source>
         <translation>必要なパーティションを準備中</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1251"/>
+        <location filename="../partman.cpp" line="1217"/>
         <source>Creating encrypted volume: %1</source>
         <translation>暗号化ボリュームの作成中: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1256"/>
+        <location filename="../partman.cpp" line="1249"/>
         <source>Formatting: %1</source>
         <translation>フォーマット中: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1239"/>
+        <location filename="../partman.cpp" line="1241"/>
         <source>Failed to format partition.</source>
         <translation>パーティションの初期化に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1315"/>
+        <location filename="../partman.cpp" line="1308"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>サブボリュームの準備に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1316"/>
+        <location filename="../partman.cpp" line="1309"/>
         <source>Preparing subvolumes</source>
         <translation>サブボリュームを準備中</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1426"/>
+        <location filename="../partman.cpp" line="1419"/>
         <source>Failed to mount partition.</source>
         <translation>パーティションのマウントに失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1431"/>
+        <location filename="../partman.cpp" line="1424"/>
         <source>Mounting: %1</source>
         <translation>マウント中: %1</translation>
     </message>
