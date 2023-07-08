@@ -22,7 +22,7 @@
 #include "mtreeview.h"
 
 MTreeView::MTreeView(QWidget *parent) noexcept
-    : QTreeView(parent)
+    : QTreeView(parent), gridon(false)
 {
     setTabKeyNavigation(true);
     setSelectionBehavior(SelectRows);
