@@ -273,8 +273,8 @@ long long AutoPart::buildLayout(long long rootFormatSize, bool crypto,
         if (remaining > 0) volList->append("/home");
     }
     if (updateTree) {
-        drvitem->addPart(rootFormatSize, "root", crypto);
-        if (remaining > 0) drvitem->addPart(remaining, "home", crypto);
+        drvitem->addPart(rootFormatSize, "/", crypto);
+        if (remaining > 0) drvitem->addPart(remaining, "/home", crypto);
         drvitem->labelParts();
         drvitem->driveAutoSetActive();
     }
