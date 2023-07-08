@@ -1060,21 +1060,6 @@ int PartMan::countPrepSteps() noexcept
 }
 void PartMan::prepStorage()
 {
-    // Populate required device mapper fields.
-    int mapnum = 0, volnum = 0;
-    for (const auto &it : mounts) {
-        DeviceItem *item = it.second;
-        if (item->encrypt) {
-            const QString &mount = it.first;
-            if (mount == "FORMAT") item->devMapper = QString("vol%1.fsm").arg(++volnum);
-            else if (mount == "/") item->devMapper = "root.fsm";
-            else if (mount.startsWith("SWAP")) item->devMapper = mount.toLower();
-            else {
-                item->devMapper = QString::number(++mapnum) + mount + ".fsm";
-                item->devMapper.replace('/','.');
-            }
-        }
-    }
     // For debugging
     qDebug() << "Mount points:";
     for (const auto &it : mounts) {
@@ -1233,6 +1218,12 @@ void PartMan::luksFormat()
         proc.exec("cryptsetup", {"--batch-mode", "--key-size=512",
             "--hash=sha512", "luksFormat", part->path}, &encPass);
         proc.status();
+        if (part->devMapper.isEmpty()) {
+            proc.exec("cryptsetup", {"luksUUID", part->path}, nullptr, true);
+            part->devMapper = "luks-" + proc.readAll().trimmed();
+            // Backwards compat for broken MX Boot Repair
+            if (part->usefor == "/") part->devMapper = "root.fsm";
+        }
         luksOpen(part, part->devMapper, encPass);
     }
 }
@@ -1256,7 +1247,7 @@ void PartMan::formatPartitions()
         const QString &dev = twit->mappedDevice();
         const QString &useFor = twit->realUseFor();
         const QString &fmtstatus = tr("Formatting: %1");
-        if (useFor == "FORMAT") proc.status(fmtstatus.arg(dev));
+        if (useFor == "FORMAT") proc.status(fmtstatus.arg(twit->device));
         else proc.status(fmtstatus.arg(twit->shownUseFor()));
         if (useFor == "ESP") {
             QStringList cargs({"-F", twit->format.mid(3)});
@@ -1430,7 +1421,7 @@ void PartMan::mountPartitions()
         if (it.first.at(0) != '/') continue;
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = it.second->mappedDevice();
-        proc.status(tr("Mounting: %1").arg(dev));
+        proc.status(tr("Mounting: %1").arg(it.first));
         if (it.first == "/boot") {
              // needed to run fsck because sfdisk --part-type can mess up the partition
             proc.exec("fsck.ext4", {"-y", dev});
