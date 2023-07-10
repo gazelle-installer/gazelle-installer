@@ -260,7 +260,7 @@ long long AutoPart::buildLayout(long long rootFormatSize, bool crypto,
     }
     if (crypto) {
         const long long bootFormatSize = partman->volSpecs["/boot"].preferred;
-        if (updateTree) drvitem->addPart(bootFormatSize, "boot", crypto);
+        if (updateTree) drvitem->addPart(bootFormatSize, "/boot", crypto);
         if (volList) volList->append("/boot");
         remaining -= bootFormatSize;
     }
