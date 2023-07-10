@@ -191,7 +191,7 @@ class PartMan : public QAbstractItemModel
     bool confirmSpace(class QMessageBox &msgbox) noexcept;
     bool confirmBootable(class QMessageBox &msgbox) noexcept;
     void luksFormat();
-    void luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password);
+    void luksOpen(DeviceItem *partit, const QByteArray &password);
 public:
     enum TreeColumns {
         Device,
