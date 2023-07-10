@@ -632,7 +632,6 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
             twit->mapCount++;
             notifyChange(twit);
             scanVirtualDevices(true);
-            resizeColumnsToFit();
             treeSelChange();
             gui.boxMain->setEnabled(true);
             qApp->restoreOverrideCursor();
@@ -663,7 +662,6 @@ void PartMan::partMenuLock(DeviceItem *twit)
     twit->origin = nullptr;
     // Refresh virtual devices list.
     scanVirtualDevices(true);
-    resizeColumnsToFit();
     treeSelChange();
 
     gui.boxMain->setEnabled(true);
