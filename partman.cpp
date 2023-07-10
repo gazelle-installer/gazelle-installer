@@ -610,12 +610,10 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
     QDialog dialog(gui.boxMain);
     QFormLayout layout(&dialog);
     dialog.setWindowTitle(tr("Unlock Drive"));
-    QLineEdit *editVDev = new QLineEdit(&dialog);
     QLineEdit *editPass = new QLineEdit(&dialog);
     QCheckBox *checkCrypttab = new QCheckBox(tr("Add to crypttab"), &dialog);
     editPass->setEchoMode(QLineEdit::Password);
     checkCrypttab->setChecked(true);
-    layout.addRow(tr("Virtual Device:"), editVDev);
     layout.addRow(tr("Password:"), editPass);
     layout.addRow(checkCrypttab);
     QDialogButtonBox buttons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
@@ -628,8 +626,7 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
         try {
-            const QString &mapdev = editVDev->text();
-            luksOpen(twit, mapdev, editPass->text().toUtf8());
+            luksOpen(twit, editPass->text().toUtf8());
             twit->usefor.clear();
             twit->addToCrypttab = checkCrypttab->isChecked();
             twit->mapCount++;
@@ -1218,20 +1215,24 @@ void PartMan::luksFormat()
         proc.exec("cryptsetup", {"--batch-mode", "--key-size=512",
             "--hash=sha512", "luksFormat", part->path}, &encPass);
         proc.status();
-        if (part->devMapper.isEmpty()) {
-            proc.exec("cryptsetup", {"luksUUID", part->path}, nullptr, true);
-            part->devMapper = "luks-" + proc.readAll().trimmed();
-            // Backwards compat for broken MX Boot Repair
-            if (part->usefor == "/") part->devMapper = "root.fsm";
+
+        // Backwards compat for broken MX Boot Repair
+        if (part->devMapper.isEmpty() && part->usefor == "/") {
+            part->devMapper = "root.fsm";
         }
-        luksOpen(part, part->devMapper, encPass);
+
+        luksOpen(part, encPass);
     }
 }
-void PartMan::luksOpen(DeviceItem *partit, const QString &luksfs, const QByteArray &password)
+void PartMan::luksOpen(DeviceItem *part, const QByteArray &password)
 {
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to open LUKS container."));
-    QStringList cargs({"open", partit->path, luksfs, "--type", "luks"});
-    if (partit->discgran) cargs.prepend("--allow-discards");
+    if (part->devMapper.isEmpty()) {
+        proc.exec("cryptsetup", {"luksUUID", part->path}, nullptr, true);
+        part->devMapper = "luks-" + proc.readAll().trimmed();
+    }
+    QStringList cargs({"open", part->path, part->devMapper, "--type", "luks"});
+    if (part->discgran) cargs.prepend("--allow-discards");
     proc.exec("cryptsetup", cargs, &password);
 }
 
