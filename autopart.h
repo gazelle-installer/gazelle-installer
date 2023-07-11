@@ -38,7 +38,6 @@ class AutoPart : public QObject
     bool installFromRootDevice = false;
     bool snapToRec = false;
     // Layout Builder
-    class QCheckBox *checkHibernation = nullptr;
     class QCheckBox *checkSnapshot = nullptr;
     bool inBuilder = false;
     // Slots
