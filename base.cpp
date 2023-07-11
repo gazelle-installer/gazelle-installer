@@ -45,10 +45,12 @@ Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     bufferHome = appConf.value("HOME_BUFFER", 1024).toLongLong() * MB;
 
     bootSource = "/live/aufs/boot";
-    rootSources << "/live/aufs/bin" << "/live/aufs/dev"
-        << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/libx32" << "/live/aufs/lib64"
-        << "/live/aufs/media" << "/live/aufs/mnt" << "/live/aufs/opt" << "/live/aufs/root"
-        << "/live/aufs/sbin" << "/live/aufs/usr" << "/live/aufs/var" << "/live/aufs/home";
+    rootSources << "/bin" << "/dev" << "/etc" << "/lib" << "/libx32" << "/lib64"
+        << "/media" << "/mnt" << "/opt" << "/root" << "/sbin" << "/usr" << "/var";
+    partman.volClean << "/boot" << rootSources;
+    rootSources << "/home";
+    for (QString &rs : rootSources) rs.prepend("/live/aufs");
+
     PartMan::VolumeSpec &vspecRoot = partman.volSpecs["/"];
     PartMan::VolumeSpec &vspecBoot = partman.volSpecs["/boot"];
     PartMan::VolumeSpec &vspecHome = partman.volSpecs["/home"];

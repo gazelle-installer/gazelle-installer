@@ -2054,8 +2054,18 @@ QStringList DeviceItem::allowedFormats() const noexcept
 
     if (encrypt) allowPreserve = false;
     if (allowPreserve) {
-        if (use != "/") list.prepend("PRESERVE");
-        else list.append("PRESERVE");
+        bool clean = (use == "/");
+        if (!clean && partman) {
+            for (const QString &vc : partman->volClean) {
+                if (use == vc || use.startsWith(vc + '/')) {
+                    clean = true;
+                    break;
+                }
+            }
+        }
+        // Preserve by default if the use is not on the clean list.
+        if (clean) list.append("PRESERVE");
+        else list.prepend("PRESERVE");
     }
     return list;
 }
