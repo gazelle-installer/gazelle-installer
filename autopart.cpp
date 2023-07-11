@@ -34,8 +34,6 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman),
       passCrypto(ui.textCryptoPass, ui.textCryptoPass2, 1, this)
 {
-    checkHibernation = gui.checkHibernationReg;
-
     connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
     connect(gui.boxEncryptAuto, &QGroupBox::toggled, this, &AutoPart::toggleEncrypt);
     connect(&passCrypto, &PassEdit::validationChanged, gui.pushNext, &QPushButton::setEnabled);
@@ -129,7 +127,11 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
     const PartMan::VolumeSpec &vspecHome = partman->volSpecTotal("/home", volumes);
     minHome = vspecHome.minimum;
     recHome = vspecHome.preferred;
-    if (swapfile) recRoot += SwapMan::recommended(hibernation);
+    if (swapfile) {
+        const long long swapsize = SwapMan::recommended(hibernation);
+        recRoot += swapsize;
+        if (hibernation) minRoot += swapsize;
+    }
     if (snapshot) recHome += addSnapshot; // squashfs + ISO
 
     const int rootMinPercent = percent(minRoot, available, true);
@@ -183,7 +185,7 @@ void AutoPart::builderGUI(DeviceItem *drive) noexcept
     QCheckBox *checkEncrypt = new QCheckBox(gui.boxEncryptAuto->title(), &dialog);
     QCheckBox *checkSwapFile = new QCheckBox('+' + syslocale.formattedDataSize(
         swapRec, 1, QLocale::DataSizeTraditionalFormat), &dialog);
-    checkHibernation = new QCheckBox('+' + syslocale.formattedDataSize(
+    QCheckBox *checkHibernation = new QCheckBox('+' + syslocale.formattedDataSize(
         swapHiber-swapRec, 1, QLocale::DataSizeTraditionalFormat), &dialog);
     checkSnapshot = new QCheckBox('+' + syslocale.formattedDataSize(
         2*minRoot, 1, QLocale::DataSizeTraditionalFormat), &dialog);
@@ -236,7 +238,6 @@ void AutoPart::builderGUI(DeviceItem *drive) noexcept
 
     qApp->processEvents(); // Process residual signals.
     // Reset pointers to original controls.
-    checkHibernation = gui.checkHibernationReg;
     checkSnapshot = nullptr;
     inBuilder = false;
 }
@@ -387,10 +388,6 @@ void AutoPart::sliderValueChanged(int value) noexcept
     // Unselect features that won't fit with the current configuration.
     const QStringList vols(sizeRoot < available ? "/home" : "/");
     const long long rmin = partman->volSpecTotal("/", vols).minimum;
-    if (checkHibernation->isChecked() && sizeRoot < (rmin + SwapMan::recommended(true))) {
-        checkHibernation->setChecked(false);
-        QApplication::beep();
-    }
     if (checkSnapshot && checkSnapshot->isChecked()) {
         bool ok = false;
         if (!newHome) ok = (sizeRoot >= (rmin + addSnapshot));
