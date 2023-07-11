@@ -1906,16 +1906,12 @@ void DeviceItem::sortChildren() noexcept
 /* Helpers */
 QString DeviceItem::realUseFor(const QString &use) noexcept
 {
-    if (use == "root") return QStringLiteral("/");
-    else if (use == "boot") return QStringLiteral("/boot");
-    else if (use == "home") return QStringLiteral("/home");
-    else if (!use.startsWith('/')) return use.toUpper();
+    if (!use.startsWith('/')) return use.toUpper();
     else return use;
 }
 QString DeviceItem::shownUseFor(const QString &use) noexcept
 {
-    if (use == "/") return "/ (root)";
-    else if (use == "ESP") return tr("EFI System Partition");
+    if (use == "ESP") return tr("EFI System Partition");
     else if (use == "SWAP") return tr("swap space");
     else if (use == "FORMAT") return tr("format only");
     return use;
