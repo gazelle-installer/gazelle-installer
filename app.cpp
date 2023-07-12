@@ -114,7 +114,9 @@ int main(int argc, char *argv[])
             "-- doesn't format /root and it doesn't work with encryption.")},
         {"media-check", QObject::tr("Always check the installation media at the beginning.")},
         {"no-media-check", QObject::tr("Do not check the installation media at the beginning.\n"
-            "Not recommended unless the installation media is guaranteed to be free from errors.")}});
+            "Not recommended unless the installation media is guaranteed to be free from errors.")},
+        // TODO: Eliminate --good-luks when MX Boot Repair is fixed. No translations needed.
+        {"good-luks", "Use luks-<UUID> mapping name for all LUKS containers, including root."}});
     parser.addPositionalArgument("config-file", QObject::tr("Load a configuration file as specified by <config-file>."), "<config-file>");
     parser.process(a);
 

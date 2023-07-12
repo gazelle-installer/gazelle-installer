@@ -58,6 +58,9 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     brave = appArgs.isSet("brave");
     gptoverride = appArgs.isSet("gpt-override");
 
+    // TODO: Eliminate when MX Boot Repair is fixed.
+    goodluks = appArgs.isSet("good-luks");
+
     root.partman = this;
     gui.treePartitions->setModel(this);
     gui.treePartitions->setItemDelegate(new DeviceItemDelegate);
@@ -1214,8 +1217,8 @@ void PartMan::luksFormat()
             "--hash=sha512", "luksFormat", part->path}, &encPass);
         proc.status();
 
-        // Backwards compat for broken MX Boot Repair
-        if (part->devMapper.isEmpty() && part->usefor == "/") {
+        // TODO: Eliminate when MX Boot Repair is fixed.
+        if (!goodluks && part->devMapper.isEmpty() && part->usefor == "/") {
             part->devMapper = "root.fsm";
         }
 
