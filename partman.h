@@ -214,7 +214,6 @@ public:
         long long preferred = 0;
     };
     std::map<QString, struct VolumeSpec> volSpecs;
-    QStringList volClean; // Non-root volumes that should not be preserved.
     QString bootUUID;
     std::map<QString, DeviceItem *> mounts;
     class AutoPart *autopart = nullptr;
