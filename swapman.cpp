@@ -54,7 +54,7 @@ void SwapMan::manageConfig(MSettings &config, bool advanced) noexcept
 void SwapMan::setupDefaults() noexcept
 {
     gui.boxSwap->setChecked(partman.swapCount() <= 0);
-    swapFileEdited(gui.textSwapFile->text());
+    if (gui.radioCustomPart->isChecked()) swapFileEdited(gui.textSwapFile->text());
     sizeResetClicked();
 }
 
