@@ -168,6 +168,7 @@ class PartMan : public QAbstractItemModel
     DeviceItem *changing = nullptr;
     Ui::MeInstall &gui;
     bool brave, gptoverride;
+    bool goodluks; // TODO: Eliminate when MX Boot Repair is fixed.
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit() noexcept;
     void preparePartitions();
