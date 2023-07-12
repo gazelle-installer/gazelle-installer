@@ -44,14 +44,14 @@ if [ "$EUID" != 0 ]; then
     if [ -z "$AUTHENTICATION" ]; then
         AUTHENTICATION="su-to-root -X -c"
     fi
-    
+
     $AUTHENTICATION /usr/bin/minstall-launcher
 
     ##renable Xfce automount feature, if it was enabled in the first place
     if [ -e "/tmp/minstall-auto" ]; then
         rm /tmp/minstall-auto
     fi
-    
+
     if [ "$INITIALAUTOMOUNT" = "true" ]; then
         xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true
     fi
@@ -75,26 +75,27 @@ else
     # put pattern list of environment variables we want get from users environment into array
     __ENVIRONEMENT_PATTERN__=(
         DESKTOP_SESSION
+        HOME=
         KDE_FULL_SESSION=
         LANG=
         LANGUAGE=
         LC_
         QT_
-        XDG_CURRENT_DESKTOP=
-        XDG_SESSION_TYPE
+        XCURSOR_
+        XDG_
         WAYLAND_
         )
 
-    # combine array into a string of space separated entries 
+    # combine array into a string of space separated entries
     __ENVIRONEMENT_PATTERN__="${__ENVIRONEMENT_PATTERN__[*]}"
     # replace spaces with pipe-symbole as pattern alternative
     __ENVIRONEMENT_PATTERN__="^(${__ENVIRONEMENT_PATTERN__// /|})"
     # read environment variables from users process environement table
-    while read -r; do  
-        IFS='=' read -r  k v  <<<"$REPLY" 
+    while read -r; do
+        IFS='=' read -r  k v  <<<"$REPLY"
         # remove any 'bad' special char's like back-quotes and dollar sign
         v="${v//[\`\$]/}"
-        export $k="$v"  
+        export $k="$v"
     done < <( xargs -0 -L1 -a /proc/$PPID/environ \
             | grep -E "${__ENVIRONEMENT_PATTERN__}")
 
