@@ -44,7 +44,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 
 int main(int argc, char *argv[])
 {
-    if (!getenv("XDG_CURRENT_DESKTOP")) {
+    if (!getenv("QT_QPA_PLATFORMTHEME") && !getenv("XDG_CURRENT_DESKTOP")) {
         // The default style in the OOBE environment is hideous and unusable.
         QApplication::setStyle("windows"); // Qt docs say do this before the QApplication instance.
         QPalette pal;
