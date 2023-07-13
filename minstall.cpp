@@ -515,6 +515,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         config->sync();
         QFile::remove("/etc/minstalled.conf");
         QFile::copy(config->fileName(), "/etc/minstalled.conf");
+        chmod(config->fileName().toUtf8().constData(), 0600);
     }
 
     if (config->bad) {
@@ -1086,7 +1087,12 @@ void MInstall::cleanup()
 
     if (config) config->dumpDebug();
     else qDebug() << "NO CONFIG";
-    proc.exec("cp", {"/var/log/minstall.log", "/mnt/antiX/var/log"});
+    const char *destlog = "/mnt/antiX/var/log/minstall.log";
+    QFile::remove(destlog);
+    bool ok = QFile::copy("/var/log/minstall.log", destlog);
+    if (ok) ok = (chmod(destlog, 0400) == 0);
+    if (!ok) proc.log("Failed to copy the installation log to the target.", MProcess::LOG_FAIL);
+
     proc.exec("rm", {"-rf", "/mnt/antiX/mnt/antiX"});
     if (!mountkeep) partman->clearWorkArea();
     setupAutoMount(true);
