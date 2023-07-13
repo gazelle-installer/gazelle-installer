@@ -164,8 +164,6 @@ void MInstall::startup()
             checkmd5 = nullptr;
         }
 
-        setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
-
         partman = new PartMan(proc, *this, appConf, appArgs);
         base = new Base(proc, *partman, *this, appConf, appArgs);
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
@@ -359,6 +357,8 @@ bool MInstall::processNextPhase() noexcept
             phase = Preparing;
             proc.advance(-1, -1);
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
+
+            setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
 
             // Load defaults for configuration phase
             bootman->buildBootLists();
