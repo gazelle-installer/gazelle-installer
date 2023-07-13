@@ -44,9 +44,10 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 
 int main(int argc, char *argv[])
 {
-    if (!getenv("QT_QPA_PLATFORMTHEME") && !getenv("XDG_CURRENT_DESKTOP")) {
+    const bool defskin = (!getenv("QT_QPA_PLATFORMTHEME") && !getenv("XDG_CURRENT_DESKTOP"));
+    if (defskin) {
         // The default style in the OOBE environment is hideous and unusable.
-        QApplication::setStyle("windows"); // Qt docs say do this before the QApplication instance.
+        QApplication::setStyle("cde"); // Qt docs say do this before the QApplication instance.
         QPalette pal;
         pal.setColor(QPalette::Window, Qt::black);
         pal.setColor(QPalette::WindowText, Qt::white);
@@ -68,6 +69,7 @@ int main(int argc, char *argv[])
     }
 
     QApplication a(argc, argv);
+    if (defskin) a.setStyleSheet("QDialog { border: 2px ridge gray; }");
     a.setApplicationVersion(VERSION);
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
     QTranslator qtTran;
