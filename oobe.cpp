@@ -575,6 +575,7 @@ void Oobe::setUserInfo()
     qDebug() << "check for remastered home demo folder:" << remasteredDemo;
 
     if (QFileInfo::exists(dpath.toUtf8())) { // Still exists.
+        sect.setExceptionMode(nullptr);
         proc.exec("cp", {"-n", skelpath + "/.bash_profile", dpath});
         proc.exec("cp", {"-n", skelpath + "/.bashrc", dpath});
         proc.exec("cp", {"-n", skelpath + "/.gtkrc", dpath});
@@ -592,7 +593,7 @@ void Oobe::setUserInfo()
         }
     }
 
-    sect.setExceptionMode(nullptr); // TODO: Make the following shell script minefield more robust.
+    sect.setExceptionMode(nullptr);
 
     // saving Desktop changes
     if (gui.checkSaveDesktop->isChecked()) {
