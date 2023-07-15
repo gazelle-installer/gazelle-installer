@@ -2057,8 +2057,11 @@ QStringList DeviceItem::allowedFormats() const noexcept
 
     if (encrypt) allowPreserve = false;
     if (allowPreserve) {
-        if (use != "/home" && allowedUsesFor().contains(use)) list.append("PRESERVE");
-        else list.prepend("PRESERVE"); // Preserve custom mounts and /home by default.
+        if (use == "ESP" || use == "/home" || !allowedUsesFor().contains(use)) {
+            list.prepend("PRESERVE"); // Preserve ESP, custom mounts and /home by default.
+        } else {
+            list.append("PRESERVE");
+        }
     }
     return list;
 }
