@@ -82,8 +82,7 @@ void BootMan::buildBootLists() noexcept
     chosenBootPBR();
     const bool canPBR = (gui.comboBoot->count() > 0);
     gui.radioBootPBR->setEnabled(canPBR);
-    chosenBootESP();
-    const bool canESP = (proc.detectEFI() && gui.comboBoot->count() > 0);
+    const bool canESP = (proc.detectEFI() && partman.mounts.find("/boot/efi") != partman.mounts.end());
     gui.radioBootESP->setEnabled(canESP);
 
     // load one as the default in preferential order: ESP, MBR, PBR
@@ -132,7 +131,6 @@ void BootMan::install(const QStringList &cmdextra)
             proc.exec("grub-install", {"--target=i386-pc", "--recheck",
                 "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", bootdev});
         } else {
-            proc.exec("mount", {"--mkdir", bootdev, "/mnt/antiX/boot/efi"});
             // rename arch to match grub-install target
             proc.exec("cat", {"/sys/firmware/efi/fw_platform_size"}, nullptr, true);
 
@@ -298,7 +296,7 @@ void BootMan::chosenBootPBR() noexcept
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Partition && (!item->flags.bootRoot || installFromRootDevice)) {
-            if (item->realUseFor() == "ESP") continue;
+            if (item->flags.sysEFI) continue;
             else if (!item->format.compare("SWAP", Qt::CaseInsensitive)) continue;
             else if (item->format == "crypto_LUKS") continue;
             else if (item->format.isEmpty() || item->format == "PRESERVE") {
@@ -312,14 +310,11 @@ void BootMan::chosenBootPBR() noexcept
     gui.labelBoot->setText(tr("Partition to use:"));
 }
 
-void BootMan::chosenBootESP() noexcept
+void BootMan::chosenBootESP(bool checked) noexcept
 {
     gui.comboBoot->clear();
-    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->realUseFor() == "ESP" && (!item->flags.bootRoot || installFromRootDevice)) {
-            item->addToCombo(gui.comboBoot);
-        }
-    }
-    selectBootMain();
+    const auto fit = partman.mounts.find("/boot/efi");
+    if (fit != partman.mounts.end()) fit->second->addToCombo(gui.comboBoot);
+    gui.comboBoot->setDisabled(checked);
     gui.labelBoot->setText(tr("Partition to use:"));
 }

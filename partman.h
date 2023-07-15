@@ -71,6 +71,7 @@ public:
         bool curGPT : 1;
         bool curESP : 1;
         bool volCrypto : 1;
+        bool sysEFI : 1;
     } flags = {};
     QString model, device, path, uuid, devMapper;
     QString label, curLabel;
