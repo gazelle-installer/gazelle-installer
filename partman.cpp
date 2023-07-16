@@ -2023,7 +2023,7 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
     };
 
     if (type != Subvolume) {
-        checkAndAdd("Format");
+        checkAndAdd("FORMAT");
         if (type != VirtualBD) {
             if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
             if (all || size <= 8*GB) {
@@ -2044,7 +2044,7 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
         // checkAndAdd("/tmp"); // temporary files
         // checkAndAdd("/srv"); // data for services provided by this system
         // checkAndAdd("/opt"); // add-on application software packages
-        if (type != Subvolume) checkAndAdd("swap");
+        if (type != Subvolume) checkAndAdd("SWAP");
         else checkAndAdd("/swap");
     }
     return list;
