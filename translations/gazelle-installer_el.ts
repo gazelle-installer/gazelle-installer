@@ -80,33 +80,33 @@ Minimum: %2</source>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="267"/>
+        <location filename="../bootman.cpp" line="274"/>
         <source>Updating initramfs</source>
         <translation>Ενημέρωση του initramfs...</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="126"/>
+        <location filename="../bootman.cpp" line="125"/>
         <source>Installing GRUB</source>
         <translation>Εγκατάσταση GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="104"/>
+        <location filename="../bootman.cpp" line="103"/>
         <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
         <translation>Η εγκατάσταση του GRUB απέτυχε. Μπορείτε να κάνετε επανεκκίνηση στο live iso και να χρησιμοποιήσετε το μενού GRUB Rescue για να επιδιορθώσετε την εγκατάσταση.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="268"/>
+        <location filename="../bootman.cpp" line="275"/>
         <source>Failed to update initramfs.</source>
         <translation>Η ενημέρωση του initramfs απέτυχε.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="293"/>
+        <location filename="../bootman.cpp" line="300"/>
         <source>System boot disk:</source>
         <translation>Δίσκος εκκίνησης συστήματος:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="312"/>
-        <location filename="../bootman.cpp" line="324"/>
+        <location filename="../bootman.cpp" line="319"/>
+        <location filename="../bootman.cpp" line="329"/>
         <source>Partition to use:</source>
         <translation>Διαμέρισμα για χρήση:</translation>
     </message>
@@ -137,17 +137,16 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <location filename="../partman.cpp" line="1917"/>
         <source>EFI System Partition</source>
-        <translation>Διαμέρισμα συστήματος EFI</translation>
+        <translation type="vanished">Διαμέρισμα συστήματος EFI</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1918"/>
+        <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>swap</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1919"/>
+        <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>μορφή μόνο</translation>
     </message>
@@ -171,22 +170,22 @@ Minimum: %2</source>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2468"/>
+        <location filename="../partman.cpp" line="2501"/>
         <source>&amp;Templates</source>
         <translation>&amp;Πρότυπα</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2480"/>
+        <location filename="../partman.cpp" line="2513"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Συμπίεση (&amp; ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2509"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Συμπίεση (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2478"/>
+        <location filename="../partman.cpp" line="2511"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Συμπίεση (&amp;LZO)</translation>
     </message>
@@ -363,19 +362,19 @@ Enjoy using %1</source>
     </message>
     <message>
         <location filename="../minstall.cpp" line="656"/>
-        <location filename="../minstall.cpp" line="730"/>
+        <location filename="../minstall.cpp" line="740"/>
         <source>Encryption</source>
         <translation>Κρυπτογράφηση</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="657"/>
-        <location filename="../minstall.cpp" line="731"/>
+        <location filename="../minstall.cpp" line="741"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>Η κρυπτογράφηση είναι δυνατή μέσω του LUKS. Απαιτείται κωδικός πρόσβασης.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="658"/>
-        <location filename="../minstall.cpp" line="732"/>
+        <location filename="../minstall.cpp" line="742"/>
         <source>A separate unencrypted boot partition is required.</source>
         <translation>Απαιτείται ξεχωριστό μη κρυπτογραφημένο διαμέρισμα εκκίνησης.</translation>
     </message>
@@ -420,525 +419,588 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Χρήση για&lt;/i&gt; - Για να χρησιμοποιήσετε αυτό το διαμέρισμα σε μια εγκατάσταση, πρέπει να επιλέξετε κάτι εδώ.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="673"/>
         <source>Format - Format without mounting.</source>
-        <translation>Μορφή - Μορφοποίηση χωρίς τοποθέτηση.</translation>
+        <translation type="vanished">Μορφή - Μορφοποίηση χωρίς τοποθέτηση.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="674"/>
         <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation>BIOS -GRUB - BIOS Boot GPT διαμέρισμα για GRUB. </translation>
+        <translation type="vanished">BIOS -GRUB - BIOS Boot GPT διαμέρισμα για GRUB. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="675"/>
         <source>EFI - EFI System Partition.</source>
-        <translation>EFI - Διαμέρισμα συστήματος EFI.</translation>
+        <translation type="vanished">EFI - Διαμέρισμα συστήματος EFI.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="676"/>
         <source>boot - Boot manager (/boot).</source>
-        <translation>εκκίνηση - Διαχείριση εκκίνησης (/boot). </translation>
+        <translation type="vanished">εκκίνηση - Διαχείριση εκκίνησης (/boot). </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="677"/>
         <source>root - System root (/).</source>
-        <translation>root - συστήματος root (/).</translation>
+        <translation type="vanished">root - συστήματος root (/).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="678"/>
         <source>swap - Swap space.</source>
-        <translation>swap - χώρος για Swap</translation>
+        <translation type="vanished">swap - χώρος για Swap</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="679"/>
         <source>home - User data (/home).</source>
-        <translation>home - Δεδομένα χρήστη (/home).</translation>
+        <translation type="vanished">home - Δεδομένα χρήστη (/home).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="680"/>
+        <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Εκτός από τα παραπάνω, μπορείτε επίσης να πληκτρολογήσετε το δικό σας σημείο στήριξης. Τα προσαρμοσμένα σημεία συναρμολόγησης πρέπει να ξεκινούν με κάθετο (&quot;/&quot;). </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="681"/>
         <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation>Το πρόγραμμα εγκατάστασης αντιμετωπίζει τα &quot;/boot&quot;, &quot;/&quot; και &quot;/home&quot; ακριβώς το ίδιο με τα &quot;boot&quot;, &quot;root&quot; και &quot;home&quot;, αντίστοιχα.</translation>
+        <translation type="vanished">Το πρόγραμμα εγκατάστασης αντιμετωπίζει τα &quot;/boot&quot;, &quot;/&quot; και &quot;/home&quot; ακριβώς το ίδιο με τα &quot;boot&quot;, &quot;root&quot; και &quot;home&quot;, αντίστοιχα.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="682"/>
+        <location filename="../minstall.cpp" line="688"/>
         <source>&lt;i&gt;Label&lt;/i&gt; - The label that is assigned to the partition once it has been formatted.</source>
         <translation>&lt;i&gt;Ετικέτα&lt;/i&gt; - Η ετικέτα που έχει αντιστοιχιστεί στο διαμέρισμα αφού έχει μορφοποιηθεί.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="683"/>
+        <location filename="../minstall.cpp" line="689"/>
         <source>&lt;i&gt;Encrypt&lt;/i&gt; - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.</source>
         <translation>&lt;i&gt;Κρυπτογράφηση&lt;/i&gt; - Χρησιμοποιήστε κρυπτογράφηση LUKS για αυτό το διαμέρισμα. Ο κωδικός πρόσβασης ισχύει για όλα τα διαμερίσματα που έχουν επιλεγεί για κρυπτογράφηση.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="684"/>
+        <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Μορφή&lt;/i&gt; - Αυτή είναι η μορφή του διαμερίσματος. Οι διαθέσιμες μορφές εξαρτώνται από τη χρήση του διαμερίσματος. Όταν εργάζεστε με μια υπάρχουσα διάταξη, ενδέχεται να μπορείτε να διατηρήσετε τη μορφή του διαμερίσματος επιλέγοντας &lt;b&gt;Διατήρηση&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="686"/>
+        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
         <translation>Επιλέγοντας το &lt;b&gt;Preserve /home &lt;/b&gt;για το διαμέρισμα root διατηρείται τα περιεχόμενα του καταλόγου /home, διαγράφοντας οτιδήποτε άλλο. Αυτή η επιλογή μπορεί να χρησιμοποιηθεί μόνο όταν το /home βρίσκεται στο ίδιο διαμέρισμα με το root.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="688"/>
+        <location filename="../minstall.cpp" line="694"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
         <translation>Υποστηρίζονται τα συστήματα αρχείων Linux ext2, ext3, ext4, jfs, xfs και btrfs και συνιστάται το ext4.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="689"/>
+        <location filename="../minstall.cpp" line="695"/>
         <source>&lt;i&gt;Check&lt;/i&gt; - Check and correct for bad blocks on the drive (not supported for all formats). This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
         <translation>&lt;i&gt;Ελεγχος&lt;/i&gt; - Ελέγξτε και διορθώστε για κακά μπλοκ στη μονάδα δίσκου (δεν υποστηρίζεται για όλες τις μορφές). Αυτό είναι πολύ χρονοβόρο, οπότε μπορεί να θέλετε να παραλείψετε αυτό το βήμα, εκτός εάν υποψιάζεστε ότι η μονάδα δίσκου σας έχει κακό μπλοκ.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="691"/>
+        <location filename="../minstall.cpp" line="697"/>
         <source>&lt;i&gt;Mount Options&lt;/i&gt; - This specifies mounting options that will be used for this partition.</source>
         <translation>&lt;i&gt;Επιλογές προσάρτησης&lt;/i&gt; - Καθορίζει επιλογές συναρμολόγησης που θα χρησιμοποιηθούν για αυτό το διαμέρισμα.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
+        <location filename="../minstall.cpp" line="698"/>
         <source>&lt;i&gt;Dump&lt;/i&gt; - Instructs the dump utility to include this partition in the backup.</source>
         <translation>&lt;i&gt;Απόρριψη&lt;/i&gt; - Δίνει εντολή στο βοηθητικό πρόγραμμα απόρριψης να συμπεριλάβει αυτό το διαμέρισμα στο αντίγραφο ασφαλείας.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="693"/>
+        <location filename="../minstall.cpp" line="699"/>
         <source>&lt;i&gt;Pass&lt;/i&gt; - The sequence in which this file system is to be checked at boot. If zero, the file system is not checked.</source>
         <translation>&lt;i&gt;Pass&lt;/i&gt; - Η σειρά με την οποία πρέπει να ελεγχθεί αυτό το σύστημα αρχείων κατά την εκκίνηση. Εάν είναι μηδέν, το σύστημα αρχείων δεν ελέγχεται. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="694"/>
+        <location filename="../minstall.cpp" line="700"/>
         <source>Menus and actions</source>
         <translation>Μενού και ενέργειες</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="695"/>
+        <location filename="../minstall.cpp" line="701"/>
         <source>A variety of actions are available by right-clicking any drive or partition item in the list.</source>
         <translation>Διατίθεται μια ποικιλία ενεργειών κάνοντας δεξί κλικ σε οποιοδήποτε στοιχείο μονάδας δίσκου ή διαμερίσματος στη λίστα.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="696"/>
+        <location filename="../minstall.cpp" line="702"/>
         <source>The buttons to the right of the list can also be used to manipulate the entries.</source>
         <translation>Τα κουμπιά στα δεξιά της λίστας μπορούν επίσης να χρησιμοποιηθούν για τον χειρισμό των καταχωρήσεων.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="697"/>
+        <location filename="../minstall.cpp" line="703"/>
         <source>The installer cannot modify the layout already on the drive. To create a custom layout, mark the drive for a new layout with the &lt;b&gt;New layout&lt;/b&gt; menu action or button (%1). This clears the existing layout.</source>
         <translation>Το πρόγραμμα εγκατάστασης δεν μπορεί να τροποποιήσει τη διάταξη που υπάρχει ήδη στη μονάδα δίσκου. Για να δημιουργήσετε μια προσαρμοσμένη διάταξη, επισημάνετε τη μονάδα δίσκου για μια νέα διάταξη με την ενέργεια ή το κουμπί μενού &lt;b&gt;νέας διάταξης&lt;/b&gt; (%1). Αυτό διαγράφει την υπάρχουσα διάταξη.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="700"/>
+        <location filename="../minstall.cpp" line="706"/>
         <source>Basic layout requirements</source>
         <translation>Βασικές απαιτήσεις διάταξης</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="701"/>
+        <location filename="../minstall.cpp" line="707"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
         <translation>Το %1 απαιτεί ένα διαμέρισμα root. Το διαμέρισμα swap είναι προαιρετικό αλλά συνιστάται ιδιαίτερα. Εάν θέλετε να χρησιμοποιήσετε τη λειτουργία Suspend-to-Disk του %1, θα χρειαστείτε ένα διαμέρισμα swap μεγαλύτερο από το μέγεθος φυσικής μνήμης.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="703"/>
+        <location filename="../minstall.cpp" line="709"/>
         <source>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</source>
         <translation>Αν επιλέξετε ένα ξεχωριστό διαμέρισμα /home, θα είναι ευκολότερο να κάνετε αναβάθμιση στο μέλλον, αλλά αυτό δεν θα είναι εφικτό εάν αναβαθμίζετε από μια εγκατάσταση που δεν έχει ξεχωριστό διαμέρισμα στο /home</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="705"/>
+        <location filename="../minstall.cpp" line="711"/>
         <source>Active partition</source>
         <translation>Ενεργό διαμέρισμα</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="706"/>
+        <location filename="../minstall.cpp" line="712"/>
         <source>For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.</source>
         <translation>Για την εκκίνηση του εγκατεστημένου λειτουργικού συστήματος, το κατάλληλο διαμέρισμα (συνήθως το διαμέρισμα εκκίνησης ή root) πρέπει να έχει επισημανθεί ως ενεργό.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="707"/>
+        <location filename="../minstall.cpp" line="713"/>
         <source>The active partition of a drive can be chosen using the &lt;b&gt;Active partition&lt;/b&gt; menu action.</source>
         <translation>Το ενεργό διαμέρισμα μιας μονάδας δίσκου μπορεί να επιλεγεί χρησιμοποιώντας την ενέργεια του μενού &lt;b&gt;Ενεργό διαμέρισμα&lt;/b&gt;. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="708"/>
+        <location filename="../minstall.cpp" line="714"/>
         <source>A partition with an asterisk (*) next to its device name is, or will become, the active partition.</source>
         <translation>Ένα διαμέρισμα με έναν αστερίσκο (*) δίπλα στο όνομα της συσκευής του είναι ή θα γίνει το ενεργό διαμέρισμα. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="709"/>
+        <location filename="../minstall.cpp" line="719"/>
         <source>Boot partition</source>
         <translation>Διαμέρισμα εκκίνησης</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="710"/>
+        <location filename="../minstall.cpp" line="720"/>
         <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
         <translation>Αυτό το διαμέρισμα απαιτείται γενικά μόνο για κατατμήσεις root σε εικονικές συσκευές, όπως κρυπτογραφημένες, LVM ή τόμοι RAID λογισμικού.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="711"/>
+        <location filename="../minstall.cpp" line="721"/>
         <source>It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.</source>
         <translation>Περιέχει έναν βασικό πυρήνα και προγράμματα οδήγησης που χρησιμοποιούνται για πρόσβαση σε κρυπτογραφημένο δίσκο ή εικονικές συσκευές.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="712"/>
+        <location filename="../minstall.cpp" line="722"/>
         <source>BIOS-GRUB partition</source>
         <translation>Διαμέρισμα BIOS-GRUB</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="713"/>
+        <location filename="../minstall.cpp" line="723"/>
         <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
         <translation>Όταν χρησιμοποιείτε μονάδα μορφοποίησης GPT σε σύστημα που δεν είναι EFI, απαιτείται διαμέρισμα εκκίνησης BIOS 1MB όταν χρησιμοποιείτε το GRUB.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="714"/>
+        <location filename="../minstall.cpp" line="724"/>
         <source>New drives are formatted in GPT if more than 4 partitions are to be created, or the drive has a capacity greater than 2TB. If the installer is about to format the disk in GPT, and there is no BIOS-GRUB partition, a warning will be displayed before the installation starts.</source>
         <translation>Οι νέες μονάδες δίσκου διαμορφώνονται στο GPT εάν πρόκειται να δημιουργηθούν περισσότερα από 4 διαμερίσματα ή η μονάδα δίσκου έχει χωρητικότητα μεγαλύτερη από 2TB. Εάν το πρόγραμμα εγκατάστασης πρόκειται να μορφοποιήσει το δίσκο σε GPT και δεν υπάρχει διαμέρισμα BIOS-GRUB, θα εμφανιστεί μια προειδοποίηση πριν ξεκινήσει η εγκατάσταση.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="716"/>
+        <location filename="../minstall.cpp" line="726"/>
         <source>Need help creating a layout?</source>
         <translation>Χρειάζεστε βοήθεια για τη δημιουργία διάταξης;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="717"/>
+        <location filename="../minstall.cpp" line="727"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
         <translation>Απλώς κάντε δεξί κλικ σε μια μονάδα δίσκου και επιλέξτε &lt;b&gt;Layout Builder&lt;/b&gt; από το μενού. Αυτό μπορεί να δημιουργήσει μια διάταξη παρόμοια με αυτή της κανονικής εγκατάστασης.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="751"/>
+        <location filename="../minstall.cpp" line="761"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Εγκατάσταση του GRUB για το Linux και τα Windows</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="752"/>
+        <location filename="../minstall.cpp" line="762"/>
         <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation>Το %1 χρησιμοποιεί το πρόγραμμα εκκίνησης GRUB για την εκκίνηση του %1 και των Microsoft Windows.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="753"/>
+        <location filename="../minstall.cpp" line="763"/>
         <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
         <translation>Από προεπιλογή, το GRUB είναι εγκατεστημένο στο Master Boot Record (MBR) ή στο ESP (EFI System Partition για συστήματα εκκίνησης UEFI 64-bit) της μονάδας εκκίνησης και αντικαθιστά το boot loader που χρησιμοποιούσατε πριν. Αυτό είναι φυσιολογικό.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="754"/>
+        <location filename="../minstall.cpp" line="764"/>
         <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
         <translation>Αν επιλέξετε να εγκαταστήσετε το GRUB σε Partition Boot Record (PBR), τότε το GRUB θα εγκατασταθεί στην αρχή του καθορισμένου διαμερίσματος. Αυτή η επιλογή είναι μόνο για ειδικούς.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="755"/>
+        <location filename="../minstall.cpp" line="765"/>
         <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
         <translation>Εάν καταργήσετε την επιλογή του πλαισίου Εγκατάσταση GRUB, το GRUB δεν θα εγκατασταθεί αυτήν τη στιγμή. Αυτή η επιλογή είναι μόνο για ειδικούς.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="756"/>
+        <location filename="../minstall.cpp" line="766"/>
         <source>Create a swap file</source>
         <translation>Δημιουργία αρχείου swap</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="757"/>
+        <location filename="../minstall.cpp" line="767"/>
         <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
         <translation>Ένα αρχείο swap είναι πιο ευέλικτο από ένα διαμέρισμα ανταλλαγής. είναι πολύ πιο εύκολο να αλλάξετε το μέγεθος ενός αρχείου ανταλλαγής ώστε να προσαρμοστεί στις αλλαγές στη χρήση του συστήματος.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="758"/>
+        <location filename="../minstall.cpp" line="768"/>
         <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
         <translation>Από προεπιλογή, αυτό ελέγχεται εάν δεν έχουν οριστεί διαμερίσματα ανταλλαγής και δεν επιλέγεται εάν έχουν οριστεί διαμερίσματα ανταλλαγής. Αυτή η επιλογή θα πρέπει να μείνει ανέγγιχτη και είναι μόνο για ειδικούς.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="759"/>
+        <location filename="../minstall.cpp" line="769"/>
         <source>Setting the size to 0 has the same effect as unchecking this option.</source>
         <translation>Η ρύθμιση του μεγέθους σε 0 έχει το ίδιο αποτέλεσμα με την αποεπιλογή αυτής της επιλογής.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="866"/>
+        <location filename="../minstall.cpp" line="876"/>
         <source>Enjoy using %1</source>
         <translation>Απολαύστε τη χρήση του %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="718"/>
+        <location filename="../minstall.cpp" line="728"/>
         <source>Upgrading</source>
         <translation>Αναβάθμιση</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="719"/>
+        <location filename="../minstall.cpp" line="674"/>
+        <source>Format without mounting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="675"/>
+        <source>BIOS Boot GPT partition for GRUB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="676"/>
+        <location filename="../minstall.cpp" line="715"/>
+        <source>EFI System Partition</source>
+        <translation type="unfinished">Διαμέρισμα συστήματος EFI</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="678"/>
+        <source>Boot manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="679"/>
+        <source>System root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="680"/>
+        <source>User data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="681"/>
+        <source>Static data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="682"/>
+        <source>Variable data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="683"/>
+        <source>Temporary files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="684"/>
+        <source>Swap files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="685"/>
+        <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="716"/>
+        <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="717"/>
+        <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="718"/>
+        <source>Most systems built within the last 10 years use EFI.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="729"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and select &lt;b&gt;Preserve&lt;/b&gt; as the format.</source>
         <translation>Για αναβάθμιση από υπάρχουσα εγκατάσταση Linux, επιλέξτε το ίδιο διαμέρισμα στο home όπως πριν και επιλέξτε &lt;b&gt;Διατήρηση&lt;/b&gt; ως μορφή. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="720"/>
+        <location filename="../minstall.cpp" line="730"/>
         <source>If you do not use a separate home partition, select &lt;b&gt;Preserve /home&lt;/b&gt; on the root file system entry to preserve the existing /home directory located on your root partition. The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.</source>
         <translation>Εάν δεν χρησιμοποιείτε ξεχωριστό αρχικό διαμέρισμα, επιλέξτε &lt;b&gt;Διατήρηση /home&lt;/b&gt; στην καταχώριση συστήματος αρχείων root για να διατηρήσετε τον υπάρχοντα /home κατάλογο που βρίσκεται στο διαμέρισμα root. Το πρόγραμμα εγκατάστασης θα διατηρήσει μόνο /home και θα διαγράψει όλα τα άλλα. Ως αποτέλεσμα, η εγκατάσταση θα διαρκέσει πολύ περισσότερο από το συνηθισμένο. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="722"/>
+        <location filename="../minstall.cpp" line="732"/>
         <source>Preferred Filesystem Type</source>
         <translation>Προτεινόμενος τύπος συστήματος αρχείων</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="723"/>
+        <location filename="../minstall.cpp" line="733"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
         <translation>Για το %1, μπορείτε να επιλέξετε να μορφοποιήσετε τα διαμερίσματα ως ext2, ext3, ext4, f2fs, jfs, xfs ή btrfs.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="724"/>
+        <location filename="../minstall.cpp" line="734"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>Πρόσθετες επιλογές συμπίεσης είναι διαθέσιμες για μονάδες δίσκου που χρησιμοποιούν btrfs. Το Lzo είναι γρήγορο, αλλά η συμπίεση είναι χαμηλότερη. Το Zlib είναι πιο αργό, με υψηλότερη συμπίεση.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="726"/>
+        <location filename="../minstall.cpp" line="736"/>
         <source>System partition management tool</source>
         <translation>Εργαλείο διαχείρισης διαμερισμάτων συστήματος</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="727"/>
+        <location filename="../minstall.cpp" line="737"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
         <translation>Για μεγαλύτερο έλεγχο των διατάξεων της μονάδας δίσκου (όπως τροποποίηση της υπάρχουσας διάταξης σε δίσκο), κάντε κλικ στο κουμπί διαχείρισης διαμερισμάτων (%1). Αυτό θα εκτελέσει το εργαλείο διαχείρισης διαμερισμάτων του λειτουργικού συστήματος, το οποίο θα σας επιτρέψει να δημιουργήσετε την ακριβή διάταξη που χρειάζεστε.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="733"/>
+        <location filename="../minstall.cpp" line="743"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
         <translation>Για να διατηρήσετε ένα κρυπτογραφημένο διαμέρισμα, κάντε δεξί κλικ σε αυτό και επιλέξτε &lt;b&gt;Ξεκλείδωμα&lt;/b&gt;. Στο παράθυρο διαλόγου που εμφανίζεται, εισαγάγετε ένα όνομα για την εικονική συσκευή και τον κωδικό πρόσβασης. Όταν η συσκευή είναι ξεκλειδωμένη, το όνομα που επιλέξατε θα εμφανίζεται στην ενότητα &lt;i&gt;Εικονικές συσκευές&lt;/i&gt;, με παρόμοιες επιλογές με αυτήν ενός κανονικού διαμερίσματος. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="735"/>
+        <location filename="../minstall.cpp" line="745"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
         <translation>Για να ξεκλειδωθεί το κρυπτογραφημένο διαμέρισμα κατά την εκκίνηση, πρέπει να προστεθεί στο αρχείο κρυπτογράφησης. Χρησιμοποιήστε την ενέργεια μενού &lt;b&gt;Προσθήκη σε κρυπτογράφηση&lt;/b&gt; για να το κάνετε αυτό</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="736"/>
+        <location filename="../minstall.cpp" line="746"/>
         <source>Other partitions</source>
         <translation>Άλλα χωρίσματα</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="737"/>
+        <location filename="../minstall.cpp" line="747"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
         <translation>Το πρόγραμμα εγκατάστασης επιτρέπει τη δημιουργία ή τη χρήση άλλων κατατμήσεων για άλλους σκοπούς, ωστόσο να έχετε υπόψη σας ότι τα παλαιότερα συστήματα δεν μπορούν να χειριστούν μονάδες δίσκου με περισσότερα από 4 διαμερίσματα.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="738"/>
+        <location filename="../minstall.cpp" line="748"/>
         <source>Subvolumes</source>
         <translation>Subvolumes</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="739"/>
+        <location filename="../minstall.cpp" line="749"/>
         <source>Some file systems, such as Btrfs, support multiple subvolumes in a single partition. These are not physical subdivisions, and so their order does not matter.</source>
         <translation>Ορισμένα συστήματα αρχείων, όπως το Btrfs, υποστηρίζουν πολλούς υποτόμους σε ένα μόνο διαμέρισμα. Δεν πρόκειται για φυσικές υποδιαιρέσεις και επομένως η σειρά τους δεν έχει σημασία.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="741"/>
+        <location filename="../minstall.cpp" line="751"/>
         <source>Use the &lt;b&gt;Scan subvolumes&lt;/b&gt; menu action to search an existing Btrfs partition for subvolumes. To create a new subvolume, use the &lt;b&gt;New subvolume&lt;/b&gt; menu action.</source>
         <translation>Χρησιμοποιήστε την ενέργεια μενού &lt;b&gt;Σάρωση υποτόμων&lt;/b&gt; για αναζήτηση σε υπάρχον διαμέρισμα Btrfs για υποτόμους. Για να δημιουργήσετε έναν νέο subvolume, χρησιμοποιήστε την ενέργεια μενού &lt;b&gt;Νέος subvolume&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="743"/>
+        <location filename="../minstall.cpp" line="753"/>
         <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
         <translation>Οι υπάρχοντες υποτόμοι μπορούν να διατηρηθούν, ωστόσο το όνομα πρέπει να παραμείνει το ίδιο.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="744"/>
+        <location filename="../minstall.cpp" line="754"/>
         <source>Virtual Devices</source>
         <translation>Εικονικές συσκευές</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="745"/>
+        <location filename="../minstall.cpp" line="755"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
         <translation>Εάν το πρόγραμμα εγκατάστασης εντοπίσει οπτικές συσκευές όπως ανοίγματα διαμερισμάτων LUKS, λογικούς τόμους LVM ή τόμους RAID που βασίζονται σε λογισμικό, μπορεί να χρησιμοποιηθούν για την εγκατάσταση. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="746"/>
+        <location filename="../minstall.cpp" line="756"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Η χρήση εικονικών συσκευών (πέρα από τη διατήρηση κρυπτογραφημένων συστημάτων αρχείων) είναι μια προηγμένη δυνατότητα. Μπορεί να χρειαστεί να επεξεργαστείτε κάποια αρχεία (π.χ.. Initramfs, crypttab, fstab) για να εξασφαλίσει τις εικονικές συσκευές που χρησιμοποιούνται δημιουργούνται κατά την εκκίνηση.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="765"/>
+        <location filename="../minstall.cpp" line="775"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Κοινές Υπηρεσίες προς Ενεργοποίηση&lt;/b&gt;&lt;br/&gt;Επιλέξτε οποιεσδήποτε Κοινές Υπηρεσίες που μπορεί να χρειασθείτε για τη ρύθμιση του συστήματός σας και οι υπηρεσίες θα ξεκινούν αυτομάτως, με την εκκίνηση του %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="769"/>
+        <location filename="../minstall.cpp" line="779"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ταυτότητα Υπολογιστή&lt;/b&gt;&lt;br/&gt;Το Όνομα Υπολογιστή είναι ένα μοναδικό κοινό όνομα, που θα ταυτοποιεί τον υπολογιστή σας όταν βρίσκεται σε ένα δίκτυο. Είναι απίθανο να χρησιμοποιηθεί το Όνομα του υπολογιστή, εκτός αν το Τοπικό Δίκτυο ή ο ISP σας, το απαιτούν.&lt;/p&gt;&lt;p&gt;Ο υπολογιστής και τα ονόματα τομέα μπορούν να περιέχουν μόνο αλφαριθμητικούς χαρακτήρες, τελείες, παύλες. Δεν μπορεί να περιέχει κενά, αρχίζει ή να τελειώνει με παύλες&lt;/p&gt;&lt;p&gt;Αν θέλετε να χρησιμοποιείτε τον υπολογιστή σας για να μοιράζεσθε κάποιους φακέλλους σας, ή τον εκτυπωτή, με ένα τοπικό υπολογιστή που τρέχει MS-Windows ή Mac OSX, τότε θα πρέπει να ενεργοποιηθεί ο Διακομιστής SaMBa .&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="779"/>
+        <location filename="../minstall.cpp" line="789"/>
         <source>Localization Defaults</source>
         <translation>Προεπιλογές τοπικής ρύθμισης</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="780"/>
+        <location filename="../minstall.cpp" line="790"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation>Ορίστε τις προεπιλεγμένες τοπικές ρυθμίσεις. Αυτό θα ισχύει εκτός εάν παρακαμφθούν αργότερα από τον χρήστη.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="781"/>
+        <location filename="../minstall.cpp" line="791"/>
         <source>Configure Clock</source>
         <translation>Ρύθμιση Ωρολογίου</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="782"/>
+        <location filename="../minstall.cpp" line="792"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation>Εάν διαθέτετε υπολογιστή Apple ή καθαρό Unix, από προεπιλογή το ρολόι συστήματος έχει οριστεί σε Greenwich Meridian Time (GMT) ή Coordinated Universal Time (UTC). Για να το αλλάξετε αυτό, επιλέξτε το πλαίσιο &quot;&lt;b&gt;Το ρολόι συστήματος χρησιμοποιεί τοπική ώρα&lt;/b&gt;&quot;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="784"/>
+        <location filename="../minstall.cpp" line="794"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation>Το σύστημα ξεκινά με την προκαθορισμένη ζώνη ώρας σε GMT/UTC. Για να αλλάξετε τη ζώνη ώρας, μετά την επανεκκίνηση στη νέα εγκατάσταση, κάντε δεξί κλικ στο ρολόι στον Πίνακα και επιλέξτε Ιδιότητες. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="786"/>
+        <location filename="../minstall.cpp" line="796"/>
         <source>Service Settings</source>
         <translation>Ρυθμίσεις υπηρεσίας</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="787"/>
+        <location filename="../minstall.cpp" line="797"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation>Οι περισσότεροι χρήστες δεν πρέπει να αλλάζουν τις προεπιλογές. Οι χρήστες με υπολογιστές χαμηλού πόρου μερικές φορές θέλουν να απενεργοποιήσουν τις άχρηστες υπηρεσίες προκειμένου να διατηρήσουν τη χρήση της RAM όσο το δυνατόν χαμηλότερη. Βεβαιωθείτε ότι γνωρίζετε τι κάνετε!</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="793"/>
+        <location filename="../minstall.cpp" line="803"/>
         <source>Default User Login</source>
         <translation>Προεπιλεγμένη σύνδεση χρήστη</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="794"/>
+        <location filename="../minstall.cpp" line="804"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
         <translation>Ο χρήστης root είναι παρόμοιος με τον χρήστη Administrator σε ορισμένα άλλα λειτουργικά συστήματα. Δεν πρέπει να χρησιμοποιείτε το χρήστη root ως τον καθημερινό λογαριασμό χρήστη σας. Εισαγάγετε το όνομα για έναν νέο (προεπιλεγμένο) λογαριασμό χρήστη που θα χρησιμοποιείτε σε καθημερινή βάση. Εάν χρειαστεί, μπορείτε να προσθέσετε άλλους λογαριασμούς χρηστών αργότερα με τη Διαχείριση χρηστών %1. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="798"/>
+        <location filename="../minstall.cpp" line="808"/>
         <source>Passwords</source>
         <translation>Κωδικοί πρόσβασης</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="799"/>
+        <location filename="../minstall.cpp" line="809"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
         <translation>Εισαγάγετε έναν νέο κωδικό πρόσβασης για τον προεπιλεγμένο λογαριασμό χρήστη σας και για τον λογαριασμό root. Κάθε κωδικός πρέπει να εισαχθεί δύο φορές.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="801"/>
+        <location filename="../minstall.cpp" line="811"/>
         <source>No passwords</source>
         <translation>Χωρίς κωδικούς</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="802"/>
+        <location filename="../minstall.cpp" line="812"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
         <translation>Εάν θέλετε ο προεπιλεγμένος λογαριασμός χρήστη να μην έχει κωδικό πρόσβασης, αφήστε τα πεδία κωδικού πρόσβασης κενά. Αυτό σας επιτρέπει να συνδεθείτε χωρίς να απαιτείται κωδικός πρόσβασης.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="804"/>
+        <location filename="../minstall.cpp" line="814"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
         <translation>Προφανώς, αυτό πρέπει να γίνεται μόνο σε περιπτώσεις όπου ο λογαριασμός χρήστη δεν χρειάζεται να είναι ασφαλής, όπως ένα δημόσιο τερματικό.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="812"/>
+        <location filename="../minstall.cpp" line="822"/>
         <source>Old Home Directory</source>
         <translation>Κατάλογος παλαιό /home</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="813"/>
+        <location filename="../minstall.cpp" line="823"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation>Ένας κατάλογος /home υπάρχει ήδη για το όνομα χρήστη που έχετε επιλέξει. Αυτή η οθόνη σάς επιτρέπει να επιλέξετε τι συμβαίνει σε αυτόν τον κατάλογο.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="815"/>
+        <location filename="../minstall.cpp" line="825"/>
         <source>Re-use it for this installation</source>
         <translation>Επαναχρησιμοποιήστε το για αυτήν την εγκατάσταση</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="816"/>
+        <location filename="../minstall.cpp" line="826"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation>Ο παλιός κατάλογος /home θα χρησιμοποιηθεί για αυτόν τον λογαριασμό χρήστη. Αυτή είναι μια καλή επιλογή κατά την αναβάθμιση και τα αρχεία και οι ρυθμίσεις σας θα είναι άμεσα διαθέσιμα.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="818"/>
+        <location filename="../minstall.cpp" line="828"/>
         <source>Rename it and create a new directory</source>
         <translation>Μετονομάστε το και δημιουργήστε ένα νέο κατάλογο</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="819"/>
+        <location filename="../minstall.cpp" line="829"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation>Θα δημιουργηθεί ένας νέος κατάλογος /home για τον χρήστη, αλλά ο παλιός κατάλογος /home θα μετονομαστεί. Τα αρχεία και οι ρυθμίσεις σας δεν θα είναι άμεσα ορατά στη νέα εγκατάσταση, αλλά μπορούν να προσπελαστούν χρησιμοποιώντας τον κατάλογο που έχει μετονομαστεί.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="821"/>
+        <location filename="../minstall.cpp" line="831"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation>Ο παλιός κατάλογος θα έχει έναν αριθμό στο τέλος του, ανάλογα με το πόσες φορές ο κατάλογος έχει μετονομαστεί πριν.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="822"/>
+        <location filename="../minstall.cpp" line="832"/>
         <source>Delete it and create a new directory</source>
         <translation>Διαγράψτε το και δημιουργήστε έναν νέο κατάλογο</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="823"/>
+        <location filename="../minstall.cpp" line="833"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation>Ο παλιός κατάλογος /home θα διαγραφεί και ένας νέος θα δημιουργηθεί από την αρχή.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="824"/>
+        <location filename="../minstall.cpp" line="834"/>
         <source>Warning</source>
         <translation>Προειδοποίηση </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="825"/>
+        <location filename="../minstall.cpp" line="835"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation>Όλα τα αρχεία και οι ρυθμίσεις θα διαγραφούν μόνιμα εάν αυτή η επιλογή είναι επιλεγμένη. Οι πιθανότητες ανάκτησης είναι χαμηλές.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="841"/>
+        <location filename="../minstall.cpp" line="851"/>
         <source>Installation in Progress</source>
         <translation>Εγκατάσταση σε εξέλιξη</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="842"/>
+        <location filename="../minstall.cpp" line="852"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation>Το %1 εγκαθίσταται. Για μια νέα εγκατάσταση, αυτό πιθανόν να διαρκέσει 3-20 λεπτά, ανάλογα με την ταχύτητα του συστήματός σας και το μέγεθος των τυχόν διαμερισμάτων που επαναδιαμορφώνετε.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="844"/>
+        <location filename="../minstall.cpp" line="854"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation>Εάν κάνετε κλικ στο κουμπί Ακύρωση, η εγκατάσταση θα διακοπεί το συντομότερο δυνατό.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="846"/>
+        <location filename="../minstall.cpp" line="856"/>
         <source>Change settings while you wait</source>
         <translation>Αλλάξτε τις ρυθμίσεις ενώ περιμένετε</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="847"/>
+        <location filename="../minstall.cpp" line="857"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation>Ενώ το %1 είναι εγκατεστημένο, μπορείτε να κάνετε κλικ στα κουμπιά Επόμενο ή Πίσω για να εισάγετε άλλες πληροφορίες που απαιτούνται για την εγκατάσταση.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="849"/>
+        <location filename="../minstall.cpp" line="859"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation>Ολοκληρώστε αυτά τα βήματα με το δικό σας ρυθμό. Ο εγκαταστάτης θα περιμένει την είσοδό σας εάν είναι απαραίτητο.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="857"/>
+        <location filename="../minstall.cpp" line="867"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Συγχαρητήρια!&lt;/b&gt;&lt;br/&gt;Ολοκληρώσατε την εγκατάσταση του %1.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Εύρεση Εφαρμογών&lt;/b&gt;&lt;br/&gt;Υπάρχουν εκατοντάδες εξαιρετικών εφαρμογών που εγκαθίστανται με το %1. Ο καλύτερος τρόπος για να μάθετε γι&apos; αυτές είναι εξερευνώντας το Μενού και δοκιμάζοντας τες. Πολλές από αυτές αναπτύχθηκαν ειδικά για το %1. Αυτές εμφανίζονται στα Κεντρικά Μενού. Μπορείτε να βρείτε άλλες εφαρμογές Linux στο Μενού &gt; Εφαρμογές;&lt;/p&gt;&lt;p&gt;Επιπλέον, το %1 περιλαμβάνει πολλλές standard εφαρμογές linux που τρέχουν μόνον από τη γραμμή εντολών και, συνεπώς, δεν εμφανίζονται στο Μενού.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="867"/>
-        <location filename="../minstall.cpp" line="1133"/>
+        <location filename="../minstall.cpp" line="877"/>
+        <location filename="../minstall.cpp" line="1143"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Υποστηρίξτε το %1
 
 Το %1 στηρίζεται από ανθρώπους σαν κι&apos; εσάς. Κάποιο βοηθούν κάποιους άλλους στο forum υποστήριξης- %2, ή μεταφράζουν αρχεία βοήθειας σε διάφορες γλώσσες, ή κάνουν υποδείξεις, γράφουν τεκμηρίωση, ή βοηθούν δοκιμάζοντας νέο λογισμικό.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="897"/>
+        <location filename="../minstall.cpp" line="907"/>
         <source>Finish</source>
         <translation>Ολοκλήρωση</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="900"/>
+        <location filename="../minstall.cpp" line="910"/>
         <source>OK</source>
         <translation>Εντάξει</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="902"/>
+        <location filename="../minstall.cpp" line="912"/>
         <source>Next</source>
         <translation>Επόμενο</translation>
     </message>
@@ -953,34 +1015,34 @@ Enjoy using %1</source>
         <translation>Η διαμόρφωση ολοκληρώθηκε. Επανεκκίνηση συστήματος.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1055"/>
+        <location filename="../minstall.cpp" line="1065"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>Η εγκατάσταση και η ρύθμιση δεν ολοκληρώθηκαν.
 Θέλετε πραγματικά να σταματήσετε τώρα;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1119"/>
+        <location filename="../minstall.cpp" line="1129"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Παίρνοντας Βοήθεια&lt;/b&gt;&lt;br/&gt;Μπορείτε να βρείτε Βασικές Πληροφορίες για το %1 στη διεύθυνση %2 Υπάρχουν εθελοντές που θα σας βοηθήσουν στο %3 στη διεύθυνση %4 Αν αναζητάτε βοήθεια, παρακαλώ να θυμάστε να περιγράψετε το πρόβλημά σας και τον υπολογιστή σας, με κάποιες λεπτομέρειες. Φράσεις όπως &apos;δεν δούλεψε&apos; δεν βοηθούν συνήθως και πάρα πολύ.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1127"/>
+        <location filename="../minstall.cpp" line="1137"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Επισκευή της Εγκατάστασής σας&lt;/b&gt;&lt;br/&gt;Αν το %1 σταματήσει να λειτουργεί από τον σκληρό δίσκο, μπορεί, ορισμένες φορές, να είναι εφικτή η διόρθωση του προβλήματος, κάνοντας εκκίνηση από το LiveDVD η LiveUSB και τρέχοντας ένα από τα utilities του %1, είτε χρησιμοποιώντας ένα από τα συνηθισμένα εργαλεία Linux για την επισκευή του συστήματος.&lt;/p&gt;&lt;p&gt;Μπορείτε, επίσης, να χρησιμοποιήσετε το LiveDVD η LiveUSB του %1 για να ανακτήσετε δεδομένα από συστήματα MS-Windows!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1141"/>
+        <location filename="../minstall.cpp" line="1151"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ρύθμιση του Μίκτη Ήχου&lt;/b&gt;&lt;br/&gt;Το %1 προσπαθεί να ρυθμίσει τον Μίκτη Ήχου για σας, αλλά μπορεί να πρέπει πρώτα να δυναμώσετε την ένταση του ήχου και να βγάλετε τη Σίγαση από τα κανάλια του μίκτη, για να ακούσετε ήχο.&lt;/p&gt; &lt;p&gt;Η συντόμευση για τον μίκτη βρίσκεται στο tray. Κάντε κλικ πάνω της για να ανοίξετε τον Μίκτη. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1149"/>
+        <location filename="../minstall.cpp" line="1159"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Διατηρείστε ενημερωμένο το αντίγραφό σας του %1&lt;/b&gt;&lt;br/&gt;Για πληροφορίες και ενημερώσεις, παρακαλώ επισκεφθείτε τη διεύθυνση %2&lt;/p&gt; </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1154"/>
+        <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ιδιαίτερες Ευχαριστίες&lt;/b&gt;&lt;br/&gt;Τις ευχαριστίες μας προς όλους εκείνους που επέλεξαν να υποστηρίξουν το %1 με τον χρόνο τους, χρήμα, υποδείξεις, εργασία, επαίνους, ιδέες, προώθηση και/ή ενθάρρυνση.&lt;/p&gt;&lt;p&gt;Χωρίς εσάς, δεν θα υπήρχε καθόλου το %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
     </message>
@@ -1460,12 +1522,12 @@ Do you really want to stop now?</source>
 <context>
     <name>Oobe</name>
     <message>
-        <location filename="../oobe.cpp" line="332"/>
+        <location filename="../oobe.cpp" line="331"/>
         <source>Please enter a computer name.</source>
         <translation>Εισαγάγετε ένα όνομα υπολογιστή.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="336"/>
+        <location filename="../oobe.cpp" line="335"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1474,12 +1536,12 @@ name before proceeding.</source>
 πριν προχωρήσετε.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="341"/>
+        <location filename="../oobe.cpp" line="340"/>
         <source>Please enter a domain name.</source>
         <translation>Εισαγάγετε ένα όνομα τομέα.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="345"/>
+        <location filename="../oobe.cpp" line="344"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1488,51 +1550,51 @@ name before proceeding.</source>
 πριν προχωρήσετε.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="352"/>
+        <location filename="../oobe.cpp" line="351"/>
         <source>Please enter a workgroup.</source>
         <translation>Εισαγάγετε όνομα workgroup.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="492"/>
+        <location filename="../oobe.cpp" line="491"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>Το όνομα χρήστη δεν μπορεί να περιέχει ειδικούς χαρακτήρες ή κενά.
 Παρακαλούμε επιλέξτε ένα άλλο όνομα πριν προχωρήσετε.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="503"/>
+        <location filename="../oobe.cpp" line="502"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Λυπούμαστε, το όνομα χρησιμοποιείται.
 Επιλέξτε ένα διαφορετικό όνομα.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="512"/>
+        <location filename="../oobe.cpp" line="511"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="513"/>
+        <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
         <translation type="unfinished">Θέλετε να συνεχίσετε;</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="519"/>
+        <location filename="../oobe.cpp" line="518"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>Δεν δώσατε κωδικό πρόσβασης για το root. Θέλετε να συνεχίσετε;</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="532"/>
+        <location filename="../oobe.cpp" line="531"/>
         <source>Failed to set user account passwords.</source>
         <translation>Αποτυχία ορισμού κωδικών πρόσβασης λογαριασμού χρήστη.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="558"/>
+        <location filename="../oobe.cpp" line="557"/>
         <source>Failed to save old home directory.</source>
         <translation>Αποτυχία αποθήκευσης του παλιού αρχικού καταλόγου.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="567"/>
+        <location filename="../oobe.cpp" line="566"/>
         <source>Failed to delete old home directory.</source>
         <translation>Αποτυχία κατάργησης του παλιού οικείου καταλόγου.</translation>
     </message>
@@ -1555,69 +1617,74 @@ Please select a different name.</source>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="../partman.cpp" line="232"/>
+        <location filename="../partman.cpp" line="226"/>
         <source>Virtual Devices</source>
         <translation>Εικονικές συσκευές</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="456"/>
-        <location filename="../partman.cpp" line="511"/>
+        <location filename="../partman.cpp" line="452"/>
+        <location filename="../partman.cpp" line="514"/>
         <source>&amp;Add partition</source>
         <translation>&amp;Προσθήκη διαμερίσματος</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="458"/>
+        <location filename="../partman.cpp" line="454"/>
         <source>&amp;Remove partition</source>
         <translation>&amp;Κατάργηση διαμερίσματος</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="468"/>
+        <location filename="../partman.cpp" line="464"/>
         <source>&amp;Lock</source>
         <translation>&amp;Κλείδωμα</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="472"/>
+        <location filename="../partman.cpp" line="468"/>
         <source>&amp;Unlock</source>
         <translation>&amp;Ξεκλείδωμα</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="477"/>
-        <location filename="../partman.cpp" line="617"/>
+        <location filename="../partman.cpp" line="473"/>
+        <location filename="../partman.cpp" line="620"/>
         <source>Add to crypttab</source>
         <translation>Προσθήκη στο crypttab</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="483"/>
+        <location filename="../partman.cpp" line="479"/>
         <source>Active partition</source>
         <translation>Ενεργό διαμέρισμα</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="489"/>
+        <location filename="../partman.cpp" line="480"/>
+        <source>EFI System Partition</source>
+        <translation type="unfinished">Διαμέρισμα συστήματος EFI</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="488"/>
         <source>New subvolume</source>
         <translation>Νέος subvolume</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="490"/>
+        <location filename="../partman.cpp" line="489"/>
         <source>Scan subvolumes</source>
         <translation>Σάρωση υποτόμων</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="514"/>
+        <location filename="../partman.cpp" line="517"/>
         <source>New &amp;layout</source>
         <translation>Νέο &amp;διάταξη</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="515"/>
+        <location filename="../partman.cpp" line="518"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Επαναφορά διάταξης </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="538"/>
+        <location filename="../partman.cpp" line="541"/>
         <source>Remove subvolume</source>
         <translation>Αφαίρεση του subvolume</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="615"/>
+        <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Ξεκλειδώστε το Drive</translation>
     </message>
@@ -1626,164 +1693,175 @@ Please select a different name.</source>
         <translation type="vanished">Εικονικές συσκευές</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="620"/>
+        <location filename="../partman.cpp" line="623"/>
         <source>Password:</source>
         <translation>Κωδικός Πρόσβασης:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="646"/>
+        <location filename="../partman.cpp" line="649"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>Δεν ήταν δυνατό το ξεκλείδωμα της συσκευής. Πιθανός λανθασμένος κωδικός πρόσβασης.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="674"/>
+        <location filename="../partman.cpp" line="677"/>
         <source>Failed to close %1</source>
         <translation>Αποτυχία κλεισίματος %1 </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="718"/>
+        <location filename="../partman.cpp" line="721"/>
         <source>Invalid subvolume label</source>
         <translation>Μη έγκυρη ετικέτα υποτόμου</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="729"/>
+        <location filename="../partman.cpp" line="732"/>
         <source>Duplicate subvolume label</source>
         <translation>Διπλότυπη ετικέτα υποτόμου</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="738"/>
+        <location filename="../partman.cpp" line="741"/>
         <source>Invalid use for %1: %2</source>
         <translation>Μη έγκυρη χρήση για %1: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="749"/>
+        <location filename="../partman.cpp" line="752"/>
         <source>%1 is already selected for: %2</source>
         <translation>Το %1 είναι ήδη επιλεγμένο για: %2 </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="763"/>
+        <location filename="../partman.cpp" line="766"/>
         <source>A root partition of at least %1 is required.</source>
         <translation>Απαιτείται ένα διαμέρισμα root τουλάχιστον %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="769"/>
+        <location filename="../partman.cpp" line="772"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>Δεν είναι δυνατή η διατήρηση /home εντός της root (/) εάν έχει τοποθετηθεί επίσης ξεχωριστό διαμέρισμα /home. </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="792"/>
+        <location filename="../partman.cpp" line="795"/>
         <source>Reuse (no reformat) %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="813"/>
+        <location filename="../partman.cpp" line="816"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="815"/>
+        <location filename="../partman.cpp" line="818"/>
         <source>Delete subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="818"/>
+        <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="819"/>
+        <location filename="../partman.cpp" line="822"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="821"/>
+        <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="822"/>
+        <location filename="../partman.cpp" line="825"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="837"/>
+        <location filename="../partman.cpp" line="840"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Πρέπει να επιλέξετε ξεχωριστό διαμέρισμα εκκίνησης κατά την κρυπτογράφηση του root.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="782"/>
+        <location filename="../partman.cpp" line="785"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>Ετοιμάστε το %1 πίνακα διαμερισμάτων στο %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="795"/>
+        <location filename="../partman.cpp" line="798"/>
         <source>Format %1 to use for %2</source>
         <translation>Μορφοποιήστε %1 για χρήση για %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="796"/>
+        <location filename="../partman.cpp" line="799"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Επαναχρησιμοποίηση (χωρίς αναδιαμόρφωση) %1 ως %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="797"/>
+        <location filename="../partman.cpp" line="800"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>Διαγράψτε τα δεδομένα στο %1 εκτός από το /home, για χρήση για το %2 </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="800"/>
+        <location filename="../partman.cpp" line="803"/>
         <source>Create %1 without formatting</source>
         <translation>Δημιουργία %1 χωρίς μορφοποίηση</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="801"/>
+        <location filename="../partman.cpp" line="804"/>
         <source>Create %1, format to use for %2</source>
         <translation>Δημιουργία %1, μορφοποίηση για χρήση για %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="970"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>Οι ακόλουθες μονάδες δίσκου είναι ή θα είναι, εγκατεστημένες με GPT, αλλά δεν διαθέτουν διαμέρισμα BIOS-GRUB:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="951"/>
+        <location filename="../partman.cpp" line="972"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>Αυτό το σύστημα μπορεί να μην εκκινείται από μονάδες GPT χωρίς διαμέρισμα BIOS-GRUB. </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="838"/>
-        <location filename="../partman.cpp" line="922"/>
-        <location filename="../partman.cpp" line="952"/>
+        <location filename="../partman.cpp" line="841"/>
+        <location filename="../partman.cpp" line="925"/>
+        <location filename="../partman.cpp" line="943"/>
+        <location filename="../partman.cpp" line="973"/>
         <source>Are you sure you want to continue?</source>
         <translation>Θέλετε να συνεχίσετε;</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="517"/>
+        <location filename="../partman.cpp" line="520"/>
         <source>Layout &amp;Builder...</source>
         <translation>Layout &amp;Builder...</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="892"/>
+        <location filename="../partman.cpp" line="895"/>
         <source>%1 (%2) requires %3</source>
         <translation>Το %1 (%2) απαιτεί %3</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="920"/>
+        <location filename="../partman.cpp" line="923"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>Η εγκατάσταση ενδέχεται να αποτύχει επειδή οι ακόλουθοι τόμοι είναι πολύ μικροί:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="844"/>
+        <location filename="../partman.cpp" line="847"/>
         <source>The %1 installer will now perform the requested actions.</source>
         <translation>Ο εγκαταστάτης %1 θα εκτελέσει τώρα τις ζητούμενες ενέργειες.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="845"/>
+        <location filename="../partman.cpp" line="848"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation>Αυτές οι ενέργειες δεν μπορούν να ανακληθούν. Θέλετε να συνεχίσετε;</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="991"/>
+        <location filename="../partman.cpp" line="936"/>
+        <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="939"/>
+        <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="1012"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>
 
@@ -1791,92 +1869,92 @@ Please select a different name.</source>
  </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="995"/>
+        <location filename="../partman.cpp" line="1016"/>
         <source>Smartmon tool output:</source>
         <translation>Aποτέλεσμα του εργαλείου Smartmon:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="996"/>
+        <location filename="../partman.cpp" line="1017"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Οι δίσκοι με το διαμέρισμα που έχετε επιλέξει για την εγκατάσταση περνάνε τη δοκιμή SMART (smartctl), αλλά οι δοκιμές δείχνουν ότι θα έχει υψηλότερο από το μέσο ποσοστό αποτυχίας στο μέλλον.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1001"/>
+        <location filename="../partman.cpp" line="1022"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>Αν δεν είστε σίγουροι, παρακαλούμε να βγείτε από το πρόγραμμα εγκατάστασης και να εκτελέσετε GSmartControl για περισσότερες πληροφορίες.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1003"/>
+        <location filename="../partman.cpp" line="1024"/>
         <source>Do you want to abort the installation?</source>
         <translation>Θέλετε να ακυρώσετε την εγκατάσταση; </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1008"/>
+        <location filename="../partman.cpp" line="1029"/>
         <source>Do you want to continue?</source>
         <translation>Θέλετε να συνεχίσετε; </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1210"/>
+        <location filename="../partman.cpp" line="1237"/>
         <source>Failed to format LUKS container.</source>
         <translation>Απέτυχε η μορφοποίηση του κοντέινερ LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1230"/>
+        <location filename="../partman.cpp" line="1257"/>
         <source>Failed to open LUKS container.</source>
         <translation>Απέτυχε το άνοιγμα του κοντέινερ LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1344"/>
+        <location filename="../partman.cpp" line="1368"/>
         <source>Failed to finalize encryption setup.</source>
         <translation>Αποτυχία οριστικοποίησης της ρύθμισης κρυπτογράφησης.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1097"/>
+        <location filename="../partman.cpp" line="1118"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Η προετοιμασία των απαιτούμενων διαμερισμάτων απέτυχε.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1140"/>
+        <location filename="../partman.cpp" line="1161"/>
         <source>Preparing partition tables</source>
         <translation>Προετοιμασία πινάκων διαμερισμάτων</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1157"/>
+        <location filename="../partman.cpp" line="1178"/>
         <source>Preparing required partitions</source>
         <translation>Προετοιμασία των απαιτούμενων κατατμήσεων</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1215"/>
+        <location filename="../partman.cpp" line="1242"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Δημιουργία κρυπτογραφημένης έντασης: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1251"/>
+        <location filename="../partman.cpp" line="1278"/>
         <source>Formatting: %1</source>
         <translation>Μορφοποίηση: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1243"/>
+        <location filename="../partman.cpp" line="1270"/>
         <source>Failed to format partition.</source>
         <translation>Απέτυχε η μορφοποίηση του διαμερίσματος.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1310"/>
+        <location filename="../partman.cpp" line="1334"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>Αποτυχία προετοιμασίας υποτόμων.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1311"/>
+        <location filename="../partman.cpp" line="1335"/>
         <source>Preparing subvolumes</source>
         <translation>Προετοιμασία υποτόμων </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1421"/>
+        <location filename="../partman.cpp" line="1439"/>
         <source>Failed to mount partition.</source>
         <translation>Απέτυχε η προσάρτηση του διαμερίσματος.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1426"/>
+        <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation>Προσάρτηση: %1</translation>
     </message>

@@ -80,33 +80,33 @@ home %2%</translation>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="267"/>
+        <location filename="../bootman.cpp" line="274"/>
         <source>Updating initramfs</source>
         <translation>initramfs を更新中</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="126"/>
+        <location filename="../bootman.cpp" line="125"/>
         <source>Installing GRUB</source>
         <translation>GRUB のインストール中</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="104"/>
+        <location filename="../bootman.cpp" line="103"/>
         <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
         <translation>GRUB のインストールに失敗しました。Live メディアから再起動し、GRUB Rescueメニューを使用してインストールを修復できます。</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="268"/>
+        <location filename="../bootman.cpp" line="275"/>
         <source>Failed to update initramfs.</source>
         <translation>initramfs の更新に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="293"/>
+        <location filename="../bootman.cpp" line="300"/>
         <source>System boot disk:</source>
         <translation>システム起動ディスク:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="312"/>
-        <location filename="../bootman.cpp" line="324"/>
+        <location filename="../bootman.cpp" line="319"/>
+        <location filename="../bootman.cpp" line="329"/>
         <source>Partition to use:</source>
         <translation>使用するパーティション:</translation>
     </message>
@@ -137,17 +137,16 @@ home %2%</translation>
 <context>
     <name>DeviceItem</name>
     <message>
-        <location filename="../partman.cpp" line="1917"/>
         <source>EFI System Partition</source>
-        <translation>EFI システムパーティション</translation>
+        <translation type="vanished">EFI システムパーティション</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1918"/>
+        <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>スワップ領域</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1919"/>
+        <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>初期化のみ実行</translation>
     </message>
@@ -171,22 +170,22 @@ home %2%</translation>
 <context>
     <name>DeviceItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2468"/>
+        <location filename="../partman.cpp" line="2501"/>
         <source>&amp;Templates</source>
         <translation>テンプレート(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2480"/>
+        <location filename="../partman.cpp" line="2513"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>圧縮 (&amp;ZLIB)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2509"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>圧縮 (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2478"/>
+        <location filename="../partman.cpp" line="2511"/>
         <source>Compression (&amp;LZO)</source>
         <translation>圧縮 (&amp;LZO)</translation>
     </message>
@@ -363,19 +362,19 @@ Enjoy using %1</source>
     </message>
     <message>
         <location filename="../minstall.cpp" line="656"/>
-        <location filename="../minstall.cpp" line="730"/>
+        <location filename="../minstall.cpp" line="740"/>
         <source>Encryption</source>
         <translation>暗号化</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="657"/>
-        <location filename="../minstall.cpp" line="731"/>
+        <location filename="../minstall.cpp" line="741"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>暗号化は LUKS で行えます。パスワードが必要です。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="658"/>
-        <location filename="../minstall.cpp" line="732"/>
+        <location filename="../minstall.cpp" line="742"/>
         <source>A separate unencrypted boot partition is required.</source>
         <translation>暗号化されていない別の boot パーティションが必要です。</translation>
     </message>
@@ -420,523 +419,586 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Use For&lt;/i&gt; - インストールでこのパーティションを使用するには、ここで何かを選択する必要があります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="673"/>
         <source>Format - Format without mounting.</source>
-        <translation>Format - マウントせずにフォーマットします。</translation>
+        <translation type="vanished">Format - マウントせずにフォーマットします。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="674"/>
         <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation>BIOS-GRUB - GRUB 用の BIOS Boot GPT パーティション。</translation>
+        <translation type="vanished">BIOS-GRUB - GRUB 用の BIOS Boot GPT パーティション。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="675"/>
         <source>EFI - EFI System Partition.</source>
-        <translation>EFI - EFI システムパーティション。</translation>
+        <translation type="vanished">EFI - EFI システムパーティション。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="676"/>
         <source>boot - Boot manager (/boot).</source>
-        <translation>boot - ブートマネージャ (/boot).</translation>
+        <translation type="vanished">boot - ブートマネージャ (/boot).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="677"/>
         <source>root - System root (/).</source>
-        <translation>root - システムルート (/).</translation>
+        <translation type="vanished">root - システムルート (/).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="678"/>
         <source>swap - Swap space.</source>
-        <translation>swap - スワップ領域。</translation>
+        <translation type="vanished">swap - スワップ領域。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="679"/>
         <source>home - User data (/home).</source>
-        <translation>home - ユーザーのデータ保存領域 (/home)。</translation>
+        <translation type="vanished">home - ユーザーのデータ保存領域 (/home)。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="680"/>
+        <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>上記に加えて、独自のマウントポイントを入力することもできます。カスタム・マウントポイントはスラッシュ (&quot;/&quot;) で始める必要があります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="681"/>
         <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation>インストーラは、&quot;/boot&quot;、&quot;/&quot;、&quot;/home&quot; をそれぞれ &quot;boot&quot;、&quot;root&quot;、&quot;home&quot; とまったく同じものとして扱います。</translation>
+        <translation type="vanished">インストーラは、&quot;/boot&quot;、&quot;/&quot;、&quot;/home&quot; をそれぞれ &quot;boot&quot;、&quot;root&quot;、&quot;home&quot; とまったく同じものとして扱います。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="682"/>
+        <location filename="../minstall.cpp" line="688"/>
         <source>&lt;i&gt;Label&lt;/i&gt; - The label that is assigned to the partition once it has been formatted.</source>
         <translation>&lt;i&gt;ラベル&lt;/i&gt; - パーティションがフォーマットされた後に割り当てられるラベルです。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="683"/>
+        <location filename="../minstall.cpp" line="689"/>
         <source>&lt;i&gt;Encrypt&lt;/i&gt; - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.</source>
         <translation>&lt;i&gt;Encrypt&lt;/i&gt; - このパーティションにはLUKS暗号化を使用します。パスワードは、暗号化用に選択されたすべてのパーティションに適用されます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="684"/>
+        <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;フォーマット&lt;/i&gt; - これはパーティションのフォーマットです。利用可能なフォーマットは、パーティションの使用目的によって異なります。既存のレイアウトで作業する場合、&lt;b&gt;保存&lt;/b&gt; を選択することで、そのパーティションのフォーマットを維持できる場合があります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="686"/>
+        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
         <translation>root パーティションで &lt;b&gt;Preserve /home&lt;/b&gt; を選択すると、/home ディレクトリの内容が保存され、その他はすべて削除されます。このオプションは、/home が root と同じパーティションに存在する場合にのみ使用できます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="688"/>
+        <location filename="../minstall.cpp" line="694"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
         <translation>ext2、ext3、 ext4、 jfs、 xfs、 btrfs の Linux ファイルシステムをサポートしますが、 ext4 システムをお推めします。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="689"/>
+        <location filename="../minstall.cpp" line="695"/>
         <source>&lt;i&gt;Check&lt;/i&gt; - Check and correct for bad blocks on the drive (not supported for all formats). This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
         <translation>&lt;i&gt;チェック&lt;/i&gt; - ドライブ上の不正なブロックをチェックして修正します (すべてのフォーマットでサポートされているわけではありません)。これは非常に時間がかかるので、ドライブに不正なブロックがあると思われない限り、この手順は省略可能です。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="691"/>
+        <location filename="../minstall.cpp" line="697"/>
         <source>&lt;i&gt;Mount Options&lt;/i&gt; - This specifies mounting options that will be used for this partition.</source>
         <translation>&lt;i&gt;マウントオプション&lt;/i&gt; - このパーティションで使用するマウントオプションを指定します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
+        <location filename="../minstall.cpp" line="698"/>
         <source>&lt;i&gt;Dump&lt;/i&gt; - Instructs the dump utility to include this partition in the backup.</source>
         <translation>&lt;i&gt;Dump&lt;/i&gt; - このパーティションをバックアップに含めるように、Dump ユーティリティに指示します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="693"/>
+        <location filename="../minstall.cpp" line="699"/>
         <source>&lt;i&gt;Pass&lt;/i&gt; - The sequence in which this file system is to be checked at boot. If zero, the file system is not checked.</source>
         <translation>&lt;i&gt;Pass&lt;/i&gt; - このファイルシステムが起動時にチェックされる順序です。0 の場合、ファイルシステムはチェックされません。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="694"/>
+        <location filename="../minstall.cpp" line="700"/>
         <source>Menus and actions</source>
         <translation>メニューと操作</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="695"/>
+        <location filename="../minstall.cpp" line="701"/>
         <source>A variety of actions are available by right-clicking any drive or partition item in the list.</source>
         <translation>リスト内のドライブやパーティションの項目を右クリックすると、様々な操作が可能です。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="696"/>
+        <location filename="../minstall.cpp" line="702"/>
         <source>The buttons to the right of the list can also be used to manipulate the entries.</source>
         <translation>リストの右側にあるボタンを使っても、エントリーを操作することもできます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="697"/>
+        <location filename="../minstall.cpp" line="703"/>
         <source>The installer cannot modify the layout already on the drive. To create a custom layout, mark the drive for a new layout with the &lt;b&gt;New layout&lt;/b&gt; menu action or button (%1). This clears the existing layout.</source>
         <translation>インストーラは、ドライブ上の既存レイアウトを変更することはできません。独自のレイアウトを作成するには、&lt;b&gt;新規レイアウト&lt;/b&gt; メニューアクションまたはボタン (%1) でドライブを新規レイアウト用にマークします。これにより、既存レイアウトが消去されます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="700"/>
+        <location filename="../minstall.cpp" line="706"/>
         <source>Basic layout requirements</source>
         <translation>基本的なレイアウト要件</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="701"/>
+        <location filename="../minstall.cpp" line="707"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
         <translation>%1 には root パーティションが必要です。 swap パーティションは任意ですが強く推奨します。 Suspend-to-Disk という機能 %1 を利用するには、物理的メモリの容量以上の swap パーティションが必要となります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="703"/>
+        <location filename="../minstall.cpp" line="709"/>
         <source>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</source>
         <translation>独立した /home パーティションを選択すると、将来のアップグレードが容易になりますが、独立した home パーティションを有しないインストールからアップグレードする場合には、これは不可能になります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="705"/>
+        <location filename="../minstall.cpp" line="711"/>
         <source>Active partition</source>
         <translation>アクティブパーティション</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="706"/>
+        <location filename="../minstall.cpp" line="712"/>
         <source>For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.</source>
         <translation>インストールされたオペレーティングシステムを起動するには、適切なパーティション (通常は boot パーティションまたは root パーティション) がアクティブとしてマークされている必要があります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="707"/>
+        <location filename="../minstall.cpp" line="713"/>
         <source>The active partition of a drive can be chosen using the &lt;b&gt;Active partition&lt;/b&gt; menu action.</source>
         <translation>ドライブのアクティブパーティションは、&lt;b&gt;アクティブパーティション&lt;/b&gt;のメニューアクションを使用して選択できます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="708"/>
+        <location filename="../minstall.cpp" line="714"/>
         <source>A partition with an asterisk (*) next to its device name is, or will become, the active partition.</source>
         <translation>デバイス名の横にアスタリスク (*) が付いているパーティションは、現在アクティブパーティション、もしくは今後アクティブパーティションになります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="709"/>
+        <location filename="../minstall.cpp" line="719"/>
         <source>Boot partition</source>
         <translation>Boot パーティション</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="710"/>
+        <location filename="../minstall.cpp" line="720"/>
         <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
         <translation>このパーティションは通常、暗号化された LVM ボリュームやソフトウェア RAID ボリュームなどの、仮想デバイス上の root パーティションにのみ必要です。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="711"/>
+        <location filename="../minstall.cpp" line="721"/>
         <source>It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.</source>
         <translation>暗号化されたディスクや仮想デバイスにアクセスするための、基本カーネルとドライバが含まれています。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="712"/>
+        <location filename="../minstall.cpp" line="722"/>
         <source>BIOS-GRUB partition</source>
         <translation>BIOS-GRUB パーティション</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="713"/>
+        <location filename="../minstall.cpp" line="723"/>
         <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
         <translation>GPT フォーマットのドライブを非 EFI システムで使用する場合、GRUB を使用時に 1MB の BIOS ブートパーティションが必要です。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="714"/>
+        <location filename="../minstall.cpp" line="724"/>
         <source>New drives are formatted in GPT if more than 4 partitions are to be created, or the drive has a capacity greater than 2TB. If the installer is about to format the disk in GPT, and there is no BIOS-GRUB partition, a warning will be displayed before the installation starts.</source>
         <translation>新しいドライブは、4 つ以上のパーティションを作成する場合や、ドライブの容量が 2TB を超える場合は、GPT で初期化されます。インストーラがディスクを GPT で初期化しようとしている時、BIOS-GRUB パーティションが存在しない場合、インストール開始前に警告が表示されます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="716"/>
+        <location filename="../minstall.cpp" line="726"/>
         <source>Need help creating a layout?</source>
         <translation>レイアウト作成でお困りですか？</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="717"/>
+        <location filename="../minstall.cpp" line="727"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
         <translation>ドライブ上で右クリックし、メニューから &lt;b&gt;Layout Builder&lt;/b&gt; を選択してください。これで通常のインストールの場合と同様のレイアウトを作成できます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="751"/>
+        <location filename="../minstall.cpp" line="761"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Linux および Windows 向けに GRUB をインストール</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="752"/>
+        <location filename="../minstall.cpp" line="762"/>
         <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation> %1 は GRUB ブートローダを使用して、%1 と Microsoft Windows を起動します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="753"/>
+        <location filename="../minstall.cpp" line="763"/>
         <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
         <translation>既定では、GRUB は起動ドライブのマスターブートレコード（MBR）またはESP（64ビット UEFI ブートシステム用の EFIシステムパーティション）にインストールされ、以前使用していたブートローダーと置き換わります。これは正常な動作です。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="754"/>
+        <location filename="../minstall.cpp" line="764"/>
         <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
         <translation>もし代わりに GRUB をパーティションブートレコード（PBR）にインストールすることを選択した場合は、GRUB を指定したパーティションの先頭にインストールします。このオプションは上級者向けです。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="755"/>
+        <location filename="../minstall.cpp" line="765"/>
         <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
         <translation>「GRUB のインストール」という項目でチェックを外した場合には、GRUB は今回の作業でインストールしません。このオプションは上級者向けです。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="756"/>
+        <location filename="../minstall.cpp" line="766"/>
         <source>Create a swap file</source>
         <translation>スワップ（swap）ファイルを作成する</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="757"/>
+        <location filename="../minstall.cpp" line="767"/>
         <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
         <translation>スワップファイルは、スワップパーティションよりもずっと柔軟性があります。システムの使用状況の変化に合わせて、スワップファイルの大きさを簡単に変更することができます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="758"/>
+        <location filename="../minstall.cpp" line="768"/>
         <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
         <translation>既定では、スワップパーティションを設定していない場合はチェックが入り、設定したる場合はチェックが外れます。このオプションは上級者向けであり、なるべく変更しないようにしてください。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="759"/>
+        <location filename="../minstall.cpp" line="769"/>
         <source>Setting the size to 0 has the same effect as unchecking this option.</source>
         <translation>サイズを 0 に設定すると、オプションのチェックを外したのと同じ効果をもたらします。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="866"/>
+        <location filename="../minstall.cpp" line="876"/>
         <source>Enjoy using %1</source>
         <translation>%1 を上手く活用してください</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="718"/>
+        <location filename="../minstall.cpp" line="728"/>
         <source>Upgrading</source>
         <translation>アップグレード中</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="719"/>
+        <location filename="../minstall.cpp" line="674"/>
+        <source>Format without mounting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="675"/>
+        <source>BIOS Boot GPT partition for GRUB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="676"/>
+        <location filename="../minstall.cpp" line="715"/>
+        <source>EFI System Partition</source>
+        <translation type="unfinished">EFI システムパーティション</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="678"/>
+        <source>Boot manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="679"/>
+        <source>System root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="680"/>
+        <source>User data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="681"/>
+        <source>Static data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="682"/>
+        <source>Variable data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="683"/>
+        <source>Temporary files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="684"/>
+        <source>Swap files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="685"/>
+        <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="716"/>
+        <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="717"/>
+        <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="718"/>
+        <source>Most systems built within the last 10 years use EFI.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="729"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and select &lt;b&gt;Preserve&lt;/b&gt; as the format.</source>
         <translation>既存の Linux インストールからアップグレードするには、以前と同じホームパーティションを選択し、フォーマットとして&lt;b&gt;保持&lt;/b&gt;を選択します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="720"/>
+        <location filename="../minstall.cpp" line="730"/>
         <source>If you do not use a separate home partition, select &lt;b&gt;Preserve /home&lt;/b&gt; on the root file system entry to preserve the existing /home directory located on your root partition. The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.</source>
         <translation>個別の home パーティションを使用しない場合は、root ファイルシステムのエントリで &lt;b&gt;/home の保持&lt;/b&gt;を選択して、root パーティションにある既存の /home ディレクトリを保持します。インストーラは /home だけを保持し、それ以外はすべて削除します。その結果、インストールには通常の場合よりもずっと時間がかかります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="722"/>
+        <location filename="../minstall.cpp" line="732"/>
         <source>Preferred Filesystem Type</source>
         <translation> 優先するファイルシステムのタイプ</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="723"/>
+        <location filename="../minstall.cpp" line="733"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
         <translation>%1 については、フォーマットするパーティションの形式を ext2、ext3、 ext4、 f2fs、 jfs、 xfs、 btrfs の中から選択することが可能です。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="724"/>
+        <location filename="../minstall.cpp" line="734"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>btrfs を使用するドライブでは、追加の圧縮オプションを使用できます。 Lzo は高速ですが圧縮率は低くなります。 Zlib は低速ですが圧縮率が高くなります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="726"/>
+        <location filename="../minstall.cpp" line="736"/>
         <source>System partition management tool</source>
         <translation>システムパーティション管理ツール</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="727"/>
+        <location filename="../minstall.cpp" line="737"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
         <translation>ドライブのレイアウトをより詳細に管理したい場合（ディスク上の既存レイアウトを変更する場合など）は、パーティション管理ボタン (%1) をクリックします。これによって、オペレーティングシステムのパーティション管理ツールが起動し、必要なレイアウトを正確に作成することができます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="733"/>
+        <location filename="../minstall.cpp" line="743"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
         <translation>暗号化されたパーティションを保持するには、そのパーティションを右クリックして&lt;b&gt;ロック解除&lt;/b&gt;を選択します。表示されるダイアログで、仮想デバイスの名前とパスワードを入力します。デバイスのロックが解除されると、選択した名前が&lt;i&gt;仮想デバイス&lt;/i&gt;に表示され、通常のパーティションと同様のオプションが表示されます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="735"/>
+        <location filename="../minstall.cpp" line="745"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
         <translation>暗号化されたパーティションをブート時にロック解除するには、そのパーティションを crypttab ファイルに追加する必要があります。これを行うには、&lt;b&gt;Add to crypttab&lt;/b&gt; メニューアクションを使用します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="736"/>
+        <location filename="../minstall.cpp" line="746"/>
         <source>Other partitions</source>
         <translation>その他のパーテーション</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="737"/>
+        <location filename="../minstall.cpp" line="747"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
         <translation>インストーラでは、他のパーティションを作成したり、他の目的に使用することができますが、古いシステムでは4つ以上のパーティションを持つドライブを処理できないことに注意してください。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="738"/>
+        <location filename="../minstall.cpp" line="748"/>
         <source>Subvolumes</source>
         <translation>サブボリューム</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="739"/>
+        <location filename="../minstall.cpp" line="749"/>
         <source>Some file systems, such as Btrfs, support multiple subvolumes in a single partition. These are not physical subdivisions, and so their order does not matter.</source>
         <translation>Btrfs などの一部のファイルシステムは、1 つのパーティション内で複数のサブボリュームをサポートします。これらは物理的な分割ではないため、順序は関係ありません。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="741"/>
+        <location filename="../minstall.cpp" line="751"/>
         <source>Use the &lt;b&gt;Scan subvolumes&lt;/b&gt; menu action to search an existing Btrfs partition for subvolumes. To create a new subvolume, use the &lt;b&gt;New subvolume&lt;/b&gt; menu action.</source>
         <translation>&lt;b&gt;サブボリュームのスキャン&lt;/b&gt;メニューアクションを使用して、既存の Btrfs パーティションでサブボリュームを検索します。新しいサブボリュームを作成するには、&lt;b&gt;新規サブボリューム&lt;/b&gt;のメニューアクションを使用します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="743"/>
+        <location filename="../minstall.cpp" line="753"/>
         <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
         <translation>既存のサブボリュームは保持できますが、名前は元と同じままにする必要があります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="744"/>
+        <location filename="../minstall.cpp" line="754"/>
         <source>Virtual Devices</source>
         <translation>仮想デバイス</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="745"/>
+        <location filename="../minstall.cpp" line="755"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
         <translation>イントーラーが、開いている LUK パーティションや LVM 論理ボリューム、またはソフトウェアベースの RAID ボリュームなどの仮想デバイスを検出した場合、それらはインストールで使用可能です。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="746"/>
+        <location filename="../minstall.cpp" line="756"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>仮想デバイスの使用 (暗号化されたファイルシステムの保持以上の操作) は高度な機能です。使用する仮想デバイスがブート時に確実に作成されるようにするには、いくつかのファイル (initramfs、crypttab、fstab など) を編集する必要があります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="765"/>
+        <location filename="../minstall.cpp" line="775"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;コモンサービスの有効&lt;/b&gt;&lt;br/&gt;ご使用のシステム構成に必要なサービスがあればそれを選択して下さい。これは %1 起動時に自動的に開始されます。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="769"/>
+        <location filename="../minstall.cpp" line="779"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;コンピュータ ID&lt;/b&gt;&lt;br/&gt;コンピュータ名は、ネットワーク上でコンピュータを特定するための名称です。インターネットサービスプロバイダ（ISP）またはローカル・ネットワークが必要としない限り、コンピュータドメインは使われません。&lt;/p&gt;&lt;p&gt;コンピュータ名・ドメイン名は英数・ドット（.）・ハイフン（-）の文字で構成されます。空白を含めず、ハイフンは前後に付けられません。&lt;/p&gt;&lt;p&gt;フォルダやプリンターを Windows・Mac OS X を実行するコンピュータを共有するためには SAMBA サーバを有効にする必要があります。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="779"/>
+        <location filename="../minstall.cpp" line="789"/>
         <source>Localization Defaults</source>
         <translation>既定のロケール</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="780"/>
+        <location filename="../minstall.cpp" line="790"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation>既定の言語と地域を設定します。これは、後でユーザーが上書きしない限り、適用されます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="781"/>
+        <location filename="../minstall.cpp" line="791"/>
         <source>Configure Clock</source>
         <translation>時刻の設定</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="782"/>
+        <location filename="../minstall.cpp" line="792"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation>Apple または純粋な Unixコンピュータの場合、デフォルトではシステムクロックはグリニッジ標準時（GMT）または協定世界時（UTC）に設定されています。これを変更するには、「&lt;b&gt;システムクロックは現地時刻を使う&lt;/b&gt;」のボックスをチェックします。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="784"/>
+        <location filename="../minstall.cpp" line="794"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation>システムは、時刻帯が GMT/UTC に予めセットされた状態で起動します。時刻帯を変更するには、新規インストール環境で再起動した後、パネル内の時計を右クリックし、プロパティを選択します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="786"/>
+        <location filename="../minstall.cpp" line="796"/>
         <source>Service Settings</source>
         <translation>各種サービスの設定</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="787"/>
+        <location filename="../minstall.cpp" line="797"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation>たいていのユーザーはデフォルト値を変更しないでください。ただし、リソースの少ないコンピューターでは、RAMの使用量をできるだけ少なくするために、必要のないサービスを無効にしたい場合があります。自分が何をしようとしているのか良く考えましょう。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="793"/>
+        <location filename="../minstall.cpp" line="803"/>
         <source>Default User Login</source>
         <translation>既定のユーザーログイン</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="794"/>
+        <location filename="../minstall.cpp" line="804"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
         <translation>root ユーザーは、他のいくつかのオペレーティングシステムにおける管理者アカウントに似ています。通常使用するユーザーアカウントとして root ユーザーを使用しないでください。日常的に使用する新しい (既定の) ユーザー アカウントの名前を入力してください。もし必要な場合は、あとから %1 ユーザー管理 でアカウントの追加を行うことができます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="798"/>
+        <location filename="../minstall.cpp" line="808"/>
         <source>Passwords</source>
         <translation>パスワード</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="799"/>
+        <location filename="../minstall.cpp" line="809"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
         <translation>既定のユーザーアカウントと root アカウントの新規パスワードを入力してください。パスワードは、それぞれ 2回入力する必要があります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="801"/>
+        <location filename="../minstall.cpp" line="811"/>
         <source>No passwords</source>
         <translation>パスワードを使用しない</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="802"/>
+        <location filename="../minstall.cpp" line="812"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
         <translation>既定のユーザーアカウントにパスワードを設定したくない場合は、そのパスワード入力欄を空白にしてください。これで、パスワードを要求されずにログインすることができます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="804"/>
+        <location filename="../minstall.cpp" line="814"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
         <translation>もちろん、これは公共の端末などで、ユーザーアカウントの安全性を確保する必要がない場合にのみ行うべきものです。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="812"/>
+        <location filename="../minstall.cpp" line="822"/>
         <source>Old Home Directory</source>
         <translation>古い Home ディレクトリ</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="813"/>
+        <location filename="../minstall.cpp" line="823"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation>選択したユーザー名の home ディレクトリが既に存在しています。この画面で、そのディレクトリをどうするか選択することができます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="815"/>
+        <location filename="../minstall.cpp" line="825"/>
         <source>Re-use it for this installation</source>
         <translation>このインストールで再利用します</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="816"/>
+        <location filename="../minstall.cpp" line="826"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation>古い home ディレクトリ用にこのユーザーアカウントを使用します。これはアップグレードの際に良い選択であり、ファイルや設定がすぐ利用できるようになります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="818"/>
+        <location filename="../minstall.cpp" line="828"/>
         <source>Rename it and create a new directory</source>
         <translation>それを変更して新しいディレクトリを作成</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="819"/>
+        <location filename="../minstall.cpp" line="829"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation>新しい home ディレクトリが作成され、古い home ディレクトリ名は変更されます。ファイルや設定は新しいインストールではすぐには表示されませんが、変更後のディレクトリ名を使用してアクセスできます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="821"/>
+        <location filename="../minstall.cpp" line="831"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation>古いディレクトリには、以前に行った名前変更の回数にしたがって、そのディレクトリの最後に数字が表示されます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="822"/>
+        <location filename="../minstall.cpp" line="832"/>
         <source>Delete it and create a new directory</source>
         <translation>それを削除し新しいディレクトリを作成</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="823"/>
+        <location filename="../minstall.cpp" line="833"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation>古い home ディレクトリを削除し、新しい home ディレクトリを全く最初から作成します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="824"/>
+        <location filename="../minstall.cpp" line="834"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="825"/>
+        <location filename="../minstall.cpp" line="835"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation>このオプションを選択した場合、すべてのファイルと設定は永久に削除されます。復元できる可能性が低くなります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="841"/>
+        <location filename="../minstall.cpp" line="851"/>
         <source>Installation in Progress</source>
         <translation>インストール進行中</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="842"/>
+        <location filename="../minstall.cpp" line="852"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation>%1 をインストール中です。新規インストールの場合、システムの速度や再フォーマットするパーティションのサイズによっては、およそ3分から20分位かかります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="844"/>
+        <location filename="../minstall.cpp" line="854"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation>中止ボタンをクリックすると、すぐインストールを中止します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="846"/>
+        <location filename="../minstall.cpp" line="856"/>
         <source>Change settings while you wait</source>
         <translation>待機している間に設定を変更</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="847"/>
+        <location filename="../minstall.cpp" line="857"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation>%1  がインストールされている間、&lt;b&gt;次へ&lt;/b&gt; ボタンまたは &lt;b&gt;戻る&lt;/b&gt; ボタンをクリックして、インストールに必要なその他の情報を入力できます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="849"/>
+        <location filename="../minstall.cpp" line="859"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation>ご自分のペースでこれらのステップを完了させてください。インストーラは必要に応じてあなたの入力を待ちます。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="857"/>
+        <location filename="../minstall.cpp" line="867"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;おめでとうございます！&lt;/b&gt;&lt;br/&gt;%1 のインストールが完了しました&lt;/p&gt;&lt;p&gt;&lt;b&gt;アプリケーションの検索&lt;/b&gt;&lt;br/&gt;%1 には沢山の素晴らしいアプリケーションが入っています。まずはメニュー中を探索して下さい。多くのアプリは特に %1 環境のために作成されています。これはメインメニューの中に表示されています。&lt;p&gt;更に %1 はコマンドラインだけから動作する、メニューに表示されない標準の Linux アプリケーションを含んでいます。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="867"/>
-        <location filename="../minstall.cpp" line="1133"/>
+        <location filename="../minstall.cpp" line="877"/>
+        <location filename="../minstall.cpp" line="1143"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;%1 のサポート&lt;/b&gt;&lt;br/&gt;%1 はあなたのような皆さんに支援されています。サポートフォーラム %2  で他の人を助ける、使用している言語の翻訳作業を行う、ドキュメント作成を行う、新しいバージョンのテストを行う、といった支援が可能です。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="897"/>
+        <location filename="../minstall.cpp" line="907"/>
         <source>Finish</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="900"/>
+        <location filename="../minstall.cpp" line="910"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="902"/>
+        <location filename="../minstall.cpp" line="912"/>
         <source>Next</source>
         <translation>次へ</translation>
     </message>
@@ -951,34 +1013,34 @@ Enjoy using %1</source>
         <translation>設定が完了しました。システムを再起動します。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1055"/>
+        <location filename="../minstall.cpp" line="1065"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>インストールと設定がまだ完了していません。
 本当に処理を中止したいのですか？</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1119"/>
+        <location filename="../minstall.cpp" line="1129"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;困った時に&lt;/b&gt;&lt;br/&gt;%1 の基本的な情報は %2 で参照できます。&lt;/p&gt;&lt;p&gt;%3 フォーラム %4 で助けてくれる人がいるでしょう。&lt;/p&gt;&lt;p&gt;もし助けを求める場合、その問題のとコンピュータ情報の詳細を忘れず記述してください。通常、「動きません」とだけ書かれたような内容は役に立ちません。&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1127"/>
+        <location filename="../minstall.cpp" line="1137"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;インストールの修復&lt;/b&gt;&lt;br/&gt;%1 はハードドライブから作業を停止した場合、ライブ DVD やライブ USB からブートして、 %1 ツールのユーティリティまたはシステムを修復するための通常の Linux ツールを使用して問題を解決することが可能です。&lt;/p&gt;&lt;p&gt;また、MS-Windows システムからデータを回復するために %1 ライブ DVD や ライブ USB を使用することができます！&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1141"/>
+        <location filename="../minstall.cpp" line="1151"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;サウンドミキサーの調整&lt;/b&gt;&lt;br/&gt;%1 はサウンドミキサーを設定します。ときには音を聞くためボリュームを上げたり、ミキサーのミュート解除が必要になるかもしれません。&lt;/p&gt; &lt;p&gt;ミキサーのショートカットはメニューにあります。ミキサーを開くにはこれをクリックしてください。 &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1149"/>
+        <location filename="../minstall.cpp" line="1159"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;%1 のコピーを最新にする&lt;/b&gt;&lt;br/&gt; さらなる情報やアップデートについては&lt;/p&gt; %2 &lt;p&gt;参照してください。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1154"/>
+        <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;特別な感謝&lt;/b&gt;&lt;br/&gt;%1 をサポートするために、自分の時間やお金、提案、仕事、賞賛、アイデア、プロモーション、激励を提供していただいた全ての方々に感謝いたします。&lt;/p&gt;&lt;p&gt;あなたなしでは %1 はなかったでしょう。&lt;/p&gt;&lt;p&gt;%2 開発チーム&lt;/p&gt;</translation>
     </message>
@@ -1458,12 +1520,12 @@ Do you really want to stop now?</source>
 <context>
     <name>Oobe</name>
     <message>
-        <location filename="../oobe.cpp" line="332"/>
+        <location filename="../oobe.cpp" line="331"/>
         <source>Please enter a computer name.</source>
         <translation>コンピューター名を入力してください。</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="336"/>
+        <location filename="../oobe.cpp" line="335"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1471,12 +1533,12 @@ name before proceeding.</source>
 先へ進むには別の名前を選んでください。</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="341"/>
+        <location filename="../oobe.cpp" line="340"/>
         <source>Please enter a domain name.</source>
         <translation>ドメイン名を入力してください。</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="345"/>
+        <location filename="../oobe.cpp" line="344"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1484,51 +1546,51 @@ name before proceeding.</source>
 先へ進むには別の名前を選んでください。</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="352"/>
+        <location filename="../oobe.cpp" line="351"/>
         <source>Please enter a workgroup.</source>
         <translation>ワークグループを入力してください。</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="492"/>
+        <location filename="../oobe.cpp" line="491"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>ユーザー名には特殊文字や空白を含むことができません。
 先へ進むには別の名前を選んで下さい。</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="503"/>
+        <location filename="../oobe.cpp" line="502"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>申しわけありませんが、この名前はすでに使われています。
 別の名前を選んでください。</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="512"/>
+        <location filename="../oobe.cpp" line="511"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="513"/>
+        <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
         <translation type="unfinished">本当に作業を続けてもよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="519"/>
+        <location filename="../oobe.cpp" line="518"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>rootアカウントのパスワードを入力していません。作業を続けますか？</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="532"/>
+        <location filename="../oobe.cpp" line="531"/>
         <source>Failed to set user account passwords.</source>
         <translation>ユーザーアカウントのパスワード設定に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="558"/>
+        <location filename="../oobe.cpp" line="557"/>
         <source>Failed to save old home directory.</source>
         <translation>以前の home ディレクトリの保存に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="567"/>
+        <location filename="../oobe.cpp" line="566"/>
         <source>Failed to delete old home directory.</source>
         <translation>以前の home ディレクトリの削除に失敗しました。</translation>
     </message>
@@ -1551,69 +1613,74 @@ Please select a different name.</source>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="../partman.cpp" line="232"/>
+        <location filename="../partman.cpp" line="226"/>
         <source>Virtual Devices</source>
         <translation>仮想デバイス</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="456"/>
-        <location filename="../partman.cpp" line="511"/>
+        <location filename="../partman.cpp" line="452"/>
+        <location filename="../partman.cpp" line="514"/>
         <source>&amp;Add partition</source>
         <translation>パーティション追加(&amp;A)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="458"/>
+        <location filename="../partman.cpp" line="454"/>
         <source>&amp;Remove partition</source>
         <translation>パーティション削除(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="468"/>
+        <location filename="../partman.cpp" line="464"/>
         <source>&amp;Lock</source>
         <translation>ロック(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="472"/>
+        <location filename="../partman.cpp" line="468"/>
         <source>&amp;Unlock</source>
         <translation>ロック解除(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="477"/>
-        <location filename="../partman.cpp" line="617"/>
+        <location filename="../partman.cpp" line="473"/>
+        <location filename="../partman.cpp" line="620"/>
         <source>Add to crypttab</source>
         <translation>crypttab へ追加</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="483"/>
+        <location filename="../partman.cpp" line="479"/>
         <source>Active partition</source>
         <translation>アクティブパーティション</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="489"/>
+        <location filename="../partman.cpp" line="480"/>
+        <source>EFI System Partition</source>
+        <translation type="unfinished">EFI システムパーティション</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="488"/>
         <source>New subvolume</source>
         <translation>新規サブボリューム</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="490"/>
+        <location filename="../partman.cpp" line="489"/>
         <source>Scan subvolumes</source>
         <translation>サブボリュームのスキャン</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="514"/>
+        <location filename="../partman.cpp" line="517"/>
         <source>New &amp;layout</source>
         <translation>新規レイアウト(_&amp;)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="515"/>
+        <location filename="../partman.cpp" line="518"/>
         <source>&amp;Reset layout</source>
         <translation>レイアウトのリセット(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="538"/>
+        <location filename="../partman.cpp" line="541"/>
         <source>Remove subvolume</source>
         <translation>サブボリュームの削除</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="615"/>
+        <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>ドライブのロック解除</translation>
     </message>
@@ -1622,254 +1689,265 @@ Please select a different name.</source>
         <translation type="vanished">仮想デバイス</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="620"/>
+        <location filename="../partman.cpp" line="623"/>
         <source>Password:</source>
         <translation>パスワード</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="646"/>
+        <location filename="../partman.cpp" line="649"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>デバイスをロック解除できません。パスワードが正しくないようです。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="674"/>
+        <location filename="../partman.cpp" line="677"/>
         <source>Failed to close %1</source>
         <translation>%1 の近くで失敗しました</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="718"/>
+        <location filename="../partman.cpp" line="721"/>
         <source>Invalid subvolume label</source>
         <translation>無効なサブボリュームラベル</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="729"/>
+        <location filename="../partman.cpp" line="732"/>
         <source>Duplicate subvolume label</source>
         <translation>重複したサブボリュームラベル</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="738"/>
+        <location filename="../partman.cpp" line="741"/>
         <source>Invalid use for %1: %2</source>
         <translation>無効な %1: %2 の利用</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="749"/>
+        <location filename="../partman.cpp" line="752"/>
         <source>%1 is already selected for: %2</source>
         <translation>%1 はすでに %2 で選択されています。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="763"/>
+        <location filename="../partman.cpp" line="766"/>
         <source>A root partition of at least %1 is required.</source>
         <translation>少なくとも %1の root パーティションが必要です。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="769"/>
+        <location filename="../partman.cpp" line="772"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>別の独立した /home パーティションがマウントされている場合、root (/) 内に /home を保持することはできません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="792"/>
+        <location filename="../partman.cpp" line="795"/>
         <source>Reuse (no reformat) %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="813"/>
+        <location filename="../partman.cpp" line="816"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="815"/>
+        <location filename="../partman.cpp" line="818"/>
         <source>Delete subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="818"/>
+        <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="819"/>
+        <location filename="../partman.cpp" line="822"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="821"/>
+        <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="822"/>
+        <location filename="../partman.cpp" line="825"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="837"/>
+        <location filename="../partman.cpp" line="840"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>暗号化するには別の独立した boot パーティションを選択する必要があります。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="782"/>
+        <location filename="../partman.cpp" line="785"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>%2 で %1 パーティションテーブルを準備します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="795"/>
+        <location filename="../partman.cpp" line="798"/>
         <source>Format %1 to use for %2</source>
         <translation>%2 に使用する %1 を初期化します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="796"/>
+        <location filename="../partman.cpp" line="799"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>%1 を %2 として再利用（再フォーマット不要）</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="797"/>
+        <location filename="../partman.cpp" line="800"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>/home 以外の %1 のデータを削除して %2 に使用します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="800"/>
+        <location filename="../partman.cpp" line="803"/>
         <source>Create %1 without formatting</source>
         <translation>初期化しないで %1 を作成します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="801"/>
+        <location filename="../partman.cpp" line="804"/>
         <source>Create %1, format to use for %2</source>
         <translation>%1 を作成し、%2 に使用するため初期化します</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="970"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>以下のドライブは現在 GPT で設定されているか、または設定される予定ですが、BIOS-GRUB パーティションが存在しません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="951"/>
+        <location filename="../partman.cpp" line="972"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>このシステムでは、BIOS-GRUB パーティションが存在しないので、GPT ドライブから起動しないかもしれません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="838"/>
-        <location filename="../partman.cpp" line="922"/>
-        <location filename="../partman.cpp" line="952"/>
+        <location filename="../partman.cpp" line="841"/>
+        <location filename="../partman.cpp" line="925"/>
+        <location filename="../partman.cpp" line="943"/>
+        <location filename="../partman.cpp" line="973"/>
         <source>Are you sure you want to continue?</source>
         <translation>本当に作業を続けてもよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="517"/>
+        <location filename="../partman.cpp" line="520"/>
         <source>Layout &amp;Builder...</source>
         <translation>Layout &amp;Builder...</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="892"/>
+        <location filename="../partman.cpp" line="895"/>
         <source>%1 (%2) requires %3</source>
         <translation>%1 (%2) には %3 が必要です</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="920"/>
+        <location filename="../partman.cpp" line="923"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>以下のボリュームが小さすぎるので、インストールに失敗する可能性があります。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="844"/>
+        <location filename="../partman.cpp" line="847"/>
         <source>The %1 installer will now perform the requested actions.</source>
         <translation>%1 インストーラは今から指示された動作を実行します。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="845"/>
+        <location filename="../partman.cpp" line="848"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation>これから先の操作は元に戻すことができません。続けますか？</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="991"/>
+        <location filename="../partman.cpp" line="936"/>
+        <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="939"/>
+        <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="1012"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>インストール用に選択したディスクのパーディションに障害が発生しています：</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="995"/>
+        <location filename="../partman.cpp" line="1016"/>
         <source>Smartmon tool output:</source>
         <translation>Smartmonツールの出力：</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="996"/>
+        <location filename="../partman.cpp" line="1017"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>インストール用に選択したディスクのパーディションは SMART モニターテスト (smartctl)に合格しましたが、テストは近い将来、平均よりも高い故障率になることを示しています。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1001"/>
+        <location filename="../partman.cpp" line="1022"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>よく分からないのであれば、このインストーラを終了し、GSmartControl を起動して詳細をつかんでください。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1003"/>
+        <location filename="../partman.cpp" line="1024"/>
         <source>Do you want to abort the installation?</source>
         <translation>インストールを中止してよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1008"/>
+        <location filename="../partman.cpp" line="1029"/>
         <source>Do you want to continue?</source>
         <translation>作業を続けてもよろしいですか？</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1210"/>
+        <location filename="../partman.cpp" line="1237"/>
         <source>Failed to format LUKS container.</source>
         <translation> LUKS コンテナの初期化に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1230"/>
+        <location filename="../partman.cpp" line="1257"/>
         <source>Failed to open LUKS container.</source>
         <translation>LUKS コンテナを開くことができません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1344"/>
+        <location filename="../partman.cpp" line="1368"/>
         <source>Failed to finalize encryption setup.</source>
         <translation>暗号化の設定を完了できませんでした。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1097"/>
+        <location filename="../partman.cpp" line="1118"/>
         <source>Failed to prepare required partitions.</source>
         <translation>必要なパーティションを準備できません。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1140"/>
+        <location filename="../partman.cpp" line="1161"/>
         <source>Preparing partition tables</source>
         <translation>パーティションテーブルを準備しています</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1157"/>
+        <location filename="../partman.cpp" line="1178"/>
         <source>Preparing required partitions</source>
         <translation>必要なパーティションを準備中</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1215"/>
+        <location filename="../partman.cpp" line="1242"/>
         <source>Creating encrypted volume: %1</source>
         <translation>暗号化ボリュームの作成中: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1251"/>
+        <location filename="../partman.cpp" line="1278"/>
         <source>Formatting: %1</source>
         <translation>フォーマット中: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1243"/>
+        <location filename="../partman.cpp" line="1270"/>
         <source>Failed to format partition.</source>
         <translation>パーティションの初期化に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1310"/>
+        <location filename="../partman.cpp" line="1334"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>サブボリュームの準備に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1311"/>
+        <location filename="../partman.cpp" line="1335"/>
         <source>Preparing subvolumes</source>
         <translation>サブボリュームを準備中</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1421"/>
+        <location filename="../partman.cpp" line="1439"/>
         <source>Failed to mount partition.</source>
         <translation>パーティションのマウントに失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1426"/>
+        <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation>マウント中: %1</translation>
     </message>
