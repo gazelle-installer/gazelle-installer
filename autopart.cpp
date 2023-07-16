@@ -251,8 +251,8 @@ long long AutoPart::buildLayout(long long rootFormatSize, bool crypto,
 
     // Boot partitions.
     if (proc.detectEFI()) {
-        if (updateTree) drvitem->addPart(256*MB, "ESP", crypto);
-        if (volList) volList->append("ESP");
+        if (updateTree) drvitem->addPart(256*MB, "/boot/efi", crypto);
+        if (volList) volList->append("/boot/efi");
         remaining -= 256*MB;
     } else if (drvitem->willUseGPT()) {
         if (updateTree) drvitem->addPart(1*MB, "BIOS-GRUB", crypto);

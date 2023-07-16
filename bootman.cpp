@@ -51,7 +51,7 @@ void BootMan::manageConfig(MSettings &config) noexcept
     const char *grubChoices[] = {"MBR", "PBR", "ESP"};
     QRadioButton *grubRadios[] = {gui.radioBootMBR, gui.radioBootPBR, gui.radioBootESP};
     config.manageRadios("TargetType", 3, grubChoices, grubRadios);
-    config.manageComboBox("Location", gui.comboBoot, true);
+    if (!gui.radioBootESP->isChecked()) config.manageComboBox("Location", gui.comboBoot, true);
     config.endGroup();
 }
 
@@ -82,8 +82,7 @@ void BootMan::buildBootLists() noexcept
     chosenBootPBR();
     const bool canPBR = (gui.comboBoot->count() > 0);
     gui.radioBootPBR->setEnabled(canPBR);
-    chosenBootESP();
-    const bool canESP = (proc.detectEFI() && gui.comboBoot->count() > 0);
+    const bool canESP = proc.detectEFI();
     gui.radioBootESP->setEnabled(canESP);
 
     // load one as the default in preferential order: ESP, MBR, PBR
@@ -132,7 +131,6 @@ void BootMan::install(const QStringList &cmdextra)
             proc.exec("grub-install", {"--target=i386-pc", "--recheck",
                 "--no-floppy", "--force", "--boot-directory=/mnt/antiX/boot", bootdev});
         } else {
-            proc.exec("mount", {"--mkdir", bootdev, "/mnt/antiX/boot/efi"});
             // rename arch to match grub-install target
             proc.exec("cat", {"/sys/firmware/efi/fw_platform_size"}, nullptr, true);
 
@@ -146,9 +144,16 @@ void BootMan::install(const QStringList &cmdextra)
             }
 
             sect.setRoot("/mnt/antiX");
-            proc.exec("grub-install", {"--no-nvram", "--force-extra-removable",
+
+            QStringList grubinstargs({"--no-nvram", "--force-extra-removable",
                 (efisize==32 ? "--target=i386-efi" : "--target=x86_64-efi"),
-                "--efi-directory=/boot/efi", "--bootloader-id=" + loaderID, "--recheck"});
+                "--bootloader-id=" + loaderID, "--recheck"});
+            auto fitesp = partman.mounts.find("/boot/efi");
+            if (fitesp == partman.mounts.end()) fitesp = partman.mounts.find("/boot");
+            if (fitesp != partman.mounts.end() && fitesp->second->flags.sysEFI) {
+                grubinstargs << "--efi-directory=" + fitesp->first;
+            }
+            proc.exec("grub-install", grubinstargs);
 
             // Update the boot NVRAM variables. Non-critial step so no need to fail.
             sect.setExceptionMode(false);
@@ -163,9 +168,11 @@ void BootMan::install(const QStringList &cmdextra)
                 }
             }
             // Add a new NVRAM boot variable.
-            const DeviceItem::NameParts &bs = DeviceItem::split(bootdev);
-            proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", "/dev/"+bs.drive, "-p", bs.partition,
-                "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
+            if (fitesp != partman.mounts.end()) {
+                const DeviceItem::NameParts &bs = DeviceItem::split(fitesp->second->device);
+                proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", "/dev/"+bs.drive, "-p", bs.partition,
+                    "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
+            }
             sect.setExceptionMode(true);
             sect.setRoot(nullptr);
         }
@@ -298,7 +305,7 @@ void BootMan::chosenBootPBR() noexcept
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
         if (item->type == DeviceItem::Partition && (!item->flags.bootRoot || installFromRootDevice)) {
-            if (item->realUseFor() == "ESP") continue;
+            if (item->flags.sysEFI) continue;
             else if (!item->format.compare("SWAP", Qt::CaseInsensitive)) continue;
             else if (item->format == "crypto_LUKS") continue;
             else if (item->format.isEmpty() || item->format == "PRESERVE") {
@@ -312,14 +319,12 @@ void BootMan::chosenBootPBR() noexcept
     gui.labelBoot->setText(tr("Partition to use:"));
 }
 
-void BootMan::chosenBootESP() noexcept
+void BootMan::chosenBootESP(bool checked) noexcept
 {
     gui.comboBoot->clear();
-    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->realUseFor() == "ESP" && (!item->flags.bootRoot || installFromRootDevice)) {
-            item->addToCombo(gui.comboBoot);
-        }
-    }
-    selectBootMain();
+    auto fit = partman.mounts.find("/boot/efi");
+    if (fit == partman.mounts.end()) fit = partman.mounts.find("/boot");
+    if (fit != partman.mounts.end()) fit->second->addToCombo(gui.comboBoot);
+    gui.comboBoot->setDisabled(checked);
     gui.labelBoot->setText(tr("Partition to use:"));
 }

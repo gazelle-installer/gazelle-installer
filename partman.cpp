@@ -49,9 +49,9 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     : QAbstractItemModel(ui.boxMain), proc(mproc), root(DeviceItem::Unknown), gui(ui)
 {
     const QString &projShort = appConf.value("PROJECT_SHORTNAME").toString();
-    volSpecs["ESP"] = {"EFI System"};
     volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
     volSpecs["/boot"] = {"boot"};
+    volSpecs["/boot/efi"] = {"EFI System"};
     volSpecs["/"] = {"root" + projShort + appConf.value("VERSION").toString()};
     volSpecs["/home"] = {"home" + projShort};
     volSpecs["SWAP"] = {"swap" + projShort};
@@ -101,7 +101,7 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
 void PartMan::scan(DeviceItem *drvstart)
 {
     QStringList cargs({"-T", "-bJo",
-        "TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,LABEL,MODEL,PARTFLAGS"});
+        "TYPE,NAME,PATH,UUID,ROTA,DISC-GRAN,SIZE,PHY-SEC,PTTYPE,PARTTYPENAME,FSTYPE,FSVER,LABEL,MODEL,PARTFLAGS"});
     if (drvstart) cargs.append(drvstart->path);
     proc.exec("lsblk", cargs, nullptr, true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
@@ -167,9 +167,10 @@ void PartMan::scan(DeviceItem *drvstart)
             const int partflags = jsonPart["partflags"].toString().toUInt(nullptr, 0);
             if ((partflags & 0x80) || (partflags & 0x04)) partit->setActive(true);
             partit->mapCount = jsonPart["children"].toArray().count();
-            partit->flags.curESP = partTypeName.startsWith("EFI "); // "System"/"(FAT-12/16/32)"
+            partit->flags.sysEFI = partit->flags.curESP = partTypeName.startsWith("EFI "); // "System"/"(FAT-12/16/32)"
             partit->flags.bootRoot = (!bootUUID.isEmpty() && partit->uuid == bootUUID);
             partit->curFormat = jsonPart["fstype"].toString();
+            if (partit->curFormat == "vfat") partit->curFormat = jsonPart["fsver"].toString();
             if (partTypeName == "BIOS boot") partit->curFormat = "BIOS-GRUB";
             // Touching MacOS first drive, or MS LDM may brick the system.
             if ((proc.detectMac() && partit->device.startsWith("sda"))
@@ -179,10 +180,6 @@ void PartMan::scan(DeviceItem *drvstart)
             // Propagate the boot and nasty flags up to the drive.
             if (partit->flags.bootRoot) drvit->flags.bootRoot = true;
             if (partit->flags.nasty) drvit->flags.nasty = true;
-            else if (partit->flags.curESP && partit->allowedUsesFor().contains("ESP")) {
-                partit->usefor = "ESP";
-                partit->format = partit->allowedFormats().at(0);
-            }
         }
         for (int ixPart = drvit->childCount() - 1; ixPart >= 0; --ixPart) {
             // Propagate the boot flag across the entire drive.
@@ -330,6 +327,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
             if (save) {
                 config.setValue("Size", partit->size);
                 if (partit->isActive()) config.setValue("Active", true);
+                if (partit->flags.sysEFI) config.setValue("ESP", true);
                 if (partit->addToCrypttab) config.setValue("AddToCrypttab", true);
                 if (!partit->usefor.isEmpty()) config.setValue("UseFor", partit->usefor);
                 if (!partit->format.isEmpty()) config.setValue("Format", partit->format);
@@ -346,6 +344,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                     if (sizeTotal > sizeMax) return false;
                     if (config.value("Active").toBool()) partit->setActive(true);
                 }
+                partit->flags.sysEFI = config.value("ESP", partit->flags.sysEFI).toBool();
                 partit->addToCrypttab = config.value("AddToCrypttab").toBool();
                 partit->usefor = config.value("UseFor", partit->usefor).toString();
                 partit->format = config.value("Format", partit->format).toString();
@@ -460,7 +459,7 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actUnlock = nullptr;
         QAction *actAddCrypttab = nullptr;
         QAction *actNewSubvolume = nullptr, *actScanSubvols = nullptr;
-        QAction *actActive = nullptr;
+        QAction *actActive = nullptr, *actESP = nullptr;
         actRemove->setEnabled(gui.pushPartRemove->isEnabled());
         menu.addSeparator();
         if (twit->type == DeviceItem::VirtualBD) {
@@ -481,8 +480,11 @@ void PartMan::treeMenu(const QPoint &)
             }
             menu.addSeparator();
             actActive = menu.addAction(tr("Active partition"));
+            actESP = menu.addAction(tr("EFI System Partition"));
             actActive->setCheckable(true);
             actActive->setChecked(twit->isActive());
+            actESP->setCheckable(true);
+            actESP->setChecked(twit->flags.sysEFI);
         }
         if (twit->finalFormat() == "btrfs") {
             menu.addSeparator();
@@ -499,7 +501,11 @@ void PartMan::treeMenu(const QPoint &)
         else if (action == actLock) partMenuLock(twit);
         else if (action == actActive) twit->setActive(action->isChecked());
         else if (action == actAddCrypttab) twit->addToCrypttab = action->isChecked();
-        else if (action == actNewSubvolume) {
+        else if (action == actESP) {
+            twit->flags.sysEFI = action->isChecked();
+            twit->autoFill(1 << Format);
+            notifyChange(twit);
+        } else if (action == actNewSubvolume) {
             DeviceItem *subvol = new DeviceItem(DeviceItem::Subvolume, twit);
             subvol->autoFill();
             gui.treePartitions->expand(selIndex);
@@ -926,6 +932,24 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
 }
 bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
 {
+    if (proc.detectEFI()) {
+        const char *msgtext = nullptr;
+        auto fitefi = mounts.find("/boot/efi");
+        if (fitefi == mounts.end()) {
+            msgtext = QT_TR_NOOP("This system uses EFI, but no valid"
+                " EFI system partition was assigned to /boot/efi separately.");
+        } else if (!fitefi->second->flags.sysEFI) {
+            msgtext = QT_TR_NOOP("The volume assigned to /boot/efi"
+                " is not a valid EFI system partition.");
+        }
+        if (msgtext) {
+            msgbox.setText(tr(msgtext) + '\n' + tr("Are you sure you want to continue?"));
+            if (msgbox.exec() != QMessageBox::Yes) return false;
+        }
+        return true;
+    }
+
+    // BIOS with GPT
     QString biosgpt;
     for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
         DeviceItem *drvit = root.child(ixdrv);
@@ -1168,10 +1192,10 @@ void PartMan::preparePartitions()
             // Set the type for partitions that will be used in this installation.
             for (int ixdev = 0; ixdev < devCount; ++ixdev) {
                 DeviceItem *twit = drvit->child(ixdev);
-                const QString &useFor = twit->realUseFor();
+                assert(twit != nullptr);
+                if (twit->usefor.isEmpty()) continue;
                 const char *ptype = useGPT ? "8303" : "83";
-                if (useFor.isEmpty()) continue;
-                else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
+                if (twit->flags.sysEFI) ptype = useGPT ? "ef00" : "ef";
                 const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
                 proc.shell(cmd.arg(devsplit.drive, devsplit.partition, ptype));
                 proc.status();
@@ -1199,9 +1223,15 @@ void PartMan::preparePartitions()
                 cargs.append("on");
                 proc.exec("parted", cargs);
             }
+            if (twit->flags.sysEFI != twit->flags.curESP) {
+                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
+                proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition,
+                    "esp", twit->flags.sysEFI ? "on" : "off"});
+            }
             proc.status();
         }
     }
+    sect.setExceptionMode(nullptr);
     proc.exec("partprobe", {"-s"});
 }
 
@@ -1251,16 +1281,7 @@ void PartMan::formatPartitions()
         const QString &fmtstatus = tr("Formatting: %1");
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(twit->device));
         else proc.status(fmtstatus.arg(twit->shownUseFor()));
-        if (useFor == "ESP") {
-            QStringList cargs({"-F", twit->format.mid(3)});
-            if (twit->chkbadblk) cargs.append("-c");
-            if (!twit->label.isEmpty()) cargs << "-n" << twit->label.trimmed().left(11);
-            cargs.append(dev);
-            proc.exec("mkfs.msdos", cargs);
-            // Sets boot flag and ESP flag.
-            const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
-            proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "esp", "on"});
-        } else if (useFor == "BIOS-GRUB") {
+        if (useFor == "BIOS-GRUB") {
             proc.exec("dd", {"bs=64K", "if=/dev/zero", "of=" + dev});
             const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
@@ -1268,6 +1289,12 @@ void PartMan::formatPartitions()
             QStringList cargs({"-q", dev});
             if (!twit->label.isEmpty()) cargs << "-L" << twit->label;
             proc.exec("mkswap", cargs);
+        } else if (twit->format.left(3) == "FAT") {
+            QStringList cargs({"-F", twit->format.mid(3)});
+            if (twit->chkbadblk) cargs.append("-c");
+            if (!twit->label.isEmpty()) cargs << "-n" << twit->label.trimmed().left(11);
+            cargs.append(dev);
+            proc.exec("mkfs.msdos", cargs);
         } else {
             // Transplanted from minstall.cpp and modified to suit.
             const QString &format = twit->format;
@@ -1405,12 +1432,6 @@ bool PartMan::makeFstab()
         out << ' ' << (twit->dump ? 1 : 0);
         out << ' ' << twit->pass << '\n';
     }
-    // EFI System Partition
-    if (gui.radioBootESP->isChecked()) {
-        DeviceItem *devit = findByPath("/dev/" + gui.comboBoot->currentData().toString());
-        if (!devit) return false;
-        out << "UUID=" << devit->uuid << " /boot/efi vfat noatime,dmask=0002,fmask=0113 0 0\n";
-    }
     file.close();
     return true;
 }
@@ -1424,7 +1445,7 @@ void PartMan::mountPartitions()
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = it.second->mappedDevice();
         proc.status(tr("Mounting: %1").arg(it.first));
-        if (it.first == "/boot") {
+        if (it.first == "/boot" && it.second->finalFormat()=="ext4") {
              // needed to run fsck because sfdisk --part-type can mess up the partition
             proc.exec("fsck.ext4", {"-y", dev});
         }
@@ -1564,8 +1585,12 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
         switch (index.column()) {
         case Device:
             if (item->type == DeviceItem::Subvolume) return "----";
-            else if (item->isActive()) return item->device + '*';
-            else return item->device;
+            else {
+                QString dev = item->device;
+                if (item->isActive()) dev += '*';
+                if (item->flags.sysEFI) dev += QChar(u'†');
+                return dev;
+            }
             break;
         case Size:
             if (item->type == DeviceItem::Subvolume) return "----";
@@ -1788,7 +1813,7 @@ int PartMan::changeEnd(bool notify) noexcept
         changing->dump = false;
         changing->pass = 2;
         const QString &use = changing->realUseFor();
-        if (use.isEmpty() || use == "FORMAT" || use == "ESP") changing->options.clear();
+        if (use.isEmpty() || use == "FORMAT") changing->options.clear();
         if (changing->format != "btrfs") {
             // Clear all subvolumes if not supported.
             while (changing->childCount()) delete changing->child(0);
@@ -1914,8 +1939,7 @@ QString DeviceItem::realUseFor(const QString &use) noexcept
 }
 QString DeviceItem::shownUseFor(const QString &use) noexcept
 {
-    if (use == "ESP") return tr("EFI System Partition");
-    else if (use == "SWAP") return tr("swap space");
+    if (use == "SWAP") return tr("swap space");
     else if (use == "FORMAT") return tr("format only");
     return use;
 }
@@ -1956,7 +1980,7 @@ bool DeviceItem::canEncrypt() const noexcept
 {
     if (type != Partition) return false;
     const QString &use = realUseFor();
-    return !(use.isEmpty() || use == "ESP" || use == "BIOS-GRUB" || use == "/boot");
+    return !(flags.sysEFI || use.isEmpty() || use == "BIOS-GRUB" || use == "/boot");
 }
 inline bool DeviceItem::willEncrypt() const noexcept
 {
@@ -2006,22 +2030,26 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
         if (type != VirtualBD) {
             if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
             if (all || size <= 8*GB) {
-                if (size < (2*TB - 512)) checkAndAdd("ESP");
+                if (size < (2*TB - 512)) {
+                    if (all || flags.sysEFI || size <= 512*MB) checkAndAdd("/boot/efi");
+                }
                 checkAndAdd("/boot"); // static files of the boot loader
             }
         }
     }
-    // Debian 12 installer order: / /boot /home /tmp /usr /var /srv /opt /usr/local
-    checkAndAdd("/"); // the root file system
-    checkAndAdd("/home"); // user home directories
-    checkAndAdd("/usr"); // static data
-    // checkAndAdd("/usr/local"); // local hierarchy
-    checkAndAdd("/var"); // variable data
-    // checkAndAdd("/tmp"); // temporary files
-    // checkAndAdd("/srv"); // data for services provided by this system
-    // checkAndAdd("/opt"); // add-on application software packages
-    if (type != Subvolume) checkAndAdd("swap");
-    else checkAndAdd("/swap");
+    if (!flags.sysEFI) {
+        // Debian 12 installer order: / /boot /home /tmp /usr /var /srv /opt /usr/local
+        checkAndAdd("/"); // the root file system
+        checkAndAdd("/home"); // user home directories
+        checkAndAdd("/usr"); // static data
+        // checkAndAdd("/usr/local"); // local hierarchy
+        checkAndAdd("/var"); // variable data
+        // checkAndAdd("/tmp"); // temporary files
+        // checkAndAdd("/srv"); // data for services provided by this system
+        // checkAndAdd("/opt"); // add-on application software packages
+        if (type != Subvolume) checkAndAdd("swap");
+        else checkAndAdd("/swap");
+    }
     return list;
 }
 QStringList DeviceItem::allowedFormats() const noexcept
@@ -2031,20 +2059,22 @@ QStringList DeviceItem::allowedFormats() const noexcept
     bool allowPreserve = false;
     if (isVolume()) {
         if (use.isEmpty()) return QStringList();
-        else if (use == "/boot") list.append("ext4");
         else if (use == "BIOS-GRUB") list.append("BIOS-GRUB");
-        else if (use == "ESP") {
-            list.append("FAT32");
-            if (size <= (4*GB - 64*KB)) list.append("FAT16");
-            if (size <= (32*MB - 512)) list.append("FAT12");
-            allowPreserve = (list.contains(curFormat, Qt::CaseInsensitive)
-                || !curFormat.compare("VFAT", Qt::CaseInsensitive));
-        } else if (use == "SWAP") {
+        else if (use == "SWAP") {
             list.append("SWAP");
             allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         } else {
-            list << "ext4" << "ext3" << "ext2";
-            list << "f2fs" << "jfs" << "xfs" << "btrfs";
+            if (!flags.sysEFI) {
+                list << "ext4";
+                if (use != "/boot") {
+                    list << "ext3" << "ext2";
+                    list << "f2fs" << "jfs" << "xfs" << "btrfs";
+                }
+            }
+            if (size <= (2*TB - 64*KB)) list.append("FAT32");
+            if (size <= (4*GB - 64*KB)) list.append("FAT16");
+            if (size <= (32*MB - 512)) list.append("FAT12");
+
             if (use != "FORMAT") allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         }
     } else if (type == Subvolume) {
@@ -2057,7 +2087,7 @@ QStringList DeviceItem::allowedFormats() const noexcept
 
     if (encrypt) allowPreserve = false;
     if (allowPreserve) {
-        if (use == "ESP" || use == "/home" || !allowedUsesFor().contains(use)) {
+        if (flags.sysEFI || use == "/home" || !allowedUsesFor().contains(use)) {
             list.prepend("PRESERVE"); // Preserve ESP, custom mounts and /home by default.
         } else {
             list.append("PRESERVE");
@@ -2084,7 +2114,7 @@ QString DeviceItem::shownFormat(const QString &fmt) const noexcept
 bool DeviceItem::canMount(bool pointonly) const noexcept
 {
     const QString &use = realUseFor();
-    return !use.isEmpty() && use != "FORMAT" && use != "ESP" && use != "BIOS-GRUB"
+    return !use.isEmpty() && use != "FORMAT" && use != "BIOS-GRUB"
         && (!pointonly || use != "SWAP");
 }
 long long DeviceItem::driveFreeSpace(bool inclusive) const noexcept
@@ -2161,20 +2191,24 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             while (drvit && drvit->type != Drive) drvit = drvit->parentItem;
             if (drvit) drvit->driveAutoSetActive();
         }
+        if (use == "/boot/efi") flags.sysEFI = true;
 
         if (encrypt) encrypt = canEncrypt();
     }
-    if (format.isEmpty()) {
-        const QStringList &af = allowedFormats();
-        if (!af.isEmpty()) {
-            format = af.at(0);
-            changed |= (1 << PartMan::Format);
-        }
+    const QStringList &af = allowedFormats();
+    if (format.isEmpty() || !af.contains(format)) {
+        if (af.isEmpty()) format.clear();
+        else format = af.at(0);
+        changed |= (1 << PartMan::Format);
     }
     if ((changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format))) && canMount(false)) {
         // Default options, dump and pass
         if (format == "SWAP") options = discgran ? "discard" : "defaults";
-        else {
+        else if (finalFormat().startsWith("FAT")) {
+            options = "noatime,dmask=0002,fmask=0113";
+            pass = 0;
+            dump = false;
+        } else {
             if (use == "/boot" || use == "/") {
                 pass = (format == "btrfs") ? 0 : 1;
             }

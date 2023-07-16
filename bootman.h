@@ -40,7 +40,7 @@ class BootMan : public QObject
     // Slots
     void chosenBootMBR() noexcept;
     void chosenBootPBR() noexcept;
-    void chosenBootESP() noexcept;
+    void chosenBootESP(bool checked) noexcept;
 public:
     BootMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui,
         const class QSettings &appConf, const QCommandLineParser &appArgs) noexcept;
