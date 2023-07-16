@@ -1931,7 +1931,8 @@ void DeviceItem::sortChildren() noexcept
 /* Helpers */
 QString DeviceItem::realUseFor(const QString &use) noexcept
 {
-    if (!use.startsWith('/')) return use.toUpper();
+    if (use == "ESP") return "/boot/efi";
+    else if (!use.startsWith('/')) return use.toUpper();
     else return use;
 }
 QString DeviceItem::shownUseFor(const QString &use) noexcept
@@ -2028,7 +2029,7 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
             if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
             if (all || size <= 8*GB) {
                 if (size < (2*TB - 512)) {
-                    if (all || flags.sysEFI || size <= 512*MB) checkAndAdd("/boot/efi");
+                    if (all || flags.sysEFI || size <= 512*MB) checkAndAdd("ESP");
                 }
                 checkAndAdd("/boot"); // static files of the boot loader
             }
