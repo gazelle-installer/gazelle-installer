@@ -51,7 +51,7 @@ void BootMan::manageConfig(MSettings &config) noexcept
     const char *grubChoices[] = {"MBR", "PBR", "ESP"};
     QRadioButton *grubRadios[] = {gui.radioBootMBR, gui.radioBootPBR, gui.radioBootESP};
     config.manageRadios("TargetType", 3, grubChoices, grubRadios);
-    config.manageComboBox("Location", gui.comboBoot, true);
+    if (!gui.radioBootESP->isChecked()) config.manageComboBox("Location", gui.comboBoot, true);
     config.endGroup();
 }
 
