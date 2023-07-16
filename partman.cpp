@@ -1153,41 +1153,44 @@ void PartMan::preparePartitions()
         proc.exec("parted", {"-s", drvit->path, "mklabel", (drvit->willUseGPT() ? "gpt" : "msdos")});
     }
 
-    // Prepare partition tables, creating tables and partitions when needed.
-    proc.status(tr("Preparing required partitions"));
-    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
-        DeviceItem *drvit = root.child(ixi);
-        if (drvit->type == DeviceItem::VirtualDevices) continue;
-        const int devCount = drvit->childCount();
-        const bool useGPT = drvit->willUseGPT();
-        if (drvit->flags.oldLayout) {
-            // Using existing partitions.
-            QString cmd; // command to set the partition type
-            if (useGPT) cmd = "sgdisk /dev/%1 -q --typecode=%2:%3";
-            else cmd = "sfdisk /dev/%1 -q --part-type %2 %3";
-            // Set the type for partitions that will be used in this installation.
-            for (int ixdev = 0; ixdev < devCount; ++ixdev) {
-                DeviceItem *twit = drvit->child(ixdev);
-                const QString &useFor = twit->realUseFor();
-                const char *ptype = useGPT ? "8303" : "83";
-                if (useFor.isEmpty()) continue;
-                else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
-                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
-                proc.shell(cmd.arg(devsplit.drive, devsplit.partition, ptype));
-                proc.status();
-            }
-        } else {
-            // Creating new partitions.
-            long long start = 1; // start with 1 MB to aid alignment
-            for (int ixdev = 0; ixdev<devCount; ++ixdev) {
-                DeviceItem *twit = drvit->child(ixdev);
-                const long long end = start + twit->size / MB;
-                proc.exec("parted", {"-s", "--align", "optimal", drvit->path,
-                    "mkpart" , "primary", QString::number(start) + "MiB", QString::number(end) + "MiB"});
-                start = end;
-                proc.status();
-            }
-        }
+	    // Prepare partition tables, creating tables and partitions when needed.
+	    proc.status(tr("Preparing required partitions"));
+	    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
+	        DeviceItem *drvit = root.child(ixi);
+	        if (drvit->type == DeviceItem::VirtualDevices) continue;
+	        const int devCount = drvit->childCount();
+	        const bool useGPT = drvit->willUseGPT();
+	        if (drvit->flags.oldLayout) {
+	            {
+				MProcess::Section sect2(proc, nullptr);
+	            // Using existing partitions.
+	            QString cmd; // command to set the partition type
+	            if (useGPT) cmd = "sgdisk /dev/%1 -q --typecode=%2:%3";
+	            else cmd = "sfdisk /dev/%1 -q --part-type %2 %3";
+	            // Set the type for partitions that will be used in this installation.
+	            for (int ixdev = 0; ixdev < devCount; ++ixdev) {
+	                DeviceItem *twit = drvit->child(ixdev);
+	                const QString &useFor = twit->realUseFor();
+	                const char *ptype = useGPT ? "8303" : "83";
+	                if (useFor.isEmpty()) continue;
+	                else if (useFor == "ESP") ptype = useGPT ? "ef00" : "ef";
+	                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
+	                proc.shell(cmd.arg(devsplit.drive, devsplit.partition, ptype));
+	                proc.status();
+				}
+	            }
+	        } else {
+	            // Creating new partitions.
+	            long long start = 1; // start with 1 MB to aid alignment
+	            for (int ixdev = 0; ixdev<devCount; ++ixdev) {
+	                DeviceItem *twit = drvit->child(ixdev);
+	                const long long end = start + twit->size / MB;
+	                proc.exec("parted", {"-s", "--align", "optimal", drvit->path,
+	                    "mkpart" , "primary", QString::number(start) + "MiB", QString::number(end) + "MiB"});
+	                start = end;
+	                proc.status();
+	            }
+	        }
         // Partition flags.
         for (int ixdev=0; ixdev<devCount; ++ixdev) {
             DeviceItem *twit = drvit->child(ixdev);
@@ -1202,7 +1205,10 @@ void PartMan::preparePartitions()
             proc.status();
         }
     }
-    proc.exec("partprobe", {"-s"});
+	{
+	    MProcess::Section sect2(proc, nullptr);
+	    proc.exec("partprobe", {"-s"});
+	}
 }
 
 void PartMan::luksFormat()
