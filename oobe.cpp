@@ -63,7 +63,6 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, QSettings &appCo
     // Guess if hardware clock is UTC or local time
     proc.shell("guess-hwclock", nullptr, true);
     if (proc.readOut() == "localtime") gui.checkLocalClock->setChecked(true);
-    else if (proc.detectMac()) gui.checkLocalClock->setChecked(true);
 
     // locale list
     connect(gui.comboLocale, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Oobe::localeIndexChanged);

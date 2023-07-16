@@ -318,18 +318,6 @@ int MProcess::detectEFI(bool noTest)
     }
     return testEFI;
 }
-bool MProcess::detectMac()
-{
-    bool rc = false;
-    if (testMac < 0) {
-        // if it looks like an apple...
-        rc = exec("grub-probe", {"-d", "/dev/sda2"}, nullptr, true);
-        if (rc) rc = readOut(true).contains("hfsplus");
-        testMac = (rc ? 1 : 0);
-        qDebug() << "Detect Mac:" << rc;
-    }
-    return rc;
-}
 
 // Local execution environment
 
