@@ -161,9 +161,12 @@ void BootMan::install(const QStringList &cmdextra)
                 }
             }
             // Add a new NVRAM boot variable.
-            const DeviceItem::NameParts &bs = DeviceItem::split(bootdev);
-            proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", "/dev/"+bs.drive, "-p", bs.partition,
-                "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
+            const auto fit = partman.mounts.find("/boot/efi");
+            if (fit != partman.mounts.end()) {
+                const DeviceItem::NameParts &bs = DeviceItem::split(fit->second->device);
+                proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", "/dev/"+bs.drive, "-p", bs.partition,
+                    "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
+            }
             sect.setExceptionMode(true);
             sect.setRoot(nullptr);
         }
