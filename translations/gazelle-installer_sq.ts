@@ -471,9 +471,8 @@ Shijoni përdorimin e %1-it</translation>
         <translation>&lt;i&gt;Format&lt;/i&gt; - Ky është formati i pjesës. Formatet e mundshëm varen nga fakti se përse do të përdoret pjesa. Kur punohet me një skemë ekzistuese, mund të jeni në gjendje të ruani formatin e pjesës duke përzgjedhur &lt;b&gt;Ruaje&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Përzgjedhja e &lt;b&gt;Ruaje /home&lt;/b&gt; për pjesën e rrënjës ruan lëndën e drejtorisë /home, duke fshirë gjithçka tjetër. Kjo mundësi mund të përdoret vetëm kur /home gjendet në të njëjtën pjesë me rrënjën.</translation>
+        <translation type="vanished">Përzgjedhja e &lt;b&gt;Ruaje /home&lt;/b&gt; për pjesën e rrënjës ruan lëndën e drejtorisë /home, duke fshirë gjithçka tjetër. Kjo mundësi mund të përdoret vetëm kur /home gjendet në të njëjtën pjesë me rrënjën.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2079,9 +2083,13 @@ Instaluesi s’do të shkruajë te kartela e re e formësimit ndonjë fjalëkali
 Ju lutemi, kini parasysh, kjo është eksperimentale. Versione të ardhshëm të instaluesit mund të mos jenë të përputhshëm me kartela ekzistuese formësimesh.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Bëhet fikje vetvetiu, kur të ketë përfunduar instalimi.</translation>
+        <translation type="vanished">Bëhet fikje vetvetiu, kur të ketë përfunduar instalimi.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

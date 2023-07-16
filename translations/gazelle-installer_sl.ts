@@ -471,9 +471,8 @@ Uživajte v sistemu %1!</translation>
         <translation>&lt;i&gt;Vrsta&lt;/i&gt; - To je vrsta razdelka. Vrste, ki so na voljo, so odvisne od rabe razdelka. Če delate z obsotječim razporedom, lahko tudi ohranite vrsto razdelka z izbiro &lt;b&gt;Ohrani&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Izbira &lt;b&gt;Ohrani /home&lt;/b&gt; za korenski razdelek ohrani vsebino /home direktorija in izbriše vse drugo. To možnost je mogoče izbrati le, če se /home nahaja na istem razdelku kot root.</translation>
+        <translation type="vanished">Izbira &lt;b&gt;Ohrani /home&lt;/b&gt; za korenski razdelek ohrani vsebino /home direktorija in izbriše vse drugo. To možnost je mogoče izbrati le, če se /home nahaja na istem razdelku kot root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2087,9 +2091,13 @@ Namestilnik ne bo zapisoval gesel ali neuporabljenih nastavitev v novo namestitv
 Pomnite, da je to eksperimentalno. Prihodnji namestilniki so lahko nezdružljivi s obstoječimi namestitvenimi datotekami.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Samodejni izklop po končani namestitvi.</translation>
+        <translation type="vanished">Samodejni izklop po končani namestitvi.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

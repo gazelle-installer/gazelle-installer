@@ -471,9 +471,8 @@ Divirta-se utilizando o %1.</translation>
         <translation>&lt;i&gt;Formato&lt;/i&gt; - Este é o formato da partição. Os formatos disponíveis dependem para o que a partição será utilizada. Ao trabalhar com um leiaute existente, você pode ser capaz de preservar o formato da partição, selecionando &lt;b&gt;Preservar&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Selecionar &lt;b&gt;Preservar a pasta pessoal (/home)&lt;/b&gt; para a partição raiz (root) preservar o conteúdo da pasta pessoal (/home), excluindo todo o restante. Esta opção só pode ser utilizada quando pasta pessoal (/home) estiver na mesma partição da partição raiz (root).</translation>
+        <translation type="vanished">Selecionar &lt;b&gt;Preservar a pasta pessoal (/home)&lt;/b&gt; para a partição raiz (root) preservar o conteúdo da pasta pessoal (/home), excluindo todo o restante. Esta opção só pode ser utilizada quando pasta pessoal (/home) estiver na mesma partição da partição raiz (root).</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2087,9 +2091,13 @@ O instalador não gravará nenhuma senha ou configurações ignoradas no novo ar
 Por favor, observe que isto é experimental. As versões futuras do instalador podem quebrar a compatibilidade com os arquivos de configurações existentes.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Desligar automaticamente o computador quando finalizar a instalação.</translation>
+        <translation type="vanished">Desligar automaticamente o computador quando finalizar a instalação.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>
