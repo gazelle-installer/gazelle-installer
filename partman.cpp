@@ -2085,8 +2085,9 @@ QStringList DeviceItem::allowedFormats() const noexcept
 
     if (encrypt) allowPreserve = false;
     if (allowPreserve) {
-        if (flags.sysEFI || use == "/home" || !allowedUsesFor().contains(use)) {
-            list.prepend("PRESERVE"); // Preserve ESP, custom mounts and /home by default.
+        // People often share SWAP partitions between distros and need to keep the same UUIDs.
+        if (flags.sysEFI || use == "/home" || !allowedUsesFor().contains(use) || use == "SWAP") {
+            list.prepend("PRESERVE"); // Preserve ESP, SWAP, custom mounts and /home by default.
         } else {
             list.append("PRESERVE");
         }
