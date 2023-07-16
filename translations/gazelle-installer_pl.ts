@@ -470,9 +470,8 @@ Miłego korzystania z %1</translation>
         <translation>&lt;i&gt;Format&lt;/i&gt; - To jest format partycji. Dostępne formaty zależą od tego, do czego używana jest partycja. Podczas pracy z istniejącym układem możesz zachować format partycji, wybierając opcję &lt;b&gt;Zachowaj&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Wybieranie &lt;b&gt;Zachowaj /home&lt;/b&gt; dla partycji głównej zachowuje zawartość katalogu /home, usuwając wszystko inne. Tej opcji można użyć tylko wtedy, gdy katalog /home znajduje się na tej samej partycji co katalog główny.</translation>
+        <translation type="vanished">Wybieranie &lt;b&gt;Zachowaj /home&lt;/b&gt; dla partycji głównej zachowuje zawartość katalogu /home, usuwając wszystko inne. Tej opcji można użyć tylko wtedy, gdy katalog /home znajduje się na tej samej partycji co katalog główny.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -703,6 +702,11 @@ Miłego korzystania z %1</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2086,9 +2090,13 @@ Instalator nie zapisze żadnych haseł ani zignorowanych ustawień w nowym pliku
 Uwaga, to jest funkcja eksperymentalna. Przyszłe wersje instalatora mogą naruszać zgodność z istniejącymi plikami konfiguracyjnymi.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Wyłącza się automatycznie po zakończeniu instalacji.</translation>
+        <translation type="vanished">Wyłącza się automatycznie po zakończeniu instalacji.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

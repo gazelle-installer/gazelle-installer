@@ -471,9 +471,8 @@ Gaudiu usant %1</translation>
         <translation>&lt;i&gt;Format&lt;/i&gt; - Aquest és el format de la partició. Els formats disponibles depenen de l&apos;ús de la partició. Quan treballeu amb una disposició existent, podeu preservar el format de la partició seleccionant &lt;b&gt;Conserva&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>En seleccionar &lt;b&gt;Preserva /home&lt;/b&gt; per la nova partició arrel preserva el contingut del directori  /home, esborrant la resta. Aquesta opció només es pot usar quan  /home està a la mateixa partició que l&apos;arrel.</translation>
+        <translation type="vanished">En seleccionar &lt;b&gt;Preserva /home&lt;/b&gt; per la nova partició arrel preserva el contingut del directori  /home, esborrant la resta. Aquesta opció només es pot usar quan  /home està a la mateixa partició que l&apos;arrel.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2087,9 +2091,13 @@ L&apos;instal·lador no escriurà cap contrasenya o ajustos desconeguts al nou f
 Tingueu en compte que això és experimental. Les futures versions de l&apos;instal·lador poden trencar la compatibilitat amb els fitxers d&apos;instal·lació actuals.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Apaga automàticament en acabar la instal·lació.</translation>
+        <translation type="vanished">Apaga automàticament en acabar la instal·lació.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

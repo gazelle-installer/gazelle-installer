@@ -471,9 +471,8 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Μορφή&lt;/i&gt; - Αυτή είναι η μορφή του διαμερίσματος. Οι διαθέσιμες μορφές εξαρτώνται από τη χρήση του διαμερίσματος. Όταν εργάζεστε με μια υπάρχουσα διάταξη, ενδέχεται να μπορείτε να διατηρήσετε τη μορφή του διαμερίσματος επιλέγοντας &lt;b&gt;Διατήρηση&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Επιλέγοντας το &lt;b&gt;Preserve /home &lt;/b&gt;για το διαμέρισμα root διατηρείται τα περιεχόμενα του καταλόγου /home, διαγράφοντας οτιδήποτε άλλο. Αυτή η επιλογή μπορεί να χρησιμοποιηθεί μόνο όταν το /home βρίσκεται στο ίδιο διαμέρισμα με το root.</translation>
+        <translation type="vanished">Επιλέγοντας το &lt;b&gt;Preserve /home &lt;/b&gt;για το διαμέρισμα root διατηρείται τα περιεχόμενα του καταλόγου /home, διαγράφοντας οτιδήποτε άλλο. Αυτή η επιλογή μπορεί να χρησιμοποιηθεί μόνο όταν το /home βρίσκεται στο ίδιο διαμέρισμα με το root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2092,9 +2096,13 @@ Please note, this is experimental. Future installer versions may break compatibi
 Λάβετε υπόψη ότι αυτό είναι πειραματικό. Οι μελλοντικές εκδόσεις του προγράμματος εγκατάστασης ενδέχεται να διακόψουν τη συμβατότητα με τα υπάρχοντα αρχεία διαμόρφωσης.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Τερματίζεται αυτόματα όταν ολοκληρωθεί η εγκατάσταση.</translation>
+        <translation type="vanished">Τερματίζεται αυτόματα όταν ολοκληρωθεί η εγκατάσταση.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

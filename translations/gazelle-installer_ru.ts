@@ -470,9 +470,8 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Формат&lt;/i&gt; - Это формат раздела. Доступные форматы зависят от того, для чего используется раздел. Для работы с существующим разделом вы можете сохранить его формат, выбрав &lt;b&gt;Сохранить&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Выбор параметра &lt;b&gt;Сохранить /home&lt;/b&gt; для корневого раздела сохраняет содержимое каталога /home, удаляя всё остальное. Этот параметр можно использовать только в том случае, если /home находится в том же разделе, что и root.</translation>
+        <translation type="vanished">Выбор параметра &lt;b&gt;Сохранить /home&lt;/b&gt; для корневого раздела сохраняет содержимое каталога /home, удаляя всё остальное. Этот параметр можно использовать только в том случае, если /home находится в том же разделе, что и root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -703,6 +702,11 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2080,9 +2084,13 @@ Please note, this is experimental. Future installer versions may break compatibi
 Пожалуйста, обратите внимание, что это экспериментально. Будущие версии установщика могут нарушить совместимость с существующими файлами конфигурации.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Автоматически отключается по завершении установки.</translation>
+        <translation type="vanished">Автоматически отключается по завершении установки.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

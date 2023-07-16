@@ -471,9 +471,8 @@ Usufrua do %1</translation>
         <translation>&lt;i&gt;Formato&lt;/i&gt; - Este é o formato da partição. Os formatos disponíveis dependem da finalidade da partição. Quando a trabalhar com uma organização existente, poderá ser possível preservar o formato da partição, seleccionando &lt;b&gt;Preservar&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Ao seleccionar &lt;b&gt;Preservar /home&lt;/b&gt; para a partição root preserva o conteúdo do directório /home, apagando tudo o resto. Esta opção só pode ser utilizada quando a /home (pasta pessoal) está na mesma partição que o root.</translation>
+        <translation type="vanished">Ao seleccionar &lt;b&gt;Preservar /home&lt;/b&gt; para a partição root preserva o conteúdo do directório /home, apagando tudo o resto. Esta opção só pode ser utilizada quando a /home (pasta pessoal) está na mesma partição que o root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Usufrua do %1</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2087,9 +2091,13 @@ O instalador não escreverá no novo ficheiro de configuração quaisquer palavr
 Notar que isto é experimental. Futuras versões do instalador poderão não ser compatíveis com ficheiros de configuração existentes.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Encerra automaticamente quando termina a instalação.</translation>
+        <translation type="vanished">Encerra automaticamente quando termina a instalação.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

@@ -471,9 +471,8 @@ Ha det så trevligt med %1</translation>
         <translation>&lt;i&gt;Format&lt;/i&gt; -  Detta är partitionens format. Tillgängliga format beror på vad partitionen är avsedd för. När du arbetar med en existerande layout, kan du kanske bevara partitionens format genom att välja &lt;b&gt;Bevara&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Att välja &lt;b&gt;Bevara /home&lt;/b&gt; för  root partitionen bevarar innehållet i /home katalogen, tar bort allt annat. Detta alternativ kan enbart användas när /home är på samma partition som root.</translation>
+        <translation type="vanished">Att välja &lt;b&gt;Bevara /home&lt;/b&gt; för  root partitionen bevarar innehållet i /home katalogen, tar bort allt annat. Detta alternativ kan enbart användas när /home är på samma partition som root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2087,9 +2091,13 @@ Installeraren kommer inte att skriva några lösenord eller överhoppade instäl
 Var vänlig notera, detta är experimentelt. Framtida versioner av installeraren kan komma att bryta kompabiliteten med existerande konfigurationsfiler.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Stängs av automatiskt när installationen är klar.</translation>
+        <translation type="vanished">Stängs av automatiskt när installationen är klar.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

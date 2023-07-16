@@ -690,7 +690,7 @@ void MInstall::pageDisplayed(int next) noexcept
             "<p>" + tr("<i>Format</i> - This is the partition's format. Available formats depend on what the partition is used for."
                 " When working with an existing layout, you may be able to preserve the format of the partition by selecting <b>Preserve</b>.") + "<br/>"
             + tr("Selecting <b>Preserve /home</b> for the root partition preserves the contents of the /home directory, deleting everything else."
-                " This option can only be used when /home is on the same partition as the root.") + "</p>"
+                " This option can only be used when /home is on the same partition as the root partition.") + "</p>"
             "<p>" + tr("The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
             "<p>" + tr("<i>Check</i> - Check and correct for bad blocks on the drive (not supported for all formats)."
                 " This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"

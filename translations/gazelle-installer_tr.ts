@@ -470,9 +470,8 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Biçim&lt;/i&gt; - Bu bölümün biçimidir. Eldeki biçimler bölümün ne için kullanıldığına bağlıdır. Varolan bir düzen ile çalışırken, &lt;b&gt;Koru&lt;/b&gt;&apos;yu seçerek bölümün biçimini koruyabilirsiniz.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Kök bölüm için &lt;b&gt;Preserve /home&lt;/b&gt; öğesinin seçilmesi, /home dizininin içeriğini korur ve diğer her şeyi siler. Bu seçenek yalnızca /home, kök ile aynı bölümde olduğunda kullanılabilir.</translation>
+        <translation type="vanished">Kök bölüm için &lt;b&gt;Preserve /home&lt;/b&gt; öğesinin seçilmesi, /home dizininin içeriğini korur ve diğer her şeyi siler. Bu seçenek yalnızca /home, kök ile aynı bölümde olduğunda kullanılabilir.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -703,6 +702,11 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2086,9 +2090,13 @@ Yükleyici, yeni yapılandırma dosyasına herhangi bir parola veya yoksayılan 
 Lütfen bunun deneysel olduğunu unutmayın. Gelecekteki yükleyici sürümleri, mevcut yapılandırma dosyalarıyla uyumluluğu bozabilir.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Kurulum tamamlandığında otomatik olarak kapanır.</translation>
+        <translation type="vanished">Kurulum tamamlandığında otomatik olarak kapanır.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

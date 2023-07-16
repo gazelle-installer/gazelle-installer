@@ -471,9 +471,8 @@ Viel Spaß mit %1</translation>
         <translation>&lt;i&gt;Format&lt;/i&gt; - Auswahl des Dateisystemtyps für die Partition. Welche Typen für die Formatierung zur Auswahl stehen, ist davon abhängig, wofür die Partition verwendet werden soll. Bei vorgefundenen Partitionen kann das bestehende Dateisystem durch Auswahl von &lt;b&gt;Beibehalten&lt;/b&gt;ohne Neuformatierung übernommen werden.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Auswahl von &lt;b&gt;Preserve /home&lt;/b&gt; für die root-Partition bewahrt den Inhalt des  /home-Verzeichnisses und löscht alles andere. Diese Option kann nur gewählt werden, wenn sich /home auf derselben Partition mit root befindet.</translation>
+        <translation type="vanished">Auswahl von &lt;b&gt;Preserve /home&lt;/b&gt; für die root-Partition bewahrt den Inhalt des  /home-Verzeichnisses und löscht alles andere. Diese Option kann nur gewählt werden, wenn sich /home auf derselben Partition mit root befindet.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Viel Spaß mit %1</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2087,9 +2091,13 @@ Weder Paßworte noch abgewählte Einstellungen werden in die Konfigurationsdatei
 Zur Beachtung: Diese Funktion ist experimentell. Zukünftige Versionen des Installationsprogramms können inkompatibel zu Konfigurationsdateien früherer Versionen sein.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Automatischer Shutdown nach Abschluss der Installation.</translation>
+        <translation type="vanished">Automatischer Shutdown nach Abschluss der Installation.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>
