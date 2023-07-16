@@ -1231,6 +1231,7 @@ void PartMan::preparePartitions()
             proc.status();
         }
     }
+    sect.setExceptionMode(nullptr);
     proc.exec("partprobe", {"-s"});
 }
 
