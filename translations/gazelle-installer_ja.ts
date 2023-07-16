@@ -471,9 +471,8 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;フォーマット&lt;/i&gt; - これはパーティションのフォーマットです。利用可能なフォーマットは、パーティションの使用目的によって異なります。既存のレイアウトで作業する場合、&lt;b&gt;保存&lt;/b&gt; を選択することで、そのパーティションのフォーマットを維持できる場合があります。</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>root パーティションで &lt;b&gt;Preserve /home&lt;/b&gt; を選択すると、/home ディレクトリの内容が保存され、その他はすべて削除されます。このオプションは、/home が root と同じパーティションに存在する場合にのみ使用できます。</translation>
+        <translation type="vanished">root パーティションで &lt;b&gt;Preserve /home&lt;/b&gt; を選択すると、/home ディレクトリの内容が保存され、その他はすべて削除されます。このオプションは、/home が root と同じパーティションに存在する場合にのみ使用できます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2085,9 +2089,13 @@ Please note, this is experimental. Future installer versions may break compatibi
 注記：これは実験的なものです。将来公開されるインストーラでは、既存の設定ファイルとの互換性が失われる可能性があります。</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>インストールが完了すると自動的にシャットダウンします。</translation>
+        <translation type="vanished">インストールが完了すると自動的にシャットダウンします。</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

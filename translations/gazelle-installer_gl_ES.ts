@@ -470,11 +470,6 @@ Disfruta usando %1.</translation>
         <translation>&lt;i&gt;Formato&lt;/i&gt; - Este é o formato da partición. Os formatos dispoñibles dependen do que se utilice a partición. Cando traballes cun deseño existente, podes conservar o formato da partición seleccionando &lt;b&gt;Conservar&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="694"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
         <translation type="unfinished"></translation>
@@ -703,6 +698,11 @@ Disfruta usando %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2083,7 +2083,7 @@ Teña en conta que isto é experimental. As versións futuras do instalador pode
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
-        <source>Shutdowns automatically when done installing.</source>
+        <source>Shutdown automatically when done installing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

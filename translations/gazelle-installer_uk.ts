@@ -470,9 +470,8 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Формат (Format)&lt;/i&gt; - Це формат розділу. Доступні формати залежать від того, для чого використовується розділ. Працюючи з наявною схемою, ви можете зберегти формат розділу, вибравши &lt;b&gt;Зберегти&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Вибір &lt;b&gt;Зберегти /home&lt;/b&gt;для кореневого розділу зберігає вміст каталогу /home, видаляючи все інше. Цю опцію можна використовувати, лише якщо /home знаходиться на тому самому розділі, що й кореневий.</translation>
+        <translation type="vanished">Вибір &lt;b&gt;Зберегти /home&lt;/b&gt;для кореневого розділу зберігає вміст каталогу /home, видаляючи все інше. Цю опцію можна використовувати, лише якщо /home знаходиться на тому самому розділі, що й кореневий.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -703,6 +702,11 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2086,9 +2090,13 @@ Please note, this is experimental. Future installer versions may break compatibi
 Зверніть увагу, що це експериментально. Майбутні версії встановлювача можуть порушити сумісність із наявними конфігураційними файлами.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Автоматично вимикається після завершення встановлення.</translation>
+        <translation type="vanished">Автоматично вимикається після завершення встановлення.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>
