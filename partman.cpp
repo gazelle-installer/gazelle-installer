@@ -327,6 +327,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
             if (save) {
                 config.setValue("Size", partit->size);
                 if (partit->isActive()) config.setValue("Active", true);
+                if (partit->flags.sysEFI) config.setValue("ESP", true);
                 if (partit->addToCrypttab) config.setValue("AddToCrypttab", true);
                 if (!partit->usefor.isEmpty()) config.setValue("UseFor", partit->usefor);
                 if (!partit->format.isEmpty()) config.setValue("Format", partit->format);
@@ -343,6 +344,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                     if (sizeTotal > sizeMax) return false;
                     if (config.value("Active").toBool()) partit->setActive(true);
                 }
+                partit->flags.sysEFI = config.value("ESP", partit->flags.sysEFI).toBool();
                 partit->addToCrypttab = config.value("AddToCrypttab").toBool();
                 partit->usefor = config.value("UseFor", partit->usefor).toString();
                 partit->format = config.value("Format", partit->format).toString();
@@ -501,6 +503,7 @@ void PartMan::treeMenu(const QPoint &)
         else if (action == actAddCrypttab) twit->addToCrypttab = action->isChecked();
         else if (action == actESP) {
             twit->flags.sysEFI = action->isChecked();
+            twit->autoFill(1 << Format);
             notifyChange(twit);
         } else if (action == actNewSubvolume) {
             DeviceItem *subvol = new DeviceItem(DeviceItem::Subvolume, twit);
@@ -929,6 +932,24 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
 }
 bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
 {
+    if (proc.detectEFI()) {
+        const char *msgtext = nullptr;
+        auto fitefi = mounts.find("/boot/efi");
+        if (fitefi == mounts.end()) {
+            msgtext = QT_TR_NOOP("This system uses EFI, but no valid"
+                " EFI system partition was assigned to /boot/efi separately.");
+        } else if (!fitefi->second->flags.sysEFI) {
+            msgtext = QT_TR_NOOP("The volume assigned to /boot/efi"
+                " is not a valid EFI system partition.");
+        }
+        if (msgtext) {
+            msgbox.setText(tr(msgtext) + '\n' + tr("Are you sure you want to continue?"));
+            if (msgbox.exec() != QMessageBox::Yes) return false;
+        }
+        return true;
+    }
+
+    // BIOS with GPT
     QString biosgpt;
     for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
         DeviceItem *drvit = root.child(ixdrv);
@@ -1423,7 +1444,7 @@ void PartMan::mountPartitions()
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = it.second->mappedDevice();
         proc.status(tr("Mounting: %1").arg(it.first));
-        if (it.first == "/boot") {
+        if (it.first == "/boot" && it.second->finalFormat()=="ext4") {
              // needed to run fsck because sfdisk --part-type can mess up the partition
             proc.exec("fsck.ext4", {"-y", dev});
         }
@@ -2008,7 +2029,9 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
         if (type != VirtualBD) {
             if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
             if (all || size <= 8*GB) {
-                if (size < (2*TB - 512)) checkAndAdd("/boot/efi");
+                if (size < (2*TB - 512)) {
+                    if (all || flags.sysEFI || size <= 512*MB) checkAndAdd("/boot/efi");
+                }
                 checkAndAdd("/boot"); // static files of the boot loader
             }
         }
