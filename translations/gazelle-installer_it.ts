@@ -472,9 +472,8 @@ Se hai bisogno di un maggior controllo riguardo la posizione di installazione di
         <translation>&lt;i&gt;Formato&lt;/i&gt; - Questo è il formato della partizione. I formati disponibili dipendono dallo scopo per cui viene utilizzata la partizione. Quando si lavora con una configurazione esistente, è possibile mantenere il formato della partizione selezionando &lt;b&gt;Preserva&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Selezionando &lt;b&gt;Preserva /home&lt;/b&gt; per la partizione root, preserva i contenuti della directory /home, eliminando tutto il resto. Questa opzione può essere usata solo quando /home è nella stessa partizione di root.</translation>
+        <translation type="vanished">Selezionando &lt;b&gt;Preserva /home&lt;/b&gt; per la partizione root, preserva i contenuti della directory /home, eliminando tutto il resto. Questa opzione può essere usata solo quando /home è nella stessa partizione di root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -705,6 +704,11 @@ Se hai bisogno di un maggior controllo riguardo la posizione di installazione di
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2089,9 +2093,13 @@ Il programma di installazione non scriverà alcuna password, ne impostazioni che
 Si tenga conto che queste funzioni sono sperimentali. Le future versioni dell&apos;installer potrebbero rompere la compatibilità con i file di configurazione esistenti.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Spegnimento automatico alla fine dell&apos;installazione.</translation>
+        <translation type="vanished">Spegnimento automatico alla fine dell&apos;installazione.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

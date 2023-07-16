@@ -471,9 +471,8 @@ Lykke til med %1.</translation>
         <translation>&lt;i&gt;Format&lt;/i&gt; – partisjonens format. Tilgjengelige format avhenger av hva partisjonen skal brukes til. Opprinnelig format kan bevares ved å velge &lt;b&gt;Bevar&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Valget &lt;b&gt;Bevar /home&lt;/b&gt; for rotpartisjonen bevarer innholdet i /home-mappa og sletter alt annet. Dette kan kun velges når /home er på samme partisjon som rot.</translation>
+        <translation type="vanished">Valget &lt;b&gt;Bevar /home&lt;/b&gt; for rotpartisjonen bevarer innholdet i /home-mappa og sletter alt annet. Dette kan kun velges når /home er på samme partisjon som rot.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Lykke til med %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2085,9 +2089,13 @@ Installasjonsprogrammet skriver ingen passord eller ignorerte alternativer til n
 Legg merke til at dette er eksperimentelt. Framtidige versjoner vil ikke nødvendigvis være kompatible med eksisterende oppsettsfiler.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Slå av automatisk ved fullført installasjon.</translation>
+        <translation type="vanished">Slå av automatisk ved fullført installasjon.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

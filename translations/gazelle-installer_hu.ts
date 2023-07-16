@@ -470,9 +470,8 @@ Használja örömmel az %1-ot</translation>
         <translation>&lt;i&gt;Formátum&lt;/i&gt; - Ez a partíció formátuma. A rendelkezésre álló formátumok attól függnek, hogy mire használja a partíciót. Ha egy meglévő elrendezéssel dolgozik, a &lt;b&gt;Megőrzés&lt;/b&gt; kiválasztásával megtarthatja a partíció formátumát.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>A &lt;b&gt;/home megőrzése&lt;/b&gt; a gyökérpartícióhoz kiválasztása megőrzi a /home könyvtár tartalmát, minden mást törölve. Ez a beállítás csak akkor használható, ha a /home ugyanazon a partíción van, mint a gyökérkönyvtár.</translation>
+        <translation type="vanished">A &lt;b&gt;/home megőrzése&lt;/b&gt; a gyökérpartícióhoz kiválasztása megőrzi a /home könyvtár tartalmát, minden mást törölve. Ez a beállítás csak akkor használható, ha a /home ugyanazon a partíción van, mint a gyökérkönyvtár.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -703,6 +702,11 @@ Használja örömmel az %1-ot</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2086,9 +2090,13 @@ A telepítő nem ír jelszavakat vagy figyelmen kívül hagyott beállításokat
 Vegye figyelembe, hogy ez kísérleti jellegű. A telepítő jövőbeli verziói nem feltétlenül lesznek kompatibilisek a meglévő konfigurációs fájlokkal.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>A telepítés befejeztével automatikusan kikapcsol.</translation>
+        <translation type="vanished">A telepítés befejeztével automatikusan kikapcsol.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

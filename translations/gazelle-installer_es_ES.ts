@@ -471,9 +471,8 @@ Disfruta usando %1</translation>
         <translation>&lt;i&gt;Formato&lt;/i&gt; - Este es el formato de la partición. Los formatos disponibles dependen de para qué se usa la partición. Cuando trabaje con un diseño existente, es posible que pueda conservar el formato de la partición seleccionando &lt;b&gt;Conservar&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Al seleccionar &lt;b&gt;Preservar /home&lt;/b&gt; para la partición root se preserva el contenido del directorio /home, borrando todo lo demás. Esta opción sólo puede utilizarse cuando /home está en la misma partición que root.</translation>
+        <translation type="vanished">Al seleccionar &lt;b&gt;Preservar /home&lt;/b&gt; para la partición root se preserva el contenido del directorio /home, borrando todo lo demás. Esta opción sólo puede utilizarse cuando /home está en la misma partición que root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -704,6 +703,11 @@ Disfruta usando %1</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2087,9 +2091,13 @@ El instalador no escribirá contraseñas ni configuraciones ignoradas en el nuev
 Tenga en cuenta que esto es experimental. Las versiones futuras del instalador pueden romper la compatibilidad con los archivos de configuración existentes.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Apagar automáticamente cuando termine la instalación.</translation>
+        <translation type="vanished">Apagar automáticamente cuando termine la instalación.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

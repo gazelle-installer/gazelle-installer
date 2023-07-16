@@ -470,9 +470,8 @@ Enjoy using %1.</translation>
         <translation>&lt;i&gt;Format&lt;/i&gt; - Acesta este formatul partiției. Formatele disponibile depind de pentru ce este folosită partiția. Când lucrați cu un aspect existent, este posibil să puteți păstra formatul partiției selectând &lt;b&gt;Păstrare&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation>Selectarea &lt;b&gt;Păstrare /home&lt;/b&gt; pentru partiția rădăcină (root) păstrează conținutul directorului /home, ștergând orice altceva. Această opțiune poate fi folosită numai când /home este pe aceeași partiție cu root.</translation>
+        <translation type="vanished">Selectarea &lt;b&gt;Păstrare /home&lt;/b&gt; pentru partiția rădăcină (root) păstrează conținutul directorului /home, ștergând orice altceva. Această opțiune poate fi folosită numai când /home este pe aceeași partiție cu root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -703,6 +702,11 @@ Enjoy using %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2078,9 +2082,13 @@ Programul de instalare nu va scrie nicio parolă sau setări ignorate în noul f
 Vă rugăm să luați în considerare că acestă opțiune este experimentală. Versiunile viitoare de instalare pot rupe compatibilitatea cu fișierele de configurare existente.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
         <source>Shutdowns automatically when done installing.</source>
-        <translation>Se oprește automat la finalizarea instalării.</translation>
+        <translation type="vanished">Se oprește automat la finalizarea instalării.</translation>
+    </message>
+    <message>
+        <location filename="../app.cpp" line="102"/>
+        <source>Shutdown automatically when done installing.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>

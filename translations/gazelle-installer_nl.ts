@@ -470,11 +470,6 @@ Veel plezier met %1</translation>
         <translation>&lt;i&gt;Formaat&lt;/i&gt; - Dit is het formaat van de partitie. Beschikbare formaten zijn afhankelijk van waarvoor de partitie wordt gebruikt. Als u met een bestaande lay-out werkt, kunt u mogelijk de indeling van de partitie behouden door &lt;b&gt;Behouden&lt;/b&gt; te selecteren.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="694"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
         <translation type="unfinished"></translation>
@@ -703,6 +698,11 @@ Veel plezier met %1</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="692"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2087,7 +2087,7 @@ Let op, dit is experimenteel. Toekomstige installatieversies kunnen de compatibi
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
-        <source>Shutdowns automatically when done installing.</source>
+        <source>Shutdown automatically when done installing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
