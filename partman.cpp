@@ -172,11 +172,8 @@ void PartMan::scan(DeviceItem *drvstart)
             partit->curFormat = jsonPart["fstype"].toString();
             if (partit->curFormat == "vfat") partit->curFormat = jsonPart["fsver"].toString();
             if (partTypeName == "BIOS boot") partit->curFormat = "BIOS-GRUB";
-            // Touching MacOS first drive, or MS LDM may brick the system.
-            if ((proc.detectMac() && partit->device.startsWith("sda"))
-                || partTypeName.startsWith("Microsoft LDM")) {
-                partit->flags.nasty = true;
-            }
+            // Touching Microsoft LDM may brick the system.
+            if (partTypeName.startsWith("Microsoft LDM")) partit->flags.nasty = true;
             // Propagate the boot and nasty flags up to the drive.
             if (partit->flags.bootRoot) drvit->flags.bootRoot = true;
             if (partit->flags.nasty) drvit->flags.nasty = true;
