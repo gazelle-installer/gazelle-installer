@@ -1444,10 +1444,6 @@ void PartMan::mountPartitions()
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = it.second->mappedDevice();
         proc.status(tr("Mounting: %1").arg(it.first));
-        if (it.first == "/boot" && it.second->finalFormat()=="ext4") {
-             // needed to run fsck because sfdisk --part-type can mess up the partition
-            proc.exec("fsck.ext4", {"-y", dev});
-        }
         QStringList opts;
         if (it.second->type == DeviceItem::Subvolume) {
             opts.append("subvol=" + it.second->label);
