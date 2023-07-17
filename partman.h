@@ -36,7 +36,7 @@
 #define PB 1125899906842624LL
 #define EB 1152921504606846976LL
 
-#define PARTMAN_SAFETY (8*MB) // 1MB at start + Compensate for rounding errors.
+#define PARTMAN_SAFETY (2*MB) // 1MB at start + Compensate for rounding errors.
 #define PARTMAN_MAX_PARTS 128 // Maximum number of partitions Linux supports.
 
 class DeviceItem
