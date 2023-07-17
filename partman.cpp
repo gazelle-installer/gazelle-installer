@@ -107,10 +107,6 @@ void PartMan::scan(DeviceItem *drvstart)
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
 
-    if (!drvstart) {
-        proc.exec("partprobe", {"-s"}); // Inform the kernel of partition changes.
-        proc.exec("blkid", {"-c", "/dev/null"}); // Refresh cached blkid information.
-    }
     // Partitions listed in order of their physical locations.
     QStringList order;
     QString curdev;
@@ -1091,8 +1087,6 @@ void PartMan::prepStorage()
     luksFormat();
     formatPartitions();
     mountPartitions();
-    // Run blkid -c /dev/null to freshen UUID cache
-    proc.exec("blkid", {"-c", "/dev/null"});
     // Refresh the UUIDs
     proc.exec("lsblk", {"--list", "-bJo", "PATH,UUID"}, nullptr, true);
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(proc.readOut(true).toUtf8()).object();
@@ -1177,6 +1171,7 @@ void PartMan::preparePartitions()
     // Prepare partition tables, creating tables and partitions when needed.
     proc.status(tr("Preparing required partitions"));
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
+        bool partupdate = false;
         DeviceItem *drvit = root.child(ixi);
         if (drvit->type == DeviceItem::VirtualDevices) continue;
         const int devCount = drvit->childCount();
@@ -1195,6 +1190,7 @@ void PartMan::preparePartitions()
                 if (twit->flags.sysEFI) ptype = useGPT ? "ef00" : "ef";
                 const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
                 proc.shell(cmd.arg(devsplit.drive, devsplit.partition, ptype));
+                partupdate = true;
                 proc.status();
             }
         } else {
@@ -1205,6 +1201,7 @@ void PartMan::preparePartitions()
                 const long long end = start + twit->size / MB;
                 proc.exec("parted", {"-s", "--align", "optimal", drvit->path,
                     "mkpart" , "primary", QString::number(start) + "MiB", QString::number(end) + "MiB"});
+                partupdate = true;
                 start = end;
                 proc.status();
             }
@@ -1219,17 +1216,19 @@ void PartMan::preparePartitions()
                 cargs.append(useGPT ? "legacy_boot" : "boot");
                 cargs.append("on");
                 proc.exec("parted", cargs);
+                partupdate = true;
             }
             if (twit->flags.sysEFI != twit->flags.curESP) {
                 const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
                 proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition,
                     "esp", twit->flags.sysEFI ? "on" : "off"});
+                partupdate = true;
             }
             proc.status();
         }
+        // Update kernel partition records.
+        if (partupdate) proc.exec("partx", {"-u", drvit->path});
     }
-    sect.setExceptionMode(nullptr);
-    proc.exec("partprobe", {"-s"});
 }
 
 void PartMan::luksFormat()
@@ -1413,10 +1412,13 @@ bool PartMan::makeFstab()
         if (twit->willMap()) out << dev;
         else out << "UUID=" << twit->assocUUID();
         // Mount point, file system
-        proc.exec("blkid", {dev, "-o", "value", "-s", "TYPE"}, nullptr, true);
-        const QString &fsfmt = proc.readOut();
+        const QString &fsfmt = twit->finalFormat();
         if (fsfmt == "swap") out << " swap swap";
-        else out << ' ' << it.first << ' ' << fsfmt;
+        else {
+            out << ' ' << it.first;
+            if (fsfmt.startsWith("FAT")) out << " vfat";
+            else out << ' ' << fsfmt;
+        }
         // Options
         const QString &mountopts = twit->options;
         if (twit->type == DeviceItem::Subvolume) {
