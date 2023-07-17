@@ -115,30 +115,26 @@ Minimum: %2</source>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Проверяется установочный носитель.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите ESC для пропуска.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Установочный носитель повреждён.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>Уверены, что хотите пропустить проверку установочного носителя?</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Системный раздел EFI</translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -148,22 +144,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>только отформатировать</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Создать</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Сохранить</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Сохранить (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Сохранить /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -418,41 +398,9 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Использовать для&lt;/i&gt; - Чтобы использовать этот раздел в установке, вы должны выбрать что-то здесь.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Format - Отформатировать, но не монтировать.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - Загрузочный BIOS-раздел GPT для GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - Системный раздел EFI.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - Менеджер загрузки (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - Корень системы (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - Раздел подкачки.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Данные пользователя (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Также Вы можете создать свои точки монтирования. Они должны начинаться с косой черты (/).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Программа установки понимает «/boot», «/» и «/home» как «boot», «root» и «home» соответственно.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -468,10 +416,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Формат&lt;/i&gt; - Это формат раздела. Доступные форматы зависят от того, для чего используется раздел. Для работы с существующим разделом вы можете сохранить его формат, выбрав &lt;b&gt;Сохранить&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">Выбор параметра &lt;b&gt;Сохранить /home&lt;/b&gt; для корневого раздела сохраняет содержимое каталога /home, удаляя всё остальное. Этот параметр можно использовать только в том случае, если /home находится в том же разделе, что и root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -662,7 +606,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Системный раздел EFI</translation>
+        <translation>Системный раздел EFI</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1046,21 +990,6 @@ Do you really want to stop now?</source>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Особая благодарность&lt;/b&gt;&lt;br/&gt;Спасибо всем, кто поддержал %1 времeнем, деньгaми, предложениями, работой, похвалaми, идеями, продвижением в сообществах и/или поощрениями.&lt;/p&gt;&lt;p&gt;Без Вас не было бы %1.&lt;/p&gt;&lt;p&gt;Команда разработчиков %2&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Использовать пароль</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Скрыть пароль</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Отображать пароль</translation>
     </message>
 </context>
 <context>
@@ -1571,7 +1500,7 @@ Please select a different name.</source>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Вы действительно хотите продолжить?</translation>
+        <translation>Вы действительно хотите продолжить?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1651,7 +1580,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Системный раздел EFI</translation>
+        <translation>Системный раздел EFI</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1682,10 +1611,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Разблокировать диск</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Виртуальное устройство:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1950,54 +1875,6 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation>Монтирование: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Модель: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Свободное место: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Устройство</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Размер</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Использовать для</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Метка</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Зашифровать</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Формат</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Проверка</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Опции</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Дамп</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Проход</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -2039,12 +1916,12 @@ Please select a different name.</source>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Скрыть пароль</translation>
+        <translation>Скрыть пароль</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Отображать пароль</translation>
+        <translation>Отображать пароль</translation>
     </message>
 </context>
 <context>
@@ -2082,10 +1959,6 @@ Please note, this is experimental. Future installer versions may break compatibi
 Установщик создает (или перезаписывает) /mnt/antiX/etc/minstall.conf и сохраняет копию в /etc/minstalled.conf для дальнейшего использования.
 Установщик не будет записывать никакие пароли или игнорируемые настройки в новый конфигурационный файл.
 Пожалуйста, обратите внимание, что это экспериментально. Будущие версии установщика могут нарушить совместимость с существующими файлами конфигурации.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Автоматически отключается по завершении установки.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
@@ -2147,7 +2020,7 @@ This will start automatically if installed with --oem option.</source>
     <message>
         <location filename="../app.cpp" line="117"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Всегда проверять установочный носитель в самом начале.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="118"/>

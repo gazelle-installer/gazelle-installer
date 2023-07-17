@@ -144,10 +144,6 @@ Minimum: %2</source>
         <source>format only</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Napravi</translation>
-    </message>
 </context>
 <context>
     <name>DeviceItemDelegate</name>
@@ -1875,22 +1871,6 @@ Molim odaberite drugo ime.</translation>
         <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Uređaj</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Veličina</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formatiraj</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Opcije</translation>
     </message>
 </context>
 <context>

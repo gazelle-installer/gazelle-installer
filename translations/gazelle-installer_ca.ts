@@ -116,30 +116,26 @@ Mínim: %2</translation>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprovant el suport d&apos;instal·lació</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Premeu ESC per ometre.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>El suport d&apos;instal·lació està malmès.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>Esteu segur de voler ometre la comprovació del suport d&apos;instal·lació?</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Partició de Sistema EFI </translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -149,22 +145,6 @@ Mínim: %2</translation>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>només formata </translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Crea</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Preserva</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Conserva (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Preserva /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -263,7 +243,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="437"/>
         <source>The installation was aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>S&apos;ha interromput la instal·lació.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="523"/>
@@ -419,41 +399,9 @@ Gaudiu usant %1</translation>
         <translation>&lt;i&gt;Usa Per&lt;/i&gt; - Per usar aquesta partició en la instal·lació, cal que hi seleccioneu quelcom aquí.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Format - Formata sense muntar.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">Partició BIOS-GRUB - BIOS Boot GPT per al GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - Partició de Sistema EFI.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - Gestor d&apos;arrencada (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - Arrel del sistema (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - Espai d&apos;intercanvi.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - dades d&apos;usuari (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>A més d&apos;aquests,  podeu crear els vostres punts de muntatge. Aquests han de començar per una barra inclinada (&quot;/&quot;).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">L&apos;instal·lador tracta &quot;/boot&quot;, &quot;/&quot;, i &quot;/home&quot; exactament com &quot;boot&quot;, &quot;root&quot;, i &quot;home&quot;, respectivament.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -469,10 +417,6 @@ Gaudiu usant %1</translation>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Format&lt;/i&gt; - Aquest és el format de la partició. Els formats disponibles depenen de l&apos;ús de la partició. Quan treballeu amb una disposició existent, podeu preservar el format de la partició seleccionant &lt;b&gt;Conserva&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">En seleccionar &lt;b&gt;Preserva /home&lt;/b&gt; per la nova partició arrel preserva el contingut del directori  /home, esborrant la resta. Aquesta opció només es pot usar quan  /home està a la mateixa partició que l&apos;arrel.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -652,78 +596,78 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="674"/>
         <source>Format without mounting</source>
-        <translation type="unfinished"></translation>
+        <translation>Formata sense muntar</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="675"/>
         <source>BIOS Boot GPT partition for GRUB</source>
-        <translation type="unfinished"></translation>
+        <translation>Partició d&apos;arrencada BIOS GPT per GRUB</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished"></translation>
+        <translation>Partició de Sistema EFI </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
         <source>Boot manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestor d&apos;arrencada</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="679"/>
         <source>System root</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrel del Sistema</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="680"/>
         <source>User data</source>
-        <translation type="unfinished"></translation>
+        <translation>Dades d&apos;usuari</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="681"/>
         <source>Static data</source>
-        <translation type="unfinished"></translation>
+        <translation>Dades estàtiques</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="682"/>
         <source>Variable data</source>
-        <translation type="unfinished"></translation>
+        <translation>Dades variables</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="683"/>
         <source>Temporary files</source>
-        <translation type="unfinished"></translation>
+        <translation>Fitxers temporals</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="684"/>
         <source>Swap files</source>
-        <translation type="unfinished"></translation>
+        <translation>Fitxers d&apos;intercanvi</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
-        <translation type="unfinished"></translation>
+        <translation>Partició d&apos;intercanvi</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>En seleccionar&lt;b&gt;Preserva /home&lt;/b&gt; per la partició arrel preserva el contingut del directori /home, eliminant tota la resta. Aquesta opció només es pot usar quan  /home està a la mateixa partició que l&apos;arrel.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="716"/>
         <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si el vostre sistema usa la Extensible Firmware Interface (EFI), cal una partició anomenada EFI System Partition (ESP) per arrencar el sistema.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="717"/>
         <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquests sistemes no necessiten una partició marcada com a Activa, però, en canvi, cal una partició formatada amb el Sistema de Fitxers FAT, marcada com a ESP.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="718"/>
         <source>Most systems built within the last 10 years use EFI.</source>
-        <translation type="unfinished"></translation>
+        <translation>Molts sistemes fabricats en els darrers 10 anys usen EFI.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="729"/>
@@ -1050,21 +994,6 @@ De debò voleu aturar-la ara?</translation>
     </message>
 </context>
 <context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Contrasenya d&apos;usuari </translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Amaga la contrasenya</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Mostra la contrasenya</translation>
-    </message>
-</context>
-<context>
     <name>MeInstall</name>
     <message>
         <location filename="../meinstall.ui" line="43"/>
@@ -1208,12 +1137,12 @@ De debò voleu aturar-la ara?</translation>
     <message>
         <location filename="../meinstall.ui" line="698"/>
         <source>Show Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra la Graella</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="705"/>
         <source>Ctrl+G</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+G</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="715"/>
@@ -1573,12 +1502,12 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../oobe.cpp" line="511"/>
         <source>You did not provide a passphrase for %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>No heu donat la contrasenya per %1.</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Esteu segurs de voler continuar?</translation>
+        <translation>Esteu segurs de voler continuar?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1658,7 +1587,7 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished"></translation>
+        <translation>Partició de Sistema EFI </translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1689,10 +1618,6 @@ Si us plau, trieu un nom diferent. </translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Desbloqueja la unitat</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Dispositiu virtual:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1742,37 +1667,37 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="795"/>
         <source>Reuse (no reformat) %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Reutilitza (sense reformatar) %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="816"/>
         <source>Reuse subvolume %1 as %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Reutilitza el subvolum %1 com a %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="818"/>
         <source>Delete subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Esborra el subvolum %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobreescriu el subvolum %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="822"/>
         <source>Overwrite subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobreescriu el subvolum %1 per usar-lo per %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea el subvolum %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="825"/>
         <source>Create subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Crea el subvolum %1 per usar per %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="840"/>
@@ -1855,12 +1780,12 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="936"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aquest sistema usa EFI, però s&apos;ha assignat separadament una partició de sistema EFI no vàlida a /boot/efi.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="939"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>El volum assignat a /boot/efi no és una partició de sistema EFI vàlida.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1012"/>
@@ -1957,101 +1882,53 @@ Si us plau, trieu un nom diferent. </translation>
         <source>Mounting: %1</source>
         <translation>Muntant: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Model: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Espai lliure: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Dispositiu </translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Mida </translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Usa Com </translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Etiqueta </translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Encripta</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Format </translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Comprova</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Opcions </translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Dump</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Pass</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Negligible</source>
-        <translation type="unfinished"></translation>
+        <translation>Negligible</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Very weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Molt feble</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Feble</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>Moderat</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Fort</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Very strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Molt Fort</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="147"/>
         <source>Password strength: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Robustesa de la contrasenya: %1</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Amaga la contrasenya</translation>
+        <translation>Amaga la contrasenya</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Mostra la contrasenya</translation>
+        <translation>Mostra la contrasenya</translation>
     </message>
 </context>
 <context>
@@ -2091,13 +1968,9 @@ L&apos;instal·lador no escriurà cap contrasenya o ajustos desconeguts al nou f
 Tingueu en compte que això és experimental. Les futures versions de l&apos;instal·lador poden trencar la compatibilitat amb els fitxers d&apos;instal·lació actuals.</translation>
     </message>
     <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Apaga automàticament en acabar la instal·lació.</translation>
-    </message>
-    <message>
         <location filename="../app.cpp" line="102"/>
         <source>Shutdown automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Atura automàticament en acabar la instal·lació.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>
@@ -2152,13 +2025,14 @@ Arrencarà automàticament si s&apos;ha instal·lat amb l&apos;opció --oem.</tr
     <message>
         <location filename="../app.cpp" line="117"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Comproveu sempre el suport d&apos;instal·lació en començar.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="118"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>No comprova el suport d&apos;instal·lació en començar.
+No es recomana, llevat que el suport d&apos;instal·lació garanteixi estar lliure d&apos;errors.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>

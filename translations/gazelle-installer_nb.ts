@@ -116,30 +116,26 @@ Minimum: %2</translation>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrollerer installasjonsmediet.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Trykk Esc for å avbryte.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Installasjonsmediet er ødelagt.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vil du avbryte kontrollen av installasjonsmediet?</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI-systempartisjon</translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -149,22 +145,6 @@ Minimum: %2</translation>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>kun formatering</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Opprett</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Bevar</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Bevar (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Bevar /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -263,7 +243,7 @@ Lykke til med %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="437"/>
         <source>The installation was aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Installasjonen ble avbrutt.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="523"/>
@@ -419,41 +399,9 @@ Lykke til med %1.</translation>
         <translation>&lt;i&gt;Bruk til&lt;/i&gt; – velg noe her for å bruke partisjonen ved installering.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Formater – formater uten montering.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB – GPT-partisjon for GRUB, BIOS-oppstart.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI – EFI-systempartisjon.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot – oppstartsbehandler (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root – systemrota (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap – vekselminne.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home – brukerdata (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Du kan også skrive inn selvvalgte monteringspunkter. Disse må starte med skråstrek («/»).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Installasjonsprogrammet betrakter «/boot», «/» og «/home» som henholdsvis «boot», «root» og «home».</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -469,10 +417,6 @@ Lykke til med %1.</translation>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Format&lt;/i&gt; – partisjonens format. Tilgjengelige format avhenger av hva partisjonen skal brukes til. Opprinnelig format kan bevares ved å velge &lt;b&gt;Bevar&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">Valget &lt;b&gt;Bevar /home&lt;/b&gt; for rotpartisjonen bevarer innholdet i /home-mappa og sletter alt annet. Dette kan kun velges når /home er på samme partisjon som rot.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -663,7 +607,7 @@ Lykke til med %1.</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI-systempartisjon</translation>
+        <translation>EFI-systempartisjon</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1050,21 +994,6 @@ Vil du virkelig avbryte nå?</translation>
     </message>
 </context>
 <context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Bruk passord</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Skjul passord</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Vis passord</translation>
-    </message>
-</context>
-<context>
     <name>MeInstall</name>
     <message>
         <location filename="../meinstall.ui" line="43"/>
@@ -1208,12 +1137,12 @@ Vil du virkelig avbryte nå?</translation>
     <message>
         <location filename="../meinstall.ui" line="698"/>
         <source>Show Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis rutenett</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="705"/>
         <source>Ctrl+G</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl + G</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="715"/>
@@ -1571,12 +1500,12 @@ Velg et annet brukernavn.</translation>
     <message>
         <location filename="../oobe.cpp" line="511"/>
         <source>You did not provide a passphrase for %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen passfrase for %1 ble oppgitt.</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Vil du virkelig fortsette?</translation>
+        <translation>Vil du virkelig fortsette?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1656,7 +1585,7 @@ Velg et annet brukernavn.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI-systempartisjon</translation>
+        <translation>EFI-systempartisjon</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1687,10 +1616,6 @@ Velg et annet brukernavn.</translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Lås opp disk</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Virtuell enhet:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1740,37 +1665,37 @@ Velg et annet brukernavn.</translation>
     <message>
         <location filename="../partman.cpp" line="795"/>
         <source>Reuse (no reformat) %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjenbruk (uten reformatering) %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="816"/>
         <source>Reuse subvolume %1 as %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjenbruk underområde %1 som %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="818"/>
         <source>Delete subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett underområde %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Overskriv underområde %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="822"/>
         <source>Overwrite subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Overskriv underområde %1 til bruk for %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Opprett underområde %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="825"/>
         <source>Create subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Opprett %1 til bruk for %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="840"/>
@@ -1955,101 +1880,53 @@ Velg et annet brukernavn.</translation>
         <source>Mounting: %1</source>
         <translation>Monterer: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Modell: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Ledig plass: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Enhet</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Størrelse</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Bruk som</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Navn</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Kryptering</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formater</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Kontroller</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Alternativer</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Dump</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Pass</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Negligible</source>
-        <translation type="unfinished"></translation>
+        <translation>Umerkelig</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Very weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldig svak</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Svak</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>Moderat</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Sterk</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Very strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Veldig sterk</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="147"/>
         <source>Password strength: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Passordstyrke: %1</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Skjul passord</translation>
+        <translation>Skjul passord</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Vis passord</translation>
+        <translation>Vis passord</translation>
     </message>
 </context>
 <context>
@@ -2087,10 +1964,6 @@ Dette oppsettet kan brukes med --auto for installasjon uten tilstedeværelse.
 Installasjonsprogrammet oppretter (eller overskriver) /mnt/antiX/etc/minstall.conf og lagrer en kopi til /etc/minstalled.conf for framtidig bruk.
 Installasjonsprogrammet skriver ingen passord eller ignorerte alternativer til ny oppsettsfil.
 Legg merke til at dette er eksperimentelt. Framtidige versjoner vil ikke nødvendigvis være kompatible med eksisterende oppsettsfiler.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Slå av automatisk ved fullført installasjon.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
@@ -2152,13 +2025,14 @@ Startes automatisk hvis installert med alternativet --oem.</translation>
     <message>
         <location filename="../app.cpp" line="117"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontroller alltid installasjonsmediet først.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="118"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke kontroller installasjonsmediet først.
+Dette anbefales kun hvis du vet det er feilfritt.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>

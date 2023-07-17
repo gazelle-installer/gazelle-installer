@@ -136,10 +136,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFİ Sistem Bölümü</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>takas alanı </translation>
@@ -148,22 +144,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>sadece biçimlendir</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Oluştur</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Koru</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Koru (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">/home (%1) dizinini Koru</translation>
     </message>
 </context>
 <context>
@@ -418,41 +398,9 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Kullanım İçin&lt;/i&gt; - Bu bölümü bir yüklemede kullanmak için burada seçime yapmalısınız.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Biçimlendirme - Bağlamadan biçimlendirin.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - GRUB için GPT BIOS Önyükleme bölümü.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - EFI Sistem Bölümü.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - Açılış yönetimi (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - Sistem kökü (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - Takas alanı.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Kullanıcı dosyaları (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Yukarıdakilere ek olarak, kendi bağlama noktanızı da yazabilirsiniz. Özel bağlama noktaları eğik çizgi (&quot;/&quot;) ile başlamalıdır.</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Yükleyici, &quot;/boot&quot;, &quot;/&quot; ve &quot;/home&quot; öğelerini sırasıyla &quot;boot&quot;, &quot;root&quot; ve &quot;home&quot; ile tamamen aynı şekilde ele alır.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -468,10 +416,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Biçim&lt;/i&gt; - Bu bölümün biçimidir. Eldeki biçimler bölümün ne için kullanıldığına bağlıdır. Varolan bir düzen ile çalışırken, &lt;b&gt;Koru&lt;/b&gt;&apos;yu seçerek bölümün biçimini koruyabilirsiniz.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">Kök bölüm için &lt;b&gt;Preserve /home&lt;/b&gt; öğesinin seçilmesi, /home dizininin içeriğini korur ve diğer her şeyi siler. Bu seçenek yalnızca /home, kök ile aynı bölümde olduğunda kullanılabilir.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -662,7 +606,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFİ Sistem Bölümü</translation>
+        <translation>EFİ Sistem Bölümü</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1046,21 +990,6 @@ Gerçekten şimdi durdurmak istiyor musunuz?</translation>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Teşekkürler&lt;/b&gt;&lt;br/&gt;%1&apos;i zamanı, parası, önerileri, çalışmaları, övgüleri, düşünceleri, tanıtımları ve/veya teşvikleriyle desteklemeyi seçen herkese teşekkürler.&lt;/p&gt;&lt;p&gt;Siz olmadan %1 olamazdı.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Parola kullan</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Şifreyi gizle</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Şifreyi göster</translation>
     </message>
 </context>
 <context>
@@ -1577,7 +1506,7 @@ Farklı bir ad seçin.</translation>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Devam etmek istediğinize emin misiniz?</translation>
+        <translation>Devam etmek istediğinize emin misiniz?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1657,7 +1586,7 @@ Farklı bir ad seçin.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFİ Sistem Bölümü</translation>
+        <translation>EFİ Sistem Bölümü</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1688,10 +1617,6 @@ Farklı bir ad seçin.</translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Sürücü Kilidini Aç</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Sanal Cihaz:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1956,54 +1881,6 @@ Farklı bir ad seçin.</translation>
         <source>Mounting: %1</source>
         <translation>Bağlanıyor: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Modeli: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Boş alan: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Aygıt</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Boyut</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Şunun için Kullan</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Etiket</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Şifrele</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Biçim</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Kontrol et</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Seçenekler</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Dök</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Geç</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -2045,12 +1922,12 @@ Farklı bir ad seçin.</translation>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Şifreyi gizle</translation>
+        <translation>Şifreyi gizle</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Şifreyi göster</translation>
+        <translation>Şifreyi göster</translation>
     </message>
 </context>
 <context>
@@ -2088,10 +1965,6 @@ Bu yapılandırma, katılımsız bir kurulum için --auto ile kullanılabilir.
 Yükleyici /mnt/antiX/etc/minstall.conf dosyasını oluşturur (veya üzerine yazar) ve ileride kullanmak üzere /etc/minstalled.conf dosyasına bir kopyasını kaydeder.
 Yükleyici, yeni yapılandırma dosyasına herhangi bir parola veya yoksayılan ayar yazmaz.
 Lütfen bunun deneysel olduğunu unutmayın. Gelecekteki yükleyici sürümleri, mevcut yapılandırma dosyalarıyla uyumluluğu bozabilir.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Kurulum tamamlandığında otomatik olarak kapanır.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>

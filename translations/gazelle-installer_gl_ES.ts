@@ -136,10 +136,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Partición do sistema EFI</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>espazo de intercambio</translation>
@@ -148,22 +144,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>só formato</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Crear</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Preservar</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Preservar (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Preservar /casa (%1)</translation>
     </message>
 </context>
 <context>
@@ -418,41 +398,9 @@ Disfruta usando %1.</translation>
         <translation>&lt;i&gt;Usar para&lt;/i&gt; - Para usar esta partición nunha instalación, debes seleccionar algo aquí.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Formato - Formato sen montar.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - Partición GPT de arranque da BIOS para GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - Partición do sistema EFI.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">Arranque - Xestor do arranque (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">raíz - Sistema raíz (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">intercambiar - Intercambiar espazo.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">inicio - datos da persoa usuaria (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Ademais do anterior, tamén pode escribir o seu propio punto de montaxe. Os puntos de montaxe personalizados deben comezar cunha barra (&quot;/&quot;).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">O instalador trata &quot;/boot&quot;, &quot;/&quot; e &quot;/home&quot; exactamente igual que &quot;boot&quot;, &quot;root&quot; e &quot;home&quot;, respectivamente.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -658,7 +606,7 @@ Disfruta usando %1.</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Partición do sistema EFI</translation>
+        <translation>Partición do sistema EFI</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1043,21 +991,6 @@ Interromper realmente o proceso agora?</translation>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Agradecementos&lt;/b&gt;&lt;br/&gt; a todos os que decidiron apoiar a% 1 co seu tempo, doazóns, suxestións, traballo, loanzas, ideas, promocionalo e / ou animándonos. &lt;/p&gt;&lt;p&gt;Sen eles% 1 non existiría.&lt;/p&gt;&lt;p&gt;O equipo de desenvolvemento% 2&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Usar contrasinal</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Agochar o contrasinal</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Amosar o contrasinal</translation>
     </message>
 </context>
 <context>
@@ -1569,7 +1502,7 @@ Escoller un nome diferente.</translation>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Tes a certeza de que queres continuar?</translation>
+        <translation>Tes a certeza de que queres continuar?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1649,7 +1582,7 @@ Escoller un nome diferente.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Partición do sistema EFI</translation>
+        <translation>Partición do sistema EFI</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1680,10 +1613,6 @@ Escoller un nome diferente.</translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Desbloquear unidade</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Dispositivo virtual:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1948,54 +1877,6 @@ Escoller un nome diferente.</translation>
         <source>Mounting: %1</source>
         <translation>Montando: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Modelo: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Espazo libre: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Dispositivo</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Tamaño</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Usar para</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Rótulo</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Encriptar</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formato</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Comprobar</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Opcións</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Botar</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Pasar</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -2037,12 +1918,12 @@ Escoller un nome diferente.</translation>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Agochar o contrasinal</translation>
+        <translation>Agochar o contrasinal</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Amosar o contrasinal</translation>
+        <translation>Amosar o contrasinal</translation>
     </message>
 </context>
 <context>

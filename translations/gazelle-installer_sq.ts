@@ -116,30 +116,26 @@ Shtëpia e %2%</translation>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Po kontrollohet media instalimi.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Që të anashkalohet, shtypni tastin ESC</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Media e instalimit është e dëmtuar.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeni i sigurt se doni të anashkalohet kontrolli i medias së instalimit?</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Pjesë EFI Sistemi</translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -149,22 +145,6 @@ Shtëpia e %2%</translation>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>vetëm formatim</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Krijoje</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Ruaje</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Ruaje (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Ruaje /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -263,7 +243,7 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="437"/>
         <source>The installation was aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalimi u ndërpre.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="523"/>
@@ -419,41 +399,9 @@ Shijoni përdorimin e %1-it</translation>
         <translation>&lt;i&gt;Përdore Për&lt;/i&gt; - Që këtë pjesë ta përdorni në një instalim, duhet të përzgjidhni diçka këtu.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Formatoje - Formatojeni pa e montuar.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - Pjesë BIOS Boot GPT për GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - Pjesë EFI Sistemi.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - Përgjegjës nisjesh (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - Rrënja e sistemit (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - Hapësirë swap.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Të dhëna përdoruesi (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Përtej sa më sipër, mundeni edhe të shtypni pikën tuaj të montimit. Pika vetjake montimi duhet të fillojnë me një pjerrake (&quot;/&quot;).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Instaluesi i trajton përkatësisht &quot;/boot&quot;, &quot;/&quot;, dhe &quot;/home&quot; saktësisht si &quot;boot&quot;, &quot;root&quot;, dhe &quot;home&quot;.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -469,10 +417,6 @@ Shijoni përdorimin e %1-it</translation>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Format&lt;/i&gt; - Ky është formati i pjesës. Formatet e mundshëm varen nga fakti se përse do të përdoret pjesa. Kur punohet me një skemë ekzistuese, mund të jeni në gjendje të ruani formatin e pjesës duke përzgjedhur &lt;b&gt;Ruaje&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">Përzgjedhja e &lt;b&gt;Ruaje /home&lt;/b&gt; për pjesën e rrënjës ruan lëndën e drejtorisë /home, duke fshirë gjithçka tjetër. Kjo mundësi mund të përdoret vetëm kur /home gjendet në të njëjtën pjesë me rrënjën.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -663,7 +607,7 @@ Shijoni përdorimin e %1-it</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Pjesë EFI Sistemi</translation>
+        <translation>Pjesë EFI Sistemi</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1050,21 +994,6 @@ Doni vërtet të ndalet tani?</translation>
     </message>
 </context>
 <context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Përdor fjalëkalim</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Fshihe fjalëkalimin</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Shfaqe fjalëkalimin</translation>
-    </message>
-</context>
-<context>
     <name>MeInstall</name>
     <message>
         <location filename="../meinstall.ui" line="43"/>
@@ -1208,12 +1137,12 @@ Doni vërtet të ndalet tani?</translation>
     <message>
         <location filename="../meinstall.ui" line="698"/>
         <source>Show Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Shfaqe Si Mozaik</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="705"/>
         <source>Ctrl+G</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+G</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="715"/>
@@ -1573,12 +1502,12 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../oobe.cpp" line="511"/>
         <source>You did not provide a passphrase for %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>S’dhatë frazëkalim për %1.</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Jeni i sigurt se doni të vazhdohet?</translation>
+        <translation>Jeni i sigurt se doni të vazhdohet?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1658,7 +1587,7 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Pjesë EFI Sistemi</translation>
+        <translation>Pjesë EFI Sistemi</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1689,10 +1618,6 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Shkyçe Diskun</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Pajisje Virtuale:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1742,37 +1667,37 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="795"/>
         <source>Reuse (no reformat) %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripërdore (pa riformatim) %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="816"/>
         <source>Reuse subvolume %1 as %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripërdor nënvëllimin %1 si %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="818"/>
         <source>Delete subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fshije nënvëllimin %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Mbishkruaje nënvëllimin %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="822"/>
         <source>Overwrite subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Mbishkruaje nënvëllimin %1 për ta përdorur për %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Krijoje nënvëllimin %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="825"/>
         <source>Create subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Krijoje nënvëllimin %1 për ta përdorur për %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="840"/>
@@ -1957,93 +1882,53 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <source>Mounting: %1</source>
         <translation>Po montohet: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Model: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Hapësirë e lirë: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Pajisje</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Madhësi</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Përdore Për</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Etiketë</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Fshehtëzoje</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formatoje</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Kontrolloje</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Mundësi</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Negligible</source>
-        <translation type="unfinished"></translation>
+        <translation>I neglizhueshëm</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Very weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Shumë i dobët</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Weak</source>
-        <translation type="unfinished"></translation>
+        <translation>I dobët</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>Çka</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Strong</source>
-        <translation type="unfinished"></translation>
+        <translation>I fortë</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Very strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Shumë i fortë</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="147"/>
         <source>Password strength: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fuqi fjalëkalimi: %1</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Fshihe fjalëkalimin</translation>
+        <translation>Fshihe fjalëkalimin</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Shfaqe fjalëkalimin</translation>
+        <translation>Shfaqe fjalëkalimin</translation>
     </message>
 </context>
 <context>
@@ -2081,10 +1966,6 @@ Ky formësim mund të përdore me --auto, për instalime pa u ndenjur mbi kokë.
 Instaluesi krijon (ose mbishkruan) /mnt/antiX/etc/minstall.conf dhe ruan një kopje te /etc/minstalled.conf, për përdorim në të ardhmen.
 Instaluesi s’do të shkruajë te kartela e re e formësimit ndonjë fjalëkalim, apo rregullime të shpërfillura.
 Ju lutemi, kini parasysh, kjo është eksperimentale. Versione të ardhshëm të instaluesit mund të mos jenë të përputhshëm me kartela ekzistuese formësimesh.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Bëhet fikje vetvetiu, kur të ketë përfunduar instalimi.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
@@ -2146,13 +2027,14 @@ Kjo do të instalohet automatikisht, nëse instalimi bëhet me mundësinë --oem
     <message>
         <location filename="../app.cpp" line="117"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Në fillim kontrollo përherë median e instalimit.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="118"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mos e kontrollo median e instalimit në fillim.
+Nuk rekomandohet, veç nëse është e garantuar se media e instalimit është pa gabime.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>

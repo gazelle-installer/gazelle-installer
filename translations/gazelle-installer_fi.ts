@@ -135,10 +135,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI Järjestelmäosio</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>sivutustiedoston tila</translation>
@@ -147,22 +143,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Luo</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Säilytä</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Säilytä (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Säilytä /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -417,18 +397,6 @@ Pidä hauskaa käyttäessäsi %1:ia</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Alustus - Alusta ilman liittämistä.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - EFI-järjestelmäosio.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Käyttäjän tiedostot (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation type="unfinished"></translation>
@@ -637,7 +605,7 @@ Pidä hauskaa käyttäessäsi %1:ia</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI Järjestelmäosio</translation>
+        <translation>EFI Järjestelmäosio</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1021,21 +989,6 @@ Haluatko varmasti lopettaa nyt?</translation>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Erityiskiitokset&lt;/b&gt;&lt;br/&gt;Kiitokset kaikille jotka ovat valinneet tukevansa %1 omalla ajalla, rahalla, ehdotuksilla, työllä, kehuilla, ideoilla, mainonnalla, ja/tai sitoutumisella.&lt;/p&gt;&lt;p&gt;Ilman teitä %1 ei olisi olemassa.&lt;/p&gt;&lt;p&gt;%2 Kehitystiimi&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Käytä salasanaa</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Piilota salasana</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Näytä salasana</translation>
     </message>
 </context>
 <context>
@@ -1552,7 +1505,7 @@ Valitse eri nimi.</translation>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Haluatko varmasti jatkaa?</translation>
+        <translation>Haluatko varmasti jatkaa?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1632,7 +1585,7 @@ Valitse eri nimi.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI Järjestelmäosio</translation>
+        <translation>EFI Järjestelmäosio</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1927,42 +1880,6 @@ Valitse eri nimi.</translation>
         <source>Mounting: %1</source>
         <translation>Liitetään: %1</translation>
     </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Tilaa vapaana: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Laite</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Koko</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Käytä tarkoitukseen</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Nimilappu</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Salaa</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Muoto</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Tarkista</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Asetukset</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -2004,12 +1921,12 @@ Valitse eri nimi.</translation>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Piilota salasana</translation>
+        <translation>Piilota salasana</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Näytä salasana</translation>
+        <translation>Näytä salasana</translation>
     </message>
 </context>
 <context>
