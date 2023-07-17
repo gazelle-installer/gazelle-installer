@@ -157,14 +157,17 @@ void Base::install()
         proc.shell("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home -exec rm -r {} \\;");
     }
 
-    MProcess::Section sect(proc);
     copyLinux(skiphome);
 
+    MProcess::Section sect(proc, QT_TR_NOOP("Failed to set the system configuration."));
     proc.advance(1, 1);
-    proc.status(tr("Creating system directories"));
+    proc.status(tr("Setting system configuration"));
     // make empty dir for opt. home already done.
     proc.mkpath("/mnt/antiX/opt", 0755);
     proc.mkpath("/mnt/antiX/tmp", 01777, true);
+    // Fix live setup to install before creating a chroot environment.
+    proc.shell("/usr/sbin/live-to-installed /mnt/antiX");
+    if (!partman.installTabs()) throw sect.failMessage();
     // Create a chroot environment.
     proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
     proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
@@ -172,9 +175,9 @@ void Base::install()
     proc.exec("mount", {"--mkdir", "-t", "tmpfs", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
     proc.exec("mount", {"--mkdir", "--rbind", "/run/udev", "/mnt/antiX/run/udev"});
 
-    proc.status(tr("Fixing configuration"));
-    // Copy live set up to install and clean up.
-    proc.shell("/usr/sbin/live-to-installed /mnt/antiX");
+    sect.setExceptionMode(nullptr);
+    proc.status();
+
     qDebug() << "Desktop menu";
     proc.exec("chroot", {"/mnt/antiX", "desktop-menu", "--write-out-global"});
 
@@ -209,7 +212,6 @@ void Base::install()
         proc.shell("mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
     }
 
-    partman.installTabs();
     // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
     if (populateMediaMounts) {
         proc.shell("make-fstab -O --install=/mnt/antiX --mntpnt=/media");
