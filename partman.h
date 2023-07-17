@@ -175,8 +175,8 @@ class PartMan : public QAbstractItemModel
     void preparePartitions();
     void formatPartitions();
     void prepareSubvolumes(DeviceItem *partit);
-    void fixCryptoSetup();
-    bool makeFstab();
+    bool makeCrypttab() noexcept;
+    bool makeFstab() noexcept;
     void mountPartitions();
     void treeItemChange() noexcept;
     void treeSelChange() noexcept;
@@ -229,7 +229,7 @@ public:
     void clearAllUses() noexcept;
     int countPrepSteps() noexcept;
     void prepStorage();
-    void installTabs();
+    bool installTabs() noexcept;
     void clearWorkArea();
     int swapCount() const noexcept;
     int isEncrypt(const QString &point) const noexcept;
