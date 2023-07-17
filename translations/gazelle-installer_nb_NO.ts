@@ -1864,14 +1864,6 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Størrelse</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Alternativer</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>

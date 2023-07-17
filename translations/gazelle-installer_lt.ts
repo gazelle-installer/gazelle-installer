@@ -114,7 +114,7 @@ Minimum: %2</source>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tikrinama diegimo laikmena.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
@@ -124,20 +124,16 @@ Minimum: %2</source>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Diegimo laikmena yra pažeista.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ar tikrai norite praleisti diegimo laikmenos tikrinimą?</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI sistemos skaidinys</translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -147,10 +143,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Sukurti</translation>
     </message>
 </context>
 <context>
@@ -610,7 +602,7 @@ Mėgaukitės, naudodami %1</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI sistemos skaidinys</translation>
+        <translation>EFI sistemos skaidinys</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -994,21 +986,6 @@ Ar tikrai, norite sustabdyti dabar?</translation>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ypatingos padėkos&lt;/b&gt;&lt;br/&gt;Dėkojame visiems, kas nusprendė palaikyti %1 savo laiku, pinigais, pasiūlymais, darbu, pagyrimais, idėjomis, reklama ir/arba padrąsinimu.&lt;/p&gt;&lt;p&gt;Be jūsų nebūtų jokios %1.&lt;/p&gt;&lt;p&gt;%2 plėtojimo komanda&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Naudoti slaptažodį</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Slėpti slaptažodį</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Rodyti slaptažodį</translation>
     </message>
 </context>
 <context>
@@ -1519,7 +1496,7 @@ Please select a different name.</source>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Ar tikrai norite tęsti?</translation>
+        <translation>Ar tikrai norite tęsti?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1599,7 +1576,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI sistemos skaidinys</translation>
+        <translation>EFI sistemos skaidinys</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1630,10 +1607,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Virtualus įrenginys:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1898,38 +1871,6 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation>Prijungiama: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Modelis: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Laisva vieta: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Įrenginys</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Dydis</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Etiketė</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Šifruoti</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formatuoti</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Parametrai</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -1971,12 +1912,12 @@ Please select a different name.</source>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Slėpti slaptažodį</translation>
+        <translation>Slėpti slaptažodį</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Rodyti slaptažodį</translation>
+        <translation>Rodyti slaptažodį</translation>
     </message>
 </context>
 <context>

@@ -1864,22 +1864,6 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Устройство</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Размер</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Табела</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Опции</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>

@@ -1870,10 +1870,6 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Định dạng</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>

@@ -135,10 +135,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished"> Sistema ng Partition ng EFI</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation type="unfinished"></translation>
@@ -606,7 +602,7 @@ Gamiting may kagalakan ang %1</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished"> Sistema ng Partition ng EFI</translation>
+        <translation> Sistema ng Partition ng EFI</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1585,7 +1581,7 @@ Pumili ng ibang pangalan.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished"> Sistema ng Partition ng EFI</translation>
+        <translation> Sistema ng Partition ng EFI</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1879,26 +1875,6 @@ Pumili ng ibang pangalan.</translation>
         <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Device</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Laki</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Label</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Format</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Mga pagpipilian</translation>
     </message>
 </context>
 <context>

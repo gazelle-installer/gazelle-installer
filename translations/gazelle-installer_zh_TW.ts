@@ -135,10 +135,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI 系統磁碟區</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation type="unfinished"></translation>
@@ -600,7 +596,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI 系統磁碟區</translation>
+        <translation>EFI 系統磁碟區</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1573,7 +1569,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI 系統磁碟區</translation>
+        <translation>EFI 系統磁碟區</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1867,18 +1863,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">加密</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">格式</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">選項</translation>
     </message>
 </context>
 <context>

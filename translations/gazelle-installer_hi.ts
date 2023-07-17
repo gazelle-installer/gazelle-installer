@@ -135,10 +135,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI सिस्टम विभाजन</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>स्वैप स्पेस</translation>
@@ -147,14 +143,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">बनाएँ</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">संरक्षण (%1)</translation>
     </message>
 </context>
 <context>
@@ -616,7 +604,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI सिस्टम विभाजन</translation>
+        <translation>EFI सिस्टम विभाजन</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1000,13 +988,6 @@ Do you really want to stop now?</source>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;विशिष्ट आभार&lt;/b&gt;&lt;br/&gt;उन सभी का धन्यवाद जिन्होंने अपने समय, धन राशि, सुझावों, कार्यों, प्रशंसा, विचारों, प्रचार व/या प्रोत्साहन के रूप में %1 का समर्थन किया।&lt;/p&gt;&lt;p&gt;आपके सहयोग के बिना %1 का अस्तित्व संभव नहीं था।&lt;/p&gt;&lt;p&gt;%2 सॉफ्टवेयर विकासकर्ता टीम&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">कूटशब्द प्रयुक्त करें</translation>
     </message>
 </context>
 <context>
@@ -1603,7 +1584,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI सिस्टम विभाजन</translation>
+        <translation>EFI सिस्टम विभाजन</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1897,34 +1878,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation>माउंट करना जारी : %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">उपकरण</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">आकार</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">उपयोग उद्देश्य</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">उपनाम</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">एन्क्रिप्ट करें</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">प्रारूप</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">विकल्प</translation>
     </message>
 </context>
 <context>
