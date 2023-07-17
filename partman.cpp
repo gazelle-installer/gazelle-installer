@@ -1278,7 +1278,6 @@ void PartMan::formatPartitions()
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(twit->device));
         else proc.status(fmtstatus.arg(twit->shownUseFor()));
         if (useFor == "BIOS-GRUB") {
-            proc.exec("dd", {"bs=64K", "if=/dev/zero", "of=" + dev});
             const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
         } else if (useFor == "SWAP") {
@@ -2016,7 +2015,9 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
     if (type != Subvolume) {
         checkAndAdd("FORMAT");
         if (type != VirtualBD) {
-            if (all || size <= 16*MB) checkAndAdd("BIOS-GRUB");
+            if (all || size <= 1*MB) {
+                if (parentItem && parentItem->willUseGPT()) checkAndAdd("BIOS-GRUB");
+            }
             if (all || size <= 8*GB) {
                 if (size < (2*TB - 512)) {
                     if (all || flags.sysEFI || size <= 512*MB) checkAndAdd("ESP");
