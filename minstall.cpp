@@ -105,7 +105,6 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
             phase = Ready;
         } catch (const char *msg) {
             proc.unhalt();
-            setupAutoMount(true);
             const bool closenow = (!msg || !*msg);
             if(!closenow) {
                 proc.log(QStringLiteral("FAILED START - ") + msg, MProcess::LOG_FAIL);
