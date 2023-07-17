@@ -144,10 +144,6 @@ Minimum: %2</source>
         <source>format only</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">创建</translation>
-    </message>
 </context>
 <context>
     <name>DeviceItemDelegate</name>
@@ -1873,30 +1869,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">驱动器</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">大小</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">标签</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">加密</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">格式化</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">选项</translation>
     </message>
 </context>
 <context>

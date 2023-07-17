@@ -135,10 +135,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">מחיצת מערכת EFI</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>שטח החלפה</translation>
@@ -147,22 +143,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>לפרמט בלבד</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">יצירה</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">שימור</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">לשמר (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">לשמר את ‎/home‏ (%1)</translation>
     </message>
 </context>
 <context>
@@ -408,41 +388,9 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;שימוש לטובת&lt;/i&gt; - כדי להשתמש במחיצה הזאת בהתקנה, חובה לבחור כאן משהו.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">פרמוט - לפרמט בלי לעגן.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - מחיצת GPT לטעינה מ־BIOS עבור GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - מחיצת מערכת EFI.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - מנהל טעינה (‎/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - תיקיית הבסיס של המערכת (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - שטח החלפה.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - נתוני המשתמש (‎/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>בנוסף לאמור, אפשר להקליד נקודת עיגון משלך. נקודות עיגון מותאמות אישית חייבות להיפתח בלוכסן („/”).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">תוכנית ההתקנה מתייחסת ל־„/boot”,‏ ‎”/„‎ ול־„/home” בדיוק כמו ל־„boot”,‏ „root” ול־„home” בהתאמה.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -648,7 +596,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">מחיצת מערכת EFI</translation>
+        <translation>מחיצת מערכת EFI</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1032,21 +980,6 @@ Do you really want to stop now?</source>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">להשתמש בסיסמה</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">הסתרת הסיסמה</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">הצגת הסיסמה</translation>
     </message>
 </context>
 <context>
@@ -1560,7 +1493,7 @@ Please select a different name.</source>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">להמשיך?</translation>
+        <translation>להמשיך?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1640,7 +1573,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">מחיצת מערכת EFI</translation>
+        <translation>מחיצת מערכת EFI</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1671,10 +1604,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>שחרור כונן</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">התקן וירטואלי:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1939,54 +1868,6 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation>עיגון: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">דגם: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">מקום פנוי: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">התקן</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">גודל</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">שימוש לטובת</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">תווית</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">הצפנה</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">פרמוט</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">בדיקה</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">אפשרויות</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">היטל</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">דילוג</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -2028,12 +1909,12 @@ Please select a different name.</source>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">הסתרת הסיסמה</translation>
+        <translation>הסתרת הסיסמה</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">הצגת הסיסמה</translation>
+        <translation>הצגת הסיסמה</translation>
     </message>
 </context>
 <context>

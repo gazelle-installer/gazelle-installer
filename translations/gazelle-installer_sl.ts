@@ -116,30 +116,26 @@ Najmanj: %2</translation>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Preverjanje namestitvenega nosilca.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pritisniti ESC za preskok.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Namestitveni nosilec je okvarjen.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ali želite res preskočiti preverjanje namestitvenega nosilca?</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI sistemski razdelek</translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -149,22 +145,6 @@ Najmanj: %2</translation>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>zgolj formatiranje</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Ustvari</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Ohrani</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Ohrani (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Ohrani /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -419,41 +399,9 @@ Uživajte v sistemu %1!</translation>
         <translation>&lt;i&gt;Uporabi za&lt;/i&gt; - Da bi ta razdelek uporabili pri namestitvi, morate tu nekaj izbrati.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Formatiranje - formatiraj brez priklapljanja.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - BIOS zagonski GPT razdelek za GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - EFI sistemski razdelek.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - zagonski upravljalnik (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - koren sistema (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - izmenjevalni prostor</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - uporabniški podatki (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Poleg naštetih je mogoče ustvariti tudi svojo točko priklopa. Lastne pirklopne točke se morajo začeti s poševnico (&quot;/&quot;).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Namestilnik obravnava &quot;/boot&quot;, &quot;/&quot;, in &quot;/home&quot; popolnoma na enak način kot &quot;boot&quot;, &quot;root&quot;, in  &quot;home&quot;.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -469,10 +417,6 @@ Uživajte v sistemu %1!</translation>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Vrsta&lt;/i&gt; - To je vrsta razdelka. Vrste, ki so na voljo, so odvisne od rabe razdelka. Če delate z obsotječim razporedom, lahko tudi ohranite vrsto razdelka z izbiro &lt;b&gt;Ohrani&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">Izbira &lt;b&gt;Ohrani /home&lt;/b&gt; za korenski razdelek ohrani vsebino /home direktorija in izbriše vse drugo. To možnost je mogoče izbrati le, če se /home nahaja na istem razdelku kot root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -663,7 +607,7 @@ Uživajte v sistemu %1!</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI sistemski razdelek</translation>
+        <translation>EFI sistemski razdelek</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1047,21 +991,6 @@ Ali bi jo res radi zaustavili?</translation>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Posebna zahvala&lt;/b&gt;&lt;br/&gt;Hvala vsem, ki se odločili podpreti %1 s svojim časom, denarjem, predlogi, delom, pohvalami, idejami, promoviranjem in/ali spodbujanjem.&lt;/p&gt;&lt;p&gt;Brez vas %1 ne bi obstajal.&lt;/p&gt;&lt;p&gt;%2 ravojna skupina&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Uporabniško geslo</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Skrij geslo</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Prikaži geslo</translation>
     </message>
 </context>
 <context>
@@ -1578,7 +1507,7 @@ Izberite drugo ime.</translation>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Želite nadaljevati?</translation>
+        <translation>Želite nadaljevati?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1658,7 +1587,7 @@ Izberite drugo ime.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI sistemski razdelek</translation>
+        <translation>EFI sistemski razdelek</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1689,10 +1618,6 @@ Izberite drugo ime.</translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Odkleni pogon</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Virtualna naprava:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1957,54 +1882,6 @@ Izberite drugo ime.</translation>
         <source>Mounting: %1</source>
         <translation>Priklapljanje: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Model: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Prostor na voljo: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Naprava</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Velikost</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Uporabi za</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Vrsta</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Šifriranje</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Format</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Preveri</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Možnosti</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Deponiraj</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Prehod</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -2046,12 +1923,12 @@ Izberite drugo ime.</translation>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Skrij geslo</translation>
+        <translation>Skrij geslo</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Prikaži geslo</translation>
+        <translation>Prikaži geslo</translation>
     </message>
 </context>
 <context>
@@ -2089,10 +1966,6 @@ To nastavitev je mogoče uporabiti z --auto za nenadzorovano namestitev.
 Namestitveni program ustvari (ali prepiše) /mnt/antiX/etc/minstall.conf in shrani kopijo na /etc(minstalled.conf za rabo v prihodnosti.
 Namestilnik ne bo zapisoval gesel ali neuporabljenih nastavitev v novo namestitveno datoteko.
 Pomnite, da je to eksperimentalno. Prihodnji namestilniki so lahko nezdružljivi s obstoječimi namestitvenimi datotekami.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Samodejni izklop po končani namestitvi.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
@@ -2154,13 +2027,14 @@ To bo samodejno zagnano ob namestitvi z --oem možnostjo.</translation>
     <message>
         <location filename="../app.cpp" line="117"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vedno na začetku preveri namestitveni nosilec.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="118"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Na začetku ne preveri namestitvenega nosilca.
+Ni priporočljivo, razen v primerih, ko je nosilec zagotovo brez napak.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>

@@ -136,10 +136,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Partiție de sistem EFI</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>spațiu de swap</translation>
@@ -148,22 +144,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>numai formatare</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Creează</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Păstrează</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Păstrează (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Păstrează /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -418,41 +398,9 @@ Enjoy using %1.</translation>
         <translation>&lt;i&gt;Utilizare pentru&lt;/i&gt; - Pentru a utiliza această partiție într-o instalare, trebuie să selectați ceva aici.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Format - Format fără montaj.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - BIOS Boot GPT partiție pentru GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - EFI Partiție Sistem.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - Manager de pornire (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - rădăcină de sistem (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - Spațiu de swap.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Date utilizator (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Pe lângă cele de mai sus, puteți introduce și propriul punct de montare. Punctele de montare personalizate trebuie să înceapă cu o bară oblică (&quot;/&quot;).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Programul de instalare tratează „/boot”, „/” și „/home” exact la fel ca „boot”, „root” și, respectiv, „home”.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -468,10 +416,6 @@ Enjoy using %1.</translation>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Format&lt;/i&gt; - Acesta este formatul partiției. Formatele disponibile depind de pentru ce este folosită partiția. Când lucrați cu un aspect existent, este posibil să puteți păstra formatul partiției selectând &lt;b&gt;Păstrare&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">Selectarea &lt;b&gt;Păstrare /home&lt;/b&gt; pentru partiția rădăcină (root) păstrează conținutul directorului /home, ștergând orice altceva. Această opțiune poate fi folosită numai când /home este pe aceeași partiție cu root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -662,7 +606,7 @@ Enjoy using %1.</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Partiție de sistem EFI</translation>
+        <translation>Partiție de sistem EFI</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1046,21 +990,6 @@ Sigur doriți sa opriți acum?</translation>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;Mulțumiri speciale&lt;b&gt;&lt;br/&gt;Mulțumim tuturor celor care au ales să sprijine %1, cu timpul lor, bani, sugestii, muncă, laudă, idei, promovare, și/sau cu încurajare.&lt;/p&gt;&lt;p&gt;Fără dumneavoastră nu ar exista %1. &lt;/p&gt;&lt;p&gt;Echipa de dezvoltatori %2&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Folosește parola</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Ascunde parola</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Arată parola</translation>
     </message>
 </context>
 <context>
@@ -1577,7 +1506,7 @@ Alegeți un nume diferit.</translation>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Doriți să continuați?</translation>
+        <translation>Doriți să continuați?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1657,7 +1586,7 @@ Alegeți un nume diferit.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Partiție de sistem EFI</translation>
+        <translation>Partiție de sistem EFI</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1688,10 +1617,6 @@ Alegeți un nume diferit.</translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Deblocare Unitate</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Unitate Virtuală:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1956,46 +1881,6 @@ Alegeți un nume diferit.</translation>
         <source>Mounting: %1</source>
         <translation>Montare: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Model: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Spațiu liber: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Dispozitiv</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Mărime</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Folosire Pentru</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Etichetă</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Criptare</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formatare</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Verificare</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Opțiuni</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -2037,12 +1922,12 @@ Alegeți un nume diferit.</translation>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Ascunde parola</translation>
+        <translation>Ascunde parola</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Arată parola</translation>
+        <translation>Arată parola</translation>
     </message>
 </context>
 <context>
@@ -2080,10 +1965,6 @@ Această configurație poate fi utilizată cu --auto pentru o instalare nesuprav
 Programul de instalare creează (sau suprascrie) /mnt/antiX/etc/minstall.conf și salvează o copie în /etc/minstalled.conf pentru utilizare ulterioară.
 Programul de instalare nu va scrie nicio parolă sau setări ignorate în noul fișier de configurare.
 Vă rugăm să luați în considerare că acestă opțiune este experimentală. Versiunile viitoare de instalare pot rupe compatibilitatea cu fișierele de configurare existente.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Se oprește automat la finalizarea instalării.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>

@@ -135,10 +135,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Systémový oddiel EFI</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation type="unfinished"></translation>
@@ -147,10 +143,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Vytvoriť</translation>
     </message>
 </context>
 <context>
@@ -604,7 +596,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Systémový oddiel EFI</translation>
+        <translation>Systémový oddiel EFI</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1578,7 +1570,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Systémový oddiel EFI</translation>
+        <translation>Systémový oddiel EFI</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1872,30 +1864,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Zariadenie</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Veľkosť</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Menovka</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Zašifrovať</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formát zobrazenia</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Nastavenia</translation>
     </message>
 </context>
 <context>

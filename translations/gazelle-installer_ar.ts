@@ -1864,14 +1864,6 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">تهيئة</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">خيارات</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>

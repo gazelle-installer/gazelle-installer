@@ -135,10 +135,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI Systeempartitie</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation type="unfinished"></translation>
@@ -147,10 +143,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Aanmaken</translation>
     </message>
 </context>
 <context>
@@ -604,7 +596,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI Systeempartitie</translation>
+        <translation>EFI Systeempartitie</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1577,7 +1569,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI Systeempartitie</translation>
+        <translation>EFI Systeempartitie</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1871,26 +1863,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Apparaat</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Grootte</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Label</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formaat</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Opties</translation>
     </message>
 </context>
 <context>

@@ -135,10 +135,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI-systempartition</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation type="unfinished"></translation>
@@ -609,7 +605,7 @@ God fornøjelse med %1</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI-systempartition</translation>
+        <translation>EFI-systempartition</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1583,7 +1579,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI-systempartition</translation>
+        <translation>EFI-systempartition</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1877,30 +1873,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Enhed</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Størrelse</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Etiket</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Kryptér</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Format</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Valgmuligheder</translation>
     </message>
 </context>
 <context>

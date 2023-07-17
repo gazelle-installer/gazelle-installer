@@ -116,30 +116,26 @@ Minimum: %2</source>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Έλεγχος μέσων εγκατάστασης.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Πατήστε ESC για παράλειψη.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Το μέσο εγκατάστασης είναι κατεστραμμένο.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>Είστε βέβαιοι ότι θέλετε να παραλείψετε τον έλεγχο των μέσων εγκατάστασης;</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Διαμέρισμα συστήματος EFI</translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -149,22 +145,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>μορφή μόνο</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Δημιουργία</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Διατήρηση</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Διατήρηση (%1) </translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Διατήρηση /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -263,7 +243,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="437"/>
         <source>The installation was aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Η εγκατάσταση ματαιώθηκε.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="523"/>
@@ -419,41 +399,9 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Χρήση για&lt;/i&gt; - Για να χρησιμοποιήσετε αυτό το διαμέρισμα σε μια εγκατάσταση, πρέπει να επιλέξετε κάτι εδώ.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Μορφή - Μορφοποίηση χωρίς τοποθέτηση.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS -GRUB - BIOS Boot GPT διαμέρισμα για GRUB. </translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - Διαμέρισμα συστήματος EFI.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">εκκίνηση - Διαχείριση εκκίνησης (/boot). </translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - συστήματος root (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - χώρος για Swap</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Δεδομένα χρήστη (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Εκτός από τα παραπάνω, μπορείτε επίσης να πληκτρολογήσετε το δικό σας σημείο στήριξης. Τα προσαρμοσμένα σημεία συναρμολόγησης πρέπει να ξεκινούν με κάθετο (&quot;/&quot;). </translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Το πρόγραμμα εγκατάστασης αντιμετωπίζει τα &quot;/boot&quot;, &quot;/&quot; και &quot;/home&quot; ακριβώς το ίδιο με τα &quot;boot&quot;, &quot;root&quot; και &quot;home&quot;, αντίστοιχα.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -469,10 +417,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Μορφή&lt;/i&gt; - Αυτή είναι η μορφή του διαμερίσματος. Οι διαθέσιμες μορφές εξαρτώνται από τη χρήση του διαμερίσματος. Όταν εργάζεστε με μια υπάρχουσα διάταξη, ενδέχεται να μπορείτε να διατηρήσετε τη μορφή του διαμερίσματος επιλέγοντας &lt;b&gt;Διατήρηση&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">Επιλέγοντας το &lt;b&gt;Preserve /home &lt;/b&gt;για το διαμέρισμα root διατηρείται τα περιεχόμενα του καταλόγου /home, διαγράφοντας οτιδήποτε άλλο. Αυτή η επιλογή μπορεί να χρησιμοποιηθεί μόνο όταν το /home βρίσκεται στο ίδιο διαμέρισμα με το root.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -663,7 +607,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Διαμέρισμα συστήματος EFI</translation>
+        <translation>Κατάτμηση συστήματος EFI</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1052,21 +996,6 @@ Do you really want to stop now?</source>
     </message>
 </context>
 <context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Κωδικός Χρήστη</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Απόκρυψη του κωδικού πρόσβασης </translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Εμφάνιση κωδικού πρόσβασης </translation>
-    </message>
-</context>
-<context>
     <name>MeInstall</name>
     <message>
         <location filename="../meinstall.ui" line="43"/>
@@ -1210,12 +1139,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="698"/>
         <source>Show Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Εμφάνιση Πλέγματος</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="705"/>
         <source>Ctrl+G</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+G</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="715"/>
@@ -1575,12 +1504,12 @@ Please select a different name.</source>
     <message>
         <location filename="../oobe.cpp" line="511"/>
         <source>You did not provide a passphrase for %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Δεν παρείχατε φράση πρόσβασης για το %1</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Θέλετε να συνεχίσετε;</translation>
+        <translation>Θέλετε να συνεχίσετε;</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1660,7 +1589,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Διαμέρισμα συστήματος EFI</translation>
+        <translation>Διαμέρισμα συστήματος EFI</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1691,10 +1620,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Ξεκλειδώστε το Drive</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Εικονικές συσκευές</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1744,37 +1669,37 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="795"/>
         <source>Reuse (no reformat) %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Επαναχρησιμοποίηση (χωρίς αναδιαμόρφωση) %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="816"/>
         <source>Reuse subvolume %1 as %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Επαναχρησιμοποίηση του υποτόμου %1 ως %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="818"/>
         <source>Delete subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Διαγραφή υποτόμου %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Αντικατάσταση του υποτόμου %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="822"/>
         <source>Overwrite subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Αντικαταστήστε τον υποτόμο %1 για χρήση για το %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Δημιουργία υποτόμου %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="825"/>
         <source>Create subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Δημιουργήστε τον υποτόμο %1 για χρήση για το %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="840"/>
@@ -1962,101 +1887,53 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation>Προσάρτηση: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Μοντέλο: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Ελεύθερος χώρος: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Συσκευή</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Μέγεθος</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Χρήση</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Επιγραφή</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Κρυπτογράφηση</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Διαμόρφωση</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Ελεγχος</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Επιλογές</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Απόρριψη</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Pass</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Negligible</source>
-        <translation type="unfinished"></translation>
+        <translation>Αμελητέος</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Very weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Πολύ αδύναμο</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Αδύναμο</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>Μέτριο</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Ισχυρό</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Very strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Πολύ δυνατό</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="147"/>
         <source>Password strength: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ισχύς κωδικού πρόσβασης: %1</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Απόκρυψη του κωδικού πρόσβασης </translation>
+        <translation>Απόκρυψη του κωδικού πρόσβασης </translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Εμφάνιση κωδικού πρόσβασης </translation>
+        <translation>Εμφάνιση κωδικού πρόσβασης </translation>
     </message>
 </context>
 <context>
@@ -2094,10 +1971,6 @@ Please note, this is experimental. Future installer versions may break compatibi
 Το πρόγραμμα εγκατάστασης δημιουργεί (ή αντικαθιστά) /mnt/antiX/etc/minstall.conf και αποθηκεύει ένα αντίγραφο στο /etc/minstalled.conf για μελλοντική χρήση. 
 Το πρόγραμμα εγκατάστασης δεν θα γράψει κωδικούς πρόσβασης ούτε θα αγνοήσει τις ρυθμίσεις στο νέο αρχείο διαμόρφωσης. 
 Λάβετε υπόψη ότι αυτό είναι πειραματικό. Οι μελλοντικές εκδόσεις του προγράμματος εγκατάστασης ενδέχεται να διακόψουν τη συμβατότητα με τα υπάρχοντα αρχεία διαμόρφωσης.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Τερματίζεται αυτόματα όταν ολοκληρωθεί η εγκατάσταση.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
@@ -2159,13 +2032,14 @@ This will start automatically if installed with --oem option.</source>
     <message>
         <location filename="../app.cpp" line="117"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ελέγχετε πάντα τα μέσα εγκατάστασης στην αρχή.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="118"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Μην ελέγχετε τα μέσα εγκατάστασης στην αρχή. 
+Δεν συνιστάται, εκτός εάν το μέσο εγκατάστασης είναι εγγυημένο ότι δεν περιέχει σφάλματα.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>
