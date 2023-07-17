@@ -51,7 +51,7 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     const QString &projShort = appConf.value("PROJECT_SHORTNAME").toString();
     volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
     volSpecs["/boot"] = {"boot"};
-    volSpecs["/boot/efi"] = {"EFI System"};
+    volSpecs["/boot/efi"] = {"EFI-SYSTEM"};
     volSpecs["/"] = {"root" + projShort + appConf.value("VERSION").toString()};
     volSpecs["/home"] = {"home" + projShort};
     volSpecs["SWAP"] = {"swap" + projShort};
@@ -338,11 +338,11 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                     if (config.value("Active").toBool()) partit->setActive(true);
                 }
                 partit->flags.sysEFI = config.value("ESP", partit->flags.sysEFI).toBool();
-                partit->addToCrypttab = config.value("AddToCrypttab").toBool();
                 partit->usefor = config.value("UseFor", partit->usefor).toString();
                 partit->format = config.value("Format", partit->format).toString();
                 partit->chkbadblk = config.value("CheckBadBlocks", partit->chkbadblk).toBool();
                 partit->encrypt = config.value("Encrypt", partit->encrypt).toBool();
+                partit->addToCrypttab = config.value("AddToCrypttab", partit->encrypt).toBool();
                 partit->label = config.value("Label", partit->label).toString();
                 partit->options = config.value("Options", partit->options).toString();
                 partit->dump = config.value("Dump", partit->dump).toBool();
@@ -459,17 +459,15 @@ void PartMan::treeMenu(const QPoint &)
             actRemove->setEnabled(false);
             if (twit->flags.volCrypto) actLock = menu.addAction(tr("&Lock"));
         } else {
-            bool allowCryptTab = false;
+            bool allowCryptTab = twit->encrypt;
             if (twit->flags.oldLayout && twit->curFormat == "crypto_LUKS") {
                 actUnlock = menu.addAction(tr("&Unlock"));
                 allowCryptTab = true;
             }
-            if (twit->realUseFor() == "FORMAT" && twit->canEncrypt()) allowCryptTab = true;
             if (allowCryptTab) {
                 actAddCrypttab = menu.addAction(tr("Add to crypttab"));
                 actAddCrypttab->setCheckable(true);
                 actAddCrypttab->setChecked(twit->addToCrypttab);
-                actAddCrypttab->setEnabled(twit->willMap());
             }
             menu.addSeparator();
             actActive = menu.addAction(tr("Active partition"));
@@ -1100,10 +1098,12 @@ void PartMan::prepStorage()
         if (fit != alldevs.cend()) fit->second->uuid = jsonDev["uuid"].toString();
     }
 }
-void PartMan::installTabs()
+bool PartMan::installTabs() noexcept
 {
-    makeFstab();
-    fixCryptoSetup();
+    proc.log("Install tabs");
+    if (!makeFstab()) return false;
+    if (!makeCrypttab()) return false;
+    return true;
 }
 
 void PartMan::preparePartitions()
@@ -1362,42 +1362,30 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
 }
 
 // write out crypttab if encrypting for auto-opening
-void PartMan::fixCryptoSetup()
+bool PartMan::makeCrypttab() noexcept
 {
-    MProcess::Section sect(proc, QT_TR_NOOP("Failed to finalize encryption setup."));
-
-    // Find extra devices
-    std::map<QString, DeviceItem *> cryptAdd;
+    // Count the number of crypttab entries.
+    int cryptcount = 0;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->addToCrypttab) cryptAdd[item->device] = item;
+        if (item->addToCrypttab) ++cryptcount;
     }
-    // File systems
-    for (auto &it : mounts) {
-        if (it.second->encrypt) cryptAdd[it.second->device] = it.second;
-        else if (it.second->type == DeviceItem::Subvolume) {
-            // Treat format-only, encrypted parent BTRFS partition as an extra device.
-            DeviceItem *partit = it.second->parent();
-            if (partit->encrypt && partit->realUseFor() == "FORMAT") {
-                cryptAdd[partit->device] = partit;
-            }
-        }
-    }
-
     // Add devices to crypttab.
     QFile file("/mnt/antiX/etc/crypttab");
-    if (!file.open(QIODevice::WriteOnly)) throw sect.failMessage();
+    if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
-    for (const auto &it : cryptAdd) {
-        out << it.second->devMapper << " UUID=" << it.second->uuid << " none luks";
-        if (cryptAdd.size() > 1) out << ",keyscript=decrypt_keyctl";
-        if (!it.second->flags.rotational) out << ",no-read-workqueue,no-write-workqueue";
-        if (it.second->discgran) out << ",discard";
+    for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
+        if (!item->addToCrypttab) continue;
+        out << item->devMapper << " UUID=" << item->uuid << " none luks";
+        if (cryptcount > 1) out << ",keyscript=decrypt_keyctl";
+        if (!item->flags.rotational) out << ",no-read-workqueue,no-write-workqueue";
+        if (item->discgran) out << ",discard";
         out << '\n';
     }
+    return true;
 }
 
 // create /etc/fstab file
-bool PartMan::makeFstab()
+bool PartMan::makeFstab() noexcept
 {
     QFile file("/mnt/antiX/etc/fstab");
     if (!file.open(QIODevice::WriteOnly)) return false;
@@ -1658,8 +1646,11 @@ bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
         case Check: item->chkbadblk = (value == Qt::Checked); break;
         case Dump: item->dump = (value == Qt::Checked); break;
         }
+        const int changed = changeEnd(false);
+        item->autoFill(changed);
+        if (changed) notifyChange(item);
+        else emit dataChanged(index, index);
     }
-    if(!changeEnd()) emit dataChanged(index, index);
     return true;
 }
 Qt::ItemFlags PartMan::flags(const QModelIndex &index) const noexcept
@@ -1803,6 +1794,7 @@ int PartMan::changeEnd(bool notify) noexcept
     if (changing->encrypt != root.encrypt) {
         const QStringList &allowed = changing->allowedFormats();
         if (!allowed.contains(changing->format)) changing->format = allowed.at(0);
+        changed |= (1 << Encrypt);
     }
     if (changing->format != root.format || changing->usefor != root.usefor) {
         changing->dump = false;
@@ -2130,8 +2122,8 @@ DeviceItem *DeviceItem::addPart(long long defaultSize, const QString &defaultUse
     DeviceItem *partit = new DeviceItem(DeviceItem::Partition, this);
     if (!defaultUse.isEmpty()) partit->usefor = defaultUse;
     partit->size = defaultSize;
-    partit->autoFill();
     if (partit->canEncrypt()) partit->encrypt = crypto;
+    partit->autoFill();
     if (partman) partman->notifyChange(partit);
     return partit;
 }
@@ -2190,7 +2182,10 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
         }
         if (use == "/boot/efi") flags.sysEFI = true;
 
-        if (encrypt) encrypt = canEncrypt();
+        if (encrypt & !canEncrypt()) {
+            encrypt = false;
+            changed |= (1 << PartMan::Encrypt);
+        }
     }
     const QStringList &af = allowedFormats();
     if (format.isEmpty() || !af.contains(format)) {
@@ -2219,6 +2214,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             dump = true;
         }
     }
+    if (changed & (1 << PartMan::Encrypt)) addToCrypttab = encrypt;
 }
 void DeviceItem::labelParts() noexcept
 {
