@@ -1864,26 +1864,6 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Tæki</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Stærð</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Merki</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Snið</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Valkostir</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>

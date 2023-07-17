@@ -115,30 +115,26 @@ Minimum: %2</source>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzanie nośnika instalacyjnego.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Naciśnij ESC, aby pominąć.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nośnik instalacyjny jest uszkodzony.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>Czy na pewno chcesz pominąć sprawdzanie nośnika instalacyjnego?</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Partycja systemowa EFI</translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -148,22 +144,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>tylko format</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Utwórz</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Zachowaj</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Zachowaj (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Zachowaj /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -418,41 +398,9 @@ Miłego korzystania z %1</translation>
         <translation>&lt;i&gt;Użyj dla&lt;/i&gt; - Aby użyć tej partycji w instalacji, musisz coś tutaj wybrać.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Formatuj - Formatuj bez montowania.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - Partycja BIOS Boot GPT dla GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - Partycja systemowa EFI.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - Menedżer rozruchu (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - Katalog systemowy (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - Przestrzeń wymiany.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Dane użytkownika (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Oprócz powyższego możesz również wpisać własny punkt montowania. Niestandardowe punkty montowania muszą zaczynać się od ukośnika („/”).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Instalator traktuje &quot;/boot&quot;, &quot;/&quot; i &quot;/home&quot; dokładnie tak samo jak &quot;boot&quot;, &quot;root&quot; i &quot;home&quot;.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -468,10 +416,6 @@ Miłego korzystania z %1</translation>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Format&lt;/i&gt; - To jest format partycji. Dostępne formaty zależą od tego, do czego używana jest partycja. Podczas pracy z istniejącym układem możesz zachować format partycji, wybierając opcję &lt;b&gt;Zachowaj&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">Wybieranie &lt;b&gt;Zachowaj /home&lt;/b&gt; dla partycji głównej zachowuje zawartość katalogu /home, usuwając wszystko inne. Tej opcji można użyć tylko wtedy, gdy katalog /home znajduje się na tej samej partycji co katalog główny.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -662,7 +606,7 @@ Miłego korzystania z %1</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Partycja systemowa EFI</translation>
+        <translation>Partycja systemowa EFI</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1046,21 +990,6 @@ Czy naprawdę chcesz teraz zakończyć?</translation>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Specjalne podziękowania&lt;/b&gt;&lt;br/&gt; Dziękujemy wszystkim, którzy zdecydowali się wesprzeć %1 swoim czasem, pieniędzmi, sugestiami, pracą, pochwałami, pomysłami, promocją i/lub zachętą.&lt;/p&gt;&lt;p&gt; Bez Was nie byłoby %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Użyj hasła</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Ukryj hasło</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Pokaż hasło</translation>
     </message>
 </context>
 <context>
@@ -1577,7 +1506,7 @@ Wybierz inną nazwę.</translation>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Jesteś pewien, że chcesz kontynuować?</translation>
+        <translation>Jesteś pewien, że chcesz kontynuować?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1657,7 +1586,7 @@ Wybierz inną nazwę.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Partycja systemowa EFI</translation>
+        <translation>Partycja systemowa EFI</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1688,10 +1617,6 @@ Wybierz inną nazwę.</translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Odblokuj dysk</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Urządzenie wirtualne:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1956,101 +1881,53 @@ Wybierz inną nazwę.</translation>
         <source>Mounting: %1</source>
         <translation>Montowanie: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Model: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Wolna przestrzeń: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Urządzenie</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Rozmiar</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Użyj dla</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Etykieta</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Szyfruj</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Format</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Sprawdź</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Opcje</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Zrzut</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Przebieg</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Negligible</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieistotny</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Very weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Bardzo słaby</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Słaby</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>Umiarkowany</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Silny</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Very strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Bardzo silny</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="147"/>
         <source>Password strength: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Siła hasła: %1</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Ukryj hasło</translation>
+        <translation>Ukryj hasło</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Pokaż hasło</translation>
+        <translation>Pokaż hasło</translation>
     </message>
 </context>
 <context>
@@ -2088,10 +1965,6 @@ Ta konfiguracja może być używana z opcją --auto w przypadku instalacji niena
 Instalator tworzy (lub nadpisuje) /mnt/antiX/etc/minstall.conf i zapisuje kopię w /etc/minstalled.conf do wykorzystania w przyszłości.
 Instalator nie zapisze żadnych haseł ani zignorowanych ustawień w nowym pliku konfiguracyjnym.
 Uwaga, to jest funkcja eksperymentalna. Przyszłe wersje instalatora mogą naruszać zgodność z istniejącymi plikami konfiguracyjnymi.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Wyłącza się automatycznie po zakończeniu instalacji.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
@@ -2153,13 +2026,14 @@ Rozpocznie się automatycznie, jeśli system zostanie zainstalowany z opcją --o
     <message>
         <location filename="../app.cpp" line="117"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zawsze sprawdzaj nośnik instalacyjny na początku.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="118"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie sprawdzaj nośnika instalacyjnego na początku.
+Niezalecane, chyba że gwarantuje się, że nośnik instalacyjny jest wolny od błędów.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>

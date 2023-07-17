@@ -116,30 +116,26 @@ home %2%</translation>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>インストール用メディアを確認しています。</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>ESC キーを押すとスキップします。</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>インストール用メディアが破損しています。</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>本当にインストール用メディアのチェックを省略しますか？</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI システムパーティション</translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -149,22 +145,6 @@ home %2%</translation>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>初期化のみ実行</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">作成</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">保持</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished"> (%1) を確保</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">/home (%1) を保持</translation>
     </message>
 </context>
 <context>
@@ -263,7 +243,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="437"/>
         <source>The installation was aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールを中止しました。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="523"/>
@@ -419,41 +399,9 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Use For&lt;/i&gt; - インストールでこのパーティションを使用するには、ここで何かを選択する必要があります。</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Format - マウントせずにフォーマットします。</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - GRUB 用の BIOS Boot GPT パーティション。</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - EFI システムパーティション。</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - ブートマネージャ (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - システムルート (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - スワップ領域。</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - ユーザーのデータ保存領域 (/home)。</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>上記に加えて、独自のマウントポイントを入力することもできます。カスタム・マウントポイントはスラッシュ (&quot;/&quot;) で始める必要があります。</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">インストーラは、&quot;/boot&quot;、&quot;/&quot;、&quot;/home&quot; をそれぞれ &quot;boot&quot;、&quot;root&quot;、&quot;home&quot; とまったく同じものとして扱います。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -469,10 +417,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;フォーマット&lt;/i&gt; - これはパーティションのフォーマットです。利用可能なフォーマットは、パーティションの使用目的によって異なります。既存のレイアウトで作業する場合、&lt;b&gt;保存&lt;/b&gt; を選択することで、そのパーティションのフォーマットを維持できる場合があります。</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">root パーティションで &lt;b&gt;Preserve /home&lt;/b&gt; を選択すると、/home ディレクトリの内容が保存され、その他はすべて削除されます。このオプションは、/home が root と同じパーティションに存在する場合にのみ使用できます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -652,78 +596,78 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="674"/>
         <source>Format without mounting</source>
-        <translation type="unfinished"></translation>
+        <translation>マウントしないでフォーマット実行</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="675"/>
         <source>BIOS Boot GPT partition for GRUB</source>
-        <translation type="unfinished"></translation>
+        <translation>GRUB 用の BIOS 起動 GPT パーティション</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI システムパーティション</translation>
+        <translation>EFI システムパーティション</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
         <source>Boot manager</source>
-        <translation type="unfinished"></translation>
+        <translation>ブートマネージャ</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="679"/>
         <source>System root</source>
-        <translation type="unfinished"></translation>
+        <translation>システムの root</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="680"/>
         <source>User data</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーデータ</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="681"/>
         <source>Static data</source>
-        <translation type="unfinished"></translation>
+        <translation>静的データ</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="682"/>
         <source>Variable data</source>
-        <translation type="unfinished"></translation>
+        <translation>可変データ</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="683"/>
         <source>Temporary files</source>
-        <translation type="unfinished"></translation>
+        <translation>一時データ</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="684"/>
         <source>Swap files</source>
-        <translation type="unfinished"></translation>
+        <translation>スワップファイル</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
-        <translation type="unfinished"></translation>
+        <translation>スワップパーティション</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>root パーティションで &lt;b&gt;/home を保存&lt;/b&gt; を選択すると、/home ディレクトリの内容が保存され、それ以外はすべて削除されます。このオプションは、/home が root パーティションと同じパーティションにある場合にのみ使用できます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="716"/>
         <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
-        <translation type="unfinished"></translation>
+        <translation>システムが EFI（Extensible Firmware Interface）を使用している場合、システムが起動するには EFI システムパーティション（ESP）と呼ばれるパーティションが必要です。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="717"/>
         <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
-        <translation type="unfinished"></translation>
+        <translation>これらのシステムは、アクティブとマークされたパーティションを必要としません。代わりに ESP とマークされた、FAT ファイルシステムでフォーマット済みのパーティションを必要とします。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="718"/>
         <source>Most systems built within the last 10 years use EFI.</source>
-        <translation type="unfinished"></translation>
+        <translation>過去10年以内に作製されたシステムのほとんどは EFI を使用しています。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="729"/>
@@ -1050,21 +994,6 @@ Do you really want to stop now?</source>
     </message>
 </context>
 <context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">パスワードを使用する</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">パスワードを隠す</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">パスワードを表示する</translation>
-    </message>
-</context>
-<context>
     <name>MeInstall</name>
     <message>
         <location filename="../meinstall.ui" line="43"/>
@@ -1208,12 +1137,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="698"/>
         <source>Show Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>グリッド表示</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="705"/>
         <source>Ctrl+G</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+G</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="715"/>
@@ -1343,7 +1272,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1263"/>
         <source>Computer domain:</source>
-        <translation>コンピュータドメイン:</translation>
+        <translation>コンピュータのドメイン:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1289"/>
@@ -1571,12 +1500,12 @@ Please select a different name.</source>
     <message>
         <location filename="../oobe.cpp" line="511"/>
         <source>You did not provide a passphrase for %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 のパスフレーズを入力していません。</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">本当に作業を続けてもよろしいですか？</translation>
+        <translation>本当に作業を続けてもよろしいですか？</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1656,7 +1585,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI システムパーティション</translation>
+        <translation>EFI システムパーティション</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1687,10 +1616,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>ドライブのロック解除</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">仮想デバイス</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1740,37 +1665,37 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="795"/>
         <source>Reuse (no reformat) %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 を再使用 (フォーマットしません)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="816"/>
         <source>Reuse subvolume %1 as %2</source>
-        <translation type="unfinished"></translation>
+        <translation>サブボリューム %1 を %2 として再使用する</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="818"/>
         <source>Delete subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>サブボリューム %1 を削除</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>サブボリューム %1 を上書き</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="822"/>
         <source>Overwrite subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>サブボリューム %1 を上書きし、 %2 に利用する</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>サブボリューム %1 を作成する</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="825"/>
         <source>Create subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>サブボリューム %1 を作成し、%2 に利用する</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="840"/>
@@ -1853,12 +1778,12 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="936"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
-        <translation type="unfinished"></translation>
+        <translation>このシステムでは EFI を使用していますが、/boot/efi に有効な EFI システムパーティションが割り当てられていません。</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="939"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>boot/efi に割り当てられたボリュームは、有効な EFI システムパーティションではありません。</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1012"/>
@@ -1955,101 +1880,53 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation>マウント中: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">モデル名: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">空き領域: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">デバイス</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">サイズ</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Use For</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">ラベル</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">暗号化</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">フォーマット</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">チェック</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">オプション</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">ダンプ</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">パス</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Negligible</source>
-        <translation type="unfinished"></translation>
+        <translation>わずかな</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Very weak</source>
-        <translation type="unfinished"></translation>
+        <translation>非常に弱い</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Weak</source>
-        <translation type="unfinished"></translation>
+        <translation>弱い</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>ほど良い</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Strong</source>
-        <translation type="unfinished"></translation>
+        <translation>強い</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Very strong</source>
-        <translation type="unfinished"></translation>
+        <translation>非常に強い</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="147"/>
         <source>Password strength: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードの強度: %1</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">パスワードを隠す</translation>
+        <translation>パスワードを隠す</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">パスワードを表示する</translation>
+        <translation>パスワードを表示する</translation>
     </message>
 </context>
 <context>
@@ -2089,13 +1966,9 @@ Please note, this is experimental. Future installer versions may break compatibi
 注記：これは実験的なものです。将来公開されるインストーラでは、既存の設定ファイルとの互換性が失われる可能性があります。</translation>
     </message>
     <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">インストールが完了すると自動的にシャットダウンします。</translation>
-    </message>
-    <message>
         <location filename="../app.cpp" line="102"/>
         <source>Shutdown automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールが終わると、自動的にシャットダウンします。</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>
@@ -2152,13 +2025,15 @@ This will start automatically if installed with --oem option.</source>
     <message>
         <location filename="../app.cpp" line="117"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールメディアは、必ず最初にチェック（確認）する。</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="118"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールメディアは最初の時点では確認しない。
+
+この方法は、インストールメディアにエラーがないことが保証されている場合を除き、推奨しません。</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>

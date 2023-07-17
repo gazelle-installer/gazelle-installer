@@ -136,10 +136,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI rendszer partíció</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>cserehely</translation>
@@ -148,22 +144,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>csak formázás</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Létrehozás</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Megtartás</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Megtartás (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">A /home megtartása (%1)</translation>
     </message>
 </context>
 <context>
@@ -418,41 +398,9 @@ Használja örömmel az %1-ot</translation>
         <translation>&lt;i&gt;Használat&lt;/i&gt; - Ahhoz, hogy ezt a partíciót a telepítésben használhassa, itt kell kiválasztania valamit.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Formázás - Formázás csatolás nélkül.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - BIOS rendszerindítási GPT partíció a GRUB számára.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - EFI rendszer partíció.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - Rendszerindító (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - Rendszer gyökérkönyvtár (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - Cserehely.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Felhasználói adatok (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>A fentieken kívül megadhat saját csatolási pontot is. Az egyéni csatolási pontoknak egy perjellel (&quot;/&quot;) kell kezdődniük.</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">A telepítő a &quot;/boot&quot;, &quot;/&quot; és &quot;/home&quot; útvonalakat pontosan ugyanúgy kezeli, mint a &quot;boot&quot;, &quot;root&quot; és &quot;home&quot; helyeket.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -468,10 +416,6 @@ Használja örömmel az %1-ot</translation>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Formátum&lt;/i&gt; - Ez a partíció formátuma. A rendelkezésre álló formátumok attól függnek, hogy mire használja a partíciót. Ha egy meglévő elrendezéssel dolgozik, a &lt;b&gt;Megőrzés&lt;/b&gt; kiválasztásával megtarthatja a partíció formátumát.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">A &lt;b&gt;/home megőrzése&lt;/b&gt; a gyökérpartícióhoz kiválasztása megőrzi a /home könyvtár tartalmát, minden mást törölve. Ez a beállítás csak akkor használható, ha a /home ugyanazon a partíción van, mint a gyökérkönyvtár.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -662,7 +606,7 @@ Használja örömmel az %1-ot</translation>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI rendszer partíció</translation>
+        <translation>EFI rendszer partíció</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1046,21 +990,6 @@ Biztos megszakítja a folyamatot?</translation>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Külön köszönet&lt;/b&gt;&lt;br/&gt;Köszönet mindenkinek, aki úgy döntött, hogy támogatja az %1-ot az idejével, pénzével, javaslataival, munkájával, dicséretével, ötleteivel, promóciójával és/vagy bátorításával.&lt;/p&gt;&lt;p&gt;Nélkületek nem lenne %1.&lt;/p&gt;&lt;p&gt;%2 Fejlesztői&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Jelszó használata</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Jelszó elrejtése</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Jelszó megjelenítése</translation>
     </message>
 </context>
 <context>
@@ -1577,7 +1506,7 @@ Válasszon egy másik nevet.</translation>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Biztos, hogy folytatja?</translation>
+        <translation>Biztos, hogy folytatja?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1657,7 +1586,7 @@ Válasszon egy másik nevet.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI rendszer partíció</translation>
+        <translation>EFI rendszer partíció</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1688,10 +1617,6 @@ Válasszon egy másik nevet.</translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Meghajtó feloldása</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Virtuális eszköz:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1956,54 +1881,6 @@ Válasszon egy másik nevet.</translation>
         <source>Mounting: %1</source>
         <translation>Csatolás: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Modell: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Szabad hely: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Eszköz</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Méret</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Használat</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Címke</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Titkosítás</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formátum</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Ellenőrzés</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Beállítások</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Dump</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Menet</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -2045,12 +1922,12 @@ Válasszon egy másik nevet.</translation>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Jelszó elrejtése</translation>
+        <translation>Jelszó elrejtése</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Jelszó megjelenítése</translation>
+        <translation>Jelszó megjelenítése</translation>
     </message>
 </context>
 <context>
@@ -2088,10 +1965,6 @@ Ez a konfiguráció a --auto kapcsolóval együtt használható, felügyelet né
 A telepítő létrehozza (vagy felülírja) az /mnt/antiX/etc/minstall.conf fájlt, és elmenti egy másolatát az /etc/minstalled.conf fájlba, későbbi használatra.
 A telepítő nem ír jelszavakat vagy figyelmen kívül hagyott beállításokat az új konfigurációs fájlba.
 Vegye figyelembe, hogy ez kísérleti jellegű. A telepítő jövőbeli verziói nem feltétlenül lesznek kompatibilisek a meglévő konfigurációs fájlokkal.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">A telepítés befejeztével automatikusan kikapcsol.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>

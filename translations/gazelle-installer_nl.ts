@@ -18,12 +18,13 @@
         <location filename="../autopart.cpp" line="143"/>
         <source>Recommended: %1
 Minimum: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Aanbevolen: %1
+Minimum: %2</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="180"/>
         <source>Layout Builder</source>
-        <translation type="unfinished"></translation>
+        <translation>Lay-out Bouwer</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="324"/>
@@ -43,7 +44,7 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="56"/>
         <source>Cannot access installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geen toegang tot installatiemedia.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="156"/>
@@ -53,7 +54,7 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan oud systeem niet verwijderen op bestemming.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="164"/>
@@ -73,7 +74,7 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="270"/>
         <source>Failed to copy the new system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het kopiëren van het nieuwe systeem is mislukt.</translation>
     </message>
 </context>
 <context>
@@ -96,7 +97,7 @@ Minimum: %2</source>
     <message>
         <location filename="../bootman.cpp" line="275"/>
         <source>Failed to update initramfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan initramfs niet bijwerken.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="300"/>
@@ -115,30 +116,26 @@ Minimum: %2</source>
     <message>
         <location filename="../checkmd5.cpp" line="38"/>
         <source>Checking installation media.</source>
-        <translation type="unfinished"></translation>
+        <translation>Installatiemedia controleren.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="39"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Druk op ESC om over te slaan.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="56"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het installatiemedium is corrupt.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>Weet je zeker dat je het controleren van de installatiemedia wilt overslaan?</translation>
     </message>
 </context>
 <context>
     <name>DeviceItem</name>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI Systeempartitie</translation>
-    </message>
     <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
@@ -148,22 +145,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>enkel formatteren</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Aanmaken</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Behouden</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Behouden (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Behouden /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -181,7 +162,7 @@ Minimum: %2</source>
     <message>
         <location filename="../partman.cpp" line="2509"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished"></translation>
+        <translation>Compressie (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2511"/>
@@ -262,7 +243,7 @@ Veel plezier met %1</translation>
     <message>
         <location filename="../minstall.cpp" line="437"/>
         <source>The installation was aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>De installatie is afgebroken.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="523"/>
@@ -418,41 +399,9 @@ Veel plezier met %1</translation>
         <translation>&lt;i&gt;Gebruik voor&lt;/i&gt; - Om deze partitie in een installatie te gebruiken, moet u hier iets selecteren.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Formatteer - Formatteer zonder aankoppelen.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - BIOS Opstart GPT partitie voor GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - EFI Systeempartitie.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - Opstartbeheer (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - Systeem root (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - Swap ruimte.</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Gebruikersdata (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Naast het bovenstaande kunt u ook uw eigen koppelpunt typen. Aangepaste koppelpunten moeten beginnen met een schuine streep (&quot;/&quot;).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Het installatieprogramma behandelt &quot;/boot&quot;, &quot;/&quot; en &quot;/home&quot; precies hetzelfde als respectievelijk &quot;boot&quot;, &quot;root&quot; en &quot;home&quot;.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -472,7 +421,7 @@ Veel plezier met %1</translation>
     <message>
         <location filename="../minstall.cpp" line="694"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>De Linux-bestandssystemen ext2, ext3, ext4, jfs, xfs en btrfs worden ondersteund en ext4 wordt aanbevolen.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="695"/>
@@ -587,7 +536,7 @@ Veel plezier met %1</translation>
     <message>
         <location filename="../minstall.cpp" line="727"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
-        <translation type="unfinished"></translation>
+        <translation>Klik gewoon met de rechtermuisknop op een station en selecteer &lt;b&gt;Layout Bouwer&lt;/b&gt; uit het menu. Dit kan een opmaak creëren die lijkt op die van de gewone installatie.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="761"/>
@@ -597,47 +546,47 @@ Veel plezier met %1</translation>
     <message>
         <location filename="../minstall.cpp" line="762"/>
         <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 gebruikt de GRUB bootloader om %1 en Microsoft Windows op te starten.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="763"/>
         <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard wordt GRUB geïnstalleerd in de Master Boot Record (MBR) of ESP (EFI System Partition voor 64-bit UEFI boot systemen) van je bootstation en vervangt de bootloader die je eerder gebruikte. Dit is normaal.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="764"/>
         <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je ervoor kiest om GRUB te installeren op Partition Boot Record (PBR), dan wordt GRUB geïnstalleerd aan het begin van de opgegeven partitie. Deze optie is alleen voor experts.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="765"/>
         <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als je het vinkje weghaalt bij Install GRUB, wordt GRUB op dit moment niet geïnstalleerd. Deze optie is alleen voor experts.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="766"/>
         <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak een swapbestand</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="767"/>
         <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Een swapbestand is flexibeler dan een swappartitie; het is aanzienlijk eenvoudiger om de grootte van een swapbestand aan te passen aan veranderingen in het systeemgebruik.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="768"/>
         <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard is dit aangevinkt als er geen swappartities zijn ingesteld, en uitgevinkt als er swappartities zijn ingesteld. Deze optie moet onaangeroerd blijven en is alleen voor experts.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="769"/>
         <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het instellen van de grootte op 0 heeft hetzelfde effect als het uitvinken van deze optie.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="876"/>
         <source>Enjoy using %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Veel plezier met %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="728"/>
@@ -647,78 +596,78 @@ Veel plezier met %1</translation>
     <message>
         <location filename="../minstall.cpp" line="674"/>
         <source>Format without mounting</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatteren zonder aankoppelen</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="675"/>
         <source>BIOS Boot GPT partition for GRUB</source>
-        <translation type="unfinished"></translation>
+        <translation>BIOS Boot GPT-partitie voor GRUB</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI Systeempartitie</translation>
+        <translation>EFI Systeempartitie</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
         <source>Boot manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Bootmanager</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="679"/>
         <source>System root</source>
-        <translation type="unfinished"></translation>
+        <translation>Systeem root</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="680"/>
         <source>User data</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruikersgegevens</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="681"/>
         <source>Static data</source>
-        <translation type="unfinished"></translation>
+        <translation>Statische gegevens</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="682"/>
         <source>Variable data</source>
-        <translation type="unfinished"></translation>
+        <translation>Variabele gegevens</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="683"/>
         <source>Temporary files</source>
-        <translation type="unfinished"></translation>
+        <translation>Tijdelijke bestanden</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="684"/>
         <source>Swap files</source>
-        <translation type="unfinished"></translation>
+        <translation>Swapbestanden</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>Swap partition</source>
-        <translation type="unfinished"></translation>
+        <translation>Swap partitie</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="692"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecteren van &lt;b&gt;Bewaar /home&lt;/b&gt; voor de rootpartitie bewaart de inhoud van de map /home, al het andere wordt verwijderd. Deze optie kan alleen gebruikt worden als /home op dezelfde partitie staat als de root partitie.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="716"/>
         <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als uw systeem de Extensible Firmware Interface (EFI) gebruikt, is er een partitie nodig die bekend staat als de EFI System Partition (ESP) om het systeem op te starten.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="717"/>
         <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deze systemen hebben geen partitie nodig die is gemarkeerd als Actief, maar wel een partitie die is geformatteerd met een FAT-bestandssysteem, gemarkeerd als ESP.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="718"/>
         <source>Most systems built within the last 10 years use EFI.</source>
-        <translation type="unfinished"></translation>
+        <translation>De meeste systemen die de afgelopen 10 jaar zijn gebouwd, gebruiken EFI.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="729"/>
@@ -738,7 +687,7 @@ Veel plezier met %1</translation>
     <message>
         <location filename="../minstall.cpp" line="733"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voor %1 kunt u kiezen om de partities te formatteren als ext2, ext3, ext4, f2fs, jfs, xfs of btrfs.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="734"/>
@@ -1045,21 +994,6 @@ Wilt u werkelijk stoppen?</translation>
     </message>
 </context>
 <context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Gebruik wachtwoord</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Verberg het wachtwoord</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Toon het wachtwoord</translation>
-    </message>
-</context>
-<context>
     <name>MeInstall</name>
     <message>
         <location filename="../meinstall.ui" line="43"/>
@@ -1146,22 +1080,22 @@ Wilt u werkelijk stoppen?</translation>
     <message>
         <location filename="../meinstall.ui" line="276"/>
         <source>Keyboard Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Toetsenbordinstellingen</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="291"/>
         <source>Model:</source>
-        <translation type="unfinished"></translation>
+        <translation>Model:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="306"/>
         <source>Variant:</source>
-        <translation type="unfinished"></translation>
+        <translation>Variant:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="344"/>
         <source>Layout:</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="492"/>
@@ -1172,13 +1106,13 @@ Wilt u werkelijk stoppen?</translation>
         <location filename="../meinstall.ui" line="567"/>
         <location filename="../meinstall.ui" line="589"/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="651"/>
         <location filename="../meinstall.ui" line="1092"/>
         <source>Enable hibernation support</source>
-        <translation type="unfinished"></translation>
+        <translation>Slaapstandondersteuning inschakelen</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="689"/>
@@ -1203,12 +1137,12 @@ Wilt u werkelijk stoppen?</translation>
     <message>
         <location filename="../meinstall.ui" line="698"/>
         <source>Show Grid</source>
-        <translation type="unfinished"></translation>
+        <translation>Toon raster</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="705"/>
         <source>Ctrl+G</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+G</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="715"/>
@@ -1278,17 +1212,17 @@ Wilt u werkelijk stoppen?</translation>
     <message>
         <location filename="../meinstall.ui" line="1025"/>
         <source>Create a swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak een swapbestand</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1042"/>
         <source> MB</source>
-        <translation type="unfinished"></translation>
+        <translation> MB</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1062"/>
         <source>Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Grootte:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1085"/>
@@ -1568,12 +1502,12 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../oobe.cpp" line="511"/>
         <source>You did not provide a passphrase for %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>U hebt geen wachtwoord opgegeven voor %1.</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Weet je zeker dat je door wilt gaan?</translation>
+        <translation>Weet je zeker dat je door wilt gaan?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1608,7 +1542,7 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../oobe.cpp" line="626"/>
         <source>Failed to set ownership or permissions of user directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het is niet gelukt eigendom of rechten van de gebruikersdirectory in te stellen.</translation>
     </message>
 </context>
 <context>
@@ -1653,7 +1587,7 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">EFI Systeempartitie</translation>
+        <translation>EFI Systeempartitie</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1684,10 +1618,6 @@ Kies a.u.b. een andere naam.</translation>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Schijf ontgrendelen</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Virtueel apparaat:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1737,37 +1667,37 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../partman.cpp" line="795"/>
         <source>Reuse (no reformat) %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hergebruik (geen herformattering) %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="816"/>
         <source>Reuse subvolume %1 as %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Hergebruik subvolume %1 als %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="818"/>
         <source>Delete subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Subvolume %1 verwijderen</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="821"/>
         <source>Overwrite subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Subvolume %1 overschrijven</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="822"/>
         <source>Overwrite subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Subvolume %1 overschrijven om te gebruiken voor %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="824"/>
         <source>Create subvolume %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Subvolume %1 aanmaken</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="825"/>
         <source>Create subvolume %1 to use for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Maak subvolume %1 aan om te gebruiken voor %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="840"/>
@@ -1825,17 +1755,17 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../partman.cpp" line="520"/>
         <source>Layout &amp;Builder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lay-out &amp;Bouwer...</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="895"/>
         <source>%1 (%2) requires %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2) vereist %3</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="923"/>
         <source>The installation may fail because the following volumes are too small:</source>
-        <translation type="unfinished"></translation>
+        <translation>De installatie kan mislukken omdat de volgende volumes te klein zijn:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="847"/>
@@ -1850,12 +1780,12 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../partman.cpp" line="936"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit systeem gebruikt EFI, maar er is geen geldige EFI-systeempartitie apart toegewezen aan /boot/efi.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="939"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het volume toegewezen aan /boot/efi is geen geldige EFI systeempartitie.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1012"/>
@@ -1890,12 +1820,12 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../partman.cpp" line="1237"/>
         <source>Failed to format LUKS container.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mislukt bij het formatteren van de LUKS-container.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1257"/>
         <source>Failed to open LUKS container.</source>
-        <translation type="unfinished"></translation>
+        <translation>LUKS-container is niet geopend.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1368"/>
@@ -1930,12 +1860,12 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../partman.cpp" line="1270"/>
         <source>Failed to format partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatteren van partitie mislukt.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1334"/>
         <source>Failed to prepare subvolumes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voorbereiden van subvolumes mislukt.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1335"/>
@@ -1945,60 +1875,12 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../partman.cpp" line="1439"/>
         <source>Failed to mount partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Koppeling van partitie mislukt.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1444"/>
         <source>Mounting: %1</source>
         <translation>Montage: %1</translation>
-    </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Model: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Vrije ruimte: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Apparaat</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Grootte</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Gebruik voor</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Label</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Versleutelen</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Formaat</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Controleren</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Opties</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Dumpen</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Pass</translation>
     </message>
 </context>
 <context>
@@ -2006,47 +1888,47 @@ Kies a.u.b. een andere naam.</translation>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Negligible</source>
-        <translation type="unfinished"></translation>
+        <translation>Verwaarloosbaar</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Very weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeer zwak</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="144"/>
         <source>Weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Zwak</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>Matig</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Sterk</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="145"/>
         <source>Very strong</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeer sterk</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="147"/>
         <source>Password strength: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Wachtwoordsterkte: %1</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Verberg het wachtwoord</translation>
+        <translation>Verberg het wachtwoord</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Toon het wachtwoord</translation>
+        <translation>Toon het wachtwoord</translation>
     </message>
 </context>
 <context>
@@ -2088,7 +1970,7 @@ Let op, dit is experimenteel. Toekomstige installatieversies kunnen de compatibi
     <message>
         <location filename="../app.cpp" line="102"/>
         <source>Shutdown automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sluit automatisch af als de installatie klaar is.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="103"/>
@@ -2133,7 +2015,7 @@ Dit zal automatisch starten indien geïnstalleerd met --oem optie.</translation>
     <message>
         <location filename="../app.cpp" line="114"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Start automatisch opnieuw op als de installatie klaar is.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="115"/>
@@ -2145,13 +2027,14 @@ Dit zal automatisch starten indien geïnstalleerd met --oem optie.</translation>
     <message>
         <location filename="../app.cpp" line="117"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Controleer de installatiemedia altijd aan het begin.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="118"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Controleer de installatiemedia niet aan het begin.
+Niet aanbevolen, tenzij de installatiemedia gegarandeerd vrij zijn van fouten.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>
@@ -2193,27 +2076,27 @@ Sluit deze indien mogelijk, of voer &apos;pkill minstall&apos; uit in terminal.<
     <message>
         <location filename="../swapman.cpp" line="67"/>
         <source>Failed to create or install swap file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mislukt bij het aanmaken of installeren van swapbestand.</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="73"/>
         <source>Creating swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Swapbestand aanmaken</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="85"/>
         <source>Configuring swap file</source>
-        <translation type="unfinished"></translation>
+        <translation>Swapbestand configureren</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="121"/>
         <source>Invalid location</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldige locatie</translation>
     </message>
     <message>
         <location filename="../swapman.cpp" line="124"/>
         <source>Maximum: %1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximaal: %1 MB</translation>
     </message>
 </context>
 </TS>

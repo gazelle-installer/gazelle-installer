@@ -136,10 +136,6 @@ Minimum: %2</source>
 <context>
     <name>DeviceItem</name>
     <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Системний розділ EFI</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1940"/>
         <source>swap space</source>
         <translation>простір свопу</translation>
@@ -148,22 +144,6 @@ Minimum: %2</source>
         <location filename="../partman.cpp" line="1941"/>
         <source>format only</source>
         <translation>лише форматування</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation type="vanished">Створити</translation>
-    </message>
-    <message>
-        <source>Preserve</source>
-        <translation type="vanished">Зберегти</translation>
-    </message>
-    <message>
-        <source>Preserve (%1)</source>
-        <translation type="vanished">Зберегти (%1)</translation>
-    </message>
-    <message>
-        <source>Preserve /home (%1)</source>
-        <translation type="vanished">Зберегти /home (%1)</translation>
     </message>
 </context>
 <context>
@@ -418,41 +398,9 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Викор. для (Use For)&lt;/i&gt; - Щоб використовувати цей розділ під час встановлення, ви повинні вибрати щось тут.</translation>
     </message>
     <message>
-        <source>Format - Format without mounting.</source>
-        <translation type="vanished">Format - Форматувати без монтування.</translation>
-    </message>
-    <message>
-        <source>BIOS-GRUB - BIOS Boot GPT partition for GRUB.</source>
-        <translation type="vanished">BIOS-GRUB - розділ GPT завантаження BIOS для GRUB.</translation>
-    </message>
-    <message>
-        <source>EFI - EFI System Partition.</source>
-        <translation type="vanished">EFI - системний розділ EFI.</translation>
-    </message>
-    <message>
-        <source>boot - Boot manager (/boot).</source>
-        <translation type="vanished">boot - менеджер завантаження (/boot).</translation>
-    </message>
-    <message>
-        <source>root - System root (/).</source>
-        <translation type="vanished">root - Корінь системи (/).</translation>
-    </message>
-    <message>
-        <source>swap - Swap space.</source>
-        <translation type="vanished">swap - Простір свопу</translation>
-    </message>
-    <message>
-        <source>home - User data (/home).</source>
-        <translation type="vanished">home - Дані користувача (/home).</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="687"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Окрім зазначеного вище, ви також можете ввести власну точку монтування. Налаштовувані точки монтування мають починатися зі скісної риски (&quot;/&quot;).</translation>
-    </message>
-    <message>
-        <source>The installer treats &quot;/boot&quot;, &quot;/&quot;, and &quot;/home&quot; exactly the same as &quot;boot&quot;, &quot;root&quot;, and &quot;home&quot;, respectively.</source>
-        <translation type="vanished">Установлювач обробляє &quot;/boot&quot;, &quot;/&quot; і &quot;/home&quot; точно так само, як &quot;boot&quot;, &quot;root&quot; і &quot;home&quot;, відповідно.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="688"/>
@@ -468,10 +416,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Формат (Format)&lt;/i&gt; - Це формат розділу. Доступні формати залежать від того, для чого використовується розділ. Працюючи з наявною схемою, ви можете зберегти формат розділу, вибравши &lt;b&gt;Зберегти&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root.</source>
-        <translation type="vanished">Вибір &lt;b&gt;Зберегти /home&lt;/b&gt;для кореневого розділу зберігає вміст каталогу /home, видаляючи все інше. Цю опцію можна використовувати, лише якщо /home знаходиться на тому самому розділі, що й кореневий.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="694"/>
@@ -662,7 +606,7 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="676"/>
         <location filename="../minstall.cpp" line="715"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Системний розділ EFI</translation>
+        <translation>Системний розділ EFI</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="678"/>
@@ -1046,21 +990,6 @@ Do you really want to stop now?</source>
         <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Особливі подяки&lt;/b&gt;&lt;br/&gt;Дякуємо всім, хто вирішив підтримати %1 своїм часом, грошима, пропозиціями, роботою, похвалою, ідеями, просуванням та/або заохоченням.&lt;/p&gt;&lt;p&gt;Без вас не було б %1.&lt;/p&gt;&lt;p&gt;Команда розробників %2&lt;/p&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>MPassEdit</name>
-    <message>
-        <source>Use password</source>
-        <translation type="vanished">Використовувати пароль</translation>
-    </message>
-    <message>
-        <source>Hide the password</source>
-        <translation type="vanished">Сховати пароль</translation>
-    </message>
-    <message>
-        <source>Show the password</source>
-        <translation type="vanished">Показати пароль</translation>
     </message>
 </context>
 <context>
@@ -1577,7 +1506,7 @@ Please select a different name.</source>
     <message>
         <location filename="../oobe.cpp" line="512"/>
         <source>Are you sure you want to continue?</source>
-        <translation type="unfinished">Ви впевнені, що бажаєте продовжити?</translation>
+        <translation>Ви впевнені, що бажаєте продовжити?</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="518"/>
@@ -1657,7 +1586,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="480"/>
         <source>EFI System Partition</source>
-        <translation type="unfinished">Системний розділ EFI</translation>
+        <translation>Системний розділ EFI</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="488"/>
@@ -1688,10 +1617,6 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Розблокувати диск</translation>
-    </message>
-    <message>
-        <source>Virtual Device:</source>
-        <translation type="vanished">Віртуальний пристрій:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="623"/>
@@ -1956,54 +1881,6 @@ Please select a different name.</source>
         <source>Mounting: %1</source>
         <translation>Монтування: %1</translation>
     </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="vanished">Модель: %1</translation>
-    </message>
-    <message>
-        <source>Free space: %1</source>
-        <translation type="vanished">Вільний простір: %1</translation>
-    </message>
-    <message>
-        <source>Device</source>
-        <translation type="vanished">Пристрій</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation type="vanished">Розмір</translation>
-    </message>
-    <message>
-        <source>Use For</source>
-        <translation type="vanished">Викор. для (Use for)</translation>
-    </message>
-    <message>
-        <source>Label</source>
-        <translation type="vanished">Мітка</translation>
-    </message>
-    <message>
-        <source>Encrypt</source>
-        <translation type="vanished">Шифрування</translation>
-    </message>
-    <message>
-        <source>Format</source>
-        <translation type="vanished">Формат</translation>
-    </message>
-    <message>
-        <source>Check</source>
-        <translation type="vanished">Перевірка</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation type="vanished">Опції</translation>
-    </message>
-    <message>
-        <source>Dump</source>
-        <translation type="vanished">Дамп</translation>
-    </message>
-    <message>
-        <source>Pass</source>
-        <translation type="vanished">Пропуск (pass)</translation>
-    </message>
 </context>
 <context>
     <name>PassEdit</name>
@@ -2045,12 +1922,12 @@ Please select a different name.</source>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Hide the password</source>
-        <translation type="unfinished">Сховати пароль</translation>
+        <translation>Сховати пароль</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="180"/>
         <source>Show the password</source>
-        <translation type="unfinished">Показати пароль</translation>
+        <translation>Показати пароль</translation>
     </message>
 </context>
 <context>
@@ -2088,10 +1965,6 @@ Please note, this is experimental. Future installer versions may break compatibi
 Установлювач створює (або перезаписує) /mnt/antiX/etc/minstall.conf і зберігає копію в /etc/minstalled.conf для подальшого використання.
 Установлювач не записуватиме жодних паролів чи знехтуваних налаштувань у новий файл конфігурації.
 Зверніть увагу, що це експериментально. Майбутні версії встановлювача можуть порушити сумісність із наявними конфігураційними файлами.</translation>
-    </message>
-    <message>
-        <source>Shutdowns automatically when done installing.</source>
-        <translation type="vanished">Автоматично вимикається після завершення встановлення.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
