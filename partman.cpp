@@ -124,65 +124,65 @@ void PartMan::scan(DeviceItem *drvstart)
         const QString &jdPath = jsonDrive["path"].toString();
         if (jsonDrive["type"] != "disk") continue;
         if (jdName.startsWith("zram")) continue;
-        DeviceItem *drvit = drvstart;
-        if (!drvstart) drvit = new DeviceItem(DeviceItem::Drive, &root);
+        DeviceItem *drive = drvstart;
+        if (!drvstart) drive = new DeviceItem(DeviceItem::Drive, &root);
         else if (jdPath != drvstart->path) continue;
 
-        drvit->clear();
-        drvit->flags.curEmpty = true;
-        drvit->flags.oldLayout = true;
-        drvit->device = jdName;
-        drvit->path = jdPath;
+        drive->clear();
+        drive->flags.curEmpty = true;
+        drive->flags.oldLayout = true;
+        drive->device = jdName;
+        drive->path = jdPath;
         const QString &ptType = jsonDrive["pttype"].toString();
-        drvit->flags.curGPT = (ptType == "gpt");
-        drvit->flags.curMBR = (ptType == "dos");
-        drvit->flags.rotational = jsonDrive["rota"].toBool();
-        drvit->discgran = jsonDrive["disc-gran"].toInt();
-        drvit->size = jsonDrive["size"].toVariant().toLongLong();
-        drvit->physec = jsonDrive["phy-sec"].toInt();
-        drvit->curLabel = jsonDrive["label"].toString();
-        drvit->model = jsonDrive["model"].toString();
+        drive->flags.curGPT = (ptType == "gpt");
+        drive->flags.curMBR = (ptType == "dos");
+        drive->flags.rotational = jsonDrive["rota"].toBool();
+        drive->discgran = jsonDrive["disc-gran"].toInt();
+        drive->size = jsonDrive["size"].toVariant().toLongLong();
+        drive->physec = jsonDrive["phy-sec"].toInt();
+        drive->curLabel = jsonDrive["label"].toString();
+        drive->model = jsonDrive["model"].toString();
         const QJsonArray &jsonParts = jsonDrive["children"].toArray();
         for (const QJsonValue &jsonPart : jsonParts) {
             const QString &partTypeName = jsonPart["parttypename"].toString();
             if (partTypeName == "Extended" || partTypeName == "W95 Ext'd (LBA)"
                 || partTypeName == "Linux extended") continue;
-            DeviceItem *partit = new DeviceItem(DeviceItem::Partition, drvit);
-            drvit->flags.curEmpty = false;
-            partit->flags.oldLayout = true;
-            partit->device = jsonPart["name"].toString();
-            partit->path = jsonPart["path"].toString();
-            partit->uuid = jsonPart["uuid"].toString();
-            partit->order = order.indexOf(partit->device);
-            partit->size = jsonPart["size"].toVariant().toLongLong();
-            partit->physec = jsonPart["phy-sec"].toInt();
-            partit->curLabel = jsonPart["label"].toString();
-            partit->model = jsonPart["model"].toString();
-            partit->flags.rotational = jsonPart["rota"].toBool();
-            partit->discgran = jsonPart["disc-gran"].toInt();
+            DeviceItem *part = new DeviceItem(DeviceItem::Partition, drive);
+            drive->flags.curEmpty = false;
+            part->flags.oldLayout = true;
+            part->device = jsonPart["name"].toString();
+            part->path = jsonPart["path"].toString();
+            part->uuid = jsonPart["uuid"].toString();
+            part->order = order.indexOf(part->device);
+            part->size = jsonPart["size"].toVariant().toLongLong();
+            part->physec = jsonPart["phy-sec"].toInt();
+            part->curLabel = jsonPart["label"].toString();
+            part->model = jsonPart["model"].toString();
+            part->flags.rotational = jsonPart["rota"].toBool();
+            part->discgran = jsonPart["disc-gran"].toInt();
             const int partflags = jsonPart["partflags"].toString().toUInt(nullptr, 0);
-            if ((partflags & 0x80) || (partflags & 0x04)) partit->setActive(true);
-            partit->mapCount = jsonPart["children"].toArray().count();
-            partit->flags.sysEFI = partit->flags.curESP = partTypeName.startsWith("EFI "); // "System"/"(FAT-12/16/32)"
-            partit->flags.bootRoot = (!bootUUID.isEmpty() && partit->uuid == bootUUID);
-            partit->curFormat = jsonPart["fstype"].toString();
-            if (partit->curFormat == "vfat") partit->curFormat = jsonPart["fsver"].toString();
-            if (partTypeName == "BIOS boot") partit->curFormat = "BIOS-GRUB";
+            if ((partflags & 0x80) || (partflags & 0x04)) part->setActive(true);
+            part->mapCount = jsonPart["children"].toArray().count();
+            part->flags.sysEFI = part->flags.curESP = partTypeName.startsWith("EFI "); // "System"/"(FAT-12/16/32)"
+            part->flags.bootRoot = (!bootUUID.isEmpty() && part->uuid == bootUUID);
+            part->curFormat = jsonPart["fstype"].toString();
+            if (part->curFormat == "vfat") part->curFormat = jsonPart["fsver"].toString();
+            if (partTypeName == "BIOS boot") part->curFormat = "BIOS-GRUB";
             // Touching Microsoft LDM may brick the system.
-            if (partTypeName.startsWith("Microsoft LDM")) partit->flags.nasty = true;
+            if (partTypeName.startsWith("Microsoft LDM")) part->flags.nasty = true;
             // Propagate the boot and nasty flags up to the drive.
-            if (partit->flags.bootRoot) drvit->flags.bootRoot = true;
-            if (partit->flags.nasty) drvit->flags.nasty = true;
+            if (part->flags.bootRoot) drive->flags.bootRoot = true;
+            if (part->flags.nasty) drive->flags.nasty = true;
         }
-        for (int ixPart = drvit->childCount() - 1; ixPart >= 0; --ixPart) {
+        for (int ixPart = drive->childCount() - 1; ixPart >= 0; --ixPart) {
             // Propagate the boot flag across the entire drive.
-            if (drvit->flags.bootRoot) drvit->child(ixPart)->flags.bootRoot = true;
+            if (drive->flags.bootRoot) drive->child(ixPart)->flags.bootRoot = true;
         }
-        drvit->sortChildren();
-        notifyChange(drvit);
+        drive->sortChildren();
+        notifyChange(drive);
         // Hide the live boot media and its partitions by default.
-        if (!brave && drvit->flags.bootRoot) {
-            gui.treePartitions->setRowHidden(drvit->row(), QModelIndex(), true);
+        if (!brave && drive->flags.bootRoot) {
+            gui.treePartitions->setRowHidden(drive->row(), QModelIndex(), true);
         }
     }
 
@@ -194,17 +194,17 @@ void PartMan::scan(DeviceItem *drvstart)
 
 void PartMan::scanVirtualDevices(bool rescan)
 {
-    DeviceItem *vdlit = nullptr;
+    DeviceItem *virtdevs = nullptr;
     std::map<QString, DeviceItem *> listed;
     if (rescan) {
         for (int ixi = root.childCount() - 1; ixi >= 0; --ixi) {
-            DeviceItem *twit = root.child(ixi);
-            if (twit->type == DeviceItem::VirtualDevices) {
-                vdlit = twit;
-                const int vdcount = vdlit->childCount();
+            DeviceItem *drive = root.child(ixi);
+            if (drive->type == DeviceItem::VirtualDevices) {
+                virtdevs = drive;
+                const int vdcount = virtdevs->childCount();
                 for (int ixVD = 0; ixVD < vdcount; ++ixVD) {
-                    DeviceItem *devit = vdlit->child(ixVD);
-                    listed[devit->path] = devit;
+                    DeviceItem *device = virtdevs->child(ixVD);
+                    listed[device->path] = device;
                 }
                 break;
             }
@@ -215,15 +215,15 @@ void PartMan::scanVirtualDevices(bool rescan)
     const QJsonObject &jsonObjBD = QJsonDocument::fromJson(bdRaw.toUtf8()).object();
     const QJsonArray &jsonBD = jsonObjBD["blockdevices"].toArray();
     if (jsonBD.empty()) {
-        if (vdlit) delete vdlit;
+        if (virtdevs) delete virtdevs;
         return;
-    } else if (!vdlit) {
-        vdlit = new DeviceItem(DeviceItem::VirtualDevices, &root);
-        vdlit->device = tr("Virtual Devices");
-        vdlit->flags.oldLayout = true;
-        gui.treePartitions->setFirstColumnSpanned(vdlit->row(), QModelIndex(), true);
+    } else if (!virtdevs) {
+        virtdevs = new DeviceItem(DeviceItem::VirtualDevices, &root);
+        virtdevs->device = tr("Virtual Devices");
+        virtdevs->flags.oldLayout = true;
+        gui.treePartitions->setFirstColumnSpanned(virtdevs->row(), QModelIndex(), true);
     }
-    assert(vdlit != nullptr);
+    assert(virtdevs != nullptr);
     for (const QJsonValue &jsonDev : jsonBD) {
         const QString &path = jsonDev["path"].toString();
         const bool rota = jsonDev["rota"].toBool();
@@ -233,41 +233,41 @@ void PartMan::scanVirtualDevices(bool rescan)
         const QString &label = jsonDev["label"].toString();
         const bool crypto = (jsonDev["type"].toString() == "crypt");
         // Check if the device is already in the list.
-        DeviceItem *devit = nullptr;
+        DeviceItem *device = nullptr;
         const auto fit = listed.find(path);
         if (fit != listed.cend()) {
-            devit = fit->second;
-            if (rota != devit->flags.rotational || discgran != devit->discgran
-                || size != devit->size || physec != devit->physec
-                || label != devit->curLabel || crypto != devit->flags.volCrypto) {
+            device = fit->second;
+            if (rota != device->flags.rotational || discgran != device->discgran
+                || size != device->size || physec != device->physec
+                || label != device->curLabel || crypto != device->flags.volCrypto) {
                 // List entry is different to the device, so refresh it.
-                delete devit;
-                devit = nullptr;
+                delete device;
+                device = nullptr;
             }
             listed.erase(fit);
         }
         // Create a new list entry if needed.
-        if (!devit) {
-            devit = new DeviceItem(DeviceItem::VirtualBD, vdlit);
-            devit->device = jsonDev["name"].toString();
-            devit->path = path;
-            devit->uuid = jsonDev["uuid"].toString();
-            devit->flags.rotational = rota;
-            devit->discgran = discgran;
-            devit->size = size;
-            devit->physec = physec;
-            devit->flags.bootRoot = (!bootUUID.isEmpty() && devit->uuid == bootUUID);
-            devit->curLabel = label;
-            devit->curFormat = jsonDev["fstype"].toString();
-            devit->flags.volCrypto = crypto;
-            devit->flags.oldLayout = true;
+        if (!device) {
+            device = new DeviceItem(DeviceItem::VirtualBD, virtdevs);
+            device->device = jsonDev["name"].toString();
+            device->path = path;
+            device->uuid = jsonDev["uuid"].toString();
+            device->flags.rotational = rota;
+            device->discgran = discgran;
+            device->size = size;
+            device->physec = physec;
+            device->flags.bootRoot = (!bootUUID.isEmpty() && device->uuid == bootUUID);
+            device->curLabel = label;
+            device->curFormat = jsonDev["fstype"].toString();
+            device->flags.volCrypto = crypto;
+            device->flags.oldLayout = true;
         }
     }
     for (const auto &it : listed) delete it.second;
-    vdlit->sortChildren();
-    for(int ixi = 0; ixi < vdlit->childCount(); ++ixi) {
-        const QString &name = vdlit->child(ixi)->device;
-        DeviceItem *vit = vdlit->child(ixi);
+    virtdevs->sortChildren();
+    for(int ixi = 0; ixi < virtdevs->childCount(); ++ixi) {
+        const QString &name = virtdevs->child(ixi)->device;
+        DeviceItem *vit = virtdevs->child(ixi);
         vit->origin = nullptr; // Clear stale origin pointer.
         // Find the associated partition and decrement its reference count if found.
         proc.exec("cryptsetup", {"status", vit->path}, nullptr, true);
@@ -282,104 +282,104 @@ void PartMan::scanVirtualDevices(bool rescan)
             }
         }
     }
-    gui.treePartitions->expand(index(vdlit));
+    gui.treePartitions->expand(index(virtdevs));
 }
 
 bool PartMan::manageConfig(MSettings &config, bool save) noexcept
 {
     const int driveCount = root.childCount();
     for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
-        DeviceItem *drvit = root.child(ixDrive);
+        DeviceItem *drive = root.child(ixDrive);
         // Check if the drive is to be cleared and formatted.
-        int partCount = drvit->childCount();
-        bool drvPreserve = drvit->flags.oldLayout;
-        const QString &configNewLayout = "Storage/NewLayout." + drvit->device;
+        int partCount = drive->childCount();
+        bool drvPreserve = drive->flags.oldLayout;
+        const QString &configNewLayout = "Storage/NewLayout." + drive->device;
         if (save) {
             if (!drvPreserve) config.setValue(configNewLayout, partCount);
         } else if (config.contains(configNewLayout)) {
             drvPreserve = false;
-            drvit->clear();
+            drive->clear();
             partCount = config.value(configNewLayout).toInt();
             if (partCount > PARTMAN_MAX_PARTS) return false;
         }
         // Partition configuration.
-        const long long sizeMax = drvit->size - PARTMAN_SAFETY;
+        const long long sizeMax = drive->size - PARTMAN_SAFETY;
         long long sizeTotal = 0;
         for (int ixPart = 0; ixPart < partCount; ++ixPart) {
-            DeviceItem *partit = nullptr;
+            DeviceItem *part = nullptr;
             if (save || drvPreserve) {
-                partit = drvit->child(ixPart);
-                if (!save) partit->flags.oldLayout = true;
+                part = drive->child(ixPart);
+                if (!save) part->flags.oldLayout = true;
             } else {
-                partit = new DeviceItem(DeviceItem::Partition, drvit);
-                partit->device = DeviceItem::join(drvit->device, ixPart+1);
+                part = new DeviceItem(DeviceItem::Partition, drive);
+                part->device = DeviceItem::join(drive->device, ixPart+1);
             }
             // Configuration management, accounting for automatic control correction order.
-            const QString &groupPart = "Storage." + partit->device;
+            const QString &groupPart = "Storage." + part->device;
             config.beginGroup(groupPart);
             if (save) {
-                config.setValue("Size", partit->size);
-                if (partit->isActive()) config.setValue("Active", true);
-                if (partit->flags.sysEFI) config.setValue("ESP", true);
-                if (partit->addToCrypttab) config.setValue("AddToCrypttab", true);
-                if (!partit->usefor.isEmpty()) config.setValue("UseFor", partit->usefor);
-                if (!partit->format.isEmpty()) config.setValue("Format", partit->format);
-                config.setValue("Encrypt", partit->encrypt);
-                if (!partit->label.isEmpty()) config.setValue("Label", partit->label);
-                if (!partit->options.isEmpty()) config.setValue("Options", partit->options);
-                config.setValue("CheckBadBlocks", partit->chkbadblk);
-                config.setValue("Dump", partit->dump);
-                config.setValue("Pass", partit->pass);
+                config.setValue("Size", part->size);
+                if (part->isActive()) config.setValue("Active", true);
+                if (part->flags.sysEFI) config.setValue("ESP", true);
+                if (part->addToCrypttab) config.setValue("AddToCrypttab", true);
+                if (!part->usefor.isEmpty()) config.setValue("UseFor", part->usefor);
+                if (!part->format.isEmpty()) config.setValue("Format", part->format);
+                config.setValue("Encrypt", part->encrypt);
+                if (!part->label.isEmpty()) config.setValue("Label", part->label);
+                if (!part->options.isEmpty()) config.setValue("Options", part->options);
+                config.setValue("CheckBadBlocks", part->chkbadblk);
+                config.setValue("Dump", part->dump);
+                config.setValue("Pass", part->pass);
             } else {
                 if (!drvPreserve && config.contains("Size")) {
-                    partit->size = config.value("Size").toLongLong();
-                    sizeTotal += partit->size;
+                    part->size = config.value("Size").toLongLong();
+                    sizeTotal += part->size;
                     if (sizeTotal > sizeMax) return false;
-                    if (config.value("Active").toBool()) partit->setActive(true);
+                    if (config.value("Active").toBool()) part->setActive(true);
                 }
-                partit->flags.sysEFI = config.value("ESP", partit->flags.sysEFI).toBool();
-                partit->usefor = config.value("UseFor", partit->usefor).toString();
-                partit->format = config.value("Format", partit->format).toString();
-                partit->chkbadblk = config.value("CheckBadBlocks", partit->chkbadblk).toBool();
-                partit->encrypt = config.value("Encrypt", partit->encrypt).toBool();
-                partit->addToCrypttab = config.value("AddToCrypttab", partit->encrypt).toBool();
-                partit->label = config.value("Label", partit->label).toString();
-                partit->options = config.value("Options", partit->options).toString();
-                partit->dump = config.value("Dump", partit->dump).toBool();
-                partit->pass = config.value("Pass", partit->pass).toInt();
+                part->flags.sysEFI = config.value("ESP", part->flags.sysEFI).toBool();
+                part->usefor = config.value("UseFor", part->usefor).toString();
+                part->format = config.value("Format", part->format).toString();
+                part->chkbadblk = config.value("CheckBadBlocks", part->chkbadblk).toBool();
+                part->encrypt = config.value("Encrypt", part->encrypt).toBool();
+                part->addToCrypttab = config.value("AddToCrypttab", part->encrypt).toBool();
+                part->label = config.value("Label", part->label).toString();
+                part->options = config.value("Options", part->options).toString();
+                part->dump = config.value("Dump", part->dump).toBool();
+                part->pass = config.value("Pass", part->pass).toInt();
             }
             int subvolCount = 0;
-            if (partit->format == "btrfs") {
+            if (part->format == "btrfs") {
                 if (!save) subvolCount = config.value("Subvolumes").toInt();
                 else {
-                    subvolCount = partit->childCount();
+                    subvolCount = part->childCount();
                     config.setValue("Subvolumes", subvolCount);
                 }
             }
             config.endGroup();
             // Btrfs subvolume configuration.
             for (int ixSV=0; ixSV<subvolCount; ++ixSV) {
-                DeviceItem *svit = nullptr;
-                if (save) svit = partit->child(ixSV);
-                else svit = new DeviceItem(DeviceItem::Subvolume, partit);
-                if (!svit) return false;
+                DeviceItem *subvol = nullptr;
+                if (save) subvol = part->child(ixSV);
+                else subvol = new DeviceItem(DeviceItem::Subvolume, part);
+                if (!subvol) return false;
                 config.beginGroup(groupPart + ".Subvolume" + QString::number(ixSV+1));
                 if (save) {
-                    if (!svit->usefor.isEmpty()) config.setValue("UseFor", svit->usefor);
-                    if (!svit->label.isEmpty()) config.setValue("Label", svit->label);
-                    if (!svit->options.isEmpty()) config.setValue("Options", svit->options);
-                    config.setValue("Dump", svit->dump);
-                    config.setValue("Pass", svit->pass);
+                    if (!subvol->usefor.isEmpty()) config.setValue("UseFor", subvol->usefor);
+                    if (!subvol->label.isEmpty()) config.setValue("Label", subvol->label);
+                    if (!subvol->options.isEmpty()) config.setValue("Options", subvol->options);
+                    config.setValue("Dump", subvol->dump);
+                    config.setValue("Pass", subvol->pass);
                 } else {
-                    svit->usefor = config.value("UseFor").toString();
-                    svit->label = config.value("Label").toString();
-                    svit->options = config.value("Options").toString();
-                    svit->dump = config.value("Dump").toBool();
-                    svit->pass = config.value("Pass").toInt();
+                    subvol->usefor = config.value("UseFor").toString();
+                    subvol->label = config.value("Label").toString();
+                    subvol->options = config.value("Options").toString();
+                    subvol->dump = config.value("Dump").toBool();
+                    subvol->pass = config.value("Pass").toInt();
                 }
                 config.endGroup();
             }
-            if (!save) gui.treePartitions->expand(index(partit));
+            if (!save) gui.treePartitions->expand(index(part));
         }
     }
     treeSelChange();
@@ -412,26 +412,26 @@ void PartMan::treeItemChange() noexcept
 void PartMan::treeSelChange() noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (twit && twit->type != DeviceItem::Subvolume) {
-        const bool isdrive = (twit->type == DeviceItem::Drive);
-        bool isold = twit->flags.oldLayout;
-        const bool islocked = twit->isLocked();
-        if (isdrive && twit->flags.curEmpty) isold = false;
+    DeviceItem *seldev = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
+    if (seldev && seldev->type != DeviceItem::Subvolume) {
+        const bool isdrive = (seldev->type == DeviceItem::Drive);
+        bool isold = seldev->flags.oldLayout;
+        const bool islocked = seldev->isLocked();
+        if (isdrive && seldev->flags.curEmpty) isold = false;
         gui.pushPartClear->setEnabled(isdrive && !islocked);
         gui.pushPartRemove->setEnabled(!isold && !isdrive);
         // Only allow adding partitions if there is enough space.
-        DeviceItem *drvit = twit->parent();
-        if (!drvit) drvit = twit;
+        DeviceItem *drive = seldev->parent();
+        if (!drive) drive = seldev;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else {
-            gui.pushPartAdd->setEnabled(twit->driveFreeSpace(true) > 1*MB
-                && !isold && drvit->childCount() < PARTMAN_MAX_PARTS);
+            gui.pushPartAdd->setEnabled(seldev->driveFreeSpace(true) > 1*MB
+                && !isold && drive->childCount() < PARTMAN_MAX_PARTS);
         }
     } else {
         gui.pushPartClear->setEnabled(false);
-        gui.pushPartAdd->setEnabled(twit != nullptr);
-        gui.pushPartRemove->setEnabled(twit != nullptr && !twit->flags.oldLayout);
+        gui.pushPartAdd->setEnabled(seldev != nullptr);
+        gui.pushPartRemove->setEnabled(seldev != nullptr && !seldev->flags.oldLayout);
     }
 }
 
@@ -441,10 +441,10 @@ void PartMan::treeMenu(const QPoint &)
     if (ixlist.count() < 1) return;
     const QModelIndex &selIndex = ixlist.at(0);
     if (!selIndex.isValid()) return;
-    DeviceItem *twit = item(selIndex);
-    if (twit->type == DeviceItem::VirtualDevices) return;
+    DeviceItem *seldev = item(selIndex);
+    if (seldev->type == DeviceItem::VirtualDevices) return;
     QMenu menu(gui.treePartitions);
-    if (twit->isVolume()) {
+    if (seldev->isVolume()) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.pushPartAdd->isEnabled());
         QAction *actRemove = menu.addAction(tr("&Remove partition"));
@@ -455,56 +455,56 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actActive = nullptr, *actESP = nullptr;
         actRemove->setEnabled(gui.pushPartRemove->isEnabled());
         menu.addSeparator();
-        if (twit->type == DeviceItem::VirtualBD) {
+        if (seldev->type == DeviceItem::VirtualBD) {
             actRemove->setEnabled(false);
-            if (twit->flags.volCrypto) actLock = menu.addAction(tr("&Lock"));
+            if (seldev->flags.volCrypto) actLock = menu.addAction(tr("&Lock"));
         } else {
-            bool allowCryptTab = twit->encrypt;
-            if (twit->flags.oldLayout && twit->curFormat == "crypto_LUKS") {
+            bool allowCryptTab = seldev->encrypt;
+            if (seldev->flags.oldLayout && seldev->curFormat == "crypto_LUKS") {
                 actUnlock = menu.addAction(tr("&Unlock"));
                 allowCryptTab = true;
             }
             if (allowCryptTab) {
                 actAddCrypttab = menu.addAction(tr("Add to crypttab"));
                 actAddCrypttab->setCheckable(true);
-                actAddCrypttab->setChecked(twit->addToCrypttab);
+                actAddCrypttab->setChecked(seldev->addToCrypttab);
             }
             menu.addSeparator();
             actActive = menu.addAction(tr("Active partition"));
             actESP = menu.addAction(tr("EFI System Partition"));
             actActive->setCheckable(true);
-            actActive->setChecked(twit->isActive());
+            actActive->setChecked(seldev->isActive());
             actESP->setCheckable(true);
-            actESP->setChecked(twit->flags.sysEFI);
+            actESP->setChecked(seldev->flags.sysEFI);
         }
-        if (twit->finalFormat() == "btrfs") {
+        if (seldev->finalFormat() == "btrfs") {
             menu.addSeparator();
             actNewSubvolume = menu.addAction(tr("New subvolume"));
             actScanSubvols = menu.addAction(tr("Scan subvolumes"));
-            actScanSubvols->setDisabled(twit->willFormat());
+            actScanSubvols->setDisabled(seldev->willFormat());
         }
-        if (twit->mapCount && actUnlock) actUnlock->setEnabled(false);
+        if (seldev->mapCount && actUnlock) actUnlock->setEnabled(false);
         QAction *action = menu.exec(QCursor::pos());
         if (!action) return;
         else if (action == actAdd) partAddClick(true);
         else if (action == actRemove) partRemoveClick(true);
-        else if (action == actUnlock) partMenuUnlock(twit);
-        else if (action == actLock) partMenuLock(twit);
-        else if (action == actActive) twit->setActive(action->isChecked());
-        else if (action == actAddCrypttab) twit->addToCrypttab = action->isChecked();
+        else if (action == actUnlock) partMenuUnlock(seldev);
+        else if (action == actLock) partMenuLock(seldev);
+        else if (action == actActive) seldev->setActive(action->isChecked());
+        else if (action == actAddCrypttab) seldev->addToCrypttab = action->isChecked();
         else if (action == actESP) {
-            twit->flags.sysEFI = action->isChecked();
-            twit->autoFill(1 << Format);
-            notifyChange(twit);
+            seldev->flags.sysEFI = action->isChecked();
+            seldev->autoFill(1 << Format);
+            notifyChange(seldev);
         } else if (action == actNewSubvolume) {
-            DeviceItem *subvol = new DeviceItem(DeviceItem::Subvolume, twit);
+            DeviceItem *subvol = new DeviceItem(DeviceItem::Subvolume, seldev);
             subvol->autoFill();
             gui.treePartitions->expand(selIndex);
         } else if (action == actScanSubvols) {
-            scanSubvolumes(twit);
+            scanSubvolumes(seldev);
             gui.treePartitions->expand(selIndex);
         }
-    } else if (twit->type == DeviceItem::Drive) {
+    } else if (seldev->type == DeviceItem::Drive) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.pushPartAdd->isEnabled());
         menu.addSeparator();
@@ -513,28 +513,28 @@ void PartMan::treeMenu(const QPoint &)
         menu.addSeparator();
         QAction *actBuilder = menu.addAction(tr("Layout &Builder..."));
 
-        const bool locked = twit->isLocked();
+        const bool locked = seldev->isLocked();
         actClear->setDisabled(locked);
         actReset->setDisabled(locked);
 
         const long long minSpace = brave ? 0 : volSpecTotal("/", QStringList()).minimum;
-        actBuilder->setEnabled(!locked && autopart && twit->size >= minSpace);
+        actBuilder->setEnabled(!locked && autopart && seldev->size >= minSpace);
 
         QAction *action = menu.exec(QCursor::pos());
         if (action == actAdd) partAddClick(true);
         else if (action == actClear) partClearClick(true);
         else if (action == actBuilder) {
-            if (autopart) autopart->builderGUI(twit);
+            if (autopart) autopart->builderGUI(seldev);
             treeSelChange();
         } else if (action == actReset) {
             gui.boxMain->setEnabled(false);
-            scan(twit);
+            scan(seldev);
             gui.boxMain->setEnabled(true);
         }
-    } else if (twit->type == DeviceItem::Subvolume) {
+    } else if (seldev->type == DeviceItem::Subvolume) {
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
-        actRemSubvolume->setDisabled(twit->flags.oldLayout);
-        if (menu.exec(QCursor::pos()) == actRemSubvolume) delete twit;
+        actRemSubvolume->setDisabled(seldev->flags.oldLayout);
+        if (menu.exec(QCursor::pos()) == actRemSubvolume) delete seldev;
     }
 }
 
@@ -542,9 +542,9 @@ void PartMan::treeMenu(const QPoint &)
 void PartMan::partClearClick(bool)
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *twit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (!twit || twit->type != DeviceItem::Drive) return;
-    twit->clear();
+    DeviceItem *seldev = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
+    if (!seldev || seldev->type != DeviceItem::Drive) return;
+    seldev->clear();
     treeSelChange();
 }
 
@@ -574,14 +574,14 @@ void PartMan::partAddClick(bool) noexcept
 void PartMan::partRemoveClick(bool) noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
-    DeviceItem *devit = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (!devit) return;
-    DeviceItem *drvit = devit->parent();
-    if (!drvit) return;
-    const bool notSub = (devit->type != DeviceItem::Subvolume);
-    delete devit;
+    DeviceItem *seldev = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
+    if (!seldev) return;
+    DeviceItem *parent = seldev->parent();
+    if (!parent) return;
+    const bool notSub = (seldev->type != DeviceItem::Subvolume);
+    delete seldev;
     if (notSub) {
-        drvit->labelParts();
+        parent->labelParts();
         treeSelChange();
     }
 }
@@ -605,7 +605,7 @@ void PartMan::partManRunClick()
 }
 
 // Partition menu items
-void PartMan::partMenuUnlock(DeviceItem *twit)
+void PartMan::partMenuUnlock(DeviceItem *part)
 {
     QDialog dialog(gui.boxMain);
     QFormLayout layout(&dialog);
@@ -626,11 +626,11 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
         try {
-            luksOpen(twit, editPass->text().toUtf8());
-            twit->usefor.clear();
-            twit->addToCrypttab = checkCrypttab->isChecked();
-            twit->mapCount++;
-            notifyChange(twit);
+            luksOpen(part, editPass->text().toUtf8());
+            part->usefor.clear();
+            part->addToCrypttab = checkCrypttab->isChecked();
+            part->mapCount++;
+            notifyChange(part);
             scanVirtualDevices(true);
             treeSelChange();
             gui.boxMain->setEnabled(true);
@@ -645,21 +645,21 @@ void PartMan::partMenuUnlock(DeviceItem *twit)
     }
 }
 
-void PartMan::partMenuLock(DeviceItem *twit)
+void PartMan::partMenuLock(DeviceItem *volume)
 {
     qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
     gui.boxMain->setEnabled(false);
     bool ok = false;
     // Find the associated partition and decrement its reference count if found.
-    DeviceItem *origin = twit->origin;
-    if (origin) ok = proc.exec("cryptsetup", {"close", twit->path});
+    DeviceItem *origin = volume->origin;
+    if (origin) ok = proc.exec("cryptsetup", {"close", volume->path});
     if (ok) {
         if (origin->mapCount > 0) origin->mapCount--;
         origin->devMapper.clear();
         origin->addToCrypttab = false;
         notifyChange(origin);
     }
-    twit->origin = nullptr;
+    volume->origin = nullptr;
     // Refresh virtual devices list.
     scanVirtualDevices(true);
     treeSelChange();
@@ -668,29 +668,29 @@ void PartMan::partMenuLock(DeviceItem *twit)
     qApp->restoreOverrideCursor();
     // If not OK then a command failed, or trying to close a non-LUKS device.
     if (!ok) {
-        QMessageBox::critical(gui.boxMain, QString(), tr("Failed to close %1").arg(twit->device));
+        QMessageBox::critical(gui.boxMain, QString(), tr("Failed to close %1").arg(volume->device));
     }
 }
 
-void PartMan::scanSubvolumes(DeviceItem *partit)
+void PartMan::scanSubvolumes(DeviceItem *part)
 {
     qApp->setOverrideCursor(Qt::WaitCursor);
     gui.boxMain->setEnabled(false);
-    while (partit->childCount()) delete partit->child(0);
+    while (part->childCount()) delete part->child(0);
     QStringList lines;
     if (!proc.exec("mount", {"--mkdir", "-o", "subvolid=5,ro",
-        partit->mappedDevice(), "/mnt/btrfs-scratch"})) goto END;
+        part->mappedDevice(), "/mnt/btrfs-scratch"})) goto END;
     proc.exec("btrfs", {"subvolume", "list", "/mnt/btrfs-scratch"}, nullptr, true);
     lines = proc.readOutLines();
     proc.exec("umount", {"/mnt/btrfs-scratch"});
     for (const QString &line : qAsConst(lines)) {
         const int start = line.indexOf("path") + 5;
         if (line.length() <= start) goto END;
-        DeviceItem *svit = new DeviceItem(DeviceItem::Subvolume, partit);
-        svit->flags.oldLayout = true;
-        svit->label = svit->curLabel = line.mid(start);
-        svit->format = "PRESERVE";
-        notifyChange(svit);
+        DeviceItem *subvol = new DeviceItem(DeviceItem::Subvolume, part);
+        subvol->flags.oldLayout = true;
+        subvol->label = subvol->curLabel = line.mid(start);
+        subvol->format = "PRESERVE";
+        notifyChange(subvol);
     }
  END:
     gui.boxMain->setEnabled(true);
@@ -771,46 +771,46 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         // Final warnings before the installer starts.
         QString details;
         for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
-            DeviceItem *drvit = root.child(ixdrv);
-            assert(drvit != nullptr);
-            const int partCount = drvit->childCount();
-            if (!drvit->flags.oldLayout && drvit->type != DeviceItem::VirtualDevices) {
-                const char *pttype = drvit->willUseGPT() ? "GPT" : "MBR";
-                details += tr("Prepare %1 partition table on %2").arg(pttype, drvit->device) + '\n';
+            DeviceItem *drive = root.child(ixdrv);
+            assert(drive != nullptr);
+            const int partCount = drive->childCount();
+            if (!drive->flags.oldLayout && drive->type != DeviceItem::VirtualDevices) {
+                const char *pttype = drive->willUseGPT() ? "GPT" : "MBR";
+                details += tr("Prepare %1 partition table on %2").arg(pttype, drive->device) + '\n';
             }
             for (int ixdev = 0; ixdev < partCount; ++ixdev) {
-                DeviceItem *partit = drvit->child(ixdev);
-                assert(partit != nullptr);
-                const int subcount = partit->childCount();
+                DeviceItem *part = drive->child(ixdev);
+                assert(part != nullptr);
+                const int subcount = part->childCount();
                 QString actmsg;
-                if (drvit->flags.oldLayout) {
-                    if (partit->usefor.isEmpty()) {
+                if (drive->flags.oldLayout) {
+                    if (part->usefor.isEmpty()) {
                         if (subcount > 0) actmsg = tr("Reuse (no reformat) %1");
                         else continue;
                     } else {
-                        if (partit->usefor == "FORMAT") actmsg = tr("Format %1");
-                        else if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
-                        else if (partit->usefor != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
+                        if (part->usefor == "FORMAT") actmsg = tr("Format %1");
+                        else if (part->willFormat()) actmsg = tr("Format %1 to use for %2");
+                        else if (part->usefor != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
                         else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
                     }
                 } else {
-                    if (partit->usefor.isEmpty()) actmsg = tr("Create %1 without formatting");
+                    if (part->usefor.isEmpty()) actmsg = tr("Create %1 without formatting");
                     else actmsg = tr("Create %1, format to use for %2");
                 }
                 // QString::arg() emits warnings if a marker is not in the string.
-                details += actmsg.replace("%1", partit->shownDevice()).replace("%2", partit->usefor) + '\n';
+                details += actmsg.replace("%1", part->shownDevice()).replace("%2", part->usefor) + '\n';
 
                 for (int ixsv = 0; ixsv < subcount; ++ixsv) {
-                    DeviceItem *svit = partit->child(ixsv);
-                    assert(svit != nullptr);
-                    const bool svnouse = svit->usefor.isEmpty();
-                    if (svit->format == "PRESERVE") {
+                    DeviceItem *subvol = part->child(ixsv);
+                    assert(subvol != nullptr);
+                    const bool svnouse = subvol->usefor.isEmpty();
+                    if (subvol->format == "PRESERVE") {
                         if (svnouse) continue;
                         else actmsg = tr("Reuse subvolume %1 as %2");
-                    } else if (svit->format == "DELETE") {
+                    } else if (subvol->format == "DELETE") {
                         actmsg = tr("Delete subvolume %1");
-                    } else if (svit->format == "CREATE") {
-                        if (svit->flags.oldLayout) {
+                    } else if (subvol->format == "CREATE") {
+                        if (subvol->flags.oldLayout) {
                             if (svnouse) actmsg = tr("Overwrite subvolume %1");
                             else actmsg = tr("Overwrite subvolume %1 to use for %2");
                         } else {
@@ -819,7 +819,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                         }
                     }
                     // QString::arg() emits warnings if a marker is not in the string.
-                    details += " + " + actmsg.replace("%1", svit->label).replace("%2", svit->usefor) + '\n';
+                    details += " + " + actmsg.replace("%1", subvol->label).replace("%2", subvol->usefor) + '\n';
                 }
             }
         }
@@ -864,40 +864,40 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
 
     QStringList toosmall;
     for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
-        DeviceItem *drvit = root.child(ixdrv);
-        const int partCount = drvit->childCount();
+        DeviceItem *drive = root.child(ixdrv);
+        const int partCount = drive->childCount();
         for (int ixdev = 0; ixdev < partCount; ++ixdev) {
-            DeviceItem *partit = drvit->child(ixdev);
-            assert(partit != nullptr);
-            const int subcount = partit->childCount();
-            bool isused = !partit->usefor.isEmpty();
-            long long minsize = isused ? volSpecTotal(partit->usefor, vols).minimum : 0;
+            DeviceItem *part = drive->child(ixdev);
+            assert(part != nullptr);
+            const int subcount = part->childCount();
+            bool isused = !part->usefor.isEmpty();
+            long long minsize = isused ? volSpecTotal(part->usefor, vols).minimum : 0;
 
             // First pass = get the total minimum required for all subvolumes.
             for (int ixsv = 0; ixsv < subcount; ++ixsv) {
-                DeviceItem *svit = partit->child(ixsv);
-                assert(svit != nullptr);
-                if(!svit->usefor.isEmpty()) {
-                    minsize += volSpecTotal(svit->usefor, vols).minimum;
+                DeviceItem *subvol = part->child(ixsv);
+                assert(subvol != nullptr);
+                if(!subvol->usefor.isEmpty()) {
+                    minsize += volSpecTotal(subvol->usefor, vols).minimum;
                     isused = true;
                 }
             }
             // If this volume is too small, add to the warning list.
-            if (isused && partit->size < minsize) {
+            if (isused && part->size < minsize) {
                 const QString &msgsz = tr("%1 (%2) requires %3");
-                toosmall << msgsz.arg(partit->usefor, partit->shownDevice(),
+                toosmall << msgsz.arg(part->usefor, part->shownDevice(),
                     QLocale::system().formattedDataSize(minsize, 1, QLocale::DataSizeTraditionalFormat));
 
                 // Add all subvolumes (sorted) to the warning list as one string.
                 QStringList svsmall;
                 for (int ixsv = 0; ixsv < subcount; ++ixsv) {
-                    DeviceItem *svit = partit->child(ixsv);
-                    assert(svit != nullptr);
-                    if (svit->usefor.isEmpty()) continue;
+                    DeviceItem *subvol = part->child(ixsv);
+                    assert(subvol != nullptr);
+                    if (subvol->usefor.isEmpty()) continue;
 
-                    const long long svmin = volSpecTotal(svit->usefor, vols).minimum;
+                    const long long svmin = volSpecTotal(subvol->usefor, vols).minimum;
                     if (svmin > 0) {
-                        svsmall << msgsz.arg(svit->usefor, svit->shownDevice(),
+                        svsmall << msgsz.arg(subvol->usefor, subvol->shownDevice(),
                             QLocale::system().formattedDataSize(svmin, 1, QLocale::DataSizeTraditionalFormat));
                     }
                 }
@@ -941,21 +941,21 @@ bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
     // BIOS with GPT
     QString biosgpt;
     for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
-        DeviceItem *drvit = root.child(ixdrv);
-        const int partCount = drvit->childCount();
+        DeviceItem *drive = root.child(ixdrv);
+        const int partCount = drive->childCount();
         bool hasBiosGrub = false;
         for (int ixdev = 0; ixdev < partCount; ++ixdev) {
-            DeviceItem *partit = drvit->child(ixdev);
-            assert(partit != nullptr);
-            if (partit->finalFormat() == "BIOS-GRUB") {
+            DeviceItem *part = drive->child(ixdev);
+            assert(part != nullptr);
+            if (part->finalFormat() == "BIOS-GRUB") {
                 hasBiosGrub = true;
                 break;
             }
         }
         // Potentially unbootable GPT when on a BIOS-based PC.
-        const bool hasBoot = (drvit->active != nullptr);
-        if (!proc.detectEFI() && drvit->willUseGPT() && hasBoot && !hasBiosGrub) {
-            biosgpt += ' ' + drvit->device;
+        const bool hasBoot = (drive->active != nullptr);
+        if (!proc.detectEFI() && drive->willUseGPT() && hasBoot && !hasBiosGrub) {
+            biosgpt += ' ' + drive->device;
         }
     }
     if (!biosgpt.isEmpty()) {
@@ -976,21 +976,21 @@ bool PartMan::checkTargetDrivesOK()
     MProcess::Section sect(proc, nullptr); // No exception on execution error for this block.
     QString smartFail, smartWarn;
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
-        DeviceItem *drvit =  root.child(ixi);
-        if (drvit->type == DeviceItem::VirtualDevices) continue;
+        DeviceItem *drive = root.child(ixi);
+        if (drive->type == DeviceItem::VirtualDevices) continue;
         QStringList purposes;
-        for (DeviceItemIterator it(drvit); const DeviceItem *item = *it; it.next()) {
+        for (DeviceItemIterator it(drive); const DeviceItem *item = *it; it.next()) {
             if (!item->usefor.isEmpty()) purposes << item->usefor;
         }
         // If any partitions are selected run the SMART tests.
         if (!purposes.isEmpty()) {
-            QString smartMsg = drvit->device + " (" + purposes.join(", ") + ")";
-            proc.exec("smartctl", {"-H", drvit->path});
+            QString smartMsg = drive->device + " (" + purposes.join(", ") + ")";
+            proc.exec("smartctl", {"-H", drive->path});
             if (proc.exitStatus() == MProcess::NormalExit && proc.exitCode() & 8) {
                 // See smartctl(8) manual: EXIT STATUS (Bit 3)
                 smartFail += " - " + smartMsg + "\n";
             } else {
-                proc.shell("smartctl -A " + drvit->path + "| grep -E \"^  5|^196|^197|^198\""
+                proc.shell("smartctl -A " + drive->path + "| grep -E \"^  5|^196|^197|^198\""
                     " | awk '{ if ( $10 != 0 ) { print $1,$2,$10} }'", nullptr, true);
                 const QString &out = proc.readOut();
                 if (!out.isEmpty()) smartWarn += " ---- " + smartMsg + " ---\n" + out + "\n\n";
@@ -1031,8 +1031,8 @@ DeviceItem *PartMan::selectedDriveAuto() noexcept
     QString drv(gui.comboDisk->currentData().toString());
     if (!findByPath("/dev/" + drv)) return nullptr;
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
-        DeviceItem *const drvit = root.child(ixi);
-        if (drvit->device == drv) return drvit;
+        DeviceItem *const drive = root.child(ixi);
+        if (drive->device == drv) return drive;
     }
     return nullptr;
 }
@@ -1110,18 +1110,18 @@ void PartMan::preparePartitions()
     // Detach all existing partitions.
     QStringList listToUnmount;
     for (int ixDrive = 0; ixDrive < root.childCount(); ++ixDrive) {
-        DeviceItem *drvit = root.child(ixDrive);
-        if (drvit->type == DeviceItem::VirtualDevices) continue;
-        const int partCount = drvit->childCount();
-        if (drvit->flags.oldLayout) {
+        DeviceItem *drive = root.child(ixDrive);
+        if (drive->type == DeviceItem::VirtualDevices) continue;
+        const int partCount = drive->childCount();
+        if (drive->flags.oldLayout) {
             // Using the existing layout, so only mark used partitions for unmounting.
             for (int ixPart=0; ixPart < partCount; ++ixPart) {
-                DeviceItem *twit = drvit->child(ixPart);
-                if (!twit->usefor.isEmpty()) listToUnmount << twit->path;
+                DeviceItem *part = drive->child(ixPart);
+                if (!part->usefor.isEmpty()) listToUnmount << part->path;
             }
         } else {
             // Clearing the drive, so mark all partitions on the drive for unmounting.
-            proc.exec("lsblk", {"-nro", "path", drvit->path}, nullptr, true);
+            proc.exec("lsblk", {"-nro", "path", drive->path}, nullptr, true);
             listToUnmount << proc.readOutLines();
         }
     }
@@ -1146,14 +1146,14 @@ void PartMan::preparePartitions()
 
     // Prepare partition tables on devices which will have a new layout.
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
-        DeviceItem *drvit = root.child(ixi);
-        if (drvit->flags.oldLayout || drvit->type == DeviceItem::VirtualDevices) continue;
+        DeviceItem *drive = root.child(ixi);
+        if (drive->flags.oldLayout || drive->type == DeviceItem::VirtualDevices) continue;
         proc.status(tr("Preparing partition tables"));
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
         {
             MProcess::Section sect2(proc, nullptr);
-            const long long offset = (drvit->size / 65536) - 63; // Account for integer rounding.
-            QStringList cargs({"conv=notrunc", "bs=64K", "count=64", "if=/dev/zero", "of=" + drvit->path});
+            const long long offset = (drive->size / 65536) - 63; // Account for integer rounding.
+            QStringList cargs({"conv=notrunc", "bs=64K", "count=64", "if=/dev/zero", "of=" + drive->path});
             // First 17KB = primary partition table (accounts for both MBR and GPT disks).
             // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
             proc.exec("dd", cargs);
@@ -1161,30 +1161,30 @@ void PartMan::preparePartitions()
             cargs.append("seek=" + QString::number(offset));
             proc.exec("dd", cargs);
         }
-        proc.exec("parted", {"-s", drvit->path, "mklabel", (drvit->willUseGPT() ? "gpt" : "msdos")});
+        proc.exec("parted", {"-s", drive->path, "mklabel", (drive->willUseGPT() ? "gpt" : "msdos")});
     }
 
     // Prepare partition tables, creating tables and partitions when needed.
     proc.status(tr("Preparing required partitions"));
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
         bool partupdate = false;
-        DeviceItem *drvit = root.child(ixi);
-        if (drvit->type == DeviceItem::VirtualDevices) continue;
-        const int devCount = drvit->childCount();
-        const bool useGPT = drvit->willUseGPT();
-        if (drvit->flags.oldLayout) {
+        DeviceItem *drive = root.child(ixi);
+        if (drive->type == DeviceItem::VirtualDevices) continue;
+        const int devCount = drive->childCount();
+        const bool useGPT = drive->willUseGPT();
+        if (drive->flags.oldLayout) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
             if (useGPT) cmd = "sgdisk /dev/%1 -q --typecode=%2:%3";
             else cmd = "sfdisk /dev/%1 -q --part-type %2 %3";
             // Set the type for partitions that will be used in this installation.
             for (int ixdev = 0; ixdev < devCount; ++ixdev) {
-                DeviceItem *twit = drvit->child(ixdev);
-                assert(twit != nullptr);
-                if (twit->usefor.isEmpty()) continue;
+                DeviceItem *part = drive->child(ixdev);
+                assert(part != nullptr);
+                if (part->usefor.isEmpty()) continue;
                 const char *ptype = useGPT ? "8303" : "83";
-                if (twit->flags.sysEFI) ptype = useGPT ? "ef00" : "ef";
-                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
+                if (part->flags.sysEFI) ptype = useGPT ? "ef00" : "ef";
+                const DeviceItem::NameParts &devsplit = DeviceItem::split(part->device);
                 proc.shell(cmd.arg(devsplit.drive, devsplit.partition, ptype));
                 partupdate = true;
                 proc.status();
@@ -1193,9 +1193,9 @@ void PartMan::preparePartitions()
             // Creating new partitions.
             long long start = 1; // start with 1 MB to aid alignment
             for (int ixdev = 0; ixdev<devCount; ++ixdev) {
-                DeviceItem *twit = drvit->child(ixdev);
-                const long long end = start + twit->size / MB;
-                proc.exec("parted", {"-s", "--align", "optimal", drvit->path,
+                DeviceItem *part = drive->child(ixdev);
+                const long long end = start + part->size / MB;
+                proc.exec("parted", {"-s", "--align", "optimal", drive->path,
                     "mkpart" , "primary", QString::number(start) + "MiB", QString::number(end) + "MiB"});
                 partupdate = true;
                 start = end;
@@ -1204,26 +1204,26 @@ void PartMan::preparePartitions()
         }
         // Partition flags.
         for (int ixdev=0; ixdev<devCount; ++ixdev) {
-            DeviceItem *twit = drvit->child(ixdev);
-            if (twit->usefor.isEmpty()) continue;
-            if (twit->isActive()) {
-                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
+            DeviceItem *part = drive->child(ixdev);
+            if (part->usefor.isEmpty()) continue;
+            if (part->isActive()) {
+                const DeviceItem::NameParts &devsplit = DeviceItem::split(part->device);
                 QStringList cargs({"-s", "/dev/" + devsplit.drive, "set", devsplit.partition});
                 cargs.append(useGPT ? "legacy_boot" : "boot");
                 cargs.append("on");
                 proc.exec("parted", cargs);
                 partupdate = true;
             }
-            if (twit->flags.sysEFI != twit->flags.curESP) {
-                const DeviceItem::NameParts &devsplit = DeviceItem::split(twit->device);
+            if (part->flags.sysEFI != part->flags.curESP) {
+                const DeviceItem::NameParts &devsplit = DeviceItem::split(part->device);
                 proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition,
-                    "esp", twit->flags.sysEFI ? "on" : "off"});
+                    "esp", part->flags.sysEFI ? "on" : "off"});
                 partupdate = true;
             }
             proc.status();
         }
         // Update kernel partition records.
-        if (partupdate) proc.exec("partx", {"-u", drvit->path});
+        if (partupdate) proc.exec("partx", {"-u", drive->path});
     }
 }
 
@@ -1265,34 +1265,34 @@ void PartMan::formatPartitions()
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to format partition."));
 
     // Format partitions.
-    for (DeviceItemIterator it(*this); DeviceItem *twit = *it; it.next()) {
-        if (twit->type != DeviceItem::Partition && twit->type != DeviceItem::VirtualBD) continue;
-        if (!twit->willFormat()) continue;
-        const QString &dev = twit->mappedDevice();
+    for (DeviceItemIterator it(*this); DeviceItem *volume = *it; it.next()) {
+        if (volume->type != DeviceItem::Partition && volume->type != DeviceItem::VirtualBD) continue;
+        if (!volume->willFormat()) continue;
+        const QString &dev = volume->mappedDevice();
         const QString &fmtstatus = tr("Formatting: %1");
-        if (twit->usefor == "FORMAT") proc.status(fmtstatus.arg(twit->device));
-        else proc.status(fmtstatus.arg(twit->usefor));
-        if (twit->usefor == "BIOS-GRUB") {
+        if (volume->usefor == "FORMAT") proc.status(fmtstatus.arg(volume->device));
+        else proc.status(fmtstatus.arg(volume->usefor));
+        if (volume->usefor == "BIOS-GRUB") {
             const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
-        } else if (twit->usefor == "SWAP") {
+        } else if (volume->usefor == "SWAP") {
             QStringList cargs({"-q", dev});
-            if (!twit->label.isEmpty()) cargs << "-L" << twit->label;
+            if (!volume->label.isEmpty()) cargs << "-L" << volume->label;
             proc.exec("mkswap", cargs);
-        } else if (twit->format.left(3) == "FAT") {
-            QStringList cargs({"-F", twit->format.mid(3)});
-            if (twit->chkbadblk) cargs.append("-c");
-            if (!twit->label.isEmpty()) cargs << "-n" << twit->label.trimmed().left(11);
+        } else if (volume->format.left(3) == "FAT") {
+            QStringList cargs({"-F", volume->format.mid(3)});
+            if (volume->chkbadblk) cargs.append("-c");
+            if (!volume->label.isEmpty()) cargs << "-n" << volume->label.trimmed().left(11);
             cargs.append(dev);
             proc.exec("mkfs.msdos", cargs);
         } else {
             // Transplanted from minstall.cpp and modified to suit.
-            const QString &format = twit->format;
+            const QString &format = volume->format;
             QStringList cargs;
             if (format == "btrfs") {
                 cargs.append("-f");
                 proc.exec("cp", {"-fp", "/usr/bin/true", "/usr/sbin/fsck.auto"});
-                if (twit->size < 6000000000) {
+                if (volume->size < 6000000000) {
                     cargs << "-M" << "-O" << "skinny-metadata"; // Mixed mode (-M)
                 }
             } else if (format == "xfs" || format == "f2fs") {
@@ -1300,13 +1300,13 @@ void PartMan::formatPartitions()
             } else { // jfs, ext2, ext3, ext4
                 if (format == "jfs") cargs.append("-q");
                 else cargs.append("-F");
-                if (twit->chkbadblk) cargs.append("-c");
+                if (volume->chkbadblk) cargs.append("-c");
             }
             cargs.append(dev);
-            if (!twit->label.isEmpty()) {
+            if (!volume->label.isEmpty()) {
                 if (format == "f2fs") cargs.append("-l");
                 else cargs.append("-L");
-                cargs.append(twit->label);
+                cargs.append(volume->label);
             }
             proc.exec("mkfs." + format, cargs);
             if (format.startsWith("ext")) {
@@ -1320,28 +1320,30 @@ void PartMan::formatPartitions()
     }
 }
 
-void PartMan::prepareSubvolumes(DeviceItem *partit)
+void PartMan::prepareSubvolumes(DeviceItem *part)
 {
-    const int subvolcount = partit->childCount();
+    const int subvolcount = part->childCount();
     if (subvolcount <= 0) return;
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to prepare subvolumes."));
     proc.status(tr("Preparing subvolumes"));
 
-    proc.exec("mount", {"--mkdir", "-o", "subvolid=5,noatime", partit->mappedDevice(), "/mnt/btrfs-scratch"});
+    proc.exec("mount", {"--mkdir", "-o", "subvolid=5,noatime", part->mappedDevice(), "/mnt/btrfs-scratch"});
     const char *errmsg = nullptr;
     try {
         // Since the default subvolume cannot be deleted, ensure the default is set to the top.
         proc.exec("btrfs", {"-q", "subvolume", "set-default", "5", "/mnt/btrfs-scratch"});
         DeviceItem *devroot = nullptr;
         for (int ixsv = 0; ixsv < subvolcount; ++ixsv) {
-            DeviceItem *svit = partit->child(ixsv);
-            assert(svit != nullptr);
-            const QString &svpath = "/mnt/btrfs-scratch/" + svit->label;
-            if (svit->format != "PRESERVE" && QFileInfo::exists(svpath)) {
+            DeviceItem *subvol = part->child(ixsv);
+            assert(subvol != nullptr);
+            const QString &svpath = "/mnt/btrfs-scratch/" + subvol->label;
+            if (subvol->format != "PRESERVE" && QFileInfo::exists(svpath)) {
                 proc.exec("btrfs", {"-q", "subvolume", "delete", svpath});
             }
-            if (svit->format == "CREATE") proc.exec("btrfs", {"-q", "subvolume", "create", svpath});
-            if (svit->usefor == "/") devroot = svit;
+            if (subvol->format == "CREATE") {
+                proc.exec("btrfs", {"-q", "subvolume", "create", svpath});
+            }
+            if (subvol->usefor == "/") devroot = subvol;
             proc.status();
         }
         // Make the root subvolume the default again.
@@ -1387,14 +1389,14 @@ bool PartMan::makeFstab() noexcept
     out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
     // File systems and swap space.
     for (auto &it : mounts) {
-        const DeviceItem *twit = it.second;
-        const QString &dev = twit->mappedDevice();
+        const DeviceItem *volume = it.second;
+        const QString &dev = volume->mappedDevice();
         qDebug() << "Creating fstab entry for:" << it.first << dev;
         // Device ID or UUID
-        if (twit->willMap()) out << dev;
-        else out << "UUID=" << twit->assocUUID();
+        if (volume->willMap()) out << dev;
+        else out << "UUID=" << volume->assocUUID();
         // Mount point, file system
-        const QString &fsfmt = twit->finalFormat();
+        const QString &fsfmt = volume->finalFormat();
         if (fsfmt == "swap") out << " swap swap";
         else {
             out << ' ' << it.first;
@@ -1402,16 +1404,16 @@ bool PartMan::makeFstab() noexcept
             else out << ' ' << fsfmt;
         }
         // Options
-        const QString &mountopts = twit->options;
-        if (twit->type == DeviceItem::Subvolume) {
-            out << " subvol=" << twit->label;
+        const QString &mountopts = volume->options;
+        if (volume->type == DeviceItem::Subvolume) {
+            out << " subvol=" << volume->label;
             if (!mountopts.isEmpty()) out << ',' << mountopts;
         } else {
             if (mountopts.isEmpty()) out << " defaults";
             else out << ' ' << mountopts;
         }
-        out << ' ' << (twit->dump ? 1 : 0);
-        out << ' ' << twit->pass << '\n';
+        out << ' ' << (volume->dump ? 1 : 0);
+        out << ' ' << volume->pass << '\n';
     }
     file.close();
     return true;
@@ -1500,13 +1502,13 @@ DeviceItem *PartMan::findByPath(const QString &devpath) const noexcept
 DeviceItem *PartMan::findHostDev(const QString &path) const noexcept
 {
     QString spath = path;
-    DeviceItem *devit = nullptr;
+    DeviceItem *device = nullptr;
     do {
         spath = QDir::cleanPath(QFileInfo(spath).path());
         const auto fit = mounts.find(spath);
-        if (fit != mounts.cend()) devit = mounts.at(spath);
-    } while(!devit && !spath.isEmpty() && spath != '/' && spath != '.');
-    return devit;
+        if (fit != mounts.cend()) device = mounts.at(spath);
+    } while(!device && !spath.isEmpty() && spath != '/' && spath != '.');
+    return device;
 }
 
 struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStringList &vols) const noexcept
@@ -1967,13 +1969,13 @@ QString DeviceItem::assocUUID() const noexcept
 }
 QString DeviceItem::mappedDevice() const noexcept
 {
-    const DeviceItem *twit = this;
-    if (twit->type == Subvolume) twit = twit->parentItem;
-    if (twit->type == Partition) {
-        const QVariant &d = twit->devMapper;
+    const DeviceItem *device = this;
+    if (device->type == Subvolume) device = device->parentItem;
+    if (device->type == Partition) {
+        const QVariant &d = device->devMapper;
         if (!d.isNull()) return "/dev/mapper/" + d.toString();
     }
-    return twit->path;
+    return device->path;
 }
 inline bool DeviceItem::willMap() const noexcept
 {
@@ -2092,10 +2094,10 @@ bool DeviceItem::canMount(bool pointonly) const noexcept
 }
 long long DeviceItem::driveFreeSpace(bool inclusive) const noexcept
 {
-    const DeviceItem *drvit = parent();
-    if (!drvit) drvit = this;
-    long long free = drvit->size - PARTMAN_SAFETY;
-    for (const DeviceItem *child : drvit->children) {
+    const DeviceItem *drive = parent();
+    if (!drive) drive = this;
+    long long free = drive->size - PARTMAN_SAFETY;
+    for (const DeviceItem *child : drive->children) {
         if (inclusive || child != this) free -= child->size;
     }
     return free;
@@ -2103,13 +2105,13 @@ long long DeviceItem::driveFreeSpace(bool inclusive) const noexcept
 /* Convenience */
 DeviceItem *DeviceItem::addPart(long long defaultSize, const QString &defaultUse, bool crypto) noexcept
 {
-    DeviceItem *partit = new DeviceItem(DeviceItem::Partition, this);
-    if (!defaultUse.isEmpty()) partit->usefor = defaultUse;
-    partit->size = defaultSize;
-    if (partit->canEncrypt()) partit->encrypt = crypto;
-    partit->autoFill();
-    if (partman) partman->notifyChange(partit);
-    return partit;
+    DeviceItem *part = new DeviceItem(DeviceItem::Partition, this);
+    if (!defaultUse.isEmpty()) part->usefor = defaultUse;
+    part->size = defaultSize;
+    if (part->canEncrypt()) part->encrypt = crypto;
+    part->autoFill();
+    if (partman) partman->notifyChange(part);
+    return part;
 }
 void DeviceItem::driveAutoSetActive() noexcept
 {
@@ -2159,9 +2161,9 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
         }
         // Automatic default boot device selection
         if ((type != VirtualBD) && (usefor == "/boot" || usefor == "/")) {
-            DeviceItem *drvit = this;
-            while (drvit && drvit->type != Drive) drvit = drvit->parentItem;
-            if (drvit) drvit->driveAutoSetActive();
+            DeviceItem *drive = this;
+            while (drive && drive->type != Drive) drive = drive->parentItem;
+            if (drive) drive->driveAutoSetActive();
         }
         if (usefor == "/boot/efi") flags.sysEFI = true;
 
@@ -2478,17 +2480,17 @@ void DeviceItemDelegate::partOptionsMenu() noexcept
 {
     QLineEdit *edit = static_cast<QLineEdit *>(sender());
     if (!edit) return;
-    DeviceItem *partit = static_cast<DeviceItem *>(edit->property("row").value<void *>());
-    if (!partit) return;
+    DeviceItem *part = static_cast<DeviceItem *>(edit->property("row").value<void *>());
+    if (!part) return;
     QMenu *menu = edit->createStandardContextMenu();
     menu->addSeparator();
     QMenu *menuTemplates = menu->addMenu(tr("&Templates"));
-    QString selFS = partit->format;
-    if (selFS == "PRESERVE") selFS = partit->curFormat;
-    if ((partit->type == DeviceItem::Partition && selFS == "btrfs") || partit->type == DeviceItem::Subvolume) {
+    QString selFS = part->format;
+    if (selFS == "PRESERVE") selFS = part->curFormat;
+    if ((part->type == DeviceItem::Partition && selFS == "btrfs") || part->type == DeviceItem::Subvolume) {
         QString tcommon;
-        if (!partit->flags.rotational) tcommon = "ssd,";
-        if (partit->discgran) tcommon = "discard=async,";
+        if (!part->flags.rotational) tcommon = "ssd,";
+        if (part->discgran) tcommon = "discard=async,";
         tcommon += "noatime";
         QAction *action = menuTemplates->addAction(tr("Compression (Z&STD)"));
         action->setData(tcommon + ",compress=zstd");
