@@ -533,9 +533,15 @@ void PartMan::treeMenu(const QPoint &)
             gui.boxMain->setEnabled(true);
         }
     } else if (seldev->type == DeviceItem::SUBVOLUME) {
+        QAction *actDefault = menu.addAction(tr("Default subvolume"));
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
+        actDefault->setCheckable(true);
+        actDefault->setChecked(seldev->isActive());
         actRemSubvolume->setDisabled(seldev->flags.oldLayout);
-        if (menu.exec(QCursor::pos()) == actRemSubvolume) delete seldev;
+
+        QAction *action = menu.exec(QCursor::pos());
+        if (action == actDefault) seldev->setActive(action->isChecked());
+        else if (action == actRemSubvolume) delete seldev;
     }
 }
 
@@ -1333,7 +1339,6 @@ void PartMan::prepareSubvolumes(DeviceItem *part)
     try {
         // Since the default subvolume cannot be deleted, ensure the default is set to the top.
         proc.exec("btrfs", {"-q", "subvolume", "set-default", "5", "/mnt/btrfs-scratch"});
-        DeviceItem *devroot = nullptr;
         for (int ixsv = 0; ixsv < subvolcount; ++ixsv) {
             DeviceItem *subvol = part->child(ixsv);
             assert(subvol != nullptr);
@@ -1344,12 +1349,11 @@ void PartMan::prepareSubvolumes(DeviceItem *part)
             if (subvol->format == "CREATE") {
                 proc.exec("btrfs", {"-q", "subvolume", "create", svpath});
             }
-            if (subvol->usefor == "/") devroot = subvol;
             proc.status();
         }
-        // Make the root subvolume the default again.
-        if (devroot) {
-            proc.exec("btrfs", {"-q", "subvolume", "set-default", "/mnt/btrfs-scratch/"+devroot->label});
+        // Set the default subvolume if one was chosen.
+        if (part->active) {
+            proc.exec("btrfs", {"-q", "subvolume", "set-default", "/mnt/btrfs-scratch/"+part->active->label});
         }
     } catch(const char *msg) {
         errmsg = msg;
@@ -1564,8 +1568,9 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
     } else if (role == Qt::DisplayRole) {
         switch (index.column()) {
         case COL_DEVICE:
-            if (item->type == DeviceItem::SUBVOLUME) return "----";
-            else {
+            if (item->type == DeviceItem::SUBVOLUME) {
+                return item->isActive() ? "++++" : "----";
+            } else {
                 QString dev = item->device;
                 if (item->isActive()) dev += '*';
                 if (item->flags.sysEFI) dev += QChar(u'†');
@@ -1573,8 +1578,9 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
             }
             break;
         case COL_SIZE:
-            if (item->type == DeviceItem::SUBVOLUME) return "----";
-            else {
+            if (item->type == DeviceItem::SUBVOLUME) {
+                return item->isActive() ? "++++" : "----";
+            } else {
                 return QLocale::system().formattedDataSize(item->size,
                     1, QLocale::DataSizeTraditionalFormat);
             }
@@ -1920,13 +1926,13 @@ void DeviceItem::sortChildren() noexcept
     }
 }
 /* Helpers */
-void DeviceItem::setActive(bool boot) noexcept
+void DeviceItem::setActive(bool on) noexcept
 {
     if (!parentItem) return;
     if (partman && parentItem->active != this) {
         if (parentItem->active) partman->notifyChange(parentItem->active);
     }
-    parentItem->active = boot ? this : nullptr;
+    parentItem->active = on ? this : nullptr;
     if (partman) partman->notifyChange(this);
 }
 inline bool DeviceItem::isActive() const noexcept
@@ -2166,6 +2172,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             while (drive && drive->type != DRIVE) drive = drive->parentItem;
             if (drive) drive->driveAutoSetActive();
         }
+        if (type == SUBVOLUME && usefor == "/") setActive(true);
         if (usefor == "/boot/efi") flags.sysEFI = true;
 
         if (encrypt & !canEncrypt()) {
