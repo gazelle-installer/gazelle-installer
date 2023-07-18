@@ -728,7 +728,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                 }
             }
         }
-        QString mount = item->realUseFor();
+        QString mount = item->usefor;
         if (mount.isEmpty()) continue;
         if (!mount.startsWith("/") && !item->allowedUsesFor().contains(mount)) {
             QMessageBox::critical(gui.boxMain, QString(),
@@ -782,19 +782,18 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                 DeviceItem *partit = drvit->child(ixdev);
                 assert(partit != nullptr);
                 const int subcount = partit->childCount();
-                const QString &use = partit->realUseFor();
                 QString actmsg;
                 if (drvit->flags.oldLayout) {
-                    if (use.isEmpty()) {
+                    if (drvit->usefor.isEmpty()) {
                         if (subcount > 0) actmsg = tr("Reuse (no reformat) %1");
                         else continue;
                     } else {
                         if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
-                        else if (use != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
+                        else if (drvit->usefor != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
                         else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
                     }
                 } else {
-                    if (use.isEmpty()) actmsg = tr("Create %1 without formatting");
+                    if (drvit->usefor.isEmpty()) actmsg = tr("Create %1 without formatting");
                     else actmsg = tr("Create %1, format to use for %2");
                 }
                 // QString::arg() emits warnings if a marker is not in the string.
@@ -803,8 +802,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                 for (int ixsv = 0; ixsv < subcount; ++ixsv) {
                     DeviceItem *svit = partit->child(ixsv);
                     assert(svit != nullptr);
-                    const QString &svuse = svit->realUseFor();
-                    const bool svnouse = svuse.isEmpty();
+                    const bool svnouse = svit->usefor.isEmpty();
                     if (svit->format == "PRESERVE") {
                         if (svnouse) continue;
                         else actmsg = tr("Reuse subvolume %1 as %2");
@@ -860,7 +858,7 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
     QStringList vols;
     for (DeviceItemIterator it(*this); *it; it.next()) {
         const QString &use = (*it)->usefor;
-        if (!use.isEmpty()) vols.append(DeviceItem::realUseFor(use));
+        if (!use.isEmpty()) vols.append(use);
     }
 
     QStringList toosmall;
@@ -871,16 +869,15 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
             DeviceItem *partit = drvit->child(ixdev);
             assert(partit != nullptr);
             const int subcount = partit->childCount();
-            const QString &partuse = partit->realUseFor();
-            bool isused = !partuse.isEmpty();
-            long long minsize = isused ? volSpecTotal(partuse, vols).minimum : 0;
+            bool isused = !partit->usefor.isEmpty();
+            long long minsize = isused ? volSpecTotal(partit->usefor, vols).minimum : 0;
 
             // First pass = get the total minimum required for all subvolumes.
             for (int ixsv = 0; ixsv < subcount; ++ixsv) {
                 DeviceItem *svit = partit->child(ixsv);
                 assert(svit != nullptr);
                 if(!svit->usefor.isEmpty()) {
-                    minsize += volSpecTotal(svit->realUseFor(), vols).minimum;
+                    minsize += volSpecTotal(svit->usefor, vols).minimum;
                     isused = true;
                 }
             }
@@ -897,7 +894,7 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
                     assert(svit != nullptr);
                     if (svit->usefor.isEmpty()) continue;
 
-                    const long long svmin = volSpecTotal(svit->realUseFor(), vols).minimum;
+                    const long long svmin = volSpecTotal(svit->usefor, vols).minimum;
                     if (svmin > 0) {
                         svsmall << msgsz.arg(svit->shownUseFor(), svit->shownDevice(),
                             QLocale::system().formattedDataSize(svmin, 1, QLocale::DataSizeTraditionalFormat));
@@ -981,9 +978,8 @@ bool PartMan::checkTargetDrivesOK()
         DeviceItem *drvit =  root.child(ixi);
         if (drvit->type == DeviceItem::VirtualDevices) continue;
         QStringList purposes;
-        for (DeviceItemIterator it(drvit); *it; it.next()) {
-            const QString &useFor = (*it)->realUseFor();
-            if (!useFor.isEmpty()) purposes << useFor;
+        for (DeviceItemIterator it(drvit); const DeviceItem *item = *it; it.next()) {
+            if (!item->usefor.isEmpty()) purposes << item->usefor;
         }
         // If any partitions are selected run the SMART tests.
         if (!purposes.isEmpty()) {
@@ -1056,15 +1052,14 @@ int PartMan::countPrepSteps() noexcept
         if (item->type == DeviceItem::Drive) {
             if (!item->flags.oldLayout) ++nstep; // New partition table
         } else if (item->isVolume()) {
-            const QString &tuse = item->realUseFor();
             // Preparation
             if (!item->flags.oldLayout) ++nstep; // New partition
-            else if (!tuse.isEmpty()) ++nstep; // Existing partition
+            else if (!item->usefor.isEmpty()) ++nstep; // Existing partition
             // Formatting
             if (item->encrypt) nstep += 2; // LUKS Format
             if (item->willFormat()) ++nstep; // New file system
             // Mounting
-            if (tuse.startsWith('/')) ++nstep;
+            if (item->usefor.startsWith('/')) ++nstep;
         } else if (item->type == DeviceItem::Subvolume) {
             ++nstep; // Create a new subvolume.
         }
@@ -1273,14 +1268,13 @@ void PartMan::formatPartitions()
         if (twit->type != DeviceItem::Partition && twit->type != DeviceItem::VirtualBD) continue;
         if (!twit->willFormat()) continue;
         const QString &dev = twit->mappedDevice();
-        const QString &useFor = twit->realUseFor();
         const QString &fmtstatus = tr("Formatting: %1");
-        if (useFor == "FORMAT") proc.status(fmtstatus.arg(twit->device));
+        if (twit->usefor == "FORMAT") proc.status(fmtstatus.arg(twit->device));
         else proc.status(fmtstatus.arg(twit->shownUseFor()));
-        if (useFor == "BIOS-GRUB") {
+        if (twit->usefor == "BIOS-GRUB") {
             const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
-        } else if (useFor == "SWAP") {
+        } else if (twit->usefor == "SWAP") {
             QStringList cargs({"-q", dev});
             if (!twit->label.isEmpty()) cargs << "-L" << twit->label;
             proc.exec("mkswap", cargs);
@@ -1779,7 +1773,7 @@ int PartMan::changeEnd(bool notify) noexcept
     if (!changing) return false;
     int changed = 0;
     if (changing->size != root.size) {
-        if (!changing->usefor.startsWith('/') && !changing->allowedUsesFor().contains(changing->realUseFor())) {
+        if (!changing->usefor.startsWith('/') && !changing->allowedUsesFor().contains(changing->usefor)) {
             changing->usefor.clear();
         }
         if (!changing->canEncrypt()) changing->encrypt = false;
@@ -1801,8 +1795,9 @@ int PartMan::changeEnd(bool notify) noexcept
     if (changing->format != root.format || changing->usefor != root.usefor) {
         changing->dump = false;
         changing->pass = 2;
-        const QString &use = changing->realUseFor();
-        if (use.isEmpty() || use == "FORMAT") changing->options.clear();
+        if (changing->usefor.isEmpty() || changing->usefor == "FORMAT") {
+            changing->options.clear();
+        }
         if (changing->format != "btrfs") {
             // Clear all subvolumes if not supported.
             while (changing->childCount()) delete changing->child(0);
@@ -1921,12 +1916,6 @@ void DeviceItem::sortChildren() noexcept
     }
 }
 /* Helpers */
-QString DeviceItem::realUseFor(const QString &use) noexcept
-{
-    if (use == "ESP") return "/boot/efi";
-    else if (!use.startsWith('/')) return use.toUpper();
-    else return use;
-}
 QString DeviceItem::shownUseFor(const QString &use) noexcept
 {
     if (use == "SWAP") return tr("swap space");
@@ -1969,8 +1958,7 @@ bool DeviceItem::willFormat() const noexcept
 bool DeviceItem::canEncrypt() const noexcept
 {
     if (type != Partition) return false;
-    const QString &use = realUseFor();
-    return !(flags.sysEFI || use.isEmpty() || use == "BIOS-GRUB" || use == "/boot");
+    return !(flags.sysEFI || usefor.isEmpty() || usefor == "BIOS-GRUB" || usefor == "/boot");
 }
 inline bool DeviceItem::willEncrypt() const noexcept
 {
@@ -2003,15 +1991,14 @@ QString DeviceItem::shownDevice() const noexcept
     if (type == Subvolume) return parentItem->device + '[' + label + ']';
     return device;
 }
-QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
+QStringList DeviceItem::allowedUsesFor(bool all) const noexcept
 {
     if (!isVolume() && type != Subvolume) return QStringList();
     QStringList list;
     auto checkAndAdd = [&](const QString &use) {
-        const QString &realUse = realUseFor(use);
-        const auto fit = partman->volSpecs.find(realUse);
+        const auto fit = partman->volSpecs.find(usefor);
         if (all || !partman || fit == partman->volSpecs.end() || size >= fit->second.minimum) {
-            list.append(real ? realUse : use);
+            list.append(use);
         }
     };
 
@@ -2047,18 +2034,17 @@ QStringList DeviceItem::allowedUsesFor(bool real, bool all) const noexcept
 QStringList DeviceItem::allowedFormats() const noexcept
 {
     QStringList list;
-    const QString &use = realUseFor();
     bool allowPreserve = false;
     if (isVolume()) {
-        if (use.isEmpty()) return QStringList();
-        else if (use == "BIOS-GRUB") list.append("BIOS-GRUB");
-        else if (use == "SWAP") {
+        if (usefor.isEmpty()) return QStringList();
+        else if (usefor == "BIOS-GRUB") list.append("BIOS-GRUB");
+        else if (usefor == "SWAP") {
             list.append("SWAP");
             allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         } else {
             if (!flags.sysEFI) {
                 list << "ext4";
-                if (use != "/boot") {
+                if (usefor != "/boot") {
                     list << "ext3" << "ext2";
                     list << "f2fs" << "jfs" << "xfs" << "btrfs";
                 }
@@ -2067,7 +2053,7 @@ QStringList DeviceItem::allowedFormats() const noexcept
             if (size <= (4*GB - 64*KB)) list.append("FAT16");
             if (size <= (32*MB - 512)) list.append("FAT12");
 
-            if (use != "FORMAT") allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
+            if (usefor != "FORMAT") allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         }
     } else if (type == Subvolume) {
         list.append("CREATE");
@@ -2080,7 +2066,7 @@ QStringList DeviceItem::allowedFormats() const noexcept
     if (encrypt) allowPreserve = false;
     if (allowPreserve) {
         // People often share SWAP partitions between distros and need to keep the same UUIDs.
-        if (flags.sysEFI || use == "/home" || !allowedUsesFor().contains(use) || use == "SWAP") {
+        if (flags.sysEFI || usefor == "/home" || !allowedUsesFor().contains(usefor) || usefor == "SWAP") {
             list.prepend("PRESERVE"); // Preserve ESP, SWAP, custom mounts and /home by default.
         } else {
             list.append("PRESERVE");
@@ -2100,15 +2086,14 @@ QString DeviceItem::shownFormat(const QString &fmt) const noexcept
     else if (fmt != "PRESERVE") return fmt;
     else {
         if (type == Subvolume) return tr("Preserve");
-        else if (realUseFor() != "/") return tr("Preserve (%1)").arg(curFormat);
+        else if (usefor != "/") return tr("Preserve (%1)").arg(curFormat);
         else return tr("Preserve /home (%1)").arg(curFormat);
     }
 }
 bool DeviceItem::canMount(bool pointonly) const noexcept
 {
-    const QString &use = realUseFor();
-    return !use.isEmpty() && use != "FORMAT" && use != "BIOS-GRUB"
-        && (!pointonly || use != "SWAP");
+    return !usefor.isEmpty() && usefor != "FORMAT" && usefor != "BIOS-GRUB"
+        && (!pointonly || usefor != "SWAP");
 }
 long long DeviceItem::driveFreeSpace(bool inclusive) const noexcept
 {
@@ -2138,7 +2123,7 @@ void DeviceItem::driveAutoSetActive() noexcept
     // Cannot use partman->mounts map here as it may not be populated.
     for (const QString &pref : QStringList({"/boot", "/"})) {
         for (DeviceItemIterator it(this); DeviceItem *item = *it; it.next()) {
-            if (item->realUseFor() == pref) {
+            if (item->usefor == pref) {
                 while (item && item->type != Partition) item = item->parentItem;
                 if (item) item->setActive(true);
                 return;
@@ -2148,7 +2133,6 @@ void DeviceItem::driveAutoSetActive() noexcept
 }
 void DeviceItem::autoFill(unsigned int changed) noexcept
 {
-    const QString &use = realUseFor();
     if (changed & (1 << PartMan::UseFor)) {
         // Default labels
         if (type == Subvolume) {
@@ -2160,31 +2144,31 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
                 chklist << parentItem->child(ixi)->label;
             }
             QString newLabel;
-            if (use.startsWith('/')) {
-                const QString base = use.mid(1).replace('/','.');
+            if (usefor.startsWith('/')) {
+                const QString base = usefor.mid(1).replace('/','.');
                 newLabel = '@' + base;
                 for (int ixi = 2; chklist.contains(newLabel, Qt::CaseInsensitive); ++ixi) {
                     newLabel = QString::number(ixi) + '@' + base;
                 }
-            } else if (!use.isEmpty()) {
-                newLabel = use;
+            } else if (!usefor.isEmpty()) {
+                newLabel = usefor;
                 for (int ixi = 2; chklist.contains(newLabel, Qt::CaseInsensitive); ++ixi) {
                     newLabel = usefor + QString::number(ixi);
                 }
             }
             label = newLabel;
         } else if (partman) {
-            const auto fit = partman->volSpecs.find(use);
+            const auto fit = partman->volSpecs.find(usefor);
             if (fit == partman->volSpecs.cend()) label.clear();
             else label = fit->second.defaultLabel;
         }
         // Automatic default boot device selection
-        if ((type != VirtualBD) && (use == "/boot" || use == "/")) {
+        if ((type != VirtualBD) && (usefor == "/boot" || usefor == "/")) {
             DeviceItem *drvit = this;
             while (drvit && drvit->type != Drive) drvit = drvit->parentItem;
             if (drvit) drvit->driveAutoSetActive();
         }
-        if (use == "/boot/efi") flags.sysEFI = true;
+        if (usefor == "/boot/efi") flags.sysEFI = true;
 
         if (encrypt & !canEncrypt()) {
             encrypt = false;
@@ -2205,7 +2189,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             pass = 0;
             dump = false;
         } else {
-            if (use == "/boot" || use == "/") {
+            if (usefor == "/boot" || usefor == "/") {
                 pass = (format == "btrfs") ? 0 : 1;
             }
             options.clear();
@@ -2214,7 +2198,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             if (discgran && (format == "ext4" || format == "xfs")) options += "discard,";
             else if (discgran && btrfs) options += "discard=async,";
             options += "noatime";
-            if (btrfs && use != "/swap") options += ",compress=zstd:1";
+            if (btrfs && usefor != "/swap") options += ",compress=zstd:1";
             dump = true;
         }
     }
@@ -2343,7 +2327,7 @@ QSize DeviceItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
         }
         break;
     case PartMan::UseFor:
-        for (const QString &use : item->allowedUsesFor(false, false)) {
+        for (const QString &use : item->allowedUsesFor(false)) {
             const int uw = option.fontMetrics.boundingRect(use).width() + residue;
             if (uw > width) width = uw;
         }
@@ -2414,7 +2398,11 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
             combo->addItem("");
-            combo->addItems(item->allowedUsesFor(false, false));
+            QStringList &&uses = item->allowedUsesFor(false);
+            for (QString &use : uses) {
+                if (use == "/boot/efi") use = "ESP";
+            }
+            combo->addItems(uses);
             combo->setCurrentText(item->usefor);
         }
         break;
@@ -2465,6 +2453,9 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
         break;
     case PartMan::UseFor:
         item->usefor = qobject_cast<QComboBox *>(editor)->currentText().trimmed();
+        // Convert user-friendly entries to real mounts.
+        if (!item->usefor.startsWith('/')) item->usefor = item->usefor.toUpper();
+        if (item->usefor == "ESP") item->usefor = "/boot/efi";
         break;
     case PartMan::Label:
         item->label = qobject_cast<QLineEdit *>(editor)->text().trimmed();

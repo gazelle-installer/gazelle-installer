@@ -102,10 +102,8 @@ public:
     void driveAutoSetActive() noexcept;
     void labelParts() noexcept;
     // Helpers
-    static QString realUseFor(const QString &use) noexcept;
-    inline QString realUseFor() const noexcept { return realUseFor(usefor); }
     static QString shownUseFor(const QString &use) noexcept;
-    inline QString shownUseFor() const noexcept { return shownUseFor(realUseFor()); }
+    inline QString shownUseFor() const noexcept { return shownUseFor(usefor); }
     void setActive(bool boot) noexcept;
     bool isActive() const noexcept;
     bool isLocked() const noexcept;
@@ -117,7 +115,7 @@ public:
     QString mappedDevice() const noexcept;
     bool willMap() const noexcept;
     QString shownDevice() const noexcept;
-    QStringList allowedUsesFor(bool real = true, bool all = true) const noexcept;
+    QStringList allowedUsesFor(bool all = true) const noexcept;
     QStringList allowedFormats() const noexcept;
     QString finalFormat() const noexcept;
     QString shownFormat(const QString &fmt) const noexcept;
