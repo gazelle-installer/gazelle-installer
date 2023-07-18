@@ -102,7 +102,7 @@ public:
     void driveAutoSetActive() noexcept;
     void labelParts() noexcept;
     // Helpers
-    void setActive(bool boot) noexcept;
+    void setActive(bool on) noexcept;
     bool isActive() const noexcept;
     bool isLocked() const noexcept;
     bool willUseGPT() const noexcept;
