@@ -315,12 +315,11 @@ void MInstall::setupAutoMount(bool enabled)
     } else {
         // enable auto-mount
         if (udisksd_running) {
-            proc.shell( "service udev stop");
-            proc.sleep(500);
-            proc.shell( "service udev start");
-            proc.sleep(500);
             proc.exec("rm", {"-f", "/run/udev/rules.d/91-mx-udisks-inhibit.rules"});
             proc.exec("udevadm", {"control", "--reload"});
+            proc.sleep(500);
+            proc.shell("service udev stop");
+            proc.shell("service udev start");
         }
         // clear the rules that were temporarily overridden
         for (const QString &rule : qAsConst(udev_temp_mdadm_rules)) {
