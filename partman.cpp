@@ -1779,7 +1779,7 @@ int PartMan::changeEnd(bool notify) noexcept
     if (!changing) return false;
     int changed = 0;
     if (changing->size != root.size) {
-        if (!changing->allowedUsesFor().contains(changing->realUseFor())) {
+        if (!changing->usefor.startsWith('/') && !changing->allowedUsesFor().contains(changing->realUseFor())) {
             changing->usefor.clear();
         }
         if (!changing->canEncrypt()) changing->encrypt = false;
@@ -1787,7 +1787,10 @@ int PartMan::changeEnd(bool notify) noexcept
     }
     if (changing->usefor != root.usefor) {
         if (changing->usefor.isEmpty()) changing->format.clear();
-        else changing->format = changing->allowedFormats().at(0);
+        else {
+            const QStringList &allowed = changing->allowedFormats();
+            if (!allowed.contains(changing->format)) changing->format = allowed.at(0);
+        }
         changed |= (1 << UseFor);
     }
     if (changing->encrypt != root.encrypt) {
