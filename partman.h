@@ -170,7 +170,7 @@ class PartMan : public QAbstractItemModel
     void resizeColumnsToFit() noexcept;
     void preparePartitions();
     void formatPartitions();
-    void prepareSubvolumes(DeviceItem *partit);
+    void prepareSubvolumes(DeviceItem *part);
     bool makeCrypttab() noexcept;
     bool makeFstab() noexcept;
     void mountPartitions();
@@ -183,9 +183,9 @@ class PartMan : public QAbstractItemModel
     void partRemoveClick(bool) noexcept;
     void partReloadClick();
     void partManRunClick();
-    void partMenuUnlock(DeviceItem *twit);
-    void partMenuLock(DeviceItem *twit);
-    void scanSubvolumes(DeviceItem *partit);
+    void partMenuUnlock(DeviceItem *part);
+    void partMenuLock(DeviceItem *volume);
+    void scanSubvolumes(DeviceItem *part);
     bool confirmSpace(class QMessageBox &msgbox) noexcept;
     bool confirmBootable(class QMessageBox &msgbox) noexcept;
     void luksFormat();
