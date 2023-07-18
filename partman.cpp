@@ -21,6 +21,7 @@
  * This file is part of the gazelle-installer.
  ***************************************************************************/
 
+#include <algorithm>
 #include <iterator>
 #include <sys/stat.h>
 #include <QDebug>
@@ -1149,18 +1150,18 @@ void PartMan::preparePartitions()
         DeviceItem *drive = root.child(ixi);
         if (drive->flags.oldLayout || drive->type == DeviceItem::VIRTUAL_DEVICES) continue;
         proc.status(tr("Preparing partition tables"));
+
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
-        {
-            MProcess::Section sect2(proc, nullptr);
-            const long long offset = (drive->size / 65536) - 63; // Account for integer rounding.
-            QStringList cargs({"conv=notrunc", "bs=64K", "count=64", "if=/dev/zero", "of=" + drive->path});
-            // First 17KB = primary partition table (accounts for both MBR and GPT disks).
-            // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
-            proc.exec("dd", cargs);
-            // Last 17KB = secondary partition table (for GPT disks).
-            cargs.append("seek=" + QString::number(offset));
-            proc.exec("dd", cargs);
-        }
+        const int gran = std::max(drive->discgran, drive->physec);
+        const char *opts = drive->discgran ? "-fv" : "-fvz";
+        // First 17KB = primary partition table (accounts for both MBR and GPT disks).
+        // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
+        const long long length = (4*MB + (gran - 1)) / gran; // ceiling
+        proc.exec("blkdiscard", {opts, "-l", QString::number(length*gran), drive->path});
+        // Last 17KB = secondary partition table (for GPT disks).
+        const long long offset = (drive->size - 4*MB) / gran; // floor
+        proc.exec("blkdiscard", {opts, "-o", QString::number(offset*gran), drive->path});
+
         proc.exec("parted", {"-s", drive->path, "mklabel", (drive->willUseGPT() ? "gpt" : "msdos")});
     }
 
