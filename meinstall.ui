@@ -38,53 +38,18 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <widget class="QWidget" name="tabHelp">
+      <widget class="QTextEdit" name="textHelp">
        <attribute name="title">
         <string>Help</string>
        </attribute>
-       <layout class="QVBoxLayout">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QTextEdit" name="textHelp">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
       </widget>
-      <widget class="QWidget" name="tabLog">
+      <widget class="QListWidget" name="listLog">
        <attribute name="title">
         <string>Live Log</string>
        </attribute>
-       <layout class="QVBoxLayout">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QListWidget" name="listLog"/>
-        </item>
-       </layout>
       </widget>
      </widget>
      <widget class="QFrame" name="boxMain">
