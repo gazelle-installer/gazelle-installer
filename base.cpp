@@ -130,7 +130,7 @@ bool Base::saveHomeBasic() noexcept
     // Store a listing of /home to compare with the user name given later.
     mkdir("/mnt/antiX", 0755);
     QString opts = "ro";
-    if (mntit->type == DeviceItem::Subvolume) opts += ",subvol="+mntit->curLabel;
+    if (mntit->type == DeviceItem::SUBVOLUME) opts += ",subvol="+mntit->curLabel;
     bool ok = proc.exec("mount", {"-o", opts, homedev, "/mnt/antiX"});
     if (ok) {
         QDir hd("/mnt/antiX" + homedir);

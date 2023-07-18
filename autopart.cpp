@@ -87,7 +87,7 @@ void AutoPart::scan() noexcept
     gui.comboDisk->blockSignals(true);
     gui.comboDisk->clear();
     for (DeviceItemIterator it(*partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive && (!item->flags.bootRoot || installFromRootDevice)) {
+        if (item->type == DeviceItem::DRIVE && (!item->flags.bootRoot || installFromRootDevice)) {
             drvitem = item;
             if (buildLayout(LLONG_MAX, false, false) >= minSpace) {
                 item->addToCombo(gui.comboDisk);

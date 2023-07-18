@@ -54,12 +54,12 @@ public:
     DeviceItem *active = nullptr;
     DeviceItem *origin = nullptr;
     enum DeviceType {
-        Unknown,
-        Drive,
-        Partition,
-        VirtualDevices,
-        VirtualBD,
-        Subvolume
+        UNKNOWN,
+        DRIVE,
+        PARTITION,
+        VIRTUAL_DEVICES,
+        VIRTUAL,
+        SUBVOLUME
     } type;
     struct Flags {
         bool rotational : 1;
@@ -118,7 +118,7 @@ public:
     QString finalFormat() const noexcept;
     QString shownFormat(const QString &fmt) const noexcept;
     inline QString shownFormat() const noexcept { return shownFormat(format); }
-    inline bool isVolume() const noexcept { return (type == Partition || type == VirtualBD); }
+    inline bool isVolume() const noexcept { return (type == PARTITION || type == VIRTUAL); }
     bool canMount(bool pointonly = true) const noexcept;
     long long driveFreeSpace(bool inclusive = false) const noexcept;
     /* Convenience */
@@ -192,17 +192,17 @@ class PartMan : public QAbstractItemModel
     void luksOpen(DeviceItem *partit, const QByteArray &password);
 public:
     enum TreeColumns {
-        Device,
-        Size,
-        UseFor,
-        Label,
-        Encrypt,
-        Format,
-        Check,
-        Options,
-        Dump,
-        Pass,
-        _TreeColumns_
+        COL_DEVICE,
+        COL_SIZE,
+        COL_USEFOR,
+        COL_LABEL,
+        COL_ENCRYPT,
+        COL_FORMAT,
+        COL_CHECK,
+        COL_OPTIONS,
+        COL_DUMP,
+        COL_PASS,
+        TREE_COLUMNS
     };
     struct VolumeSpec
     {
@@ -244,7 +244,7 @@ public:
     QModelIndex parent(const QModelIndex &index) const noexcept override;
     DeviceItem *item(const QModelIndex &index) const noexcept;
     int rowCount(const QModelIndex &parent = QModelIndex()) const noexcept override;
-    inline int columnCount(const QModelIndex &) const noexcept override { return _TreeColumns_; }
+    inline int columnCount(const QModelIndex &) const noexcept override { return TREE_COLUMNS; }
     bool changeBegin(DeviceItem *item) noexcept;
     int changeEnd(bool notify = true) noexcept;
     void notifyChange(class DeviceItem *item, int first = -1, int last = -1) noexcept;

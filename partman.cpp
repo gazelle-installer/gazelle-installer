@@ -46,7 +46,7 @@
 #include "partman.h"
 
 PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs)
-    : QAbstractItemModel(ui.boxMain), proc(mproc), root(DeviceItem::Unknown), gui(ui)
+    : QAbstractItemModel(ui.boxMain), proc(mproc), root(DeviceItem::UNKNOWN), gui(ui)
 {
     const QString &projShort = appConf.value("PROJECT_SHORTNAME").toString();
     volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
@@ -88,7 +88,7 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
         gui.boxEncryptAuto->hide();
         gui.boxCryptoPass->hide();
-        gui.treePartitions->setColumnHidden(Encrypt, true);
+        gui.treePartitions->setColumnHidden(COL_ENCRYPT, true);
     }
 
     // UUID of the device that the live system is booted from.
@@ -125,7 +125,7 @@ void PartMan::scan(DeviceItem *drvstart)
         if (jsonDrive["type"] != "disk") continue;
         if (jdName.startsWith("zram")) continue;
         DeviceItem *drive = drvstart;
-        if (!drvstart) drive = new DeviceItem(DeviceItem::Drive, &root);
+        if (!drvstart) drive = new DeviceItem(DeviceItem::DRIVE, &root);
         else if (jdPath != drvstart->path) continue;
 
         drive->clear();
@@ -147,7 +147,7 @@ void PartMan::scan(DeviceItem *drvstart)
             const QString &partTypeName = jsonPart["parttypename"].toString();
             if (partTypeName == "Extended" || partTypeName == "W95 Ext'd (LBA)"
                 || partTypeName == "Linux extended") continue;
-            DeviceItem *part = new DeviceItem(DeviceItem::Partition, drive);
+            DeviceItem *part = new DeviceItem(DeviceItem::PARTITION, drive);
             drive->flags.curEmpty = false;
             part->flags.oldLayout = true;
             part->device = jsonPart["name"].toString();
@@ -199,7 +199,7 @@ void PartMan::scanVirtualDevices(bool rescan)
     if (rescan) {
         for (int ixi = root.childCount() - 1; ixi >= 0; --ixi) {
             DeviceItem *drive = root.child(ixi);
-            if (drive->type == DeviceItem::VirtualDevices) {
+            if (drive->type == DeviceItem::VIRTUAL_DEVICES) {
                 virtdevs = drive;
                 const int vdcount = virtdevs->childCount();
                 for (int ixVD = 0; ixVD < vdcount; ++ixVD) {
@@ -218,7 +218,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         if (virtdevs) delete virtdevs;
         return;
     } else if (!virtdevs) {
-        virtdevs = new DeviceItem(DeviceItem::VirtualDevices, &root);
+        virtdevs = new DeviceItem(DeviceItem::VIRTUAL_DEVICES, &root);
         virtdevs->device = tr("Virtual Devices");
         virtdevs->flags.oldLayout = true;
         gui.treePartitions->setFirstColumnSpanned(virtdevs->row(), QModelIndex(), true);
@@ -248,7 +248,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         }
         // Create a new list entry if needed.
         if (!device) {
-            device = new DeviceItem(DeviceItem::VirtualBD, virtdevs);
+            device = new DeviceItem(DeviceItem::VIRTUAL, virtdevs);
             device->device = jsonDev["name"].toString();
             device->path = path;
             device->uuid = jsonDev["uuid"].toString();
@@ -311,7 +311,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                 part = drive->child(ixPart);
                 if (!save) part->flags.oldLayout = true;
             } else {
-                part = new DeviceItem(DeviceItem::Partition, drive);
+                part = new DeviceItem(DeviceItem::PARTITION, drive);
                 part->device = DeviceItem::join(drive->device, ixPart+1);
             }
             // Configuration management, accounting for automatic control correction order.
@@ -361,7 +361,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
             for (int ixSV=0; ixSV<subvolCount; ++ixSV) {
                 DeviceItem *subvol = nullptr;
                 if (save) subvol = part->child(ixSV);
-                else subvol = new DeviceItem(DeviceItem::Subvolume, part);
+                else subvol = new DeviceItem(DeviceItem::SUBVOLUME, part);
                 if (!subvol) return false;
                 config.beginGroup(groupPart + ".Subvolume" + QString::number(ixSV+1));
                 if (save) {
@@ -388,7 +388,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
 
 void PartMan::resizeColumnsToFit() noexcept
 {
-    for (int ixi = _TreeColumns_ - 1; ixi >= 0; --ixi) {
+    for (int ixi = TREE_COLUMNS - 1; ixi >= 0; --ixi) {
         gui.treePartitions->resizeColumnToContents(ixi);
     }
 }
@@ -398,7 +398,7 @@ void PartMan::treeItemChange() noexcept
     // Encryption and bad blocks controls
     bool cryptoAny = false;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->type != DeviceItem::Partition) continue;
+        if (item->type != DeviceItem::PARTITION) continue;
         if (item->canEncrypt() && item->encrypt) cryptoAny = true;
     }
     if (gui.boxCryptoPass->isEnabled() != cryptoAny) {
@@ -413,8 +413,8 @@ void PartMan::treeSelChange() noexcept
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
     DeviceItem *seldev = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (seldev && seldev->type != DeviceItem::Subvolume) {
-        const bool isdrive = (seldev->type == DeviceItem::Drive);
+    if (seldev && seldev->type != DeviceItem::SUBVOLUME) {
+        const bool isdrive = (seldev->type == DeviceItem::DRIVE);
         bool isold = seldev->flags.oldLayout;
         const bool islocked = seldev->isLocked();
         if (isdrive && seldev->flags.curEmpty) isold = false;
@@ -442,7 +442,7 @@ void PartMan::treeMenu(const QPoint &)
     const QModelIndex &selIndex = ixlist.at(0);
     if (!selIndex.isValid()) return;
     DeviceItem *seldev = item(selIndex);
-    if (seldev->type == DeviceItem::VirtualDevices) return;
+    if (seldev->type == DeviceItem::VIRTUAL_DEVICES) return;
     QMenu menu(gui.treePartitions);
     if (seldev->isVolume()) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
@@ -455,7 +455,7 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actActive = nullptr, *actESP = nullptr;
         actRemove->setEnabled(gui.pushPartRemove->isEnabled());
         menu.addSeparator();
-        if (seldev->type == DeviceItem::VirtualBD) {
+        if (seldev->type == DeviceItem::VIRTUAL) {
             actRemove->setEnabled(false);
             if (seldev->flags.volCrypto) actLock = menu.addAction(tr("&Lock"));
         } else {
@@ -494,17 +494,17 @@ void PartMan::treeMenu(const QPoint &)
         else if (action == actAddCrypttab) seldev->addToCrypttab = action->isChecked();
         else if (action == actESP) {
             seldev->flags.sysEFI = action->isChecked();
-            seldev->autoFill(1 << Format);
+            seldev->autoFill(1 << COL_FORMAT);
             notifyChange(seldev);
         } else if (action == actNewSubvolume) {
-            DeviceItem *subvol = new DeviceItem(DeviceItem::Subvolume, seldev);
+            DeviceItem *subvol = new DeviceItem(DeviceItem::SUBVOLUME, seldev);
             subvol->autoFill();
             gui.treePartitions->expand(selIndex);
         } else if (action == actScanSubvols) {
             scanSubvolumes(seldev);
             gui.treePartitions->expand(selIndex);
         }
-    } else if (seldev->type == DeviceItem::Drive) {
+    } else if (seldev->type == DeviceItem::DRIVE) {
         QAction *actAdd = menu.addAction(tr("&Add partition"));
         actAdd->setEnabled(gui.pushPartAdd->isEnabled());
         menu.addSeparator();
@@ -531,7 +531,7 @@ void PartMan::treeMenu(const QPoint &)
             scan(seldev);
             gui.boxMain->setEnabled(true);
         }
-    } else if (seldev->type == DeviceItem::Subvolume) {
+    } else if (seldev->type == DeviceItem::SUBVOLUME) {
         QAction *actRemSubvolume = menu.addAction(tr("Remove subvolume"));
         actRemSubvolume->setDisabled(seldev->flags.oldLayout);
         if (menu.exec(QCursor::pos()) == actRemSubvolume) delete seldev;
@@ -543,7 +543,7 @@ void PartMan::partClearClick(bool)
 {
     const QModelIndexList &indexes = gui.treePartitions->selectionModel()->selectedIndexes();
     DeviceItem *seldev = (indexes.size() > 0) ? item(indexes.at(0)) : nullptr;
-    if (!seldev || seldev->type != DeviceItem::Drive) return;
+    if (!seldev || seldev->type != DeviceItem::DRIVE) return;
     seldev->clear();
     treeSelChange();
 }
@@ -556,11 +556,11 @@ void PartMan::partAddClick(bool) noexcept
     DeviceItem *volume = selitem->parent();
     if (!volume) volume = selitem;
 
-    DeviceItem::DeviceType newtype = DeviceItem::Partition;
-    if (selitem->type == DeviceItem::Subvolume) newtype = DeviceItem::Subvolume;
+    DeviceItem::DeviceType newtype = DeviceItem::PARTITION;
+    if (selitem->type == DeviceItem::SUBVOLUME) newtype = DeviceItem::SUBVOLUME;
 
     DeviceItem *newitem = new DeviceItem(newtype, volume, selitem);
-    if (newtype == DeviceItem::Partition) {
+    if (newtype == DeviceItem::PARTITION) {
         volume->labelParts();
         volume->flags.oldLayout = false;
         notifyChange(volume);
@@ -578,7 +578,7 @@ void PartMan::partRemoveClick(bool) noexcept
     if (!seldev) return;
     DeviceItem *parent = seldev->parent();
     if (!parent) return;
-    const bool notSub = (seldev->type != DeviceItem::Subvolume);
+    const bool notSub = (seldev->type != DeviceItem::SUBVOLUME);
     delete seldev;
     if (notSub) {
         parent->labelParts();
@@ -686,7 +686,7 @@ void PartMan::scanSubvolumes(DeviceItem *part)
     for (const QString &line : qAsConst(lines)) {
         const int start = line.indexOf("path") + 5;
         if (line.length() <= start) goto END;
-        DeviceItem *subvol = new DeviceItem(DeviceItem::Subvolume, part);
+        DeviceItem *subvol = new DeviceItem(DeviceItem::SUBVOLUME, part);
         subvol->flags.oldLayout = true;
         subvol->label = subvol->curLabel = line.mid(start);
         subvol->format = "PRESERVE";
@@ -703,8 +703,8 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
     // Partition use and other validation
     int swapnum = 0;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices) continue;
-        if (item->type == DeviceItem::Subvolume) {
+        if (item->type == DeviceItem::DRIVE || item->type == DeviceItem::VIRTUAL_DEVICES) continue;
+        if (item->type == DeviceItem::SUBVOLUME) {
             // Ensure the subvolume label entry is valid.
             bool ok = true;
             const QString &cmptext = item->label.trimmed().toUpper();
@@ -774,7 +774,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
             DeviceItem *drive = root.child(ixdrv);
             assert(drive != nullptr);
             const int partCount = drive->childCount();
-            if (!drive->flags.oldLayout && drive->type != DeviceItem::VirtualDevices) {
+            if (!drive->flags.oldLayout && drive->type != DeviceItem::VIRTUAL_DEVICES) {
                 const char *pttype = drive->willUseGPT() ? "GPT" : "MBR";
                 details += tr("Prepare %1 partition table on %2").arg(pttype, drive->device) + '\n';
             }
@@ -977,7 +977,7 @@ bool PartMan::checkTargetDrivesOK()
     QString smartFail, smartWarn;
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
         DeviceItem *drive = root.child(ixi);
-        if (drive->type == DeviceItem::VirtualDevices) continue;
+        if (drive->type == DeviceItem::VIRTUAL_DEVICES) continue;
         QStringList purposes;
         for (DeviceItemIterator it(drive); const DeviceItem *item = *it; it.next()) {
             if (!item->usefor.isEmpty()) purposes << item->usefor;
@@ -1041,7 +1041,7 @@ void PartMan::clearAllUses() noexcept
 {
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
         item->usefor.clear();
-        if (item->type == DeviceItem::Partition) item->setActive(false);
+        if (item->type == DeviceItem::PARTITION) item->setActive(false);
         notifyChange(item);
     }
 }
@@ -1050,7 +1050,7 @@ int PartMan::countPrepSteps() noexcept
 {
     int nstep = 0;
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive) {
+        if (item->type == DeviceItem::DRIVE) {
             if (!item->flags.oldLayout) ++nstep; // New partition table
         } else if (item->isVolume()) {
             // Preparation
@@ -1061,7 +1061,7 @@ int PartMan::countPrepSteps() noexcept
             if (item->willFormat()) ++nstep; // New file system
             // Mounting
             if (item->usefor.startsWith('/')) ++nstep;
-        } else if (item->type == DeviceItem::Subvolume) {
+        } else if (item->type == DeviceItem::SUBVOLUME) {
             ++nstep; // Create a new subvolume.
         }
     }
@@ -1111,7 +1111,7 @@ void PartMan::preparePartitions()
     QStringList listToUnmount;
     for (int ixDrive = 0; ixDrive < root.childCount(); ++ixDrive) {
         DeviceItem *drive = root.child(ixDrive);
-        if (drive->type == DeviceItem::VirtualDevices) continue;
+        if (drive->type == DeviceItem::VIRTUAL_DEVICES) continue;
         const int partCount = drive->childCount();
         if (drive->flags.oldLayout) {
             // Using the existing layout, so only mark used partitions for unmounting.
@@ -1147,7 +1147,7 @@ void PartMan::preparePartitions()
     // Prepare partition tables on devices which will have a new layout.
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
         DeviceItem *drive = root.child(ixi);
-        if (drive->flags.oldLayout || drive->type == DeviceItem::VirtualDevices) continue;
+        if (drive->flags.oldLayout || drive->type == DeviceItem::VIRTUAL_DEVICES) continue;
         proc.status(tr("Preparing partition tables"));
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
         {
@@ -1169,7 +1169,7 @@ void PartMan::preparePartitions()
     for (int ixi = 0; ixi < root.childCount(); ++ixi) {
         bool partupdate = false;
         DeviceItem *drive = root.child(ixi);
-        if (drive->type == DeviceItem::VirtualDevices) continue;
+        if (drive->type == DeviceItem::VIRTUAL_DEVICES) continue;
         const int devCount = drive->childCount();
         const bool useGPT = drive->willUseGPT();
         if (drive->flags.oldLayout) {
@@ -1266,7 +1266,7 @@ void PartMan::formatPartitions()
 
     // Format partitions.
     for (DeviceItemIterator it(*this); DeviceItem *volume = *it; it.next()) {
-        if (volume->type != DeviceItem::Partition && volume->type != DeviceItem::VirtualBD) continue;
+        if (volume->type != DeviceItem::PARTITION && volume->type != DeviceItem::VIRTUAL) continue;
         if (!volume->willFormat()) continue;
         const QString &dev = volume->mappedDevice();
         const QString &fmtstatus = tr("Formatting: %1");
@@ -1405,7 +1405,7 @@ bool PartMan::makeFstab() noexcept
         }
         // Options
         const QString &mountopts = volume->options;
-        if (volume->type == DeviceItem::Subvolume) {
+        if (volume->type == DeviceItem::SUBVOLUME) {
             out << " subvol=" << volume->label;
             if (!mountopts.isEmpty()) out << ',' << mountopts;
         } else {
@@ -1429,7 +1429,7 @@ void PartMan::mountPartitions()
         const QString &dev = it.second->mappedDevice();
         proc.status(tr("Mounting: %1").arg(it.first));
         QStringList opts;
-        if (it.second->type == DeviceItem::Subvolume) {
+        if (it.second->type == DeviceItem::SUBVOLUME) {
             opts.append("subvol=" + it.second->label);
         }
         // Use noatime to speed up the installation.
@@ -1458,7 +1458,7 @@ void PartMan::clearWorkArea()
     if (QFileInfo::exists("/mnt/antiX")) proc.exec("umount", {"-qR", "/mnt/antiX"});
     // Close encrypted containers that were opened by the installer.
     for (DeviceItemIterator it(*this); DeviceItem *item = *it; it.next()) {
-        if (item->encrypt && item->type != DeviceItem::VirtualBD && QFile::exists(item->mappedDevice())) {
+        if (item->encrypt && item->type != DeviceItem::VIRTUAL && QFile::exists(item->mappedDevice())) {
             proc.exec("cryptsetup", {"close", item->devMapper});
         }
     }
@@ -1540,30 +1540,30 @@ struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path) const noex
 QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
 {
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
-    const bool isDriveOrVD = (item->type == DeviceItem::Drive || item->type == DeviceItem::VirtualDevices);
+    const bool isDriveOrVD = (item->type == DeviceItem::DRIVE || item->type == DeviceItem::VIRTUAL_DEVICES);
     if (role == Qt::EditRole) {
         switch (index.column())
         {
-        case Device: return item->device; break;
-        case Size: return item->size; break;
-        case UseFor: return item->usefor; break;
-        case Label: return item->label; break;
-        case Format: return item->format; break;
-        case Options: return item->options; break;
-        case Pass: return item->pass; break;
+        case COL_DEVICE: return item->device; break;
+        case COL_SIZE: return item->size; break;
+        case COL_USEFOR: return item->usefor; break;
+        case COL_LABEL: return item->label; break;
+        case COL_FORMAT: return item->format; break;
+        case COL_OPTIONS: return item->options; break;
+        case COL_PASS: return item->pass; break;
         }
     } else if (role == Qt::CheckStateRole && !isDriveOrVD
         && index.flags() & Qt::ItemIsUserCheckable) {
         switch (index.column())
         {
-        case Encrypt: return item->encrypt ? Qt::Checked : Qt::Unchecked; break;
-        case Check: return item->chkbadblk ? Qt::Checked : Qt::Unchecked; break;
-        case Dump: return item->dump ? Qt::Checked : Qt::Unchecked; break;
+        case COL_ENCRYPT: return item->encrypt ? Qt::Checked : Qt::Unchecked; break;
+        case COL_CHECK: return item->chkbadblk ? Qt::Checked : Qt::Unchecked; break;
+        case COL_DUMP: return item->dump ? Qt::Checked : Qt::Unchecked; break;
         }
     } else if (role == Qt::DisplayRole) {
         switch (index.column()) {
-        case Device:
-            if (item->type == DeviceItem::Subvolume) return "----";
+        case COL_DEVICE:
+            if (item->type == DeviceItem::SUBVOLUME) return "----";
             else {
                 QString dev = item->device;
                 if (item->isActive()) dev += '*';
@@ -1571,47 +1571,47 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
                 return dev;
             }
             break;
-        case Size:
-            if (item->type == DeviceItem::Subvolume) return "----";
+        case COL_SIZE:
+            if (item->type == DeviceItem::SUBVOLUME) return "----";
             else {
                 return QLocale::system().formattedDataSize(item->size,
                     1, QLocale::DataSizeTraditionalFormat);
             }
             break;
-        case UseFor: return item->usefor; break;
-        case Label:
+        case COL_USEFOR: return item->usefor; break;
+        case COL_LABEL:
             if (index.flags() & Qt::ItemIsEditable) return item->label;
             else return item->curLabel;
             break;
-        case Format:
-            if (item->type == DeviceItem::Drive) {
+        case COL_FORMAT:
+            if (item->type == DeviceItem::DRIVE) {
                 if (item->willUseGPT()) return "GPT";
                 else if (item->flags.curMBR || !item->flags.oldLayout) return "MBR";
-            } else if (item->type == DeviceItem::Subvolume) {
+            } else if (item->type == DeviceItem::SUBVOLUME) {
                 return item->shownFormat(item->format);
             } else {
                 if (item->usefor.isEmpty()) return item->curFormat;
                 else return item->shownFormat(item->format);
             }
             break;
-        case Options:
+        case COL_OPTIONS:
             if (item->canMount(false)) return item->options;
             else if (!isDriveOrVD) return "--------";
             break;
-        case Pass:
+        case COL_PASS:
             if (item->canMount()) return item->pass;
             else if (!isDriveOrVD) return "--";
             break;
         }
     } else if (role == Qt::ToolTipRole) {
         switch (index.column()) {
-        case Device:
+        case COL_DEVICE:
             if (!item->model.isEmpty()) return tr("Model: %1").arg(item->model);
             else return item->path;
             break;
-        case Size:
-            if (item->type == DeviceItem::Subvolume) return "----";
-            else if (item->type == DeviceItem::Drive) {
+        case COL_SIZE:
+            if (item->type == DeviceItem::SUBVOLUME) return "----";
+            else if (item->type == DeviceItem::DRIVE) {
                 long long fs = item->driveFreeSpace();
                 if (fs <= 0) fs = 0;
                 return tr("Free space: %1").arg(QLocale::system().formattedDataSize(fs,
@@ -1620,10 +1620,10 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
             break;
         }
         return item->shownDevice();
-    } else if (role == Qt::DecorationRole && index.column() == Device) {
-        if ((item->type == DeviceItem::Drive || item->type == DeviceItem::Subvolume) && !item->flags.oldLayout) {
+    } else if (role == Qt::DecorationRole && index.column() == COL_DEVICE) {
+        if ((item->type == DeviceItem::DRIVE || item->type == DeviceItem::SUBVOLUME) && !item->flags.oldLayout) {
             return QIcon(":/appointment-soon");
-        } else if (item->type == DeviceItem::VirtualBD && item->flags.volCrypto) {
+        } else if (item->type == DeviceItem::VIRTUAL && item->flags.volCrypto) {
             return QIcon::fromTheme("unlock");
         } else if (item->mapCount) {
             return QIcon::fromTheme("lock");
@@ -1638,9 +1638,9 @@ bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
         changeBegin(item);
         switch (index.column())
         {
-        case Encrypt: item->encrypt = (value == Qt::Checked); break;
-        case Check: item->chkbadblk = (value == Qt::Checked); break;
-        case Dump: item->dump = (value == Qt::Checked); break;
+        case COL_ENCRYPT: item->encrypt = (value == Qt::Checked); break;
+        case COL_CHECK: item->chkbadblk = (value == Qt::Checked); break;
+        case COL_DUMP: item->dump = (value == Qt::Checked); break;
         }
         const int changed = changeEnd(false);
         item->autoFill(changed);
@@ -1652,47 +1652,47 @@ bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
 Qt::ItemFlags PartMan::flags(const QModelIndex &index) const noexcept
 {
     DeviceItem *item = static_cast<DeviceItem *>(index.internalPointer());
-    if (item->type == DeviceItem::VirtualDevices) return Qt::ItemIsEnabled;
+    if (item->type == DeviceItem::VIRTUAL_DEVICES) return Qt::ItemIsEnabled;
     Qt::ItemFlags flagsOut({Qt::ItemIsSelectable, Qt::ItemIsEnabled});
     if (item->mapCount) return flagsOut;
     switch (index.column())
     {
-    case Device: break;
-    case Size:
-        if (item->type == DeviceItem::Partition && !item->flags.oldLayout) {
+    case COL_DEVICE: break;
+    case COL_SIZE:
+        if (item->type == DeviceItem::PARTITION && !item->flags.oldLayout) {
             flagsOut |= Qt::ItemIsEditable;
         }
         break;
-    case UseFor:
+    case COL_USEFOR:
         if (item->allowedUsesFor().count() >= 1 && item->format != "DELETE") {
             flagsOut |= Qt::ItemIsEditable;
         }
         break;
-    case Label:
+    case COL_LABEL:
         if (item->format != "PRESERVE" && item->format != "DELETE") {
-            if (item->type == DeviceItem::Subvolume) flagsOut |= Qt::ItemIsEditable;
+            if (item->type == DeviceItem::SUBVOLUME) flagsOut |= Qt::ItemIsEditable;
             else if (!item->usefor.isEmpty()) flagsOut |= Qt::ItemIsEditable;
         }
         break;
-    case Encrypt:
+    case COL_ENCRYPT:
         if (item->canEncrypt()) flagsOut |= Qt::ItemIsUserCheckable;
         break;
-    case Format:
+    case COL_FORMAT:
         if (item->allowedFormats().count() > 1) flagsOut |= Qt::ItemIsEditable;
         break;
-    case Check:
+    case COL_CHECK:
         if (item->format.startsWith("ext") || item->format == "jfs"
             || item->format.startsWith("FAT", Qt::CaseInsensitive)) {
             flagsOut |= Qt::ItemIsUserCheckable;
         }
         break;
-    case Options:
+    case COL_OPTIONS:
         if (item->canMount(false)) flagsOut |= Qt::ItemIsEditable;
         break;
-    case Dump:
+    case COL_DUMP:
         if (item->canMount()) flagsOut |= Qt::ItemIsUserCheckable;
         break;
-    case Pass:
+    case COL_PASS:
         if (item->canMount()) flagsOut |= Qt::ItemIsEditable;
         break;
     }
@@ -1704,18 +1704,18 @@ QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role)
     if (role == Qt::DisplayRole) {
         switch (section)
         {
-        case Device: return tr("Device"); break;
-        case Size: return tr("Size"); break;
-        case UseFor: return tr("Use For"); break;
-        case Label: return tr("Label"); break;
-        case Encrypt: return tr("Encrypt"); break;
-        case Format: return tr("Format"); break;
-        case Check: return tr("Check"); break;
-        case Options: return tr("Options"); break;
-        case Dump: return tr("Dump"); break;
-        case Pass: return tr("Pass"); break;
+        case COL_DEVICE: return tr("Device"); break;
+        case COL_SIZE: return tr("Size"); break;
+        case COL_USEFOR: return tr("Use For"); break;
+        case COL_LABEL: return tr("Label"); break;
+        case COL_ENCRYPT: return tr("Encrypt"); break;
+        case COL_FORMAT: return tr("Format"); break;
+        case COL_CHECK: return tr("Check"); break;
+        case COL_OPTIONS: return tr("Options"); break;
+        case COL_DUMP: return tr("Dump"); break;
+        case COL_PASS: return tr("Pass"); break;
         }
-    } else if (role == Qt::FontRole && (section == Encrypt || section == Check || section == Dump)) {
+    } else if (role == Qt::FontRole && (section == COL_ENCRYPT || section == COL_CHECK || section == COL_DUMP)) {
         QFont smallFont;
         smallFont.setPointSizeF(smallFont.pointSizeF() * 0.6);
         return smallFont;
@@ -1780,7 +1780,7 @@ int PartMan::changeEnd(bool notify) noexcept
             changing->usefor.clear();
         }
         if (!changing->canEncrypt()) changing->encrypt = false;
-        changed |= (1 << Size);
+        changed |= (1 << COL_SIZE);
     }
     if (changing->usefor != root.usefor) {
         if (changing->usefor.isEmpty()) changing->format.clear();
@@ -1788,12 +1788,12 @@ int PartMan::changeEnd(bool notify) noexcept
             const QStringList &allowed = changing->allowedFormats();
             if (!allowed.contains(changing->format)) changing->format = allowed.at(0);
         }
-        changed |= (1 << UseFor);
+        changed |= (1 << COL_USEFOR);
     }
     if (changing->encrypt != root.encrypt) {
         const QStringList &allowed = changing->allowedFormats();
         if (!allowed.contains(changing->format)) changing->format = allowed.at(0);
-        changed |= (1 << Encrypt);
+        changed |= (1 << COL_ENCRYPT);
     }
     if (changing->format != root.format || changing->usefor != root.usefor) {
         changing->dump = false;
@@ -1812,7 +1812,7 @@ int PartMan::changeEnd(bool notify) noexcept
                 notifyChange(child);
             }
         }
-        if (changing->format != root.format) changed |= (1 << Format);
+        if (changing->format != root.format) changed |= (1 << COL_FORMAT);
     }
     if (changed && notify) notifyChange(changing);
     changing = nullptr;
@@ -1821,7 +1821,7 @@ int PartMan::changeEnd(bool notify) noexcept
 void PartMan::notifyChange(class DeviceItem *item, int first, int last) noexcept
 {
     if (first < 0) first = 0;
-    if (last < 0) last = _TreeColumns_ - 1;
+    if (last < 0) last = TREE_COLUMNS - 1;
     const int row = item->row();
     emit dataChanged(createIndex(row, first, item), createIndex(row, last, item));
 }
@@ -1831,11 +1831,11 @@ void PartMan::notifyChange(class DeviceItem *item, int first, int last) noexcept
 DeviceItem::DeviceItem(enum DeviceType type, DeviceItem *parent, DeviceItem *preceding) noexcept
     : parentItem(parent), type(type)
 {
-    if (type == Partition) size = 1*MB;
+    if (type == PARTITION) size = 1*MB;
     if (parent) {
         flags.rotational = parent->flags.rotational;
         discgran = parent->discgran;
-        if (type == Subvolume) size = parent->size;
+        if (type == SUBVOLUME) size = parent->size;
         physec = parent->physec;
         partman = parent->partman;
         const int i = preceding ? (parentItem->indexOfChild(preceding) + 1) : parentItem->childCount();
@@ -1942,7 +1942,7 @@ bool DeviceItem::isLocked() const noexcept
 }
 bool DeviceItem::willUseGPT() const noexcept
 {
-    if (type != Drive) return false;
+    if (type != DRIVE) return false;
     if (flags.oldLayout) return flags.curGPT;
     else if (size >= 2*TB || children.size() > 4) return true;
     else if (partman) return (partman->gptoverride || partman->proc.detectEFI());
@@ -1954,24 +1954,24 @@ bool DeviceItem::willFormat() const noexcept
 }
 bool DeviceItem::canEncrypt() const noexcept
 {
-    if (type != Partition) return false;
+    if (type != PARTITION) return false;
     return !(flags.sysEFI || usefor.isEmpty() || usefor == "BIOS-GRUB" || usefor == "/boot");
 }
 inline bool DeviceItem::willEncrypt() const noexcept
 {
-    if (type == Subvolume) return parentItem->encrypt;
+    if (type == SUBVOLUME) return parentItem->encrypt;
     return encrypt;
 }
 QString DeviceItem::assocUUID() const noexcept
 {
-    if (type == Subvolume) return parentItem->uuid;
+    if (type == SUBVOLUME) return parentItem->uuid;
     return uuid;
 }
 QString DeviceItem::mappedDevice() const noexcept
 {
     const DeviceItem *device = this;
-    if (device->type == Subvolume) device = device->parentItem;
-    if (device->type == Partition) {
+    if (device->type == SUBVOLUME) device = device->parentItem;
+    if (device->type == PARTITION) {
         const QVariant &d = device->devMapper;
         if (!d.isNull()) return "/dev/mapper/" + d.toString();
     }
@@ -1979,18 +1979,18 @@ QString DeviceItem::mappedDevice() const noexcept
 }
 inline bool DeviceItem::willMap() const noexcept
 {
-    if (type == Drive || type == VirtualDevices) return false;
-    else if (type == Subvolume) return !parentItem->devMapper.isEmpty();
+    if (type == DRIVE || type == VIRTUAL_DEVICES) return false;
+    else if (type == SUBVOLUME) return !parentItem->devMapper.isEmpty();
     return !devMapper.isEmpty();
 }
 QString DeviceItem::shownDevice() const noexcept
 {
-    if (type == Subvolume) return parentItem->device + '[' + label + ']';
+    if (type == SUBVOLUME) return parentItem->device + '[' + label + ']';
     return device;
 }
 QStringList DeviceItem::allowedUsesFor(bool all) const noexcept
 {
-    if (!isVolume() && type != Subvolume) return QStringList();
+    if (!isVolume() && type != SUBVOLUME) return QStringList();
     QStringList list;
     auto checkAndAdd = [&](const QString &use) {
         const auto fit = partman->volSpecs.find(usefor);
@@ -1999,9 +1999,9 @@ QStringList DeviceItem::allowedUsesFor(bool all) const noexcept
         }
     };
 
-    if (type != Subvolume) {
+    if (type != SUBVOLUME) {
         checkAndAdd("FORMAT");
-        if (type != VirtualBD) {
+        if (type != VIRTUAL) {
             if (all || size <= 1*MB) {
                 if (parentItem && parentItem->willUseGPT()) checkAndAdd("BIOS-GRUB");
             }
@@ -2023,7 +2023,7 @@ QStringList DeviceItem::allowedUsesFor(bool all) const noexcept
         // checkAndAdd("/tmp"); // temporary files
         // checkAndAdd("/srv"); // data for services provided by this system
         // checkAndAdd("/opt"); // add-on application software packages
-        if (type != Subvolume) checkAndAdd("SWAP");
+        if (type != SUBVOLUME) checkAndAdd("SWAP");
         else checkAndAdd("/swap");
     }
     return list;
@@ -2052,7 +2052,7 @@ QStringList DeviceItem::allowedFormats() const noexcept
 
             if (usefor != "FORMAT") allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         }
-    } else if (type == Subvolume) {
+    } else if (type == SUBVOLUME) {
         list.append("CREATE");
         if (flags.oldLayout) {
             list.append("DELETE");
@@ -2073,7 +2073,7 @@ QStringList DeviceItem::allowedFormats() const noexcept
 }
 QString DeviceItem::finalFormat() const noexcept
 {
-    if (type == Subvolume) return format;
+    if (type == SUBVOLUME) return format;
     return (usefor.isEmpty() || format == "PRESERVE") ? curFormat : format;
 }
 QString DeviceItem::shownFormat(const QString &fmt) const noexcept
@@ -2082,7 +2082,7 @@ QString DeviceItem::shownFormat(const QString &fmt) const noexcept
     else if (fmt == "DELETE") return tr("Delete");
     else if (fmt != "PRESERVE") return fmt;
     else {
-        if (type == Subvolume) return tr("Preserve");
+        if (type == SUBVOLUME) return tr("Preserve");
         else if (usefor != "/") return tr("Preserve (%1)").arg(curFormat);
         else return tr("Preserve /home (%1)").arg(curFormat);
     }
@@ -2105,7 +2105,7 @@ long long DeviceItem::driveFreeSpace(bool inclusive) const noexcept
 /* Convenience */
 DeviceItem *DeviceItem::addPart(long long defaultSize, const QString &defaultUse, bool crypto) noexcept
 {
-    DeviceItem *part = new DeviceItem(DeviceItem::Partition, this);
+    DeviceItem *part = new DeviceItem(DeviceItem::PARTITION, this);
     if (!defaultUse.isEmpty()) part->usefor = defaultUse;
     part->size = defaultSize;
     if (part->canEncrypt()) part->encrypt = crypto;
@@ -2121,7 +2121,7 @@ void DeviceItem::driveAutoSetActive() noexcept
     for (const QString &pref : QStringList({"/boot", "/"})) {
         for (DeviceItemIterator it(this); DeviceItem *item = *it; it.next()) {
             if (item->usefor == pref) {
-                while (item && item->type != Partition) item = item->parentItem;
+                while (item && item->type != PARTITION) item = item->parentItem;
                 if (item) item->setActive(true);
                 return;
             }
@@ -2130,9 +2130,9 @@ void DeviceItem::driveAutoSetActive() noexcept
 }
 void DeviceItem::autoFill(unsigned int changed) noexcept
 {
-    if (changed & (1 << PartMan::UseFor)) {
+    if (changed & (1 << PartMan::COL_USEFOR)) {
         // Default labels
-        if (type == Subvolume) {
+        if (type == SUBVOLUME) {
             QStringList chklist;
             const int count = parentItem->childCount();
             const int index = parentItem->indexOfChild(this);
@@ -2160,25 +2160,25 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             else label = fit->second.defaultLabel;
         }
         // Automatic default boot device selection
-        if ((type != VirtualBD) && (usefor == "/boot" || usefor == "/")) {
+        if ((type != VIRTUAL) && (usefor == "/boot" || usefor == "/")) {
             DeviceItem *drive = this;
-            while (drive && drive->type != Drive) drive = drive->parentItem;
+            while (drive && drive->type != DRIVE) drive = drive->parentItem;
             if (drive) drive->driveAutoSetActive();
         }
         if (usefor == "/boot/efi") flags.sysEFI = true;
 
         if (encrypt & !canEncrypt()) {
             encrypt = false;
-            changed |= (1 << PartMan::Encrypt);
+            changed |= (1 << PartMan::COL_ENCRYPT);
         }
     }
     const QStringList &af = allowedFormats();
     if (format.isEmpty() || !af.contains(format)) {
         if (af.isEmpty()) format.clear();
         else format = af.at(0);
-        changed |= (1 << PartMan::Format);
+        changed |= (1 << PartMan::COL_FORMAT);
     }
-    if ((changed & ((1 << PartMan::UseFor) | (1 << PartMan::Format))) && canMount(false)) {
+    if ((changed & ((1 << PartMan::COL_USEFOR) | (1 << PartMan::COL_FORMAT))) && canMount(false)) {
         // Default options, dump and pass
         if (format == "SWAP") options = discgran ? "discard" : "defaults";
         else if (finalFormat().startsWith("FAT")) {
@@ -2190,7 +2190,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
                 pass = (format == "btrfs") ? 0 : 1;
             }
             options.clear();
-            const bool btrfs = (format == "btrfs" || type == Subvolume);
+            const bool btrfs = (format == "btrfs" || type == SUBVOLUME);
             if (!flags.rotational && btrfs) options += "ssd,";
             if (discgran && (format == "ext4" || format == "xfs")) options += "discard,";
             else if (discgran && btrfs) options += "discard=async,";
@@ -2199,7 +2199,7 @@ void DeviceItem::autoFill(unsigned int changed) noexcept
             dump = true;
         }
     }
-    if (changed & (1 << PartMan::Encrypt)) addToCrypttab = encrypt;
+    if (changed & (1 << PartMan::COL_ENCRYPT)) addToCrypttab = encrypt;
 }
 void DeviceItem::labelParts() noexcept
 {
@@ -2208,7 +2208,7 @@ void DeviceItem::labelParts() noexcept
         DeviceItem *chit = children[ixi];
         chit->device = join(device, ixi + 1);
         chit->path = "/dev/" + chit->device;
-        if (partman) partman->notifyChange(chit, PartMan::Device, PartMan::Device);
+        if (partman) partman->notifyChange(chit, PartMan::COL_DEVICE, PartMan::COL_DEVICE);
     }
     if (partman) partman->resizeColumnsToFit();
 }
@@ -2291,7 +2291,7 @@ void DeviceItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &op
         const QRect &rect = option.rect.adjusted(0, 0, -pen.width(), -pen.width());
         painter->drawRect(rect);
         // Arrow to indicate a drop-down list
-        if(index.column() == PartMan::Format || index.column() == PartMan::UseFor) {
+        if(index.column() == PartMan::COL_FORMAT || index.column() == PartMan::COL_USEFOR) {
             const int arrowEdgeX = 4, arrowEdgeY = 6, arrowWidth = 8;
             pen.setWidthF(1.5);
             painter->setPen(pen);
@@ -2317,13 +2317,13 @@ QSize DeviceItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QMo
     // In the case of Format and Use For, the cell should accommodate all options in the list.
     const int residue = 10 + width - option.fontMetrics.boundingRect(index.data(Qt::DisplayRole).toString()).width();
     switch(index.column()) {
-    case PartMan::Format:
+    case PartMan::COL_FORMAT:
         for (const QString &fmt : item->allowedFormats()) {
             const int fw = option.fontMetrics.boundingRect(item->shownFormat(fmt)).width() + residue;
             if (fw > width) width = fw;
         }
         break;
-    case PartMan::UseFor:
+    case PartMan::COL_USEFOR:
         for (const QString &use : item->allowedUsesFor(false)) {
             const int uw = option.fontMetrics.boundingRect(use).width() + residue;
             if (uw > width) width = uw;
@@ -2339,7 +2339,7 @@ QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionVie
     QComboBox *combo = nullptr;
     switch (index.column())
     {
-    case PartMan::Size:
+    case PartMan::COL_SIZE:
         {
             QSpinBox *spin = new QSpinBox(parent);
             spin->setSuffix("MB");
@@ -2349,15 +2349,15 @@ QWidget *DeviceItemDelegate::createEditor(QWidget *parent, const QStyleOptionVie
             widget = spin;
         }
         break;
-    case PartMan::UseFor:
+    case PartMan::COL_USEFOR:
         widget = combo = new QComboBox(parent);
         combo->setEditable(true);
         combo->setInsertPolicy(QComboBox::NoInsert);
         combo->lineEdit()->setPlaceholderText("----");
         break;
-    case PartMan::Format: widget = combo = new QComboBox(parent); break;
-    case PartMan::Pass: widget = new QSpinBox(parent); break;
-    case PartMan::Options:
+    case PartMan::COL_FORMAT: widget = combo = new QComboBox(parent); break;
+    case PartMan::COL_PASS: widget = new QSpinBox(parent); break;
+    case PartMan::COL_OPTIONS:
         {
             QLineEdit *edit = new QLineEdit(parent);
             edit->setProperty("row", QVariant::fromValue<void *>(index.internalPointer()));
@@ -2383,14 +2383,14 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
     DeviceItem *item = static_cast<DeviceItem*>(index.internalPointer());
     switch (index.column())
     {
-    case PartMan::Size:
+    case PartMan::COL_SIZE:
         {
             QSpinBox *spin = qobject_cast<QSpinBox *>(editor);
             spin->setRange(0, static_cast<int>(item->driveFreeSpace() / MB));
             spin->setValue(item->size / MB);
         }
         break;
-    case PartMan::UseFor:
+    case PartMan::COL_USEFOR:
         {
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
@@ -2403,10 +2403,10 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             combo->setCurrentText(item->usefor);
         }
         break;
-    case PartMan::Label:
+    case PartMan::COL_LABEL:
         qobject_cast<QLineEdit *>(editor)->setText(item->label);
         break;
-    case PartMan::Format:
+    case PartMan::COL_FORMAT:
         {
             QComboBox *combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
@@ -2424,10 +2424,10 @@ void DeviceItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index
             if (ixfmt >= 0) combo->setCurrentIndex(ixfmt);
         }
         break;
-    case PartMan::Pass:
+    case PartMan::COL_PASS:
         qobject_cast<QSpinBox *>(editor)->setValue(item->pass);
         break;
-    case PartMan::Options:
+    case PartMan::COL_OPTIONS:
         qobject_cast<QLineEdit *>(editor)->setText(item->options);
         break;
     }
@@ -2439,7 +2439,7 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
     partman->changeBegin(item);
     switch (index.column())
     {
-    case PartMan::Size:
+    case PartMan::COL_SIZE:
         item->size = qobject_cast<QSpinBox *>(editor)->value();
         item->size *= 1048576; // Separate step to prevent int overflow.
         if (item->size == 0) item->size = item->driveFreeSpace();
@@ -2448,22 +2448,22 @@ void DeviceItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
             subvol->size = item->size;
         }
         break;
-    case PartMan::UseFor:
+    case PartMan::COL_USEFOR:
         item->usefor = qobject_cast<QComboBox *>(editor)->currentText().trimmed();
         // Convert user-friendly entries to real mounts.
         if (!item->usefor.startsWith('/')) item->usefor = item->usefor.toUpper();
         if (item->usefor == "ESP") item->usefor = "/boot/efi";
         break;
-    case PartMan::Label:
+    case PartMan::COL_LABEL:
         item->label = qobject_cast<QLineEdit *>(editor)->text().trimmed();
         break;
-    case PartMan::Format:
+    case PartMan::COL_FORMAT:
         item->format = qobject_cast<QComboBox *>(editor)->currentData().toString();
         break;
-    case PartMan::Pass:
+    case PartMan::COL_PASS:
         item->pass = qobject_cast<QSpinBox *>(editor)->value();
         break;
-    case PartMan::Options:
+    case PartMan::COL_OPTIONS:
         item->options = qobject_cast<QLineEdit *>(editor)->text().trimmed();
         break;
     }
@@ -2487,7 +2487,7 @@ void DeviceItemDelegate::partOptionsMenu() noexcept
     QMenu *menuTemplates = menu->addMenu(tr("&Templates"));
     QString selFS = part->format;
     if (selFS == "PRESERVE") selFS = part->curFormat;
-    if ((part->type == DeviceItem::Partition && selFS == "btrfs") || part->type == DeviceItem::Subvolume) {
+    if ((part->type == DeviceItem::PARTITION && selFS == "btrfs") || part->type == DeviceItem::SUBVOLUME) {
         QString tcommon;
         if (!part->flags.rotational) tcommon = "ssd,";
         if (part->discgran) tcommon = "discard=async,";
