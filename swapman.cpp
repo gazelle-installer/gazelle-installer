@@ -73,7 +73,7 @@ void SwapMan::install(QStringList &cmdboot_out)
     proc.status(tr("Creating swap file"));
     // Create a blank swap file.
     proc.mkpath(QFileInfo(instpath).path(), 0700);
-    const bool btrfs = (devit->type == DeviceItem::Subvolume || devit->finalFormat() == "btrfs");
+    const bool btrfs = (devit->type == DeviceItem::SUBVOLUME || devit->finalFormat() == "btrfs");
     if (btrfs) {
         proc.exec("truncate", {"--size=0", instpath});
         proc.exec("chattr", {"+C", instpath});

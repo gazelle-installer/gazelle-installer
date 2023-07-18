@@ -61,7 +61,7 @@ void BootMan::selectBootMain() noexcept
     const DeviceItem *twit = (fit != partman.mounts.end() ? fit->second : partman.mounts.at("/"));
 
     if (twit->origin) twit = twit->origin;
-    while (twit && twit->type != DeviceItem::Partition) twit = twit->parent();
+    while (twit && twit->type != DeviceItem::PARTITION) twit = twit->parent();
     if (!gui.radioBootPBR->isChecked() && twit) twit = twit->parent();
     if (!twit) return;
     int ixsel = gui.comboBoot->findData(twit->device); // Boot drive or partition
@@ -292,7 +292,7 @@ void BootMan::chosenBootMBR() noexcept
 {
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Drive && (!item->flags.bootRoot || installFromRootDevice)) {
+        if (item->type == DeviceItem::DRIVE && (!item->flags.bootRoot || installFromRootDevice)) {
             if (!item->flags.nasty || brave) item->addToCombo(gui.comboBoot, true);
         }
     }
@@ -304,7 +304,7 @@ void BootMan::chosenBootPBR() noexcept
 {
     gui.comboBoot->clear();
     for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::Partition && (!item->flags.bootRoot || installFromRootDevice)) {
+        if (item->type == DeviceItem::PARTITION && (!item->flags.bootRoot || installFromRootDevice)) {
             if (item->flags.sysEFI) continue;
             else if (!item->format.compare("SWAP", Qt::CaseInsensitive)) continue;
             else if (item->format == "crypto_LUKS") continue;
