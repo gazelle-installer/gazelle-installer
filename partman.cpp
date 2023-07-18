@@ -1332,26 +1332,26 @@ void PartMan::prepareSubvolumes(DeviceItem *partit)
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to prepare subvolumes."));
     proc.status(tr("Preparing subvolumes"));
 
-    proc.mkpath("/mnt/btrfs-scratch");
-    proc.exec("mount", {"-o", "subvolid=5,noatime", partit->mappedDevice(), "/mnt/btrfs-scratch"});
+    proc.exec("mount", {"--mkdir", "-o", "subvolid=5,noatime", partit->mappedDevice(), "/mnt/btrfs-scratch"});
     const char *errmsg = nullptr;
     try {
         // Since the default subvolume cannot be deleted, ensure the default is set to the top.
-        proc.exec("btrfs", {"subvolume", "set-default", "5", "/mnt/btrfs-scratch"});
+        proc.exec("btrfs", {"-q", "subvolume", "set-default", "5", "/mnt/btrfs-scratch"});
+        DeviceItem *devroot = nullptr;
         for (int ixsv = 0; ixsv < subvolcount; ++ixsv) {
             DeviceItem *svit = partit->child(ixsv);
             assert(svit != nullptr);
             const QString &svpath = "/mnt/btrfs-scratch/" + svit->label;
             if (svit->format != "PRESERVE" && QFileInfo::exists(svpath)) {
-                proc.exec("btrfs", {"subvolume", "delete", svpath});
+                proc.exec("btrfs", {"-q", "subvolume", "delete", svpath});
             }
-            if (svit->format == "CREATE") proc.exec("btrfs", {"subvolume", "create", svpath});
+            if (svit->format == "CREATE") proc.exec("btrfs", {"-q", "subvolume", "create", svpath});
+            if (svit->usefor == "/") devroot = svit;
             proc.status();
         }
         // Make the root subvolume the default again.
-        DeviceItem *devit = mounts.at("/");
-        if (devit->type == DeviceItem::Subvolume) {
-            proc.exec("btrfs", {"subvolume", "set-default", "/mnt/btrfs-scratch/"+devit->label});
+        if (devroot) {
+            proc.exec("btrfs", {"-q", "subvolume", "set-default", "/mnt/btrfs-scratch/"+devroot->label});
         }
     } catch(const char *msg) {
         errmsg = msg;
