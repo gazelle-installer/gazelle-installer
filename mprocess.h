@@ -28,7 +28,7 @@ class MProcess : public QProcess
     friend class ExceptionInfo;
     int execount = 0;
     int sleepcount = 0;
-    enum HaltMode { NoHalt, ThrowHalt, Halted } halting = NoHalt;
+    enum HaltMode { NO_HALT, THROW_HALT, HALTED } halting = NO_HALT;
     bool debugUnusedOutput = true;
     class QListWidget *logView = nullptr;
     class QProgressBar *progBar = nullptr;
@@ -68,7 +68,7 @@ public:
     // Killer functions
     void halt(bool exception = false) noexcept;
     void unhalt() noexcept;
-    bool halted() const noexcept { return halting!=NoHalt; }
+    bool halted() const noexcept { return halting!=NO_HALT; }
     // User interface
     static QString joinCommand(const QString &program, const QStringList &arguments) noexcept;
     class QListWidgetItem *log(const QString &text, const enum LogType type = LOG_LOG) noexcept;
