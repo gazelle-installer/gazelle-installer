@@ -58,28 +58,28 @@ private:
     class QSettings &appConf;
     const class QCommandLineParser &appArgs;
     enum Phase {
-        StartingUp = -1, // Must be less than Ready. -1 for log cosmetics.
-        Ready, // Must be less than all install phases. 0 for log cosmetics.
-        Preparing,
-        Installing,
-        WaitingForInfo,
-        Configuring,
-        OutOfBox,
-        Finished = 99 // Must be the largest. 99 for log cosmetics.
-    } phase = StartingUp;
+        PH_STARTUP = -1, // Must be less than Ready. -1 for log cosmetics.
+        PH_READY, // Must be less than all install phases. 0 for log cosmetics.
+        PH_PREPARING,
+        PH_INSTALLING,
+        PH_WAITING_FOR_INFO,
+        PH_CONFIGURING,
+        PH_OUT_OF_BOX,
+        PH_FINISHED = 99 // Must be the largest. 99 for log cosmetics.
+    } phase = PH_STARTUP;
     enum Abortion {
-        NoAbort,
-        Aborting,
-        Closing,
-        Aborted
-    } abortion = NoAbort;
+        AB_NO_ABORT,
+        AB_ABORTING,
+        AB_CLOSING,
+        AB_ABORTED
+    } abortion = AB_NO_ABORT;
 
     // command line options
     bool pretend, automatic;
     bool oem, modeOOBE, mountkeep;
     // configuration management
     class MSettings *config = nullptr;
-    enum ConfigAction { ConfigSave, ConfigLoadA, ConfigLoadB };
+    enum ConfigAction { CONFIG_SAVE, CONFIG_LOAD1, CONFIG_LOAD2 };
 
     // auto-mount setup
     QString listMaskedMounts;

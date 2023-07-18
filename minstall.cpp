@@ -49,18 +49,18 @@
 #include "minstall.h"
 
 enum Step {
-    Splash,
-    Terms,
-    Disk,
-    Partitions,
-    Boot,
-    Services,
-    Network,
-    Localization,
-    UserAccounts,
-    OldHome,
-    Progress,
-    End
+    SPLASH,
+    TERMS,
+    DISK,
+    PARTITIONS,
+    BOOT,
+    SERVICES,
+    NETWORK,
+    LOCALIZATION,
+    USER_ACCOUNTS,
+    OLD_HOME,
+    PROGRESS,
+    END
 };
 
 MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
@@ -91,7 +91,7 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     PROJECTURL = appConf.value("PROJECT_URL").toString();
     PROJECTFORUM = appConf.value("FORUM_URL").toString();
 
-    gotoPage(Step::Splash);
+    gotoPage(Step::SPLASH);
 
     // config file
     config = new MSettings(cfgfile, this);
@@ -102,7 +102,7 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     QTimer::singleShot(0, this, [this]() noexcept {
         try {
             startup();
-            phase = Ready;
+            phase = PH_READY;
         } catch (const char *msg) {
             proc.unhalt();
             const bool closenow = (!msg || !*msg);
@@ -192,7 +192,7 @@ void MInstall::startup()
 
     oobe = new Oobe(proc, *this, this, appConf, oem, modeOOBE);
 
-    if (modeOOBE) manageConfig(ConfigLoadB);
+    if (modeOOBE) manageConfig(CONFIG_LOAD2);
     else {
         // Build disk widgets
         partman->scan();
@@ -213,7 +213,7 @@ void MInstall::startup()
             radioCustomPart->setChecked(true);
         }
         // Override with whatever is in the config.
-        manageConfig(ConfigLoadA);
+        manageConfig(CONFIG_LOAD1);
         // Hibernation check box (regular install).
         checkHibernationReg->setChecked(checkHibernation->isChecked());
         connect(checkHibernationReg, &QCheckBox::clicked, checkHibernation, &QCheckBox::setChecked);
@@ -223,7 +223,7 @@ void MInstall::startup()
     textCopyright->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
         "%1 uses some components from MEPIS Linux which are released under an Apache free license."
         " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
-    gotoPage(Step::Terms);
+    gotoPage(Step::TERMS);
 }
 
 void MInstall::splashSetThrobber(bool active) noexcept
@@ -350,8 +350,8 @@ bool MInstall::processNextPhase() noexcept
     try {
         widgetStack->setEnabled(true);
         if (proc.halted()) throw ""; // Abortion
-        if (!modeOOBE && phase == Ready) { // no install started yet
-            phase = Preparing;
+        if (!modeOOBE && phase == PH_READY) { // no install started yet
+            phase = PH_PREPARING;
             proc.advance(-1, -1);
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
 
@@ -360,14 +360,14 @@ bool MInstall::processNextPhase() noexcept
             // Load defaults for configuration phase
             bootman->buildBootLists();
             swapman->setupDefaults();
-            manageConfig(ConfigLoadB);
+            manageConfig(CONFIG_LOAD2);
 
             if (!partman->checkTargetDrivesOK()) return false;
             autoMountEnabled = true; // disable auto mount by force
             if (!pretend) setupAutoMount(false);
 
             // the core of the installation
-            phase = Installing;
+            phase = PH_INSTALLING;
             if (!pretend) {
                 proc.advance(11, partman->countPrepSteps());
                 partman->prepStorage();
@@ -383,10 +383,10 @@ bool MInstall::processNextPhase() noexcept
                 proc.log(progInstall->format(), MProcess::LOG_STATUS);
                 QApplication::beep();
             }
-            phase = WaitingForInfo;
+            phase = PH_WAITING_FOR_INFO;
         }
-        if (phase == WaitingForInfo && widgetStack->currentWidget() == pageProgress) {
-            phase = Configuring;
+        if (phase == PH_WAITING_FOR_INFO && widgetStack->currentWidget() == pageProgress) {
+            phase = PH_CONFIGURING;
             progInstall->setEnabled(true);
             pushBack->setEnabled(false);
             if (!pretend) {
@@ -394,7 +394,7 @@ bool MInstall::processNextPhase() noexcept
                 proc.status(tr("Setting system configuration"));
                 if (oem) oobe->enable();
                 oobe->process();
-                manageConfig(ConfigSave);
+                manageConfig(CONFIG_SAVE);
                 proc.exec("sync"); // the sync(2) system call will block the GUI
                 QStringList grubextra;
                 swapman->install(grubextra);
@@ -406,7 +406,7 @@ bool MInstall::processNextPhase() noexcept
             proc.status(tr("Cleaning up"));
             cleanup();
 
-            phase = Finished;
+            phase = PH_FINISHED;
             proc.status(tr("Finished"));
             if (!pretend && appArgs.isSet("reboot")) {
                 proc.shell("/usr/local/bin/persist-config --shutdown --command reboot &");
@@ -414,18 +414,18 @@ bool MInstall::processNextPhase() noexcept
             if (!pretend && appArgs.isSet("poweroff")) {
                 proc.shell("/usr/local/bin/persist-config --shutdown --command poweroff &");
             }
-            gotoPage(Step::End);
+            gotoPage(Step::END);
         }
         // This OOBE phase is only run under --oobe mode.
-        if (modeOOBE && phase == Ready) {
-            phase = OutOfBox;
+        if (modeOOBE && phase == PH_READY) {
+            phase = PH_OUT_OF_BOX;
             labelSplash->setText(tr("Configuring sytem. Please wait."));
-            gotoPage(Step::Splash);
+            gotoPage(Step::SPLASH);
 
             if (!pretend) oobe->process();
             else if (!pretendToInstall(1, 100)) throw "";
 
-            phase = Finished;
+            phase = PH_FINISHED;
             labelSplash->setText(tr("Configuration complete. Restarting system."));
             proc.exec("/usr/sbin/reboot");
         }
@@ -435,16 +435,16 @@ bool MInstall::processNextPhase() noexcept
         }
         proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::LOG_FAIL);
 
-        const bool closing = (abortion == Closing);
+        const bool closing = (abortion == AB_CLOSING);
         labelSplash->setText(tr(msg));
         abortUI(false, closing);
         proc.unhalt();
         if (!modeOOBE) {
-            manageConfig(ConfigSave);
+            manageConfig(CONFIG_SAVE);
             cleanup();
         }
 
-        abortion = Aborted;
+        abortion = AB_ABORTED;
         abortEndUI(closing);
         return false;
     }
@@ -454,20 +454,20 @@ bool MInstall::processNextPhase() noexcept
 
 void MInstall::manageConfig(enum ConfigAction mode) noexcept
 {
-    if (mode == ConfigSave) {
+    if (mode == CONFIG_SAVE) {
         delete config;
         config = new MSettings("/mnt/antiX/etc/minstall.conf", this);
     }
     if (!config) return;
     config->bad = false;
 
-    if (mode == ConfigSave) {
+    if (mode == CONFIG_SAVE) {
         config->setSave(true);
         config->clear();
         config->setValue("Version", VERSION);
         config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
-    if ((mode == ConfigSave || mode == ConfigLoadA) && !modeOOBE) {
+    if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
         // Automatic or Manual partitioning
         config->setGroupWidget(pageDisk);
         const char *diskChoices[] = {"Drive", "Partitions"};
@@ -476,15 +476,15 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         const bool targetIsDrive = radioEntireDisk->isChecked();
 
         // Storage and partition management
-        if(targetIsDrive || mode!=ConfigSave) autopart->manageConfig(*config);
-        if (!targetIsDrive || mode!=ConfigSave) {
+        if(targetIsDrive || mode!=CONFIG_SAVE) autopart->manageConfig(*config);
+        if (!targetIsDrive || mode!=CONFIG_SAVE) {
             config->setGroupWidget(pagePartitions);
-            partman->manageConfig(*config, mode==ConfigSave);
+            partman->manageConfig(*config, mode==CONFIG_SAVE);
         }
 
         // Encryption
         config->startGroup("Encryption", targetIsDrive ? pageDisk : pagePartitions);
-        if (mode != ConfigSave) {
+        if (mode != CONFIG_SAVE) {
             const QString &epass = config->value("Pass").toString();
             if (targetIsDrive) {
                 textCryptoPass->setText(epass);
@@ -500,15 +500,15 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     if (!modeOOBE) {
         const bool advanced = radioCustomPart->isChecked();
         swapman->manageConfig(*config, advanced);
-        if (mode == ConfigSave || mode == ConfigLoadB) {
+        if (mode == CONFIG_SAVE || mode == CONFIG_LOAD2) {
             if (advanced) bootman->manageConfig(*config);
-            oobe->manageConfig(*config, mode==ConfigSave);
+            oobe->manageConfig(*config, mode==CONFIG_SAVE);
         }
-    } else if (mode == ConfigLoadB) {
+    } else if (mode == CONFIG_LOAD2) {
         oobe->manageConfig(*config, false);
     }
 
-    if (mode == ConfigSave) {
+    if (mode == CONFIG_SAVE) {
         config->sync();
         QFile::remove("/etc/minstalled.conf");
         QFile::copy(config->fileName(), "/etc/minstalled.conf");
@@ -525,16 +525,16 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
 // logic displaying pages
 int MInstall::showPage(int curr, int next) noexcept
 {
-    if (next == Step::Splash) { // Enter splash screen
+    if (next == Step::SPLASH) { // Enter splash screen
         boxMain->setCursor(Qt::WaitCursor);
         splashSetThrobber(appConf.value("SPLASH_THROBBER", true).toBool());
-    } else if (curr == Step::Splash) { // Leave splash screen
+    } else if (curr == Step::SPLASH) { // Leave splash screen
         labelSplash->clear();
         splashSetThrobber(false);
         boxMain->unsetCursor();
-    } else if (curr == Step::Terms && next > curr) {
-        if (modeOOBE) return Step::Network;
-    } else if (curr == Step::Disk && next > curr) {
+    } else if (curr == Step::TERMS && next > curr) {
+        if (modeOOBE) return Step::NETWORK;
+    } else if (curr == Step::DISK && next > curr) {
         if (radioEntireDisk->isChecked()) {
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
@@ -558,12 +558,12 @@ int MInstall::showPage(int curr, int next) noexcept
                 return curr;
             }
             bootman->buildBootLists(); // Load default boot options
-            manageConfig(ConfigLoadB);
+            manageConfig(CONFIG_LOAD2);
             checkHibernation->setChecked(checkHibernationReg->isChecked());
             swapman->setupDefaults();
-            return oem ? Step::Progress : Step::Network;
+            return oem ? Step::PROGRESS : Step::NETWORK;
         }
-    } else if (curr == Step::Partitions && next > curr) {
+    } else if (curr == Step::PARTITIONS && next > curr) {
         if (!partman->composeValidate(automatic, PROJECTNAME)) {
             nextFocus = treePartitions;
             return curr;
@@ -574,45 +574,45 @@ int MInstall::showPage(int curr, int next) noexcept
                     " the required information could not be obtained."));
             return curr;
         }
-        return Step::Boot;
-    } else if (curr == Step::Boot && next > curr) {
-        return oem ? Step::Progress : Step::Network;
-    } else if (curr == Step::Network && next > curr) {
+        return Step::BOOT;
+    } else if (curr == Step::BOOT && next > curr) {
+        return oem ? Step::PROGRESS : Step::NETWORK;
+    } else if (curr == Step::NETWORK && next > curr) {
         nextFocus = oobe->validateComputerName();
         if (nextFocus) return curr;
-    } else if (curr == Step::Network && next < curr) { // Backward
-        if (modeOOBE) return Step::Terms;
-        else return Step::Boot; // Skip pageServices
-    } else if (curr == Step::Localization && next > curr) {
+    } else if (curr == Step::NETWORK && next < curr) { // Backward
+        if (modeOOBE) return Step::TERMS;
+        else return Step::BOOT; // Skip pageServices
+    } else if (curr == Step::LOCALIZATION && next > curr) {
         if (!pretend && oobe->haveSnapshotUserAccounts) {
-            return Step::Progress; // Skip pageUserAccounts and pageOldHome
+            return Step::PROGRESS; // Skip pageUserAccounts and pageOldHome
         }
-    } else if (curr == Step::UserAccounts && next > curr) {
+    } else if (curr == Step::USER_ACCOUNTS && next > curr) {
         nextFocus = oobe->validateUserInfo(automatic);
         if (nextFocus) return curr;
         // Check for pre-existing /home directory, see if user directory already exists.
         haveOldHome = base && base->homes.contains(textUserName->text());
-        if (!haveOldHome) return Step::Progress; // Skip pageOldHome
+        if (!haveOldHome) return Step::PROGRESS; // Skip pageOldHome
         else {
             const QString &str = tr("The home directory for %1 already exists.");
             labelOldHome->setText(str.arg(textUserName->text()));
         }
-    } else if (curr == Step::OldHome && next < curr) { // Backward
+    } else if (curr == Step::OLD_HOME && next < curr) { // Backward
         if (!pretend && oobe->haveSnapshotUserAccounts) {
-            return Step::Localization; // Skip pageUserAccounts and pageOldHome
+            return Step::LOCALIZATION; // Skip pageUserAccounts and pageOldHome
         }
-    } else if (curr == Step::Progress && next < curr) { // Backward
-        if (oem) return Step::Boot;
+    } else if (curr == Step::PROGRESS && next < curr) { // Backward
+        if (oem) return Step::BOOT;
         else if (!haveOldHome) {
             // skip pageOldHome
             if (!pretend && oobe->haveSnapshotUserAccounts) {
-                return Step::Localization;
+                return Step::LOCALIZATION;
             }
-            return Step::UserAccounts;
+            return Step::USER_ACCOUNTS;
         }
-    } else if (curr == Step::Services) { // Backward or forward
+    } else if (curr == Step::SERVICES) { // Backward or forward
         oobe->stashServices(next > curr);
-        return Step::Localization; // The page that called pageServices
+        return Step::LOCALIZATION; // The page that called pageServices
     }
     return next;
 }
@@ -629,7 +629,7 @@ void MInstall::pageDisplayed(int next) noexcept
     }
 
     switch (next) {
-    case Step::Terms:
+    case Step::TERMS:
         textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
             + (modeOOBE ? "" : (tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p><p>"))
             + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
@@ -639,7 +639,7 @@ void MInstall::pageDisplayed(int next) noexcept
                 " It is solely your responsibility to backup your data before proceeding.") + "</p>");
         pushNext->setDefault(true);
         break;
-    case Step::Disk:
+    case Step::DISK:
         textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
             + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
             "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
@@ -661,7 +661,7 @@ void MInstall::pageDisplayed(int next) noexcept
         enableNext = radioCustomPart->isChecked() || !boxEncryptAuto->isChecked() || autopart->passCrypto.valid();
         break;
 
-    case Step::Partitions:
+    case Step::PARTITIONS:
         textHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
             + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"
             "<p>" + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"
@@ -754,7 +754,7 @@ void MInstall::pageDisplayed(int next) noexcept
         enableNext = !(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || passCryptoCust->valid();
         break;
 
-    case Step::Boot: // Start of installation.
+    case Step::BOOT: // Start of installation.
         textHelp->setText("<p><b>" + tr("Install GRUB for Linux and Windows") + "</b><br/>"
             + tr("%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.").arg(PROJECTNAME) + "</p>"
             "<p>" + tr("By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.") + "</p>"
@@ -768,11 +768,11 @@ void MInstall::pageDisplayed(int next) noexcept
         enableBack = false;
         break;
 
-    case Step::Services:
+    case Step::SERVICES:
         textHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         break;
 
-    case Step::Network:
+    case Step::NETWORK:
         textHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
                              "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
@@ -782,7 +782,7 @@ void MInstall::pageDisplayed(int next) noexcept
         else enableBack = radioCustomPart->isChecked();
         break;
 
-    case Step::Localization:
+    case Step::LOCALIZATION:
         textHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
             + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"
             "<p><b>" + tr("Configure Clock") + "</b><br/>"
@@ -796,7 +796,7 @@ void MInstall::pageDisplayed(int next) noexcept
                 " Make sure you know what you are doing!"));
         break;
 
-    case Step::UserAccounts:
+    case Step::USER_ACCOUNTS:
         textHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
         + tr("The root user is similar to the Administrator user in some other operating systems."
             " You should not use the root user as your daily user account."
@@ -815,7 +815,7 @@ void MInstall::pageDisplayed(int next) noexcept
         enableNext = pushNext->isEnabled();
         break;
 
-    case Step::OldHome:
+    case Step::OLD_HOME:
         textHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
             + tr("A home directory already exists for the user name you have chosen."
                 " This screen allows you to choose what happens to this directory.") + "</p>"
@@ -840,7 +840,7 @@ void MInstall::pageDisplayed(int next) noexcept
         }
         break;
 
-    case Step::Progress:
+    case Step::PROGRESS:
         if (ixTipStart >= 0) {
             iLastProgress = progInstall->value();
             on_progInstall_valueChanged(iLastProgress);
@@ -859,7 +859,7 @@ void MInstall::pageDisplayed(int next) noexcept
         enableNext = false;
         break;
 
-    case Step::End:
+    case Step::END:
         pushClose->setEnabled(false);
         textHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                              "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
@@ -898,18 +898,18 @@ void MInstall::gotoPage(int next) noexcept
 
     QSize isize = pushNext->iconSize();
     isize.setWidth(isize.height());
-    if (next >= Step::End) {
+    if (next >= Step::END) {
         // entering the last page
         pushBack->hide();
         pushNext->setText(tr("Finish"));
-    } else if (next == Step::Services){
+    } else if (next == Step::SERVICES){
         isize.setWidth(0);
         pushNext->setText(tr("OK"));
     } else {
         pushNext->setText(tr("Next"));
     }
     pushNext->setIconSize(isize);
-    if (next > Step::End) {
+    if (next > Step::END) {
         // finished
         qApp->setOverrideCursor(Qt::WaitCursor);
         if (!pretend && checkExitReboot->isChecked()) {
@@ -940,8 +940,8 @@ void MInstall::gotoPage(int next) noexcept
     }
 
     // process next installation phase
-    if (next == Step::Boot || next == Step::Progress
-        || (radioEntireDisk->isChecked() && next == Step::Network)) {
+    if (next == Step::BOOT || next == Step::PROGRESS
+        || (radioEntireDisk->isChecked() && next == Step::NETWORK)) {
         processNextPhase();
     }
 }
@@ -1004,7 +1004,7 @@ void MInstall::changeEvent(QEvent *event) noexcept
 
 void MInstall::closeEvent(QCloseEvent *event) noexcept
 {
-    if (phase > Ready && phase < Finished && abortion != Aborted) {
+    if (phase > PH_READY && phase < PH_FINISHED && abortion != AB_ABORTED) {
         // Currently installing, could be pending abortion (but not finished aborting).
         event->ignore();
         abortUI(true, true);
@@ -1012,13 +1012,13 @@ void MInstall::closeEvent(QCloseEvent *event) noexcept
         // Shutdown for pending or fully aborted OOBE
         event->ignore();
         labelSplash->clear();
-        gotoPage(Step::Splash);
+        gotoPage(Step::SPLASH);
         proc.unhalt();
         proc.exec("/usr/sbin/shutdown", {"-hP", "now"});
     } else {
         // Fully aborted installation (but not OOBE).
         event->accept();
-        if (phase == StartingUp) proc.halt(true);
+        if (phase == PH_STARTUP) proc.halt(true);
         if (checkmd5) checkmd5->halt(true);
     }
 }
@@ -1049,14 +1049,14 @@ void MInstall::on_pushAbort_clicked() noexcept
 // clicking advanced button to go to Services page
 void MInstall::on_pushServices_clicked() noexcept
 {
-    gotoPage(Step::Services);
+    gotoPage(Step::SERVICES);
 }
 
 void MInstall::abortUI(bool manual, bool closing) noexcept
 {
     // ask for confirmation when installing (except for some steps that don't need confirmation)
-    if (abortion != NoAbort) return; // Don't abort an abortion.
-    else if (phase > Ready && phase < Finished) {
+    if (abortion != AB_NO_ABORT) return; // Don't abort an abortion.
+    else if (phase > PH_READY && phase < PH_FINISHED) {
         if (manual) {
             const QMessageBox::StandardButton rc = QMessageBox::warning(this, QString(),
                 tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
@@ -1066,11 +1066,11 @@ void MInstall::abortUI(bool manual, bool closing) noexcept
         }
     }
     // At this point the abortion has not been cancelled.
-    abortion = closing ? Closing : Aborting;
-    gotoPage(Step::Splash);
+    abortion = closing ? AB_CLOSING : AB_ABORTING;
+    gotoPage(Step::SPLASH);
     proc.halt(true);
     // Early phase bump if waiting on input to trigger abortion cleanup.
-    if (manual && phase == WaitingForInfo) processNextPhase();
+    if (manual && phase == PH_WAITING_FOR_INFO) processNextPhase();
 }
 void MInstall::abortEndUI(bool closenow) noexcept
 {
