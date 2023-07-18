@@ -1278,7 +1278,7 @@ void PartMan::formatPartitions()
         if (useFor == "FORMAT") proc.status(fmtstatus.arg(twit->device));
         else proc.status(fmtstatus.arg(twit->shownUseFor()));
         if (useFor == "BIOS-GRUB") {
-            proc.exec("dd", {"bs=64K", "if=/dev/zero", "of=" + dev});
+            proc.shell("dd bs=32K if=/dev/zero of=" + dev + " || echo Note: The error message \\'No space left on device\\' is ignored!");
             const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
         } else if (useFor == "SWAP") {
