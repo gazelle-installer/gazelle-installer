@@ -102,8 +102,6 @@ public:
     void driveAutoSetActive() noexcept;
     void labelParts() noexcept;
     // Helpers
-    static QString shownUseFor(const QString &use) noexcept;
-    inline QString shownUseFor() const noexcept { return shownUseFor(usefor); }
     void setActive(bool boot) noexcept;
     bool isActive() const noexcept;
     bool isLocked() const noexcept;

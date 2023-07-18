@@ -744,7 +744,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         const auto fit = mounts.find(mount);
         if (fit != mounts.cend()) {
             QMessageBox::critical(gui.boxMain, QString(), tr("%1 is already"
-                " selected for: %2").arg(fit->second->shownDevice(), fit->second->shownUseFor()));
+                " selected for: %2").arg(fit->second->shownDevice(), fit->second->usefor));
             return false;
         } else if(item->canMount(false)) {
             mounts[mount] = item;
@@ -784,20 +784,21 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                 const int subcount = partit->childCount();
                 QString actmsg;
                 if (drvit->flags.oldLayout) {
-                    if (drvit->usefor.isEmpty()) {
+                    if (partit->usefor.isEmpty()) {
                         if (subcount > 0) actmsg = tr("Reuse (no reformat) %1");
                         else continue;
                     } else {
-                        if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
-                        else if (drvit->usefor != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
+                        if (partit->usefor == "FORMAT") actmsg = tr("Format %1");
+                        else if (partit->willFormat()) actmsg = tr("Format %1 to use for %2");
+                        else if (partit->usefor != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
                         else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
                     }
                 } else {
-                    if (drvit->usefor.isEmpty()) actmsg = tr("Create %1 without formatting");
+                    if (partit->usefor.isEmpty()) actmsg = tr("Create %1 without formatting");
                     else actmsg = tr("Create %1, format to use for %2");
                 }
                 // QString::arg() emits warnings if a marker is not in the string.
-                details += actmsg.replace("%1", partit->shownDevice()).replace("%2", partit->shownUseFor()) + '\n';
+                details += actmsg.replace("%1", partit->shownDevice()).replace("%2", partit->usefor) + '\n';
 
                 for (int ixsv = 0; ixsv < subcount; ++ixsv) {
                     DeviceItem *svit = partit->child(ixsv);
@@ -818,7 +819,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                         }
                     }
                     // QString::arg() emits warnings if a marker is not in the string.
-                    details += " + " + actmsg.replace("%1", svit->label).replace("%2", svit->shownUseFor()) + '\n';
+                    details += " + " + actmsg.replace("%1", svit->label).replace("%2", svit->usefor) + '\n';
                 }
             }
         }
@@ -884,7 +885,7 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
             // If this volume is too small, add to the warning list.
             if (isused && partit->size < minsize) {
                 const QString &msgsz = tr("%1 (%2) requires %3");
-                toosmall << msgsz.arg(partit->shownUseFor(), partit->shownDevice(),
+                toosmall << msgsz.arg(partit->usefor, partit->shownDevice(),
                     QLocale::system().formattedDataSize(minsize, 1, QLocale::DataSizeTraditionalFormat));
 
                 // Add all subvolumes (sorted) to the warning list as one string.
@@ -896,7 +897,7 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
 
                     const long long svmin = volSpecTotal(svit->usefor, vols).minimum;
                     if (svmin > 0) {
-                        svsmall << msgsz.arg(svit->shownUseFor(), svit->shownDevice(),
+                        svsmall << msgsz.arg(svit->usefor, svit->shownDevice(),
                             QLocale::system().formattedDataSize(svmin, 1, QLocale::DataSizeTraditionalFormat));
                     }
                 }
@@ -1270,7 +1271,7 @@ void PartMan::formatPartitions()
         const QString &dev = twit->mappedDevice();
         const QString &fmtstatus = tr("Formatting: %1");
         if (twit->usefor == "FORMAT") proc.status(fmtstatus.arg(twit->device));
-        else proc.status(fmtstatus.arg(twit->shownUseFor()));
+        else proc.status(fmtstatus.arg(twit->usefor));
         if (twit->usefor == "BIOS-GRUB") {
             const DeviceItem::NameParts &devsplit = DeviceItem::split(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
@@ -1916,12 +1917,6 @@ void DeviceItem::sortChildren() noexcept
     }
 }
 /* Helpers */
-QString DeviceItem::shownUseFor(const QString &use) noexcept
-{
-    if (use == "SWAP") return tr("swap space");
-    else if (use == "FORMAT") return tr("format only");
-    return use;
-}
 void DeviceItem::setActive(bool boot) noexcept
 {
     if (!parentItem) return;
