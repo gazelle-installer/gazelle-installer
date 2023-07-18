@@ -60,8 +60,8 @@ void MProcess::setupChildProcess() noexcept
 
 inline bool MProcess::checkHalt()
 {
-    if (halting == ThrowHalt) throw("");
-    else if (halting == Halted) return true;
+    if (halting == THROW_HALT) throw("");
+    else if (halting == HALTED) return true;
     return false;
 }
 
@@ -150,7 +150,7 @@ QStringList MProcess::readOutLines() noexcept
 void MProcess::halt(bool exception) noexcept
 {
     log(__PRETTY_FUNCTION__, LOG_MARKER);
-    halting = exception ? ThrowHalt : Halted;
+    halting = exception ? THROW_HALT : HALTED;
     if(state() != QProcess::NotRunning) {
         QEventLoop eloop;
         connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
@@ -164,7 +164,7 @@ void MProcess::halt(bool exception) noexcept
 }
 void MProcess::unhalt() noexcept
 {
-    if (halting == NoHalt) return;
+    if (halting == NO_HALT) return;
     QEventLoop eloop;
     connect(this, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
     if (state() != QProcess::NotRunning) {
@@ -173,7 +173,7 @@ void MProcess::unhalt() noexcept
         closeWriteChannel();
         eloop.exec();
     }
-    halting = NoHalt;
+    halting = NO_HALT;
 }
 
 QString MProcess::joinCommand(const QString &program, const QStringList &arguments) noexcept
