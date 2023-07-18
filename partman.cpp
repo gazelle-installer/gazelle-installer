@@ -366,12 +366,14 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                 if (!subvol) return false;
                 config.beginGroup(groupPart + ".Subvolume" + QString::number(ixSV+1));
                 if (save) {
+                    if (subvol->isActive()) config.setValue("Default", true);
                     if (!subvol->usefor.isEmpty()) config.setValue("UseFor", subvol->usefor);
                     if (!subvol->label.isEmpty()) config.setValue("Label", subvol->label);
                     if (!subvol->options.isEmpty()) config.setValue("Options", subvol->options);
                     config.setValue("Dump", subvol->dump);
                     config.setValue("Pass", subvol->pass);
                 } else {
+                    if (config.value("Default").toBool()) subvol->setActive(true);
                     subvol->usefor = config.value("UseFor").toString();
                     subvol->label = config.value("Label").toString();
                     subvol->options = config.value("Options").toString();
