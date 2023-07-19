@@ -231,15 +231,15 @@ private:
     QVariant headerData(int section, Qt::Orientation orientation,
         int role = Qt::DisplayRole) const noexcept override;
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-    QModelIndex index(Device *item) const noexcept;
+    QModelIndex index(Device *device) const noexcept;
     QModelIndex parent(const QModelIndex &index) const noexcept override;
     Device *item(const QModelIndex &index) const noexcept;
     int rowCount(const QModelIndex &parent = QModelIndex()) const noexcept override;
     inline int columnCount(const QModelIndex &) const noexcept override { return TREE_COLUMNS; }
 public:
-    bool changeBegin(Device *item) noexcept;
+    bool changeBegin(Device *device) noexcept;
     int changeEnd(bool notify = true) noexcept;
-    void notifyChange(class Device *item, int first = -1, int last = -1) noexcept;
+    void notifyChange(class Device *device, int first = -1, int last = -1) noexcept;
 };
 
 class PartMan::ItemDelegate : public QStyledItemDelegate
