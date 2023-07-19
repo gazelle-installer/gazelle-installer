@@ -290,15 +290,19 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
         // Check if the drive is to be cleared and formatted.
         size_t partCount = drive->children.size();
         bool drvPreserve = drive->flags.oldLayout;
-        const QString &configNewLayout = "Storage/NewLayout." + drive->name;
+        config.beginGroup("Storage." + drive->name);
         if (save) {
-            if (!drvPreserve) config.setValue(configNewLayout, static_cast<uint>(partCount));
-        } else if (config.contains(configNewLayout)) {
+            if (!drvPreserve) {
+                config.setValue("Format", drive->willUseGPT() ? "GPT" : "DOS");
+                config.setValue("Partitions", static_cast<uint>(partCount));
+            }
+        } else if (config.contains("Format")) {
             drvPreserve = false;
             drive->clear();
-            partCount = config.value(configNewLayout).toUInt();
+            partCount = config.value("Partitions").toUInt();
             if (partCount > PARTMAN_MAX_PARTS) return false;
         }
+        config.endGroup();
         // Partition configuration.
         const long long sizeMax = drive->size - PARTMAN_SAFETY;
         long long sizeTotal = 0;
