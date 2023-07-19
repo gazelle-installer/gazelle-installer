@@ -112,16 +112,16 @@ bool Base::saveHomeBasic() noexcept
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     QString homedir("/");
     const auto fit = partman.mounts.find("/home");
-    const DeviceItem *mntit = nullptr;
+    const PartMan::Device *mount = nullptr;
     if (fit != partman.mounts.cend() && !fit->second->willFormat()) {
-        mntit = fit->second;
+        mount = fit->second;
     } else {
-        mntit = partman.mounts.at("/"); // Must have '/' at this point.
+        mount = partman.mounts.at("/"); // Must have '/' at this point.
         homedir = "/home";
     }
-    assert(mntit != nullptr);
-    if (mntit->willFormat()) return true;
-    const QString &homedev = mntit->mappedDevice();
+    assert(mount != nullptr);
+    if (mount->willFormat()) return true;
+    const QString &homedev = mount->mappedDevice();
 
     // Just in case the device or mount point is in use elsewhere.
     proc.exec("umount", {"-q", homedev});
@@ -130,7 +130,7 @@ bool Base::saveHomeBasic() noexcept
     // Store a listing of /home to compare with the user name given later.
     mkdir("/mnt/antiX", 0755);
     QString opts = "ro";
-    if (mntit->type == DeviceItem::SUBVOLUME) opts += ",subvol="+mntit->curLabel;
+    if (mount->type == PartMan::Device::SUBVOLUME) opts += ",subvol="+mount->curLabel;
     bool ok = proc.exec("mount", {"-o", opts, homedev, "/mnt/antiX"});
     if (ok) {
         QDir hd("/mnt/antiX" + homedir);
@@ -147,8 +147,8 @@ void Base::install()
     if (proc.halted()) return;
     proc.advance(1, 2);
 
-    const DeviceItem *mntit = partman.mounts.at("/");
-    const bool skiphome = !mntit->willFormat();
+    const PartMan::Device *mount = partman.mounts.at("/");
+    const bool skiphome = !mount->willFormat();
     if (skiphome) {
         MProcess::Section sect(proc, QT_TR_NOOP("Failed to delete old system on destination."));
         // if root was not formatted and not using --sync option then re-use it

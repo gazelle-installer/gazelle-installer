@@ -200,7 +200,7 @@ void MInstall::startup()
         if (comboDisk->count() > 0) {
             comboDisk->setCurrentIndex(0);
             radioEntireDisk->setChecked(true);
-            for (DeviceItemIterator it(*partman); *it; it.next()) {
+            for (PartMan::Iterator it(*partman); *it; it.next()) {
                 if ((*it)->isVolume()) {
                     // found at least one partition
                     radioCustomPart->setChecked(true);
@@ -542,8 +542,8 @@ int MInstall::showPage(int curr, int next) noexcept
             if (!automatic) {
                 QString msg = tr("OK to format and use the entire disk (%1) for %2?");
                 if (!proc.detectEFI()) {
-                    DeviceItem *devit = partman->findByPath("/dev/" + comboDisk->currentData().toString());
-                    if (devit && devit->size >= 2*TB) {
+                    PartMan::Device *device = partman->findByPath("/dev/" + comboDisk->currentData().toString());
+                    if (device && device->size >= 2*TB) {
                         msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
                                            " On some systems, a GPT-formatted disk will not boot.");
                         return curr;

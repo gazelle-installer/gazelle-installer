@@ -58,16 +58,19 @@ void BootMan::manageConfig(MSettings &config) noexcept
 void BootMan::selectBootMain() noexcept
 {
     const auto fit = partman.mounts.find("/boot");
-    const DeviceItem *twit = (fit != partman.mounts.end() ? fit->second : partman.mounts.at("/"));
+    const PartMan::Device *device = (fit != partman.mounts.end() ? fit->second : partman.mounts.at("/"));
 
-    if (twit->origin) twit = twit->origin;
-    while (twit && twit->type != DeviceItem::PARTITION) twit = twit->parent();
-    if (!gui.radioBootPBR->isChecked() && twit) twit = twit->parent();
-    if (!twit) return;
-    int ixsel = gui.comboBoot->findData(twit->device); // Boot drive or partition
+    if (device->origin) device = device->origin;
+    while (device && device->type != PartMan::Device::PARTITION) {
+        device = device->parent();
+    }
+    if (!gui.radioBootPBR->isChecked() && device) device = device->parent();
+    if (!device) return;
+
+    int ixsel = gui.comboBoot->findData(device->name); // Boot drive or partition
     for(int ixi = 0; ixsel < 0 && ixi < gui.comboBoot->count(); ++ixi) {
-        const DeviceItem::NameParts &s = DeviceItem::split(gui.comboBoot->itemData(ixi).toString());
-        if (s.drive == twit->device) ixsel = ixi; // Partition on boot drive
+        const PartMan::NameParts &s = PartMan::splitName(gui.comboBoot->itemData(ixi).toString());
+        if (s.drive == device->name) ixsel = ixi; // Partition on boot drive
     }
     if (ixsel >= 0) gui.comboBoot->setCurrentIndex(ixsel);
 }
@@ -169,7 +172,7 @@ void BootMan::install(const QStringList &cmdextra)
             }
             // Add a new NVRAM boot variable.
             if (fitesp != partman.mounts.end()) {
-                const DeviceItem::NameParts &bs = DeviceItem::split(fitesp->second->device);
+                const PartMan::NameParts &bs = PartMan::splitName(fitesp->second->name);
                 proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", "/dev/"+bs.drive, "-p", bs.partition,
                     "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
             }
@@ -291,9 +294,9 @@ void BootMan::install(const QStringList &cmdextra)
 void BootMan::chosenBootMBR() noexcept
 {
     gui.comboBoot->clear();
-    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::DRIVE && (!item->flags.bootRoot || installFromRootDevice)) {
-            if (!item->flags.nasty || brave) item->addToCombo(gui.comboBoot, true);
+    for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
+        if (device->type == PartMan::Device::DRIVE && (!device->flags.bootRoot || installFromRootDevice)) {
+            if (!device->flags.nasty || brave) device->addToCombo(gui.comboBoot, true);
         }
     }
     selectBootMain();
@@ -303,16 +306,16 @@ void BootMan::chosenBootMBR() noexcept
 void BootMan::chosenBootPBR() noexcept
 {
     gui.comboBoot->clear();
-    for (DeviceItemIterator it(partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::PARTITION && (!item->flags.bootRoot || installFromRootDevice)) {
-            if (item->flags.sysEFI) continue;
-            else if (!item->format.compare("SWAP", Qt::CaseInsensitive)) continue;
-            else if (item->format == "crypto_LUKS") continue;
-            else if (item->format.isEmpty() || item->format == "PRESERVE") {
-                if (item->curFormat == "crypto_LUKS") continue;
-                if (!item->curFormat.compare("SWAP", Qt::CaseInsensitive)) continue;
+    for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
+        if (device->type == PartMan::Device::PARTITION && (!device->flags.bootRoot || installFromRootDevice)) {
+            if (device->flags.sysEFI) continue;
+            else if (!device->format.compare("SWAP", Qt::CaseInsensitive)) continue;
+            else if (device->format == "crypto_LUKS") continue;
+            else if (device->format.isEmpty() || device->format == "PRESERVE") {
+                if (device->curFormat == "crypto_LUKS") continue;
+                if (!device->curFormat.compare("SWAP", Qt::CaseInsensitive)) continue;
             }
-            if (!item->flags.nasty || brave) item->addToCombo(gui.comboBoot, true);
+            if (!device->flags.nasty || brave) device->addToCombo(gui.comboBoot, true);
         }
     }
     selectBootMain();

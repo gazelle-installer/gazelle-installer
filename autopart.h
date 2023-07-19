@@ -22,6 +22,7 @@
 #include <QObject>
 #include "ui_meinstall.h"
 #include "passedit.h"
+#include "partman.h"
 
 class AutoPart : public QObject
 {
@@ -29,7 +30,7 @@ class AutoPart : public QObject
     class MProcess &proc;
     class Ui::MeInstall &gui;
     class PartMan *partman;
-    class DeviceItem *drvitem = nullptr;
+    class PartMan::Device *drvitem = nullptr;
     QString strRoot, strHome, strNone;
     long long available = 0;
     long long minRoot = 0, recRoot = 0, sizeRoot = 0;
@@ -57,7 +58,7 @@ public:
     void setPartSize(Part part, long long nbytes) noexcept;
     long long partSize(Part part = Root) const noexcept;
     // Layout Builder
-    void builderGUI(class DeviceItem *drive) noexcept;
+    void builderGUI(class PartMan::Device *drive) noexcept;
     long long buildLayout(long long rootFormatSize, bool crypto,
         bool updateTree=true, class QStringList *volList=nullptr) noexcept;
     // Helpers
