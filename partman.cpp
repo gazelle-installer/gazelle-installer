@@ -47,8 +47,9 @@
 #include "partman.h"
 
 PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs)
-    : QAbstractItemModel(ui.boxMain), proc(mproc), root(*this), gui(ui)
+    : QAbstractItemModel(ui.boxMain), proc(mproc), gui(ui)
 {
+    root = new Device(*this);
     const QString &projShort = appConf.value("PROJECT_SHORTNAME").toString();
     volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
     volSpecs["/boot"] = {"boot"};
@@ -97,6 +98,10 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
         bootUUID = livecfg.value("BOOT_UUID").toString();
     }
 }
+PartMan::~PartMan()
+{
+    if (root) delete root;
+}
 
 void PartMan::scan(Device *drvstart)
 {
@@ -118,14 +123,14 @@ void PartMan::scan(Device *drvstart)
         else if (sect.startsWith("/dev/")) curdev = sect.mid(5);
     }
 
-    if (!drvstart) root.clear();
+    if (!drvstart) root->clear();
     for (const QJsonValue &jsonDrive : jsonBD) {
         const QString &jdName = jsonDrive["name"].toString();
         const QString &jdPath = jsonDrive["path"].toString();
         if (jsonDrive["type"] != "disk") continue;
         if (jdName.startsWith("zram")) continue;
         Device *drive = drvstart;
-        if (!drvstart) drive = new Device(Device::DRIVE, &root);
+        if (!drvstart) drive = new Device(Device::DRIVE, root);
         else if (jdPath != drvstart->path) continue;
 
         drive->clear();
@@ -197,7 +202,7 @@ void PartMan::scanVirtualDevices(bool rescan)
     Device *virtdevs = nullptr;
     std::map<QString, Device *> listed;
     if (rescan) {
-        for (Device *drive : root.children) {
+        for (Device *drive : root->children) {
             if (drive->type == Device::VIRTUAL_DEVICES) {
                 virtdevs = drive;
                 for (Device *device : virtdevs->children) listed[device->path] = device;
@@ -213,7 +218,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         if (virtdevs) delete virtdevs;
         return;
     } else if (!virtdevs) {
-        virtdevs = new Device(Device::VIRTUAL_DEVICES, &root);
+        virtdevs = new Device(Device::VIRTUAL_DEVICES, root);
         virtdevs->name = tr("Virtual Devices");
         virtdevs->flags.oldLayout = true;
         gui.treePartitions->setFirstColumnSpanned(virtdevs->row(), QModelIndex(), true);
@@ -281,7 +286,7 @@ void PartMan::scanVirtualDevices(bool rescan)
 
 bool PartMan::manageConfig(MSettings &config, bool save) noexcept
 {
-    for (Device *drive : root.children) {
+    for (Device *drive : root->children) {
         // Check if the drive is to be cleared and formatted.
         size_t partCount = drive->children.size();
         bool drvPreserve = drive->flags.oldLayout;
@@ -768,7 +773,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
     if (!automatic) {
         // Final warnings before the installer starts.
         QString details;
-        for (const Device *drive : std::as_const(root.children)) {
+        for (const Device *drive : std::as_const(root->children)) {
             if (!drive->flags.oldLayout && drive->type != Device::VIRTUAL_DEVICES) {
                 const char *pttype = drive->willUseGPT() ? "GPT" : "MBR";
                 details += tr("Prepare %1 partition table on %2").arg(pttype, drive->name) + '\n';
@@ -853,7 +858,7 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
     }
 
     QStringList toosmall;
-    for (const Device *drive : std::as_const(root.children)) {
+    for (const Device *drive : std::as_const(root->children)) {
         for (const Device *part : std::as_const(drive->children)) {
             bool isused = !part->usefor.isEmpty();
             long long minsize = isused ? volSpecTotal(part->usefor, vols).minimum : 0;
@@ -921,7 +926,7 @@ bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
 
     // BIOS with GPT
     QString biosgpt;
-    for (const Device *drive : std::as_const(root.children)) {
+    for (const Device *drive : std::as_const(root->children)) {
         bool hasBiosGrub = false;
         for (const Device *part : std::as_const(drive->children)) {
             if (part->finalFormat() == "BIOS-GRUB") {
@@ -952,7 +957,7 @@ bool PartMan::checkTargetDrivesOK()
 {
     MProcess::Section sect(proc, nullptr); // No exception on execution error for this block.
     QString smartFail, smartWarn;
-    for (Device *drive : root.children) {
+    for (Device *drive : root->children) {
         if (drive->type == Device::VIRTUAL_DEVICES) continue;
         QStringList purposes;
         for (Iterator it(drive); const Device *device = *it; it.next()) {
@@ -1006,7 +1011,7 @@ PartMan::Device *PartMan::selectedDriveAuto() noexcept
 {
     QString drv(gui.comboDisk->currentData().toString());
     if (!findByPath("/dev/" + drv)) return nullptr;
-    for (Device *drive : root.children) {
+    for (Device *drive : root->children) {
         if (drive->name == drv) return drive;
     }
     return nullptr;
@@ -1084,7 +1089,7 @@ void PartMan::preparePartitions()
 
     // Detach all existing partitions.
     QStringList listToUnmount;
-    for (const Device *drive : std::as_const(root.children)) {
+    for (const Device *drive : std::as_const(root->children)) {
         if (drive->type == Device::VIRTUAL_DEVICES) continue;
         if (drive->flags.oldLayout) {
             // Using the existing layout, so only mark used partitions for unmounting.
@@ -1117,7 +1122,7 @@ void PartMan::preparePartitions()
     }
 
     // Prepare partition tables on devices which will have a new layout.
-    for (const Device *drive : std::as_const(root.children)) {
+    for (const Device *drive : std::as_const(root->children)) {
         if (drive->flags.oldLayout || drive->type == Device::VIRTUAL_DEVICES) continue;
         proc.status(tr("Preparing partition tables"));
 
@@ -1137,7 +1142,7 @@ void PartMan::preparePartitions()
 
     // Prepare partition tables, creating tables and partitions when needed.
     proc.status(tr("Preparing required partitions"));
-    for (const Device *drive : std::as_const(root.children)) {
+    for (const Device *drive : std::as_const(root->children)) {
         bool partupdate = false;
         if (drive->type == Device::VIRTUAL_DEVICES) continue;
         const int devCount = drive->children.size();
@@ -1694,13 +1699,13 @@ QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role)
 }
 QModelIndex PartMan::index(Device *device) const noexcept
 {
-    if (device == &root) return QModelIndex();
+    if (device == root) return QModelIndex();
     return createIndex(device->row(), 0, device);
 }
 QModelIndex PartMan::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent)) return QModelIndex();
-    const Device *pdevice = parent.isValid() ? static_cast<Device *>(parent.internalPointer()) : &root;
+    const Device *pdevice = parent.isValid() ? static_cast<Device *>(parent.internalPointer()) : root;
     Device *cdevice = pdevice->child(row);
     if (cdevice) return createIndex(row, column, cdevice);
     return QModelIndex();
@@ -1710,7 +1715,7 @@ QModelIndex PartMan::parent(const QModelIndex &index) const noexcept
     if (!index.isValid()) return QModelIndex();
     Device *cdevice = static_cast<Device *>(index.internalPointer());
     Device *pdevice = cdevice->parentItem;
-    if (!pdevice || pdevice == &root) return QModelIndex();
+    if (!pdevice || pdevice == root) return QModelIndex();
     return createIndex(pdevice->row(), 0, pdevice);
 }
 inline PartMan::Device *PartMan::item(const QModelIndex &index) const noexcept
@@ -1723,21 +1728,21 @@ int PartMan::rowCount(const QModelIndex &parent) const noexcept
     if (parent.isValid()) {
         return static_cast<Device *>(parent.internalPointer())->children.size();
     }
-    return root.children.size();
+    return root->children.size();
 }
 
 bool PartMan::changeBegin(Device *device) noexcept
 {
     if (changing) return false;
-    root.flags = device->flags;
-    root.size = device->size;
-    root.usefor = device->usefor;
-    root.label = device->label;
-    root.encrypt = device->encrypt;
-    root.format = device->format;
-    root.options = device->options;
-    root.dump = device->dump;
-    root.pass = device->pass;
+    root->flags = device->flags;
+    root->size = device->size;
+    root->usefor = device->usefor;
+    root->label = device->label;
+    root->encrypt = device->encrypt;
+    root->format = device->format;
+    root->options = device->options;
+    root->dump = device->dump;
+    root->pass = device->pass;
     changing = device;
     return true;
 }
@@ -1745,14 +1750,14 @@ int PartMan::changeEnd(bool notify) noexcept
 {
     if (!changing) return false;
     int changed = 0;
-    if (changing->size != root.size) {
+    if (changing->size != root->size) {
         if (!changing->usefor.startsWith('/') && !changing->allowedUsesFor().contains(changing->usefor)) {
             changing->usefor.clear();
         }
         if (!changing->canEncrypt()) changing->encrypt = false;
         changed |= (1 << COL_SIZE);
     }
-    if (changing->usefor != root.usefor) {
+    if (changing->usefor != root->usefor) {
         if (changing->usefor.isEmpty()) changing->format.clear();
         else {
             const QStringList &allowed = changing->allowedFormats();
@@ -1760,12 +1765,12 @@ int PartMan::changeEnd(bool notify) noexcept
         }
         changed |= (1 << COL_USEFOR);
     }
-    if (changing->encrypt != root.encrypt) {
+    if (changing->encrypt != root->encrypt) {
         const QStringList &allowed = changing->allowedFormats();
         if (!allowed.contains(changing->format)) changing->format = allowed.at(0);
         changed |= (1 << COL_ENCRYPT);
     }
-    if (changing->format != root.format || changing->usefor != root.usefor) {
+    if (changing->format != root->format || changing->usefor != root->usefor) {
         changing->dump = false;
         changing->pass = 2;
         if (changing->usefor.isEmpty() || changing->usefor == "FORMAT") {
@@ -1781,7 +1786,7 @@ int PartMan::changeEnd(bool notify) noexcept
                 notifyChange(cdevice);
             }
         }
-        if (changing->format != root.format) changed |= (1 << COL_FORMAT);
+        if (changing->format != root->format) changed |= (1 << COL_FORMAT);
     }
     if (changed && notify) notifyChange(changing);
     changing = nullptr;
@@ -2201,9 +2206,9 @@ QString PartMan::joinName(const QString &drive, int partnum) noexcept
 /* A very slimmed down and non-standard one-way tree iterator. */
 PartMan::Iterator::Iterator(const PartMan &partman) noexcept
 {
-    if (partman.root.children.size() < 1) return;
+    if (partman.root->children.size() < 1) return;
     ixParents.push(0);
-    pos = partman.root.child(0);
+    pos = partman.root->child(0);
 }
 void PartMan::Iterator::next() noexcept
 {
