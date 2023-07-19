@@ -174,9 +174,9 @@ void PartMan::scan(Device *drvstart)
             if (part->flags.bootRoot) drive->flags.bootRoot = true;
             if (part->flags.nasty) drive->flags.nasty = true;
         }
-        for (int ixPart = drive->childCount() - 1; ixPart >= 0; --ixPart) {
+        for (Device *part : drive->children) {
             // Propagate the boot flag across the entire drive.
-            if (drive->flags.bootRoot) drive->child(ixPart)->flags.bootRoot = true;
+            if (drive->flags.bootRoot) part->flags.bootRoot = true;
         }
         drive->sortChildren();
         notifyChange(drive);
@@ -197,15 +197,10 @@ void PartMan::scanVirtualDevices(bool rescan)
     Device *virtdevs = nullptr;
     std::map<QString, Device *> listed;
     if (rescan) {
-        for (int ixi = root.childCount() - 1; ixi >= 0; --ixi) {
-            Device *drive = root.child(ixi);
+        for (Device *drive : root.children) {
             if (drive->type == Device::VIRTUAL_DEVICES) {
                 virtdevs = drive;
-                const int vdcount = virtdevs->childCount();
-                for (int ixVD = 0; ixVD < vdcount; ++ixVD) {
-                    Device *device = virtdevs->child(ixVD);
-                    listed[device->path] = device;
-                }
+                for (Device *device : virtdevs->children) listed[device->path] = device;
                 break;
             }
         }
@@ -265,9 +260,8 @@ void PartMan::scanVirtualDevices(bool rescan)
     }
     for (const auto &it : listed) delete it.second;
     virtdevs->sortChildren();
-    for(int ixi = 0; ixi < virtdevs->childCount(); ++ixi) {
-        const QString &name = virtdevs->child(ixi)->name;
-        Device *virt = virtdevs->child(ixi);
+    for(Device *virt : virtdevs->children) {
+        const QString &name = virt->name;
         virt->origin = nullptr; // Clear stale origin pointer.
         // Find the associated partition and decrement its reference count if found.
         proc.exec("cryptsetup", {"status", virt->path}, nullptr, true);
@@ -287,25 +281,23 @@ void PartMan::scanVirtualDevices(bool rescan)
 
 bool PartMan::manageConfig(MSettings &config, bool save) noexcept
 {
-    const int driveCount = root.childCount();
-    for (int ixDrive = 0; ixDrive < driveCount; ++ixDrive) {
-        Device *drive = root.child(ixDrive);
+    for (Device *drive : root.children) {
         // Check if the drive is to be cleared and formatted.
-        int partCount = drive->childCount();
+        size_t partCount = drive->children.size();
         bool drvPreserve = drive->flags.oldLayout;
         const QString &configNewLayout = "Storage/NewLayout." + drive->name;
         if (save) {
-            if (!drvPreserve) config.setValue(configNewLayout, partCount);
+            if (!drvPreserve) config.setValue(configNewLayout, static_cast<uint>(partCount));
         } else if (config.contains(configNewLayout)) {
             drvPreserve = false;
             drive->clear();
-            partCount = config.value(configNewLayout).toInt();
+            partCount = config.value(configNewLayout).toUInt();
             if (partCount > PARTMAN_MAX_PARTS) return false;
         }
         // Partition configuration.
         const long long sizeMax = drive->size - PARTMAN_SAFETY;
         long long sizeTotal = 0;
-        for (int ixPart = 0; ixPart < partCount; ++ixPart) {
+        for (size_t ixPart = 0; ixPart < partCount; ++ixPart) {
             Device *part = nullptr;
             if (save || drvPreserve) {
                 part = drive->child(ixPart);
@@ -348,17 +340,17 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                 part->dump = config.value("Dump", part->dump).toBool();
                 part->pass = config.value("Pass", part->pass).toInt();
             }
-            int subvolCount = 0;
+            size_t subvolCount = 0;
             if (part->format == "btrfs") {
-                if (!save) subvolCount = config.value("Subvolumes").toInt();
+                if (!save) subvolCount = config.value("Subvolumes").toUInt();
                 else {
-                    subvolCount = part->childCount();
-                    config.setValue("Subvolumes", subvolCount);
+                    subvolCount = part->children.size();
+                    config.setValue("Subvolumes", static_cast<uint>(subvolCount));
                 }
             }
             config.endGroup();
             // Btrfs subvolume configuration.
-            for (int ixSV=0; ixSV<subvolCount; ++ixSV) {
+            for (size_t ixSV=0; ixSV<subvolCount; ++ixSV) {
                 Device *subvol = nullptr;
                 if (save) subvol = part->child(ixSV);
                 else subvol = new Device(Device::SUBVOLUME, part);
@@ -428,7 +420,7 @@ void PartMan::treeSelChange() noexcept
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else {
             gui.pushPartAdd->setEnabled(seldev->driveFreeSpace(true) > 1*MB
-                && !isold && drive->childCount() < PARTMAN_MAX_PARTS);
+                && !isold && drive->children.size() < PARTMAN_MAX_PARTS);
         }
     } else {
         gui.pushPartClear->setEnabled(false);
@@ -684,7 +676,7 @@ void PartMan::scanSubvolumes(Device *part)
 {
     qApp->setOverrideCursor(Qt::WaitCursor);
     gui.boxMain->setEnabled(false);
-    while (part->childCount()) delete part->child(0);
+    while (part->children.size()) delete part->child(0);
     QStringList lines;
     if (!proc.exec("mount", {"--mkdir", "-o", "subvolid=5,ro",
         part->mappedDevice(), "/mnt/btrfs-scratch"})) goto END;
@@ -726,11 +718,9 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
             // Check for duplicate subvolume label entries.
             Device *pit = volume->parentItem;
             assert(pit != nullptr);
-            const int count = pit->childCount();
-            const int index = pit->indexOfChild(volume);
-            for (int ixi = 0; ixi < count; ++ixi) {
-                if (ixi == index) continue;
-                if (pit->child(ixi)->label.trimmed().toUpper() == cmptext) {
+            for (Device *sdevice : pit->children) {
+                if (sdevice == volume) continue;
+                if (sdevice->label.trimmed().toUpper() == cmptext) {
                     QMessageBox::critical(gui.boxMain, QString(), tr("Duplicate subvolume label"));
                     return false;
                 }
@@ -778,22 +768,16 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
     if (!automatic) {
         // Final warnings before the installer starts.
         QString details;
-        for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
-            Device *drive = root.child(ixdrv);
-            assert(drive != nullptr);
-            const int partCount = drive->childCount();
+        for (const Device *drive : std::as_const(root.children)) {
             if (!drive->flags.oldLayout && drive->type != Device::VIRTUAL_DEVICES) {
                 const char *pttype = drive->willUseGPT() ? "GPT" : "MBR";
                 details += tr("Prepare %1 partition table on %2").arg(pttype, drive->name) + '\n';
             }
-            for (int ixdev = 0; ixdev < partCount; ++ixdev) {
-                Device *part = drive->child(ixdev);
-                assert(part != nullptr);
-                const int subcount = part->childCount();
+            for (const Device *part : std::as_const(drive->children)) {
                 QString actmsg;
                 if (drive->flags.oldLayout) {
                     if (part->usefor.isEmpty()) {
-                        if (subcount > 0) actmsg = tr("Reuse (no reformat) %1");
+                        if (part->children.size() > 0) actmsg = tr("Reuse (no reformat) %1");
                         else continue;
                     } else {
                         if (part->usefor == "FORMAT") actmsg = tr("Format %1");
@@ -808,9 +792,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
                 // QString::arg() emits warnings if a marker is not in the string.
                 details += actmsg.replace("%1", part->shownDevice()).replace("%2", part->usefor) + '\n';
 
-                for (int ixsv = 0; ixsv < subcount; ++ixsv) {
-                    Device *subvol = part->child(ixsv);
-                    assert(subvol != nullptr);
+                for (const Device *subvol : std::as_const(part->children)) {
                     const bool svnouse = subvol->usefor.isEmpty();
                     if (subvol->format == "PRESERVE") {
                         if (svnouse) continue;
@@ -871,20 +853,13 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
     }
 
     QStringList toosmall;
-    for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
-        Device *drive = root.child(ixdrv);
-        const int partCount = drive->childCount();
-        for (int ixdev = 0; ixdev < partCount; ++ixdev) {
-            Device *part = drive->child(ixdev);
-            assert(part != nullptr);
-            const int subcount = part->childCount();
+    for (const Device *drive : std::as_const(root.children)) {
+        for (const Device *part : std::as_const(drive->children)) {
             bool isused = !part->usefor.isEmpty();
             long long minsize = isused ? volSpecTotal(part->usefor, vols).minimum : 0;
 
             // First pass = get the total minimum required for all subvolumes.
-            for (int ixsv = 0; ixsv < subcount; ++ixsv) {
-                Device *subvol = part->child(ixsv);
-                assert(subvol != nullptr);
+            for (const Device *subvol : std::as_const(part->children)) {
                 if(!subvol->usefor.isEmpty()) {
                     minsize += volSpecTotal(subvol->usefor, vols).minimum;
                     isused = true;
@@ -898,9 +873,7 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
 
                 // Add all subvolumes (sorted) to the warning list as one string.
                 QStringList svsmall;
-                for (int ixsv = 0; ixsv < subcount; ++ixsv) {
-                    Device *subvol = part->child(ixsv);
-                    assert(subvol != nullptr);
+                for (const Device *subvol : std::as_const(part->children)) {
                     if (subvol->usefor.isEmpty()) continue;
 
                     const long long svmin = volSpecTotal(subvol->usefor, vols).minimum;
@@ -948,13 +921,9 @@ bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
 
     // BIOS with GPT
     QString biosgpt;
-    for (int ixdrv = 0; ixdrv < root.childCount(); ++ixdrv) {
-        Device *drive = root.child(ixdrv);
-        const int partCount = drive->childCount();
+    for (const Device *drive : std::as_const(root.children)) {
         bool hasBiosGrub = false;
-        for (int ixdev = 0; ixdev < partCount; ++ixdev) {
-            Device *part = drive->child(ixdev);
-            assert(part != nullptr);
+        for (const Device *part : std::as_const(drive->children)) {
             if (part->finalFormat() == "BIOS-GRUB") {
                 hasBiosGrub = true;
                 break;
@@ -983,8 +952,7 @@ bool PartMan::checkTargetDrivesOK()
 {
     MProcess::Section sect(proc, nullptr); // No exception on execution error for this block.
     QString smartFail, smartWarn;
-    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
-        Device *drive = root.child(ixi);
+    for (Device *drive : root.children) {
         if (drive->type == Device::VIRTUAL_DEVICES) continue;
         QStringList purposes;
         for (Iterator it(drive); const Device *device = *it; it.next()) {
@@ -1038,8 +1006,7 @@ PartMan::Device *PartMan::selectedDriveAuto() noexcept
 {
     QString drv(gui.comboDisk->currentData().toString());
     if (!findByPath("/dev/" + drv)) return nullptr;
-    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
-        Device *const drive = root.child(ixi);
+    for (Device *drive : root.children) {
         if (drive->name == drv) return drive;
     }
     return nullptr;
@@ -1117,14 +1084,11 @@ void PartMan::preparePartitions()
 
     // Detach all existing partitions.
     QStringList listToUnmount;
-    for (int ixDrive = 0; ixDrive < root.childCount(); ++ixDrive) {
-        Device *drive = root.child(ixDrive);
+    for (const Device *drive : std::as_const(root.children)) {
         if (drive->type == Device::VIRTUAL_DEVICES) continue;
-        const int partCount = drive->childCount();
         if (drive->flags.oldLayout) {
             // Using the existing layout, so only mark used partitions for unmounting.
-            for (int ixPart=0; ixPart < partCount; ++ixPart) {
-                Device *part = drive->child(ixPart);
+            for (const Device *part : std::as_const(drive->children)) {
                 if (!part->usefor.isEmpty()) listToUnmount << part->path;
             }
         } else {
@@ -1153,8 +1117,7 @@ void PartMan::preparePartitions()
     }
 
     // Prepare partition tables on devices which will have a new layout.
-    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
-        Device *drive = root.child(ixi);
+    for (const Device *drive : std::as_const(root.children)) {
         if (drive->flags.oldLayout || drive->type == Device::VIRTUAL_DEVICES) continue;
         proc.status(tr("Preparing partition tables"));
 
@@ -1174,11 +1137,10 @@ void PartMan::preparePartitions()
 
     // Prepare partition tables, creating tables and partitions when needed.
     proc.status(tr("Preparing required partitions"));
-    for (int ixi = 0; ixi < root.childCount(); ++ixi) {
+    for (const Device *drive : std::as_const(root.children)) {
         bool partupdate = false;
-        Device *drive = root.child(ixi);
         if (drive->type == Device::VIRTUAL_DEVICES) continue;
-        const int devCount = drive->childCount();
+        const int devCount = drive->children.size();
         const bool useGPT = drive->willUseGPT();
         if (drive->flags.oldLayout) {
             // Using existing partitions.
@@ -1330,7 +1292,7 @@ void PartMan::formatPartitions()
 
 void PartMan::prepareSubvolumes(Device *part)
 {
-    const int subvolcount = part->childCount();
+    const int subvolcount = part->children.size();
     if (subvolcount <= 0) return;
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to prepare subvolumes."));
     proc.status(tr("Preparing subvolumes"));
@@ -1759,9 +1721,9 @@ int PartMan::rowCount(const QModelIndex &parent) const noexcept
 {
     if (parent.column() > 0) return 0;
     if (parent.isValid()) {
-        return static_cast<Device *>(parent.internalPointer())->childCount();
+        return static_cast<Device *>(parent.internalPointer())->children.size();
     }
-    return root.childCount();
+    return root.children.size();
 }
 
 bool PartMan::changeBegin(Device *device) noexcept
@@ -1811,11 +1773,10 @@ int PartMan::changeEnd(bool notify) noexcept
         }
         if (changing->format != "btrfs") {
             // Clear all subvolumes if not supported.
-            while (changing->childCount()) delete changing->child(0);
+            while (changing->children.size()) delete changing->child(0);
         } else {
             // Remove preserve option from all subvolumes.
-            for (int ixi = 0; ixi < changing->childCount(); ++ixi) {
-                Device *cdevice = changing->child(ixi);
+            for (Device *cdevice : changing->children) {
                 cdevice->format = "CREATE";
                 notifyChange(cdevice);
             }
@@ -1845,7 +1806,7 @@ PartMan::Device::Device(enum DeviceType type, Device *parent, Device *preceding)
     if (type == SUBVOLUME) size = parent->size;
     else if (type == PARTITION) size = 1*MB;
     physec = parent->physec;
-    const int i = preceding ? (parentItem->indexOfChild(preceding) + 1) : parentItem->childCount();
+    const int i = preceding ? (parentItem->indexOfChild(preceding) + 1) : parentItem->children.size();
     partman.beginInsertRows(partman.index(parent), i, i);
     parent->children.insert(std::next(parent->children.begin(), i), this);
     partman.endInsertRows();
@@ -1905,10 +1866,6 @@ inline int PartMan::Device::indexOfChild(const Device *device) const noexcept
     }
     return -1;
 }
-inline int PartMan::Device::childCount() const noexcept
-{
-    return children.size();
-}
 void PartMan::Device::sortChildren() noexcept
 {
     auto cmp = [](Device *l, Device *r) {
@@ -1935,7 +1892,7 @@ inline bool PartMan::Device::isActive() const noexcept
 }
 bool PartMan::Device::isLocked() const noexcept
 {
-    for (const Device *cdevice : children) {
+    for (const Device *cdevice : std::as_const(children)) {
         if (cdevice->isLocked()) return true;
     }
     return (mapCount != 0); // In use by at least one virtual device.
@@ -2097,7 +2054,7 @@ long long PartMan::Device::driveFreeSpace(bool inclusive) const noexcept
     const Device *drive = parent();
     if (!drive) drive = this;
     long long free = drive->size - PARTMAN_SAFETY;
-    for (const Device *cdevice : drive->children) {
+    for (const Device *cdevice : std::as_const(drive->children)) {
         if (inclusive || cdevice != this) free -= cdevice->size;
     }
     return free;
@@ -2134,11 +2091,9 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
         // Default labels
         if (type == SUBVOLUME) {
             QStringList chklist;
-            const int count = parentItem->childCount();
-            const int index = parentItem->indexOfChild(this);
-            for (int ixi = 0; ixi < count; ++ixi) {
-                if (ixi == index) continue;
-                chklist << parentItem->child(ixi)->label;
+            for (Device *cdevice : std::as_const(parentItem->children)) {
+                if (cdevice == this) continue;
+                chklist << cdevice->label;
             }
             QString newLabel;
             if (usefor.startsWith('/')) {
@@ -2204,7 +2159,7 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
 }
 void PartMan::Device::labelParts() noexcept
 {
-    const size_t nchildren = childCount();
+    const size_t nchildren = children.size();
     for (size_t ixi = 0; ixi < nchildren; ++ixi) {
         Device *cdevice = children[ixi];
         cdevice->name = PartMan::joinName(name, ixi + 1);
@@ -2246,14 +2201,14 @@ QString PartMan::joinName(const QString &drive, int partnum) noexcept
 /* A very slimmed down and non-standard one-way tree iterator. */
 PartMan::Iterator::Iterator(const PartMan &partman) noexcept
 {
-    if (partman.root.childCount() < 1) return;
+    if (partman.root.children.size() < 1) return;
     ixParents.push(0);
     pos = partman.root.child(0);
 }
 void PartMan::Iterator::next() noexcept
 {
     if (!pos) return;
-    if (pos->childCount()) {
+    if (pos->children.size()) {
         ixParents.push(ixPos);
         ixPos = 0;
         pos = pos->child(0);

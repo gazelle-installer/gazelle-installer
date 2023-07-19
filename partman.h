@@ -100,7 +100,6 @@ public:
         Device *parent() const noexcept;
         Device *child(int row) const noexcept;
         int indexOfChild(const Device *device) const noexcept;
-        int childCount() const noexcept;
         void sortChildren() noexcept;
         // Layout finishing
         Device *addPart(long long defaultSize, const QString &defaultUse, bool crypto) noexcept;
