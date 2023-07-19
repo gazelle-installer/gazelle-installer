@@ -1248,6 +1248,7 @@ void PartMan::formatPartitions()
         if (volume->usefor == "FORMAT") proc.status(fmtstatus.arg(volume->name));
         else proc.status(fmtstatus.arg(volume->usefor));
         if (volume->usefor == "BIOS-GRUB") {
+            proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev});
             const NameParts &devsplit = splitName(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
         } else if (volume->usefor == "SWAP") {
