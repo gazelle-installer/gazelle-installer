@@ -51,8 +51,9 @@ public:
         friend class ItemDelegate;
         std::vector<Device *> children;
         Device *parentItem = nullptr;
-        class PartMan *partman = nullptr;
+        class PartMan &partman;
         int order = -1;
+        inline Device(class PartMan &pman) : partman(pman) {}
         void autoFill(unsigned int changed = 0xFFFF) noexcept;
     public:
         Device *active = nullptr;
@@ -64,7 +65,7 @@ public:
             VIRTUAL_DEVICES,
             VIRTUAL,
             SUBVOLUME
-        } type;
+        } type = UNKNOWN;
         struct Flags {
             bool rotational : 1;
             bool nasty : 1;
@@ -92,7 +93,7 @@ public:
         bool dump = false;
         bool addToCrypttab = false;
 
-        Device(enum DeviceType type, Device *parent = nullptr, Device *preceding = nullptr) noexcept;
+        Device(enum DeviceType type, Device *parent, Device *preceding = nullptr) noexcept;
         ~Device();
         void clear() noexcept;
         int row() const noexcept;

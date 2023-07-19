@@ -47,7 +47,7 @@
 #include "partman.h"
 
 PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs)
-    : QAbstractItemModel(ui.boxMain), proc(mproc), root(Device::UNKNOWN), gui(ui)
+    : QAbstractItemModel(ui.boxMain), proc(mproc), root(*this), gui(ui)
 {
     const QString &projShort = appConf.value("PROJECT_SHORTNAME").toString();
     volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
@@ -62,7 +62,6 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     // TODO: Eliminate when MX Boot Repair is fixed.
     goodluks = appArgs.isSet("good-luks");
 
-    root.partman = this;
     gui.treePartitions->setModel(this);
     gui.treePartitions->setItemDelegate(new ItemDelegate);
     gui.treePartitions->header()->setMinimumSectionSize(5);
@@ -1838,30 +1837,27 @@ void PartMan::notifyChange(class Device *device, int first, int last) noexcept
 /* Model element */
 
 PartMan::Device::Device(enum DeviceType type, Device *parent, Device *preceding) noexcept
-    : parentItem(parent), type(type)
+    : parentItem(parent), partman(parent->partman), type(type)
 {
-    if (type == PARTITION) size = 1*MB;
-    if (parent) {
-        flags.rotational = parent->flags.rotational;
-        discgran = parent->discgran;
-        if (type == SUBVOLUME) size = parent->size;
-        physec = parent->physec;
-        partman = parent->partman;
-        const int i = preceding ? (parentItem->indexOfChild(preceding) + 1) : parentItem->childCount();
-        if (partman) partman->beginInsertRows(partman->index(parent), i, i);
-        parent->children.insert(std::next(parent->children.begin(), i), this);
-        if (partman) partman->endInsertRows();
-    }
+    assert(parent != nullptr);
+    flags.rotational = parent->flags.rotational;
+    discgran = parent->discgran;
+    if (type == SUBVOLUME) size = parent->size;
+    else if (type == PARTITION) size = 1*MB;
+    physec = parent->physec;
+    const int i = preceding ? (parentItem->indexOfChild(preceding) + 1) : parentItem->childCount();
+    partman.beginInsertRows(partman.index(parent), i, i);
+    parent->children.insert(std::next(parent->children.begin(), i), this);
+    partman.endInsertRows();
 }
 PartMan::Device::~Device()
 {
-    if (parentItem && partman) {
+    if (parentItem) {
         const int r = parentItem->indexOfChild(this);
-        partman->beginRemoveRows(partman->index(parentItem), r, r);
+        partman.beginRemoveRows(partman.index(parentItem), r, r);
     }
     for (Device *child : children) {
-        child->partman = nullptr; // Stop unnecessary signals.
-        child->parentItem = nullptr; // Stop double deletes.
+        child->parentItem = nullptr; // Stop unnecessary signals and double deletes.
         delete child;
     }
     children.clear();
@@ -1871,25 +1867,22 @@ PartMan::Device::~Device()
             if (*it == this) it = parentItem->children.erase(it);
             else ++it;
         }
-        if (partman) {
-            partman->endRemoveRows();
-            partman->notifyChange(parentItem);
-        }
+        partman.endRemoveRows();
+        partman.notifyChange(parentItem);
     }
 }
 void PartMan::Device::clear() noexcept
 {
     const int chcount = children.size();
-    if (partman && chcount > 0) partman->beginRemoveRows(partman->index(this), 0, chcount - 1);
+    if (chcount > 0) partman.beginRemoveRows(partman.index(this), 0, chcount - 1);
     for (Device *child : children) {
-        child->partman = nullptr; // Stop unnecessary signals.
-        child->parentItem = nullptr; // Stop double deletes.
+        child->parentItem = nullptr; // Stop unnecessary signals and double deletes.
         delete child;
     }
     children.clear();
     active = nullptr;
     flags.oldLayout = false;
-    if (partman && chcount > 0) partman->endRemoveRows();
+    if (chcount > 0) partman.endRemoveRows();
 }
 inline int PartMan::Device::row() const noexcept
 {
@@ -1923,19 +1916,17 @@ void PartMan::Device::sortChildren() noexcept
         return l->name < r->name;
     };
     std::sort(children.begin(), children.end(), cmp);
-    if (partman) {
-        for (Device *c : qAsConst(children)) partman->notifyChange(c);
-    }
+    for (Device *c : qAsConst(children)) partman.notifyChange(c);
 }
 /* Helpers */
 void PartMan::Device::setActive(bool on) noexcept
 {
     if (!parentItem) return;
-    if (partman && parentItem->active != this) {
-        if (parentItem->active) partman->notifyChange(parentItem->active);
+    if (parentItem->active != this) {
+        if (parentItem->active) partman.notifyChange(parentItem->active);
     }
     parentItem->active = on ? this : nullptr;
-    if (partman) partman->notifyChange(this);
+    partman.notifyChange(this);
 }
 inline bool PartMan::Device::isActive() const noexcept
 {
@@ -1954,7 +1945,7 @@ bool PartMan::Device::willUseGPT() const noexcept
     if (type != DRIVE) return false;
     if (flags.oldLayout) return flags.curGPT;
     else if (size >= 2*TB || children.size() > 4) return true;
-    else if (partman) return (partman->gptoverride || partman->proc.detectEFI());
+    else return (partman.gptoverride || partman.proc.detectEFI());
     return false;
 }
 bool PartMan::Device::willFormat() const noexcept
@@ -2002,8 +1993,8 @@ QStringList PartMan::Device::allowedUsesFor(bool all) const noexcept
     if (!isVolume() && type != SUBVOLUME) return QStringList();
     QStringList list;
     auto checkAndAdd = [&](const QString &use) {
-        const auto fit = partman->volSpecs.find(usefor);
-        if (all || !partman || fit == partman->volSpecs.end() || size >= fit->second.minimum) {
+        const auto fit = partman.volSpecs.find(usefor);
+        if (all || fit == partman.volSpecs.end() || size >= fit->second.minimum) {
             list.append(use);
         }
     };
@@ -2119,14 +2110,14 @@ PartMan::Device *PartMan::Device::addPart(long long defaultSize, const QString &
     part->size = defaultSize;
     if (part->canEncrypt()) part->encrypt = crypto;
     part->autoFill();
-    if (partman) partman->notifyChange(part);
+    partman.notifyChange(part);
     return part;
 }
 void PartMan::Device::driveAutoSetActive() noexcept
 {
     if (active) return;
-    if (partman && partman->proc.detectEFI() && willUseGPT()) return;
-    // Cannot use partman->mounts map here as it may not be populated.
+    if (partman.proc.detectEFI() && willUseGPT()) return;
+    // Cannot use partman.mounts map here as it may not be populated.
     for (const QString &pref : QStringList({"/boot", "/"})) {
         for (PartMan::Iterator it(this); Device *device = *it; it.next()) {
             if (device->usefor == pref) {
@@ -2163,9 +2154,9 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
                 }
             }
             label = newLabel;
-        } else if (partman) {
-            const auto fit = partman->volSpecs.find(usefor);
-            if (fit == partman->volSpecs.cend()) label.clear();
+        } else {
+            const auto fit = partman.volSpecs.find(usefor);
+            if (fit == partman.volSpecs.cend()) label.clear();
             else label = fit->second.defaultLabel;
         }
         // Automatic default boot device selection
@@ -2218,9 +2209,9 @@ void PartMan::Device::labelParts() noexcept
         Device *child = children[ixi];
         child->name = PartMan::joinName(name, ixi + 1);
         child->path = "/dev/" + child->name;
-        if (partman) partman->notifyChange(child, PartMan::COL_DEVICE, PartMan::COL_DEVICE);
+        partman.notifyChange(child, PartMan::COL_DEVICE, PartMan::COL_DEVICE);
     }
-    if (partman) partman->resizeColumnsToFit();
+    partman.resizeColumnsToFit();
 }
 
 // Return block device info that is suitable for a combo box.
