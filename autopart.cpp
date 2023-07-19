@@ -26,7 +26,6 @@
 
 #include "msettings.h"
 #include "mprocess.h"
-#include "partman.h"
 #include "swapman.h"
 #include "autopart.h"
 
@@ -86,11 +85,11 @@ void AutoPart::scan() noexcept
     long long minSpace = partman->volSpecTotal("/", QStringList()).minimum;
     gui.comboDisk->blockSignals(true);
     gui.comboDisk->clear();
-    for (DeviceItemIterator it(*partman); DeviceItem *item = *it; it.next()) {
-        if (item->type == DeviceItem::DRIVE && (!item->flags.bootRoot || installFromRootDevice)) {
-            drvitem = item;
+    for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
+        if (device->type == PartMan::Device::DRIVE && (!device->flags.bootRoot || installFromRootDevice)) {
+            drvitem = device;
             if (buildLayout(LLONG_MAX, false, false) >= minSpace) {
-                item->addToCombo(gui.comboDisk);
+                device->addToCombo(gui.comboDisk);
             }
         }
     }
@@ -163,7 +162,7 @@ long long AutoPart::partSize(Part part) const noexcept
 }
 
 // Layout Builder
-void AutoPart::builderGUI(DeviceItem *drive) noexcept
+void AutoPart::builderGUI(PartMan::Device *drive) noexcept
 {
     inBuilder = true;
     long long swapRec = SwapMan::recommended(false);

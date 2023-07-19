@@ -67,13 +67,13 @@ void SwapMan::install(QStringList &cmdboot_out)
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to create or install swap file."));
     const QString &swapfile = QDir::cleanPath(gui.textSwapFile->text().trimmed());
     const QString &instpath = "/mnt/antiX" + swapfile;
-    const DeviceItem *devit = partman.findHostDev(swapfile);
-    if (!devit) throw sect.failMessage();
+    const PartMan::Device *device = partman.findHostDev(swapfile);
+    if (!device) throw sect.failMessage();
 
     proc.status(tr("Creating swap file"));
     // Create a blank swap file.
     proc.mkpath(QFileInfo(instpath).path(), 0700);
-    const bool btrfs = (devit->type == DeviceItem::SUBVOLUME || devit->finalFormat() == "btrfs");
+    const bool btrfs = (device->type == PartMan::Device::SUBVOLUME || device->finalFormat() == "btrfs");
     if (btrfs) {
         proc.exec("truncate", {"--size=0", instpath});
         proc.exec("chattr", {"+C", instpath});
@@ -91,7 +91,7 @@ void SwapMan::install(QStringList &cmdboot_out)
     file.close();
     // Hibernation.
     if (gui.checkHibernation->isChecked()) {
-        cmdboot_out.append("resume=UUID=" + devit->uuid);
+        cmdboot_out.append("resume=UUID=" + device->uuid);
         if (btrfs) {
             proc.exec("btrfs", {"inspect-internal", "map-swapfile", "-r", instpath}, nullptr, true);
         } else {
@@ -116,18 +116,18 @@ long long SwapMan::recommended(bool hibernation) noexcept
 
 void SwapMan::swapFileEdited(const QString &text) noexcept
 {
-    const DeviceItem *devit = partman.findHostDev(text);
+    const PartMan::Device *device = partman.findHostDev(text);
     int max = 0;
-    if (!devit) gui.labelSwapMax->setText(tr("Invalid location"));
+    if (!device) gui.labelSwapMax->setText(tr("Invalid location"));
     else {
-        max = (int)((devit->size - partman.volSpecTotal(devit->usefor).minimum) / MB);
+        max = (int)((device->size - partman.volSpecTotal(device->usefor).minimum) / MB);
         gui.labelSwapMax->setText(tr("Maximum: %1 MB").arg(max));
     }
     gui.spinSwapSize->setMaximum(max);
     const bool canHibernate = (max >= (recommended(true) / MB));
     gui.checkHibernation->setEnabled(canHibernate);
     if (!canHibernate) gui.checkHibernation->setChecked(false);
-    gui.pushNext->setEnabled(devit != nullptr);
+    gui.pushNext->setEnabled(device != nullptr);
 }
 
 void SwapMan::sizeResetClicked() noexcept
