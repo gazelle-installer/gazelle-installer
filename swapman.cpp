@@ -30,13 +30,15 @@
 SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
     : QObject(ui.boxMain), proc(mproc), partman(pman), gui(ui)
 {
-    connect(ui.textSwapFile, &QLineEdit::textEdited, this, &SwapMan::swapFileEdited);
+    connect(ui.textSwapFile, &QLineEdit::textEdited, this, [this](const QString &) {
+        gui.pushNext->setEnabled(setupBounds());
+    });
     connect(ui.spinSwapSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &SwapMan::spinSizeChanged);
     connect(ui.pushSwapSizeReset, &QToolButton::clicked, this, &SwapMan::sizeResetClicked);
     connect(ui.checkHibernation, &QCheckBox::clicked, this, &SwapMan::checkHibernationClicked);
     connect(ui.boxSwap, &QGroupBox::toggled, this, [=](bool on) {
         if (on) ui.pushNext->setEnabled(true);
-        else swapFileEdited(ui.textSwapFile->text());
+        else ui.pushNext->setEnabled(setupBounds());
     });
 }
 
@@ -54,8 +56,24 @@ void SwapMan::manageConfig(MSettings &config, bool advanced) noexcept
 void SwapMan::setupDefaults() noexcept
 {
     gui.boxSwap->setChecked(partman.swapCount() <= 0);
-    if (gui.radioCustomPart->isChecked()) swapFileEdited(gui.textSwapFile->text());
+    setupBounds();
     sizeResetClicked();
+}
+
+bool SwapMan::setupBounds() noexcept
+{
+    const PartMan::Device *device = partman.findHostDev(gui.textSwapFile->text());
+    int max = 0;
+    if (!device) gui.labelSwapMax->setText(tr("Invalid location"));
+    else {
+        max = (int)((device->size - partman.volSpecTotal(device->usefor).minimum) / MB);
+        gui.labelSwapMax->setText(tr("Maximum: %1 MB").arg(max));
+    }
+    gui.spinSwapSize->setMaximum(max);
+    const bool canHibernate = (max >= (recommended(true) / MB));
+    gui.checkHibernation->setEnabled(canHibernate);
+    if (!canHibernate) gui.checkHibernation->setChecked(false);
+    return (device != nullptr);
 }
 
 void SwapMan::install(QStringList &cmdboot_out)
@@ -113,22 +131,6 @@ long long SwapMan::recommended(bool hibernation) noexcept
 }
 
 /* Slots */
-
-void SwapMan::swapFileEdited(const QString &text) noexcept
-{
-    const PartMan::Device *device = partman.findHostDev(text);
-    int max = 0;
-    if (!device) gui.labelSwapMax->setText(tr("Invalid location"));
-    else {
-        max = (int)((device->size - partman.volSpecTotal(device->usefor).minimum) / MB);
-        gui.labelSwapMax->setText(tr("Maximum: %1 MB").arg(max));
-    }
-    gui.spinSwapSize->setMaximum(max);
-    const bool canHibernate = (max >= (recommended(true) / MB));
-    gui.checkHibernation->setEnabled(canHibernate);
-    if (!canHibernate) gui.checkHibernation->setChecked(false);
-    gui.pushNext->setEnabled(device != nullptr);
-}
 
 void SwapMan::sizeResetClicked() noexcept
 {
