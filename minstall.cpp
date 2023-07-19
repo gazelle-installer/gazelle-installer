@@ -363,11 +363,6 @@ bool MInstall::processNextPhase() noexcept
 
             setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
 
-            // Load defaults for configuration phase
-            bootman->buildBootLists();
-            swapman->setupDefaults();
-            manageConfig(CONFIG_LOAD2);
-
             if (!partman->checkTargetDrivesOK()) return false;
             autoMountEnabled = true; // disable auto mount by force
             if (!pretend) setupAutoMount(false);
@@ -505,8 +500,8 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
 
     if (!modeOOBE) {
         const bool advanced = radioCustomPart->isChecked();
-        swapman->manageConfig(*config, advanced);
         if (mode == CONFIG_SAVE || mode == CONFIG_LOAD2) {
+            swapman->manageConfig(*config, advanced);
             if (advanced) bootman->manageConfig(*config);
             oobe->manageConfig(*config, mode==CONFIG_SAVE);
         }
@@ -564,9 +559,9 @@ int MInstall::showPage(int curr, int next) noexcept
                 return curr;
             }
             bootman->buildBootLists(); // Load default boot options
-            manageConfig(CONFIG_LOAD2);
             checkHibernation->setChecked(checkHibernationReg->isChecked());
             swapman->setupDefaults();
+            manageConfig(CONFIG_LOAD2);
             return oem ? Step::PROGRESS : Step::NETWORK;
         }
     } else if (curr == Step::PARTITIONS && next > curr) {
@@ -580,6 +575,9 @@ int MInstall::showPage(int curr, int next) noexcept
                     " the required information could not be obtained."));
             return curr;
         }
+        bootman->buildBootLists();
+        swapman->setupDefaults();
+        manageConfig(CONFIG_LOAD2);
         return Step::BOOT;
     } else if (curr == Step::BOOT && next > curr) {
         return oem ? Step::PROGRESS : Step::NETWORK;

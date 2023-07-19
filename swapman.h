@@ -28,8 +28,8 @@ class SwapMan : public QObject
     class MProcess &proc;
     class PartMan &partman;
     Ui::MeInstall &gui;
+    bool setupBounds() noexcept;
     // Slots
-    void swapFileEdited(const QString &text) noexcept;
     void sizeResetClicked() noexcept;
     void spinSizeChanged(int i) noexcept;
     void checkHibernationClicked(bool checked) noexcept;
