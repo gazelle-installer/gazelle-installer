@@ -99,7 +99,7 @@ public:
         int row() const noexcept;
         Device *parent() const noexcept;
         Device *child(int row) const noexcept;
-        int indexOfChild(const Device *child) const noexcept;
+        int indexOfChild(const Device *device) const noexcept;
         int childCount() const noexcept;
         void sortChildren() noexcept;
         // Layout finishing
@@ -135,7 +135,7 @@ public:
         int ixPos = 0;
         std::stack<int, std::vector<int>> ixParents;
     public:
-        Iterator(Device *item) noexcept : pos(item) {}
+        Iterator(Device *device) noexcept : pos(device) {}
         Iterator(const PartMan &partman) noexcept;
         inline Device *operator*() const noexcept { return pos; }
         void next() noexcept;
@@ -222,7 +222,7 @@ private:
     bool confirmSpace(class QMessageBox &msgbox) noexcept;
     bool confirmBootable(class QMessageBox &msgbox) noexcept;
     void luksFormat();
-    void luksOpen(class Device *partit, const QByteArray &password);
+    void luksOpen(class Device *part, const QByteArray &password);
 
     // Model View Controller
     class ItemDelegate;

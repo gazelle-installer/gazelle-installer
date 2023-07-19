@@ -267,17 +267,17 @@ void PartMan::scanVirtualDevices(bool rescan)
     virtdevs->sortChildren();
     for(int ixi = 0; ixi < virtdevs->childCount(); ++ixi) {
         const QString &name = virtdevs->child(ixi)->name;
-        Device *vit = virtdevs->child(ixi);
-        vit->origin = nullptr; // Clear stale origin pointer.
+        Device *virt = virtdevs->child(ixi);
+        virt->origin = nullptr; // Clear stale origin pointer.
         // Find the associated partition and decrement its reference count if found.
-        proc.exec("cryptsetup", {"status", vit->path}, nullptr, true);
+        proc.exec("cryptsetup", {"status", virt->path}, nullptr, true);
         for (const QString &line : proc.readOutLines()) {
             const QString &trline = line.trimmed();
             if (!trline.startsWith("device:")) continue;
-            vit->origin = findByPath(trline.mid(8).trimmed());
-            if (vit->origin) {
-                vit->origin->map = name;
-                notifyChange(vit->origin);
+            virt->origin = findByPath(trline.mid(8).trimmed());
+            if (virt->origin) {
+                virt->origin->map = name;
+                notifyChange(virt->origin);
                 break;
             }
         }
@@ -1738,18 +1738,18 @@ QModelIndex PartMan::index(Device *device) const noexcept
 QModelIndex PartMan::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent)) return QModelIndex();
-    const Device *pit = parent.isValid() ? static_cast<Device *>(parent.internalPointer()) : &root;
-    Device *cit = pit->child(row);
-    if (cit) return createIndex(row, column, cit);
+    const Device *pdevice = parent.isValid() ? static_cast<Device *>(parent.internalPointer()) : &root;
+    Device *cdevice = pdevice->child(row);
+    if (cdevice) return createIndex(row, column, cdevice);
     return QModelIndex();
 }
 QModelIndex PartMan::parent(const QModelIndex &index) const noexcept
 {
     if (!index.isValid()) return QModelIndex();
-    Device *cit = static_cast<Device *>(index.internalPointer());
-    Device *pit = cit->parentItem;
-    if (!pit || pit == &root) return QModelIndex();
-    return createIndex(pit->row(), 0, pit);
+    Device *cdevice = static_cast<Device *>(index.internalPointer());
+    Device *pdevice = cdevice->parentItem;
+    if (!pdevice || pdevice == &root) return QModelIndex();
+    return createIndex(pdevice->row(), 0, pdevice);
 }
 inline PartMan::Device *PartMan::item(const QModelIndex &index) const noexcept
 {
@@ -1815,9 +1815,9 @@ int PartMan::changeEnd(bool notify) noexcept
         } else {
             // Remove preserve option from all subvolumes.
             for (int ixi = 0; ixi < changing->childCount(); ++ixi) {
-                Device *child = changing->child(ixi);
-                child->format = "CREATE";
-                notifyChange(child);
+                Device *cdevice = changing->child(ixi);
+                cdevice->format = "CREATE";
+                notifyChange(cdevice);
             }
         }
         if (changing->format != root.format) changed |= (1 << COL_FORMAT);
@@ -1856,9 +1856,9 @@ PartMan::Device::~Device()
         const int r = parentItem->indexOfChild(this);
         partman.beginRemoveRows(partman.index(parentItem), r, r);
     }
-    for (Device *child : children) {
-        child->parentItem = nullptr; // Stop unnecessary signals and double deletes.
-        delete child;
+    for (Device *cdevice : children) {
+        cdevice->parentItem = nullptr; // Stop unnecessary signals and double deletes.
+        delete cdevice;
     }
     children.clear();
     if (parentItem) {
@@ -1875,9 +1875,9 @@ void PartMan::Device::clear() noexcept
 {
     const int chcount = children.size();
     if (chcount > 0) partman.beginRemoveRows(partman.index(this), 0, chcount - 1);
-    for (Device *child : children) {
-        child->parentItem = nullptr; // Stop unnecessary signals and double deletes.
-        delete child;
+    for (Device *cdevice : children) {
+        cdevice->parentItem = nullptr; // Stop unnecessary signals and double deletes.
+        delete cdevice;
     }
     children.clear();
     active = nullptr;
@@ -1898,10 +1898,10 @@ inline PartMan::Device *PartMan::Device::child(int row) const noexcept
     if (row < 0 || row >= static_cast<int>(children.size())) return nullptr;
     return children[row];
 }
-inline int PartMan::Device::indexOfChild(const Device *child) const noexcept
+inline int PartMan::Device::indexOfChild(const Device *device) const noexcept
 {
     for (size_t ixi = 0; ixi < children.size(); ++ixi) {
-        if (children[ixi] == child) return ixi;
+        if (children[ixi] == device) return ixi;
     }
     return -1;
 }
@@ -1935,8 +1935,8 @@ inline bool PartMan::Device::isActive() const noexcept
 }
 bool PartMan::Device::isLocked() const noexcept
 {
-    for (const Device *child : children) {
-        if (child->isLocked()) return true;
+    for (const Device *cdevice : children) {
+        if (cdevice->isLocked()) return true;
     }
     return (mapCount != 0); // In use by at least one virtual device.
 }
@@ -2097,8 +2097,8 @@ long long PartMan::Device::driveFreeSpace(bool inclusive) const noexcept
     const Device *drive = parent();
     if (!drive) drive = this;
     long long free = drive->size - PARTMAN_SAFETY;
-    for (const Device *child : drive->children) {
-        if (inclusive || child != this) free -= child->size;
+    for (const Device *cdevice : drive->children) {
+        if (inclusive || cdevice != this) free -= cdevice->size;
     }
     return free;
 }
@@ -2206,10 +2206,10 @@ void PartMan::Device::labelParts() noexcept
 {
     const size_t nchildren = childCount();
     for (size_t ixi = 0; ixi < nchildren; ++ixi) {
-        Device *child = children[ixi];
-        child->name = PartMan::joinName(name, ixi + 1);
-        child->path = "/dev/" + child->name;
-        partman.notifyChange(child, PartMan::COL_DEVICE, PartMan::COL_DEVICE);
+        Device *cdevice = children[ixi];
+        cdevice->name = PartMan::joinName(name, ixi + 1);
+        cdevice->path = "/dev/" + cdevice->name;
+        partman.notifyChange(cdevice, PartMan::COL_DEVICE, PartMan::COL_DEVICE);
     }
     partman.resizeColumnsToFit();
 }
