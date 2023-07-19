@@ -46,15 +46,6 @@ public:
     class Device
     {
         Q_DECLARE_TR_FUNCTIONS(Device)
-        friend class PartMan;
-        friend class Iterator;
-        friend class ItemDelegate;
-        std::vector<Device *> children;
-        Device *parentItem = nullptr;
-        class PartMan &partman;
-        int order = -1;
-        inline Device(class PartMan &pman) : partman(pman) {}
-        void autoFill(unsigned int changed = 0xFFFF) noexcept;
     public:
         Device *active = nullptr;
         Device *origin = nullptr;
@@ -127,18 +118,19 @@ public:
         long long driveFreeSpace(bool inclusive = false) const noexcept;
         /* Convenience */
         void addToCombo(QComboBox *combo, bool warnNasty = false) const noexcept;
+
+    private:
+        friend class PartMan;
+        friend class Iterator;
+        friend class ItemDelegate;
+        std::vector<Device *> children;
+        Device *parentItem = nullptr;
+        class PartMan &partman;
+        int order = -1;
+        inline Device(class PartMan &pman) : partman(pman) {}
+        void autoFill(unsigned int changed = 0xFFFF) noexcept;
     };
-    class Iterator
-    {
-        Device *pos = nullptr;
-        int ixPos = 0;
-        std::stack<int, std::vector<int>> ixParents;
-    public:
-        Iterator(Device *device) noexcept : pos(device) {}
-        Iterator(const PartMan &partman) noexcept;
-        inline Device *operator*() const noexcept { return pos; }
-        void next() noexcept;
-    };
+    class Iterator;
     enum TreeColumns {
         COL_DEVICE,
         COL_SIZE,
@@ -240,6 +232,18 @@ public:
     bool changeBegin(Device *device) noexcept;
     int changeEnd(bool notify = true) noexcept;
     void notifyChange(class Device *device, int first = -1, int last = -1) noexcept;
+};
+
+class PartMan::Iterator
+{
+    Device *pos = nullptr;
+    int ixPos = 0;
+    std::stack<int, std::vector<int>> ixParents;
+public:
+    Iterator(Device *device) noexcept : pos(device) {}
+    Iterator(const PartMan &partman) noexcept;
+    inline Device *operator*() const noexcept { return pos; }
+    void next() noexcept;
 };
 
 class PartMan::ItemDelegate : public QStyledItemDelegate

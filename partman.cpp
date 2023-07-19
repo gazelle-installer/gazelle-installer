@@ -1798,7 +1798,7 @@ void PartMan::notifyChange(class Device *device, int first, int last) noexcept
 /* Model element */
 
 PartMan::Device::Device(enum DeviceType type, Device *parent, Device *preceding) noexcept
-    : parentItem(parent), partman(parent->partman), type(type)
+    : type(type), parentItem(parent), partman(parent->partman)
 {
     assert(parent != nullptr);
     flags.rotational = parent->flags.rotational;
