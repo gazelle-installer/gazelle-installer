@@ -28,7 +28,7 @@ class MSettings : public QSettings
 public:
     MSettings(const QString &fileName, QObject *parent = Q_NULLPTR) noexcept;
     bool bad = false;
-    void dumpDebug() noexcept;
+    void dumpDebug(const class QRegularExpression *censor = nullptr) noexcept;
     void setSave(bool save) noexcept;
     bool isSave() const noexcept { return saving; }
     void startGroup(const QString &prefix, class QWidget *wgroup) noexcept;

@@ -63,6 +63,9 @@ enum Step {
     END
 };
 
+// The values of settings ("GROUP/KEY") matching this regex will not be logged.
+static const QRegularExpression configCensor("Encryption\\/Pass|User\\/.*Pass/i");
+
 MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
     : proc(this), appConf(acfg), appArgs(args), helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
@@ -1095,7 +1098,7 @@ void MInstall::cleanup()
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     if (pretend) return;
 
-    if (config) config->dumpDebug();
+    if (config) config->dumpDebug(&configCensor);
     else qDebug() << "NO CONFIG";
     const char *destlog = "/mnt/antiX/var/log/minstall.log";
     QFile::remove(destlog);

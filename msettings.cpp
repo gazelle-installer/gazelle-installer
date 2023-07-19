@@ -33,7 +33,7 @@ MSettings::MSettings(const QString &fileName, QObject *parent) noexcept
 {
 }
 
-void MSettings::dumpDebug() noexcept
+void MSettings::dumpDebug(const QRegularExpression *censor) noexcept
 {
     qDebug().noquote() << "Configuration:" << fileName();
     // top-level settings (version, etc)
@@ -43,15 +43,14 @@ void MSettings::dumpDebug() noexcept
                                      << ": " << value(strkey).toString();
     }
     // iterate through groups
-    QStringList chgroup = childGroups();
-    for (QString &strgroup : chgroup) {
+    for (const QString &strgroup : childGroups()) {
         beginGroup(strgroup);
         qDebug().noquote().nospace() << " = " << strgroup << ":";
         QStringList chkeys = childKeys();
         for (QString &strkey : chkeys) {
             QString val(value(strkey).toString());
-            if (!val.isEmpty() && strkey.endsWith("Pass", Qt::CaseInsensitive)) {
-                val = "???";
+            if (censor && !val.isEmpty()) {
+                if (QString(strgroup+'/'+strkey).contains(*censor)) val = "???";
             }
             qDebug().noquote().nospace() << "   - " << strkey << ": " << val;
         }
