@@ -23,22 +23,22 @@ if [ "$EUID" != 0 ]; then
 
     ##disable Xfce automount features
     if command -v xfconf-query >/dev/null; then
-       unset AUTO PROP XFCQ
-       XFCQ="xfconf-query --channel thunar-volman"
-       AUTO=($(${XFCQ} --list 2>/dev/null | grep /auto))
-       PROP=()
-       for prop in "${AUTO[@]}";  do
+        unset AUTO PROP XFCQ
+        XFCQ="xfconf-query --channel thunar-volman"
+        AUTO=($(${XFCQ} --list 2>/dev/null | grep /auto))
+        PROP=()
+        for prop in "${AUTO[@]}";  do
             auto=$(${XFCQ} --property $prop)
             [ "$auto" = "true" ] || continue
             ${XFCQ} --property "$prop" --set "false"
             PROP+=("$prop")
         done
     fi
-
     ###end Xfce automount feature
+
     # wayland fix (AK-47)
     if [ x"$WAYLAND_DISPLAY" != "x" ] && [ -n "${WAYLAND_DISPLAY##/*}" ]; then
-      export WAYLAND_DISPLAY=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
+        export WAYLAND_DISPLAY=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
     fi
 
     AUTHENTICATION="$(grep AUTHENTICATION /usr/share/gazelle-installer-data/installer.conf |cut -d= -f2)"
@@ -48,14 +48,12 @@ if [ "$EUID" != 0 ]; then
 
     $AUTHENTICATION /usr/bin/minstall-launcher
 
-    ##renable Xfce automount feature, if it was enabled in the first place
-
-     if command -v xfconf-query >/dev/null; then
-       for prop in "${PROP[@]}"; do
-           ${XFCQ} --property "$prop" --set "true"
-       done
+    ##re-enable Xfce automount feature, if it was enabled in the first place
+    if command -v xfconf-query >/dev/null; then
+        for prop in "${PROP[@]}"; do
+            ${XFCQ} --property "$prop" --set "true"
+        done
     fi
-
     ##end Xfce automount feaure
 
 else
@@ -76,7 +74,7 @@ else
         XCURSOR_
         XDG_
         WAYLAND_
-        )
+    )
 
     # combine array into a string of space separated entries
     __ENVIRONEMENT_PATTERN__="${__ENVIRONEMENT_PATTERN__[*]}"
@@ -96,11 +94,11 @@ else
 
     # set XDG_RUNTIME_DIR - create a valid runtime dir
     if [ "$XDG_RUNTIME_DIR" != "/run/user/0" ]; then
-      XDG_RUNTIME_DIR=/run/user/0
-      export XDG_RUNTIME_DIR
-      [ -d $XDG_RUNTIME_DIR ] || mkdir -p $XDG_RUNTIME_DIR
-      chmod 700 $XDG_RUNTIME_DIR
-      chown 0:0 $XDG_RUNTIME_DIR
+        XDG_RUNTIME_DIR=/run/user/0
+        export XDG_RUNTIME_DIR
+        [ -d $XDG_RUNTIME_DIR ] || mkdir -p $XDG_RUNTIME_DIR
+        chmod 700 $XDG_RUNTIME_DIR
+        chown 0:0 $XDG_RUNTIME_DIR
     fi
 
     RUN="/usr/sbin/minstall"
