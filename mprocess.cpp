@@ -28,6 +28,7 @@
 #include <QDir>
 #include <QListWidget>
 #include <QProgressBar>
+#include <QScrollBar>
 
 #include "mprocess.h"
 
@@ -48,6 +49,11 @@ void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall) noexcept
     pal.setColor(QPalette::Base, Qt::black);
     pal.setColor(QPalette::Text, Qt::white);
     listLog->setPalette(pal);
+    QScrollBar *lvscroll = logView->verticalScrollBar();
+    connect(lvscroll, &QScrollBar::rangeChanged, lvscroll, [this, lvscroll](int, int max){
+        if (lvscroll->value() >= prevScrollMax) logView->scrollToBottom();
+        prevScrollMax = max;
+    });
 }
 
 void MProcess::setupChildProcess() noexcept
@@ -210,7 +216,6 @@ QListWidgetItem *MProcess::log(const QString &text, const LogType type) noexcept
         entry->setFont(font);
         if (type == LOG_FAIL) entry->setForeground(Qt::magenta);
     }
-    logView->scrollToBottom();
     return entry;
 }
 void MProcess::log(QListWidgetItem *entry, enum Status status) noexcept
