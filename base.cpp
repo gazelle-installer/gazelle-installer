@@ -154,8 +154,11 @@ void Base::install()
         // if root was not formatted and not using --sync option then re-use it
         // remove all folders in root except for /home
         proc.status(tr("Deleting old system"));
-        proc.shell("find /mnt/antiX -mindepth 1 -maxdepth 1 ! -name home ! -name boot -exec rm -r {} \\;");
-        proc.shell("find /mnt/antiX/boot -mindepth 1 -maxdepth 1 ! -name efi -exec rm -r {} \\;");
+        proc.exec("find", {"/mnt/antiX/boot", "-mindepth", "1", "-maxdepth", "1",
+            "!", "-name", "efi", "-exec", "rm", "-r", "{}", "+"});
+        proc.status();
+        proc.exec("find", {"/mnt/antiX", "-mindepth", "1", "-maxdepth", "1",
+            "!", "-name", "home", "!", "-name", "boot", "-exec", "rm", "-r", "{}", "+"});
     }
 
     copyLinux(skiphome);
