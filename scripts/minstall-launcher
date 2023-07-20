@@ -7,9 +7,11 @@
 
 #exit early if not live or parameter given
 
-if ! grep -sq '^overlay /live/aufs' /proc/mounts; then
+if [ -n "$1" ] || ! grep -sq '^overlay /live/aufs' /proc/mounts; then
     echo ""
-    echo "INFORMATION: Non-live enviroment is not supported"
+    echo "INFORMATION: Non-live enviroment or options not supported"
+    echo "             use alternate authentication to launch installer"
+    echo "             sudo minstall [OPTIONS]"
     echo ""
     exit 1
 fi
@@ -44,7 +46,7 @@ if [ "$EUID" != 0 ]; then
         AUTHENTICATION="su-to-root -X -c"
     fi
 
-    $AUTHENTICATION /usr/bin/minstall-launcher "${@}"
+    $AUTHENTICATION /usr/bin/minstall-launcher
 
     ##renable Xfce automount feature, if it was enabled in the first place
 
@@ -102,11 +104,11 @@ else
     fi
 
     RUN="/usr/sbin/minstall"
-    echo Starting "$RUN" "$@"
+    echo Starting "$RUN"
     # always change working directory to /usr/sbin for security
     cd "/usr/sbin"
     command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
-    exec "$RUN" "$@"
+    exec "$RUN"
 fi
 
 exit
