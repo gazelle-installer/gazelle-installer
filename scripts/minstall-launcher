@@ -7,11 +7,9 @@
 
 #exit early if not live or parameter given
 
-if [ -n "$1" ] || ! grep -sq '^overlay /live/aufs' /proc/mounts; then
+if ! grep -sq '^overlay /live/aufs' /proc/mounts; then
     echo ""
-    echo "INFORMATION: Non-live enviroment or options not supported"
-    echo "             use alternate authentication to launch installer"
-    echo "             sudo minstall [OPTIONS]"
+    echo "INFORMATION: Non-live enviroment is not supported"
     echo ""
     exit 1
 fi
@@ -22,16 +20,17 @@ if [ "$EUID" != 0 ]; then
     # normal user
 
     ##disable Xfce automount features
-
-    INITIALAUTOMOUNT=false
-    if command -v xfconf-query >/dev/null && \
-       xfconf-query --channel thunar-volman --property /automount-drives/enabled 1>/dev/null 2>&1; then
-       INITIALAUTOMOUNT=$(xfconf-query --channel thunar-volman --property /automount-drives/enabled)
-       echo "INITIALAUTOMOUNT =" "$INITIALAUTOMOUNT"
-       if [ "$INITIALAUTOMOUNT" = "true" ]; then
-          echo "$INITIALAUTOMOUNT" > /tmp/minstall-auto
-          xfconf-query --channel thunar-volman --property /automount-drives/enabled --set false
-       fi
+    if command -v xfconf-query >/dev/null; then
+       unset AUTO PROP XFCQ
+       XFCQ="xfconf-query --channel thunar-volman"
+       AUTO=($(${XFCQ} --list 2>/dev/null | grep /auto))
+       PROP=()
+       for prop in "${AUTO[@]}";  do
+            auto=$(${XFCQ} --property $prop)
+            [ "$auto" = "true" ] || continue
+            ${XFCQ} --property "$prop" --set "false"
+            PROP+=("$prop")
+        done
     fi
 
     ###end Xfce automount feature
@@ -45,15 +44,14 @@ if [ "$EUID" != 0 ]; then
         AUTHENTICATION="su-to-root -X -c"
     fi
 
-    $AUTHENTICATION /usr/bin/minstall-launcher
+    $AUTHENTICATION /usr/bin/minstall-launcher "${@}"
 
     ##renable Xfce automount feature, if it was enabled in the first place
-    if [ -e "/tmp/minstall-auto" ]; then
-        rm /tmp/minstall-auto
-    fi
 
-    if [ "$INITIALAUTOMOUNT" = "true" ]; then
-        xfconf-query --channel thunar-volman --property /automount-drives/enabled --set true
+     if command -v xfconf-query >/dev/null; then
+       for prop in "${PROP[@]}"; do
+           ${XFCQ} --property "$prop" --set "true"
+       done
     fi
 
     ##end Xfce automount feaure
@@ -61,14 +59,6 @@ if [ "$EUID" != 0 ]; then
 else
     # root user
 
-    # set XDG_RUNTIME_DIR - create a valid runtime dir
-    if [ "$XDG_RUNTIME_DIR" != "/run/user/0" ]; then
-      XDG_RUNTIME_DIR=/run/user/0
-      export XDG_RUNTIME_DIR
-      [ -d $XDG_RUNTIME_DIR ] || mkdir -p $XDG_RUNTIME_DIR
-      chmod 700 $XDG_RUNTIME_DIR
-      chown 0:0 $XDG_RUNTIME_DIR
-    fi
     # restrict PATH for security
     PATH="/usr/bin:/usr/sbin:/usr/local/bin"
 
@@ -92,7 +82,7 @@ else
     __ENVIRONEMENT_PATTERN__="^(${__ENVIRONEMENT_PATTERN__// /|})"
     # read environment variables from users process environement table
     while read -r; do
-        IFS='=' read -r  k v  <<<"$REPLY"
+        IFS='=' read -r k v  <<<"$REPLY"
         # remove any 'bad' special char's like back-quotes and dollar sign
         v="${v//[\`\$]/}"
         export $k="$v"
@@ -102,12 +92,21 @@ else
     unset k v
     unset __ENVIRONEMENT_PATTERN__
 
+    # set XDG_RUNTIME_DIR - create a valid runtime dir
+    if [ "$XDG_RUNTIME_DIR" != "/run/user/0" ]; then
+      XDG_RUNTIME_DIR=/run/user/0
+      export XDG_RUNTIME_DIR
+      [ -d $XDG_RUNTIME_DIR ] || mkdir -p $XDG_RUNTIME_DIR
+      chmod 700 $XDG_RUNTIME_DIR
+      chown 0:0 $XDG_RUNTIME_DIR
+    fi
+
     RUN="/usr/sbin/minstall"
-    echo Starting "$RUN"
+    echo Starting "$RUN" "$@"
     # always change working directory to /usr/sbin for security
     cd "/usr/sbin"
     command -v "$RUN" >/dev/null || { echo "mx-installer: Command '$RUN' not found"; exit 1; }
-    exec "$RUN" 
+    exec "$RUN" "$@"
 fi
 
 exit
