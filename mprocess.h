@@ -79,6 +79,7 @@ private:
     class QProgressBar *progBar = nullptr;
     int progSliceStart = 0, progSliceSpace = 0;
     long progSlicePos = 0, progSliceSteps = 0;
+    int prevScrollMax = 0;
     // System detection results
     QString testArch;
     int testEFI = -1;
