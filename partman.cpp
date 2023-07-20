@@ -61,7 +61,7 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     gptoverride = appArgs.isSet("gpt-override");
 
     // TODO: Eliminate when MX Boot Repair is fixed.
-    goodluks = appArgs.isSet("good-luks");
+    goodluks = appArgs.isSet("good-luks") || appConf.value("GOOD_LUKS", true).toBool();
 
     gui.treePartitions->setModel(this);
     gui.treePartitions->setItemDelegate(new ItemDelegate);
