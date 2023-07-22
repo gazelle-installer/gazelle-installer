@@ -10,7 +10,6 @@ TRANSLATIONS += translations/gazelle-installer_af.ts \
                 translations/gazelle-installer_be.ts \
                 translations/gazelle-installer_bg.ts \
                 translations/gazelle-installer_bn.ts \
-                translations/gazelle-installer_bs_BA.ts \
                 translations/gazelle-installer_bs.ts \
                 translations/gazelle-installer_ca.ts \
                 translations/gazelle-installer_ceb.ts \
