@@ -1589,7 +1589,8 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
         switch (index.column()) {
         case COL_DEVICE:
             if (!device->model.isEmpty()) return tr("Model: %1").arg(device->model);
-            else return device->path;
+            else if (!device->origin) return device->path;
+            else return device->path + "\n(" + device->origin->name + ')';
             break;
         case COL_SIZE:
             if (device->type == Device::SUBVOLUME) return "----";
