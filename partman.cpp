@@ -1295,8 +1295,10 @@ void PartMan::formatPartitions()
         }
     }
     // Prepare subvolumes on all that (are to) contain them.
-    for (Iterator it(*this); *it; it.next()) {
-        if ((*it)->finalFormat() == "btrfs") prepareSubvolumes(*it);
+    for (Iterator it(*this); Device *device = *it; it.next()) {
+        if (device->isVolume() && device->finalFormat() == "btrfs") {
+            prepareSubvolumes(*it);
+        }
     }
 }
 
@@ -2040,7 +2042,7 @@ QStringList PartMan::Device::allowedFormats() const noexcept
 }
 QString PartMan::Device::finalFormat() const noexcept
 {
-    if (type == SUBVOLUME) return format;
+    if (type == SUBVOLUME) return parentItem->format;
     return (usefor.isEmpty() || format == "PRESERVE") ? curFormat : format;
 }
 QString PartMan::Device::shownFormat(const QString &fmt) const noexcept
