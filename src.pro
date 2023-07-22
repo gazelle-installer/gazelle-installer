@@ -28,7 +28,6 @@ TRANSLATIONS += translations/gazelle-installer_af.ts \
                 translations/gazelle-installer_et.ts \
                 translations/gazelle-installer_eu.ts \
                 translations/gazelle-installer_fa.ts \
-                translations/gazelle-installer_fi_FI.ts \
                 translations/gazelle-installer_fil_PH.ts \
                 translations/gazelle-installer_fil.ts \
                 translations/gazelle-installer_fi.ts \
@@ -88,7 +87,6 @@ TRANSLATIONS += translations/gazelle-installer_af.ts \
                 translations/gazelle-installer_pt.ts \
                 translations/gazelle-installer_ro.ts \
                 translations/gazelle-installer_rue.ts \
-                translations/gazelle-installer_ru_RU.ts \
                 translations/gazelle-installer_ru.ts \
                 translations/gazelle-installer_rw.ts \
                 translations/gazelle-installer_sd.ts \
