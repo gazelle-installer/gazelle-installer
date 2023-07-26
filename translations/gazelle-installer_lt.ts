@@ -57,20 +57,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Nustatoma sistemos konfigūracija</translation>
+        <translation>Nustatoma sistemos konfigūracija</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Nepavyko paskirties vietoje ištrinti senąją sistemą.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Kuriami sistemos katalogai</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Pataisoma konfigūracija</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -138,25 +130,6 @@ Minimum: %2</source>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Ar tikrai norite praleisti diegimo laikmenos tikrinimą?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">Ša&amp;blonai</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Glaudinimas (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Glaudinimas (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Glaudinimas (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1818,10 +1791,6 @@ Please select a different name.</source>
         <translation>Nepavyko atverti LUKS konteinerio.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Nepavyko inicijuoti šifravimo sąrankos.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation type="unfinished"></translation>
@@ -1877,22 +1846,22 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">Ša&amp;blonai</translation>
+        <translation>Ša&amp;blonai</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Glaudinimas (Z&amp;STD)</translation>
+        <translation>Glaudinimas (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Glaudinimas (&amp;LZO)</translation>
+        <translation>Glaudinimas (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Glaudinimas (&amp;ZLIB)</translation>
+        <translation>Glaudinimas (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

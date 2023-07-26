@@ -57,20 +57,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Asetetaan järjestelmän kokoonpano</translation>
+        <translation>Asetetaan järjestelmän kokoonpano</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Luodaan järjestelmähakemistoja</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Korjataan rakennetta</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -138,24 +130,6 @@ Minimum: %2</source>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">sivutustiedoston tila</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Pakkaus (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Pakkaus (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1826,10 +1800,6 @@ Valitse eri nimi.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Salauksen viimeistely epäonnistui.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Vaadittujen osioiden valmistelu epäonnistui.</translation>
@@ -1895,12 +1865,12 @@ Valitse eri nimi.</translation>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Pakkaus (&amp;LZO)</translation>
+        <translation>Pakkaus (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Pakkaus (&amp;ZLIB)</translation>
+        <translation>Pakkaus (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

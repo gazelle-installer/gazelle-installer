@@ -57,20 +57,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">सिस्टम विन्यास सेट करना जारी</translation>
+        <translation>सिस्टम विन्यास सेट करना जारी</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">सिस्टम डायरेक्टरी सृजन जारी</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">विन्यास सुधार जारी</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -138,13 +130,6 @@ Minimum: %2</source>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">स्वैप स्पेस</translation>
     </message>
 </context>
 <context>

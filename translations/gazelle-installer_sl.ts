@@ -59,20 +59,12 @@ Najmanj: %2</translation>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Nastavitev konfiguracije sistema</translation>
+        <translation>Nastavitev konfiguracije sistema</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Neuspešno brisanje starega sistema.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Ustvarjanje sistemskih direktorijev</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Popravljanje konfiguracije</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -140,36 +132,6 @@ Najmanj: %2</translation>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Ali želite res preskočiti preverjanje namestitvenega nosilca?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">prostor za izmenjavo</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">zgolj formatiranje</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Predloge</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Stiskanje (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Stiskanje (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Stiskanje (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1840,10 +1802,6 @@ Izberite drugo ime.</translation>
         <translation>LUKS vsebnika ni bilo mogoče odpreti.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Ni bilo mogoče dokončati namestitve šifriranja.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Ni bilo mogoče pripraviti zahtevanih razdelkov</translation>
@@ -1899,22 +1857,22 @@ Izberite drugo ime.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Predloge</translation>
+        <translation>&amp;Predloge</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Stiskanje (Z&amp;STD)</translation>
+        <translation>Stiskanje (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Stiskanje (&amp;LZO)</translation>
+        <translation>Stiskanje (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Stiskanje (&amp;ZLIB)</translation>
+        <translation>Stiskanje (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>
