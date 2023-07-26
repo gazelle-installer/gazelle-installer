@@ -59,20 +59,12 @@ Minimum: %2</translation>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Rendszer-konfiguráció beállítása</translation>
+        <translation>Rendszer-konfiguráció beállítása</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Nem sikerült a régi rendszer törlése a célhelyen.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Rendszer könyvtárak létrehozása</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Beállítások javítása</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -140,36 +132,6 @@ Minimum: %2</translation>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Biztos, hogy kihagyja a telepítési média ellenőrzését?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">cserehely</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">csak formázás</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Sablonok</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Tömörítés (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Tömörítés (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Tömörítés (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1840,10 +1802,6 @@ Válasszon egy másik nevet.</translation>
         <translation>Nem sikerült a LUKS konténer megnyitása.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Nem sikerült a titkosítás beállításának befejezése.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Nem sikerült előkészíteni a szükséges partíciókat.</translation>
@@ -1899,22 +1857,22 @@ Válasszon egy másik nevet.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Sablonok</translation>
+        <translation>&amp;Sablonok</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Tömörítés (Z&amp;STD)</translation>
+        <translation>Tömörítés (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Tömörítés (&amp;LZO)</translation>
+        <translation>Tömörítés (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Tömörítés (&amp;ZLIB)</translation>
+        <translation>Tömörítés (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>
