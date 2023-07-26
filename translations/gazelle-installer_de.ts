@@ -54,25 +54,17 @@ Minimum: %2</translation>
     <message>
         <location filename="../base.cpp" line="166"/>
         <source>Failed to set the system configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Systemkonfiguration konnte nicht eingestellt werden.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Einstellung der Systemkonfiguration</translation>
+        <translation>Einstellung der Systemkonfiguration</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Löschen des alten Systems auf dem Zielort fehlgeschlagen.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Erstelle Systemverzeichnisse</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Schließe die Konfiguration ab</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -143,36 +135,6 @@ Minimum: %2</translation>
     </message>
 </context>
 <context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">Swapspeicher</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">Nur Formatieren</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Vorlagen</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Kompression (mit &amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Komprimierung (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Kompression (mit &amp;LZO)</translation>
-    </message>
-</context>
-<context>
     <name>MInstall</name>
     <message>
         <location filename="../minstall.cpp" line="87"/>
@@ -197,7 +159,7 @@ Mit der Installation fortfahren?</translation>
 %1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.</source>
         <translation>Unterstützung für %1
 
-%1 wird von Leuten wie Ihnen unterstützt. Einige helfen anderen Nutzern im Forum - %2 oder übersetzen Dateien in andere Sprachen oder machen Verbesserungsvorschläge, schreiben Dokumentationen oder helfen beim Testen neuer Programme.</translation>
+%1 wird von Leuten wie ihnen unterstützt. Einige helfen anderen Nutzern im Forum - %2 oder übersetzen Dateien in andere Sprachen oder machen Verbesserungsvorschläge, schreiben Dokumentationen oder helfen beim Testen neuer Programme.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="226"/>
@@ -936,7 +898,7 @@ Wählen sie hier die Systemdienste, die sie in ihrer Systemkonfiguration haben w
         <location filename="../minstall.cpp" line="878"/>
         <location filename="../minstall.cpp" line="1144"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Unterstützung für %1&lt;/b&gt;&lt;br/&gt;%1 wird von Leuten wie Ihnen unterstützt. Einige helfen anderen Nutzern im Forum - %2 - oder übersetzen Dateien in andere Sprachen oder machen Verbesserungsvorschläge, schreiben Dokumentationen oder helfen beim Testen neuer Programme.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Unterstützung für %1&lt;/b&gt;&lt;br/&gt;%1 wird von Leuten wie ihnen unterstützt. Einige helfen anderen Nutzern im Forum - %2 - oder übersetzen Dateien in andere Sprachen oder machen Verbesserungsvorschläge, schreiben Dokumentationen oder helfen beim Testen neuer Programme.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="908"/>
@@ -1614,7 +1576,7 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../partman.cpp" line="538"/>
         <source>Default subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard-Subvolumen</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="539"/>
@@ -1679,7 +1641,7 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../partman.cpp" line="792"/>
         <source>Format %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Format %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="808"/>
@@ -1840,10 +1802,6 @@ Bitte einen anderen Namen wählen.</translation>
         <translation>Öffnen des LUKS-Containers fehlgeschlagen.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Einrichtung der Verschlüsselung konnte nicht erfolgreich beendet werden.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Erforderliche Partitionen konnten nicht erfolgreich vorbereitet werden.</translation>
@@ -1899,22 +1857,22 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Vorlagen</translation>
+        <translation>&amp;Vorlagen</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Komprimierung (Z&amp;STD)</translation>
+        <translation>Komprimierung (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Kompression (mit &amp;LZO)</translation>
+        <translation>Kompression (mit &amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Kompression (mit &amp;ZLIB)</translation>
+        <translation>Kompression (mit &amp;ZLIB)</translation>
     </message>
 </context>
 <context>

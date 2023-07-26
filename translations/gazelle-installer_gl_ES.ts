@@ -58,20 +58,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Establecendo a configuración do sistema</translation>
+        <translation>Establecendo a configuración do sistema</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Creando os directorios do sistema</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Reparando a configuración</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -139,32 +131,6 @@ Minimum: %2</source>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">espazo de intercambio</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">só formato</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Modelos</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Compresión (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Compresión (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1831,10 +1797,6 @@ Escoller un nome diferente.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Produciuse un erro ao finalizar a configuración do cifrado.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Produciuse un erro ao preparar as particións necesarias.</translation>
@@ -1890,7 +1852,7 @@ Escoller un nome diferente.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Modelos</translation>
+        <translation>&amp;Modelos</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
@@ -1900,12 +1862,12 @@ Escoller un nome diferente.</translation>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Compresión (&amp;LZO)</translation>
+        <translation>Compresión (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Compresión (&amp;ZLIB)</translation>
+        <translation>Compresión (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

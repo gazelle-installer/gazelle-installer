@@ -59,20 +59,12 @@ Mínimo: %2</translation>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Estableciendo la configuración del sistema</translation>
+        <translation>Estableciendo la configuración del sistema</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Fallo al eliminar el sistema antiguo en el destino.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Creando directorios del sistema</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Reparando la configuración</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -140,36 +132,6 @@ Mínimo: %2</translation>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>¿Está seguro que desea omitir la comprobación de los medios de instalación?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">espacio de intercambio (swap)</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">Solo formatear</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Plantillas</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Compresión (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Compresión (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Compresión (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1673,7 +1635,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="792"/>
         <source>Format %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatear %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="808"/>
@@ -1834,10 +1796,6 @@ Please select a different name.</source>
         <translation>Fallo al abrir el contenedor LUKS.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">No se pudo finalizar la configuración del cifrado.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Fallo al preparar las particiones requeridas.</translation>
@@ -1893,22 +1851,22 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Plantillas</translation>
+        <translation>&amp;Plantillas</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Compresión (Z&amp;STD)</translation>
+        <translation>Compresión (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Compresión (&amp;LZO)</translation>
+        <translation>Compresión (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Compresión (&amp;ZLIB)</translation>
+        <translation>Compresión (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

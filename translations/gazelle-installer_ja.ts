@@ -54,25 +54,17 @@ home %2%</translation>
     <message>
         <location filename="../base.cpp" line="166"/>
         <source>Failed to set the system configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>システムの設定に失敗しました。</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">システムの設定を行っています</translation>
+        <translation>システムの設定を行っています</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>指定した場所の古いシステム情報の削除に失敗しました。</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">システムディレクトリを作成中</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">設定を修復中</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -100,7 +92,7 @@ home %2%</translation>
     <message>
         <location filename="../bootman.cpp" line="106"/>
         <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
-        <translation>GRUB のインストールに失敗しました。Live メディアから再起動し、GRUB Rescueメニューを使用してインストールを修復できます。</translation>
+        <translation>GRUB のインストールに失敗しました。Live メディアから再起動し、GRUB の回復メニューを使用してインストールを修復できます。</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="278"/>
@@ -140,36 +132,6 @@ home %2%</translation>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>本当にインストール用メディアのチェックを省略しますか？</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">スワップ領域</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">初期化のみ実行</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">テンプレート(&amp;T)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">圧縮 (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">圧縮 (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">圧縮 (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1612,7 +1574,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="538"/>
         <source>Default subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation>デフォルトのサブボリューム</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="539"/>
@@ -1677,7 +1639,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="792"/>
         <source>Format %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 のフォーマット</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="808"/>
@@ -1838,10 +1800,6 @@ Please select a different name.</source>
         <translation>LUKS コンテナを開くことができません。</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">暗号化の設定を完了できませんでした。</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>必要なパーティションを準備できません。</translation>
@@ -1897,22 +1855,22 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">テンプレート(&amp;T)</translation>
+        <translation>テンプレート(&amp;T)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">圧縮 (Z&amp;STD)</translation>
+        <translation>圧縮 (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">圧縮 (&amp;LZO)</translation>
+        <translation>圧縮 (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">圧縮 (&amp;ZLIB)</translation>
+        <translation>圧縮 (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

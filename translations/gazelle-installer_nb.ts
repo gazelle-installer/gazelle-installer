@@ -59,20 +59,12 @@ Minimum: %2</translation>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Setter opp systemet</translation>
+        <translation>Setter opp systemet</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Klarte ikke slette gammelt system på målet.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Oppretter systemmapper</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Ferdigstiller oppsett</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -140,36 +132,6 @@ Minimum: %2</translation>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Vil du avbryte kontrollen av installasjonsmediet?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">vekselfil</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">kun formatering</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Maler</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Komprimering (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Komprimering (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Komprimering (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1677,7 +1639,7 @@ Velg et annet brukernavn.</translation>
     <message>
         <location filename="../partman.cpp" line="792"/>
         <source>Format %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formater %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="808"/>
@@ -1838,10 +1800,6 @@ Velg et annet brukernavn.</translation>
         <translation>Klarte ikke åpne LUKS-partisjon.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Klarte ikke fullføre oppsett av kryptering.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Klarte ikke forberede nødvendige partisjoner.</translation>
@@ -1897,22 +1855,22 @@ Velg et annet brukernavn.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Maler</translation>
+        <translation>&amp;Maler</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Komprimering (Z&amp;STD)</translation>
+        <translation>Komprimering (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Komprimering (&amp;LZO)</translation>
+        <translation>Komprimering (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Komprimering (&amp;ZLIB)</translation>
+        <translation>Komprimering (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

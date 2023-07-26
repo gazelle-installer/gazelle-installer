@@ -54,25 +54,17 @@ En az: %2</translation>
     <message>
         <location filename="../base.cpp" line="166"/>
         <source>Failed to set the system configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem yapılandırması ayarlanamadı.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Sistem yapılandırma ayarları</translation>
+        <translation>Sistem yapılandırma ayarları</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Hedefdeki eski sistem silinemedi.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Sistem dizinleri oluşturuluyor</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Yapılandırma onarılıyor</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -140,36 +132,6 @@ En az: %2</translation>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Kurulum ortamını kontrol etmeyi atlamak istediğinizden emin misiniz?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">takas alanı </translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">sadece biçimlendir</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Şablonlar</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Sıkıştırma (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Sıkıştırma (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Sıkıştırma (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1614,7 +1576,7 @@ Farklı bir ad seçin.</translation>
     <message>
         <location filename="../partman.cpp" line="538"/>
         <source>Default subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation>Varsayılan alt birim</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="539"/>
@@ -1679,7 +1641,7 @@ Farklı bir ad seçin.</translation>
     <message>
         <location filename="../partman.cpp" line="792"/>
         <source>Format %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1’i Biçimlendir</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="808"/>
@@ -1840,10 +1802,6 @@ Farklı bir ad seçin.</translation>
         <translation>LUKS kapsayıcısı açılamadı.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Şifreleme kurulumu tamamlanamadı.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Gerekli bölümler hazırlanamadı.</translation>
@@ -1899,22 +1857,22 @@ Farklı bir ad seçin.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Şablonlar</translation>
+        <translation>&amp;Şablonlar</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Sıkıştırma (Z&amp;STD)</translation>
+        <translation>Sıkıştırma (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Sıkıştırma (&amp;LZO)</translation>
+        <translation>Sıkıştırma (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Sıkıştırma (&amp;ZLIB)</translation>
+        <translation>Sıkıştırma (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

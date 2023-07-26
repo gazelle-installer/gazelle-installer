@@ -57,20 +57,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Itinatakda ang configuration ng sistema</translation>
+        <translation>Itinatakda ang configuration ng sistema</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Nagsasagawa ng system directories</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Inaayos ang  configuration</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
