@@ -57,20 +57,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">กำลังทำการตั้งค่าระบบ</translation>
+        <translation>กำลังทำการตั้งค่าระบบ</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">กำลังสร้างไดเรกทอรีระบบ</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">กำลังซ่อมแซมการตั้งค่า</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>

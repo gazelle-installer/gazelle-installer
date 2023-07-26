@@ -57,7 +57,7 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">设置系统配置中</translation>
+        <translation>设置系统配置中</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>

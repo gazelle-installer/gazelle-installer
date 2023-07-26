@@ -54,25 +54,17 @@ Mínim: %2</translation>
     <message>
         <location filename="../base.cpp" line="166"/>
         <source>Failed to set the system configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha fallat en definir la configuració del sistema.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Configuració dels paràmetres del sistema</translation>
+        <translation>Configuració dels paràmetres del sistema</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Ha fallat en esborrar el sistema anterior a la destinació.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Creant els directoris de sistema </translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Arranjant la configuració</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -140,36 +132,6 @@ Mínim: %2</translation>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Esteu segur de voler ometre la comprovació del suport d&apos;instal·lació?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">espai d&apos;intercanvi</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">només formata </translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">Plan&amp;tilles</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Compressió (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Compressió (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Compressió (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1614,7 +1576,7 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="538"/>
         <source>Default subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation>Subvolum per omissió</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="539"/>
@@ -1679,7 +1641,7 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="792"/>
         <source>Format %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formata %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="808"/>
@@ -1840,10 +1802,6 @@ Si us plau, trieu un nom diferent. </translation>
         <translation>Ha fallat en obrir el contenidor LUKS.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Ha fallat en acabar la instal·lació de l&apos;encriptatge.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Ha fallat en preparar les particions necessàries.</translation>
@@ -1899,22 +1857,22 @@ Si us plau, trieu un nom diferent. </translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">Plan&amp;tilles</translation>
+        <translation>Plan&amp;tilles</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Compressió (Z&amp;STD)</translation>
+        <translation>Compressió (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Compressió (&amp;LZO)</translation>
+        <translation>Compressió (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Compressió (&amp;ZLIB)</translation>
+        <translation>Compressió (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

@@ -54,25 +54,17 @@ Shtëpia e %2%</translation>
     <message>
         <location filename="../base.cpp" line="166"/>
         <source>Failed to set the system configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>S’u arrit të ujdisej formësimi i sistemit.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Po ujdiset formësim sistemi</translation>
+        <translation>Po ujdiset formësim sistemi</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>S’u arrit të fshihet sistemi i vjetër te vendmbërritje.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Po krijohen drejtori sistemi</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Po ndreqet formësimi</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -140,36 +132,6 @@ Shtëpia e %2%</translation>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Jeni i sigurt se doni të anashkalohet kontrolli i medias së instalimit?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">hapësirë swap</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">vetëm formatim</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Gjedhe</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Ngjeshje (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Ngjeshje (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Ngjeshje (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1614,7 +1576,7 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="538"/>
         <source>Default subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation>Nënvëllim parazgjedhje</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="539"/>
@@ -1679,7 +1641,7 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="792"/>
         <source>Format %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="808"/>
@@ -1840,10 +1802,6 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>S’u arrit të hapej kontejner LUKS.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">S’u arrit të përfundohet ujdisja e fshehtëzimit.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>S’u arrit të përgatiten pjesët e domosdoshme.</translation>
@@ -1899,22 +1857,22 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Gjedhe</translation>
+        <translation>&amp;Gjedhe</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Ngjeshje (Z&amp;STD)</translation>
+        <translation>Ngjeshje (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Ngjeshje (&amp;LZO)</translation>
+        <translation>Ngjeshje (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Ngjeshje (&amp;ZLIB)</translation>
+        <translation>Ngjeshje (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

@@ -57,20 +57,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">תצורת המערכת מוגדרת</translation>
+        <translation>תצורת המערכת מוגדרת</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>מחיקת המערכת הישנה ביעד נכשלה.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">תיקיות המערכת נוצרות</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">ההגדרות עוברות תיקון</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -138,36 +130,6 @@ Minimum: %2</source>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">שטח החלפה</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">לפרמט בלבד</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;תבניות</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">דחיסה (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">דחיסה (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">דחיסה (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1826,10 +1788,6 @@ Please select a different name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">סיום הקמת ההצפנה נכשל.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation type="unfinished"></translation>
@@ -1885,22 +1843,22 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;תבניות</translation>
+        <translation>&amp;תבניות</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">דחיסה (Z&amp;STD)</translation>
+        <translation>דחיסה (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">דחיסה (&amp;LZO)</translation>
+        <translation>דחיסה (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">דחיסה (&amp;ZLIB)</translation>
+        <translation>דחיסה (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

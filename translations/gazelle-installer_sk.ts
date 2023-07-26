@@ -65,14 +65,6 @@ Minimum: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Vytváranie systémových zložiek</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Oprava konfigurácie</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="246"/>
         <source>Copying new system</source>
         <translation>Kopírovanie nového systému</translation>

@@ -58,20 +58,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Configurare a sistemului</translation>
+        <translation>Configurare a sistemului</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>A eșuat ștegerea vechiul sistem de la destinație.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Se crează directoarele sistemului</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Se prepară configurarea</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -139,36 +131,6 @@ Minimum: %2</source>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">spațiu de swap</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">numai formatare</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Șabloane</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Comprimare (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Comprimare (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Comprimare (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1839,10 +1801,6 @@ Alegeți un nume diferit.</translation>
         <translation>Nu s-a putut deschide containerul LUKS.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">A eșuat finalizarea configurării de criptare.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Nu s-au putut pregătit partițiile necesare.</translation>
@@ -1898,22 +1856,22 @@ Alegeți un nume diferit.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Șabloane</translation>
+        <translation>&amp;Șabloane</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Comprimare (Z&amp;STD)</translation>
+        <translation>Comprimare (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Comprimare (&amp;LZO)</translation>
+        <translation>Comprimare (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Comprimare (&amp;ZLIB)</translation>
+        <translation>Comprimare (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

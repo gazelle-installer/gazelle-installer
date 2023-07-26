@@ -57,16 +57,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Đang thiết lập cấu hình hệ thống</translation>
+        <translation>Đang thiết lập cấu hình hệ thống</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Đang tạo các thư mục hệ thống</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>

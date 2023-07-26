@@ -49,40 +49,32 @@ Mínimo: %2</translation>
     <message>
         <location filename="../base.cpp" line="156"/>
         <source>Deleting old system</source>
-        <translation>Apagando o sistema antigo</translation>
+        <translation>Apagando o sistema operacional antigo</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="166"/>
         <source>Failed to set the system configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocorreu uma falha ao definir as configurações do sistema operacional.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Definir a configuração do sistema</translation>
+        <translation>Definir as configurações do sistema operacional.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
-        <translation>Ocorreu uma falha ao apagar o sistema antigo no destino.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Criando os diretórios (pastas) do sistema</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Reparando a configuração</translation>
+        <translation>Ocorreu uma falha ao apagar o sistema operacional antigo no destino.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
         <source>Copying new system</source>
-        <translation>Copiando o novo sistema</translation>
+        <translation>Copiando o novo sistema operacional</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="276"/>
         <source>Failed to copy the new system.</source>
-        <translation>Ocorreu uma falha ao copiar o novo sistema.</translation>
+        <translation>Ocorreu uma falha ao copiar o novo sistema operacional.</translation>
     </message>
 </context>
 <context>
@@ -143,36 +135,6 @@ Mínimo: %2</translation>
     </message>
 </context>
 <context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">espaço de troca (swap)</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">apenas no formato</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Modelos</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Compressão (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Compressão (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Compressão (&amp;LZO)</translation>
-    </message>
-</context>
-<context>
     <name>MInstall</name>
     <message>
         <location filename="../minstall.cpp" line="87"/>
@@ -186,7 +148,7 @@ We recommend you quit now and restart in Legacy Boot
 
 Do you want to continue the installation?</source>
         <translation>Você está executando um Sistema Operacional de 32 bits que foi iniciado no modo UEFI de 64 bits. Após a instalação no disco, o sistema não inicializará, a menos que na reinicialização do computador você selecione o modo de inicialização legado/herdado (Legacy Boot), isto é, o modo BIOS, ou similar.
-Recomenda-se que o sistema seja encerrado agora e reiniciado com o modo de inicialização legado.
+É recomendado que o sistema operacional seja desligado agora e reiniciado com o modo de inicialização legado.
 
 Você quer continuar a instalação?</translation>
     </message>
@@ -230,7 +192,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="395"/>
         <source>Setting system configuration</source>
-        <translation>Definir a configuração do sistema</translation>
+        <translation>Definir as configurações do sistema operacional</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="407"/>
@@ -260,7 +222,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="545"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
-        <translation>AVISO: O disco selecionado possui capacidade de pelo menos 2 TB e tem que ser formatado utilizando o GPT (GUID Partition Table ou Tabela de Partição GUID). Em alguns sistemas, um disco formatado em GPT não inicializará.</translation>
+        <translation>AVISO: O disco selecionado possui capacidade de pelo menos 2 TB e tem que ser formatado utilizando o GPT (GUID Partition Table ou Tabela de Partição GUID). Em alguns computadores, um disco formatado em GPT não inicializará.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="574"/>
@@ -340,7 +302,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="655"/>
         <source>Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier. This can also improve overall performance by constraining the system files to a defined portion of the drive.</source>
-        <translation>Manter a pasta ‘home’ em uma partição separada aumenta a confiabilidade nas atualizações do sistema operacional. Também torna a cópia de segurança e a recuperação dos dados mais fáceis. Isto também pode melhorar o desempenho geral, restringindo os arquivos do sistema a uma parte definida do dispositivo de armazenamento.</translation>
+        <translation>Manter a pasta ‘home’ em uma partição separada aumenta a confiabilidade nas atualizações do sistema operacional. Também torna a cópia de segurança e a recuperação dos dados mais fáceis. Este recurso também pode melhorar o desempenho geral, restringindo os arquivos do sistema operacional em uma partição definida do dispositivo de armazenamento.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="657"/>
@@ -573,7 +535,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="768"/>
         <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation>Um arquivo de trocas ou arquivo de swap é mais fácil de ser ajustado do que uma partição de trocas. É consideravelmente mais fácil redimensionar um arquivo de trocas para adaptá-lo às modificações na utilização do sistema operacional do que de uma partição de trocas.</translation>
+        <translation>Um arquivo de trocas ou arquivo de ‘swap’ é mais fácil de ser ajustado do que uma partição de trocas. É consideravelmente mais fácil redimensionar um arquivo de trocas para adaptá-lo às modificações na utilização do sistema operacional do que de uma partição de trocas.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="769"/>
@@ -684,7 +646,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="733"/>
         <source>Preferred Filesystem Type</source>
-        <translation>Tipo de Sistema de Arquivos Preferido</translation>
+        <translation>Tipo do Sistema de Arquivos Preferido</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="734"/>
@@ -699,7 +661,7 @@ Divirta-se utilizando o %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="737"/>
         <source>System partition management tool</source>
-        <translation>Ferramenta de gerenciamento de partição do sistema</translation>
+        <translation>Ferramenta de gerenciamento de partições do sistema operacional</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="738"/>
@@ -1204,7 +1166,7 @@ Você realmente quer parar agora?</translation>
     <message>
         <location filename="../meinstall.ui" line="941"/>
         <source>System boot disk:</source>
-        <translation>Disco de inicialização do sistema:</translation>
+        <translation>Disco de inicialização do sistema operacional:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="954"/>
@@ -1299,7 +1261,7 @@ Você realmente quer parar agora?</translation>
     <message>
         <location filename="../meinstall.ui" line="1429"/>
         <source>System clock uses local time</source>
-        <translation>O relógio do sistema utiliza a hora local</translation>
+        <translation>O relógio do sistema operacional utiliza a hora local</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1461"/>
@@ -1614,7 +1576,7 @@ Por favor, insira um nome diferente.</translation>
     <message>
         <location filename="../partman.cpp" line="538"/>
         <source>Default subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation>Subvolume padrão</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="539"/>
@@ -1679,7 +1641,7 @@ Por favor, insira um nome diferente.</translation>
     <message>
         <location filename="../partman.cpp" line="792"/>
         <source>Format %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="808"/>
@@ -1792,7 +1754,7 @@ Por favor, insira um nome diferente.</translation>
     <message>
         <location filename="../partman.cpp" line="918"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
-        <translation>Este computador utiliza o EFI, mas nenhuma partição de sistema EFI válida foi atribuída separadamente a &lt;b&gt;/boot/efi&lt;/b&gt;.</translation>
+        <translation>Este computador utiliza o EFI, mas nenhuma partição do sistema EFI válida foi atribuída separadamente a &lt;b&gt;/boot/efi&lt;/b&gt;.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="921"/>
@@ -1838,10 +1800,6 @@ Por favor, insira um nome diferente.</translation>
         <location filename="../partman.cpp" line="1231"/>
         <source>Failed to open LUKS container.</source>
         <translation>Ocorreu uma falha ao abrir o contêiner LUKS.</translation>
-    </message>
-    <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Ocorreu uma falha ao finalizar a configuração da criptografia/encriptação.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1092"/>
@@ -1899,22 +1857,22 @@ Por favor, insira um nome diferente.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Modelos</translation>
+        <translation>&amp;Modelos</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Compressão (Z&amp;STD)</translation>
+        <translation>Compressão (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Compressão (&amp;LZO)</translation>
+        <translation>Compressão (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Compressão (&amp;ZLIB)</translation>
+        <translation>Compressão (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

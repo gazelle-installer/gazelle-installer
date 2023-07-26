@@ -58,20 +58,12 @@ Minimum: %2</source>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Установка конфигурации системы</translation>
+        <translation>Установка конфигурации системы</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Не удалось удалить старую систему в месте назначения.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Создание системных директорий</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Исправление конфигурации</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -139,36 +131,6 @@ Minimum: %2</source>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Уверены, что хотите пропустить проверку установочного носителя?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">раздел подкачки</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">только отформатировать</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Шаблоны</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Сжатие (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Сжатие (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Сжатие (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1833,10 +1795,6 @@ Please select a different name.</source>
         <translation>Не удалось открыть контейнер LUKS.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Не удалось завершить настройку шифрования.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Не удалось подготовить необходимые разделы.</translation>
@@ -1892,22 +1850,22 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Шаблоны</translation>
+        <translation>&amp;Шаблоны</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Сжатие (Z&amp;STD)</translation>
+        <translation>Сжатие (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Сжатие (&amp;LZO)</translation>
+        <translation>Сжатие (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Сжатие (&amp;ZLIB)</translation>
+        <translation>Сжатие (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>

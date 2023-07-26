@@ -54,25 +54,17 @@ Minimo: %2</translation>
     <message>
         <location filename="../base.cpp" line="166"/>
         <source>Failed to set the system configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossibile impostare la configurazione del sistema.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="168"/>
         <source>Setting system configuration</source>
-        <translation type="unfinished">Impostazioni di configurazione del sistema</translation>
+        <translation>Impostazioni di configurazione del sistema</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="153"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Impossibile eliminare il vecchio sistema sulla destinazione.</translation>
-    </message>
-    <message>
-        <source>Creating system directories</source>
-        <translation type="vanished">Creazione delle cartelle di sistema</translation>
-    </message>
-    <message>
-        <source>Fixing configuration</source>
-        <translation type="vanished">Riparazione della configurazione</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="246"/>
@@ -140,36 +132,6 @@ Minimo: %2</translation>
         <location filename="../checkmd5.cpp" line="120"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Sei sicuro di voler saltare il controllo del supporto d&apos;installazione?</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItem</name>
-    <message>
-        <source>swap space</source>
-        <translation type="vanished">Spazio swap</translation>
-    </message>
-    <message>
-        <source>format only</source>
-        <translation type="vanished">formatta solo</translation>
-    </message>
-</context>
-<context>
-    <name>DeviceItemDelegate</name>
-    <message>
-        <source>&amp;Templates</source>
-        <translation type="vanished">&amp;Modelli</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;ZLIB)</source>
-        <translation type="vanished">Compressione (&amp;ZLIB)</translation>
-    </message>
-    <message>
-        <source>Compression (Z&amp;STD)</source>
-        <translation type="vanished">Compressione (Z&amp;STD)</translation>
-    </message>
-    <message>
-        <source>Compression (&amp;LZO)</source>
-        <translation type="vanished">Compressione (&amp;LZO)</translation>
     </message>
 </context>
 <context>
@@ -1615,7 +1577,7 @@ Per favore, scegli un nome differente.</translation>
     <message>
         <location filename="../partman.cpp" line="538"/>
         <source>Default subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation>Sottovolume predefinito</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="539"/>
@@ -1680,7 +1642,7 @@ Per favore, scegli un nome differente.</translation>
     <message>
         <location filename="../partman.cpp" line="792"/>
         <source>Format %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Formato %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="808"/>
@@ -1843,10 +1805,6 @@ Per favore, scegli un nome differente.</translation>
         <translation>Impossibile aprire il contenitore LUKS.</translation>
     </message>
     <message>
-        <source>Failed to finalize encryption setup.</source>
-        <translation type="vanished">Impossibile finalizzare l&apos;impostazione della criptazione.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1092"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Impossibile preparare le partizioni richieste.</translation>
@@ -1902,22 +1860,22 @@ Per favore, scegli un nome differente.</translation>
     <message>
         <location filename="../partman.cpp" line="2454"/>
         <source>&amp;Templates</source>
-        <translation type="unfinished">&amp;Modelli</translation>
+        <translation>&amp;Modelli</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2462"/>
         <source>Compression (Z&amp;STD)</source>
-        <translation type="unfinished">Compressione (Z&amp;STD)</translation>
+        <translation>Compressione (Z&amp;STD)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2464"/>
         <source>Compression (&amp;LZO)</source>
-        <translation type="unfinished">Compressione (&amp;LZO)</translation>
+        <translation>Compressione (&amp;LZO)</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="2466"/>
         <source>Compression (&amp;ZLIB)</source>
-        <translation type="unfinished">Compressione (&amp;ZLIB)</translation>
+        <translation>Compressione (&amp;ZLIB)</translation>
     </message>
 </context>
 <context>
