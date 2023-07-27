@@ -1377,7 +1377,7 @@ bool PartMan::makeFstab() noexcept
         else out << "UUID=" << volume->assocUUID();
         // Mount point, file system
         const QString &fsfmt = volume->finalFormat();
-        if (fsfmt == "swap") out << " swap swap";
+        if (fsfmt == "SWAP") out << " swap swap";
         else {
             out << ' ' << it.first;
             if (fsfmt.startsWith("FAT")) out << " vfat";
