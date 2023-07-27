@@ -1392,8 +1392,11 @@ bool PartMan::makeFstab() noexcept
             if (mountopts.isEmpty()) out << " defaults";
             else out << ' ' << mountopts;
         }
-        out << ' ' << (volume->dump ? 1 : 0);
-        out << ' ' << volume->pass << '\n';
+        if (volume->canMount()) {
+            out << ' ' << (volume->dump ? 1 : 0);
+            out << ' ' << volume->pass;
+        }
+        out << '\n';
     }
     file.close();
     return true;
@@ -2149,7 +2152,7 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
     }
     if ((changed & ((1 << PartMan::COL_USEFOR) | (1 << PartMan::COL_FORMAT))) && canMount(false)) {
         // Default options, dump and pass
-        if (format == "SWAP") options = discgran ? "discard" : "defaults";
+        if (usefor == "SWAP") options = discgran ? "discard" : "defaults";
         else if (finalFormat().startsWith("FAT")) {
             options = "noatime,dmask=0002,fmask=0113";
             pass = 0;
