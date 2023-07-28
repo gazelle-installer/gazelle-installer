@@ -1832,12 +1832,12 @@ Molim odaberite drugo ime.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1405"/>
+        <location filename="../partman.cpp" line="1408"/>
         <source>Failed to mount partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1410"/>
+        <location filename="../partman.cpp" line="1413"/>
         <source>Mounting: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1845,22 +1845,22 @@ Molim odaberite drugo ime.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2454"/>
+        <location filename="../partman.cpp" line="2457"/>
         <source>&amp;Templates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2462"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>Compression (Z&amp;STD)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2464"/>
+        <location filename="../partman.cpp" line="2467"/>
         <source>Compression (&amp;LZO)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2466"/>
+        <location filename="../partman.cpp" line="2469"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation type="unfinished"></translation>
     </message>
