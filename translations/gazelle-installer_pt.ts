@@ -1842,12 +1842,12 @@ Escolher um nome diferente.</translation>
         <translation>A preparar os sub-volumes</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1405"/>
+        <location filename="../partman.cpp" line="1408"/>
         <source>Failed to mount partition.</source>
         <translation>Falha ao montar a partição.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1410"/>
+        <location filename="../partman.cpp" line="1413"/>
         <source>Mounting: %1</source>
         <translation>A montar: %1</translation>
     </message>
@@ -1855,22 +1855,22 @@ Escolher um nome diferente.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2454"/>
+        <location filename="../partman.cpp" line="2457"/>
         <source>&amp;Templates</source>
         <translation>&amp;Modelos</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2462"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compressão (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2464"/>
+        <location filename="../partman.cpp" line="2467"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compressão (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2466"/>
+        <location filename="../partman.cpp" line="2469"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compressão (&amp;ZLIB)</translation>
     </message>

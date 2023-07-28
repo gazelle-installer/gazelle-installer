@@ -1842,12 +1842,12 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>Po përgatitet nënvëllime</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1405"/>
+        <location filename="../partman.cpp" line="1408"/>
         <source>Failed to mount partition.</source>
         <translation>S’u arrit të montohej pjesë.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1410"/>
+        <location filename="../partman.cpp" line="1413"/>
         <source>Mounting: %1</source>
         <translation>Po montohet: %1</translation>
     </message>
@@ -1855,22 +1855,22 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2454"/>
+        <location filename="../partman.cpp" line="2457"/>
         <source>&amp;Templates</source>
         <translation>&amp;Gjedhe</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2462"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Ngjeshje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2464"/>
+        <location filename="../partman.cpp" line="2467"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Ngjeshje (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2466"/>
+        <location filename="../partman.cpp" line="2469"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Ngjeshje (&amp;ZLIB)</translation>
     </message>

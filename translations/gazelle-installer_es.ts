@@ -54,7 +54,7 @@ Mínimo: %2</translation>
     <message>
         <location filename="../base.cpp" line="166"/>
         <source>Failed to set the system configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ha fallado la configuración del sistema.</translation>
     </message>
     <message>
         <location filename="../base.cpp" line="168"/>
@@ -1570,7 +1570,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="538"/>
         <source>Default subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation>Subvolumen por defecto</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="539"/>
@@ -1836,12 +1836,12 @@ Please select a different name.</source>
         <translation>Preparando subvolúmenes</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1405"/>
+        <location filename="../partman.cpp" line="1408"/>
         <source>Failed to mount partition.</source>
         <translation>Fallo al montar la partición.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1410"/>
+        <location filename="../partman.cpp" line="1413"/>
         <source>Mounting: %1</source>
         <translation>Montaje: %1</translation>
     </message>
@@ -1849,22 +1849,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2454"/>
+        <location filename="../partman.cpp" line="2457"/>
         <source>&amp;Templates</source>
         <translation>&amp;Plantillas</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2462"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compresión (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2464"/>
+        <location filename="../partman.cpp" line="2467"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compresión (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2466"/>
+        <location filename="../partman.cpp" line="2469"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compresión (&amp;ZLIB)</translation>
     </message>
