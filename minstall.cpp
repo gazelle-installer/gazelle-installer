@@ -167,7 +167,7 @@ void MInstall::startup()
         }
 
         partman = new PartMan(proc, *this, appConf, appArgs);
-        base = new Base(proc, *partman, *this, appConf, appArgs);
+        base = new Base(proc, *partman, appConf, appArgs);
         bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
         swapman = new SwapMan(proc, *partman, *this);
         autopart = new AutoPart(proc, partman, *this, appConf);

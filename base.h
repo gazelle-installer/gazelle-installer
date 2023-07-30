@@ -23,14 +23,11 @@
 #define BASE_H
 
 #include <QCommandLineParser>
-#include "ui_meinstall.h"
 
 class Base
 {
     Q_DECLARE_TR_FUNCTIONS(Base)
     class MProcess &proc;
-    Ui::MeInstall &gui;
-    QWidget *master;
     class PartMan &partman;
     long long sourceInodes = 1;
     long long bufferRoot = 0, bufferHome = 0;
@@ -44,8 +41,8 @@ public:
     QStringList rootSources;
     QStringList homes;
 
-    Base(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui,
-        const QSettings &appConf, const QCommandLineParser &appArgs);
+    Base(class MProcess &mproc, class PartMan &pman,
+        const class QSettings &appConf, const QCommandLineParser &appArgs);
     bool saveHomeBasic() noexcept;
     void install();
 };

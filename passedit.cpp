@@ -18,7 +18,7 @@
  **************************************************************************/
 
 #include <algorithm>
-#include <cmath>
+#include <random>
 #include <QApplication>
 #include <QContextMenuEvent>
 #include <QMenu>
@@ -78,7 +78,6 @@ void PassEdit::generate() noexcept
         for (int i = std::min(GEN_NUMBER_MAX, (words.count()/GEN_WORD_NUM_RATIO)-1); i >= 0; --i) {
             words.append(QString::number(i));
         }
-        std::srand(unsigned(std::time(nullptr)));
         pos = words.count();
     }
     gentext.clear();
@@ -86,7 +85,8 @@ void PassEdit::generate() noexcept
     const int genmax = master->maxLength();
     do {
         if (pos >= words.count()) {
-            std::random_shuffle(words.begin(), words.end());
+            std::random_device randev;
+            std::shuffle(words.begin(), words.end(), std::default_random_engine(randev()));
             pos = 0;
         }
         const QString &word = words.at(pos);

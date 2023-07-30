@@ -33,9 +33,8 @@
 
 #define BASE_BLOCK  (4*KB)
 
-Base::Base(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
-    const QSettings &appConf, const QCommandLineParser &appArgs)
-    : proc(mproc), gui(ui), partman(pman)
+Base::Base(MProcess &mproc, PartMan &pman, const QSettings &appConf, const QCommandLineParser &appArgs)
+    : proc(mproc), partman(pman)
 {
     pretend = appArgs.isSet("pretend");
     populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
