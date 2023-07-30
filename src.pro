@@ -4,6 +4,12 @@ DEFINES += QT_DISABLE_DEPRECATED_UP_TO=0x050F00
 
 TEMPLATE = app
 TARGET = minstall
+CONFIG += debug_and_release warn_on strict_c++ c++17
+CONFIG(release, debug|release) {
+    DEFINES += NDEBUG
+    QMAKE_CXXFLAGS += -flto
+    QMAKE_LFLAGS += -flto
+}
 TRANSLATIONS += translations/gazelle-installer_af.ts \
                 translations/gazelle-installer_am.ts \
                 translations/gazelle-installer_ar.ts \
@@ -148,7 +154,6 @@ SOURCES += app.cpp minstall.cpp \
     mprocess.cpp \
     swapman.cpp
 LIBS += -lzxcvbn
-CONFIG += release warn_on thread qt c++17
 
 RESOURCES += \
     images.qrc

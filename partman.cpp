@@ -1684,7 +1684,7 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const noexcept
     }
     return flagsOut;
 }
-QVariant PartMan::headerData(int section, Qt::Orientation orientation, int role) const noexcept
+QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orientation, int role) const noexcept
 {
     assert(orientation == Qt::Horizontal);
     if (role == Qt::DisplayRole) {

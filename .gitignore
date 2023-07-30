@@ -11,6 +11,8 @@ version.h # no need to add this to repo
 *.so
 *.dll
 *.dylib
+debug/
+release/
 
 # Qt-es
 
@@ -54,4 +56,4 @@ debs
 .tx/
 
 # Auto-generated makefile
-Makefile
+Makefile*
