@@ -72,16 +72,22 @@ int main(int argc, char *argv[])
     if (defskin) a.setStyleSheet("QDialog { border: 2px ridge gray; }");
     a.setApplicationVersion(VERSION);
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
+
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    const QString &transpath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
+#else
+    const QString &transpath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+#endif
     QTranslator qtTran;
-    if (qtTran.load(QLocale::system(), "qt", "_", QLibraryInfo::location(QLibraryInfo::TranslationsPath))) {
+    if (qtTran.load(QLocale::system(), "qt", "_", transpath)) {
         a.installTranslator(&qtTran);
     }
     QTranslator qtBaseTran;
-    if (qtBaseTran.load("qtbase_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) {
+    if (qtBaseTran.load(QLocale::system(), "qtbase", "_", transpath)) {
         a.installTranslator(&qtBaseTran);
     }
     QTranslator appTran;
-    if (appTran.load(QString("gazelle-installer_") + QLocale::system().name(), "/usr/share/gazelle-installer/locale")) {
+    if (appTran.load(QLocale::system(), "gazelle-installer", "_", "/usr/share/gazelle-installer/locale")) {
         a.installTranslator(&appTran);
     }
 
