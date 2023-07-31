@@ -17,10 +17,6 @@
  * This file is part of the gazelle-installer.
 \***************************************************************************/
 #include <vector>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/statvfs.h>
-#include <QDebug>
 #include <QFileInfo>
 #include <QCryptographicHash>
 #include <QDirIterator>
