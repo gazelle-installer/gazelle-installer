@@ -20,6 +20,7 @@
 #define AUTOPART_H
 
 #include <QObject>
+#include <QStringList>
 #include "ui_meinstall.h"
 #include "passedit.h"
 #include "partman.h"
@@ -60,7 +61,7 @@ public:
     // Layout Builder
     void builderGUI(class PartMan::Device *drive) noexcept;
     long long buildLayout(long long rootFormatSize, bool crypto,
-        bool updateTree=true, class QStringList *volList=nullptr) noexcept;
+        bool updateTree=true, QStringList *volList=nullptr) noexcept;
     // Helpers
     static QString sizeString(long long size) noexcept;
 };

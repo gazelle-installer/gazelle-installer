@@ -238,7 +238,9 @@ void Oobe::buildServiceList(QSettings &appconf) noexcept
     gui.treeServices->header()->resizeSection(0,150);
 
     QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     services_desc.setIniCodec("UTF-8");
+#endif
 
     gui.textComputerName->setText(appconf.value("DEFAULT_HOSTNAME").toString());
     appconf.beginGroup("SERVICES");
@@ -330,7 +332,7 @@ QWidget *Oobe::validateComputerName() noexcept
     if (gui.textComputerName->text().isEmpty()) {
         QMessageBox::critical(master, master->windowTitle(), tr("Please enter a computer name."));
         return gui.textComputerName;
-    } else if (gui.textComputerName->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
+    } else if (gui.textComputerName->text().contains(QRegularExpression("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(master, master->windowTitle(),
             tr("Sorry, your computer name contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return gui.textComputerName;
@@ -339,7 +341,7 @@ QWidget *Oobe::validateComputerName() noexcept
     if (gui.textComputerDomain->text().isEmpty()) {
         QMessageBox::critical(master, master->windowTitle(), tr("Please enter a domain name."));
         return gui.textComputerDomain;
-    } else if (gui.textComputerDomain->text().contains(QRegExp("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
+    } else if (gui.textComputerDomain->text().contains(QRegularExpression("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
         QMessageBox::critical(master, master->windowTitle(),
                               tr("Sorry, your computer domain contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return gui.textComputerDomain;
@@ -486,7 +488,7 @@ QWidget *Oobe::validateUserInfo(bool automatic) noexcept
 {
     const QString &userName = gui.textUserName->text();
     // see if username is reasonable length
-    if (!userName.contains(QRegExp("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
+    if (!userName.contains(QRegularExpression("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
         QMessageBox::critical(master, master->windowTitle(),
             tr("The user name cannot contain special characters or spaces.\n"
                 "Please choose another name before proceeding."));

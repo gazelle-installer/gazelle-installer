@@ -56,6 +56,7 @@ void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall) noexcept
     });
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 void MProcess::setupChildProcess() noexcept
 {
     if (section && section->rootdir) {
@@ -63,6 +64,7 @@ void MProcess::setupChildProcess() noexcept
         if (chdir("/") != 0) exit(255);
     }
 }
+#endif
 
 inline bool MProcess::checkHalt()
 {
@@ -348,4 +350,17 @@ void MProcess::Section::setRoot(const char *newroot) noexcept
 {
     if (qstrcmp(newroot, rootdir)) proc.log(QString("Change root: ")+newroot, LOG_LOG);
     rootdir = newroot; // Might be different pointers to the same text.
+
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    if (qstrlen(rootdir) > 0) {
+        proc.setChildProcessModifier([this]() {
+            if (rootdir) {
+                if (chroot(rootdir) != 0) _exit(255);
+                if (chdir("/") != 0) _exit(255);
+            }
+        });
+    } else {
+        proc.setChildProcessModifier(nullptr);
+    }
+#endif
 }
