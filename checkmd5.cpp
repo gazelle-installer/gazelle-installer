@@ -16,6 +16,7 @@
  *
  * This file is part of the gazelle-installer.
 \***************************************************************************/
+#include <vector>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
@@ -52,7 +53,7 @@ void CheckMD5::check()
         QString path;
         QByteArray hash;
     };
-    QList<FileHash> hashes;
+    std::vector<FileHash> hashes;
     static const char *failmsg = QT_TR_NOOP("The installation media is corrupt.");
     // Obtain a list of MD5 hashes and their files.
     QDirIterator it(path, {"*.md5"}, QDir::Files);
@@ -71,7 +72,7 @@ void CheckMD5::check()
                 .path = it.path() + '/' + fname,
                 .hash = QByteArray::fromHex(line.section(' ', 0, 0, QString::SectionSkipEmpty).toUtf8())
             };
-            hashes.append(sfhash);
+            hashes.push_back(sfhash);
             btotal += QFileInfo(sfhash.path).size();
             qApp->processEvents();
         }
@@ -81,7 +82,7 @@ void CheckMD5::check()
     const size_t bufsize = 65536;
     std::unique_ptr<char[]> buf(new char[bufsize]);
     qint64 bprog = 0;
-    for(const FileHash &fh : hashes) {
+    for(const auto &fh : hashes) {
         auto logEntry = proc.log("Check MD5: " + fh.path, MProcess::LOG_EXEC);
         QFile file(fh.path);
         MProcess::Status status = MProcess::STATUS_OK;
