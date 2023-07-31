@@ -994,19 +994,21 @@ bool PartMan::checkTargetDrivesOK()
                 " but the tests indicate it will have a higher than average failure rate in the near future.");
     }
     if (!msg.isEmpty()) {
-        int ans;
+        QMessageBox msgbox(gui.boxMain);
+        msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+        msgbox.setDefaultButton(QMessageBox::Yes);
         msg += tr("If unsure, please exit the Installer and run GSmartControl for more information.") + "\n\n";
         if (!smartFail.isEmpty()) {
+            msgbox.setIcon(QMessageBox::Critical);
+            msgbox.setEscapeButton(QMessageBox::Yes);
             msg += tr("Do you want to abort the installation?");
-            ans = QMessageBox::critical(gui.boxMain, QString(), msg,
-                    QMessageBox::Yes|QMessageBox::Default|QMessageBox::Escape, QMessageBox::No);
-            if (ans == QMessageBox::Yes) return false;
         } else {
+            msgbox.setIcon(QMessageBox::Warning);
+            msgbox.setEscapeButton(QMessageBox::No);
             msg += tr("Do you want to continue?");
-            ans = QMessageBox::warning(gui.boxMain, QString(), msg,
-                    QMessageBox::Yes|QMessageBox::Default, QMessageBox::No|QMessageBox::Escape);
-            if (ans != QMessageBox::Yes) return false;
         }
+        msgbox.setText(msg);
+        if (msgbox.exec() != QMessageBox::Yes) return false;
     }
     return true;
 }
@@ -1945,8 +1947,8 @@ QString PartMan::Device::mappedDevice() const noexcept
     const Device *device = this;
     if (device->type == SUBVOLUME) device = device->parentItem;
     if (device->type == PARTITION) {
-        const QVariant &d = device->map;
-        if (!d.isNull()) return "/dev/mapper/" + d.toString();
+        const QString &d = device->map;
+        if (!d.isEmpty()) return "/dev/mapper/" + d;
     }
     return device->path;
 }
@@ -2308,7 +2310,6 @@ QSize PartMan::ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const 
 QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *widget = nullptr;
-    QComboBox *combo = nullptr;
     switch (index.column())
     {
     case PartMan::COL_SIZE:
@@ -2322,12 +2323,15 @@ QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOption
         }
         break;
     case PartMan::COL_USEFOR:
-        widget = combo = new QComboBox(parent);
-        combo->setEditable(true);
-        combo->setInsertPolicy(QComboBox::NoInsert);
-        combo->lineEdit()->setPlaceholderText("----");
+        {
+            QComboBox *combo = new QComboBox(parent);
+            combo->setEditable(true);
+            combo->setInsertPolicy(QComboBox::NoInsert);
+            combo->lineEdit()->setPlaceholderText("----");
+            widget = combo;
+        }
         break;
-    case PartMan::COL_FORMAT: widget = combo = new QComboBox(parent); break;
+    case PartMan::COL_FORMAT: widget = new QComboBox(parent); break;
     case PartMan::COL_PASS: widget = new QSpinBox(parent); break;
     case PartMan::COL_OPTIONS:
         {
@@ -2343,14 +2347,12 @@ QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOption
     assert(widget != nullptr);
     widget->setAutoFillBackground(true);
     widget->setFocusPolicy(Qt::StrongFocus);
-    if (combo) {
-        connect(combo, QOverload<int>::of(&QComboBox::activated), this, &ItemDelegate::emitCommit);
-    }
     return widget;
 }
 void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     PartMan::Device *device = static_cast<PartMan::Device*>(index.internalPointer());
+    QComboBox *combo = nullptr;
     switch (index.column())
     {
     case PartMan::COL_SIZE:
@@ -2362,7 +2364,7 @@ void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
         break;
     case PartMan::COL_USEFOR:
         {
-            QComboBox *combo = qobject_cast<QComboBox *>(editor);
+            combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
             combo->addItem("");
             QStringList &&uses = device->allowedUsesFor(false);
@@ -2378,7 +2380,7 @@ void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
         break;
     case PartMan::COL_FORMAT:
         {
-            QComboBox *combo = qobject_cast<QComboBox *>(editor);
+            combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
             const QStringList &formats = device->allowedFormats();
             assert(!formats.isEmpty());
@@ -2400,6 +2402,9 @@ void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
     case PartMan::COL_OPTIONS:
         qobject_cast<QLineEdit *>(editor)->setText(device->options);
         break;
+    }
+    if (combo) {
+        connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ItemDelegate::emitCommit);
     }
 }
 void PartMan::ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const

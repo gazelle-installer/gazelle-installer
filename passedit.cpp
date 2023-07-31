@@ -19,10 +19,10 @@
 
 #include <algorithm>
 #include <random>
+#include <vector>
 #include <QApplication>
 #include <QContextMenuEvent>
 #include <QMenu>
-#include <QStringList>
 #include <QString>
 #include <QFile>
 #include <QDebug>
@@ -30,9 +30,9 @@
 #include "passedit.h"
 
 // Password generator parameters applicable accross every PassEdit instance.
-static const int GEN_WORD_MAX       = 6;    // Maximum number of characters per word.
-static const int GEN_NUMBER_MAX     = 999;  // Numbers will go from 0 to GEN_NUMBER_MAX without duplicates.
-static const int GEN_WORD_NUM_RATIO = 3;    // Ratio N:1 of words to numbers (if less than GEN_NUMBER_MAX).
+static const qsizetype GEN_WORD_MAX     = 6;    // Maximum number of characters per word.
+static const size_t GEN_NUMBER_MAX      = 999;  // Numbers will go from 0 to GEN_NUMBER_MAX without duplicates.
+static const size_t GEN_WORD_NUM_RATIO  = 3;    // Ratio N:1 of words to numbers (if less than GEN_NUMBER_MAX).
 
 PassEdit::PassEdit(QLineEdit *master, QLineEdit *slave, int min, QObject *parent) noexcept
     : QObject(parent), master(master), slave(slave), min(min)
@@ -63,36 +63,35 @@ PassEdit::PassEdit(QLineEdit *master, QLineEdit *slave, int min, QObject *parent
 
 void PassEdit::generate() noexcept
 {
-    static QStringList words;
-    static int pos;
-    if (words.isEmpty()) {
+    static std::vector<QString> words;
+    static size_t pos;
+    if (words.empty()) {
         QFile file("/usr/share/dict/words");
         if (file.open(QFile::ReadOnly | QFile::Text)) {
             while (!file.atEnd()) {
                 const QByteArray &word = file.readLine().trimmed();
-                if (word.size() <= GEN_WORD_MAX) words.append(word);
+                if (word.size() <= GEN_WORD_MAX) words.emplace_back(word);
             }
             file.close();
         }
-        if (words.isEmpty()) return;
-        for (int i = std::min(GEN_NUMBER_MAX, (words.count()/GEN_WORD_NUM_RATIO)-1); i >= 0; --i) {
-            words.append(QString::number(i));
+        if (words.empty()) return;
+        for (int i = std::min(GEN_NUMBER_MAX, (words.size()/GEN_WORD_NUM_RATIO)-1); i >= 0; --i) {
+            words.push_back(QString::number(i));
         }
-        pos = words.count();
+        pos = words.size();
     }
     gentext.clear();
     double entropy = 0;
     const int genmax = master->maxLength();
     do {
-        if (pos >= words.count()) {
+        if (pos >= words.size()) {
             std::random_device randev;
             std::shuffle(words.begin(), words.end(), std::default_random_engine(randev()));
             pos = 0;
         }
-        const QString &word = words.at(pos);
         const int origlen = gentext.length();
         if (origlen) gentext.append(' ');
-        gentext.append(word);
+        gentext.append(words[pos]);
         if (gentext.length() > genmax) {
             gentext.truncate(origlen);
             break;
