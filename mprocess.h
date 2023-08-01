@@ -54,7 +54,7 @@ public:
     bool halted() const noexcept { return halting!=NO_HALT; }
     // User interface
     static QString joinCommand(const QString &program, const QStringList &arguments) noexcept;
-    class QListWidgetItem *log(const QString &text, const enum LogType type = LOG_LOG) noexcept;
+    class QListWidgetItem *log(const QString &text, const enum LogType type = LOG_LOG, bool save = true) noexcept;
     void log(class QListWidgetItem *entry, enum Status status = STATUS_OK) noexcept;
     void status(const QString &text, long progress = -1) noexcept;
     void status(long progress = -1) noexcept;
