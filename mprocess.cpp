@@ -202,12 +202,14 @@ QString MProcess::joinCommand(const QString &program, const QStringList &argumen
     return text;
 }
 
-QListWidgetItem *MProcess::log(const QString &text, const LogType type) noexcept
+QListWidgetItem *MProcess::log(const QString &text, const LogType type, bool save) noexcept
 {
-    if (type == LOG_LOG) qDebug().noquote() << text;
-    else if (type == LOG_MARKER) qDebug().noquote() << "<<" << text << ">>";
-    else if (type == LOG_STATUS) qDebug().noquote() << "++" << text << "++";
-    else if (type == LOG_FAIL) qDebug().noquote() << "--" << text << "--";
+    if (save) {
+        if (type == LOG_MARKER) qDebug().noquote() << "<<" << text << ">>";
+        else if (type == LOG_STATUS) qDebug().noquote() << "++" << text << "++";
+        else if (type == LOG_FAIL) qDebug().noquote() << "--" << text << "--";
+        else qDebug().noquote() << text;
+    }
     if (!logView || type == LOG_MARKER) return nullptr;
     QListWidgetItem *entry = new QListWidgetItem(text, logView);
     logView->addItem(entry);

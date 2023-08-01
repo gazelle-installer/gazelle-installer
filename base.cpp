@@ -248,7 +248,7 @@ void Base::copyLinux(bool skiphome)
 
     const QString &joined = MProcess::joinCommand(prog, args);
     qDebug().noquote() << "Exec COPY:" << joined;
-    QListWidgetItem *logEntry = proc.log(joined, MProcess::LOG_EXEC);
+    QListWidgetItem *logEntry = proc.log(joined, MProcess::LOG_EXEC, false);
 
     QEventLoop eloop;
     QObject::connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &eloop, &QEventLoop::quit);
