@@ -7,8 +7,8 @@ TARGET = minstall
 CONFIG += debug_and_release warn_on strict_c++ c++17
 CONFIG(release, debug|release) {
     DEFINES += NDEBUG
-    QMAKE_CXXFLAGS += -flto
-    QMAKE_LFLAGS += -flto
+    QMAKE_CXXFLAGS += -flto=auto
+    QMAKE_LFLAGS += -flto=auto
 }
 TRANSLATIONS += translations/gazelle-installer_af.ts \
                 translations/gazelle-installer_am.ts \
