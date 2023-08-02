@@ -95,13 +95,13 @@ bool MProcess::exec(const QString &program, const QStringList &arguments,
             const QByteArray &StdOut = readAllStandardOutput();
             if (!StdOut.isEmpty()) {
                 qDebug().nospace() << "SOut #" << execount << ": " << StdOut;
-                hasOut = 1;
+                hasOut = true;
             }
         }
         const QByteArray &StdErr = readAllStandardError();
         if (!StdErr.isEmpty()) {
             qDebug().nospace() << "SErr #" << execount << ": " << StdErr;
-            hasOut = 1;
+            hasOut = true;
         }
         if (hasOut) {
             QFont logFont = logEntry->font();
