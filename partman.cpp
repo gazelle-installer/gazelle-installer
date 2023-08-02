@@ -60,9 +60,6 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     brave = appArgs.isSet("brave");
     gptoverride = appArgs.isSet("gpt-override");
 
-    // TODO: Eliminate when MX Boot Repair is fixed.
-    goodluks = appArgs.isSet("good-luks") || appConf.value("GOOD_LUKS", true).toBool();
-
     gui.treePartitions->setModel(this);
     gui.treePartitions->setItemDelegate(new ItemDelegate);
     gui.treePartitions->header()->setMinimumSectionSize(5);
@@ -1219,12 +1216,6 @@ void PartMan::luksFormat()
         proc.exec("cryptsetup", {"--batch-mode", "--key-size=512",
             "--hash=sha512", "luksFormat", part->path}, &encPass);
         proc.status();
-
-        // TODO: Eliminate when MX Boot Repair is fixed.
-        if (!goodluks && part->map.isEmpty() && part->usefor == "/") {
-            part->map = "root.fsm";
-        }
-
         luksOpen(part, encPass);
     }
 }
