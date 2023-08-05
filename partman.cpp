@@ -955,7 +955,7 @@ bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
 
 // Checks SMART status of the selected drives.
 // Returns false if it detects errors and user chooses to abort.
-bool PartMan::checkTargetDrivesOK()
+bool PartMan::checkTargetDrivesOK() const
 {
     MProcess::Section sect(proc, nullptr); // No exception on execution error for this block.
     QString smartFail, smartWarn;
