@@ -53,7 +53,7 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     const QString &projShort = appConf.value("PROJECT_SHORTNAME").toString();
     volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
     volSpecs["/boot"] = {"boot"};
-    volSpecs["/boot/efi"] = {"EFI-SYSTEM"};
+    volSpecs["/boot/efi"] = volSpecs["ESP"] = {"EFI-SYSTEM"};
     volSpecs["/"] = {"root" + projShort + appConf.value("VERSION").toString()};
     volSpecs["/home"] = {"home" + projShort};
     volSpecs["SWAP"] = {"swap" + projShort};
@@ -734,6 +734,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         }
         QString mount = volume->usefor;
         if (mount.isEmpty()) continue;
+        if (mount == "ESP") mount = "/boot/efi";
         if (!mount.startsWith("/") && !volume->allowedUsesFor().contains(mount)) {
             QMessageBox::critical(gui.boxMain, QString(),
                 tr("Invalid use for %1: %2").arg(volume->shownDevice(), mount));
@@ -2130,7 +2131,7 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
             if (drive) drive->driveAutoSetActive();
         }
         if (type == SUBVOLUME && usefor == "/") setActive(true);
-        if (usefor == "/boot/efi") flags.sysEFI = true;
+        if (usefor == "ESP" || usefor == "/boot/efi") flags.sysEFI = true;
 
         if (encrypt & !canEncrypt()) {
             encrypt = false;
@@ -2358,11 +2359,7 @@ void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
             combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
             combo->addItem("");
-            QStringList &&uses = device->allowedUsesFor(false);
-            for (QString &use : uses) {
-                if (use == "/boot/efi") use = "ESP";
-            }
-            combo->addItems(uses);
+            combo->addItems(device->allowedUsesFor(false));
             combo->setCurrentText(device->usefor);
         }
         break;
@@ -2418,7 +2415,6 @@ void PartMan::ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
         device->usefor = qobject_cast<QComboBox *>(editor)->currentText().trimmed();
         // Convert user-friendly entries to real mounts.
         if (!device->usefor.startsWith('/')) device->usefor = device->usefor.toUpper();
-        if (device->usefor == "ESP") device->usefor = "/boot/efi";
         break;
     case PartMan::COL_LABEL:
         device->label = qobject_cast<QLineEdit *>(editor)->text().trimmed();
