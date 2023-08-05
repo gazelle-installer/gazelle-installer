@@ -337,25 +337,16 @@ void MInstall::setupAutoMount(bool enabled)
     autoMountEnabled = enabled;
 }
 
-// Installation simulation
-bool MInstall::pretendToInstall(int space, long steps) noexcept
-{
-    proc.advance(space, steps);
-    proc.status(tr("Pretending to install %1").arg(PROJECTNAME));
-    for (long ixi = 0; ixi < steps; ++ixi) {
-        proc.sleep(100, true);
-        proc.status();
-        if (proc.halted()) return false;
-    }
-    return true;
-}
-
 // process the next phase of installation if possible
-bool MInstall::processNextPhase() noexcept
+void MInstall::processNextPhase() noexcept
 {
     try {
         widgetStack->setEnabled(true);
         if (proc.halted()) throw ""; // Abortion
+        if (pretend) {
+            pretendNextPhase();
+            return;
+        }
         if (!modeOOBE && phase == PH_READY) { // no install started yet
             phase = PH_PREPARING;
             proc.advance(-1, -1);
@@ -363,20 +354,15 @@ bool MInstall::processNextPhase() noexcept
 
             setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
 
-            if (!partman->checkTargetDrivesOK()) return false;
+            if (!partman->checkTargetDrivesOK()) return;
             autoMountEnabled = true; // disable auto mount by force
-            if (!pretend) setupAutoMount(false);
+            setupAutoMount(false);
 
             // the core of the installation
             phase = PH_INSTALLING;
-            if (!pretend) {
-                proc.advance(11, partman->countPrepSteps());
-                partman->prepStorage();
-                base->install();
-            } else {
-                if (!pretendToInstall(14, 100)) throw "";
-                if (!pretendToInstall(80, 100)) throw "";
-            }
+            proc.advance(11, partman->countPrepSteps());
+            partman->prepStorage();
+            base->install();
             if (widgetStack->currentWidget() != pageProgress) {
                 progInstall->setEnabled(false);
                 // Using proc.status() prepends the percentage to the text.
@@ -390,29 +376,27 @@ bool MInstall::processNextPhase() noexcept
             phase = PH_CONFIGURING;
             progInstall->setEnabled(true);
             pushBack->setEnabled(false);
-            if (!pretend) {
-                proc.advance(1, 1);
-                proc.status(tr("Setting system configuration"));
-                if (oem) oobe->enable();
-                oobe->process();
-                manageConfig(CONFIG_SAVE);
-                proc.exec("sync"); // the sync(2) system call will block the GUI
-                QStringList grubextra;
-                swapman->install(grubextra);
-                bootman->install(grubextra);
-            } else if (!pretendToInstall(5, 100)) {
-                throw "";
-            }
+
+            proc.advance(1, 1);
+            proc.status(tr("Setting system configuration"));
+            if (oem) oobe->enable();
+            oobe->process();
+            manageConfig(CONFIG_SAVE);
+            proc.exec("sync"); // the sync(2) system call will block the GUI
+            QStringList grubextra;
+            swapman->install(grubextra);
+            bootman->install(grubextra);
+
             proc.advance(1, 1);
             proc.status(tr("Cleaning up"));
             cleanup();
 
             phase = PH_FINISHED;
             proc.status(tr("Finished"));
-            if (!pretend && appArgs.isSet("reboot")) {
+            if (appArgs.isSet("reboot")) {
                 proc.shell("/usr/local/bin/persist-config --shutdown --command reboot &");
             }
-            if (!pretend && appArgs.isSet("poweroff")) {
+            if (appArgs.isSet("poweroff")) {
                 proc.shell("/usr/local/bin/persist-config --shutdown --command poweroff &");
             }
             gotoPage(Step::END);
@@ -422,10 +406,7 @@ bool MInstall::processNextPhase() noexcept
             phase = PH_OUT_OF_BOX;
             labelSplash->setText(tr("Configuring sytem. Please wait."));
             gotoPage(Step::SPLASH);
-
-            if (!pretend) oobe->process();
-            else if (!pretendToInstall(1, 100)) throw "";
-
+            oobe->process();
             phase = PH_FINISHED;
             labelSplash->setText(tr("Configuration complete. Restarting system."));
             proc.exec("/usr/sbin/reboot");
@@ -447,17 +428,31 @@ bool MInstall::processNextPhase() noexcept
 
         abortion = AB_ABORTED;
         abortEndUI(closing);
-        return false;
     }
+}
 
-    return true;
+void MInstall::pretendNextPhase() noexcept
+{
+    if (phase == PH_READY) {
+        if (modeOOBE) phase = PH_FINISHED;
+        else {
+            phase = PH_INSTALLING;
+            proc.status(tr("Pretending to install %1").arg(PROJECTNAME));
+            phase = PH_WAITING_FOR_INFO;
+        }
+    }
+    if (phase == PH_WAITING_FOR_INFO && widgetStack->currentWidget() == pageProgress) {
+        manageConfig(CONFIG_SAVE);
+        phase = PH_FINISHED;
+        gotoPage(Step::END);
+    }
 }
 
 void MInstall::manageConfig(enum ConfigAction mode) noexcept
 {
     if (mode == CONFIG_SAVE) {
         delete config;
-        config = new MSettings("/mnt/antiX/etc/minstall.conf", this);
+        config = new MSettings(pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf", this);
     }
     if (!config) return;
     config->bad = false;
@@ -509,7 +504,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         oobe->manageConfig(*config, false);
     }
 
-    if (mode == CONFIG_SAVE) {
+    if (mode == CONFIG_SAVE && !pretend) {
         config->sync();
         QFile::remove("/etc/minstalled.conf");
         QFile::copy(config->fileName(), "/etc/minstalled.conf");
