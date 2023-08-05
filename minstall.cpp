@@ -353,8 +353,7 @@ void MInstall::processNextPhase() noexcept
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
 
             setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
-
-            if (!partman->checkTargetDrivesOK()) return;
+            if (!partman->checkTargetDrivesOK()) throw "";
             autoMountEnabled = true; // disable auto mount by force
             setupAutoMount(false);
 
