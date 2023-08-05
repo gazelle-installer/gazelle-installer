@@ -29,9 +29,6 @@ public:
     MInstall(class QSettings &acfg, const class QCommandLineParser &args, const QString &cfgfile) noexcept;
     ~MInstall();
 
-    // helpers
-    bool processNextPhase() noexcept;
-
     QString PROJECTFORUM;
     QString PROJECTNAME;
     QString PROJECTSHORTNAME;
@@ -116,7 +113,8 @@ private:
     // private functions
     void setupZRam();
     void setupAutoMount(bool enabled);
-    bool pretendToInstall(int space, long steps) noexcept;
+    void processNextPhase() noexcept;
+    void pretendNextPhase() noexcept;
     void manageConfig(enum ConfigAction mode) noexcept;
     bool eventFilter(QObject *watched, QEvent *event) noexcept;
 };
