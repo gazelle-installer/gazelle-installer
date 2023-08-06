@@ -136,8 +136,7 @@ void PartMan::scan(Device *drvstart)
         drive->name = jdName;
         drive->path = jdPath;
         const QString &ptType = jsonDrive["pttype"].toString();
-        drive->flags.curGPT = (ptType == "gpt");
-        drive->flags.curMBR = (ptType == "dos");
+        drive->format = drive->curFormat = ptType.toUpper();
         drive->flags.rotational = jsonDrive["rota"].toBool();
         drive->discgran = jsonDrive["disc-gran"].toInt();
         drive->size = jsonDrive["size"].toVariant().toLongLong();
@@ -290,7 +289,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
         config.beginGroup("Storage." + drive->name);
         if (save) {
             if (!drvPreserve) {
-                config.setValue("Format", drive->willUseGPT() ? "GPT" : "DOS");
+                config.setValue("Format", drive->format);
                 config.setValue("Partitions", static_cast<uint>(partCount));
             }
         } else if (config.contains("Format")) {
@@ -425,8 +424,9 @@ void PartMan::treeSelChange() noexcept
         if (!drive) drive = seldev;
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else {
+            const size_t maxparts = (drive->format == "DOS") ? 4 : PARTMAN_MAX_PARTS;
             gui.pushPartAdd->setEnabled(seldev->driveFreeSpace(true) > 1*MB
-                && !isold && drive->children.size() < PARTMAN_MAX_PARTS);
+                && !isold && drive->children.size() < maxparts);
         }
     } else {
         gui.pushPartClear->setEnabled(false);
@@ -777,8 +777,7 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         QString details;
         for (const Device *drive : std::as_const(root->children)) {
             if (!drive->flags.oldLayout && drive->type != Device::VIRTUAL_DEVICES) {
-                const char *pttype = drive->willUseGPT() ? "GPT" : "MBR";
-                details += tr("Prepare %1 partition table on %2").arg(pttype, drive->name) + '\n';
+                details += tr("Prepare %1 partition table on %2").arg(drive->format, drive->name) + '\n';
             }
             for (const Device *part : std::as_const(drive->children)) {
                 QString actmsg;
@@ -938,7 +937,7 @@ bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
         }
         // Potentially unbootable GPT when on a BIOS-based PC.
         const bool hasBoot = (drive->active != nullptr);
-        if (!proc.detectEFI() && drive->willUseGPT() && hasBoot && !hasBiosGrub) {
+        if (!proc.detectEFI() && drive->format=="GPT" && hasBoot && !hasBiosGrub) {
             biosgpt += ' ' + drive->name;
         }
     }
@@ -1141,7 +1140,7 @@ void PartMan::preparePartitions()
         const long long offset = (drive->size - 4*MB) / gran; // floor
         proc.exec("blkdiscard", {opts, "-o", QString::number(offset*gran), drive->path});
 
-        proc.exec("parted", {"-s", drive->path, "mklabel", (drive->willUseGPT() ? "gpt" : "msdos")});
+        proc.exec("parted", {"-s", drive->path, "mklabel", (drive->format=="GPT" ? "gpt" : "msdos")});
     }
 
     // Prepare partition tables, creating tables and partitions when needed.
@@ -1150,7 +1149,7 @@ void PartMan::preparePartitions()
         bool partupdate = false;
         if (drive->type == Device::VIRTUAL_DEVICES) continue;
         const int devCount = drive->children.size();
-        const bool useGPT = drive->willUseGPT();
+        const bool useGPT = (drive->finalFormat() == "GPT");
         if (drive->flags.oldLayout) {
             // Using existing partitions.
             QString cmd; // command to set the partition type
@@ -1563,10 +1562,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
             else return device->curLabel;
             break;
         case COL_FORMAT:
-            if (device->type == Device::DRIVE) {
-                if (device->willUseGPT()) return "GPT";
-                else if (device->flags.curMBR || !device->flags.oldLayout) return "MBR";
-            } else if (device->type == Device::SUBVOLUME) {
+            if (device->type == Device::DRIVE || device->type == Device::SUBVOLUME) {
                 return device->shownFormat(device->format);
             } else {
                 if (device->usefor.isEmpty()) return device->curFormat;
@@ -1622,10 +1618,9 @@ bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
         case COL_CHECK: device->chkbadblk = (value == Qt::Checked); break;
         case COL_DUMP: device->dump = (value == Qt::Checked); break;
         }
-        const int changed = changeEnd(false);
-        device->autoFill(changed);
-        if (changed) notifyChange(device);
-        else emit dataChanged(index, index);
+        if (!changeEnd(true, true)) {
+            emit dataChanged(index, index);
+        }
     }
     return true;
 }
@@ -1751,7 +1746,7 @@ bool PartMan::changeBegin(Device *device) noexcept
     changing = device;
     return true;
 }
-int PartMan::changeEnd(bool notify) noexcept
+int PartMan::changeEnd(bool autofill, bool notify) noexcept
 {
     if (!changing) return false;
     int changed = 0;
@@ -1775,7 +1770,7 @@ int PartMan::changeEnd(bool notify) noexcept
         if (!allowed.contains(changing->format)) changing->format = allowed.at(0);
         changed |= (1 << COL_ENCRYPT);
     }
-    if (changing->format != root->format || changing->usefor != root->usefor) {
+    if (changing->type != Device::DRIVE && (changing->format != root->format || changing->usefor != root->usefor)) {
         changing->dump = false;
         changing->pass = 2;
         if (changing->usefor.isEmpty() || changing->usefor == "FORMAT") {
@@ -1791,9 +1786,17 @@ int PartMan::changeEnd(bool notify) noexcept
                 notifyChange(cdevice);
             }
         }
-        if (changing->format != root->format) changed |= (1 << COL_FORMAT);
     }
-    if (changed && notify) notifyChange(changing);
+    if (changing->format != root->format) {
+        changed |= (1 << COL_FORMAT);
+    }
+
+    if (autofill) {
+        changing->autoFill(changed);
+    }
+    if (changed && notify) {
+        notifyChange(changing);
+    }
     changing = nullptr;
     return changed;
 }
@@ -1816,6 +1819,11 @@ PartMan::Device::Device(enum DeviceType type, Device *parent, Device *preceding)
     if (type == SUBVOLUME) size = parent->size;
     else if (type == PARTITION) size = 1*MB;
     physec = parent->physec;
+    if (parent->children.size() == 0 && parent->format.isEmpty()) {
+        // Starting with a completely blank layout.
+        parent->flags.oldLayout = false;
+        parent->format = parent->allowedFormats().value(0);
+    }
     const int i = preceding ? (parentItem->indexOfChild(preceding) + 1) : parentItem->children.size();
     partman.beginInsertRows(partman.index(parent), i, i);
     parent->children.insert(std::next(parent->children.begin(), i), this);
@@ -1907,14 +1915,6 @@ bool PartMan::Device::isLocked() const noexcept
     }
     return (mapCount != 0); // In use by at least one virtual device.
 }
-bool PartMan::Device::willUseGPT() const noexcept
-{
-    if (type != DRIVE) return false;
-    if (flags.oldLayout) return flags.curGPT;
-    else if (size >= 2*TB || children.size() > 4) return true;
-    else return (partman.gptoverride || partman.proc.detectEFI());
-    return false;
-}
 bool PartMan::Device::willFormat() const noexcept
 {
     return format != "PRESERVE" && !usefor.isEmpty();
@@ -1969,8 +1969,8 @@ QStringList PartMan::Device::allowedUsesFor(bool all) const noexcept
     if (type != SUBVOLUME) {
         checkAndAdd("FORMAT");
         if (type != VIRTUAL) {
-            if (all || size <= 1*MB) {
-                if (parentItem && parentItem->willUseGPT()) checkAndAdd("BIOS-GRUB");
+            if ((all || size <= 1*MB) && parentItem && parentItem->format == "GPT") {
+                checkAndAdd("BIOS-GRUB");
             }
             if (all || size <= 8*GB) {
                 if (size < (2*TB - 512)) {
@@ -1998,6 +1998,18 @@ QStringList PartMan::Device::allowedUsesFor(bool all) const noexcept
 QStringList PartMan::Device::allowedFormats() const noexcept
 {
     QStringList list;
+    if (type == DRIVE && !flags.oldLayout) {
+        list.append("GPT");
+        if (size < 2*TB && children.size() <= 4) {
+            if (partman.gptoverride || partman.proc.detectEFI()) {
+                list.append("DOS");
+            } else {
+                list.prepend("DOS");
+            }
+        }
+        return list;
+    }
+
     bool allowPreserve = false;
     if (isVolume()) {
         if (usefor.isEmpty()) return QStringList();
@@ -2041,7 +2053,7 @@ QStringList PartMan::Device::allowedFormats() const noexcept
 QString PartMan::Device::finalFormat() const noexcept
 {
     if (type == SUBVOLUME) return parentItem->format;
-    return (usefor.isEmpty() || format == "PRESERVE") ? curFormat : format;
+    return (type != DRIVE && (usefor.isEmpty() || format == "PRESERVE")) ? curFormat : format;
 }
 QString PartMan::Device::shownFormat(const QString &fmt) const noexcept
 {
@@ -2083,7 +2095,7 @@ PartMan::Device *PartMan::Device::addPart(long long defaultSize, const QString &
 void PartMan::Device::driveAutoSetActive() noexcept
 {
     if (active) return;
-    if (partman.proc.detectEFI() && willUseGPT()) return;
+    if (partman.proc.detectEFI() && format=="GPT") return;
     // Cannot use partman.mounts map here as it may not be populated.
     for (const QString &pref : QStringList({"/boot", "/"})) {
         for (PartMan::Iterator it(this); Device *device = *it; it.next()) {
@@ -2183,8 +2195,7 @@ void PartMan::Device::labelParts() noexcept
 void PartMan::Device::addToCombo(QComboBox *combo, bool warnNasty) const noexcept
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
-    if (!curFormat.isEmpty()) strout += ' ' + curFormat;
-    else if (!format.isEmpty()) strout += ' ' + format;
+    strout += ' ' + finalFormat();
     if (!label.isEmpty()) strout += " - " + label;
     if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
     QString stricon;
@@ -2302,6 +2313,7 @@ QSize PartMan::ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const 
 QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *widget = nullptr;
+    QComboBox *combo = nullptr;
     switch (index.column())
     {
     case PartMan::COL_SIZE:
@@ -2315,15 +2327,12 @@ QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOption
         }
         break;
     case PartMan::COL_USEFOR:
-        {
-            QComboBox *combo = new QComboBox(parent);
-            combo->setEditable(true);
-            combo->setInsertPolicy(QComboBox::NoInsert);
-            combo->lineEdit()->setPlaceholderText("----");
-            widget = combo;
-        }
+        widget = combo = new QComboBox(parent);
+        combo->setEditable(true);
+        combo->setInsertPolicy(QComboBox::NoInsert);
+        combo->lineEdit()->setPlaceholderText("----");
         break;
-    case PartMan::COL_FORMAT: widget = new QComboBox(parent); break;
+    case PartMan::COL_FORMAT: widget = combo = new QComboBox(parent); break;
     case PartMan::COL_PASS: widget = new QSpinBox(parent); break;
     case PartMan::COL_OPTIONS:
         {
@@ -2336,6 +2345,9 @@ QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOption
         break;
     default: widget = new QLineEdit(parent);
     }
+    if (combo) {
+        connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ItemDelegate::emitCommit);
+    }
     assert(widget != nullptr);
     widget->setAutoFillBackground(true);
     widget->setFocusPolicy(Qt::StrongFocus);
@@ -2344,7 +2356,7 @@ QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOption
 void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     PartMan::Device *device = static_cast<PartMan::Device*>(index.internalPointer());
-    QComboBox *combo = nullptr;
+    editor->blockSignals(true);
     switch (index.column())
     {
     case PartMan::COL_SIZE:
@@ -2356,7 +2368,7 @@ void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
         break;
     case PartMan::COL_USEFOR:
         {
-            combo = qobject_cast<QComboBox *>(editor);
+            QComboBox *combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
             combo->addItem("");
             combo->addItems(device->allowedUsesFor(false));
@@ -2368,7 +2380,7 @@ void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
         break;
     case PartMan::COL_FORMAT:
         {
-            combo = qobject_cast<QComboBox *>(editor);
+            QComboBox *combo = qobject_cast<QComboBox *>(editor);
             combo->clear();
             const QStringList &formats = device->allowedFormats();
             assert(!formats.isEmpty());
@@ -2391,9 +2403,7 @@ void PartMan::ItemDelegate::setEditorData(QWidget *editor, const QModelIndex &in
         qobject_cast<QLineEdit *>(editor)->setText(device->options);
         break;
     }
-    if (combo) {
-        connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ItemDelegate::emitCommit);
-    }
+    editor->blockSignals(false);
 }
 void PartMan::ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
@@ -2429,9 +2439,7 @@ void PartMan::ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
         device->options = qobject_cast<QLineEdit *>(editor)->text().trimmed();
         break;
     }
-    const int changed = partman->changeEnd(false);
-    device->autoFill(changed);
-    if (changed) partman->notifyChange(device);
+    partman->changeEnd(true, true);
 }
 void PartMan::ItemDelegate::emitCommit() noexcept
 {
