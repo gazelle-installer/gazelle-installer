@@ -58,7 +58,6 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     volSpecs["/home"] = {"home" + projShort};
     volSpecs["SWAP"] = {"swap" + projShort};
     brave = appArgs.isSet("brave");
-    gptoverride = appArgs.isSet("gpt-override");
 
     gui.treePartitions->setModel(this);
     gui.treePartitions->setItemDelegate(new ItemDelegate);
@@ -2001,7 +2000,7 @@ QStringList PartMan::Device::allowedFormats() const noexcept
     if (type == DRIVE && !flags.oldLayout) {
         list.append("GPT");
         if (size < 2*TB && children.size() <= 4) {
-            if (partman.gptoverride || partman.proc.detectEFI()) {
+            if (partman.proc.detectEFI()) {
                 list.append("DOS");
             } else {
                 list.prepend("DOS");
