@@ -253,7 +253,7 @@ long long AutoPart::buildLayout(long long rootFormatSize, bool crypto,
         if (updateTree) drvitem->addPart(256*MB, "ESP", crypto);
         if (volList) volList->append("ESP");
         remaining -= 256*MB;
-    } else if (drvitem->willUseGPT()) {
+    } else if (drvitem->format == "GPT") {
         if (updateTree) drvitem->addPart(1*MB, "BIOS-GRUB", crypto);
         if (volList) volList->append("BIOS-GRUB");
         remaining -= 1*MB;

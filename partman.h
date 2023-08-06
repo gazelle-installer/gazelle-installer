@@ -144,7 +144,7 @@ private:
     inline int columnCount(const QModelIndex &) const noexcept override { return TREE_COLUMNS; }
 public:
     bool changeBegin(Device *device) noexcept;
-    int changeEnd(bool notify = true) noexcept;
+    int changeEnd(bool autofill = true, bool notify = true) noexcept;
     void notifyChange(class Device *device, int first = -1, int last = -1) noexcept;
 };
 
@@ -168,8 +168,6 @@ public:
         bool curEmpty : 1;
         bool oldLayout : 1;
         bool bootRoot : 1;
-        bool curMBR : 1;
-        bool curGPT : 1;
         bool curESP : 1;
         bool volCrypto : 1;
         bool sysEFI : 1;
@@ -205,7 +203,6 @@ public:
     void setActive(bool on) noexcept;
     bool isActive() const noexcept;
     bool isLocked() const noexcept;
-    bool willUseGPT() const noexcept;
     bool willFormat() const noexcept;
     bool canEncrypt() const noexcept;
     bool willEncrypt() const noexcept;
