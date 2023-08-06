@@ -292,6 +292,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                 config.setValue("Partitions", static_cast<uint>(partCount));
             }
         } else if (config.contains("Format")) {
+            drive->format = config.value("Format").toString();
             drvPreserve = false;
             drive->clear();
             partCount = config.value("Partitions").toUInt();
