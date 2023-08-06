@@ -424,7 +424,7 @@ void PartMan::treeSelChange() noexcept
         if (!islocked && isold && isdrive) gui.pushPartAdd->setEnabled(false);
         else {
             const size_t maxparts = (drive->format == "DOS") ? 4 : PARTMAN_MAX_PARTS;
-            gui.pushPartAdd->setEnabled(seldev->driveFreeSpace(true) > 1*MB
+            gui.pushPartAdd->setEnabled(seldev->driveFreeSpace(true) >= 1*MB
                 && !isold && drive->children.size() < maxparts);
         }
     } else {
