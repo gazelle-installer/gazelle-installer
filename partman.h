@@ -103,7 +103,7 @@ private:
     class Device *root = nullptr;
     class Device *changing = nullptr;
     Ui::MeInstall &gui;
-    bool brave, gptoverride;
+    bool brave;
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit() noexcept;
     void preparePartitions();

@@ -106,9 +106,6 @@ int main(int argc, char *argv[])
             "The installer will not write any passwords or ignored settings to the new configuration file.\n"
             "Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.")},
         {{"f", "poweroff"}, QObject::tr("Shutdown automatically when done installing.")},
-        {"gpt-override", QObject::tr("Always use GPT when doing a whole-drive installation regardlesss of capacity.\n"
-            "Without this option, GPT will only be used on drives with at least 2TB capacity.\n"
-            "GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.")},
         {{"m", "mount-keep"}, QObject::tr("Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.")},
         {"nocopy", QObject::tr("Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.")},
         {{"o", "oem"}, QObject::tr("Install the operating system, delaying prompts for user-specific options until the first reboot.\n"
