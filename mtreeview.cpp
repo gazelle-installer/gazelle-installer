@@ -104,7 +104,12 @@ void MTreeView::drawRow(QPainter *painter,
     color.setAlpha(128);
     QPen pen = painter->pen();
     pen.setColor(color);
-    pen.setStyle(Qt::DashDotDotLine);
+    pen.setDashPattern({3, 5});
+    int rowindent = 0;
+    for (QModelIndex in = index; in.isValid(); in = in.parent()) {
+        rowindent += indentation();
+    }
+    pen.setDashOffset(rowindent);
     pen.setJoinStyle(Qt::MiterJoin);
     if (gridon && !isFirstColumnSpanned(index.row(), index.parent())) {
         painter->save();

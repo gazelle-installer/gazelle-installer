@@ -1571,11 +1571,9 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
             break;
         case COL_OPTIONS:
             if (device->canMount(false)) return device->options;
-            else if (!isDriveOrVD) return "--------";
             break;
         case COL_PASS:
             if (device->canMount()) return device->pass;
-            else if (!isDriveOrVD) return "--";
             break;
         }
     } else if (role == Qt::ToolTipRole) {
@@ -1586,8 +1584,7 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
             else return device->path + "\n(" + device->origin->name + ')';
             break;
         case COL_SIZE:
-            if (device->type == Device::SUBVOLUME) return "----";
-            else if (device->type == Device::DRIVE) {
+            if (device->type == Device::DRIVE) {
                 long long fs = device->driveFreeSpace();
                 if (fs <= 0) fs = 0;
                 return tr("Free space: %1").arg(QLocale::system().formattedDataSize(fs,
