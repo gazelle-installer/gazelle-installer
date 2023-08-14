@@ -42,37 +42,37 @@ Minimum: %2</translation>
 <context>
     <name>Base</name>
     <message>
-        <location filename="../base.cpp" line="56"/>
+        <location filename="../base.cpp" line="55"/>
         <source>Cannot access installation media.</source>
         <translation>Mangler tilgang til installasjonsmediet.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="156"/>
+        <location filename="../base.cpp" line="155"/>
         <source>Deleting old system</source>
         <translation>Sletter gammelt system</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="166"/>
+        <location filename="../base.cpp" line="165"/>
         <source>Failed to set the system configuration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="168"/>
+        <location filename="../base.cpp" line="167"/>
         <source>Setting system configuration</source>
         <translation>Setter opp systemet</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="153"/>
+        <location filename="../base.cpp" line="152"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Klarte ikke slette gammelt system på målet.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="246"/>
+        <location filename="../base.cpp" line="245"/>
         <source>Copying new system</source>
         <translation>Kopierer nytt system</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="276"/>
+        <location filename="../base.cpp" line="275"/>
         <source>Failed to copy the new system.</source>
         <translation>Klarte ikke kopiere det nye systemet.</translation>
     </message>
@@ -114,22 +114,22 @@ Minimum: %2</translation>
 <context>
     <name>CheckMD5</name>
     <message>
-        <location filename="../checkmd5.cpp" line="38"/>
+        <location filename="../checkmd5.cpp" line="35"/>
         <source>Checking installation media.</source>
         <translation>Kontrollerer installasjonsmediet.</translation>
     </message>
     <message>
-        <location filename="../checkmd5.cpp" line="39"/>
+        <location filename="../checkmd5.cpp" line="36"/>
         <source>Press ESC to skip.</source>
         <translation>Trykk Esc for å avbryte.</translation>
     </message>
     <message>
-        <location filename="../checkmd5.cpp" line="56"/>
+        <location filename="../checkmd5.cpp" line="53"/>
         <source>The installation media is corrupt.</source>
         <translation>Installasjonsmediet er ødelagt.</translation>
     </message>
     <message>
-        <location filename="../checkmd5.cpp" line="120"/>
+        <location filename="../checkmd5.cpp" line="117"/>
         <source>Are you sure you want to skip checking the installation media?</source>
         <translation>Vil du avbryte kontrollen av installasjonsmediet?</translation>
     </message>
@@ -175,784 +175,784 @@ Enjoy using %1</source>
 Lykke til med %1.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="344"/>
+        <location filename="../minstall.cpp" line="439"/>
         <source>Pretending to install %1</source>
         <translation>Simulerer installasjon av %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="362"/>
+        <location filename="../minstall.cpp" line="353"/>
         <source>Preparing to install %1</source>
         <translation>Forbereder installasjon av %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="383"/>
+        <location filename="../minstall.cpp" line="368"/>
         <source>Paused for required operator input</source>
         <translation>Pauset for nødvendig inndata fra bruker</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="395"/>
+        <location filename="../minstall.cpp" line="380"/>
         <source>Setting system configuration</source>
         <translation>Setter opp systemet</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="407"/>
+        <location filename="../minstall.cpp" line="390"/>
         <source>Cleaning up</source>
         <translation>Rydder opp</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="411"/>
+        <location filename="../minstall.cpp" line="394"/>
         <source>Finished</source>
         <translation>Fullført</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="435"/>
+        <location filename="../minstall.cpp" line="415"/>
         <source>The installation was aborted.</source>
         <translation>Installasjonen ble avbrutt.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="521"/>
+        <location filename="../minstall.cpp" line="515"/>
         <source>Invalid settings found in configuration file (%1). Please review marked fields as you encounter them.</source>
         <translation>Fant ugyldige innstillinger i oppsettsfila (%1). Kontroller de markerte feltene.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="541"/>
+        <location filename="../minstall.cpp" line="535"/>
         <source>OK to format and use the entire disk (%1) for %2?</source>
         <translation>Kan hele disken (%1) formateres og tas i bruk til %2?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="545"/>
+        <location filename="../minstall.cpp" line="539"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
         <translation>ADVARSEL: Valgt disk er minst 2 TB, og må formateres med GPT. Noen datamaskiner kan ikke starte opp med GPT-formaterte disker.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="574"/>
+        <location filename="../minstall.cpp" line="568"/>
         <source>The data in /home cannot be preserved because the required information could not be obtained.</source>
         <translation>Data i /home kan ikke beholdes fordi nødvendig informasjon ikke kunne framskaffes.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="601"/>
+        <location filename="../minstall.cpp" line="595"/>
         <source>The home directory for %1 already exists.</source>
         <translation>Hjemmemappa for %1 finnes allerede.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="637"/>
+        <location filename="../minstall.cpp" line="631"/>
         <source>General Instructions</source>
         <translation>Generelle instruksjoner</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="638"/>
+        <location filename="../minstall.cpp" line="632"/>
         <source>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</source>
         <translation>LUKK ALLE ANDRE PROGRAMMER FØR DU FORTSETTER.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="639"/>
+        <location filename="../minstall.cpp" line="633"/>
         <source>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.</source>
         <translation>Les instruksjonene på hver side før noe velges. Trykk «Neste» for å fortsette. Ødeleggende handlinger må bekreftes før de kjører.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="641"/>
+        <location filename="../minstall.cpp" line="635"/>
         <source>Limitations</source>
         <translation>Eget ansvar</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="642"/>
+        <location filename="../minstall.cpp" line="636"/>
         <source>Remember, this software is provided AS-IS with no warranty what-so-ever. It is solely your responsibility to backup your data before proceeding.</source>
         <translation>Denne programvaren tilbys slik den er, uten garanti av noe slag. Det er ditt eget ansvar å reservekopiere data før du fortsetter.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="647"/>
+        <location filename="../minstall.cpp" line="641"/>
         <source>Installation Options</source>
         <translation>Installasjonsalternativer</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="648"/>
+        <location filename="../minstall.cpp" line="642"/>
         <source>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.</source>
         <translation>Hvis maskinen har Mac OS eller Windows (fra og med Vista) må kanskje disses systemverktøy brukes til å sette opp partisjoner og oppstartslaster før installering.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="649"/>
+        <location filename="../minstall.cpp" line="643"/>
         <source>Using the root-home space slider</source>
         <translation>Bruk av glidebryter for diskplass root-home</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="650"/>
+        <location filename="../minstall.cpp" line="644"/>
         <source>The drive can be divided into separate system (root) and user data (home) partitions using the slider.</source>
         <translation>Disken kan deles opp i adskilte partisjoner for system («/») og brukerdata («/home») ved å bruke glidebryteren.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="651"/>
+        <location filename="../minstall.cpp" line="645"/>
         <source>The &lt;b&gt;root&lt;/b&gt; partition will contain the operating system and applications.</source>
         <translation>&lt;b&gt;Root&lt;/b&gt;-partisjonen vil inneholde operativsystem og programmer.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="652"/>
+        <location filename="../minstall.cpp" line="646"/>
         <source>The &lt;b&gt;home&lt;/b&gt; partition will contain the data of all users, such as their settings, files, documents, pictures, music, videos, etc.</source>
         <translation>&lt;b&gt;Home&lt;/b&gt;-partisjonen vil inneholde brukerdata, som for eksempel innstillinger, filer, dokumenter, bilder, musikk, videoer.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="653"/>
+        <location filename="../minstall.cpp" line="647"/>
         <source>Move the slider to the right to increase the space for &lt;b&gt;root&lt;/b&gt;. Move it to the left to increase the space for &lt;b&gt;home&lt;/b&gt;.</source>
         <translation>Flytt bryteren til høyre for å la &lt;b&gt;root&lt;/b&gt; få mer plass. Flytt den til venstre for å la &lt;b&gt;home&lt;/b&gt; få mer plass.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="654"/>
+        <location filename="../minstall.cpp" line="648"/>
         <source>Move the slider all the way to the right if you want both root and home on the same partition.</source>
         <translation>Flytt bryteren helt til høyre for å la root og home være på samme partisjon.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="655"/>
+        <location filename="../minstall.cpp" line="649"/>
         <source>Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier. This can also improve overall performance by constraining the system files to a defined portion of the drive.</source>
         <translation>Oppgradering av operativsystemet er mer pålitelig hvis home-mappa ligger på en separat partisjon. Reservekopiering og gjenoppretting blir også enklere. Dette kan øke ytelsen ved at systemfiler holdes på en bestemt partisjon på disken.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="657"/>
-        <location filename="../minstall.cpp" line="741"/>
+        <location filename="../minstall.cpp" line="651"/>
+        <location filename="../minstall.cpp" line="735"/>
         <source>Encryption</source>
         <translation>Kryptering</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="658"/>
-        <location filename="../minstall.cpp" line="742"/>
+        <location filename="../minstall.cpp" line="652"/>
+        <location filename="../minstall.cpp" line="736"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>Data kan krypteres med LUKS. Det trengs i så fall et passord.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="659"/>
-        <location filename="../minstall.cpp" line="743"/>
+        <location filename="../minstall.cpp" line="653"/>
+        <location filename="../minstall.cpp" line="737"/>
         <source>A separate unencrypted boot partition is required.</source>
         <translation>En adskilt, ukryptert oppstartspartisjon kreves.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="660"/>
+        <location filename="../minstall.cpp" line="654"/>
         <source>When encryption is used with autoinstall, the separate boot partition will be automatically created.</source>
         <translation>Når kryptering brukes med autoinstallering så vil den separate oppstartspartisjonen bli opprettet automatisk.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="661"/>
+        <location filename="../minstall.cpp" line="655"/>
         <source>Using a custom disk layout</source>
         <translation>Bruk av tilpasset diskutforming</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="662"/>
+        <location filename="../minstall.cpp" line="656"/>
         <source>If you need more control over where %1 is installed to, select &quot;&lt;b&gt;%2&lt;/b&gt;&quot; and click &lt;b&gt;Next&lt;/b&gt;. On the next page, you will then be able to select and configure the storage devices and partitions you need.</source>
         <translation>Velg «&lt;b&gt;%2&lt;/b&gt;» og trykk &lt;b&gt;Neste&lt;/b&gt; for mer kontroll på hvor %1 installeres til. På neste side kan du velge og sette opp nødvendige lagringsenheter og partisjoner.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="669"/>
+        <location filename="../minstall.cpp" line="663"/>
         <source>Choose Partitions</source>
         <translation>Velg partisjoner</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="670"/>
+        <location filename="../minstall.cpp" line="664"/>
         <source>The partition list allows you to choose what partitions are used for this installation.</source>
         <translation>Velg i partisjonslista hvilke partisjoner som skal brukes i denne installasjonen. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="671"/>
+        <location filename="../minstall.cpp" line="665"/>
         <source>&lt;i&gt;Device&lt;/i&gt; - This is the block device name that is, or will be, assigned to the created partition.</source>
         <translation>&lt;i&gt;Enhet&lt;/i&gt; – dette er navnet på blokkenheten som er, eller skal, tilordnes den nye partisjonen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="672"/>
+        <location filename="../minstall.cpp" line="666"/>
         <source>&lt;i&gt;Size&lt;/i&gt; - The size of the partition. This can only be changed on a new layout.</source>
         <translation>&lt;i&gt;Størrelse&lt;/i&gt; – partisjonens størrelse. Den kan kun endres ved ny utforming. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="673"/>
+        <location filename="../minstall.cpp" line="667"/>
         <source>&lt;i&gt;Use For&lt;/i&gt; - To use this partition in an installation, you must select something here.</source>
         <translation>&lt;i&gt;Bruk til&lt;/i&gt; – velg noe her for å bruke partisjonen ved installering.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="688"/>
+        <location filename="../minstall.cpp" line="682"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Du kan også skrive inn selvvalgte monteringspunkter. Disse må starte med skråstrek («/»).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="689"/>
+        <location filename="../minstall.cpp" line="683"/>
         <source>&lt;i&gt;Label&lt;/i&gt; - The label that is assigned to the partition once it has been formatted.</source>
         <translation>&lt;i&gt;Etikett&lt;/i&gt; – etiketten som tilordnes partisjonen ved formatering.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="690"/>
+        <location filename="../minstall.cpp" line="684"/>
         <source>&lt;i&gt;Encrypt&lt;/i&gt; - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.</source>
         <translation>&lt;i&gt;Kryptering&lt;/i&gt; – krypter partisjonen med LUKS. Dette passordet gjelder alle partisjoner som skal krypteres.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="691"/>
+        <location filename="../minstall.cpp" line="685"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Format&lt;/i&gt; – partisjonens format. Tilgjengelige format avhenger av hva partisjonen skal brukes til. Opprinnelig format kan bevares ved å velge &lt;b&gt;Bevar&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="695"/>
+        <location filename="../minstall.cpp" line="689"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
         <translation>Linux-filsystemene ext2, ext3, ext4, jfs, xfs og btrfs støttes, og ext4 anbefales.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="696"/>
+        <location filename="../minstall.cpp" line="690"/>
         <source>&lt;i&gt;Check&lt;/i&gt; - Check and correct for bad blocks on the drive (not supported for all formats). This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
         <translation>&lt;i&gt;Kontroll&lt;/i&gt; - Kontrollerer og korrigerer skadede blokker på harddisken (støttes ikke for alle formater). Dette tar uhyrlig med tid, så du bør hoppe over dette steget hvis du ikke mistenker at datamaskinen har skadede blokker.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="698"/>
+        <location filename="../minstall.cpp" line="692"/>
         <source>&lt;i&gt;Mount Options&lt;/i&gt; - This specifies mounting options that will be used for this partition.</source>
         <translation>&lt;i&gt;Alternativer for montering&lt;/i&gt; – velg alternativer for montering av denne partisjonen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="699"/>
+        <location filename="../minstall.cpp" line="693"/>
         <source>&lt;i&gt;Dump&lt;/i&gt; - Instructs the dump utility to include this partition in the backup.</source>
         <translation>&lt;i&gt;Dump&lt;/i&gt; – Lar verktøyet «dump» ta med denne partisjonen ved reservekopiering.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="700"/>
+        <location filename="../minstall.cpp" line="694"/>
         <source>&lt;i&gt;Pass&lt;/i&gt; - The sequence in which this file system is to be checked at boot. If zero, the file system is not checked.</source>
         <translation>&lt;i&gt;Pass&lt;/i&gt; – Kontroller dette filsystemet i denne rekkefølgen ved oppstart. Sett lik null for å la være å kontrollere filsystemet.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="701"/>
+        <location filename="../minstall.cpp" line="695"/>
         <source>Menus and actions</source>
         <translation>Menyer og handlinger</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="702"/>
+        <location filename="../minstall.cpp" line="696"/>
         <source>A variety of actions are available by right-clicking any drive or partition item in the list.</source>
         <translation>Høyreklikk en disk eller partisjon i lista for å få opp en rekke mulige handlinger.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="703"/>
+        <location filename="../minstall.cpp" line="697"/>
         <source>The buttons to the right of the list can also be used to manipulate the entries.</source>
         <translation>Knappene på høyre side av lista kan også brukes til å behandle oppføringene.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="704"/>
+        <location filename="../minstall.cpp" line="698"/>
         <source>The installer cannot modify the layout already on the drive. To create a custom layout, mark the drive for a new layout with the &lt;b&gt;New layout&lt;/b&gt; menu action or button (%1). This clears the existing layout.</source>
         <translation>Installasjonsprogrammet kan ikke endre diskens eksisterende utforming. For å lage en tilpasset utforming må du velge &lt;b&gt;Ny utforming&lt;/b&gt; i menyen eller velge knappen (%1). Dette sletter eksisterende layout.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="707"/>
+        <location filename="../minstall.cpp" line="701"/>
         <source>Basic layout requirements</source>
         <translation>Grunnleggende krav for utforming</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="708"/>
+        <location filename="../minstall.cpp" line="702"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
         <translation>%1 trenger en rotpartisjon. Vekselpartisjonen er valgfri, men anbefales sterkt. For å kunne bruke dvalemodus i %1 trengs en vekselpartisjon som er større enn RAM-størrelsen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="710"/>
+        <location filename="../minstall.cpp" line="704"/>
         <source>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</source>
         <translation>En separat /home-partisjon vil gjøre det lettere å oppgradere systemet i framtida. Det vil være besværlig å flytte /home til en egen partisjon senere.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="712"/>
+        <location filename="../minstall.cpp" line="706"/>
         <source>Active partition</source>
         <translation>Aktiv partisjon</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="713"/>
+        <location filename="../minstall.cpp" line="707"/>
         <source>For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.</source>
         <translation>En partisjon, vanligvis oppstarts- eller rotpartisjonen, må angis som aktiv for at det installerte operativsystemet skal kunne starte.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="714"/>
+        <location filename="../minstall.cpp" line="708"/>
         <source>The active partition of a drive can be chosen using the &lt;b&gt;Active partition&lt;/b&gt; menu action.</source>
         <translation>Bruk menyvalget &lt;b&gt;Aktiv partisjon&lt;/b&gt; for å velge aktiv partisjon.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="715"/>
+        <location filename="../minstall.cpp" line="709"/>
         <source>A partition with an asterisk (*) next to its device name is, or will become, the active partition.</source>
         <translation>En partisjon med stjerne (*) ved siden av navnet er, eller vil bli, aktiv partisjon.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="720"/>
+        <location filename="../minstall.cpp" line="714"/>
         <source>Boot partition</source>
         <translation>Oppstartspartisjon</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="721"/>
+        <location filename="../minstall.cpp" line="715"/>
         <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
         <translation>Denne partisjonen kreves generelt sett kun for rotpartisjoner på virtuelle enheter, slik som krypterte, LVM- eller programvarestyrte RAID-dataområder.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="722"/>
+        <location filename="../minstall.cpp" line="716"/>
         <source>It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.</source>
         <translation>Den inneholder en enkel kjerne og drivere for tilgang til kryptert disk eller virtuelle enheter.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="723"/>
+        <location filename="../minstall.cpp" line="717"/>
         <source>BIOS-GRUB partition</source>
         <translation>BIOS-GRUB-partisjon</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="724"/>
+        <location filename="../minstall.cpp" line="718"/>
         <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
         <translation> GRUB trenger en oppstartspartisjon på 1 MB ved bruk av GPT-formatert disk på et system uten EFI.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="725"/>
+        <location filename="../minstall.cpp" line="719"/>
         <source>New drives are formatted in GPT if more than 4 partitions are to be created, or the drive has a capacity greater than 2TB. If the installer is about to format the disk in GPT, and there is no BIOS-GRUB partition, a warning will be displayed before the installation starts.</source>
         <translation>Nye disker formateres med GPT-partisjoner hvis flere enn fire partisjoner skal lages, eller hvis disken er større enn 2 TB. En advarsel vil vises før igangsetting hvis installasjonsprogrammet skal formatere med GPT-partisjoner, og det ikke er noen BIOS-GRUB-partisjon.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="727"/>
+        <location filename="../minstall.cpp" line="721"/>
         <source>Need help creating a layout?</source>
         <translation>Behov for hjelp ved opprettelse av utforming?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="728"/>
+        <location filename="../minstall.cpp" line="722"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
         <translation>Høyreklikk en harddisk og velg &lt;b&gt;Verktøy for diskutforming&lt;/b&gt; fra menyen for å lage en utforming som ligner den i den vanlige installasjonen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="762"/>
+        <location filename="../minstall.cpp" line="756"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Installer GRUB for Linux og Windows</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="763"/>
+        <location filename="../minstall.cpp" line="757"/>
         <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation>%1 bruker oppstartslasteren GRUB for å starte %1 og Microsoft Windows.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="764"/>
+        <location filename="../minstall.cpp" line="758"/>
         <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
         <translation>GRUB installeres vanligvis i oppstartsdiskens Master Boot Record (MBR) eller ESP (EFI systempartisjon for 64-biters UEFI-systemer) og erstatter den eksisterende oppstartslasteren. Dette er normalt.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="765"/>
+        <location filename="../minstall.cpp" line="759"/>
         <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
         <translation>Hvis du velger å installere GRUB til Partition Boot Record (PBR) istedenfor, så vil GRUB installeres i starten av valgt partisjon. Dette alternativet er kun for erfarne brukere.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="766"/>
+        <location filename="../minstall.cpp" line="760"/>
         <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
         <translation>Hvis du fravelger boksen «Installer GRUB», så vil ikke GRUB installeres nå. Dette alternativet er kun for erfarne brukere.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="767"/>
+        <location filename="../minstall.cpp" line="761"/>
         <source>Create a swap file</source>
         <translation>Opprett en vekselfil</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="768"/>
+        <location filename="../minstall.cpp" line="762"/>
         <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
         <translation>En vekselfil er mer fleksibel enn en vekselpartisjon. Det er mye lettere å endre størrelsen til en vekselfil for å tilpasse den til endringer i bruken av systemet.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="769"/>
+        <location filename="../minstall.cpp" line="763"/>
         <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
         <translation>Dette er vanligvis valgt hvis ingen vekselpartisjoner er angitt, og fravalgt hvis noen vekselpartisjoner er angitt. Dette alternativet bør ikke røres, og er kun for erfarne brukere.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="770"/>
+        <location filename="../minstall.cpp" line="764"/>
         <source>Setting the size to 0 has the same effect as unchecking this option.</source>
         <translation>Størrelse lik 0 betyr det samme som å fravelge dette alternativet.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="877"/>
+        <location filename="../minstall.cpp" line="871"/>
         <source>Enjoy using %1</source>
         <translation>Lykke til med %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="729"/>
+        <location filename="../minstall.cpp" line="723"/>
         <source>Upgrading</source>
         <translation>Oppgradering</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="675"/>
+        <location filename="../minstall.cpp" line="669"/>
         <source>Format without mounting</source>
         <translation>Formater uten montering</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="676"/>
+        <location filename="../minstall.cpp" line="670"/>
         <source>BIOS Boot GPT partition for GRUB</source>
         <translation>GPT-partisjon for GRUB, BIOS-oppstart</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="677"/>
-        <location filename="../minstall.cpp" line="716"/>
+        <location filename="../minstall.cpp" line="671"/>
+        <location filename="../minstall.cpp" line="710"/>
         <source>EFI System Partition</source>
         <translation>EFI-systempartisjon</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="679"/>
+        <location filename="../minstall.cpp" line="673"/>
         <source>Boot manager</source>
         <translation>Oppstartsbehandler</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="680"/>
+        <location filename="../minstall.cpp" line="674"/>
         <source>System root</source>
         <translation>Systemrot</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="681"/>
+        <location filename="../minstall.cpp" line="675"/>
         <source>User data</source>
         <translation>Brukerdata</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="682"/>
+        <location filename="../minstall.cpp" line="676"/>
         <source>Static data</source>
         <translation>Statiske data</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="683"/>
+        <location filename="../minstall.cpp" line="677"/>
         <source>Variable data</source>
         <translation>Variable data</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="684"/>
+        <location filename="../minstall.cpp" line="678"/>
         <source>Temporary files</source>
         <translation>Midlertidige filer</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="685"/>
+        <location filename="../minstall.cpp" line="679"/>
         <source>Swap files</source>
         <translation>Vekselfiler</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="686"/>
+        <location filename="../minstall.cpp" line="680"/>
         <source>Swap partition</source>
         <translation>Vekselpartisjon</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="693"/>
+        <location filename="../minstall.cpp" line="687"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation>Valget &lt;b&gt;Bevar /home&lt;/b&gt; for rotpartisjonen bevarer innholdet i /home-mappa og sletter alt annet. Dette kan kun velges når /home er på samme partisjon som rot.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="717"/>
+        <location filename="../minstall.cpp" line="711"/>
         <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
         <translation>Hvis systemet bruker EFI («Extensible Firmware Interface»), så trengs EFI Systempartisjon (ESP) for at systemet skal kunne starte opp.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="718"/>
+        <location filename="../minstall.cpp" line="712"/>
         <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
         <translation>Disse systemene trenger ikke noen partisjon angitt som aktiv, men trenger i stedet for en FAT-partisjon angitt som ESP.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="719"/>
+        <location filename="../minstall.cpp" line="713"/>
         <source>Most systems built within the last 10 years use EFI.</source>
         <translation>De fleste systemer fra de siste ti årene bruker EFI.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="730"/>
+        <location filename="../minstall.cpp" line="724"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and select &lt;b&gt;Preserve&lt;/b&gt; as the format.</source>
         <translation>For å oppgradere fra en eksisterende Linux-installasjon må samme home-partisjon som tidligere velges. Velg &lt;b&gt;behold&lt;/b&gt; som format.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="731"/>
+        <location filename="../minstall.cpp" line="725"/>
         <source>If you do not use a separate home partition, select &lt;b&gt;Preserve /home&lt;/b&gt; on the root file system entry to preserve the existing /home directory located on your root partition. The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.</source>
         <translation>Velg &lt;b&gt;behold /home&lt;/b&gt; på rotfilsystemet for å beholde eksisterende /home-mappe, hvis den ikke ligger adskilt. Installasjonsprogrammet vil bevare /home, men slette alt annet. Dermed vil installasjonsprogrammet bruke lenger tid enn vanlig.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="733"/>
+        <location filename="../minstall.cpp" line="727"/>
         <source>Preferred Filesystem Type</source>
         <translation>Foretrukket filsystemtype</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="734"/>
+        <location filename="../minstall.cpp" line="728"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
         <translation>%1 kan brukes med ext2, ext3, ext4, f2fs, jfs, xfs og btrfs.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="735"/>
+        <location filename="../minstall.cpp" line="729"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>Btrfs kan komprimere data. Algoritmen lzo er raskest, men komprimerer mindre enn zlib, som er treigere, men komprimerer bedre.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="737"/>
+        <location filename="../minstall.cpp" line="731"/>
         <source>System partition management tool</source>
         <translation>Verktøy for behandling av systempartisjon</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="738"/>
+        <location filename="../minstall.cpp" line="732"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
         <translation>Velg knappen partisjonsbehandling (%1) for mer kontroll over diskutforming (f.eks. endring av eksisterende utforming). Dette starter operativsystemets partisjonsverktøy, der eksakt utforming kan opprettes.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="744"/>
+        <location filename="../minstall.cpp" line="738"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
         <translation>Høyreklikk og velg &lt;b&gt;Lås opp&lt;/b&gt; for å beholde en kryptert partisjon. Skriv inn navnet til den virtuelle enheten og passordet i dialogvinduet som dukker opp. Dette navnet vil vises under &lt;i&gt;virtuelle enheter&lt;/i&gt; når enheten er låst opp, sammen med alternativer slik som for vanlige partisjoner.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="746"/>
+        <location filename="../minstall.cpp" line="740"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
         <translation>Legg den krypterte partisjonen til crypttab-fila for å låse den opp ved oppstart. Velg &lt;b&gt;Legg til i crypttab&lt;/b&gt; i menyen for å gjøre dette.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="747"/>
+        <location filename="../minstall.cpp" line="741"/>
         <source>Other partitions</source>
         <translation>Andre partisjoner</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="748"/>
+        <location filename="../minstall.cpp" line="742"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
         <translation>Installasjonsprogrammet tillater at andre partisjoner opprettes, eller brukes til andre formål. Men husk at eldre systemer ikke kan håndtere disker med flere enn fire partisjoner.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="749"/>
+        <location filename="../minstall.cpp" line="743"/>
         <source>Subvolumes</source>
         <translation>Underområder for data</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="750"/>
+        <location filename="../minstall.cpp" line="744"/>
         <source>Some file systems, such as Btrfs, support multiple subvolumes in a single partition. These are not physical subdivisions, and so their order does not matter.</source>
         <translation>Noen filsystemer, slik som Btrfs, støtter underområder for data på én partisjon. Dette er ikke en fysisk inndeling, og rekkefølgen har derfor ikke noe å si.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="752"/>
+        <location filename="../minstall.cpp" line="746"/>
         <source>Use the &lt;b&gt;Scan subvolumes&lt;/b&gt; menu action to search an existing Btrfs partition for subvolumes. To create a new subvolume, use the &lt;b&gt;New subvolume&lt;/b&gt; menu action.</source>
         <translation>Velg &lt;b&gt;Let etter underområder for data&lt;/b&gt; for å lete etter underområder på eksisterende Btrfs-partisjoner. Velg &lt;b&gt;Nytt underområde for data&lt;/b&gt; for å lage et nytt underområde for data.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="754"/>
+        <location filename="../minstall.cpp" line="748"/>
         <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
         <translation>Eksisterende underområder for data kan beholdes, men i så fall må navnet være likt.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="755"/>
+        <location filename="../minstall.cpp" line="749"/>
         <source>Virtual Devices</source>
         <translation>Virtuelle enheter</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="756"/>
+        <location filename="../minstall.cpp" line="750"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
         <translation>Virtuelle enheter kan brukes i installasjonen hvis de gjenkjennes. Dette kan være LUKS-partisjoner, logiske dataområder (LVM) eller  programvarestyrte RAID-dataområder.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="757"/>
+        <location filename="../minstall.cpp" line="751"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Bruk av virtuelle enheter (ut over å beholde krypterte filsystemer) kan trenge ekstra oppfølging. Du må kanskje redigere noen filer (som f.eks. initramfs, crypttab, fstab) for å sørge for at den virtuelle enheten blir opprettet ved oppstart).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="776"/>
+        <location filename="../minstall.cpp" line="770"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Aktivering av vanlige tjenester&lt;/b&gt;&lt;br/&gt; Velg hvilke tjenester som skal startes automatisk når %1 starter opp.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="780"/>
+        <location filename="../minstall.cpp" line="774"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Identifisering av datamaskinen&lt;/b&gt;&lt;br/&gt; Datamaskinens navn er et unikt navn som identifiserer maskinen hvis den er koblet til et nettverk. Domenet vil vanligvis ikke brukes hvis ikke internettleverandøren eller det lokale nettverket krever det.&lt;/p&gt;&lt;p&gt; Datamaskinens navn og domenenavnet kan kun inneholde alfanumeriske tegn, punktum og bindestrek. De kan ikke inneholde blanktegn eller starte eller slutte med bindestrek.&lt;/p&gt;&lt;p&gt; SaMBa-tjeneren må aktiveres hvis mapper eller skrivere skal deles med en lokal maskin som kjører MS Windows eller Mac OS X.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="790"/>
+        <location filename="../minstall.cpp" line="784"/>
         <source>Localization Defaults</source>
         <translation>Forvalgt lokaltilpassing</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="791"/>
+        <location filename="../minstall.cpp" line="785"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation>Velg standard lokaltilpassing. Denne vil tas i bruk hvis den ikke overstyres av brukeren.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="792"/>
+        <location filename="../minstall.cpp" line="786"/>
         <source>Configure Clock</source>
         <translation>Still inn klokka</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="793"/>
+        <location filename="../minstall.cpp" line="787"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation>Systemklokka har Greenwich Meridian Time (GTM) eller Coordinated Universal Time (UTC) på Apple- og Unix-maskiner. Velg «Systemklokka har lokaltid» hvis ikke.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="795"/>
+        <location filename="../minstall.cpp" line="789"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation>Systemet starter med tidssonen GMT/UTC. Dette kan endres etter omstart til den nye installasjonen ved å høyreklikke på klokka i panelet og velge «Egenskaper».</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="797"/>
+        <location filename="../minstall.cpp" line="791"/>
         <source>Service Settings</source>
         <translation>Tjenesteinnstillinger</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="798"/>
+        <location filename="../minstall.cpp" line="792"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation>Mannen i gata behøver ikke endre forvalgene. Brukere med ressurssvake maskiner kan slå av unødvendige tjenester for å redusere RAM-bruken – men vit hva du gjør.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="804"/>
+        <location filename="../minstall.cpp" line="798"/>
         <source>Default User Login</source>
         <translation>Vanlig brukerkonto</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="805"/>
+        <location filename="../minstall.cpp" line="799"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
         <translation>Root-brukeren svarer til administrator i andre operativsystemer. Denne brukerkontoen bør ikke anvendes til ordinær bruk. Skriv inn et nytt brukernavn for den kontoen som skal brukes til vanlig innlogging. Senere kan flere brukere legges til med %1 sin brukerbehandling.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="809"/>
+        <location filename="../minstall.cpp" line="803"/>
         <source>Passwords</source>
         <translation>Passord</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="810"/>
+        <location filename="../minstall.cpp" line="804"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
         <translation>Skriv inn et nytt passord for den vanlige brukerkontoen og for root-kontoen. Hvert passord må for sikkerhets skyld skrives inn to ganger.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="812"/>
+        <location filename="../minstall.cpp" line="806"/>
         <source>No passwords</source>
         <translation>Ingen passord</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="813"/>
+        <location filename="../minstall.cpp" line="807"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
         <translation>La passordfeltet være tomt hvis den vanlige brukerkontoen ikke behøver passord. Dette lar deg logge inn uten passord.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="815"/>
+        <location filename="../minstall.cpp" line="809"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
         <translation>Dette bør kun skje når kontoen ikke trenger være sikker, slik som offentlige terminaler.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="823"/>
+        <location filename="../minstall.cpp" line="817"/>
         <source>Old Home Directory</source>
         <translation>Gammel hjemmemappe</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="824"/>
+        <location filename="../minstall.cpp" line="818"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation>Denne brukerkontoen har allerede en hjemmemappe. Velg hva som skal skje med denne mappa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="826"/>
+        <location filename="../minstall.cpp" line="820"/>
         <source>Re-use it for this installation</source>
         <translation>Gjenbruk mappa i denne installasjonen</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="827"/>
+        <location filename="../minstall.cpp" line="821"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation>Brukerkontoen vil beholde den gamle hjemmemappa. Dette anbefales ved oppgradering, siden filer og oppsett vil beholdes.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="829"/>
+        <location filename="../minstall.cpp" line="823"/>
         <source>Rename it and create a new directory</source>
         <translation>Gi den nytt navn og lag ny mappe</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="830"/>
+        <location filename="../minstall.cpp" line="824"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation>Lag en ny hjemmemappe for brukerkontoen, og gi nytt navn til den gamle hjemmemappa. Filene og oppsettet vil ikke umiddelbart være synlige i den nye installasjonen, men vil ligge i den omdøpte mappa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="832"/>
+        <location filename="../minstall.cpp" line="826"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation>Den gamle mappa vil få et tall i slutten av navnet, avhengig av hvor mange ganger den har endret navn tidligere.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="833"/>
+        <location filename="../minstall.cpp" line="827"/>
         <source>Delete it and create a new directory</source>
         <translation>Slett den og lag ny mappe</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="834"/>
+        <location filename="../minstall.cpp" line="828"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation>Den gamle hjemmemappa vil slettes og den nye opprettes fra bunnen av.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="835"/>
+        <location filename="../minstall.cpp" line="829"/>
         <source>Warning</source>
         <translation>Advarsel</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="836"/>
+        <location filename="../minstall.cpp" line="830"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation>Alle filer og oppsett vil slettes for alltid hvis dette valget velges. Det vil være besværlig å gjenopprette dem.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="852"/>
+        <location filename="../minstall.cpp" line="846"/>
         <source>Installation in Progress</source>
         <translation>Installering pågår</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="853"/>
+        <location filename="../minstall.cpp" line="847"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation>Installering av %1 pågår. En ny installasjon vil ta omlag 3-20 minutter, avhengig av maskinens hastighet og størrelsen til eventuelle partisjoner som skal formateres.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="855"/>
+        <location filename="../minstall.cpp" line="849"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation>Hvis «Avbryt» velges så vil installasjonsprogrammet avbrytes så snart som mulig.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="857"/>
+        <location filename="../minstall.cpp" line="851"/>
         <source>Change settings while you wait</source>
         <translation>Endre innstillinger mens du venter</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="858"/>
+        <location filename="../minstall.cpp" line="852"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation>Velg &lt;b&gt;Neste&lt;/b&gt; eller &lt;b&gt;Tilbake&lt;/b&gt; mens %1 installeres for å angi øvrig nødvendig informasjon.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="860"/>
+        <location filename="../minstall.cpp" line="854"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation>Dette kan tas i eget tempo. Installasjonsprogrammet vil pause for svar om nødvendig.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="868"/>
+        <location filename="../minstall.cpp" line="862"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fullført&lt;/b&gt;&lt;br/&gt; Installasjonen av %1 er nå fullført.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finne programmer&lt;/b&gt;&lt;br/&gt; %1 kommer med hundrevis av programmer. Bla gjennom menyen og forsøk dem. Flere av dem ble utviklet spesielt for %1-prosjektet. Disse vises i hovedmenyene. &lt;p&gt;%1 har dessuten mange vanlige Linux-programmer som kun kan kjøres fra kommandolinja og derfor ikke vises i menyen.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="878"/>
-        <location filename="../minstall.cpp" line="1144"/>
+        <location filename="../minstall.cpp" line="872"/>
+        <location filename="../minstall.cpp" line="1138"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Bidra til %1&lt;/b&gt;&lt;br/&gt;%1 understøttes av folk som deg. Noen bidrar med brukerstøtte i forumet – %2, eller oversetter hjelpefiler til andre språk eller korrekturleser, skriver hjelpetekster eller tester ny programvare.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="908"/>
+        <location filename="../minstall.cpp" line="902"/>
         <source>Finish</source>
         <translation>Fullfør</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="911"/>
+        <location filename="../minstall.cpp" line="905"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="913"/>
+        <location filename="../minstall.cpp" line="907"/>
         <source>Next</source>
         <translation>Neste</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="423"/>
+        <location filename="../minstall.cpp" line="406"/>
         <source>Configuring sytem. Please wait.</source>
         <translation>Setter opp systemet. Vennligst vent.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="430"/>
+        <location filename="../minstall.cpp" line="410"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Ferdig med oppsettet. Starter på nytt.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1066"/>
+        <location filename="../minstall.cpp" line="1060"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>Installasjonen og oppsettet er ikke fullført.
 Vil du virkelig avbryte nå?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1130"/>
+        <location filename="../minstall.cpp" line="1124"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Få hjelp&lt;/b&gt;&lt;br/&gt;%2 har grunnleggende informasjon om %1.&lt;/p&gt;&lt;p&gt;%3-forumet har frivillige som bedriver brukerstøtte, %4&lt;/p&gt;&lt;p&gt;Husk å beskrive problemet og datamaskinen i noe detalj hvis du spør etter hjelp. Det kan ikke nytte å bare si at det ikke virker.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1138"/>
+        <location filename="../minstall.cpp" line="1132"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Reparerer installasjonen&lt;/b&gt;&lt;br/&gt;Hvis %1 ikke lenger kan starte fra harddisken så er det mulig å reparere dette ved å starte fra live-DVD eller live-USB og kjøre et av verktøyene i %1, eller ved å bruke et av de vanlige Linux-verktøyene for å reparere systemet.&lt;/p&gt;&lt;p&gt;%1 live-DVD eller live-USB kan også brukes til å gjenopprette data fra MS Windows-systemer.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1152"/>
+        <location filename="../minstall.cpp" line="1146"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Tilpass lydmikser&lt;/b&gt;&lt;br/&gt; %1 forsøker å sette opp lydmikseren automatisk, men av og til må man skru opp volumet og slå på dempede kanaler selv. &lt;/p&gt;&lt;p&gt;Menyen har snarvei til mikseren. Velg den for å åpne mikseren.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1160"/>
+        <location filename="../minstall.cpp" line="1154"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Hold %1 oppdatert&lt;/b&gt;&lt;br/&gt;For mer informasjon og oppdateringer besøk &lt;/p&gt;&lt;p&gt;%2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1165"/>
+        <location filename="../minstall.cpp" line="1159"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Takk&lt;/b&gt;&lt;br/&gt;Takk til alle som har bidratt til %1 med tid, penger, forslag, arbeid, ideer, promotering, ris og/eller ros.&lt;/p&gt;&lt;p&gt;%1 ville ikke eksistert uten dere.&lt;/p&gt;&lt;p&gt;%2 utviklingslag&lt;/p&gt;</translation>
     </message>
@@ -1417,12 +1417,12 @@ Vil du virkelig avbryte nå?</translation>
 <context>
     <name>Oobe</name>
     <message>
-        <location filename="../oobe.cpp" line="331"/>
+        <location filename="../oobe.cpp" line="333"/>
         <source>Please enter a computer name.</source>
         <translation>Skriv inn datamaskinens navn.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="335"/>
+        <location filename="../oobe.cpp" line="337"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1430,12 +1430,12 @@ name before proceeding.</source>
 Velg et annet navn.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="340"/>
+        <location filename="../oobe.cpp" line="342"/>
         <source>Please enter a domain name.</source>
         <translation>Skriv inn et domenenavn.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="344"/>
+        <location filename="../oobe.cpp" line="346"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1443,66 +1443,66 @@ name before proceeding.</source>
 Velg et annet navn.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="351"/>
+        <location filename="../oobe.cpp" line="353"/>
         <source>Please enter a workgroup.</source>
         <translation>Skriv inn en arbeidsgruppe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="491"/>
+        <location filename="../oobe.cpp" line="493"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>Brukernavnet kan ikke inneholde spesialtegn eller mellomrom.
 Velg et annet brukernavn.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="502"/>
+        <location filename="../oobe.cpp" line="504"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Brukernavnet er allerede i bruk.
 Velg et annet brukernavn.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="511"/>
+        <location filename="../oobe.cpp" line="513"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation>Ingen passfrase for %1 ble oppgitt.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="512"/>
+        <location filename="../oobe.cpp" line="514"/>
         <source>Are you sure you want to continue?</source>
         <translation>Vil du virkelig fortsette?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="518"/>
+        <location filename="../oobe.cpp" line="520"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>Root-kontoen mangler passord. Vil du fortsette?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="531"/>
+        <location filename="../oobe.cpp" line="533"/>
         <source>Failed to set user account passwords.</source>
         <translation>Klarte ikke lagre brukerpassord.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="557"/>
+        <location filename="../oobe.cpp" line="559"/>
         <source>Failed to save old home directory.</source>
         <translation>Klarte ikke lagre gammel hjemmemappe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="566"/>
+        <location filename="../oobe.cpp" line="568"/>
         <source>Failed to delete old home directory.</source>
         <translation>Klarte ikke slette gammel hjemmemappe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="587"/>
+        <location filename="../oobe.cpp" line="589"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Klarte ikke opprette brukermappe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="590"/>
+        <location filename="../oobe.cpp" line="592"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Klarte ikke navngi brukermappe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="626"/>
+        <location filename="../oobe.cpp" line="628"/>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation>Klarte ikke endre eierskap eller rettigheter til brukermappe.</translation>
     </message>
@@ -1510,267 +1510,267 @@ Velg et annet brukernavn.</translation>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="../partman.cpp" line="222"/>
+        <location filename="../partman.cpp" line="219"/>
         <source>Virtual Devices</source>
         <translation>Virtuelle enheter</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="451"/>
-        <location filename="../partman.cpp" line="511"/>
+        <location filename="../partman.cpp" line="448"/>
+        <location filename="../partman.cpp" line="508"/>
         <source>&amp;Add partition</source>
         <translation>Legg til p&amp;artisjon</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="453"/>
+        <location filename="../partman.cpp" line="450"/>
         <source>&amp;Remove partition</source>
         <translation>&amp;Fjern partisjon</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="463"/>
+        <location filename="../partman.cpp" line="460"/>
         <source>&amp;Lock</source>
         <translation>&amp;Lås</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="467"/>
+        <location filename="../partman.cpp" line="464"/>
         <source>&amp;Unlock</source>
         <translation>&amp;Lås opp</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="471"/>
-        <location filename="../partman.cpp" line="623"/>
+        <location filename="../partman.cpp" line="468"/>
+        <location filename="../partman.cpp" line="620"/>
         <source>Add to crypttab</source>
         <translation>Legg til i crypttab</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="476"/>
+        <location filename="../partman.cpp" line="473"/>
         <source>Active partition</source>
         <translation>Aktiv partisjon</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="477"/>
+        <location filename="../partman.cpp" line="474"/>
         <source>EFI System Partition</source>
         <translation>EFI-systempartisjon</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="485"/>
+        <location filename="../partman.cpp" line="482"/>
         <source>New subvolume</source>
         <translation>Nytt underområde for data</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="486"/>
+        <location filename="../partman.cpp" line="483"/>
         <source>Scan subvolumes</source>
         <translation>Let etter underområder for data</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="514"/>
+        <location filename="../partman.cpp" line="511"/>
         <source>New &amp;layout</source>
         <translation>Ny &amp;utforming</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="515"/>
+        <location filename="../partman.cpp" line="512"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Nullstill utforming</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="538"/>
+        <location filename="../partman.cpp" line="535"/>
         <source>Default subvolume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="539"/>
+        <location filename="../partman.cpp" line="536"/>
         <source>Remove subvolume</source>
         <translation>Fjern underområde for data</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="621"/>
+        <location filename="../partman.cpp" line="618"/>
         <source>Unlock Drive</source>
         <translation>Lås opp disk</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="626"/>
+        <location filename="../partman.cpp" line="623"/>
         <source>Password:</source>
         <translation>Passord:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="652"/>
+        <location filename="../partman.cpp" line="649"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>Kan ikke låse opp enhet. Er passordet riktig?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="680"/>
+        <location filename="../partman.cpp" line="677"/>
         <source>Failed to close %1</source>
         <translation>Klarte ikke lukke %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="724"/>
+        <location filename="../partman.cpp" line="721"/>
         <source>Invalid subvolume label</source>
         <translation>Ugyldig etikett for underområde for data</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="733"/>
+        <location filename="../partman.cpp" line="730"/>
         <source>Duplicate subvolume label</source>
         <translation>Duplisert etikett for underområde for data</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="742"/>
+        <location filename="../partman.cpp" line="740"/>
         <source>Invalid use for %1: %2</source>
         <translation>Ugyldig bruk av %1: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="753"/>
+        <location filename="../partman.cpp" line="751"/>
         <source>%1 is already selected for: %2</source>
         <translation>%1 er allerede valgt for: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="767"/>
+        <location filename="../partman.cpp" line="765"/>
         <source>A root partition of at least %1 is required.</source>
         <translation>Det kreves en rotpartisjon som er minst %1.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="773"/>
+        <location filename="../partman.cpp" line="771"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>Kan ikke bevare /home inni root (/) hvis separat /home-partisjon også monteres.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="789"/>
+        <location filename="../partman.cpp" line="787"/>
         <source>Reuse (no reformat) %1</source>
         <translation>Gjenbruk (uten reformatering) %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="792"/>
+        <location filename="../partman.cpp" line="790"/>
         <source>Format %1</source>
         <translation>Formater %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="808"/>
+        <location filename="../partman.cpp" line="806"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation>Gjenbruk underområde %1 som %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="810"/>
+        <location filename="../partman.cpp" line="808"/>
         <source>Delete subvolume %1</source>
         <translation>Slett underområde %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="813"/>
+        <location filename="../partman.cpp" line="811"/>
         <source>Overwrite subvolume %1</source>
         <translation>Overskriv underområde %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="814"/>
+        <location filename="../partman.cpp" line="812"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation>Overskriv underområde %1 til bruk for %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="816"/>
+        <location filename="../partman.cpp" line="814"/>
         <source>Create subvolume %1</source>
         <translation>Opprett underområde %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="817"/>
+        <location filename="../partman.cpp" line="815"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation>Opprett %1 til bruk for %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="832"/>
+        <location filename="../partman.cpp" line="830"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Velg en separat oppstartspartisjon når rota krypteres.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="783"/>
+        <location filename="../partman.cpp" line="781"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>Forbereder %1-partisjonstabell på %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="793"/>
+        <location filename="../partman.cpp" line="791"/>
         <source>Format %1 to use for %2</source>
         <translation>Formater %1 til bruk for %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="794"/>
+        <location filename="../partman.cpp" line="792"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Gjenbruk (uten reformatering) %1 som %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="795"/>
+        <location filename="../partman.cpp" line="793"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>Slett data på %1, bortsett fra /home, til bruk for %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="798"/>
+        <location filename="../partman.cpp" line="796"/>
         <source>Create %1 without formatting</source>
         <translation>Opprett %1 uten formatering</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="799"/>
+        <location filename="../partman.cpp" line="797"/>
         <source>Create %1, format to use for %2</source>
         <translation>Opprett %1, formater til bruk for %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="948"/>
+        <location filename="../partman.cpp" line="946"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>Følgende disker er formatert med, eller skal formateres med GPT-partisjoner, men mangler BIOS-GRUB-partisjon:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="950"/>
+        <location filename="../partman.cpp" line="948"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>Dette systemet kan ikke starte fra GPT-disker uten BIOS-GRUB-partisjon.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="833"/>
-        <location filename="../partman.cpp" line="907"/>
-        <location filename="../partman.cpp" line="925"/>
-        <location filename="../partman.cpp" line="951"/>
+        <location filename="../partman.cpp" line="831"/>
+        <location filename="../partman.cpp" line="905"/>
+        <location filename="../partman.cpp" line="923"/>
+        <location filename="../partman.cpp" line="949"/>
         <source>Are you sure you want to continue?</source>
         <translation>Vil du virkelig fortsette?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="517"/>
+        <location filename="../partman.cpp" line="514"/>
         <source>Layout &amp;Builder...</source>
         <translation>&amp;Verktøy for diskutforming …</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="879"/>
+        <location filename="../partman.cpp" line="877"/>
         <source>%1 (%2) requires %3</source>
         <translation>%1 (%2) krever %3</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="905"/>
+        <location filename="../partman.cpp" line="903"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>Installasjonen kan mislykkes fordi følgende dataområder er for små:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="839"/>
+        <location filename="../partman.cpp" line="837"/>
         <source>The %1 installer will now perform the requested actions.</source>
         <translation>Installasjonsprogrammet for %1 vil nå utføre de forespurte handlingene.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="840"/>
+        <location filename="../partman.cpp" line="838"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation>Disse handlingene kan ikke angres. Fortsette?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="918"/>
+        <location filename="../partman.cpp" line="916"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation>Dette systemet bruker EFI, men ingen gyldig EFI-systempartisjon var tilordnet /boot/efi.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="921"/>
+        <location filename="../partman.cpp" line="919"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation>Dataområdet tilordnet /boot/efi er ikke en gyldig EFI systempartisjon.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="988"/>
+        <location filename="../partman.cpp" line="986"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Det kan oppstå feil på disken med partisjonene som er valgt for installasjon:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="992"/>
+        <location filename="../partman.cpp" line="990"/>
         <source>Smartmon tool output:</source>
         <translation>Utdata fra verktøyet Smartmon:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="993"/>
+        <location filename="../partman.cpp" line="991"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Disken med partisjonene som er valgt for installasjon går gjennom S.M.A.R.T.-testene (smartctl), men de antyder at disken har høyere feilrate enn gjennomsnittet, og kan feile i nær framtid.</translation>
     </message>
@@ -1780,12 +1780,12 @@ Velg et annet brukernavn.</translation>
         <translation>I tilfelle tvil bør installasjonsprogrammet avbrytes og GSmartControl kjøres for ytterligere informasjon.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1000"/>
+        <location filename="../partman.cpp" line="1002"/>
         <source>Do you want to abort the installation?</source>
         <translation>Vil du avbryte installasjonen?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1005"/>
+        <location filename="../partman.cpp" line="1006"/>
         <source>Do you want to continue?</source>
         <translation>Vil du fortsette?</translation>
     </message>
@@ -1795,7 +1795,7 @@ Velg et annet brukernavn.</translation>
         <translation>Klarte ikke formatere LUKS-partisjon.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1231"/>
+        <location filename="../partman.cpp" line="1225"/>
         <source>Failed to open LUKS container.</source>
         <translation>Klarte ikke åpne LUKS-partisjon.</translation>
     </message>
@@ -1820,32 +1820,32 @@ Velg et annet brukernavn.</translation>
         <translation>Lager kryptert dataområde: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1251"/>
+        <location filename="../partman.cpp" line="1245"/>
         <source>Formatting: %1</source>
         <translation>Formaterer: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1244"/>
+        <location filename="../partman.cpp" line="1238"/>
         <source>Failed to format partition.</source>
         <translation>Klarte ikke formatere partisjon.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1309"/>
+        <location filename="../partman.cpp" line="1303"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>Klarte ikke forberede underdataområde.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1310"/>
+        <location filename="../partman.cpp" line="1304"/>
         <source>Preparing subvolumes</source>
         <translation>Forbereder underområder for data</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1408"/>
+        <location filename="../partman.cpp" line="1402"/>
         <source>Failed to mount partition.</source>
         <translation>Klarte ikke montere partisjon.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1413"/>
+        <location filename="../partman.cpp" line="1407"/>
         <source>Mounting: %1</source>
         <translation>Monterer: %1</translation>
     </message>
@@ -1853,22 +1853,22 @@ Velg et annet brukernavn.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2457"/>
+        <location filename="../partman.cpp" line="2449"/>
         <source>&amp;Templates</source>
         <translation>&amp;Maler</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2465"/>
+        <location filename="../partman.cpp" line="2457"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Komprimering (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2467"/>
+        <location filename="../partman.cpp" line="2459"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Komprimering (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2469"/>
+        <location filename="../partman.cpp" line="2461"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Komprimering (&amp;ZLIB)</translation>
     </message>
@@ -1876,47 +1876,47 @@ Velg et annet brukernavn.</translation>
 <context>
     <name>PassEdit</name>
     <message>
-        <location filename="../passedit.cpp" line="144"/>
+        <location filename="../passedit.cpp" line="143"/>
         <source>Negligible</source>
         <translation>Umerkelig</translation>
     </message>
     <message>
-        <location filename="../passedit.cpp" line="144"/>
+        <location filename="../passedit.cpp" line="143"/>
         <source>Very weak</source>
         <translation>Veldig svak</translation>
     </message>
     <message>
-        <location filename="../passedit.cpp" line="144"/>
+        <location filename="../passedit.cpp" line="143"/>
         <source>Weak</source>
         <translation>Svak</translation>
     </message>
     <message>
-        <location filename="../passedit.cpp" line="145"/>
+        <location filename="../passedit.cpp" line="144"/>
         <source>Moderate</source>
         <translation>Moderat</translation>
     </message>
     <message>
-        <location filename="../passedit.cpp" line="145"/>
+        <location filename="../passedit.cpp" line="144"/>
         <source>Strong</source>
         <translation>Sterk</translation>
     </message>
     <message>
-        <location filename="../passedit.cpp" line="145"/>
+        <location filename="../passedit.cpp" line="144"/>
         <source>Very strong</source>
         <translation>Veldig sterk</translation>
     </message>
     <message>
-        <location filename="../passedit.cpp" line="147"/>
+        <location filename="../passedit.cpp" line="146"/>
         <source>Password strength: %1</source>
         <translation>Passordstyrke: %1</translation>
     </message>
     <message>
-        <location filename="../passedit.cpp" line="180"/>
+        <location filename="../passedit.cpp" line="179"/>
         <source>Hide the password</source>
         <translation>Skjul passord</translation>
     </message>
     <message>
-        <location filename="../passedit.cpp" line="180"/>
+        <location filename="../passedit.cpp" line="179"/>
         <source>Show the password</source>
         <translation>Vis passord</translation>
     </message>
@@ -1924,26 +1924,26 @@ Velg et annet brukernavn.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../app.cpp" line="89"/>
+        <location filename="../app.cpp" line="95"/>
         <source>Customizable GUI installer for MX Linux and antiX Linux</source>
         <translation>Grafisk installasjonsprogram for MX Linux og antiX Linux</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="92"/>
+        <location filename="../app.cpp" line="98"/>
         <source>Installs automatically using the configuration file (more information below).
 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.</source>
         <translation>Installer automatisk med oppsettsfila (mer info nedenfor).
 – Advarsel: Kan være farlig – kan slette partisjon(er) automatisk.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="94"/>
+        <location filename="../app.cpp" line="100"/>
         <source>Overrules sanity checks on partitions and drives, causing them to be displayed.
 -- WARNING: this can break things, use it only if you don&apos;t care about data on drive.</source>
         <translation>Overstyrer trygghetskontroller av partisjoner og disker slik at de vises.
 ADVARSEL: Kan ødelegge saker og ting. Brukes kun hvis du ikke bryr deg om data på disken.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="96"/>
+        <location filename="../app.cpp" line="102"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.
 By default /etc/minstall.conf is used.
 This configuration can be used with --auto for an unattended installation.
@@ -1958,12 +1958,12 @@ Installasjonsprogrammet skriver ingen passord eller ignorerte alternativer til n
 Legg merke til at dette er eksperimentelt. Framtidige versjoner vil ikke nødvendigvis være kompatible med eksisterende oppsettsfiler.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="102"/>
+        <location filename="../app.cpp" line="108"/>
         <source>Shutdown automatically when done installing.</source>
         <translation>Slå av automatisk ved fullført installasjon.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="103"/>
+        <location filename="../app.cpp" line="109"/>
         <source>Always use GPT when doing a whole-drive installation regardlesss of capacity.
 Without this option, GPT will only be used on drives with at least 2TB capacity.
 GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.</source>
@@ -1972,17 +1972,17 @@ Uten dette alternativet vil GPT kun brukes på disker som er minst 2 TB store.
 GPT brukes alltid ved installasjon til hel disk på UEFI-systener uavhengig av størrelse, selv uten dette alternativet.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="106"/>
+        <location filename="../app.cpp" line="112"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>Ikke avmonter /mnt/antiX eller lukk noen tilknyttede LUKS-beholdere ved fullføring.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="107"/>
+        <location filename="../app.cpp" line="113"/>
         <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
         <translation>Testmodus for installasjonsprogrammet. Partisjoner/disker vil FORMATERES uten at filer kopieres.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="108"/>
+        <location filename="../app.cpp" line="114"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
@@ -1991,58 +1991,58 @@ Ved omstart vil installasjonsprogrammet startes med --oobe slik at brukeren kan 
 Dette er nyttig for OEM-installasjoner, ved salg, eller hvis maskinen skal gis vekk med et ferdiginstallert OS.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="111"/>
+        <location filename="../app.cpp" line="117"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
         <translation>Nøkkelklar. 
 Startes automatisk hvis installert med alternativet --oem.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="113"/>
+        <location filename="../app.cpp" line="119"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
         <translation>Testmodus for grafisk brukergrensesnitt. Man kan bevege seg mellom dialogvinduene uten å faktisk installere noe.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="114"/>
+        <location filename="../app.cpp" line="120"/>
         <source>Reboots automatically when done installing.</source>
         <translation>Automatisk omstart ved fullført installasjon.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="115"/>
+        <location filename="../app.cpp" line="121"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
         <translation>Installerer med rsync istedenfor cp på tilpassede partisjoner.
 – formaterer ikke /root og virker ikke med kryptering.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="117"/>
+        <location filename="../app.cpp" line="123"/>
         <source>Always check the installation media at the beginning.</source>
         <translation>Kontroller alltid installasjonsmediet først.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="118"/>
+        <location filename="../app.cpp" line="124"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
         <translation>Ikke kontroller installasjonsmediet først.
 Dette anbefales kun hvis du vet det er feilfritt.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="122"/>
+        <location filename="../app.cpp" line="126"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Laster oppsettsfil som angitt av &lt;config-file&gt;.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="126"/>
+        <location filename="../app.cpp" line="130"/>
         <source>Too many arguments. Please check the command format by running the program with --help</source>
         <translation>For mange argumenter. Kontroller riktig kommandoformat ved å kjøre programmet med --help</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="131"/>
+        <location filename="../app.cpp" line="135"/>
         <source>%1 Installer</source>
         <translation>Installering av %1</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="139"/>
+        <location filename="../app.cpp" line="143"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -2051,12 +2051,12 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Lukk det hvis mulig, eller kjør &apos;pkill minstall&apos; i terminalen.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="146"/>
+        <location filename="../app.cpp" line="150"/>
         <source>This operation requires root access.</source>
         <translation>Denne handlingen krever root-tilgang.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="167"/>
+        <location filename="../app.cpp" line="171"/>
         <source>Configuration file (%1) not found.</source>
         <translation>Fant ikke oppsettsfila (%1).</translation>
     </message>
