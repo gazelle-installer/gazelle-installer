@@ -306,19 +306,19 @@ Disfruta usando %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="651"/>
-        <location filename="../minstall.cpp" line="735"/>
+        <location filename="../minstall.cpp" line="733"/>
         <source>Encryption</source>
         <translation>Encriptación</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="652"/>
-        <location filename="../minstall.cpp" line="736"/>
+        <location filename="../minstall.cpp" line="734"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>La encriptación es posible a través de LUKS. Se requiere una contraseña.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="653"/>
-        <location filename="../minstall.cpp" line="737"/>
+        <location filename="../minstall.cpp" line="735"/>
         <source>A separate unencrypted boot partition is required.</source>
         <translation>Se requiere una partición de arranque separada sin cifrar.</translation>
     </message>
@@ -488,72 +488,71 @@ Disfruta usando %1</translation>
         <translation>Cuando se utiliza una unidad con formato GPT en un sistema no EFI, se requiere una partición de arranque de la BIOS de 1MB cuando se utiliza GRUB.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="719"/>
         <source>New drives are formatted in GPT if more than 4 partitions are to be created, or the drive has a capacity greater than 2TB. If the installer is about to format the disk in GPT, and there is no BIOS-GRUB partition, a warning will be displayed before the installation starts.</source>
-        <translation>Las unidades nuevas se formatean en GPT si se van a crear más de 4 particiones, o la unidad tiene una capacidad superior a 2TB. Si el instalador está a punto de formatear el disco en GPT, y no hay ninguna partición BIOS-GRUB, se mostrará una advertencia antes de que comience la instalación.</translation>
+        <translation type="vanished">Las unidades nuevas se formatean en GPT si se van a crear más de 4 particiones, o la unidad tiene una capacidad superior a 2TB. Si el instalador está a punto de formatear el disco en GPT, y no hay ninguna partición BIOS-GRUB, se mostrará una advertencia antes de que comience la instalación.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="721"/>
+        <location filename="../minstall.cpp" line="719"/>
         <source>Need help creating a layout?</source>
         <translation>¿Necesita ayuda para crear un diseño?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="722"/>
+        <location filename="../minstall.cpp" line="720"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
         <translation>Basta con hacer clic con el botón derecho en una unidad y seleccionar &lt;b&gt;Generador de diseños&lt;/b&gt; en el menú. Esto puede crear un diseño similar al de la instalación normal.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="756"/>
+        <location filename="../minstall.cpp" line="754"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Instalar GRUB para Linux y Windows</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="757"/>
+        <location filename="../minstall.cpp" line="755"/>
         <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation>%1 utiliza el gestor de arranque GRUB para arrancar %1 y Microsoft Windows.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="758"/>
+        <location filename="../minstall.cpp" line="756"/>
         <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
         <translation>Por defecto GRUB se instala en el Registro Maestro de Arranque (MBR) o ESP (Partición del Sistema EFI para sistemas de arranque UEFI de 64 bits) de su unidad de arranque y reemplaza al gestor de arranque que estaba utilizando antes. Esto es lo normal.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="759"/>
+        <location filename="../minstall.cpp" line="757"/>
         <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
         <translation>Si elige instalar GRUB en Partition Boot Record (PBR) en su lugar, entonces GRUB se instalará al principio de la partición especificada. Esta opción es sólo para expertos.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="760"/>
+        <location filename="../minstall.cpp" line="758"/>
         <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
         <translation>Si desmarca la casilla Instalar GRUB, GRUB no se instalará en este momento. Esta opción es sólo para expertos.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="761"/>
+        <location filename="../minstall.cpp" line="759"/>
         <source>Create a swap file</source>
         <translation>Crear un archivo para la swap</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="762"/>
+        <location filename="../minstall.cpp" line="760"/>
         <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
         <translation>Un archivo de intercambio es más flexible que una partición de intercambio; es considerablemente más fácil redimensionar un archivo de intercambio para adaptarse a los cambios en el uso del sistema.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="763"/>
+        <location filename="../minstall.cpp" line="761"/>
         <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
         <translation>Por defecto, está marcada si no se han establecido particiones swap, y desmarcada si se han establecido particiones swap. Esta opción debe dejarse sin tocar, y es sólo para expertos.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="764"/>
+        <location filename="../minstall.cpp" line="762"/>
         <source>Setting the size to 0 has the same effect as unchecking this option.</source>
         <translation>Poner el tamaño a 0 tiene el mismo efecto que desmarcar esta opción.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="871"/>
+        <location filename="../minstall.cpp" line="869"/>
         <source>Enjoy using %1</source>
         <translation>Disfrute usando %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="723"/>
+        <location filename="../minstall.cpp" line="721"/>
         <source>Upgrading</source>
         <translation>Actualizando</translation>
     </message>
@@ -634,283 +633,283 @@ Disfruta usando %1</translation>
         <translation>La mayoría de los sistemas construidos en los últimos 10 años utilizan EFI.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="724"/>
+        <location filename="../minstall.cpp" line="722"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and select &lt;b&gt;Preserve&lt;/b&gt; as the format.</source>
         <translation>Para actualizar desde una instalación de Linux existente, seleccione la misma partición de inicio que antes y seleccione &lt;b&gt;Conservar&lt;/b&gt; el formato.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="725"/>
+        <location filename="../minstall.cpp" line="723"/>
         <source>If you do not use a separate home partition, select &lt;b&gt;Preserve /home&lt;/b&gt; on the root file system entry to preserve the existing /home directory located on your root partition. The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.</source>
         <translation>Si no utiliza una partición de inicio separada, seleccione &lt;b&gt;Preservar /home&lt;/b&gt; en la entrada del sistema de archivos raíz para conservar el directorio /home existente ubicado en su partición raíz. El instalador sólo conservará /home, y borrará todo lo demás. Como resultado, la instalación tardará mucho más de lo habitual.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="727"/>
+        <location filename="../minstall.cpp" line="725"/>
         <source>Preferred Filesystem Type</source>
         <translation>Tipo de sistema de archivos preferido</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="728"/>
+        <location filename="../minstall.cpp" line="726"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
         <translation>Para %1, puede elegir formatear las particiones como ext2, ext3, ext4, f2fs, jfs, xfs o btrfs.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="729"/>
+        <location filename="../minstall.cpp" line="727"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>Hay opciones de compresión adicionales disponibles para unidades que usan btrfs. Lzo es rápido, pero la compresión es menor. Zlib es más lento, pero con mayor compresión.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="731"/>
+        <location filename="../minstall.cpp" line="729"/>
         <source>System partition management tool</source>
         <translation>Herramienta de gestión de particiones del sistema</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="732"/>
+        <location filename="../minstall.cpp" line="730"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
         <translation>Para tener más control sobre los diseños de las unidades (como modificar el diseño existente en un disco), haga clic en el botón de administración de particiones (%1). Esto ejecutará la herramienta de administración de particiones del sistema operativo, lo que le permitirá crear el diseño exacto que necesita.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="738"/>
+        <location filename="../minstall.cpp" line="736"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
         <translation>Para conservar una partición cifrada, haga clic con el botón derecho del ratón sobre ella y seleccione &lt;b&gt;Desbloquear&lt;/b&gt;. En el diálogo que aparece, introduzca un nombre para el dispositivo virtual y la contraseña. Cuando el dispositivo esté desbloqueado, el nombre que hayas elegido aparecerá en &lt;i&gt;Dispositivos virtuales&lt;/i&gt;, con opciones similares a las de una partición normal.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="740"/>
+        <location filename="../minstall.cpp" line="738"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
         <translation>Para que la partición cifrada se desbloquee en el arranque, es necesario añadirla al archivo crypttab. Para ello, utilice la acción del menú &lt;b&gt;Añadir a crypttab&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="741"/>
+        <location filename="../minstall.cpp" line="739"/>
         <source>Other partitions</source>
         <translation>Otras particiones</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="742"/>
+        <location filename="../minstall.cpp" line="740"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
         <translation>El instalador permite que se creen o utilicen otras particiones para otros fines; sin embargo, tenga en cuenta que los sistemas más antiguos no pueden manejar unidades con más de 4 particiones.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="743"/>
+        <location filename="../minstall.cpp" line="741"/>
         <source>Subvolumes</source>
         <translation>Subvolúmenes</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="744"/>
+        <location filename="../minstall.cpp" line="742"/>
         <source>Some file systems, such as Btrfs, support multiple subvolumes in a single partition. These are not physical subdivisions, and so their order does not matter.</source>
         <translation>Algunos sistemas de archivos, como Btrfs, admiten múltiples subvolúmenes en una sola partición. Estas no son subdivisiones físicas, por lo que su orden no importa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="746"/>
+        <location filename="../minstall.cpp" line="744"/>
         <source>Use the &lt;b&gt;Scan subvolumes&lt;/b&gt; menu action to search an existing Btrfs partition for subvolumes. To create a new subvolume, use the &lt;b&gt;New subvolume&lt;/b&gt; menu action.</source>
         <translation>Utilice la acción de menú &lt;b&gt;Escanear subvolúmenes&lt;/b&gt; para buscar subvolúmenes en una partición Btrfs existente. Para crear un nuevo subvolumen, utilice la acción de menú &lt;b&gt;Nuevo subvolumen&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="748"/>
+        <location filename="../minstall.cpp" line="746"/>
         <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
         <translation>Los subvolúmenes existentes pueden conservarse, pero el nombre debe seguir siendo el mismo.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="749"/>
+        <location filename="../minstall.cpp" line="747"/>
         <source>Virtual Devices</source>
         <translation>Dispositivos virtuales</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="750"/>
+        <location filename="../minstall.cpp" line="748"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
         <translation>Si el instalador detecta cualquier dispositivo virtual, como particiones LUKS abiertas, volúmenes lógicos LVM o volúmenes RAID basados en software, pueden utilizarse para la instalación.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="751"/>
+        <location filename="../minstall.cpp" line="749"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>El uso de dispositivos virtuales (más allá de preservar los sistemas de archivos cifrados) es una característica avanzada. Es posible que tenga que editar algunos archivos (por ejemplo, initramfs, crypttab, fstab) para asegurarse de que los dispositivos virtuales utilizados se crean al arrancar.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="770"/>
+        <location filename="../minstall.cpp" line="768"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Servicios Comúnes para Habilitar&lt;/b&gt;&lt;br/&gt;Seleccione cualquiera de estos servicios comunes que pueda necesitar para la configuración del sistema y los servicios serán iniciados automáticamente en el arranque de %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="774"/>
+        <location filename="../minstall.cpp" line="772"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Identidad de la computadora&lt;/b&gt;&lt;br/&gt;El nombre de la computadora es un nombre común y único que identifica a su computadora si se halla en una red de trabajo. El dominio de la computadora normalmente no se usa a menos que su ISP o red local lo requieran.&lt;/p&gt;&lt;p&gt;Ambos nombres pueden contener solamente caracteres alfanuméricos, guiones, y puntos. No pueden contener espacios ni guiones al inicio o al final.&lt;/p&gt;&lt;p&gt;El servidor SaMBa debe activarse si desea usarlo para compartir directorios o impresoras con un equipo local que funcione con MS-Windows o Mac OSX.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="784"/>
+        <location filename="../minstall.cpp" line="782"/>
         <source>Localization Defaults</source>
         <translation>Localización Predeterminada</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="785"/>
+        <location filename="../minstall.cpp" line="783"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation>Establezca la configuración regional predeterminada. Esto se aplicará a menos que el usuario las anule más adelante.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="786"/>
+        <location filename="../minstall.cpp" line="784"/>
         <source>Configure Clock</source>
         <translation>Configurar el Reloj</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="787"/>
+        <location filename="../minstall.cpp" line="785"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation>Si tiene una computadora Apple o Unix puro, el reloj del sistema está configurado de manera predeterminada en la hora del meridiano de Greenwich (GMT) o en la hora universal coordinada (UTC). Para cambiar esto, marque la casilla &quot;&lt;b&gt;El reloj del sistema usa la hora local&lt;/b&gt;&quot;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="789"/>
+        <location filename="../minstall.cpp" line="787"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation>El sistema arranca con la zona horaria preestablecida en GMT/UTC. Para cambiar la zona horaria, después de reiniciar en la nueva instalación, haga clic derecho en el reloj en el Panel y seleccione Propiedades.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="791"/>
+        <location filename="../minstall.cpp" line="789"/>
         <source>Service Settings</source>
         <translation>Configuración de servicio</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="792"/>
+        <location filename="../minstall.cpp" line="790"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation>La mayoría de los usuarios no deberían cambiar los valores predeterminados. Los usuarios con computadoras de bajos recursos a veces desean deshabilitar servicios innecesarios para mantener el uso de RAM lo más bajo posible. ¡Asegúrate de saber lo que estás haciendo!</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="798"/>
+        <location filename="../minstall.cpp" line="796"/>
         <source>Default User Login</source>
         <translation>Inicio de sesión de usuario predeterminado</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="799"/>
+        <location filename="../minstall.cpp" line="797"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
         <translation>El usuario root es similar al usuario administrador en algunos otros sistemas operativos. No debe usar el usuario root como su cuenta de usuario diaria. Introduzca el nombre de una nueva cuenta de usuario (predeterminada) que usará a diario. Si es necesario, puede agregar otras cuentas de usuario más tarde con %1 Gestor de Usuario.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="803"/>
+        <location filename="../minstall.cpp" line="801"/>
         <source>Passwords</source>
         <translation>Contraseñas</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="804"/>
+        <location filename="../minstall.cpp" line="802"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
         <translation>Ingrese una nueva contraseña para su cuenta de usuario predeterminada y para la cuenta raíz. Cada contraseña debe ingresarse dos veces.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="806"/>
+        <location filename="../minstall.cpp" line="804"/>
         <source>No passwords</source>
         <translation>Sin contraseñas</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="807"/>
+        <location filename="../minstall.cpp" line="805"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
         <translation>Si desea que la cuenta de usuario predeterminada no tenga contraseña, deje los campos de contraseña vacíos. Esto le permite iniciar sesión sin necesidad de una contraseña.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="809"/>
+        <location filename="../minstall.cpp" line="807"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
         <translation>Obviamente, esto solo debe hacerse en situaciones en las que la cuenta de usuario no necesita ser segura, como una terminal pública.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="817"/>
+        <location filename="../minstall.cpp" line="815"/>
         <source>Old Home Directory</source>
         <translation>Directorio Home Antiguo</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="818"/>
+        <location filename="../minstall.cpp" line="816"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation>Ya existe un directorio home para el nombre de usuario que ha elegido. Esta pantalla le permite elegir lo que le sucede a este directorio.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="820"/>
+        <location filename="../minstall.cpp" line="818"/>
         <source>Re-use it for this installation</source>
         <translation>Reutilizarlo para esta instalación</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="821"/>
+        <location filename="../minstall.cpp" line="819"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation>El directorio home antiguo será usado para esta cuenta de usuario. Esta es una buena opción cuando se actualiza, y sus archivos y configuraciones estarán fácilmente disponibles.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="823"/>
+        <location filename="../minstall.cpp" line="821"/>
         <source>Rename it and create a new directory</source>
         <translation>Renombrar y crear un nuevo directorio</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="824"/>
+        <location filename="../minstall.cpp" line="822"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation>Se creará un nuevo directorio home para el usuario, pero el antiguo directorio home será renombrado. Sus archivos y configuraciones no serán visibles inmediatamente en la nueva instalación, pero se puede acceder a ellos usando el directorio renombrado.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="826"/>
+        <location filename="../minstall.cpp" line="824"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation>El directorio antiguo tendrá un número al final, dependiendo de cuántas veces el directorio ha sido renombrado antes.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="827"/>
+        <location filename="../minstall.cpp" line="825"/>
         <source>Delete it and create a new directory</source>
         <translation>Borrar y crear un nuevo directorio</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="828"/>
+        <location filename="../minstall.cpp" line="826"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation>El antiguo directorio de home se eliminará y se creará uno nuevo desde cero.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="829"/>
+        <location filename="../minstall.cpp" line="827"/>
         <source>Warning</source>
         <translation>Advertencia</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="830"/>
+        <location filename="../minstall.cpp" line="828"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation>Todos los archivos y configuraciones se eliminarán permanentemente si se selecciona esta opción. Sus posibilidades de recuperarlos son bajas.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="846"/>
+        <location filename="../minstall.cpp" line="844"/>
         <source>Installation in Progress</source>
         <translation>Progreso de la Instalación</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="847"/>
+        <location filename="../minstall.cpp" line="845"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation>%1 se está instalando. Para una nueva instalación, esto probablemente tomará de 3 a 20 minutos, dependiendo de la velocidad de su sistema y el tamaño de las particiones que esté formateando.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="849"/>
+        <location filename="../minstall.cpp" line="847"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation>Si hace clic en el botón Abortar, la instalación se detendrá tan pronto como sea posible.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="851"/>
+        <location filename="../minstall.cpp" line="849"/>
         <source>Change settings while you wait</source>
         <translation>Cambie la configuración mientras espera</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="852"/>
+        <location filename="../minstall.cpp" line="850"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation>Mientras se instala %1, puede hacer clic en los botones &lt;b&gt;Siguiente&lt;/b&gt; o &lt;b&gt;Atrás&lt;/b&gt; para ingresar otra información requerida para la instalación.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="854"/>
+        <location filename="../minstall.cpp" line="852"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation>Complete estos pasos a su propio ritmo. El instalador esperará su aporte si es necesario.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="862"/>
+        <location filename="../minstall.cpp" line="860"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;¡Felicitaciones!&lt;/b&gt;&lt;br/&gt;Ha completado la instalación de %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Buscar Aplicaciones&lt;/b&gt;&lt;br/&gt;Existen cientos de aplicaciones excelentes instaladas con %1. La mejor manera de conocerlas es navegar en el Menú y probarlas. Muchas aplicaciones fueron desarrolladas específicamente para el proyecto %1. Estas aparecen en los menús principales. &lt;p&gt;Además, %1 incluye muchas aplicaciones estándares de Linux que se ejecutan solamente desde la línea de comandos y por dicha razón no aparecen en los Menús.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="872"/>
-        <location filename="../minstall.cpp" line="1138"/>
+        <location filename="../minstall.cpp" line="870"/>
+        <location filename="../minstall.cpp" line="1136"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Apoye a %1&lt;/b&gt;&lt;br/&gt;%1 está apoyado por gente como usted. Algunas personas ayudan a otras en el foro de apoyo - %2 - o traducen archivos de ayuda a diferentes idiomas, realizan sugerencias, escriben documentaciónes, o ayudan a probar software nuevo.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="902"/>
+        <location filename="../minstall.cpp" line="900"/>
         <source>Finish</source>
         <translation>Finalizar</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="905"/>
+        <location filename="../minstall.cpp" line="903"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="907"/>
+        <location filename="../minstall.cpp" line="905"/>
         <source>Next</source>
         <translation>Siguiente</translation>
     </message>
@@ -925,34 +924,34 @@ Disfruta usando %1</translation>
         <translation>Configuración completada. Reiniciando el sistema.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1060"/>
+        <location filename="../minstall.cpp" line="1058"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>La instalación y configuración están incompletas.
 ¿De verdad quieres parar ahora?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1124"/>
+        <location filename="../minstall.cpp" line="1122"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Buscar Ayuda&lt;/b&gt;&lt;br/&gt;La información Básica acerca de %1 está en %2.&lt;/p&gt;&lt;p&gt;Hay voluntarios que pueden ayudarle en el foro %3, %4&lt;/p&gt;&lt;p&gt;Si solicita ayuda, por favor recuerde describir su problema y su computador en detalle. Declaraciones como &apos;tal cosa no funciona&apos; normalmente no nos ayuda para determinar una solución a su problema.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1132"/>
+        <location filename="../minstall.cpp" line="1130"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Reparando su instalación&lt;/b&gt;&lt;br/&gt;Si %1 deja de funcionar desde el disco duro, a veces es posible arreglar el problema al iniciar con el LiveDVD o LiveUSB y al ejecutar una de las utilidades incluidas en %1 o por medio de las herramientas incluidas en Linux para reparar el sistema.&lt;/p&gt;&lt;p&gt;¡Además, puede usar el %1 LiveDVD o LiveUSB para recuperar datos de sistemas de MS-Windows!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1146"/>
+        <location filename="../minstall.cpp" line="1144"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ajustando el Mezclador de Sonido&lt;/b&gt;&lt;br/&gt; %1 intenta configurar el mezclador de sonido pero a veces será necesario que usted ajuste el volumen y/o desactive el silenciador de canales para poder escuchar el sonido.&lt;/p&gt; &lt;p&gt;El acceso directo del mezclador está ubicado en el menú. Haga clic en él para abrirlo. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1154"/>
+        <location filename="../minstall.cpp" line="1152"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Mantenga su copia de %1 actualizada&lt;/b&gt;&lt;br/&gt;Para más información y actualizaciones, por favor visite &lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1159"/>
+        <location filename="../minstall.cpp" line="1157"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Agradecimientos Especiales&lt;/b&gt;&lt;br/&gt;Gracias a todos quienes han decidido apoyar %1 con su tiempo, recursos económicos, sugerencias, trabajo, elogios, ideas, promoción y/o estímulo.&lt;/p&gt;&lt;p&gt;Sin ustedes, no existiria %1.&lt;/p&gt;&lt;p&gt;%2 El Equipo de Desarolladores&lt;/p&gt;</translation>
     </message>
@@ -1512,7 +1511,7 @@ Por favor elija un nombre diferente.</translation>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="../partman.cpp" line="219"/>
+        <location filename="../partman.cpp" line="217"/>
         <source>Virtual Devices</source>
         <translation>Dispositivos virtuales</translation>
     </message>
@@ -1634,95 +1633,95 @@ Por favor elija un nombre diferente.</translation>
         <translation>No se puede conservar /home dentro de la raíz (/) si también está montada una partición /home separada.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="787"/>
+        <location filename="../partman.cpp" line="786"/>
         <source>Reuse (no reformat) %1</source>
         <translation>Reutilizar (sin reformatear) %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="790"/>
+        <location filename="../partman.cpp" line="789"/>
         <source>Format %1</source>
         <translation>Formatear %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="806"/>
+        <location filename="../partman.cpp" line="805"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation>Reutilizar subvolumen %1 como %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="808"/>
+        <location filename="../partman.cpp" line="807"/>
         <source>Delete subvolume %1</source>
         <translation>Borrar subvolumen %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="811"/>
+        <location filename="../partman.cpp" line="810"/>
         <source>Overwrite subvolume %1</source>
         <translation>Sobrescribir subvolumen %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="812"/>
+        <location filename="../partman.cpp" line="811"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation>Sobrescribir subvolumen %1 para usarlo en %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="814"/>
+        <location filename="../partman.cpp" line="813"/>
         <source>Create subvolume %1</source>
         <translation>Crear subvolumen %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="815"/>
+        <location filename="../partman.cpp" line="814"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation>Crear subvolumen %1 para usarlo en %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="830"/>
+        <location filename="../partman.cpp" line="829"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Debe elegir una partición de arranque separada al encriptar la raíz.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="781"/>
+        <location filename="../partman.cpp" line="780"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>Preparar la tabla de partición %1 en %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="791"/>
+        <location filename="../partman.cpp" line="790"/>
         <source>Format %1 to use for %2</source>
         <translation>Formatear %1 para usar en %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="792"/>
+        <location filename="../partman.cpp" line="791"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Reutilizar (sin reformatear) %1 como %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="793"/>
+        <location filename="../partman.cpp" line="792"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>Eliminar los datos en %1 excepto /home, para usarlos en %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="796"/>
+        <location filename="../partman.cpp" line="795"/>
         <source>Create %1 without formatting</source>
         <translation>Crear %1 sin formatear</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="797"/>
+        <location filename="../partman.cpp" line="796"/>
         <source>Create %1, format to use for %2</source>
         <translation>Crear %1, formato para usar en %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="946"/>
+        <location filename="../partman.cpp" line="945"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>Las siguientes unidades están, o estarán, configuradas con GPT, pero no tienen una partición BIOS-GRUB:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="948"/>
+        <location filename="../partman.cpp" line="947"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>Este sistema no puede arrancar desde unidades GPT sin una partición BIOS-GRUB.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="831"/>
-        <location filename="../partman.cpp" line="905"/>
-        <location filename="../partman.cpp" line="923"/>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="830"/>
+        <location filename="../partman.cpp" line="904"/>
+        <location filename="../partman.cpp" line="922"/>
+        <location filename="../partman.cpp" line="948"/>
         <source>Are you sure you want to continue?</source>
         <translation>¿Está seguro que quiere continuar?</translation>
     </message>
@@ -1732,112 +1731,112 @@ Por favor elija un nombre diferente.</translation>
         <translation>&amp;Generador de diseños...</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="877"/>
+        <location filename="../partman.cpp" line="876"/>
         <source>%1 (%2) requires %3</source>
         <translation>%1 (%2) requiere %3</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="903"/>
+        <location filename="../partman.cpp" line="902"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>La instalación puede fallar porque los siguientes volúmenes son demasiado pequeños:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="837"/>
+        <location filename="../partman.cpp" line="836"/>
         <source>The %1 installer will now perform the requested actions.</source>
         <translation>El instalador %1 realizará ahora las acciones solicitadas.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="838"/>
+        <location filename="../partman.cpp" line="837"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation>Estas acciones no podrán deshacerse. ¿Desea continuar?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="916"/>
+        <location filename="../partman.cpp" line="915"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation>Este sistema utiliza EFI, pero no se ha asignado ninguna partición de sistema EFI válida para /boot/efi por separado.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="919"/>
+        <location filename="../partman.cpp" line="918"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation>El volumen asignado a /boot/efi no es una partición de sistema EFI válida.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="986"/>
+        <location filename="../partman.cpp" line="985"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Los discos con las particiones seleccionadas están fallando:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="990"/>
+        <location filename="../partman.cpp" line="989"/>
         <source>Smartmon tool output:</source>
         <translation>Resultados de la herramienta Smartmon:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="991"/>
+        <location filename="../partman.cpp" line="990"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Los discos con las particiones que seleccionó para la instalación pasan la prueba del monitor SMART (smartctl), pero las pruebas indican que tendrán una tasa de fallas superior a la media en un futuro próximo.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="998"/>
+        <location filename="../partman.cpp" line="997"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>Si no está seguro, por favor salga del instalador y ejecute GSmartControl para obtener más información.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1002"/>
+        <location filename="../partman.cpp" line="1001"/>
         <source>Do you want to abort the installation?</source>
         <translation>¿Quieres cancelar la instalación?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1006"/>
+        <location filename="../partman.cpp" line="1005"/>
         <source>Do you want to continue?</source>
         <translation>¿Desea continuar?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1211"/>
+        <location filename="../partman.cpp" line="1210"/>
         <source>Failed to format LUKS container.</source>
         <translation>Fallo al formatear el contenedor LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1225"/>
+        <location filename="../partman.cpp" line="1224"/>
         <source>Failed to open LUKS container.</source>
         <translation>Fallo al abrir el contenedor LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1092"/>
+        <location filename="../partman.cpp" line="1091"/>
         <source>Failed to prepare required partitions.</source>
         <translation>No se pudieron preparar las particiones requeridas.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1131"/>
+        <location filename="../partman.cpp" line="1130"/>
         <source>Preparing partition tables</source>
         <translation>Preparando las tablas de partición</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1148"/>
+        <location filename="../partman.cpp" line="1147"/>
         <source>Preparing required partitions</source>
         <translation>Preparando particiones requeridas</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1216"/>
+        <location filename="../partman.cpp" line="1215"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Creando volumen cifrado: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1245"/>
+        <location filename="../partman.cpp" line="1244"/>
         <source>Formatting: %1</source>
         <translation>Formateando: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1238"/>
+        <location filename="../partman.cpp" line="1237"/>
         <source>Failed to format partition.</source>
         <translation>Fallo al formatear la partición.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1303"/>
+        <location filename="../partman.cpp" line="1302"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>Fallo al preparar los subvolúmenes.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1304"/>
+        <location filename="../partman.cpp" line="1303"/>
         <source>Preparing subvolumes</source>
         <translation>Preparando subvolúmenes</translation>
     </message>
@@ -1855,22 +1854,22 @@ Por favor elija un nombre diferente.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2449"/>
+        <location filename="../partman.cpp" line="2455"/>
         <source>&amp;Templates</source>
         <translation>Plan&amp;tillas</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2457"/>
+        <location filename="../partman.cpp" line="2463"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compresión (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2459"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compresión (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2461"/>
+        <location filename="../partman.cpp" line="2467"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compresión (&amp;ZLIB)</translation>
     </message>
@@ -1965,26 +1964,25 @@ Tenga en cuenta que esto es experimental. Las versiones futuras del instalador p
         <translation>Se apagará automáticamente cuando finalice la instalación.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="109"/>
         <source>Always use GPT when doing a whole-drive installation regardlesss of capacity.
 Without this option, GPT will only be used on drives with at least 2TB capacity.
 GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.</source>
-        <translation>Use siempre GPT cuando realice una instalación de disco completo independientemente de la capacidad.
+        <translation type="vanished">Use siempre GPT cuando realice una instalación de disco completo independientemente de la capacidad.
 Sin esta opción, GPT solo se usará en unidades con al menos 2 TB de capacidad.
 GPT siempre se usa en instalaciones de disco completo en sistemas UEFI independientemente de la capacidad, incluso sin esta opción.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="112"/>
+        <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>No desmonte /mnt/antiX ni cierre ninguno de los contenedores LUKS asociados cuando finalice.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="113"/>
+        <location filename="../app.cpp" line="110"/>
         <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
         <translation>Otro modo de prueba para el instalador, las particiones/unidades serán FORMATEADAS, omitirá copiar los archivos.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="114"/>
+        <location filename="../app.cpp" line="111"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
@@ -1993,57 +1991,57 @@ Al reiniciar, el instalador se ejecutará con --oobe para que el usuario pueda p
 Esto es útil para instalaciones OEM, vender o regalar una computadora con un sistema operativo precargado.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="117"/>
+        <location filename="../app.cpp" line="114"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
         <translation>Opción de experiencia inmediata.
 Esto se iniciará automáticamente si se instala con la opción --oem.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="119"/>
+        <location filename="../app.cpp" line="116"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
         <translation>Modo de prueba para GUI, puede avanzar a diferentes pantallas sin realmente instalar.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="120"/>
+        <location filename="../app.cpp" line="117"/>
         <source>Reboots automatically when done installing.</source>
         <translation>Reiniciar automáticamente cuando termine la instalación.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="121"/>
+        <location filename="../app.cpp" line="118"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
         <translation>Instalación con rsync en lugar de cp en particiones personalizadas.
 -- no formatea /root y no funciona con encriptado.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="123"/>
+        <location filename="../app.cpp" line="120"/>
         <source>Always check the installation media at the beginning.</source>
         <translation>Verificar siempre los medios de instalación al iniciar.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="124"/>
+        <location filename="../app.cpp" line="121"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
         <translation>No verificar los medios de instalación al iniciar.No se recomienda a menos que se garantice que los medios de instalación están libres de errores.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="126"/>
+        <location filename="../app.cpp" line="123"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Cargue un archivo de configuración según lo especificado por &lt;config-file&gt;.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="130"/>
+        <location filename="../app.cpp" line="127"/>
         <source>Too many arguments. Please check the command format by running the program with --help</source>
         <translation>Demasiados argumentos. Por favor, compruebe el formato del comando ejecutando el programa con --help</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="135"/>
+        <location filename="../app.cpp" line="132"/>
         <source>%1 Installer</source>
         <translation>Instalador %1</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="143"/>
+        <location filename="../app.cpp" line="140"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -2052,12 +2050,12 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Ciérrelo si es posible, o ejecute &apos;pkill minstall&apos; en la terminal.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="150"/>
+        <location filename="../app.cpp" line="147"/>
         <source>This operation requires root access.</source>
         <translation>Esta operación requiere acceso de root.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="171"/>
+        <location filename="../app.cpp" line="168"/>
         <source>Configuration file (%1) not found.</source>
         <translation>No se encontró el archivo de configuración (%1).</translation>
     </message>

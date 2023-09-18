@@ -306,19 +306,19 @@ Gaudiu usant %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="651"/>
-        <location filename="../minstall.cpp" line="735"/>
+        <location filename="../minstall.cpp" line="733"/>
         <source>Encryption</source>
         <translation>Encriptació</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="652"/>
-        <location filename="../minstall.cpp" line="736"/>
+        <location filename="../minstall.cpp" line="734"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>Es pot encriptar amb LUKS. Caldrà una contrasenya.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="653"/>
-        <location filename="../minstall.cpp" line="737"/>
+        <location filename="../minstall.cpp" line="735"/>
         <source>A separate unencrypted boot partition is required.</source>
         <translation>Cal una partició d&apos;arrencada diferent, no encriptada.</translation>
     </message>
@@ -488,72 +488,71 @@ Gaudiu usant %1</translation>
         <translation>En usar una unitat formatada com a GPT en un sistema no-EFI,  cal una partició d&apos;arrencada BIOS d&apos;1MB BIOS quan s&apos;utilitza GRUB.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="719"/>
         <source>New drives are formatted in GPT if more than 4 partitions are to be created, or the drive has a capacity greater than 2TB. If the installer is about to format the disk in GPT, and there is no BIOS-GRUB partition, a warning will be displayed before the installation starts.</source>
-        <translation>Les noves unitats es formataran en GPT si cal crear més de 4 particions, o bé si la unitat té més de 2TB de capacitat. Si l&apos;instal·lador està a punt de formatar un disc en  GPT, i no hi ha una partició BIOS-GRUB, es mostrarà un avís abans de començar la instal·lació.</translation>
+        <translation type="vanished">Les noves unitats es formataran en GPT si cal crear més de 4 particions, o bé si la unitat té més de 2TB de capacitat. Si l&apos;instal·lador està a punt de formatar un disc en  GPT, i no hi ha una partició BIOS-GRUB, es mostrarà un avís abans de començar la instal·lació.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="721"/>
+        <location filename="../minstall.cpp" line="719"/>
         <source>Need help creating a layout?</source>
         <translation>Us cal ajuda per crear una disposició?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="722"/>
+        <location filename="../minstall.cpp" line="720"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
         <translation>Feu clic dret sobre una unitat i trieu&lt;b&gt;Creador de disposició&lt;/b&gt; del menú. Això crearà una disposició similar a la d&apos;una instal·lació normal.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="756"/>
+        <location filename="../minstall.cpp" line="754"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Instal·la GRUB per Linux i Windows</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="757"/>
+        <location filename="../minstall.cpp" line="755"/>
         <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation>%1 usa el carregador GRUB per arrencar %1 i Microsoft Windows.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="758"/>
+        <location filename="../minstall.cpp" line="756"/>
         <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
         <translation>Per omissió GRUB s&apos;instal·la al Master Boot Record (MBR) o l&apos;ESP (EFI System Partition per sistemes UEFI de 64-bit) del vostre disc d&apos;arrencada i reemplaça el carregador que estàveu usant fins llavors. Això és normal.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="759"/>
+        <location filename="../minstall.cpp" line="757"/>
         <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
         <translation>Si trieu instal·lar el GRUB al Partition Boot Record (PBR) en lloc del MBR, llavors el GRUB s&apos;instal·larà a l&apos;inici de la partició especificada. Aquesta opció és només per experts.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="760"/>
+        <location filename="../minstall.cpp" line="758"/>
         <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
         <translation>Si desactiveu la casella d&apos;instal·lar el GRUB, aquest no s&apos;instal·larà en aquest moment. Aquesta opció és només per experts.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="761"/>
+        <location filename="../minstall.cpp" line="759"/>
         <source>Create a swap file</source>
         <translation>Crea un fitxer d&apos;intercanvi</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="762"/>
+        <location filename="../minstall.cpp" line="760"/>
         <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
         <translation>Un fitxer d&apos;intercanvi és més flexible que una partició d&apos;intercanvi; és molt més fàcil redimensionar un fitxer d&apos;intercanvi per adaptar-se als canvis en l&apos;ús del sistema.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="763"/>
+        <location filename="../minstall.cpp" line="761"/>
         <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
         <translation>Per omissió, està activat si no s&apos;han definit particions d&apos;intercanvi, i desactivat si hi ha particions d&apos;intercanvi definides. Aquesta opció s&apos;hauria de deixar tal com està, i és només per experts.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="764"/>
+        <location filename="../minstall.cpp" line="762"/>
         <source>Setting the size to 0 has the same effect as unchecking this option.</source>
         <translation>Definir la mida a 0 té el mateix efecte que desactivar aquesta opció.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="871"/>
+        <location filename="../minstall.cpp" line="869"/>
         <source>Enjoy using %1</source>
         <translation>Gaudiu de l&apos;ús de %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="723"/>
+        <location filename="../minstall.cpp" line="721"/>
         <source>Upgrading</source>
         <translation>Actualització</translation>
     </message>
@@ -634,283 +633,283 @@ Gaudiu usant %1</translation>
         <translation>Molts sistemes fabricats en els darrers 10 anys usen EFI.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="724"/>
+        <location filename="../minstall.cpp" line="722"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and select &lt;b&gt;Preserve&lt;/b&gt; as the format.</source>
         <translation>Per actualitzar des d&apos;una instal·lació Linux existent, seleccioneu la mateixa partició home com abans i trieu com a format&lt;b&gt;Preserva&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="725"/>
+        <location filename="../minstall.cpp" line="723"/>
         <source>If you do not use a separate home partition, select &lt;b&gt;Preserve /home&lt;/b&gt; on the root file system entry to preserve the existing /home directory located on your root partition. The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.</source>
         <translation>Si no useu una partició /home separada, trieu&lt;b&gt;Preserva /home&lt;/b&gt; a l&apos;entrada del sistema de fitxers per preservar el directori actual /home ubicat a la vostra partició arrel. L&apos;instal·lador només preservarà  /home, i esborrarà tots els altres. En conseqüència, la instal·lació necessita molt més temps del normal.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="727"/>
+        <location filename="../minstall.cpp" line="725"/>
         <source>Preferred Filesystem Type</source>
         <translation>Tipus de Sistema  de Fitxers preferit</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="728"/>
+        <location filename="../minstall.cpp" line="726"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
         <translation>Per %1, podeu triar formatar les particions com a ext2, ext3, ext4, f2fs, jfs, xfs o btrfs.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="729"/>
+        <location filename="../minstall.cpp" line="727"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>Es pot disposar d&apos;opcions de compressió addicionals als discos que usen BTRFS. LZO és més ràpid, però la compressió és menor. ZLIB és més lent, però comprimeix més.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="731"/>
+        <location filename="../minstall.cpp" line="729"/>
         <source>System partition management tool</source>
         <translation>Eina de gestió de les particions del sistema</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="732"/>
+        <location filename="../minstall.cpp" line="730"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
         <translation>Per tenir més control sobre la disposició del disc (tal com modificar el seu format) cliqueu el botó de gestió de la partició (%1). Això engegarà l&apos;eina de gestió de particions del Sistema Operatiu, el què us permetrà crear la disposició que necessiteu.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="738"/>
+        <location filename="../minstall.cpp" line="736"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
         <translation>Per preservar una partició encriptada, feu-hi clic dret i seleccioneu &lt;b&gt;Desbloqueja&lt;/b&gt;. Al diàleg que apareix, entreu el nom i la contrasenya del dispositiu virtual. Quan es desbloqueja el dispositiu, el nom que heu triat apareixerà a  &lt;i&gt;Dispositius Virtuals&lt;/i&gt;, amb opcions semblants a una partició normal.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="740"/>
+        <location filename="../minstall.cpp" line="738"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
         <translation>Per tal que una partició encriptada es desbloquegi en arrencar,  cal que l&apos;afegiu al fitxer crypttab. Useu l&apos;acció del menú&lt;b&gt;Afegeix a crypttab&lt;/b&gt; per fer-ho. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="741"/>
+        <location filename="../minstall.cpp" line="739"/>
         <source>Other partitions</source>
         <translation>Altres particions </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="742"/>
+        <location filename="../minstall.cpp" line="740"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
         <translation>L&apos;instal·lador us permet crear altres particions o bé usar-les per altres propòsits, però cal tenir en compte que els sistemes antics no poden gestionar discos amb més de 4 particions primàries.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="743"/>
+        <location filename="../minstall.cpp" line="741"/>
         <source>Subvolumes</source>
         <translation>Subvolums</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="744"/>
+        <location filename="../minstall.cpp" line="742"/>
         <source>Some file systems, such as Btrfs, support multiple subvolumes in a single partition. These are not physical subdivisions, and so their order does not matter.</source>
         <translation>Alguns sistemes de fitxers, tal com Btrfs, donen suport a múltiples subvolums en una sola partició. Aquestes subdivisions no són físiques, i per tant no importa el seu ordre.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="746"/>
+        <location filename="../minstall.cpp" line="744"/>
         <source>Use the &lt;b&gt;Scan subvolumes&lt;/b&gt; menu action to search an existing Btrfs partition for subvolumes. To create a new subvolume, use the &lt;b&gt;New subvolume&lt;/b&gt; menu action.</source>
         <translation>Useu l&apos;acció del menú &lt;b&gt;Escaneja subvolums&lt;/b&gt; per cercar subvolums en una partició Btrfs existent. Per a crear un nou subvolum, useu l&apos;acció del menú,&lt;b&gt;Nou subvolum&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="748"/>
+        <location filename="../minstall.cpp" line="746"/>
         <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
         <translation>Es poden preservar els subvolums actuals, tanmateix el nom ha de ser el mateix. </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="749"/>
+        <location filename="../minstall.cpp" line="747"/>
         <source>Virtual Devices</source>
         <translation>Dispositius Virtuals</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="750"/>
+        <location filename="../minstall.cpp" line="748"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
         <translation>Si l&apos;instal·lador detecta dispositius virtuals tal com particions LUKS obertes, volums lògics LVM o volums RAID basats en programari, també es poden usar per a la instal·lació.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="751"/>
+        <location filename="../minstall.cpp" line="749"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>L&apos;ús de dispositius virtuals (més enllà de de preservar els sistemes de fitxers) és una característica avançada. Potser us cal editar algun fitxer (ex: initramfs, crypttab, fstab) per assegurar-vos que s&apos;han creat els dispositius virtuals en arrencar.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="770"/>
+        <location filename="../minstall.cpp" line="768"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Serveis Comuns a activar&lt;/b&gt;&lt;br/&gt;seleccioneu els serveis comuns que podeu necessitar en la vostra configuració de sistema i aquests serveis s&apos;engegaran automàticament en arrencar %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="774"/>
+        <location filename="../minstall.cpp" line="772"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Identitat de l&apos;ordinador&lt;/b&gt;&lt;br/&gt;El nom de l&apos;ordinador és un nom únic que identifica el vostre ordinador quan forma part d&apos;una xarxa. El domini de l&apos;ordinador és improbable que sigui obligatori llevat que el vostre proveïdor d&apos;Internet (ISP) o bé la xarxa local ho necessitin.&lt;/p&gt;&lt;p&gt;Els noms d&apos;equip i de domini poden contenir només caràcters alfanumèrics, punts, i guionets. No poden contenir espais en blanc, començar o acabar amb guionets.&lt;/p&gt;&lt;p&gt;Cal activar el servidor SaMBa si voleu compartir els vostres directoris o impressores amb un ordinador local que usi MS-Windows o Mac OSX.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="784"/>
+        <location filename="../minstall.cpp" line="782"/>
         <source>Localization Defaults</source>
         <translation>Localització per omissió</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="785"/>
+        <location filename="../minstall.cpp" line="783"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation>Trieu el locale per omissió. S&apos;aplicarà aquest, llevat que posteriorment sigui modificat per l&apos;usuari.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="786"/>
+        <location filename="../minstall.cpp" line="784"/>
         <source>Configure Clock</source>
         <translation>Configura el rellotge</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="787"/>
+        <location filename="../minstall.cpp" line="785"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation>Si teniu un ordinador Apple o bé purament Unix, per omissió el rellotge del sistema està definit  a l&apos;hora GMT (Greenwich Meridian Time) o UTC (Coordinated Universal Time). Per canviar-ho, comproveu la casella &quot;&lt;b&gt;El rellotge de sistema usa l&apos;hora local&lt;/b&gt;&quot;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="789"/>
+        <location filename="../minstall.cpp" line="787"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation>El sistema arrenca amb l&apos;hora del sistema definida com a GMT/UTC. Per a canviar la zona horària, després de tornar-ho a engegar, feu clic dret sobre el rellotge a la Barra de Tasques i seleccioneu Propietats.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="791"/>
+        <location filename="../minstall.cpp" line="789"/>
         <source>Service Settings</source>
         <translation>Paràmetres de Servei</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="792"/>
+        <location filename="../minstall.cpp" line="790"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation>A molts usuaris no els hi cal canviar els valors per omissió. Els usuaris amb ordinadors de pocs recursos a vegades volen desactivar serveis innecessaris per tal d&apos;estalviar RAM. Assegureu-vos que sabeu el que esteu fent!</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="798"/>
+        <location filename="../minstall.cpp" line="796"/>
         <source>Default User Login</source>
         <translation>Inici de sessió de l&apos;usuari per omissió</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="799"/>
+        <location filename="../minstall.cpp" line="797"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
         <translation>L&apos;usuari principal és semblant a l&apos;Administrador en altres Sistemes Operatius. No hauríeu d&apos;usar l&apos;usuari principal per a les tasques habituals. Si us plau, entre el nom per a un nou compte d&apos;usuari per a les tasques diàries. Si cal, podeu afegir altres comptes més endavant amb el Gestor d&apos;Usuaris %1.  </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="803"/>
+        <location filename="../minstall.cpp" line="801"/>
         <source>Passwords</source>
         <translation>Contrasenyes</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="804"/>
+        <location filename="../minstall.cpp" line="802"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
         <translation>Entreu una nova contrasenya per a l&apos;usuari per omissió i per al comte d&apos;usuari principal: cal entrar cada contrasenya dos cops.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="806"/>
+        <location filename="../minstall.cpp" line="804"/>
         <source>No passwords</source>
         <translation>Sense contrasenyes</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="807"/>
+        <location filename="../minstall.cpp" line="805"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
         <translation>Si voleu que l&apos;usuari per omissió no tingui contrasenya, deixeu buides les caselles de contrasenya. Això us permet iniciar la sessió sense entrar cap contrasenya.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="809"/>
+        <location filename="../minstall.cpp" line="807"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
         <translation>Òbviament, això només s&apos;hauria de fer en situacions on el compte d&apos;usuari no cal que sigui segur, com en terminals d&apos;ús públic.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="817"/>
+        <location filename="../minstall.cpp" line="815"/>
         <source>Old Home Directory</source>
         <translation>Director d&apos;usuaris anterior</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="818"/>
+        <location filename="../minstall.cpp" line="816"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation>Ja hi ha un directori d&apos;usuari amb el nom que heu triat. Aquesta pantalla us permet escollir què fer amb aquest directori.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="820"/>
+        <location filename="../minstall.cpp" line="818"/>
         <source>Re-use it for this installation</source>
         <translation>Tornar a usar-lo per aquesta instal·lació</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="821"/>
+        <location filename="../minstall.cpp" line="819"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation>S&apos;usarà el directori d&apos;usuari anterior. És una bona elecció quan actualitzeu, i es localitzaran fàcilment els vostres paràmetres i fitxers.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="823"/>
+        <location filename="../minstall.cpp" line="821"/>
         <source>Rename it and create a new directory</source>
         <translation>Canviar-li el nom i crear un nou directori</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="824"/>
+        <location filename="../minstall.cpp" line="822"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation>Es crearà un nou directori per aquest usuari, però en mantindrà el directori antic amb un altre nom. Els vostres paràmetres i fitxers no seran visibles immediatament per la nova instal·lació, però seran accessibles usant el directori amb el nou nom.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="826"/>
+        <location filename="../minstall.cpp" line="824"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation>El directori anterior tindrà una xifra al final del nom, depenent de quantes vegades se li hagi canviat el nom.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="827"/>
+        <location filename="../minstall.cpp" line="825"/>
         <source>Delete it and create a new directory</source>
         <translation>Esborrar-lo i crear un directori nou</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="828"/>
+        <location filename="../minstall.cpp" line="826"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation>S&apos;esborrarà el directori d&apos;usuari anterior, i se&apos;n crearà un de bell nou.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="829"/>
+        <location filename="../minstall.cpp" line="827"/>
         <source>Warning</source>
         <translation>Atenció </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="830"/>
+        <location filename="../minstall.cpp" line="828"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation>Si trieu aquesta opció, s&apos;esborraran permanentment tots els paràmetres i fitxers. La possibilitat de recuperar-los és mínima.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="846"/>
+        <location filename="../minstall.cpp" line="844"/>
         <source>Installation in Progress</source>
         <translation>Instal·lació en curs</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="847"/>
+        <location filename="../minstall.cpp" line="845"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation>S&apos;està instal·lant %1. Per una instal·lació nova, calen entre 3 i 20 minuts, depenent de la velocitat del vostre sistema i la mida de les particions que esteu reformatant.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="849"/>
+        <location filename="../minstall.cpp" line="847"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation>Si cliqueu el botó d&apos;interrupció, la instal·lació s&apos;aturarà tan aviat com sigui possible.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="851"/>
+        <location filename="../minstall.cpp" line="849"/>
         <source>Change settings while you wait</source>
         <translation>Canvieu els paràmetres mentre espereu</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="852"/>
+        <location filename="../minstall.cpp" line="850"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation>Mentre s&apos;instal·la %1 , podeu clicar els botons &lt;b&gt;Següent&lt;/b&gt; o &lt;b&gt;Enrere&lt;/b&gt; per introduir altres informacions necessàries per a la instal·lació.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="854"/>
+        <location filename="../minstall.cpp" line="852"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation>Completeu aquests passos al vostre ritme. L&apos;instal·lador esperarà la vostra entrada si és necessari.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="862"/>
+        <location filename="../minstall.cpp" line="860"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Enhorabona!&lt;/b&gt;&lt;br/&gt;Heu acomplert la instal·lació de %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Trobar Aplicacions&lt;/b&gt;&lt;br/&gt;Ja hi ha centenars d&apos;aplicacions instal·lades a %1 . La millor manera de familiaritzar-s&apos;hi és fullejar el Menú i provar-les. Moltes de les aplicacions s&apos;han desenvolupat especialment per al projecte %1. Aquestes es mostren als menús principals.&lt;p&gt;Però a més,  %1 inclou moltes aplicacions estàndard de Linux que s&apos;executen des de la línia d&apos;ordres i, per tant, no surten al Menú.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="872"/>
-        <location filename="../minstall.cpp" line="1138"/>
+        <location filename="../minstall.cpp" line="870"/>
+        <location filename="../minstall.cpp" line="1136"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Suport de %1&lt;/b&gt;&lt;br/&gt;%1 té el suport de persones com vosaltres. Uns n&apos;ajuden altres al fòrum d&apos;ajuda (%2), tradueixen fitxers d&apos;ajuda a diversos idiomes, fan suggeriments, escriuen documentació o proven el programari nou.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="902"/>
+        <location filename="../minstall.cpp" line="900"/>
         <source>Finish</source>
         <translation>Acaba</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="905"/>
+        <location filename="../minstall.cpp" line="903"/>
         <source>OK</source>
         <translation>D&apos;acord</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="907"/>
+        <location filename="../minstall.cpp" line="905"/>
         <source>Next</source>
         <translation>Següent</translation>
     </message>
@@ -925,34 +924,34 @@ Gaudiu usant %1</translation>
         <translation>Configuració completa. Reiniciant el sistema.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1060"/>
+        <location filename="../minstall.cpp" line="1058"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>No s&apos;ha acabat la instal·lació i configuració.
 De debò voleu aturar-la ara?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1124"/>
+        <location filename="../minstall.cpp" line="1122"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Obtenir Ajuda&lt;/b&gt;&lt;br/&gt;La informació bàsica quant a %1 està a %2.&lt;/p&gt;&lt;p&gt;Trobareu voluntaris per ajudar-vos al fòrum de %3 , %4&lt;/p&gt;&lt;p&gt;Si demaneu ajuda, si us plau recordeu-vos de descriure en detall l&apos;ordinador i el vostre problema. Normalment frases com &apos;No funciona&apos; no ajuden gens. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1132"/>
+        <location filename="../minstall.cpp" line="1130"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Reparar la instal·lació&lt;/b&gt;&lt;br/&gt;Si %1 deixa de funcionar des del disc dur, a vegades es pot arreglar arrencant des del DVD Autònom o Live USB i executant alguna de les utilitats incorporades a %1 o bé usant una de les eines clàssiques de Linux per reparar el sistema.&lt;/p&gt;&lt;p&gt;Fins i tot podeu usar el vostre DVD Autònom o Live USB de %1 per recuperar dades dels sistemes MS-Windows!&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1146"/>
+        <location filename="../minstall.cpp" line="1144"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Ajustatges del mesclador de so&lt;/b&gt;&lt;br/&gt; %1 prova de configurar el mesclador de so per vosaltres, però a vegades us serà necessari pujar el volum o desenmudir canals al mesclador per escoltar so.&lt;/p&gt; &lt;p&gt;Trobareu la drecera del mesclador al menú. Cliqueu-hi per obrir el mesclador. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1154"/>
+        <location filename="../minstall.cpp" line="1152"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Mantingueu la vostra còpia de %1 al dia&lt;/b&gt;&lt;br/&gt;Per més informació i actualitzacions podeu visitar &lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1159"/>
+        <location filename="../minstall.cpp" line="1157"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Agraïments&lt;/b&gt;&lt;br/&gt;Gràcies a tothom que ha triat donar suport a  %1 amb el seu temps, diners, suggeriments, treball, lloances, idees, promoció i/o ànims.&lt;/p&gt;&lt;p&gt;Sense vosaltres no hi hauria %1.&lt;/p&gt;&lt;p&gt;L&apos;Equip de Desenvolupament de %2.&lt;/p&gt;</translation>
     </message>
@@ -1512,7 +1511,7 @@ Si us plau, trieu un nom diferent. </translation>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="../partman.cpp" line="219"/>
+        <location filename="../partman.cpp" line="217"/>
         <source>Virtual Devices</source>
         <translation>Dispositius Virtuals</translation>
     </message>
@@ -1634,95 +1633,95 @@ Si us plau, trieu un nom diferent. </translation>
         <translation>No puc conservar /home dins de root (/) si ja hi ha una altra partició /home muntada.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="787"/>
+        <location filename="../partman.cpp" line="786"/>
         <source>Reuse (no reformat) %1</source>
         <translation>Reutilitza (sense reformatar) %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="790"/>
+        <location filename="../partman.cpp" line="789"/>
         <source>Format %1</source>
         <translation>Formata %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="806"/>
+        <location filename="../partman.cpp" line="805"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation>Reutilitza el subvolum %1 com a %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="808"/>
+        <location filename="../partman.cpp" line="807"/>
         <source>Delete subvolume %1</source>
         <translation>Esborra el subvolum %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="811"/>
+        <location filename="../partman.cpp" line="810"/>
         <source>Overwrite subvolume %1</source>
         <translation>Sobreescriu el subvolum %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="812"/>
+        <location filename="../partman.cpp" line="811"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation>Sobreescriu el subvolum %1 per usar-lo per %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="814"/>
+        <location filename="../partman.cpp" line="813"/>
         <source>Create subvolume %1</source>
         <translation>Crea el subvolum %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="815"/>
+        <location filename="../partman.cpp" line="814"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation>Crea el subvolum %1 per usar per %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="830"/>
+        <location filename="../partman.cpp" line="829"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Cal triar una partició d&apos;arrencada separada quan s&apos;encripta l&apos;arrel.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="781"/>
+        <location filename="../partman.cpp" line="780"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>Prepara la taula de particions %1 a %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="791"/>
+        <location filename="../partman.cpp" line="790"/>
         <source>Format %1 to use for %2</source>
         <translation>Formata %1 per a usar-la com %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="792"/>
+        <location filename="../partman.cpp" line="791"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Reutilitzar (sense reformatar) %1 com a %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="793"/>
+        <location filename="../partman.cpp" line="792"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>Esborra les dades a %1 amb l&apos;excepció de /home, per usar-la com %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="796"/>
+        <location filename="../partman.cpp" line="795"/>
         <source>Create %1 without formatting</source>
         <translation>Crea %1 sense formatar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="797"/>
+        <location filename="../partman.cpp" line="796"/>
         <source>Create %1, format to use for %2</source>
         <translation>Crea %1, formata per a usar-la com a %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="946"/>
+        <location filename="../partman.cpp" line="945"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>Aquestes unitats són o seran configurades en GPT, però no hi ha una partició BIOS-GRUB: </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="948"/>
+        <location filename="../partman.cpp" line="947"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>El sistema no podrà arrencar amb unitats GPT sense una partició BIOS-GRUB.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="831"/>
-        <location filename="../partman.cpp" line="905"/>
-        <location filename="../partman.cpp" line="923"/>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="830"/>
+        <location filename="../partman.cpp" line="904"/>
+        <location filename="../partman.cpp" line="922"/>
+        <location filename="../partman.cpp" line="948"/>
         <source>Are you sure you want to continue?</source>
         <translation>Esteu segurs de voler continuar?</translation>
     </message>
@@ -1732,112 +1731,112 @@ Si us plau, trieu un nom diferent. </translation>
         <translation>Creador de &amp;Disposició...</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="877"/>
+        <location filename="../partman.cpp" line="876"/>
         <source>%1 (%2) requires %3</source>
         <translation>%1 (%2) necessita %3</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="903"/>
+        <location filename="../partman.cpp" line="902"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>La instal·lació pot fallar perquè aquests volums són massa petits:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="837"/>
+        <location filename="../partman.cpp" line="836"/>
         <source>The %1 installer will now perform the requested actions.</source>
         <translation>L&apos;instal·lador %1 executarà ara les accions demanades.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="838"/>
+        <location filename="../partman.cpp" line="837"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
         <translation>Aquestes accions no es poden desfer. Voleu continuar?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="916"/>
+        <location filename="../partman.cpp" line="915"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation>Aquest sistema usa EFI, però s&apos;ha assignat separadament una partició de sistema EFI no vàlida a /boot/efi.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="919"/>
+        <location filename="../partman.cpp" line="918"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation>El volum assignat a /boot/efi no és una partició de sistema EFI vàlida.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="986"/>
+        <location filename="../partman.cpp" line="985"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Els discs amb les particions que heu seleccionat per la instal·lació estan fallant:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="990"/>
+        <location filename="../partman.cpp" line="989"/>
         <source>Smartmon tool output:</source>
         <translation>Sortida de l&apos;eina Smartmon:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="991"/>
+        <location filename="../partman.cpp" line="990"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Els discs amb les particions que heu seleccionat passen les proves SMART monitor (smartctl), però les proves indiquen que tenen una possibilitat de fallada en el futur superior a la mitjana: </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="998"/>
+        <location filename="../partman.cpp" line="997"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>Si no n&apos;esteu segurs, sortiu de l&apos;instal·lador i executeu GSmartControl per tenir més informació.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1002"/>
+        <location filename="../partman.cpp" line="1001"/>
         <source>Do you want to abort the installation?</source>
         <translation>Voleu interrompre la instal·lació? </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1006"/>
+        <location filename="../partman.cpp" line="1005"/>
         <source>Do you want to continue?</source>
         <translation>Voleu continuar? </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1211"/>
+        <location filename="../partman.cpp" line="1210"/>
         <source>Failed to format LUKS container.</source>
         <translation>Ha fallat en formatar el contenidor LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1225"/>
+        <location filename="../partman.cpp" line="1224"/>
         <source>Failed to open LUKS container.</source>
         <translation>Ha fallat en obrir el contenidor LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1092"/>
+        <location filename="../partman.cpp" line="1091"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Ha fallat en preparar les particions necessàries.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1131"/>
+        <location filename="../partman.cpp" line="1130"/>
         <source>Preparing partition tables</source>
         <translation>Preparant les taules de partició </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1148"/>
+        <location filename="../partman.cpp" line="1147"/>
         <source>Preparing required partitions</source>
         <translation>Preparant les particions adients </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1216"/>
+        <location filename="../partman.cpp" line="1215"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Creant el volum encriptat: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1245"/>
+        <location filename="../partman.cpp" line="1244"/>
         <source>Formatting: %1</source>
         <translation>Formatant: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1238"/>
+        <location filename="../partman.cpp" line="1237"/>
         <source>Failed to format partition.</source>
         <translation>Ha fallat en formatar la partició.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1303"/>
+        <location filename="../partman.cpp" line="1302"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>Ha fallat en preparar els subvolums.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1304"/>
+        <location filename="../partman.cpp" line="1303"/>
         <source>Preparing subvolumes</source>
         <translation>Preparant subvolums</translation>
     </message>
@@ -1855,22 +1854,22 @@ Si us plau, trieu un nom diferent. </translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2449"/>
+        <location filename="../partman.cpp" line="2455"/>
         <source>&amp;Templates</source>
         <translation>Plan&amp;tilles</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2457"/>
+        <location filename="../partman.cpp" line="2463"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compressió (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2459"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compressió (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2461"/>
+        <location filename="../partman.cpp" line="2467"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compressió (&amp;ZLIB)</translation>
     </message>
@@ -1965,84 +1964,83 @@ Tingueu en compte que això és experimental. Les futures versions de l&apos;ins
         <translation>Atura automàticament en acabar la instal·lació.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="109"/>
         <source>Always use GPT when doing a whole-drive installation regardlesss of capacity.
 Without this option, GPT will only be used on drives with at least 2TB capacity.
 GPT is always used on whole-drive installations on UEFI systems regardless of capacity, even without this option.</source>
-        <translation>Usa sempre GPT en fer una instal·lació al disc sencer, sigui quina sigui la seva capacitat.
+        <translation type="vanished">Usa sempre GPT en fer una instal·lació al disc sencer, sigui quina sigui la seva capacitat.
 Sense aquesta opció, només s&apos;usarà GPT en discos de 2TB o més de capacitat.
 Sempre s&apos;usa GPT en instal·lacions al disc sencer en sistemes UEFI de qualsevol capacitat, fins i tot sense aquesta opció.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="112"/>
+        <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>No desmunteu /mnt/antiX o tanqueu cap dels contenidors LUKS associats en acabar.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="113"/>
+        <location filename="../app.cpp" line="110"/>
         <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
         <translation>Un altre mode de prova per a l&apos;instal·lador, es FORMATARAN les particions/unitats, però no copiarà els fitxers.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="114"/>
+        <location filename="../app.cpp" line="111"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
         <translation>Instal·la el Sistema Operatiu, retardant les preguntes per a les opcions específiques de l&apos;usuari fins a la propera arrencada.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="117"/>
+        <location filename="../app.cpp" line="114"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
         <translation>Opció &apos;de bell nou&apos;.
 Arrencarà automàticament si s&apos;ha instal·lat amb l&apos;opció --oem.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="119"/>
+        <location filename="../app.cpp" line="116"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
         <translation>Mode de prova per IGU, es pot avançar per diferents pantalles sense instal·lar realment.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="120"/>
+        <location filename="../app.cpp" line="117"/>
         <source>Reboots automatically when done installing.</source>
         <translation>Reinicia automàticament en acabar la instal·lació.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="121"/>
+        <location filename="../app.cpp" line="118"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
         <translation>Instal·lació amb rsync  per comptes de cp. en particionat a mida. 
 -- No formata /root i no funciona amb encriptació.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="123"/>
+        <location filename="../app.cpp" line="120"/>
         <source>Always check the installation media at the beginning.</source>
         <translation>Comproveu sempre el suport d&apos;instal·lació en començar.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="124"/>
+        <location filename="../app.cpp" line="121"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
         <translation>No comprova el suport d&apos;instal·lació en començar.
 No es recomana, llevat que el suport d&apos;instal·lació garanteixi estar lliure d&apos;errors.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="126"/>
+        <location filename="../app.cpp" line="123"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Carrega un fitxer de configuració tal com s&apos;especifica a &lt;config-file&gt;.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="130"/>
+        <location filename="../app.cpp" line="127"/>
         <source>Too many arguments. Please check the command format by running the program with --help</source>
         <translation>Massa arguments. Si us plau, comproveu el format de l&apos;ordre executant el programa amb --help</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="135"/>
+        <location filename="../app.cpp" line="132"/>
         <source>%1 Installer</source>
         <translation>%1 Installer</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="143"/>
+        <location filename="../app.cpp" line="140"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -2052,12 +2050,12 @@ Si us plau, tanqueu-lo si podeu, o executeu &apos;pkill minstall&apos; en un ter
 </translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="150"/>
+        <location filename="../app.cpp" line="147"/>
         <source>This operation requires root access.</source>
         <translation>Per fer aquesta opció cal accés com a administrador.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="171"/>
+        <location filename="../app.cpp" line="168"/>
         <source>Configuration file (%1) not found.</source>
         <translation>No he trobat el fitxer de configuració (%1).</translation>
     </message>
