@@ -1389,6 +1389,7 @@ bool PartMan::makeFstab() noexcept
             out << ' ' << (volume->dump ? 1 : 0);
             out << ' ' << volume->pass;
         }
+        if (fsfmt =="SWAP") out <<" 0 0";
         out << '\n';
     }
     file.close();
