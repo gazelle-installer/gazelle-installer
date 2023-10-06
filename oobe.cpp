@@ -193,7 +193,7 @@ void Oobe::enable()
     setService("smbd", false);
     setService("nmbd", false);
     setService("samba-ad-dc", false);
-    proc.exec("update-rc.d", {"oobe", "defaults"});
+    proc.exec("update-rc.d", {"-f", "oobe", "defaults"});
 }
 
 void Oobe::process()
@@ -298,7 +298,7 @@ void Oobe::setService(const QString &service, bool enabled)
     MProcess::Section sect(proc);
     const QString chroot(sect.root());
     if (enabled) {
-        proc.exec("update-rc.d", {service, "defaults"});
+        proc.exec("update-rc.d", {"-f", service, "defaults"});
         if (containsSystemD) {
             proc.exec("systemctl", {"unmask", service});
             proc.exec("systemctl", {"enable", service});
@@ -311,7 +311,7 @@ void Oobe::setService(const QString &service, bool enabled)
             }
         }
     } else {
-        proc.exec("update-rc.d", {service, "remove"});
+        proc.exec("update-rc.d", {"-f", service, "remove"});
         if (containsSystemD) {
             proc.exec("systemctl", {"disable", service});
             proc.exec("systemctl", {"mask", service});
