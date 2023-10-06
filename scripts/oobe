@@ -4,7 +4,7 @@
 # Should-Start:      console-screen kbd acpid dbus hal consolekit
 # Required-Start:    $local_fs $remote_fs x11-common
 # Required-Stop:     $local_fs $remote_fs
-# X-Start-Before:    lightdm slim
+# X-Start-Before:    lightdm slim sddm
 # Default-Start:     5
 # Default-Stop:      0 1 6
 # Short-Description: OOBE
