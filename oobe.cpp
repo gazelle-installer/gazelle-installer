@@ -187,12 +187,13 @@ void Oobe::enable()
     MProcess::Section sect(proc);
     sect.setRoot("/mnt/antiX");
     QTreeWidgetItemIterator it(gui.treeServices);
-    for (; *it; ++it) {
-        if ((*it)->parent()) setService((*it)->text(0), false); // Speed up the OOBE boot.
-    }
-    setService("smbd", false);
-    setService("nmbd", false);
-    setService("samba-ad-dc", false);
+    //comment for now, don't disable services
+    //for (; *it; ++it) {
+        //if ((*it)->parent()) setService((*it)->text(0), false); // Speed up the OOBE boot.
+    //}
+    //setService("smbd", false);
+    //setService("nmbd", false);
+    //setService("samba-ad-dc", false);
     proc.exec("update-rc.d", {"-f", "oobe", "defaults"});
 }
 
