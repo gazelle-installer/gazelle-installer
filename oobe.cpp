@@ -311,7 +311,7 @@ void Oobe::setService(const QString &service, bool enabled)
             }
         }
     } else {
-        proc.exec("update-rc.d", {service, "remove"});
+        proc.exec("update-rc.d", {"-f", service, "remove"});
         if (containsSystemD) {
             proc.exec("systemctl", {"disable", service});
             proc.exec("systemctl", {"mask", service});
