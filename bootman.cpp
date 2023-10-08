@@ -189,6 +189,14 @@ void BootMan::install(const QStringList &cmdextra)
         proc.shell("/live/bin/non-live-cmdline", nullptr, true); // Get non-live boot codes
         QStringList finalcmdline = proc.readOut().split(" ");
         finalcmdline.append(grubDefault.split(" "));
+
+        // remove any leftover resume parameter
+        const QRegularExpression re("^(resume=|resume_offset=)", QRegularExpression::CaseInsensitiveOption);
+        const auto toRemove = finalcmdline.filter(re);
+        for(const auto &item : toRemove) {
+            finalcmdline.removeAll(item);
+        }
+
         finalcmdline.append(cmdextra);
         qDebug() << "intermediate" << finalcmdline;
 
@@ -215,6 +223,7 @@ void BootMan::install(const QStringList &cmdextra)
 
         //remove nosplash boot code if configured in installer.conf
         if (removeNoSplash) finalcmdline.removeAll("nosplash");
+
         //remove in null or empty strings that might have crept in
         finalcmdline.removeAll({});
         qDebug() << "Add cmdline options to Grub" << finalcmdline;
