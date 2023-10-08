@@ -109,7 +109,8 @@ void SwapMan::install(QStringList &cmdboot_out)
     file.close();
     // Hibernation.
     if (gui.checkHibernation->isChecked()) {
-        cmdboot_out.append("resume=UUID=" + device->assocUUID());
+        proc.shell("blkid -s UUID -o value $(df -P " + instpath + " | awk 'END{print $1}')", nullptr, true);
+        cmdboot_out.append("resume=UUID=" + proc.readAll().trimmed());
         if (btrfs) {
             proc.exec("btrfs", {"inspect-internal", "map-swapfile", "-r", instpath}, nullptr, true);
         } else {
