@@ -80,7 +80,7 @@ Minimum: %2</source>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="277"/>
+        <location filename="../bootman.cpp" line="286"/>
         <source>Updating initramfs</source>
         <translation>Ενημέρωση του initramfs...</translation>
     </message>
@@ -95,18 +95,18 @@ Minimum: %2</source>
         <translation>Η εγκατάσταση του GRUB απέτυχε. Μπορείτε να κάνετε επανεκκίνηση στο live iso και να χρησιμοποιήσετε το μενού GRUB Rescue για να επιδιορθώσετε την εγκατάσταση.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="278"/>
+        <location filename="../bootman.cpp" line="287"/>
         <source>Failed to update initramfs.</source>
         <translation>Η ενημέρωση του initramfs απέτυχε.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="303"/>
+        <location filename="../bootman.cpp" line="312"/>
         <source>System boot disk:</source>
         <translation>Δίσκος εκκίνησης συστήματος:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="322"/>
-        <location filename="../bootman.cpp" line="332"/>
+        <location filename="../bootman.cpp" line="331"/>
+        <location filename="../bootman.cpp" line="341"/>
         <source>Partition to use:</source>
         <translation>Διαμέρισμα για χρήση:</translation>
     </message>
@@ -502,6 +502,11 @@ Enjoy using %1</source>
         <translation>Απλώς κάντε δεξί κλικ σε μια μονάδα δίσκου και επιλέξτε &lt;b&gt;Layout Builder&lt;/b&gt; από το μενού. Αυτό μπορεί να δημιουργήσει μια διάταξη παρόμοια με αυτή της κανονικής εγκατάστασης.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="748"/>
+        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="754"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Εγκατάσταση του GRUB για το Linux και τα Windows</translation>
@@ -713,9 +718,8 @@ Enjoy using %1</source>
         <translation>Εικονικές συσκευές</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="748"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation>Εάν το πρόγραμμα εγκατάστασης εντοπίσει οπτικές συσκευές όπως ανοίγματα διαμερισμάτων LUKS, λογικούς τόμους LVM ή τόμους RAID που βασίζονται σε λογισμικό, μπορεί να χρησιμοποιηθούν για την εγκατάσταση. </translation>
+        <translation type="vanished">Εάν το πρόγραμμα εγκατάστασης εντοπίσει οπτικές συσκευές όπως ανοίγματα διαμερισμάτων LUKS, λογικούς τόμους LVM ή τόμους RAID που βασίζονται σε λογισμικό, μπορεί να χρησιμοποιηθούν για την εγκατάσταση. </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="749"/>
@@ -1418,12 +1422,12 @@ Do you really want to stop now?</source>
 <context>
     <name>Oobe</name>
     <message>
-        <location filename="../oobe.cpp" line="333"/>
+        <location filename="../oobe.cpp" line="334"/>
         <source>Please enter a computer name.</source>
         <translation>Εισαγάγετε ένα όνομα υπολογιστή.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="337"/>
+        <location filename="../oobe.cpp" line="338"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1432,12 +1436,12 @@ name before proceeding.</source>
 πριν προχωρήσετε.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="342"/>
+        <location filename="../oobe.cpp" line="343"/>
         <source>Please enter a domain name.</source>
         <translation>Εισαγάγετε ένα όνομα τομέα.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="346"/>
+        <location filename="../oobe.cpp" line="347"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1446,66 +1450,66 @@ name before proceeding.</source>
 πριν προχωρήσετε.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="353"/>
+        <location filename="../oobe.cpp" line="354"/>
         <source>Please enter a workgroup.</source>
         <translation>Εισαγάγετε όνομα workgroup.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="493"/>
+        <location filename="../oobe.cpp" line="494"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>Το όνομα χρήστη δεν μπορεί να περιέχει ειδικούς χαρακτήρες ή κενά.
 Παρακαλούμε επιλέξτε ένα άλλο όνομα πριν προχωρήσετε.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="504"/>
+        <location filename="../oobe.cpp" line="505"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Λυπούμαστε, το όνομα χρησιμοποιείται.
 Επιλέξτε ένα διαφορετικό όνομα.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="513"/>
+        <location filename="../oobe.cpp" line="514"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation>Δεν παρείχατε φράση πρόσβασης για το %1</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="514"/>
+        <location filename="../oobe.cpp" line="515"/>
         <source>Are you sure you want to continue?</source>
         <translation>Θέλετε να συνεχίσετε;</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="520"/>
+        <location filename="../oobe.cpp" line="521"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>Δεν δώσατε κωδικό πρόσβασης για το root. Θέλετε να συνεχίσετε;</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="533"/>
+        <location filename="../oobe.cpp" line="534"/>
         <source>Failed to set user account passwords.</source>
         <translation>Αποτυχία ορισμού κωδικών πρόσβασης λογαριασμού χρήστη.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="559"/>
+        <location filename="../oobe.cpp" line="560"/>
         <source>Failed to save old home directory.</source>
         <translation>Αποτυχία αποθήκευσης του παλιού αρχικού καταλόγου.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="568"/>
+        <location filename="../oobe.cpp" line="569"/>
         <source>Failed to delete old home directory.</source>
         <translation>Αποτυχία κατάργησης του παλιού οικείου καταλόγου.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="589"/>
+        <location filename="../oobe.cpp" line="590"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Συγγνώμη, αποτυχία δημιουργίας Φακέλλου Χρήστη (user directory).</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="592"/>
+        <location filename="../oobe.cpp" line="593"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Συγγνώμη, αποτυχία απόδοης ονόματος στο Φάκελλο Χρήστη</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="628"/>
+        <location filename="../oobe.cpp" line="629"/>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation>Απέτυχε ο ορισμός της ιδιοκτησίας ή των δικαιωμάτων του καταλόγου χρηστών.</translation>
     </message>
@@ -1846,12 +1850,12 @@ Please select a different name.</source>
         <translation>Προετοιμασία υποτόμων </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1402"/>
+        <location filename="../partman.cpp" line="1412"/>
         <source>Failed to mount partition.</source>
         <translation>Απέτυχε η προσάρτηση του διαμερίσματος.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1407"/>
+        <location filename="../partman.cpp" line="1417"/>
         <source>Mounting: %1</source>
         <translation>Προσάρτηση: %1</translation>
     </message>
@@ -1859,22 +1863,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2455"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>&amp;Templates</source>
         <translation>&amp;Πρότυπα</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2463"/>
+        <location filename="../partman.cpp" line="2473"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Συμπίεση (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2465"/>
+        <location filename="../partman.cpp" line="2475"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Συμπίεση (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2467"/>
+        <location filename="../partman.cpp" line="2477"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Συμπίεση (&amp; ZLIB)</translation>
     </message>

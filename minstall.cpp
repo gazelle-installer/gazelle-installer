@@ -745,7 +745,7 @@ void MInstall::pageDisplayed(int next) noexcept
                 " To create a new subvolume, use the <b>New subvolume</b> menu action.") + "</p><p>"
             + tr("Existing subvolumes can be preserved, however the name must remain the same.") + "</p>"
             "<p><b>" + tr("Virtual Devices") + "</b><br/>"
-            + tr("If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
+            + tr("If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
             "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
         enableNext = !(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || passCryptoCust->valid();
         break;
