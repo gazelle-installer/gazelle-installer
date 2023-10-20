@@ -999,13 +999,15 @@ bool PartMan::checkTargetDrivesOK() const
             msgbox.setIcon(QMessageBox::Critical);
             msgbox.setEscapeButton(QMessageBox::Yes);
             msg += tr("Do you want to abort the installation?");
+            msgbox.setText(msg);
+            if (msgbox.exec() == QMessageBox::Yes) return false;
         } else {
             msgbox.setIcon(QMessageBox::Warning);
             msgbox.setEscapeButton(QMessageBox::No);
             msg += tr("Do you want to continue?");
+            msgbox.setText(msg);
+            if (msgbox.exec() != QMessageBox::Yes) return false;
         }
-        msgbox.setText(msg);
-        if (msgbox.exec() != QMessageBox::Yes) return false;
     }
     return true;
 }
