@@ -80,7 +80,7 @@ Najmanj: %2</translation>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="277"/>
+        <location filename="../bootman.cpp" line="286"/>
         <source>Updating initramfs</source>
         <translation>Posodabljam initramfs</translation>
     </message>
@@ -95,18 +95,18 @@ Najmanj: %2</translation>
         <translation>Namesitev GRUB ni uspela. Lahko zaženete živ nosilec in uporabite GRUB reševalni meni, da bi popravili namestitev.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="278"/>
+        <location filename="../bootman.cpp" line="287"/>
         <source>Failed to update initramfs.</source>
         <translation>Ni bilo mogoče posodopbiti initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="303"/>
+        <location filename="../bootman.cpp" line="312"/>
         <source>System boot disk:</source>
         <translation>Zagonski disk sistema:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="322"/>
-        <location filename="../bootman.cpp" line="332"/>
+        <location filename="../bootman.cpp" line="331"/>
+        <location filename="../bootman.cpp" line="341"/>
         <source>Partition to use:</source>
         <translation>Razdelek za uporabo:</translation>
     </message>
@@ -502,6 +502,11 @@ Uživajte v sistemu %1!</translation>
         <translation>Zgolj kliknite na pogon in izberite &lt;b&gt;Graditelj razporedov&lt;/b&gt; iz menija. To lahko ustvari razpored, ki je pododben običajni namestitvi.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="748"/>
+        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="754"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Namesti GRUB za Linux in Windows</translation>
@@ -713,9 +718,8 @@ Uživajte v sistemu %1!</translation>
         <translation>Virtualne naprave</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="748"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation>Če namestilnik odkrije virtualno napravo, kot so odprti LUKS razdelek, LVM logični nosilec ali programsko ustvarjeni RAID, se lahko ta uporabi za namstitev.</translation>
+        <translation type="vanished">Če namestilnik odkrije virtualno napravo, kot so odprti LUKS razdelek, LVM logični nosilec ali programsko ustvarjeni RAID, se lahko ta uporabi za namstitev.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="749"/>
@@ -1416,12 +1420,12 @@ Ali bi jo res radi zaustavili?</translation>
 <context>
     <name>Oobe</name>
     <message>
-        <location filename="../oobe.cpp" line="333"/>
+        <location filename="../oobe.cpp" line="334"/>
         <source>Please enter a computer name.</source>
         <translation>Vnesite ime računalnika.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="337"/>
+        <location filename="../oobe.cpp" line="338"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1430,12 +1434,12 @@ Morali boste izbrati
 drugo ime, preden lahko nadaljujete.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="342"/>
+        <location filename="../oobe.cpp" line="343"/>
         <source>Please enter a domain name.</source>
         <translation>Prosiom vnesite ime domene.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="346"/>
+        <location filename="../oobe.cpp" line="347"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1444,66 +1448,66 @@ Morali boste izbrati
 drugo ime, preden lahko nadaljujete.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="353"/>
+        <location filename="../oobe.cpp" line="354"/>
         <source>Please enter a workgroup.</source>
         <translation>Vnesite ime delovne skupine</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="493"/>
+        <location filename="../oobe.cpp" line="494"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>Uporabniško ime ne more vsebovati posebnih znakov ali presledkov.
 Prosimo, izberite drugo ime pred nadaljevanjem.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="504"/>
+        <location filename="../oobe.cpp" line="505"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Oprostite, to ime se že uporablja.
 Izberite drugo ime.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="513"/>
+        <location filename="../oobe.cpp" line="514"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="514"/>
+        <location filename="../oobe.cpp" line="515"/>
         <source>Are you sure you want to continue?</source>
         <translation>Želite nadaljevati?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="520"/>
+        <location filename="../oobe.cpp" line="521"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>Niste podali gesla za korenski dostop. Želite nadaljevati?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="533"/>
+        <location filename="../oobe.cpp" line="534"/>
         <source>Failed to set user account passwords.</source>
         <translation>Neuspela nastavitev gesla za uporabniški račun</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="559"/>
+        <location filename="../oobe.cpp" line="560"/>
         <source>Failed to save old home directory.</source>
         <translation>Neuspešno shranjevanje starega /home direktorija</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="568"/>
+        <location filename="../oobe.cpp" line="569"/>
         <source>Failed to delete old home directory.</source>
         <translation>Neuspešno brisanje starega /home direktorija.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="589"/>
+        <location filename="../oobe.cpp" line="590"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Ustvarjanje uporabnikovega direktorija ni uspelo.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="592"/>
+        <location filename="../oobe.cpp" line="593"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Poimenovanje uporabnikovega direktorija ni bilo uspešno.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="628"/>
+        <location filename="../oobe.cpp" line="629"/>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation>Določitev lastništva ali dovoljenja za uproabniško mapo ni bilo uspešno.</translation>
     </message>
@@ -1841,12 +1845,12 @@ Izberite drugo ime.</translation>
         <translation>Pripravljanje podpogonov</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1402"/>
+        <location filename="../partman.cpp" line="1412"/>
         <source>Failed to mount partition.</source>
         <translation>Priklapljanje razdelka ni uspelo.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1407"/>
+        <location filename="../partman.cpp" line="1417"/>
         <source>Mounting: %1</source>
         <translation>Priklapljanje: %1</translation>
     </message>
@@ -1854,22 +1858,22 @@ Izberite drugo ime.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2455"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>&amp;Templates</source>
         <translation>&amp;Predloge</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2463"/>
+        <location filename="../partman.cpp" line="2473"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Stiskanje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2465"/>
+        <location filename="../partman.cpp" line="2475"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Stiskanje (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2467"/>
+        <location filename="../partman.cpp" line="2477"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Stiskanje (&amp;ZLIB)</translation>
     </message>

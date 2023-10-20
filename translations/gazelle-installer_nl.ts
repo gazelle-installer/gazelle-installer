@@ -80,7 +80,7 @@ Minimum: %2</translation>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="277"/>
+        <location filename="../bootman.cpp" line="286"/>
         <source>Updating initramfs</source>
         <translation>Initramfs opwaarderen</translation>
     </message>
@@ -95,18 +95,18 @@ Minimum: %2</translation>
         <translation>GRUB installatie mislukt. Je kunt opnieuw opstarten naar de live media en het GRUB Rescue menu gebruiken om de installatie te repareren.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="278"/>
+        <location filename="../bootman.cpp" line="287"/>
         <source>Failed to update initramfs.</source>
         <translation>Kan initramfs niet bijwerken.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="303"/>
+        <location filename="../bootman.cpp" line="312"/>
         <source>System boot disk:</source>
         <translation>Systeem opstartschijf:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="322"/>
-        <location filename="../bootman.cpp" line="332"/>
+        <location filename="../bootman.cpp" line="331"/>
+        <location filename="../bootman.cpp" line="341"/>
         <source>Partition to use:</source>
         <translation>Partitie om te gebruiken:</translation>
     </message>
@@ -502,6 +502,11 @@ Veel plezier met %1</translation>
         <translation>Klik gewoon met de rechtermuisknop op een station en selecteer &lt;b&gt;Layout Bouwer&lt;/b&gt; uit het menu. Dit kan een opmaak creëren die lijkt op die van de gewone installatie.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="748"/>
+        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="754"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Installeer GRUB voor Linux en Windows</translation>
@@ -713,9 +718,8 @@ Veel plezier met %1</translation>
         <translation>Virtuele Apparaten</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="748"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation>Als het installatieprogramma visuele apparaten detecteert, zoals geopende LUKS-partities, LVM logische volumes of op software gebaseerde RAID-volumes, kunnen deze voor de installatie worden gebruikt.</translation>
+        <translation type="vanished">Als het installatieprogramma visuele apparaten detecteert, zoals geopende LUKS-partities, LVM logische volumes of op software gebaseerde RAID-volumes, kunnen deze voor de installatie worden gebruikt.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="749"/>
@@ -1416,12 +1420,12 @@ Wilt u werkelijk stoppen?</translation>
 <context>
     <name>Oobe</name>
     <message>
-        <location filename="../oobe.cpp" line="333"/>
+        <location filename="../oobe.cpp" line="334"/>
         <source>Please enter a computer name.</source>
         <translation>Voer alstublieft een computernaam in.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="337"/>
+        <location filename="../oobe.cpp" line="338"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1430,12 +1434,12 @@ U moet een andere naam
 kiezen voordat u verder gaat.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="342"/>
+        <location filename="../oobe.cpp" line="343"/>
         <source>Please enter a domain name.</source>
         <translation>Voer alstublieft een domeinnaam in.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="346"/>
+        <location filename="../oobe.cpp" line="347"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1444,66 +1448,66 @@ U moet een andere naam
 kiezen voordat u verder gaat.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="353"/>
+        <location filename="../oobe.cpp" line="354"/>
         <source>Please enter a workgroup.</source>
         <translation>Voer alstublieft een werkgroep in.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="493"/>
+        <location filename="../oobe.cpp" line="494"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>De gebruikersnaam mag geen speciale karakters of spaties bevatten.
 Kies a.u.b. een andere naam voordat u doorgaat.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="504"/>
+        <location filename="../oobe.cpp" line="505"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Sorry, die naam is al in gebruik.
 Kies a.u.b. een andere naam.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="513"/>
+        <location filename="../oobe.cpp" line="514"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation>U hebt geen wachtwoord opgegeven voor %1.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="514"/>
+        <location filename="../oobe.cpp" line="515"/>
         <source>Are you sure you want to continue?</source>
         <translation>Weet je zeker dat je door wilt gaan?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="520"/>
+        <location filename="../oobe.cpp" line="521"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>Je hebt geen wachtwoord opgegeven voor het root-account. Wil je doorgaan?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="533"/>
+        <location filename="../oobe.cpp" line="534"/>
         <source>Failed to set user account passwords.</source>
         <translation>Het instellen van gebruikersaccount wachtwoorden is mislukt.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="559"/>
+        <location filename="../oobe.cpp" line="560"/>
         <source>Failed to save old home directory.</source>
         <translation>Niet gelukt de oude home directory op te slaan.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="568"/>
+        <location filename="../oobe.cpp" line="569"/>
         <source>Failed to delete old home directory.</source>
         <translation>Niet gelukt de oude home directory te verwijderen.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="589"/>
+        <location filename="../oobe.cpp" line="590"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Sorry. Het aanmaken van een gebruikers-directory is mislukt.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="592"/>
+        <location filename="../oobe.cpp" line="593"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Sorry. Het benoemen van een gebruikers-directory is mislukt.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="628"/>
+        <location filename="../oobe.cpp" line="629"/>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation>Het is niet gelukt eigendom of rechten van de gebruikersdirectory in te stellen.</translation>
     </message>
@@ -1841,12 +1845,12 @@ Kies a.u.b. een andere naam.</translation>
         <translation>Subvolumes voorbereiden</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1402"/>
+        <location filename="../partman.cpp" line="1412"/>
         <source>Failed to mount partition.</source>
         <translation>Koppeling van partitie mislukt.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1407"/>
+        <location filename="../partman.cpp" line="1417"/>
         <source>Mounting: %1</source>
         <translation>Montage: %1</translation>
     </message>
@@ -1854,22 +1858,22 @@ Kies a.u.b. een andere naam.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2455"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>&amp;Templates</source>
         <translation>&amp;Sjablonen</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2463"/>
+        <location filename="../partman.cpp" line="2473"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compressie (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2465"/>
+        <location filename="../partman.cpp" line="2475"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compressie (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2467"/>
+        <location filename="../partman.cpp" line="2477"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compressie (&amp;ZLIB)</translation>
     </message>

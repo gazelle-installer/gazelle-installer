@@ -80,7 +80,7 @@ Shtëpia e %2%</translation>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="277"/>
+        <location filename="../bootman.cpp" line="286"/>
         <source>Updating initramfs</source>
         <translation>Po përditësohet initramfs</translation>
     </message>
@@ -95,18 +95,18 @@ Shtëpia e %2%</translation>
         <translation>Instalimi i GRUB-it dështoi. Mund të rinisni median për sistemin live dhe të përdorni menunë GRUB Rescue që të riparoni instalimin.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="278"/>
+        <location filename="../bootman.cpp" line="287"/>
         <source>Failed to update initramfs.</source>
         <translation>S’u arrit të përditësohej initramfs.</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="303"/>
+        <location filename="../bootman.cpp" line="312"/>
         <source>System boot disk:</source>
         <translation>Disk nisjeje sistemi:</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="322"/>
-        <location filename="../bootman.cpp" line="332"/>
+        <location filename="../bootman.cpp" line="331"/>
+        <location filename="../bootman.cpp" line="341"/>
         <source>Partition to use:</source>
         <translation>Pjesë për t’u përdorur:</translation>
     </message>
@@ -502,6 +502,11 @@ Shijoni përdorimin e %1-it</translation>
         <translation>Thjesht djathtasklikoni mbi një disk dhe përzgjidhni &lt;b&gt;Ndërtues Skeme&lt;/b&gt; që nga menuja. Kjo mund të krijojë një skemë të ngjashme me atë të instalimit të rregullt.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="748"/>
+        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="754"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Instalo GRUB për Linux dhe Windows</translation>
@@ -713,9 +718,8 @@ Shijoni përdorimin e %1-it</translation>
         <translation>Pajisje Virtuale</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="748"/>
         <source>If the intaller detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation>Nëse instaluesi pika pajisje virtuale, bie fjala pjesë LUKS të hapura, vëllime logjike LVM, ose vëllime RAID me bazë software-i, ato mund të përdoren për instalimin.</translation>
+        <translation type="vanished">Nëse instaluesi pika pajisje virtuale, bie fjala pjesë LUKS të hapura, vëllime logjike LVM, ose vëllime RAID me bazë software-i, ato mund të përdoren për instalimin.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="749"/>
@@ -1416,12 +1420,12 @@ Doni vërtet të ndalet tani?</translation>
 <context>
     <name>Oobe</name>
     <message>
-        <location filename="../oobe.cpp" line="333"/>
+        <location filename="../oobe.cpp" line="334"/>
         <source>Please enter a computer name.</source>
         <translation>Ju lutemi, jepni emër kompjuteri.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="337"/>
+        <location filename="../oobe.cpp" line="338"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1430,12 +1434,12 @@ të pavlefshme. Do t’ju duhet të përzgjidhni
 tjetër emër, para se të ecni më tej.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="342"/>
+        <location filename="../oobe.cpp" line="343"/>
         <source>Please enter a domain name.</source>
         <translation>Ju lutemi, jepni një emër përkatësie.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="346"/>
+        <location filename="../oobe.cpp" line="347"/>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
@@ -1444,66 +1448,66 @@ shenja të pavlefshme. Do t’ju duhet të përzgjidhni
 tjetër emër, para se të ecni më tej.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="353"/>
+        <location filename="../oobe.cpp" line="354"/>
         <source>Please enter a workgroup.</source>
         <translation>Ju lutemi, jepni një grup pune.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="493"/>
+        <location filename="../oobe.cpp" line="494"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>Emri i përdoruesit s’mund të përmbajë shenja speciale ose
 Ju lutemi, para se të ecet më tej, zgjidhni një emër tjetër.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="504"/>
+        <location filename="../oobe.cpp" line="505"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Na ndjeni, ai emër është në përdorim. 
 Ju lutemi, përzgjidhni një emër tjetër.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="513"/>
+        <location filename="../oobe.cpp" line="514"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation>S’dhatë frazëkalim për %1.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="514"/>
+        <location filename="../oobe.cpp" line="515"/>
         <source>Are you sure you want to continue?</source>
         <translation>Jeni i sigurt se doni të vazhdohet?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="520"/>
+        <location filename="../oobe.cpp" line="521"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>S’dhatë fjalëkalim për llogarinë rrënjë. Doni të vazhdohet?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="533"/>
+        <location filename="../oobe.cpp" line="534"/>
         <source>Failed to set user account passwords.</source>
         <translation>S’u arrit të caktohen fjalëkalime llogarish përdoruesi.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="559"/>
+        <location filename="../oobe.cpp" line="560"/>
         <source>Failed to save old home directory.</source>
         <translation>S’u arrit të ruhet drejtoria shtëpi e dikurshme.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="568"/>
+        <location filename="../oobe.cpp" line="569"/>
         <source>Failed to delete old home directory.</source>
         <translation>S’u arrit të fshihet drejtoria e dikurshme shtëpi.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="589"/>
+        <location filename="../oobe.cpp" line="590"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Na ndjeni, s’u arrit të krijohej drejtori përdoruesi.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="592"/>
+        <location filename="../oobe.cpp" line="593"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Na ndjeni, s’u arrit të emërtohet drejtori përdoruesi.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="628"/>
+        <location filename="../oobe.cpp" line="629"/>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation>S’u arrit të ujdisej pronësi ose leje drejtorie përdoruesi.</translation>
     </message>
@@ -1841,12 +1845,12 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>Po përgatitet nënvëllime</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1402"/>
+        <location filename="../partman.cpp" line="1412"/>
         <source>Failed to mount partition.</source>
         <translation>S’u arrit të montohej pjesë.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1407"/>
+        <location filename="../partman.cpp" line="1417"/>
         <source>Mounting: %1</source>
         <translation>Po montohet: %1</translation>
     </message>
@@ -1854,22 +1858,22 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2455"/>
+        <location filename="../partman.cpp" line="2465"/>
         <source>&amp;Templates</source>
         <translation>&amp;Gjedhe</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2463"/>
+        <location filename="../partman.cpp" line="2473"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Ngjeshje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2465"/>
+        <location filename="../partman.cpp" line="2475"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Ngjeshje (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2467"/>
+        <location filename="../partman.cpp" line="2477"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Ngjeshje (&amp;ZLIB)</translation>
     </message>
