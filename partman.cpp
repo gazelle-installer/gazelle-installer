@@ -1375,8 +1375,8 @@ bool PartMan::makeFstab() noexcept
             //fallback UUID
             //some btrfs systems show incorrect UUID for volume, and so parent UUID never found
             if (UUID.isEmpty()){
-                proc.exec("blkid", {"-p", "-s","UUID", dev}, nullptr, true);
-                UUID = proc.readOut().section("=", 1, 1).section("\"",1,1);
+                proc.exec("lsblk", {dev, "-no", "UUID"}, nullptr, true);
+                UUID = proc.readOut();
                 qDebug() << "UUID:" << UUID;
             }
             out << "UUID=" << UUID;
