@@ -372,7 +372,7 @@ void Oobe::setComputerName()
     //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/hosts");
     const QString &compname = gui.textComputerName->text();
     QString cmd("sed -E -i '/localhost/! s/^(127\\.0\\.0\\.1|127\\.0\\.1\\.1).*/\\1    " + compname + "/'");
-    proc.shell(cmd + " " + etcpath + "hosts");
+    proc.shell(cmd + " " + etcpath + "/hosts");
     proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/hostname");
     proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/mailname");
     proc.shell("sed -i 's/.*send host-name.*/send host-name \""
