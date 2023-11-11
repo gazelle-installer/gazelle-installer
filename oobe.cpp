@@ -371,8 +371,7 @@ void Oobe::setComputerName()
     }
     //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/hosts");
     const QString &compname = gui.textComputerName->text();
-    QString cmd("sed -i 's/'\"$(grep 127.0.0.1 /etc/hosts | grep -v localhost"
-        " | head -1 | awk '{print $2}')\"'/" + compname + "/' ");
+    QString cmd("sed -E -i '/localhost/! s/^(127\\.0\\.0\\.1|127\\.0\\.1\\.1).*/\\1    " + compname + "/' ");
     if (!online) proc.shell(cmd + "/mnt/antiX/etc/hosts");
     else {
         proc.shell(cmd + "/tmp/hosts");
