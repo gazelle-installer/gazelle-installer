@@ -48,6 +48,8 @@ public:
     enum TreeColumns {
         COL_DEVICE,
         COL_SIZE,
+        COL_FLAG_ACTIVE,
+        COL_FLAG_ESP,
         COL_USEFOR,
         COL_LABEL,
         COL_ENCRYPT,

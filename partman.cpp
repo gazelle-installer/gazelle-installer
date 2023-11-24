@@ -1545,22 +1545,18 @@ QVariant PartMan::data(const QModelIndex &index, int role) const noexcept
         && index.flags() & Qt::ItemIsUserCheckable) {
         switch (index.column())
         {
+        case COL_FLAG_ACTIVE:
+            assert(device->parentItem != nullptr);
+            return (device->parentItem->active == device) ? Qt::Checked : Qt::Unchecked;
+            break;
+        case COL_FLAG_ESP: return device->flags.sysEFI ? Qt::Checked : Qt::Unchecked; break;
         case COL_ENCRYPT: return device->encrypt ? Qt::Checked : Qt::Unchecked; break;
         case COL_CHECK: return device->chkbadblk ? Qt::Checked : Qt::Unchecked; break;
         case COL_DUMP: return device->dump ? Qt::Checked : Qt::Unchecked; break;
         }
     } else if (role == Qt::DisplayRole) {
         switch (index.column()) {
-        case COL_DEVICE:
-            if (device->type == Device::SUBVOLUME) {
-                return device->isActive() ? "++++" : "----";
-            } else {
-                QString dev = device->name;
-                if (device->isActive()) dev += '*';
-                if (device->flags.sysEFI) dev += QChar(u'†');
-                return dev;
-            }
-            break;
+        case COL_DEVICE: return device->name; break;
         case COL_SIZE:
             if (device->type == Device::SUBVOLUME) {
                 return device->isActive() ? "++++" : "----";
@@ -1624,6 +1620,8 @@ bool PartMan::setData(const QModelIndex &index, const QVariant &value, int role)
         changeBegin(device);
         switch (index.column())
         {
+        case COL_FLAG_ACTIVE: device->setActive(value == Qt::Checked); break;
+        case COL_FLAG_ESP: device->flags.sysEFI = (value == Qt::Checked); break;
         case COL_ENCRYPT: device->encrypt = (value == Qt::Checked); break;
         case COL_CHECK: device->chkbadblk = (value == Qt::Checked); break;
         case COL_DUMP: device->dump = (value == Qt::Checked); break;
@@ -1646,6 +1644,16 @@ Qt::ItemFlags PartMan::flags(const QModelIndex &index) const noexcept
     case COL_SIZE:
         if (device->type == Device::PARTITION && !device->flags.oldLayout) {
             flagsOut |= Qt::ItemIsEditable;
+        }
+        break;
+    case COL_FLAG_ACTIVE:
+        if (device->type == Device::PARTITION) {
+            flagsOut |= Qt::ItemIsUserCheckable;
+        }
+        break;
+    case COL_FLAG_ESP:
+        if (device->type == Device::PARTITION && device->parent() && device->parent()->finalFormat() == "GPT") {
+            flagsOut |= Qt::ItemIsUserCheckable;
         }
         break;
     case COL_USEFOR:
@@ -1691,6 +1699,8 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
         {
         case COL_DEVICE: return tr("Device"); break;
         case COL_SIZE: return tr("Size"); break;
+        case COL_FLAG_ACTIVE: return "Act."; break;
+        case COL_FLAG_ESP: return "ESP"; break;
         case COL_USEFOR: return tr("Use For"); break;
         case COL_LABEL: return tr("Label"); break;
         case COL_ENCRYPT: return tr("Encrypt"); break;
@@ -1700,7 +1710,24 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
         case COL_DUMP: return tr("Dump"); break;
         case COL_PASS: return tr("Pass"); break;
         }
-    } else if (role == Qt::FontRole && (section == COL_ENCRYPT || section == COL_CHECK || section == COL_DUMP)) {
+    } else if (role == Qt::ToolTipRole) {
+        switch (section)
+        {
+        case COL_DEVICE: break;
+        case COL_SIZE: break;
+        case COL_FLAG_ACTIVE: return tr("Active partition"); break;
+        case COL_FLAG_ESP: return tr("EFI System Partition"); break;
+        case COL_USEFOR: break;
+        case COL_LABEL: break;
+        case COL_ENCRYPT: break;
+        case COL_FORMAT: break;
+        case COL_CHECK: break;
+        case COL_OPTIONS: break;
+        case COL_DUMP: break;
+        case COL_PASS: break;
+        }
+    } else if (role == Qt::FontRole && (section == COL_FLAG_ACTIVE || section == COL_FLAG_ESP
+        || section == COL_ENCRYPT || section == COL_CHECK || section == COL_DUMP)) {
         QFont smallFont;
         smallFont.setPointSizeF(smallFont.pointSizeF() * 0.6);
         return smallFont;
