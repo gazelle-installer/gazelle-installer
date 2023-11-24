@@ -452,7 +452,6 @@ void PartMan::treeMenu(const QPoint &)
         QAction *actUnlock = nullptr;
         QAction *actAddCrypttab = nullptr;
         QAction *actNewSubvolume = nullptr, *actScanSubvols = nullptr;
-        QAction *actActive = nullptr, *actESP = nullptr;
         actRemove->setEnabled(gui.pushPartRemove->isEnabled());
         menu.addSeparator();
         if (seldev->type == Device::VIRTUAL) {
@@ -469,13 +468,6 @@ void PartMan::treeMenu(const QPoint &)
                 actAddCrypttab->setCheckable(true);
                 actAddCrypttab->setChecked(seldev->addToCrypttab);
             }
-            menu.addSeparator();
-            actActive = menu.addAction(tr("Active partition"));
-            actESP = menu.addAction(tr("EFI System Partition"));
-            actActive->setCheckable(true);
-            actActive->setChecked(seldev->isActive());
-            actESP->setCheckable(true);
-            actESP->setChecked(seldev->flags.sysEFI);
         }
         if (seldev->finalFormat() == "btrfs") {
             menu.addSeparator();
@@ -490,13 +482,8 @@ void PartMan::treeMenu(const QPoint &)
         else if (action == actRemove) partRemoveClick(true);
         else if (action == actUnlock) partMenuUnlock(seldev);
         else if (action == actLock) partMenuLock(seldev);
-        else if (action == actActive) seldev->setActive(action->isChecked());
         else if (action == actAddCrypttab) seldev->addToCrypttab = action->isChecked();
-        else if (action == actESP) {
-            seldev->flags.sysEFI = action->isChecked();
-            seldev->autoFill(1 << COL_FORMAT);
-            notifyChange(seldev);
-        } else if (action == actNewSubvolume) {
+        else if (action == actNewSubvolume) {
             Device *subvol = new Device(Device::SUBVOLUME, seldev);
             subvol->autoFill();
             gui.treePartitions->expand(selIndex);
@@ -1824,7 +1811,7 @@ int PartMan::changeEnd(bool autofill, bool notify) noexcept
             }
         }
     }
-    if (changing->format != root->format) {
+    if (changing->format != root->format || changing->flags.sysEFI != root->flags.sysEFI) {
         changed |= (1 << COL_FORMAT);
     }
 
