@@ -30,14 +30,12 @@
 #include "autopart.h"
 
 AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf) noexcept
-    : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman),
-      passCrypto(ui.textCryptoPass, ui.textCryptoPass2, 1, this)
+    : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman)
 {
     connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
-    connect(gui.boxEncryptAuto, &QGroupBox::toggled, this, &AutoPart::toggleEncrypt);
-    connect(&passCrypto, &PassEdit::validationChanged, gui.pushNext, &QPushButton::setEnabled);
+    connect(gui.checkEncryptAuto, &QCheckBox::toggled, this, &AutoPart::toggleEncrypt);
     connect(gui.checkHibernationReg, &QCheckBox::toggled, this,
-        [this](bool checked){ setParams(true, gui.boxEncryptAuto->isChecked(), checked, true); });
+        [this](bool checked){ setParams(true, gui.checkEncryptAuto->isChecked(), checked, true); });
     connect(gui.sliderPart, &QSlider::sliderPressed, this, &AutoPart::sliderPressed);
     connect(gui.sliderPart, &QSlider::actionTriggered, this, &AutoPart::sliderActionTriggered);
     connect(gui.sliderPart, &QSlider::valueChanged, this, &AutoPart::sliderValueChanged);
@@ -67,7 +65,7 @@ void AutoPart::manageConfig(MSettings &config) noexcept
 {
     config.startGroup("Storage", gui.pageDisk);
     config.manageComboBox("Drive", gui.comboDisk, true);
-    config.manageGroupCheckBox("DriveEncrypt", gui.boxEncryptAuto);
+    config.manageCheckBox("DriveEncrypt", gui.checkEncryptAuto);
     if (config.isSave()) {
         config.setValue("RootPortion", gui.sliderPart->value());
     } else if (config.contains("RootPortion")) {
@@ -181,7 +179,7 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
     const QLocale &syslocale = QLocale::system();
     QLabel *labelBase = new QLabel(syslocale.formattedDataSize(
         minRoot, 1, QLocale::DataSizeTraditionalFormat), &dialog);
-    QCheckBox *checkEncrypt = new QCheckBox(gui.boxEncryptAuto->title(), &dialog);
+    QCheckBox *checkEncrypt = new QCheckBox(gui.checkEncryptAuto->text(), &dialog);
     QCheckBox *checkSwapFile = new QCheckBox('+' + syslocale.formattedDataSize(
         swapRec, 1, QLocale::DataSizeTraditionalFormat), &dialog);
     QCheckBox *checkHibernation = new QCheckBox('+' + syslocale.formattedDataSize(
@@ -301,11 +299,11 @@ void AutoPart::diskChanged() noexcept
 
     // Is encryption possible?
     const bool canEncrypt = (buildLayout(-1, true, false) >= minRoot);
-    gui.boxEncryptAuto->setEnabled(canEncrypt);
-    if (!canEncrypt) gui.boxEncryptAuto->setChecked(false);
+    gui.checkEncryptAuto->setEnabled(canEncrypt);
+    if (!canEncrypt) gui.checkEncryptAuto->setChecked(false);
 
     // Refresh encrypt/hibernate capabilities and cascade to set parameters.
-    toggleEncrypt(gui.boxEncryptAuto->isChecked());
+    toggleEncrypt(gui.checkEncryptAuto->isChecked());
 }
 void AutoPart::toggleEncrypt(bool checked) noexcept
 {
@@ -315,7 +313,6 @@ void AutoPart::toggleEncrypt(bool checked) noexcept
     if (!canHibernate) gui.checkHibernationReg->setChecked(false);
 
     setParams(true, checked, gui.checkHibernationReg->isChecked(), true);
-    if (!inBuilder) gui.pushNext->setEnabled(!checked || passCrypto.valid());
 }
 
 void AutoPart::sliderPressed() noexcept
