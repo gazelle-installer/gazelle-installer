@@ -74,7 +74,6 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     gui.pushPartAdd->setEnabled(false);
     gui.pushPartRemove->setEnabled(false);
     gui.pushPartClear->setEnabled(false);
-    gui.boxCryptoPass->setEnabled(false);
 
     gui.pushGrid->setChecked(gui.treePartitions->grid());
     connect(gui.pushGrid, &QToolButton::toggled, gui.treePartitions, &MTreeView::setGrid);
@@ -83,8 +82,6 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     QFileInfo cryptsetup("/usr/sbin/cryptsetup");
     QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
     if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
-        gui.boxEncryptAuto->hide();
-        gui.boxCryptoPass->hide();
         gui.treePartitions->setColumnHidden(COL_ENCRYPT, true);
     }
 
@@ -395,16 +392,6 @@ void PartMan::resizeColumnsToFit() noexcept
 void PartMan::treeItemChange() noexcept
 {
     // Encryption and bad blocks controls
-    bool cryptoAny = false;
-    for (Iterator it(*this); Device *part = *it; it.next()) {
-        if (part->type != Device::PARTITION) continue;
-        if (part->canEncrypt() && part->encrypt) cryptoAny = true;
-    }
-    if (gui.boxCryptoPass->isEnabled() != cryptoAny) {
-        gui.textCryptoPassCust->clear();
-        gui.pushNext->setDisabled(cryptoAny);
-        gui.boxCryptoPass->setEnabled(cryptoAny);
-    }
     treeSelChange();
 }
 
@@ -1210,8 +1197,7 @@ void PartMan::preparePartitions()
 void PartMan::luksFormat()
 {
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to format LUKS container."));
-    const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
-        ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
+    const QByteArray &encPass = gui.textCryptoPass->text().toUtf8();
     for (Iterator it(*this); Device *part = *it; it.next()) {
         if (!part->encrypt || !part->willFormat()) continue;
         proc.status(tr("Creating encrypted volume: %1").arg(part->name));
@@ -1934,7 +1920,7 @@ bool PartMan::Device::canEncrypt() const noexcept
     if (type != PARTITION) return false;
     return !(flags.sysEFI || usefor.isEmpty() || usefor == "BIOS-GRUB" || usefor == "/boot");
 }
-inline bool PartMan::Device::willEncrypt() const noexcept
+bool PartMan::Device::willEncrypt() const noexcept
 {
     if (type == SUBVOLUME) return parentItem->encrypt;
     return encrypt;
