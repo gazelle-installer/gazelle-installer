@@ -784,6 +784,9 @@ void MInstall::pageDisplayed(int next) noexcept
     case Step::CONFIRM: // Confirmation and review.
         textHelp->setText("<p><b>" + tr("Final Review and Confirmation") + "</b><br/>"
             + tr("Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.") + "</p>");
+        if (!automatic) {
+            proc.sleep(500, true); // Prevent accidentally skipping the confirmation.
+        }
         break;
 
     case Step::BOOT: // Start of installation.
