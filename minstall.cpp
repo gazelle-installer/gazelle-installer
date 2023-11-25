@@ -53,6 +53,8 @@ enum Step {
     TERMS,
     DISK,
     PARTITIONS,
+    ENCRYPTION,
+    CONFIRM,
     BOOT,
     SERVICES,
     NETWORK,
@@ -126,7 +128,7 @@ MInstall::~MInstall() {
     if (partman) delete partman;
     if (autopart) delete autopart;
     if (throbber) delete throbber;
-    if (passCryptoCust) delete passCryptoCust;
+    if (passCrypto) delete passCrypto;
 }
 
 // meant to be run after the installer becomes visible
@@ -172,6 +174,10 @@ void MInstall::startup()
         swapman = new SwapMan(proc, *partman, *this);
         autopart = new AutoPart(proc, partman, *this, appConf);
         partman->autopart = autopart;
+        connect(radioEntireDisk, &QRadioButton::toggled, boxAutoPart, &QGroupBox::setEnabled);
+        labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
+            + "<br/><img src=':/dialog-warning'/>" + tr("These actions cannot be undone. Do you want to continue?")
+            + "<img src=':/dialog-warning'/>");
 
         // Link block
         QString link_block;
@@ -187,8 +193,8 @@ void MInstall::startup()
                             + "\n" + link_block);
 
         // Password box setup
-        passCryptoCust = new PassEdit(textCryptoPassCust, textCryptoPassCust2, 1, this);
-        connect(passCryptoCust, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
+        passCrypto = new PassEdit(textCryptoPass, textCryptoPass2, 1, this);
+        connect(passCrypto, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
     }
 
     setupkeyboardbutton();
@@ -481,13 +487,8 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         config->startGroup("Encryption", targetIsDrive ? pageDisk : pagePartitions);
         if (mode != CONFIG_SAVE) {
             const QString &epass = config->value("Pass").toString();
-            if (targetIsDrive) {
-                textCryptoPass->setText(epass);
-                textCryptoPass2->setText(epass);
-            } else {
-                textCryptoPassCust->setText(epass);
-                textCryptoPassCust2->setText(epass);
-            }
+            textCryptoPass->setText(epass);
+            textCryptoPass2->setText(epass);
         }
         config->endGroup();
     }
@@ -531,35 +532,33 @@ int MInstall::showPage(int curr, int next) noexcept
         if (modeOOBE) return Step::NETWORK;
     } else if (curr == Step::DISK && next > curr) {
         if (radioEntireDisk->isChecked()) {
-            if (!automatic) {
-                QString msg = tr("OK to format and use the entire disk (%1) for %2?");
-                if (!proc.detectEFI()) {
-                    PartMan::Device *device = partman->findByPath("/dev/" + comboDisk->currentData().toString());
-                    if (device && device->size >= 2*TB) {
-                        msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
-                                           " On some systems, a GPT-formatted disk will not boot.");
-                        return curr;
-                    }
+            if (!automatic && !proc.detectEFI()) {
+                PartMan::Device *device = partman->findByPath("/dev/" + comboDisk->currentData().toString());
+                if (device && device->size >= 2*TB) {
+                    const int ans = QMessageBox::warning(this, windowTitle(),
+                        tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
+                           " On some systems, a GPT-formatted disk will not boot."),
+                        QMessageBox::Yes, QMessageBox::No);
+                    if (ans != QMessageBox::Yes) return curr; // don't format - stop install
                 }
-                int ans = QMessageBox::warning(this, windowTitle(),
-                    msg.arg(comboDisk->currentData().toString(), PROJECTNAME),
-                    QMessageBox::Yes, QMessageBox::No);
-                if (ans != QMessageBox::Yes) return curr; // don't format - stop install
             }
             partman->clearAllUses();
-            autopart->buildLayout(autopart->partSize(), boxEncryptAuto->isChecked());
-            if (!partman->composeValidate(true, PROJECTNAME)) {
+            autopart->buildLayout(autopart->partSize(), checkEncryptAuto->isChecked());
+            if (!partman->composeValidate(true)) {
                 nextFocus = treePartitions;
-                return curr;
+                return Step::PARTITIONS;
             }
-            bootman->buildBootLists(); // Load default boot options
-            checkHibernation->setChecked(checkHibernationReg->isChecked());
-            swapman->setupDefaults();
-            manageConfig(CONFIG_LOAD2);
-            return oem ? Step::PROGRESS : Step::NETWORK;
+            listConfirm->clear();
+            listConfirm->addItem(tr("Format and use the entire disk (%1) for %2").arg(
+                comboDisk->currentData().toString(), PROJECTNAME));
+            if (checkEncryptAuto->isChecked()) {
+                return Step::ENCRYPTION;
+            }
+            return Step::CONFIRM;
         }
     } else if (curr == Step::PARTITIONS && next > curr) {
-        if (!partman->composeValidate(automatic, PROJECTNAME)) {
+        listConfirm->clear();
+        if (!partman->composeValidate(automatic)) {
             nextFocus = treePartitions;
             return curr;
         }
@@ -569,10 +568,38 @@ int MInstall::showPage(int curr, int next) noexcept
                     " the required information could not be obtained."));
             return curr;
         }
-        bootman->buildBootLists();
-        swapman->setupDefaults();
-        manageConfig(CONFIG_LOAD2);
-        return Step::BOOT;
+        for (PartMan::Iterator it(*partman); *it; it.next()) {
+            if ((*it)->willEncrypt()) {
+                return Step::ENCRYPTION;
+            }
+        }
+        return Step::CONFIRM;
+    } else if (curr == Step::ENCRYPTION && next < curr) {
+        if (radioEntireDisk->isChecked()) {
+            partman->scan(autopart->selectedDrive()); // Clear the auto layout.
+            return Step::DISK;
+        }
+        return Step::PARTITIONS;
+    } else if (curr == Step::CONFIRM) {
+        if (next > curr) {
+            bootman->buildBootLists(); // Load default boot options
+            if (radioEntireDisk->isChecked()) {
+                checkHibernation->setChecked(checkHibernationReg->isChecked());
+                swapman->setupDefaults();
+                manageConfig(CONFIG_LOAD2);
+                return oem ? Step::PROGRESS : Step::NETWORK;
+            } else {
+                swapman->setupDefaults();
+                manageConfig(CONFIG_LOAD2);
+                return Step::BOOT;
+            }
+        } else {
+            if (radioEntireDisk->isChecked()) {
+                partman->scan(autopart->selectedDrive()); // Clear the auto layout.
+                return Step::DISK;
+            }
+            return Step::PARTITIONS;
+        }
     } else if (curr == Step::BOOT && next > curr) {
         return oem ? Step::PROGRESS : Step::NETWORK;
     } else if (curr == Step::NETWORK && next > curr) {
@@ -626,6 +653,9 @@ void MInstall::pageDisplayed(int next) noexcept
         if (next != ixProgress) ixTipStart = ixTip;
     }
 
+    // This prevents the user accidentally skipping the confirmation.
+    pushNext->setDefault(next != Step::CONFIRM);
+
     switch (next) {
     case Step::TERMS:
         textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
@@ -635,7 +665,6 @@ void MInstall::pageDisplayed(int next) noexcept
             + "<p><b>" + tr("Limitations") + "</b><br/>"
             + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
                 " It is solely your responsibility to backup your data before proceeding.") + "</p>");
-        pushNext->setDefault(true);
         break;
     case Step::DISK:
         textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
@@ -656,7 +685,6 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
                 " partitions you need.").arg(PROJECTNAME, radioCustomPart->text().remove('&')) + "</p>");
-        enableNext = radioCustomPart->isChecked() || !boxEncryptAuto->isChecked() || autopart->passCrypto.valid();
         break;
 
     case Step::PARTITIONS:
@@ -747,7 +775,20 @@ void MInstall::pageDisplayed(int next) noexcept
             "<p><b>" + tr("Virtual Devices") + "</b><br/>"
             + tr("If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
             "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
-        enableNext = !(boxCryptoPass->isEnabledTo(boxCryptoPass->parentWidget())) || passCryptoCust->valid();
+        break;
+
+    case Step::ENCRYPTION: // Disk encryption.
+        textHelp->setText("<p><b>" + tr("Encryption") + "</b><br/>"
+            + ("You have chosen to encrypt at least one volume, and more information is required before continuing.") + "</p>");
+        enableNext = passCrypto->valid();
+        break;
+
+    case Step::CONFIRM: // Confirmation and review.
+        textHelp->setText("<p><b>" + tr("Final Review and Confirmation") + "</b><br/>"
+            + tr("Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.") + "</p>");
+        if (!automatic) {
+            proc.sleep(500, true); // Prevent accidentally skipping the confirmation.
+        }
         break;
 
     case Step::BOOT: // Start of installation.
@@ -898,6 +939,9 @@ void MInstall::gotoPage(int next) noexcept
         // entering the last page
         pushBack->hide();
         pushNext->setText(tr("Finish"));
+    } else if (next == Step::CONFIRM) {
+        isize.setWidth(0);
+        pushNext->setText(tr("Start"));
     } else if (next == Step::SERVICES){
         isize.setWidth(0);
         pushNext->setText(tr("OK"));
@@ -1191,10 +1235,4 @@ void MInstall::on_pushSetKeyboard_clicked() noexcept
     }
     setupkeyboardbutton();
     this->setEnabled(true);
-}
-
-void MInstall::on_radioEntireDisk_toggled(bool checked) noexcept
-{
-    boxAutoPart->setEnabled(checked);
-    pushNext->setEnabled(!checked || !boxEncryptAuto->isChecked() || autopart->passCrypto.valid());
 }

@@ -39,12 +39,12 @@
        </sizepolicy>
       </property>
       <widget class="QTextEdit" name="textHelp">
-       <attribute name="title">
-        <string>Help</string>
-       </attribute>
        <property name="readOnly">
         <bool>true</bool>
        </property>
+       <attribute name="title">
+        <string>Help</string>
+       </attribute>
       </widget>
       <widget class="QListWidget" name="listLog">
        <attribute name="title">
@@ -72,8 +72,7 @@
           <string>Back</string>
          </property>
          <property name="icon">
-          <iconset theme="go-previous">
-           <normaloff>.</normaloff>.</iconset>
+          <iconset theme="go-previous"/>
          </property>
          <property name="shortcut">
           <string>Alt+K</string>
@@ -86,8 +85,7 @@
           <string>Next</string>
          </property>
          <property name="icon">
-          <iconset theme="go-next">
-           <normaloff>.</normaloff>.</iconset>
+          <iconset theme="go-next"/>
          </property>
          <property name="shortcut">
           <string>Alt+N</string>
@@ -160,13 +158,15 @@
           <string>Close</string>
          </property>
          <property name="icon">
-          <iconset theme="window-close">
-           <normaloff>.</normaloff>.</iconset>
+          <iconset theme="window-close"/>
          </property>
         </widget>
        </item>
        <item row="2" column="0" colspan="6">
         <widget class="QStackedWidget" name="widgetStack">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
          <widget class="QLabel" name="labelSplash">
           <property name="font">
            <font>
@@ -417,6 +417,9 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="1">
+                  <widget class="QComboBox" name="comboDisk"/>
+                 </item>
                  <item row="2" column="1">
                   <widget class="QFrame" name="boxSliderPart">
                    <property name="frameShape">
@@ -562,63 +565,18 @@ QSlider::handle:horizontal:disabled {
                   </widget>
                  </item>
                  <item row="4" column="1">
-                  <widget class="QGroupBox" name="boxEncryptAuto">
-                   <property name="title">
-                    <string>Encrypt</string>
-                   </property>
-                   <property name="checkable">
-                    <bool>true</bool>
-                   </property>
-                   <property name="checked">
-                    <bool>false</bool>
-                   </property>
-                   <layout class="QFormLayout">
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="labelCryptoPass">
-                      <property name="text">
-                       <string>Encryption password:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QLineEdit" name="textCryptoPass">
-                      <property name="maxLength">
-                       <number>512</number>
-                      </property>
-                      <property name="echoMode">
-                       <enum>QLineEdit::Password</enum>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QLabel" name="labelCryptoPass2">
-                      <property name="text">
-                       <string>Confirm password:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="1">
-                     <widget class="QLineEdit" name="textCryptoPass2">
-                      <property name="maxLength">
-                       <number>512</number>
-                      </property>
-                      <property name="echoMode">
-                       <enum>QLineEdit::Password</enum>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item row="5" column="1">
                   <widget class="QCheckBox" name="checkHibernationReg">
                    <property name="text">
                     <string>Enable hibernation support</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="1">
-                  <widget class="QComboBox" name="comboDisk"/>
+                 <item row="3" column="1">
+                  <widget class="QCheckBox" name="checkEncryptAuto">
+                   <property name="text">
+                    <string>Encrypt</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -761,30 +719,37 @@ QSlider::handle:horizontal:disabled {
              </layout>
             </widget>
            </item>
-           <item row="1" column="0">
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pageEncryption">
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
             <widget class="QGroupBox" name="boxCryptoPass">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
              <property name="title">
               <string>Encryption options</string>
              </property>
-             <layout class="QFormLayout">
+             <layout class="QFormLayout" name="_2">
               <item row="0" column="0">
-               <widget class="QLabel" name="labelCryptoPassCust">
+               <widget class="QLabel" name="labelCryptoPass">
                 <property name="text">
                  <string>Encryption password:</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="textCryptoPassCust">
+               <widget class="QLineEdit" name="textCryptoPass">
                 <property name="maxLength">
                  <number>512</number>
                 </property>
@@ -794,14 +759,14 @@ QSlider::handle:horizontal:disabled {
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="labelCryptoPassCust2">
+               <widget class="QLabel" name="labelCryptoPass2">
                 <property name="text">
                  <string>Confirm password:</string>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="textCryptoPassCust2">
+               <widget class="QLineEdit" name="textCryptoPass2">
                 <property name="maxLength">
                  <number>512</number>
                 </property>
@@ -809,6 +774,50 @@ QSlider::handle:horizontal:disabled {
                  <enum>QLineEdit::Password</enum>
                 </property>
                </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>341</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pageConfirm">
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QGroupBox" name="boxConfirm">
+             <property name="title">
+              <string>Installation Confirmation</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QLabel" name="labelConfirm"/>
+              </item>
+              <item>
+               <widget class="QListWidget" name="listConfirm"/>
               </item>
              </layout>
             </widget>
@@ -2019,9 +2028,6 @@ QSlider::handle:horizontal:disabled {
   <tabstop>radioEntireDisk</tabstop>
   <tabstop>comboDisk</tabstop>
   <tabstop>sliderPart</tabstop>
-  <tabstop>boxEncryptAuto</tabstop>
-  <tabstop>textCryptoPass</tabstop>
-  <tabstop>textCryptoPass2</tabstop>
   <tabstop>radioCustomPart</tabstop>
   <tabstop>treePartitions</tabstop>
   <tabstop>pushPartClear</tabstop>
@@ -2029,8 +2035,6 @@ QSlider::handle:horizontal:disabled {
   <tabstop>pushPartRemove</tabstop>
   <tabstop>pushPartReload</tabstop>
   <tabstop>pushPartManRun</tabstop>
-  <tabstop>textCryptoPassCust</tabstop>
-  <tabstop>textCryptoPassCust2</tabstop>
   <tabstop>boxBoot</tabstop>
   <tabstop>radioBootMBR</tabstop>
   <tabstop>radioBootPBR</tabstop>
