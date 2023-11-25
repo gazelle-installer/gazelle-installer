@@ -793,6 +793,37 @@ QSlider::handle:horizontal:disabled {
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="pageConfirm">
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QGroupBox" name="boxConfirm">
+             <property name="title">
+              <string>Installation Confirmation</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QLabel" name="labelConfirm"/>
+              </item>
+              <item>
+               <widget class="QListWidget" name="listConfirm"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
          <widget class="QWidget" name="pageBoot">
           <layout class="QGridLayout">
            <property name="leftMargin">

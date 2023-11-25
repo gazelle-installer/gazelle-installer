@@ -54,6 +54,7 @@ enum Step {
     DISK,
     PARTITIONS,
     ENCRYPTION,
+    CONFIRM,
     BOOT,
     SERVICES,
     NETWORK,
@@ -174,6 +175,9 @@ void MInstall::startup()
         autopart = new AutoPart(proc, partman, *this, appConf);
         partman->autopart = autopart;
         connect(radioEntireDisk, &QRadioButton::toggled, boxAutoPart, &QGroupBox::setEnabled);
+        labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
+            + "<br/><img src=':/dialog-warning'/>" + tr("These actions cannot be undone. Do you want to continue?")
+            + "<img src=':/dialog-warning'/>");
 
         // Link block
         QString link_block;
@@ -517,7 +521,6 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
 // logic displaying pages
 int MInstall::showPage(int curr, int next) noexcept
 {
-    bool start = false;
     if (next == Step::SPLASH) { // Enter splash screen
         boxMain->setCursor(Qt::WaitCursor);
         splashSetThrobber(appConf.value("SPLASH_THROBBER", true).toBool());
@@ -529,27 +532,33 @@ int MInstall::showPage(int curr, int next) noexcept
         if (modeOOBE) return Step::NETWORK;
     } else if (curr == Step::DISK && next > curr) {
         if (radioEntireDisk->isChecked()) {
-            if (checkEncryptAuto->isChecked()) {
-                if (!automatic) {
-                    QString msg = tr("OK to format and use the entire disk (%1) for %2?");
-                    if (!proc.detectEFI()) {
-                        PartMan::Device *device = partman->findByPath("/dev/" + comboDisk->currentData().toString());
-                        if (device && device->size >= 2*TB) {
-                            msg += "\n\n" + tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
-                                " On some systems, a GPT-formatted disk will not boot.");
-                        }
-                    }
-                    int ans = QMessageBox::warning(this, windowTitle(),
-                        msg.arg(comboDisk->currentData().toString(), PROJECTNAME),
+            if (!automatic && !proc.detectEFI()) {
+                PartMan::Device *device = partman->findByPath("/dev/" + comboDisk->currentData().toString());
+                if (device && device->size >= 2*TB) {
+                    const int ans = QMessageBox::warning(this, windowTitle(),
+                        tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
+                           " On some systems, a GPT-formatted disk will not boot."),
                         QMessageBox::Yes, QMessageBox::No);
                     if (ans != QMessageBox::Yes) return curr; // don't format - stop install
                 }
+            }
+            partman->clearAllUses();
+            autopart->buildLayout(autopart->partSize(), checkEncryptAuto->isChecked());
+            if (!partman->composeValidate(true)) {
+                nextFocus = treePartitions;
+                return Step::PARTITIONS;
+            }
+            listConfirm->clear();
+            listConfirm->addItem(tr("Format and use the entire disk (%1) for %2").arg(
+                comboDisk->currentData().toString(), PROJECTNAME));
+            if (checkEncryptAuto->isChecked()) {
                 return Step::ENCRYPTION;
             }
-            start = true;
+            return Step::CONFIRM;
         }
     } else if (curr == Step::PARTITIONS && next > curr) {
-        if (!partman->composeValidate(automatic, PROJECTNAME)) {
+        listConfirm->clear();
+        if (!partman->composeValidate(automatic)) {
             nextFocus = treePartitions;
             return curr;
         }
@@ -564,33 +573,32 @@ int MInstall::showPage(int curr, int next) noexcept
                 return Step::ENCRYPTION;
             }
         }
-        start = true;
-    } else if (curr == Step::ENCRYPTION) {
-        if (next > curr) {
-            start = true;
-        } else {
-            return radioEntireDisk->isChecked() ? Step::DISK : Step::PARTITIONS;
-        }
-    }
-
-    if (start) {
+        return Step::CONFIRM;
+    } else if (curr == Step::ENCRYPTION && next < curr) {
         if (radioEntireDisk->isChecked()) {
-            partman->clearAllUses();
-            autopart->buildLayout(autopart->partSize(), checkEncryptAuto->isChecked());
-            if (!partman->composeValidate(true, PROJECTNAME)) {
-                nextFocus = treePartitions;
-                return Step::PARTITIONS;
-            }
+            partman->scan(autopart->selectedDrive()); // Clear the auto layout.
+            return Step::DISK;
+        }
+        return Step::PARTITIONS;
+    } else if (curr == Step::CONFIRM) {
+        if (next > curr) {
             bootman->buildBootLists(); // Load default boot options
-            checkHibernation->setChecked(checkHibernationReg->isChecked());
-            swapman->setupDefaults();
-            manageConfig(CONFIG_LOAD2);
-            return oem ? Step::PROGRESS : Step::NETWORK;
+            if (radioEntireDisk->isChecked()) {
+                checkHibernation->setChecked(checkHibernationReg->isChecked());
+                swapman->setupDefaults();
+                manageConfig(CONFIG_LOAD2);
+                return oem ? Step::PROGRESS : Step::NETWORK;
+            } else {
+                swapman->setupDefaults();
+                manageConfig(CONFIG_LOAD2);
+                return Step::BOOT;
+            }
         } else {
-            bootman->buildBootLists();
-            swapman->setupDefaults();
-            manageConfig(CONFIG_LOAD2);
-            return Step::BOOT;
+            if (radioEntireDisk->isChecked()) {
+                partman->scan(autopart->selectedDrive()); // Clear the auto layout.
+                return Step::DISK;
+            }
+            return Step::PARTITIONS;
         }
     } else if (curr == Step::BOOT && next > curr) {
         return oem ? Step::PROGRESS : Step::NETWORK;
@@ -645,6 +653,9 @@ void MInstall::pageDisplayed(int next) noexcept
         if (next != ixProgress) ixTipStart = ixTip;
     }
 
+    // This prevents the user accidentally skipping the confirmation.
+    pushNext->setDefault(next != Step::CONFIRM);
+
     switch (next) {
     case Step::TERMS:
         textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
@@ -654,7 +665,6 @@ void MInstall::pageDisplayed(int next) noexcept
             + "<p><b>" + tr("Limitations") + "</b><br/>"
             + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
                 " It is solely your responsibility to backup your data before proceeding.") + "</p>");
-        pushNext->setDefault(true);
         break;
     case Step::DISK:
         textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
@@ -769,6 +779,11 @@ void MInstall::pageDisplayed(int next) noexcept
 
     case Step::ENCRYPTION: // Disk encryption.
         enableNext = passCrypto->valid();
+        break;
+
+    case Step::CONFIRM: // Confirmation and review.
+        textHelp->setText("<p><b>" + tr("Final Review and Confirmation") + "</b><br/>"
+            + tr("Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.") + "</p>");
         break;
 
     case Step::BOOT: // Start of installation.
@@ -919,6 +934,9 @@ void MInstall::gotoPage(int next) noexcept
         // entering the last page
         pushBack->hide();
         pushNext->setText(tr("Finish"));
+    } else if (next == Step::CONFIRM) {
+        isize.setWidth(0);
+        pushNext->setText(tr("Start"));
     } else if (next == Step::SERVICES){
         isize.setWidth(0);
         pushNext->setText(tr("OK"));

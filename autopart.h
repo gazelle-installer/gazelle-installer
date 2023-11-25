@@ -56,6 +56,7 @@ public:
     enum Part { Root, Home };
     void setPartSize(Part part, long long nbytes) noexcept;
     long long partSize(Part part = Root) const noexcept;
+    inline class PartMan::Device *selectedDrive() { return drvitem; }
     // Layout Builder
     void builderGUI(class PartMan::Device *drive) noexcept;
     long long buildLayout(long long rootFormatSize, bool crypto,
