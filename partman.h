@@ -76,7 +76,7 @@ public:
     ~PartMan();
     void scan(Device *drvstart = nullptr);
     bool manageConfig(class MSettings &config, bool save) noexcept;
-    bool composeValidate(bool automatic, const QString &project) noexcept;
+    bool composeValidate(bool automatic) noexcept;
     bool checkTargetDrivesOK() const;
     Device *selectedDriveAuto() noexcept;
     void clearAllUses() noexcept;
