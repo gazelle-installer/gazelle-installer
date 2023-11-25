@@ -74,7 +74,6 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     gui.pushPartAdd->setEnabled(false);
     gui.pushPartRemove->setEnabled(false);
     gui.pushPartClear->setEnabled(false);
-    gui.boxCryptoPass->setEnabled(false);
 
     gui.pushGrid->setChecked(gui.treePartitions->grid());
     connect(gui.pushGrid, &QToolButton::toggled, gui.treePartitions, &MTreeView::setGrid);
@@ -83,8 +82,6 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     QFileInfo cryptsetup("/usr/sbin/cryptsetup");
     QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
     if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
-        gui.boxEncryptAuto->hide();
-        gui.boxCryptoPass->hide();
         gui.treePartitions->setColumnHidden(COL_ENCRYPT, true);
     }
 
@@ -395,16 +392,6 @@ void PartMan::resizeColumnsToFit() noexcept
 void PartMan::treeItemChange() noexcept
 {
     // Encryption and bad blocks controls
-    bool cryptoAny = false;
-    for (Iterator it(*this); Device *part = *it; it.next()) {
-        if (part->type != Device::PARTITION) continue;
-        if (part->canEncrypt() && part->encrypt) cryptoAny = true;
-    }
-    if (gui.boxCryptoPass->isEnabled() != cryptoAny) {
-        gui.textCryptoPassCust->clear();
-        gui.pushNext->setDisabled(cryptoAny);
-        gui.boxCryptoPass->setEnabled(cryptoAny);
-    }
     treeSelChange();
 }
 
@@ -690,7 +677,7 @@ void PartMan::scanSubvolumes(Device *part)
     qApp->restoreOverrideCursor();
 }
 
-bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
+bool PartMan::composeValidate(bool automatic) noexcept
 {
     mounts.clear();
     // Partition use and other validation
@@ -759,53 +746,52 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         return false;
     }
 
-    if (!automatic) {
-        // Final warnings before the installer starts.
-        QString details;
-        for (const Device *drive : std::as_const(root->children)) {
-            if (!drive->flags.oldLayout && drive->type != Device::VIRTUAL_DEVICES) {
-                details += tr("Prepare %1 partition table on %2").arg(drive->format, drive->name) + '\n';
-            }
-            for (const Device *part : std::as_const(drive->children)) {
-                QString actmsg;
-                if (drive->flags.oldLayout) {
-                    if (part->usefor.isEmpty()) {
-                        if (part->children.size() > 0) actmsg = tr("Reuse (no reformat) %1");
-                        else continue;
-                    } else {
-                        if (part->usefor == "FORMAT") actmsg = tr("Format %1");
-                        else if (part->willFormat()) actmsg = tr("Format %1 to use for %2");
-                        else if (part->usefor != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
-                        else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
-                    }
+    // Confirmation page action list
+    for (const Device *drive : std::as_const(root->children)) {
+        if (!drive->flags.oldLayout && drive->type != Device::VIRTUAL_DEVICES) {
+            gui.listConfirm->addItem(tr("Prepare %1 partition table on %2").arg(drive->format, drive->name));
+        }
+        for (const Device *part : std::as_const(drive->children)) {
+            QString actmsg;
+            if (drive->flags.oldLayout) {
+                if (part->usefor.isEmpty()) {
+                    if (part->children.size() > 0) actmsg = tr("Reuse (no reformat) %1");
+                    else continue;
                 } else {
-                    if (part->usefor.isEmpty()) actmsg = tr("Create %1 without formatting");
-                    else actmsg = tr("Create %1, format to use for %2");
+                    if (part->usefor == "FORMAT") actmsg = tr("Format %1");
+                    else if (part->willFormat()) actmsg = tr("Format %1 to use for %2");
+                    else if (part->usefor != "/") actmsg = tr("Reuse (no reformat) %1 as %2");
+                    else actmsg = tr("Delete the data on %1 except for /home, to use for %2");
+                }
+            } else {
+                if (part->usefor.isEmpty()) actmsg = tr("Create %1 without formatting");
+                else actmsg = tr("Create %1, format to use for %2");
+            }
+            // QString::arg() emits warnings if a marker is not in the string.
+            gui.listConfirm->addItem(actmsg.replace("%1", part->shownDevice()).replace("%2", part->usefor));
+
+            for (const Device *subvol : std::as_const(part->children)) {
+                const bool svnouse = subvol->usefor.isEmpty();
+                if (subvol->format == "PRESERVE") {
+                    if (svnouse) continue;
+                    else actmsg = tr("Reuse subvolume %1 as %2");
+                } else if (subvol->format == "DELETE") {
+                    actmsg = tr("Delete subvolume %1");
+                } else if (subvol->format == "CREATE") {
+                    if (subvol->flags.oldLayout) {
+                        if (svnouse) actmsg = tr("Overwrite subvolume %1");
+                        else actmsg = tr("Overwrite subvolume %1 to use for %2");
+                    } else {
+                        if (svnouse) actmsg = tr("Create subvolume %1");
+                        else actmsg = tr("Create subvolume %1 to use for %2");
+                    }
                 }
                 // QString::arg() emits warnings if a marker is not in the string.
-                details += actmsg.replace("%1", part->shownDevice()).replace("%2", part->usefor) + '\n';
-
-                for (const Device *subvol : std::as_const(part->children)) {
-                    const bool svnouse = subvol->usefor.isEmpty();
-                    if (subvol->format == "PRESERVE") {
-                        if (svnouse) continue;
-                        else actmsg = tr("Reuse subvolume %1 as %2");
-                    } else if (subvol->format == "DELETE") {
-                        actmsg = tr("Delete subvolume %1");
-                    } else if (subvol->format == "CREATE") {
-                        if (subvol->flags.oldLayout) {
-                            if (svnouse) actmsg = tr("Overwrite subvolume %1");
-                            else actmsg = tr("Overwrite subvolume %1 to use for %2");
-                        } else {
-                            if (svnouse) actmsg = tr("Create subvolume %1");
-                            else actmsg = tr("Create subvolume %1 to use for %2");
-                        }
-                    }
-                    // QString::arg() emits warnings if a marker is not in the string.
-                    details += " + " + actmsg.replace("%1", subvol->label).replace("%2", subvol->usefor) + '\n';
-                }
+                gui.listConfirm->addItem(" + " + actmsg.replace("%1", subvol->label).replace("%2", subvol->usefor));
             }
         }
+    }
+    if (!automatic) {
         // Warning messages
         QMessageBox msgbox(gui.boxMain);
         msgbox.setIcon(QMessageBox::Warning);
@@ -819,19 +805,6 @@ bool PartMan::composeValidate(bool automatic, const QString &project) noexcept
         }
         if (!confirmSpace(msgbox)) return false;
         if (!confirmBootable(msgbox)) return false;
-
-        msgbox.setText(tr("The %1 installer will now perform the requested actions.").arg(project));
-        msgbox.setInformativeText(tr("These actions cannot be undone. Do you want to continue?"));
-        details.chop(1); // Remove trailing new-line character.
-        msgbox.setDetailedText(details);
-        const QList<QAbstractButton *> &btns = msgbox.buttons();
-        for (auto btn : btns) {
-            if (msgbox.buttonRole(btn) == QMessageBox::ActionRole) {
-                btn->click(); // Simulate clicking the "Show Details..." button.
-                break;
-            }
-        }
-        if (msgbox.exec() != QMessageBox::Yes) return false;
     }
 
     return true;
@@ -1197,8 +1170,7 @@ void PartMan::preparePartitions()
 void PartMan::luksFormat()
 {
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to format LUKS container."));
-    const QByteArray &encPass = (gui.radioEntireDisk->isChecked()
-        ? gui.textCryptoPass : gui.textCryptoPassCust)->text().toUtf8();
+    const QByteArray &encPass = gui.textCryptoPass->text().toUtf8();
     for (Iterator it(*this); Device *part = *it; it.next()) {
         if (!part->encrypt || !part->willFormat()) continue;
         proc.status(tr("Creating encrypted volume: %1").arg(part->name));
@@ -1948,7 +1920,7 @@ bool PartMan::Device::canEncrypt() const noexcept
     if (type != PARTITION) return false;
     return !(flags.sysEFI || usefor.isEmpty() || usefor == "BIOS-GRUB" || usefor == "/boot");
 }
-inline bool PartMan::Device::willEncrypt() const noexcept
+bool PartMan::Device::willEncrypt() const noexcept
 {
     if (type == SUBVOLUME) return parentItem->encrypt;
     return encrypt;
