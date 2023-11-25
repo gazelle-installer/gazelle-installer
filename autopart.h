@@ -22,7 +22,6 @@
 #include <QObject>
 #include <QStringList>
 #include "ui_meinstall.h"
-#include "passedit.h"
 #include "partman.h"
 
 class AutoPart : public QObject
@@ -49,7 +48,6 @@ class AutoPart : public QObject
     void sliderActionTriggered(int action) noexcept;
     void sliderValueChanged(int value) noexcept;
 public:
-    PassEdit passCrypto;
     AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void scan() noexcept;
@@ -58,6 +56,7 @@ public:
     enum Part { Root, Home };
     void setPartSize(Part part, long long nbytes) noexcept;
     long long partSize(Part part = Root) const noexcept;
+    inline class PartMan::Device *selectedDrive() { return drvitem; }
     // Layout Builder
     void builderGUI(class PartMan::Device *drive) noexcept;
     long long buildLayout(long long rootFormatSize, bool crypto,

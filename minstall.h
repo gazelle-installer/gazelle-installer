@@ -46,8 +46,6 @@ private slots:
     void on_pushNext_clicked() noexcept;
     void on_pushServices_clicked() noexcept;
 
-    void on_radioEntireDisk_toggled(bool checked) noexcept;
-
     void on_progInstall_valueChanged(int value) noexcept;
 
 private:
@@ -90,7 +88,7 @@ private:
     class Oobe *oobe = nullptr;
     class BootMan *bootman = nullptr;
     class SwapMan *swapman = nullptr;
-    class PassEdit *passCryptoCust = nullptr;
+    class PassEdit *passCrypto = nullptr;
 
     QPixmap helpBackdrop;
     // Splash screen
