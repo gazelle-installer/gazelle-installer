@@ -778,6 +778,8 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::ENCRYPTION: // Disk encryption.
+        textHelp->setText("<p><b>" + tr("Encryption") + "</b><br/>"
+            + ("You have chosen to encrypt at least one volume, and more information is required before continuing.") + "</p>");
         enableNext = passCrypto->valid();
         break;
 
