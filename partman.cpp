@@ -1783,8 +1783,11 @@ int PartMan::changeEnd(bool autofill, bool notify) noexcept
             }
         }
     }
-    if (changing->format != root->format || changing->flags.sysEFI != root->flags.sysEFI) {
+    if (changing->format != root->format) {
         changed |= (1 << COL_FORMAT);
+    }
+    if (changing->flags.sysEFI != root->flags.sysEFI) {
+        changed |= (1 << COL_FLAG_ESP);
     }
 
     if (autofill) {
@@ -2105,6 +2108,10 @@ void PartMan::Device::driveAutoSetActive() noexcept
 }
 void PartMan::Device::autoFill(unsigned int changed) noexcept
 {
+    if ((changed & (1 << PartMan::COL_FLAG_ESP)) && usefor.isEmpty()) {
+        usefor = "ESP";
+        changed |= (1 << PartMan::COL_USEFOR);
+    }
     if (changed & (1 << PartMan::COL_USEFOR)) {
         // Default labels
         if (type == SUBVOLUME) {
