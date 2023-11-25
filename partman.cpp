@@ -1658,7 +1658,7 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
         {
         case COL_DEVICE: return tr("Device"); break;
         case COL_SIZE: return tr("Size"); break;
-        case COL_FLAG_ACTIVE: return "Act."; break;
+        case COL_FLAG_ACTIVE: return tr("Active"); break;
         case COL_FLAG_ESP: return "ESP"; break;
         case COL_USEFOR: return tr("Use For"); break;
         case COL_LABEL: return tr("Label"); break;
@@ -1688,7 +1688,7 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
     } else if (role == Qt::FontRole && (section == COL_FLAG_ACTIVE || section == COL_FLAG_ESP
         || section == COL_ENCRYPT || section == COL_CHECK || section == COL_DUMP)) {
         QFont smallFont;
-        smallFont.setPointSizeF(smallFont.pointSizeF() * 0.6);
+        smallFont.setPointSizeF(smallFont.pointSizeF() * 0.5);
         return smallFont;
     }
     return QVariant();
