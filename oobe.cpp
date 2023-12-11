@@ -403,6 +403,22 @@ void Oobe::setLocale()
     if (!online) cmd = "chroot /mnt/antiX ";
     cmd += QString("/usr/sbin/update-locale \"LANG=%1\"").arg(gui.comboLocale->currentData().toString());
     proc.shell(cmd);
+
+    //set paper size based on locale
+    QString papersize;
+    QStringList letterpapersizedefualt = {"en_US", "es_BO", "es_CO", "es_MX", "es_NI", "es_PA", "es_US", "es_VE", "fr_CA", "en_CA" };
+    if (containsAnySubstring(gui.comboLocale->currentData().toString(), letterpapersizedefualt)) {
+        papersize = "letter";
+    } else {
+        papersize = "a4";
+    }
+
+    if (!online) {
+        proc.shell("echo " + papersize + " >/mnt/antiX/etc/papersize");
+    } else {
+        proc.shell("echo " + papersize + " >/etc/papersize");
+    }
+
     const QString &selTimeZone = gui.comboTimeZone->currentData().toString();
 
     // /etc/localtime is either a file or a symlink to a file in /usr/share/zoneinfo. Use the one selected by the user.
@@ -705,4 +721,13 @@ void Oobe::oldHomeToggled() noexcept
 bool Oobe::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
 {
     return proc.exec("sed", {"-i", QString("s/%1/%2/g").arg(oldtext, newtext), filepath});
+}
+
+bool Oobe::containsAnySubstring(const QString& mainString, const QStringList& substrings) {
+    for (const QString& substring : substrings) {
+        if (mainString.contains(substring)) {
+            return true;
+        }
+    }
+    return false;
 }

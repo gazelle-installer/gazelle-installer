@@ -65,6 +65,8 @@ public:
     // Slots
     void userPassValidationChanged() noexcept;
     void oldHomeToggled() noexcept;
-};
+    bool containsAnySubstring(const QString& mainString, const QStringList& substrings);
+
+    };
 
 #endif // OOBE_H
