@@ -47,6 +47,11 @@ Shtëpia e %2%</translation>
         <translation>S’hapet dot media e instalimit.</translation>
     </message>
     <message>
+        <location filename="../base.cpp" line="152"/>
+        <source>Failed to delete old system on destination.</source>
+        <translation>S’u arrit të fshihet sistemi i vjetër te vendmbërritje.</translation>
+    </message>
+    <message>
         <location filename="../base.cpp" line="155"/>
         <source>Deleting old system</source>
         <translation>Po fshihet sistemi i vjetër</translation>
@@ -62,11 +67,6 @@ Shtëpia e %2%</translation>
         <translation>Po ujdiset formësim sistemi</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="152"/>
-        <source>Failed to delete old system on destination.</source>
-        <translation>S’u arrit të fshihet sistemi i vjetër te vendmbërritje.</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="245"/>
         <source>Copying new system</source>
         <translation>Po kopjohet sistemi i ri</translation>
@@ -80,9 +80,9 @@ Shtëpia e %2%</translation>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="286"/>
-        <source>Updating initramfs</source>
-        <translation>Po përditësohet initramfs</translation>
+        <location filename="../bootman.cpp" line="106"/>
+        <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
+        <translation>Instalimi i GRUB-it dështoi. Mund të rinisni median për sistemin live dhe të përdorni menunë GRUB Rescue që të riparoni instalimin.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="128"/>
@@ -90,9 +90,9 @@ Shtëpia e %2%</translation>
         <translation>Po instalohet GRUB-i</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="106"/>
-        <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
-        <translation>Instalimi i GRUB-it dështoi. Mund të rinisni median për sistemin live dhe të përdorni menunë GRUB Rescue që të riparoni instalimin.</translation>
+        <location filename="../bootman.cpp" line="286"/>
+        <source>Updating initramfs</source>
+        <translation>Po përditësohet initramfs</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="287"/>
@@ -153,6 +153,16 @@ Këshillojmë të dilni tani dhe ta rinisni nën Nisje e Dikurshme
 Doni të vazhdohet instalimi?</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="178"/>
+        <source>The %1 installer will now perform the requested actions.</source>
+        <translation>Instaluesi %1 tani do të kryejë veprimet e kërkuara.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="179"/>
+        <source>These actions cannot be undone. Do you want to continue?</source>
+        <translation>Këto veprime s’mund të zhbëhen. Doni të vazhdohet?</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="192"/>
         <source>Support %1
 
@@ -173,11 +183,6 @@ Enjoy using %1</source>
 %1 përdor disa përbërës nga MEPIS Linux, që mund të përdoren sipas një licence të lirë Apache. Disa përbërës MEPIS janë ndryshuar për %1.
 
 Shijoni përdorimin e %1-it</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="445"/>
-        <source>Pretending to install %1</source>
-        <translation>Po pretendohet të instalohet %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="359"/>
@@ -205,9 +210,24 @@ Shijoni përdorimin e %1-it</translation>
         <translation>U përfundua</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="412"/>
+        <source>Configuring sytem. Please wait.</source>
+        <translation>Po formësohet sistemi. Ju lutemi, prisni.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="416"/>
+        <source>Configuration complete. Restarting system.</source>
+        <translation>Formësim i plotësuar. Po riniset sistemi.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="421"/>
         <source>The installation was aborted.</source>
         <translation>Instalimi u ndërpre.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="445"/>
+        <source>Pretending to install %1</source>
+        <translation>Po pretendohet të instalohet %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="516"/>
@@ -215,13 +235,14 @@ Shijoni përdorimin e %1-it</translation>
         <translation>U gjetën rregullime të pavlefshme në kartelën e formësimit (%1). Ju lutemi, shqyrtoni fushat me shenjë, teksa hasni të tilla.</translation>
     </message>
     <message>
-        <source>OK to format and use the entire disk (%1) for %2?</source>
-        <translation type="vanished">OK për formatim dhe përdorim të krejt diskut (%1) për %2?</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="539"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
         <translation>KUJDES: Disku i përzgjedhur ka një kapacitet të paktën 2TB dhe duhet formatuar duke përdorur GPT. Në disa sisteme, një disk i formatuar me GPT s’do të arrijë të niset.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="552"/>
+        <source>Format and use the entire disk (%1) for %2</source>
+        <translation>Formato dhe përdor krejt diskun (%1) për %2</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -363,6 +384,62 @@ Shijoni përdorimin e %1-it</translation>
         <translation>&lt;i&gt;Përdore Për&lt;/i&gt; - Që këtë pjesë ta përdorni në një instalim, duhet të përzgjidhni diçka këtu.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="697"/>
+        <source>Format without mounting</source>
+        <translation>Formatoje pa e montuar</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="698"/>
+        <source>BIOS Boot GPT partition for GRUB</source>
+        <translation>Pjesë BIOS Boot GPT për GRUB</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="699"/>
+        <location filename="../minstall.cpp" line="738"/>
+        <source>EFI System Partition</source>
+        <translation>Pjesë EFI Sistemi</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="701"/>
+        <source>Boot manager</source>
+        <translation>Përgjegjës nisjesh</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="702"/>
+        <source>System root</source>
+        <translation>Rrënjë sistemi</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="703"/>
+        <source>User data</source>
+        <translation>Të dhëna përdoruesish</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="704"/>
+        <source>Static data</source>
+        <translation>Të dhëna statike</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="705"/>
+        <source>Variable data</source>
+        <translation>Të dhëna të ndryshueshme</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="706"/>
+        <source>Temporary files</source>
+        <translation>Kartela të përkohshme</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="707"/>
+        <source>Swap files</source>
+        <translation>Kartela swap</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="708"/>
+        <source>Swap partition</source>
+        <translation>Pjesë swap</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Përtej sa më sipër, mundeni edhe të shtypni pikën tuaj të montimit. Pika vetjake montimi duhet të fillojnë me një pjerrake (&quot;/&quot;).</translation>
@@ -381,6 +458,11 @@ Shijoni përdorimin e %1-it</translation>
         <location filename="../minstall.cpp" line="713"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Format&lt;/i&gt; - Ky është formati i pjesës. Formatet e mundshëm varen nga fakti se përse do të përdoret pjesa. Kur punohet me një skemë ekzistuese, mund të jeni në gjendje të ruani formatin e pjesës duke përzgjedhur &lt;b&gt;Ruaje&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="715"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
+        <translation>Përzgjedhja e &lt;b&gt;Ruaje /home&lt;/b&gt; për pjesën e rrënjës ruan lëndën e drejtorisë /home, duke fshirë gjithçka tjetër. Kjo mundësi mund të përdoret vetëm kur /home gjendet në të njëjtën pjesë me pjesën rrënjë.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="717"/>
@@ -463,6 +545,21 @@ Shijoni përdorimin e %1-it</translation>
         <translation>Një pjesë, me një asterisk (*) në krah të emrit përkatës të pajisjes, është, ose do të jetë, pjesa aktive.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="739"/>
+        <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
+        <translation>Nëse sistemi juaj përdor Extensible Firmware Interface (EFI), që sistemi të niset, është e domosdoshme një pjesë e njohur si EFI System Partition (ESP).</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="740"/>
+        <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
+        <translation>Këto sisteme s’lypin ndonjë pjesë të shënuar si Aktive, por në vend të kësaj duan doemos një pjesë të formatuar si një sistem FAT kartelash, të shënuar si një ESP.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="741"/>
+        <source>Most systems built within the last 10 years use EFI.</source>
+        <translation>Shumica e sistemeve të ndërtuar gjatë 10 vjetëve të fundit përdorin EFI.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="742"/>
         <source>Boot partition</source>
         <translation>Pjesë nisjeje</translation>
@@ -498,155 +595,9 @@ Shijoni përdorimin e %1-it</translation>
         <translation>Thjesht djathtasklikoni mbi një disk dhe përzgjidhni &lt;b&gt;Ndërtues Skeme&lt;/b&gt; që nga menuja. Kjo mund të krijojë një skemë të ngjashme me atë të instalimit të rregullt.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="776"/>
-        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation>Nëse instaluesi pikas çfarëdo pajisjesh virtuale, bie fjala, pjesë LUKS të hapura, vëllime logjikë LVM, apo vëllime RAID me bazë software--i, ato mund të përdoren për instalimin.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="795"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation>Instalo GRUB për Linux dhe Windows</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="796"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation>%1 përdor ngarkuesin GRUB të nisjeve, për të nisur %1 dhe Microsoft-in Windows.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="797"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation>Si parazgjedhje, GRUB-i instalohet në Master Boot Record - Regjistër i Përgjithshëm Nisjesh - (MBR) ose ESP (EFI System Partition - Pjesë Sistemi EFI - për sisteme nisjeje 64-bit UEFI) të diskut tuaj të nisjes dhe zëvendëson ngarkuesin e nisjeve që përdorni më parë. Kjo është normale.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="798"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation>Nëse, në vend të kësaj,  zgjidhni të instaloni GRUB-in te Partition Boot Record - Regjistër Pjesësh Nisjeje - (PBR), atëherë GRUB-i do të instalohet në fillim të pjesës së përcaktuar. Kjo mundësi është vetëm për të sprovuarit.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="799"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation>Nëse i hiqni shenjën kutizës Instalo GRUB-in, GRUB-i s’do të instalohet këtë herë. Kjo mundësi është vetëm për ekspertë.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="800"/>
-        <source>Create a swap file</source>
-        <translation>Krijo një kartelë “swap”</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="801"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation>Një kartelë “swap” është zgjidhje më e zhdërvjellët se sa një pjesë “swap”, është goxha më e lehtë të ripërmasohet një kartelë “swap” për t’ia përshtatur ndryshimeve në përdorimin e sistemit.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="802"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation>Si parazgjedhje, kësaj i vihet shenjë nëse s’janë ujdisur pjesë “swap” dhe lihet pa shenjë, nëse janë ujdisur pjesë “swap”. Te kjo mundësi s’duhen futur duart dhe është vetëm për të sprovuar.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="803"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation>Caktimi i madhësisë si 0, ka të njëjtin efekt si mosvënia shenjë kësaj mundësie.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="910"/>
-        <source>Enjoy using %1</source>
-        <translation>Shijoni përdorimin e %1</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>Upgrading</source>
         <translation>Përmirësim</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="178"/>
-        <source>The %1 installer will now perform the requested actions.</source>
-        <translation type="unfinished">Instaluesi %1 tani do të kryejë veprimet e kërkuara.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="179"/>
-        <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation type="unfinished">Këto veprime s’mund të zhbëhen. Doni të vazhdohet?</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="552"/>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="697"/>
-        <source>Format without mounting</source>
-        <translation>Formatoje pa e montuar</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="698"/>
-        <source>BIOS Boot GPT partition for GRUB</source>
-        <translation>Pjesë BIOS Boot GPT për GRUB</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="699"/>
-        <location filename="../minstall.cpp" line="738"/>
-        <source>EFI System Partition</source>
-        <translation>Pjesë EFI Sistemi</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="701"/>
-        <source>Boot manager</source>
-        <translation>Përgjegjës nisjesh</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="702"/>
-        <source>System root</source>
-        <translation>Rrënjë sistemi</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="703"/>
-        <source>User data</source>
-        <translation>Të dhëna përdoruesish</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="704"/>
-        <source>Static data</source>
-        <translation>Të dhëna statike</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="705"/>
-        <source>Variable data</source>
-        <translation>Të dhëna të ndryshueshme</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="706"/>
-        <source>Temporary files</source>
-        <translation>Kartela të përkohshme</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="707"/>
-        <source>Swap files</source>
-        <translation>Kartela swap</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="708"/>
-        <source>Swap partition</source>
-        <translation>Pjesë swap</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="715"/>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
-        <translation>Përzgjedhja e &lt;b&gt;Ruaje /home&lt;/b&gt; për pjesën e rrënjës ruan lëndën e drejtorisë /home, duke fshirë gjithçka tjetër. Kjo mundësi mund të përdoret vetëm kur /home gjendet në të njëjtën pjesë me pjesën rrënjë.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="739"/>
-        <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
-        <translation>Nëse sistemi juaj përdor Extensible Firmware Interface (EFI), që sistemi të niset, është e domosdoshme një pjesë e njohur si EFI System Partition (ESP).</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="740"/>
-        <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
-        <translation>Këto sisteme s’lypin ndonjë pjesë të shënuar si Aktive, por në vend të kësaj duan doemos një pjesë të formatuar si një sistem FAT kartelash, të shënuar si një ESP.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="741"/>
-        <source>Most systems built within the last 10 years use EFI.</source>
-        <translation>Shumica e sistemeve të ndërtuar gjatë 10 vjetëve të fundit përdorin EFI.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -729,6 +680,11 @@ Shijoni përdorimin e %1-it</translation>
         <translation>Pajisje Virtuale</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="776"/>
+        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
+        <translation>Nëse instaluesi pikas çfarëdo pajisjesh virtuale, bie fjala, pjesë LUKS të hapura, vëllime logjikë LVM, apo vëllime RAID me bazë software--i, ato mund të përdoren për instalimin.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="777"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Përdorimi i pajijeve virtuale (përtej qëllimit të ruajtjes së sistemeve të fshehtëzuar të kartelave) është një veçori e thelluar. Mund t’ju duhet të përpunoni ca kartela (p.sh., initramfs, crypttab, fstab), për të garantuar se pajisjet virtuale të përdorura krijohen gjatë nisjes to ensure the virtual devices used are created upon boot.</translation>
@@ -736,12 +692,57 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Shqyrtimi Përfundimtar dhe Ripohim</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ju lutemi, shqyrtojeni me kujdes këtë listë. Kjo është mundësia e fundit për të kontrolluar, marrë në shqyrtim dhe ripohuar veprimet e procesit të instalimit, përpara se të ecet më tej.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="795"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Instalo GRUB për Linux dhe Windows</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="796"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
+        <translation>%1 përdor ngarkuesin GRUB të nisjeve, për të nisur %1 dhe Microsoft-in Windows.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="797"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation>Si parazgjedhje, GRUB-i instalohet në Master Boot Record - Regjistër i Përgjithshëm Nisjesh - (MBR) ose ESP (EFI System Partition - Pjesë Sistemi EFI - për sisteme nisjeje 64-bit UEFI) të diskut tuaj të nisjes dhe zëvendëson ngarkuesin e nisjeve që përdorni më parë. Kjo është normale.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="798"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation>Nëse, në vend të kësaj,  zgjidhni të instaloni GRUB-in te Partition Boot Record - Regjistër Pjesësh Nisjeje - (PBR), atëherë GRUB-i do të instalohet në fillim të pjesës së përcaktuar. Kjo mundësi është vetëm për të sprovuarit.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="799"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation>Nëse i hiqni shenjën kutizës Instalo GRUB-in, GRUB-i s’do të instalohet këtë herë. Kjo mundësi është vetëm për ekspertë.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="800"/>
+        <source>Create a swap file</source>
+        <translation>Krijo një kartelë “swap”</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="801"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation>Një kartelë “swap” është zgjidhje më e zhdërvjellët se sa një pjesë “swap”, është goxha më e lehtë të ripërmasohet një kartelë “swap” për t’ia përshtatur ndryshimeve në përdorimin e sistemit.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="802"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation>Si parazgjedhje, kësaj i vihet shenjë nëse s’janë ujdisur pjesë “swap” dhe lihet pa shenjë, nëse janë ujdisur pjesë “swap”. Te kjo mundësi s’duhen futur duart dhe është vetëm për të sprovuar.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="803"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation>Caktimi i madhësisë si 0, ka të njëjtin efekt si mosvënia shenjë kësaj mundësie.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="809"/>
@@ -914,6 +915,11 @@ Shijoni përdorimin e %1-it</translation>
         <translation>&lt;p&gt;&lt;b&gt;Përgëzime!&lt;/b&gt;&lt;br/&gt;Keni plotësuar instalimin e %1-it&lt;/p&gt;&lt;p&gt;&lt;b&gt;Gjetje Aplikacionesh&lt;/b&gt;&lt;br/&gt;Ka qindra aplikacione të shkëlqyera të instaluara me %1-in Rruga më e mirë për të mësuar rreth tyre është t’i shfletoni përmes Menusë dhe t’i provoni. Mjaft nga aplikacionet janë zhvilluar posaçërisht për projektin %1. Këto shfaqen te menutë kryesore. &lt;p&gt;Veç tyre, %1-i përfshin mjaft aplikacione standarde Linux që përdoren vetëm nga rreshti i urdhrave, ndaj nuk shfaqen te Menuja.&lt;/p&gt;</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="910"/>
+        <source>Enjoy using %1</source>
+        <translation>Shijoni përdorimin e %1</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="911"/>
         <location filename="../minstall.cpp" line="1180"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -927,7 +933,7 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="944"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Nise</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="947"/>
@@ -938,16 +944,6 @@ Shijoni përdorimin e %1-it</translation>
         <location filename="../minstall.cpp" line="949"/>
         <source>Next</source>
         <translation>Pasuesi</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="412"/>
-        <source>Configuring sytem. Please wait.</source>
-        <translation>Po formësohet sistemi. Ju lutemi, prisni.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="416"/>
-        <source>Configuration complete. Restarting system.</source>
-        <translation>Formësim i plotësuar. Po riniset sistemi.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -995,9 +991,14 @@ Doni vërtet të ndalet tani?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="158"/>
-        <source>Close</source>
-        <translation>Mbylle</translation>
+        <location filename="../meinstall.ui" line="72"/>
+        <source>Back</source>
+        <translation>Mbrapsht</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="78"/>
+        <source>Alt+K</source>
+        <translation>Alt+M</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="85"/>
@@ -1010,6 +1011,26 @@ Doni vërtet të ndalet tani?</translation>
         <translation>Alt+N</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="120"/>
+        <source>Installation in progress</source>
+        <translation>Instalim në ecuri e sipër</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="135"/>
+        <source>Abort</source>
+        <translation>Ndërprite</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="138"/>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="158"/>
+        <source>Close</source>
+        <translation>Mbylle</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="177"/>
         <source>Gathering Information, please stand by.</source>
         <translation>Po Grumbullohen të Dhëna, ju lutemi, mos u largoni.</translation>
@@ -1020,9 +1041,29 @@ Doni vërtet të ndalet tani?</translation>
         <translation>Kushte Përdorimi</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="241"/>
+        <source>Keyboard Settings</source>
+        <translation>Rregullime Tastiere</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="256"/>
+        <source>Model:</source>
+        <translation>Model:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="271"/>
+        <source>Variant:</source>
+        <translation>Variant:</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="297"/>
         <source>Change Keyboard Settings</source>
         <translation>Ndryshoni Rregullime Tastiere</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="309"/>
+        <source>Layout:</source>
+        <translation>Skemë:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="375"/>
@@ -1045,44 +1086,9 @@ Doni vërtet të ndalet tani?</translation>
         <translation>Përdor diskun:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="577"/>
-        <source>Encrypt</source>
-        <translation>Fshehtëzoje</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="747"/>
-        <source>Encryption password:</source>
-        <translation>Fjalëkalim fshehtëzimi:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="764"/>
-        <source>Confirm password:</source>
-        <translation>Ripohoni fjalëkalimin:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="450"/>
         <source>Root</source>
         <translation>Rrënjë</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="241"/>
-        <source>Keyboard Settings</source>
-        <translation>Rregullime Tastiere</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="256"/>
-        <source>Model:</source>
-        <translation>Model:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="271"/>
-        <source>Variant:</source>
-        <translation>Variant:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="309"/>
-        <source>Layout:</source>
-        <translation>Skemë:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="460"/>
@@ -1102,24 +1108,14 @@ Doni vërtet të ndalet tani?</translation>
         <translation>Aktivizo mbulim kalimi në plogështi</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="577"/>
+        <source>Encrypt</source>
+        <translation>Fshehtëzoje</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="612"/>
         <source>Choose partitions</source>
         <translation>Zgjidhni pjesë</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="652"/>
-        <source>Query the operating system and reload the layouts of all drives.</source>
-        <translation>Kërko te sistemi operativ dhe ringarko skemat e krejt disqeve.</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="685"/>
-        <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
-        <translation>Hiqni prej skemës një zë ekzistues. Kjo funksionon vetëm me zëra te një skemë e re.</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="674"/>
-        <source>Add a new partition entry. This only works with a new layout.</source>
-        <translation>Shtoni një pjesë të re. Kjo funksionon vetëm me një skemë të re.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="621"/>
@@ -1137,9 +1133,24 @@ Doni vërtet të ndalet tani?</translation>
         <translation>Vëri shenjë diskut të përzgjedhur për t’u spastruar për një skemë të re.</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="652"/>
+        <source>Query the operating system and reload the layouts of all drives.</source>
+        <translation>Kërko te sistemi operativ dhe ringarko skemat e krejt disqeve.</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="663"/>
         <source>Run the partition management application of this operating system.</source>
         <translation>Xhiro aplikacionin e administrimit të pjesëve prej këtij sistemi operativ.</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="674"/>
+        <source>Add a new partition entry. This only works with a new layout.</source>
+        <translation>Shtoni një pjesë të re. Kjo funksionon vetëm me një skemë të re.</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="685"/>
+        <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
+        <translation>Hiqni prej skemës një zë ekzistues. Kjo funksionon vetëm me zëra te një skemë e re.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="741"/>
@@ -1147,9 +1158,19 @@ Doni vërtet të ndalet tani?</translation>
         <translation>Mundësi fshehtëzimi</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="747"/>
+        <source>Encryption password:</source>
+        <translation>Fjalëkalim fshehtëzimi:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="764"/>
+        <source>Confirm password:</source>
+        <translation>Ripohoni fjalëkalimin:</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="813"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripohim Instalimi</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="844"/>
@@ -1337,6 +1358,11 @@ Doni vërtet të ndalet tani?</translation>
         <translation>Emër parazgjedhje hyrjeje për përdoruesin:</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="1645"/>
+        <source>username</source>
+        <translation>emër përdoruesi</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="1658"/>
         <source>Default user password:</source>
         <translation>Fjalëkalim përdoruesi parazgjedhje:</translation>
@@ -1345,11 +1371,6 @@ Doni vërtet të ndalet tani?</translation>
         <location filename="../meinstall.ui" line="1687"/>
         <source>Confirm user password:</source>
         <translation>Ripohoni fjalëkalim përdoruesi:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1645"/>
-        <source>username</source>
-        <translation>emër përdoruesi</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1719"/>
@@ -1415,31 +1436,6 @@ Doni vërtet të ndalet tani?</translation>
         <location filename="../meinstall.ui" line="1978"/>
         <source>Reminders</source>
         <translation>Kujtues</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="72"/>
-        <source>Back</source>
-        <translation>Mbrapsht</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="78"/>
-        <source>Alt+K</source>
-        <translation>Alt+M</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="120"/>
-        <source>Installation in progress</source>
-        <translation>Instalim në ecuri e sipër</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="135"/>
-        <source>Abort</source>
-        <translation>Ndërprite</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="138"/>
-        <source>Alt+A</source>
-        <translation>Alt+A</translation>
     </message>
 </context>
 <context>
@@ -1572,14 +1568,6 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>Shtoje te crypttab</translation>
     </message>
     <message>
-        <source>Active partition</source>
-        <translation type="vanished">Pjesë aktive</translation>
-    </message>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Pjesë EFI Sistemi</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="461"/>
         <source>New subvolume</source>
         <translation>Nënvëllim i ri</translation>
@@ -1598,6 +1586,11 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <location filename="../partman.cpp" line="486"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Riktheje skemën te parazgjedhjet</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="488"/>
+        <source>Layout &amp;Builder...</source>
+        <translation>&amp;Ndërtues Skemash…</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="509"/>
@@ -1660,6 +1653,11 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>S’ruhet dot /home brenda rrënje (/), nëse ndarazi është montuar gjithashtu një pjesë /home.</translation>
     </message>
     <message>
+        <location filename="../partman.cpp" line="752"/>
+        <source>Prepare %1 partition table on %2</source>
+        <translation>Përgatit tabelë pjesësh %1 te %2</translation>
+    </message>
+    <message>
         <location filename="../partman.cpp" line="758"/>
         <source>Reuse (no reformat) %1</source>
         <translation>Ripërdore (pa riformatim) %1</translation>
@@ -1668,6 +1666,31 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <location filename="../partman.cpp" line="761"/>
         <source>Format %1</source>
         <translation>Formato %1</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="762"/>
+        <source>Format %1 to use for %2</source>
+        <translation>Formatoje %1 për ta përdorur për %2</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="763"/>
+        <source>Reuse (no reformat) %1 as %2</source>
+        <translation>Ripërdor (pa formatim) %1 si %2</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="764"/>
+        <source>Delete the data on %1 except for /home, to use for %2</source>
+        <translation>Fshini të dhënat te %1, hiq ato në /home, që të përdoret për %2</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="767"/>
+        <source>Create %1 without formatting</source>
+        <translation>Krijoje %1 pa e formatuar</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="768"/>
+        <source>Create %1, format to use for %2</source>
+        <translation>Krijoje %1, formatoje për ta përdorur për %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="777"/>
@@ -1705,57 +1728,12 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>Kur fshehtëzohet rrënja, duhet të zgjidhni një pjesë nisjesh më vete.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="752"/>
-        <source>Prepare %1 partition table on %2</source>
-        <translation>Përgatit tabelë pjesësh %1 te %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="762"/>
-        <source>Format %1 to use for %2</source>
-        <translation>Formatoje %1 për ta përdorur për %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="763"/>
-        <source>Reuse (no reformat) %1 as %2</source>
-        <translation>Ripërdor (pa formatim) %1 si %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="764"/>
-        <source>Delete the data on %1 except for /home, to use for %2</source>
-        <translation>Fshini të dhënat te %1, hiq ato në /home, që të përdoret për %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="767"/>
-        <source>Create %1 without formatting</source>
-        <translation>Krijoje %1 pa e formatuar</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="768"/>
-        <source>Create %1, format to use for %2</source>
-        <translation>Krijoje %1, formatoje për ta përdorur për %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="905"/>
-        <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
-        <translation>Disqet pasues janë, ose të do të jenë, ujdisur me GPT, por nuk kanë një pjesë BIOS-GRUB:</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="907"/>
-        <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
-        <translation>Ky sistem mund të mos niset nga disqe GPT pa një pjesë BIOS-GRUB.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="803"/>
         <location filename="../partman.cpp" line="864"/>
         <location filename="../partman.cpp" line="882"/>
         <location filename="../partman.cpp" line="908"/>
         <source>Are you sure you want to continue?</source>
         <translation>Jeni i sigurt se doni të vazhdohet?</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="488"/>
-        <source>Layout &amp;Builder...</source>
-        <translation>&amp;Ndërtues Skemash…</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="836"/>
@@ -1768,14 +1746,6 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>Instalimi mund të dështojë, ngaqë vëllimet vijuese janë shumë të vegjël:</translation>
     </message>
     <message>
-        <source>The %1 installer will now perform the requested actions.</source>
-        <translation type="vanished">Instaluesi %1 tani do të kryejë veprimet e kërkuara.</translation>
-    </message>
-    <message>
-        <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation type="vanished">Këto veprime s’mund të zhbëhen. Doni të vazhdohet?</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="875"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation>Ky sistem përdor EFI, por /boot/efi s’i qe përshoqëruar më vete një pjesë e vlefshme EFI sistemi.</translation>
@@ -1784,6 +1754,16 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <location filename="../partman.cpp" line="878"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation>Vëllimi përshoqëruar /boot/efi s’është pjesë e vlefshme EFI sistemi.</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="905"/>
+        <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
+        <translation>Disqet pasues janë, ose të do të jenë, ujdisur me GPT, por nuk kanë një pjesë BIOS-GRUB:</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="907"/>
+        <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
+        <translation>Ky sistem mund të mos niset nga disqe GPT pa një pjesë BIOS-GRUB.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="945"/>
@@ -1816,16 +1796,6 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>Doni të vazhdohet?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1172"/>
-        <source>Failed to format LUKS container.</source>
-        <translation>S’u arrit të formatohej kontejner LUKS.</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="1185"/>
-        <source>Failed to open LUKS container.</source>
-        <translation>S’u arrit të hapej kontejner LUKS.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1053"/>
         <source>Failed to prepare required partitions.</source>
         <translation>S’u arrit të përgatiten pjesët e domosdoshme.</translation>
@@ -1841,19 +1811,29 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>Po përgatiten pjesët e domosdoshme</translation>
     </message>
     <message>
+        <location filename="../partman.cpp" line="1172"/>
+        <source>Failed to format LUKS container.</source>
+        <translation>S’u arrit të formatohej kontejner LUKS.</translation>
+    </message>
+    <message>
         <location filename="../partman.cpp" line="1176"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Po krijohet vëllim i fshehtëzuar: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1205"/>
-        <source>Formatting: %1</source>
-        <translation>Po formatohet: %1</translation>
+        <location filename="../partman.cpp" line="1185"/>
+        <source>Failed to open LUKS container.</source>
+        <translation>S’u arrit të hapej kontejner LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1198"/>
         <source>Failed to format partition.</source>
         <translation>S’u arrit të formatohej pjesa.</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="1205"/>
+        <source>Formatting: %1</source>
+        <translation>Po formatohet: %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1263"/>
@@ -2080,6 +2060,16 @@ Ju lutemi, mbylleni, nëse është e mundur, ose xhironi “pkill minstall” n�
 <context>
     <name>SwapMan</name>
     <message>
+        <location filename="../swapman.cpp" line="67"/>
+        <source>Invalid location</source>
+        <translation>Vendndodhje e pavlefshme</translation>
+    </message>
+    <message>
+        <location filename="../swapman.cpp" line="70"/>
+        <source>Maximum: %1 MB</source>
+        <translation>Maksimum: %1 MB</translation>
+    </message>
+    <message>
         <location filename="../swapman.cpp" line="85"/>
         <source>Failed to create or install swap file.</source>
         <translation>S’u arrit të krijohej ose instalohej “swap”.</translation>
@@ -2093,16 +2083,6 @@ Ju lutemi, mbylleni, nëse është e mundur, ose xhironi “pkill minstall” n�
         <location filename="../swapman.cpp" line="103"/>
         <source>Configuring swap file</source>
         <translation>Po formësohet “swap”</translation>
-    </message>
-    <message>
-        <location filename="../swapman.cpp" line="67"/>
-        <source>Invalid location</source>
-        <translation>Vendndodhje e pavlefshme</translation>
-    </message>
-    <message>
-        <location filename="../swapman.cpp" line="70"/>
-        <source>Maximum: %1 MB</source>
-        <translation>Maksimum: %1 MB</translation>
     </message>
 </context>
 </TS>
