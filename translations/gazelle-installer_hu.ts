@@ -47,6 +47,11 @@ Minimum: %2</translation>
         <translation>A telepítési média nem érhető el.</translation>
     </message>
     <message>
+        <location filename="../base.cpp" line="152"/>
+        <source>Failed to delete old system on destination.</source>
+        <translation>Nem sikerült a régi rendszer törlése a célhelyen.</translation>
+    </message>
+    <message>
         <location filename="../base.cpp" line="155"/>
         <source>Deleting old system</source>
         <translation>Régi rendszer törlése</translation>
@@ -62,11 +67,6 @@ Minimum: %2</translation>
         <translation>Rendszer-konfiguráció beállítása</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="152"/>
-        <source>Failed to delete old system on destination.</source>
-        <translation>Nem sikerült a régi rendszer törlése a célhelyen.</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="245"/>
         <source>Copying new system</source>
         <translation>Új rendszer másolása</translation>
@@ -80,9 +80,9 @@ Minimum: %2</translation>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="286"/>
-        <source>Updating initramfs</source>
-        <translation>Az initramfs frissítése</translation>
+        <location filename="../bootman.cpp" line="106"/>
+        <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
+        <translation>Nem sikerült a GRUB telepítése. Újraindíthat a Live eszközről és használhatja a GRUB Rescue menüt a telepítés javításához.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="128"/>
@@ -90,9 +90,9 @@ Minimum: %2</translation>
         <translation>A GRUB telepítése</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="106"/>
-        <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
-        <translation>Nem sikerült a GRUB telepítése. Újraindíthat a Live eszközről és használhatja a GRUB Rescue menüt a telepítés javításához.</translation>
+        <location filename="../bootman.cpp" line="286"/>
+        <source>Updating initramfs</source>
+        <translation>Az initramfs frissítése</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="287"/>
@@ -153,6 +153,16 @@ Javasoljuk, hogy most lépjen ki, és indítsa újra Legacy Boot rendszerben.
 Szeretné folytatni a telepítést?</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="178"/>
+        <source>The %1 installer will now perform the requested actions.</source>
+        <translation>Az %1 telepítő most végrehajtja a kívánt műveleteket.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="179"/>
+        <source>These actions cannot be undone. Do you want to continue?</source>
+        <translation>Ezek a műveletek nem vonhatók vissza. Kívánja folytatni?</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="192"/>
         <source>Support %1
 
@@ -173,11 +183,6 @@ Enjoy using %1</source>
 A %1 használ néhány komponenst a MEPIS Linuxból is, amelyek egy szabad Apache licenc alatt érhetők el. Néhány MEPIS komponenst módosítottunk az %1 igényeihez.
 
 Használja örömmel az %1-ot</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="445"/>
-        <source>Pretending to install %1</source>
-        <translation>Az %1 telepítésének színlelése</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="359"/>
@@ -205,9 +210,24 @@ Használja örömmel az %1-ot</translation>
         <translation>Kész</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="412"/>
+        <source>Configuring sytem. Please wait.</source>
+        <translation>A rendszer beállítása. Kérjük várjon.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="416"/>
+        <source>Configuration complete. Restarting system.</source>
+        <translation>A beállítás kész. A rendszer újraindítása.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="421"/>
         <source>The installation was aborted.</source>
         <translation>A telepítés megszakítva.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="445"/>
+        <source>Pretending to install %1</source>
+        <translation>Az %1 telepítésének színlelése</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="516"/>
@@ -215,13 +235,14 @@ Használja örömmel az %1-ot</translation>
         <translation>Érvénytelen beállítások találhatók a konfigurációs fájlban (%1). Ellenőrizze a megjelölt mezőket, amint találkozik velük.</translation>
     </message>
     <message>
-        <source>OK to format and use the entire disk (%1) for %2?</source>
-        <translation type="vanished">Rendben van a teljes lemez (%1) formázása %2 számára?</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="539"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
         <translation>FIGYELMEZTETÉS: A kiválasztott meghajtó kapacitása legalább 2 TB, és GPT formátumban kell formázni. Egyes rendszereken a GPT formátumú lemez nem fog elindulni.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="552"/>
+        <source>Format and use the entire disk (%1) for %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -363,6 +384,62 @@ Használja örömmel az %1-ot</translation>
         <translation>&lt;i&gt;Használat&lt;/i&gt; - Ahhoz, hogy ezt a partíciót a telepítésben használhassa, itt kell kiválasztania valamit.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="697"/>
+        <source>Format without mounting</source>
+        <translation>Formázás csatolás nélkül</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="698"/>
+        <source>BIOS Boot GPT partition for GRUB</source>
+        <translation>BIOS rendszerindítási GPT partíció a GRUB számára</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="699"/>
+        <location filename="../minstall.cpp" line="738"/>
+        <source>EFI System Partition</source>
+        <translation>EFI rendszer partíció</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="701"/>
+        <source>Boot manager</source>
+        <translation>Rendszerindítás kezelő</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="702"/>
+        <source>System root</source>
+        <translation>Rendszer gyökérkönyvtár</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="703"/>
+        <source>User data</source>
+        <translation>Felhasználói adatok</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="704"/>
+        <source>Static data</source>
+        <translation>Statikus adatok</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="705"/>
+        <source>Variable data</source>
+        <translation>Változó adatok</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="706"/>
+        <source>Temporary files</source>
+        <translation>Ideiglenes fájlok</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="707"/>
+        <source>Swap files</source>
+        <translation>Cserehely fájlok</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="708"/>
+        <source>Swap partition</source>
+        <translation>Cserehely partíció</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>A fentieken kívül megadhat saját csatolási pontot is. Az egyéni csatolási pontoknak egy perjellel (&quot;/&quot;) kell kezdődniük.</translation>
@@ -381,6 +458,11 @@ Használja örömmel az %1-ot</translation>
         <location filename="../minstall.cpp" line="713"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Formátum&lt;/i&gt; - Ez a partíció formátuma. A rendelkezésre álló formátumok attól függnek, hogy mire használja a partíciót. Ha egy meglévő elrendezéssel dolgozik, a &lt;b&gt;Megtartás&lt;/b&gt; kiválasztásával megtarthatja a partíció formátumát.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="715"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
+        <translation>A gyökérpartíciónál a &lt;b&gt;/home megtartása&lt;/b&gt; lehetőség kiválasztása megőrzi a /home könyvtár tartalmát, minden mást törölve. Ez a beállítás csak akkor használható, ha a /home ugyanazon a partíción van, mint a gyökérkönyvtár.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="717"/>
@@ -463,6 +545,21 @@ Használja örömmel az %1-ot</translation>
         <translation>Az eszköz neve mellett csillaggal (*) jelölt partíció az aktív partíció, vagy az lesz.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="739"/>
+        <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
+        <translation>Ha a rendszer EFI-t használ (Extensible Firmware Interface), akkor egy úgynevezett EFI rendszerpartíció (EFI System Partition - ESP) szükséges a rendszerindításhoz.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="740"/>
+        <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
+        <translation>Ilyen rendszeren nem szükséges Aktívnak jelölni semelyik partíciót, viszont szükséges egy FAT fájlrendszerrel formázott és ESP-ként megjelölt partíció.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="741"/>
+        <source>Most systems built within the last 10 years use EFI.</source>
+        <translation>Az utóbbi 10 évben készült eszközök szinte mindegyike EFI-t használ.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="742"/>
         <source>Boot partition</source>
         <translation>Boot partíció</translation>
@@ -498,155 +595,9 @@ Használja örömmel az %1-ot</translation>
         <translation>Kattintson jobb gombbal a meghajtóra és válasza az &lt;b&gt;Elrendezés szerkesztőt&lt;/b&gt; a menüből. Ez a hagyományos telepítéshez hasonló elrendezést tud létrehozni.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="776"/>
-        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation>Ha a telepítő virtuális eszközöket, például megnyitott LUKS partíciókat, LVM logikai köteteket vagy szoftveralapú RAID köteteket észlel, akkor ezek felhasználhatók a telepítéshez.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="795"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation>A GRUB telepítése Linuxhoz és Windowshoz</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="796"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation>A %1 a GRUB-ot használja a %1 és a Microsoft Windows indításához.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="797"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation>Alapértelmezésben a GRUB az indítási meghajtó Master Boot Record (MBR) vagy az ESP (EFI System Partition, 64-bites UEFI indítású rendszernél) területére kerül telepítésre, és lecseréli a korábban ott lévő rendszerbetöltőt. Ez megszokott.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="798"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation>Ha a GRUB telepítését a Partition Boot Record (PBR) területre kéri, akkor a GRUB a megadott partíció elejére kerül telepítésre. Ez csak szakértőknek ajánlott.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="799"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation>Ha kikapcsolja a GRUB telepítésének lehetőségét, a GRUB nem kerül telepítésre. Ez csak szakértőknek ajánlott.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="800"/>
-        <source>Create a swap file</source>
-        <translation>Cserehely fájl létrehozása</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="801"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation>A cserehely fájl egy rugalmasabb lehetőség mint a cserehely partíció; jelentősen egyszerűbb átméretezni, ha a rendszer használatának igényeihez alakítani szükséges.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="802"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation>Alapértelmezetten ez be van jelölve, ha cserehely partíció nincs beállítva, és ki van kapcsolva ha van cserehely partíció megadva. Ezt egy szakértői lehetőség, nem javasolt megváltoztatni.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="803"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation>A méret 0-ra állítása ugyanazt eredményezi, mint ennek a kikapcsolása.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="910"/>
-        <source>Enjoy using %1</source>
-        <translation>Használja örömmel az %1-ot</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>Upgrading</source>
         <translation>Frissítés</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="178"/>
-        <source>The %1 installer will now perform the requested actions.</source>
-        <translation type="unfinished">Az %1 telepítő most végrehajtja a kívánt műveleteket.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="179"/>
-        <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation type="unfinished">Ezek a műveletek nem vonhatók vissza. Kívánja folytatni?</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="552"/>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="697"/>
-        <source>Format without mounting</source>
-        <translation>Formázás csatolás nélkül</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="698"/>
-        <source>BIOS Boot GPT partition for GRUB</source>
-        <translation>BIOS rendszerindítási GPT partíció a GRUB számára</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="699"/>
-        <location filename="../minstall.cpp" line="738"/>
-        <source>EFI System Partition</source>
-        <translation>EFI rendszer partíció</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="701"/>
-        <source>Boot manager</source>
-        <translation>Rendszerindítás kezelő</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="702"/>
-        <source>System root</source>
-        <translation>Rendszer gyökérkönyvtár</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="703"/>
-        <source>User data</source>
-        <translation>Felhasználói adatok</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="704"/>
-        <source>Static data</source>
-        <translation>Statikus adatok</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="705"/>
-        <source>Variable data</source>
-        <translation>Változó adatok</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="706"/>
-        <source>Temporary files</source>
-        <translation>Ideiglenes fájlok</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="707"/>
-        <source>Swap files</source>
-        <translation>Cserehely fájlok</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="708"/>
-        <source>Swap partition</source>
-        <translation>Cserehely partíció</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="715"/>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
-        <translation>A gyökérpartíciónál a &lt;b&gt;/home megtartása&lt;/b&gt; lehetőség kiválasztása megőrzi a /home könyvtár tartalmát, minden mást törölve. Ez a beállítás csak akkor használható, ha a /home ugyanazon a partíción van, mint a gyökérkönyvtár.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="739"/>
-        <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
-        <translation>Ha a rendszer EFI-t használ (Extensible Firmware Interface), akkor egy úgynevezett EFI rendszerpartíció (EFI System Partition - ESP) szükséges a rendszerindításhoz.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="740"/>
-        <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
-        <translation>Ilyen rendszeren nem szükséges Aktívnak jelölni semelyik partíciót, viszont szükséges egy FAT fájlrendszerrel formázott és ESP-ként megjelölt partíció.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="741"/>
-        <source>Most systems built within the last 10 years use EFI.</source>
-        <translation>Az utóbbi 10 évben készült eszközök szinte mindegyike EFI-t használ.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -729,6 +680,11 @@ Használja örömmel az %1-ot</translation>
         <translation>Virtuális eszközök</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="776"/>
+        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
+        <translation>Ha a telepítő virtuális eszközöket, például megnyitott LUKS partíciókat, LVM logikai köteteket vagy szoftveralapú RAID köteteket észlel, akkor ezek felhasználhatók a telepítéshez.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="777"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>A virtuális eszközök használata (a titkosított fájlrendszerek megőrzésén túl) egy haladó funkció. Előfordulhat, hogy szerkesztenie kell néhány fájlt (pl. initramfs, crypttab, fstab), hogy a használt virtuális eszközök a rendszerindításkor létrejöjjenek.</translation>
@@ -742,6 +698,51 @@ Használja örömmel az %1-ot</translation>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="795"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>A GRUB telepítése Linuxhoz és Windowshoz</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="796"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
+        <translation>A %1 a GRUB-ot használja a %1 és a Microsoft Windows indításához.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="797"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation>Alapértelmezésben a GRUB az indítási meghajtó Master Boot Record (MBR) vagy az ESP (EFI System Partition, 64-bites UEFI indítású rendszernél) területére kerül telepítésre, és lecseréli a korábban ott lévő rendszerbetöltőt. Ez megszokott.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="798"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation>Ha a GRUB telepítését a Partition Boot Record (PBR) területre kéri, akkor a GRUB a megadott partíció elejére kerül telepítésre. Ez csak szakértőknek ajánlott.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="799"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation>Ha kikapcsolja a GRUB telepítésének lehetőségét, a GRUB nem kerül telepítésre. Ez csak szakértőknek ajánlott.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="800"/>
+        <source>Create a swap file</source>
+        <translation>Cserehely fájl létrehozása</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="801"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation>A cserehely fájl egy rugalmasabb lehetőség mint a cserehely partíció; jelentősen egyszerűbb átméretezni, ha a rendszer használatának igényeihez alakítani szükséges.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="802"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation>Alapértelmezetten ez be van jelölve, ha cserehely partíció nincs beállítva, és ki van kapcsolva ha van cserehely partíció megadva. Ezt egy szakértői lehetőség, nem javasolt megváltoztatni.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="803"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation>A méret 0-ra állítása ugyanazt eredményezi, mint ennek a kikapcsolása.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="809"/>
@@ -914,6 +915,11 @@ Használja örömmel az %1-ot</translation>
         <translation>&lt;p&gt;&lt;b&gt;Gratulálunk!&lt;/b&gt;&lt;br/&gt; Befejezte az %1 telepítését&lt;/p&gt;&lt;p&gt;&lt;b&gt; Alkalmazások keresése&lt;/b&gt; &lt;br/&gt;Több száz kiváló alkalmazás van telepítve az %1 rendszerrel. A legjobb módja annak, hogy megismerje őket, ha átböngészi a menüt, és kipróbálja őket. Sok alkalmazást kifejezetten az %1 projekthez fejlesztettek ki. Ezek a főmenükben láthatók. &lt;p&gt;Ezenkívül az %1 számos olyan szabványos Linux alkalmazást is tartalmaz, amelyek csak parancssorból futtathatók, és ezért nem jelennek meg a menüben.&lt;/p&gt;</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="910"/>
+        <source>Enjoy using %1</source>
+        <translation>Használja örömmel az %1-ot</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="911"/>
         <location filename="../minstall.cpp" line="1180"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -927,7 +933,7 @@ Használja örömmel az %1-ot</translation>
     <message>
         <location filename="../minstall.cpp" line="944"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Indítás</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="947"/>
@@ -938,16 +944,6 @@ Használja örömmel az %1-ot</translation>
         <location filename="../minstall.cpp" line="949"/>
         <source>Next</source>
         <translation>Következő</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="412"/>
-        <source>Configuring sytem. Please wait.</source>
-        <translation>A rendszer beállítása. Kérjük várjon.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="416"/>
-        <source>Configuration complete. Restarting system.</source>
-        <translation>A beállítás kész. A rendszer újraindítása.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -995,9 +991,14 @@ Biztos megszakítja a folyamatot?</translation>
         <translation>Naplók</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="158"/>
-        <source>Close</source>
-        <translation>Bezárás</translation>
+        <location filename="../meinstall.ui" line="72"/>
+        <source>Back</source>
+        <translation>Vissza</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="78"/>
+        <source>Alt+K</source>
+        <translation>Alt+K</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="85"/>
@@ -1010,6 +1011,26 @@ Biztos megszakítja a folyamatot?</translation>
         <translation>Alt+N</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="120"/>
+        <source>Installation in progress</source>
+        <translation>A telepítés folyamatban</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="135"/>
+        <source>Abort</source>
+        <translation>Megszakítás</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="138"/>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="158"/>
+        <source>Close</source>
+        <translation>Bezárás</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="177"/>
         <source>Gathering Information, please stand by.</source>
         <translation>Adatok összegyűjtése, kérjük várjon.</translation>
@@ -1020,9 +1041,29 @@ Biztos megszakítja a folyamatot?</translation>
         <translation>Használat feltételei</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="241"/>
+        <source>Keyboard Settings</source>
+        <translation>Billentyűzet beállítások</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="256"/>
+        <source>Model:</source>
+        <translation>Modell:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="271"/>
+        <source>Variant:</source>
+        <translation>Variáció:</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="297"/>
         <source>Change Keyboard Settings</source>
         <translation>Billentyűzet beállítások megváltoztatása</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="309"/>
+        <source>Layout:</source>
+        <translation>Billentyűzetkiosztás:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="375"/>
@@ -1045,44 +1086,9 @@ Biztos megszakítja a folyamatot?</translation>
         <translation>A használandó lemez:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="577"/>
-        <source>Encrypt</source>
-        <translation>Titkosítás</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="747"/>
-        <source>Encryption password:</source>
-        <translation>Titkosítási jelszó:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="764"/>
-        <source>Confirm password:</source>
-        <translation>Jelszó megerősítése:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="450"/>
         <source>Root</source>
         <translation>Root</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="241"/>
-        <source>Keyboard Settings</source>
-        <translation>Billentyűzet beállítások</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="256"/>
-        <source>Model:</source>
-        <translation>Modell:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="271"/>
-        <source>Variant:</source>
-        <translation>Variáció:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="309"/>
-        <source>Layout:</source>
-        <translation>Billentyűzetkiosztás:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="460"/>
@@ -1102,24 +1108,14 @@ Biztos megszakítja a folyamatot?</translation>
         <translation>Hibernálás lehetőség engedélyezése</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="577"/>
+        <source>Encrypt</source>
+        <translation>Titkosítás</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="612"/>
         <source>Choose partitions</source>
         <translation>Partíciók kiválasztása</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="652"/>
-        <source>Query the operating system and reload the layouts of all drives.</source>
-        <translation>Az összes meghajtó elrendezésének lekérdezése az operációs rendszertől.</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="685"/>
-        <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
-        <translation>Egy elem eltávolítása az elrendezésből. Csak új elrendezés elemeivel működik.</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="674"/>
-        <source>Add a new partition entry. This only works with a new layout.</source>
-        <translation>Új partíció hozzáadása. Csak új elrendezés esetén működik.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="621"/>
@@ -1137,14 +1133,39 @@ Biztos megszakítja a folyamatot?</translation>
         <translation>A kiválasztott meghatót törlésre jelöli ki, új elrendezés létrehozásához.</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="652"/>
+        <source>Query the operating system and reload the layouts of all drives.</source>
+        <translation>Az összes meghajtó elrendezésének lekérdezése az operációs rendszertől.</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="663"/>
         <source>Run the partition management application of this operating system.</source>
         <translation>Az operációs rendszer partíciókezelő eszközének elindítása.</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="674"/>
+        <source>Add a new partition entry. This only works with a new layout.</source>
+        <translation>Új partíció hozzáadása. Csak új elrendezés esetén működik.</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="685"/>
+        <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
+        <translation>Egy elem eltávolítása az elrendezésből. Csak új elrendezés elemeivel működik.</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="741"/>
         <source>Encryption options</source>
         <translation>Titkosítási beállítások</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="747"/>
+        <source>Encryption password:</source>
+        <translation>Titkosítási jelszó:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="764"/>
+        <source>Confirm password:</source>
+        <translation>Jelszó megerősítése:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="813"/>
@@ -1337,6 +1358,11 @@ Biztos megszakítja a folyamatot?</translation>
         <translation>Felhasználói bejelentkezési név:</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="1645"/>
+        <source>username</source>
+        <translation>felhasználónév</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="1658"/>
         <source>Default user password:</source>
         <translation>A felhasználó jelszava:</translation>
@@ -1345,11 +1371,6 @@ Biztos megszakítja a folyamatot?</translation>
         <location filename="../meinstall.ui" line="1687"/>
         <source>Confirm user password:</source>
         <translation>A jelszó megerősítése:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1645"/>
-        <source>username</source>
-        <translation>felhasználónév</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1719"/>
@@ -1415,31 +1436,6 @@ Biztos megszakítja a folyamatot?</translation>
         <location filename="../meinstall.ui" line="1978"/>
         <source>Reminders</source>
         <translation>Emlékeztetők</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="72"/>
-        <source>Back</source>
-        <translation>Vissza</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="78"/>
-        <source>Alt+K</source>
-        <translation>Alt+K</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="120"/>
-        <source>Installation in progress</source>
-        <translation>A telepítés folyamatban</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="135"/>
-        <source>Abort</source>
-        <translation>Megszakítás</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="138"/>
-        <source>Alt+A</source>
-        <translation>Alt+A</translation>
     </message>
 </context>
 <context>
@@ -1572,14 +1568,6 @@ Válasszon egy másik nevet.</translation>
         <translation>Hozzáadás a crypttabhez</translation>
     </message>
     <message>
-        <source>Active partition</source>
-        <translation type="vanished">Aktív partíció</translation>
-    </message>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">EFI rendszer partíció</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="461"/>
         <source>New subvolume</source>
         <translation>Új alkötet</translation>
@@ -1598,6 +1586,11 @@ Válasszon egy másik nevet.</translation>
         <location filename="../partman.cpp" line="486"/>
         <source>&amp;Reset layout</source>
         <translation>Elrendezés visszaállítása</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="488"/>
+        <source>Layout &amp;Builder...</source>
+        <translation>&amp;Elrendezés szerkesztő...</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="509"/>
@@ -1660,6 +1653,11 @@ Válasszon egy másik nevet.</translation>
         <translation>Nem lehetséges a root (/) partíción belüli /home megtartása, ha egy külön /home partíció is csatolva van.</translation>
     </message>
     <message>
+        <location filename="../partman.cpp" line="752"/>
+        <source>Prepare %1 partition table on %2</source>
+        <translation>%1 partíciós tábla létrehozása: %2</translation>
+    </message>
+    <message>
         <location filename="../partman.cpp" line="758"/>
         <source>Reuse (no reformat) %1</source>
         <translation>%1 újrahasznosítása (nem formázza)</translation>
@@ -1668,6 +1666,31 @@ Válasszon egy másik nevet.</translation>
         <location filename="../partman.cpp" line="761"/>
         <source>Format %1</source>
         <translation>%1 formázása</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="762"/>
+        <source>Format %1 to use for %2</source>
+        <translation>%1 formázása %2 használatára</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="763"/>
+        <source>Reuse (no reformat) %1 as %2</source>
+        <translation>%1 újrahasznosítása (nem formázza) %2 használatára</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="764"/>
+        <source>Delete the data on %1 except for /home, to use for %2</source>
+        <translation>Adatok törlése %1 partíción, kivéve a /home könyvtárat, %2 használatára</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="767"/>
+        <source>Create %1 without formatting</source>
+        <translation>%1 létrehozása formázás nélkül.</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="768"/>
+        <source>Create %1, format to use for %2</source>
+        <translation>%1 létrehozása, formázás %2 használatára</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="777"/>
@@ -1705,57 +1728,12 @@ Válasszon egy másik nevet.</translation>
         <translation>Egy külön boot partíció megadása szükséges, ha titkosítja a root partíciót.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="752"/>
-        <source>Prepare %1 partition table on %2</source>
-        <translation>%1 partíciós tábla létrehozása: %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="762"/>
-        <source>Format %1 to use for %2</source>
-        <translation>%1 formázása %2 használatára</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="763"/>
-        <source>Reuse (no reformat) %1 as %2</source>
-        <translation>%1 újrahasznosítása (nem formázza) %2 használatára</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="764"/>
-        <source>Delete the data on %1 except for /home, to use for %2</source>
-        <translation>Adatok törlése %1 partíción, kivéve a /home könyvtárat, %2 használatára</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="767"/>
-        <source>Create %1 without formatting</source>
-        <translation>%1 létrehozása formázás nélkül.</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="768"/>
-        <source>Create %1, format to use for %2</source>
-        <translation>%1 létrehozása, formázás %2 használatára</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="905"/>
-        <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
-        <translation>A következő meghajtók GPT-vel való használatra vannak vagy lesznek beállítva, de nincs BIOS-GRUB partíció:</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="907"/>
-        <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
-        <translation>A rendszer esetleg nem fog elindulni GPT meghajtóról, BIOS-GRUB partíció hiányában.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="803"/>
         <location filename="../partman.cpp" line="864"/>
         <location filename="../partman.cpp" line="882"/>
         <location filename="../partman.cpp" line="908"/>
         <source>Are you sure you want to continue?</source>
         <translation>Biztos, hogy folytatja?</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="488"/>
-        <source>Layout &amp;Builder...</source>
-        <translation>&amp;Elrendezés szerkesztő...</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="836"/>
@@ -1768,14 +1746,6 @@ Válasszon egy másik nevet.</translation>
         <translation>A telepítés nem sikerült, mert a következő kötetek túl kicsik:</translation>
     </message>
     <message>
-        <source>The %1 installer will now perform the requested actions.</source>
-        <translation type="vanished">Az %1 telepítő most végrehajtja a kívánt műveleteket.</translation>
-    </message>
-    <message>
-        <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation type="vanished">Ezek a műveletek nem vonhatók vissza. Kívánja folytatni?</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="875"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation>A rendszer EFI-t használ, de a /boot/efi-hez nem került külön hozzárendelésre egy érvényes EFI rendszerpartíció.</translation>
@@ -1784,6 +1754,16 @@ Válasszon egy másik nevet.</translation>
         <location filename="../partman.cpp" line="878"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation>A /boot/efi-hez rendelt kötet nem egy érvényes EFI rendszerpartíció.</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="905"/>
+        <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
+        <translation>A következő meghajtók GPT-vel való használatra vannak vagy lesznek beállítva, de nincs BIOS-GRUB partíció:</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="907"/>
+        <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
+        <translation>A rendszer esetleg nem fog elindulni GPT meghajtóról, BIOS-GRUB partíció hiányában.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="945"/>
@@ -1816,16 +1796,6 @@ Válasszon egy másik nevet.</translation>
         <translation>Szeretné folytatni?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1172"/>
-        <source>Failed to format LUKS container.</source>
-        <translation>Nem sikerült a LUKS konténer formázása.</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="1185"/>
-        <source>Failed to open LUKS container.</source>
-        <translation>Nem sikerült a LUKS konténer megnyitása.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1053"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Nem sikerült előkészíteni a szükséges partíciókat.</translation>
@@ -1841,19 +1811,29 @@ Válasszon egy másik nevet.</translation>
         <translation>A szükséges partíciók előkészítése</translation>
     </message>
     <message>
+        <location filename="../partman.cpp" line="1172"/>
+        <source>Failed to format LUKS container.</source>
+        <translation>Nem sikerült a LUKS konténer formázása.</translation>
+    </message>
+    <message>
         <location filename="../partman.cpp" line="1176"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Titkosított kötet létrehozása: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1205"/>
-        <source>Formatting: %1</source>
-        <translation>Formázás: %1</translation>
+        <location filename="../partman.cpp" line="1185"/>
+        <source>Failed to open LUKS container.</source>
+        <translation>Nem sikerült a LUKS konténer megnyitása.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1198"/>
         <source>Failed to format partition.</source>
         <translation>Nem sikerült a partíció formázása.</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="1205"/>
+        <source>Formatting: %1</source>
+        <translation>Formázás: %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1263"/>
@@ -2081,6 +2061,16 @@ Ha lehetséges, zárja be, vagy futtassa a &apos;pkill minstall&apos; parancsot 
 <context>
     <name>SwapMan</name>
     <message>
+        <location filename="../swapman.cpp" line="67"/>
+        <source>Invalid location</source>
+        <translation>Érvénytelen hely</translation>
+    </message>
+    <message>
+        <location filename="../swapman.cpp" line="70"/>
+        <source>Maximum: %1 MB</source>
+        <translation>Maximum: %1 MB</translation>
+    </message>
+    <message>
         <location filename="../swapman.cpp" line="85"/>
         <source>Failed to create or install swap file.</source>
         <translation>A cserehely fájl létrehozása vagy telepítése nem sikerült.</translation>
@@ -2094,16 +2084,6 @@ Ha lehetséges, zárja be, vagy futtassa a &apos;pkill minstall&apos; parancsot 
         <location filename="../swapman.cpp" line="103"/>
         <source>Configuring swap file</source>
         <translation>Cserehely fájl beállítása</translation>
-    </message>
-    <message>
-        <location filename="../swapman.cpp" line="67"/>
-        <source>Invalid location</source>
-        <translation>Érvénytelen hely</translation>
-    </message>
-    <message>
-        <location filename="../swapman.cpp" line="70"/>
-        <source>Maximum: %1 MB</source>
-        <translation>Maximum: %1 MB</translation>
     </message>
 </context>
 </TS>

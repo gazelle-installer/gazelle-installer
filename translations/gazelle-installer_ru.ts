@@ -47,6 +47,11 @@ Minimum: %2</source>
         <translation>Не удаётся получить доступ к установочному носителю.</translation>
     </message>
     <message>
+        <location filename="../base.cpp" line="152"/>
+        <source>Failed to delete old system on destination.</source>
+        <translation>Не удалось удалить старую систему в месте назначения.</translation>
+    </message>
+    <message>
         <location filename="../base.cpp" line="155"/>
         <source>Deleting old system</source>
         <translation>Удаление старой системы</translation>
@@ -62,11 +67,6 @@ Minimum: %2</source>
         <translation>Установка конфигурации системы</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="152"/>
-        <source>Failed to delete old system on destination.</source>
-        <translation>Не удалось удалить старую систему в месте назначения.</translation>
-    </message>
-    <message>
         <location filename="../base.cpp" line="245"/>
         <source>Copying new system</source>
         <translation>Копирование новой системы</translation>
@@ -80,9 +80,9 @@ Minimum: %2</source>
 <context>
     <name>BootMan</name>
     <message>
-        <location filename="../bootman.cpp" line="286"/>
-        <source>Updating initramfs</source>
-        <translation>Обновление initramfs</translation>
+        <location filename="../bootman.cpp" line="106"/>
+        <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
+        <translation>Установка GRUB не удалась. Вы можете перезагрузиться в live-среду и воспользоваться меню утилиты Восстановление загрузчика для правильной его установки.</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="128"/>
@@ -90,9 +90,9 @@ Minimum: %2</source>
         <translation>Устанавливается GRUB</translation>
     </message>
     <message>
-        <location filename="../bootman.cpp" line="106"/>
-        <source>GRUB installation failed. You can reboot to the live medium and use the GRUB Rescue menu to repair the installation.</source>
-        <translation>Установка GRUB не удалась. Вы можете перезагрузиться в live-среду и воспользоваться меню утилиты Восстановление загрузчика для правильной его установки.</translation>
+        <location filename="../bootman.cpp" line="286"/>
+        <source>Updating initramfs</source>
+        <translation>Обновление initramfs</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="287"/>
@@ -153,6 +153,16 @@ Do you want to continue the installation?</source>
 Вы хотите продолжить установку?</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="178"/>
+        <source>The %1 installer will now perform the requested actions.</source>
+        <translation>Сейчас программа установки %1 выполнит требуемые действия.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="179"/>
+        <source>These actions cannot be undone. Do you want to continue?</source>
+        <translation>Действия не закончены. Вы хотите продолжить?</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="192"/>
         <source>Support %1
 
@@ -173,11 +183,6 @@ Enjoy using %1</source>
 %1 использует компоненты MEPIS Linux, которые опубликованы под открытой лицензией Apache. Некоторые компоненты MEPIS были модифицированы для %1.
 
 Пользуйтесь с удовольствием %1</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="445"/>
-        <source>Pretending to install %1</source>
-        <translation>Симуляция установки %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="359"/>
@@ -205,9 +210,24 @@ Enjoy using %1</source>
         <translation>Завершено</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="412"/>
+        <source>Configuring sytem. Please wait.</source>
+        <translation>Идёт настройка системы. Пожалуйста, подождите.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="416"/>
+        <source>Configuration complete. Restarting system.</source>
+        <translation>Настройка завершена. Перезагрузка системы.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="421"/>
         <source>The installation was aborted.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="445"/>
+        <source>Pretending to install %1</source>
+        <translation>Симуляция установки %1</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="516"/>
@@ -215,13 +235,14 @@ Enjoy using %1</source>
         <translation>В файле настроек (%1) найдены неверные параметры. Пожалуйста, проверяйте отмеченные поля в ходе установки.</translation>
     </message>
     <message>
-        <source>OK to format and use the entire disk (%1) for %2?</source>
-        <translation type="vanished">Форматировать и использовать весь диск (%1) для %2?</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="539"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
         <translation>ВНИМАНИЕ: Выбранный диск больше 2ТБ и должен быть отформатирован в GPT. Некоторые системы не могут загружаться с дисков GPT.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="552"/>
+        <source>Format and use the entire disk (%1) for %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -363,6 +384,62 @@ Enjoy using %1</source>
         <translation>&lt;i&gt;Использовать для&lt;/i&gt; - Чтобы использовать этот раздел в установке, вы должны выбрать что-то здесь.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="697"/>
+        <source>Format without mounting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="698"/>
+        <source>BIOS Boot GPT partition for GRUB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="699"/>
+        <location filename="../minstall.cpp" line="738"/>
+        <source>EFI System Partition</source>
+        <translation>Системный раздел EFI</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="701"/>
+        <source>Boot manager</source>
+        <translation>Менеджер загрузки</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="702"/>
+        <source>System root</source>
+        <translation>Корень системы</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="703"/>
+        <source>User data</source>
+        <translation>Данные пользователя</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="704"/>
+        <source>Static data</source>
+        <translation>Статические данные</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="705"/>
+        <source>Variable data</source>
+        <translation>Переменные данные</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="706"/>
+        <source>Temporary files</source>
+        <translation>Временные файлы</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="707"/>
+        <source>Swap files</source>
+        <translation>Файлы подкачки</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="708"/>
+        <source>Swap partition</source>
+        <translation>Раздел подкачки</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="710"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Также Вы можете создать свои точки монтирования. Они должны начинаться с косой черты (/).</translation>
@@ -381,6 +458,11 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="713"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Формат&lt;/i&gt; - Это формат раздела. Доступные форматы зависят от того, для чего используется раздел. Для работы с существующим разделом вы можете сохранить его формат, выбрав &lt;b&gt;Сохранить&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="715"/>
+        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="717"/>
@@ -463,6 +545,21 @@ Enjoy using %1</source>
         <translation>Раздел со звездочкой (*) рядом с имененм устройства является или станет активным.</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="739"/>
+        <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="740"/>
+        <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="741"/>
+        <source>Most systems built within the last 10 years use EFI.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="742"/>
         <source>Boot partition</source>
         <translation>Загрузочный раздел</translation>
@@ -498,155 +595,9 @@ Enjoy using %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="776"/>
-        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="795"/>
-        <source>Install GRUB for Linux and Windows</source>
-        <translation>Установить GRUB для Linux и Windows</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="796"/>
-        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="797"/>
-        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="798"/>
-        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="799"/>
-        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="800"/>
-        <source>Create a swap file</source>
-        <translation>Создать файла подкачки</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="801"/>
-        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="802"/>
-        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="803"/>
-        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation>Установка размера в 0 равнозначно отключению этого параметра.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="910"/>
-        <source>Enjoy using %1</source>
-        <translation>Приятного использования %1</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>Upgrading</source>
         <translation>Обновление</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="178"/>
-        <source>The %1 installer will now perform the requested actions.</source>
-        <translation type="unfinished">Сейчас программа установки %1 выполнит требуемые действия.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="179"/>
-        <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation type="unfinished">Действия не закончены. Вы хотите продолжить?</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="552"/>
-        <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="697"/>
-        <source>Format without mounting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="698"/>
-        <source>BIOS Boot GPT partition for GRUB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="699"/>
-        <location filename="../minstall.cpp" line="738"/>
-        <source>EFI System Partition</source>
-        <translation>Системный раздел EFI</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="701"/>
-        <source>Boot manager</source>
-        <translation>Менеджер загрузки</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="702"/>
-        <source>System root</source>
-        <translation>Корень системы</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="703"/>
-        <source>User data</source>
-        <translation>Данные пользователя</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="704"/>
-        <source>Static data</source>
-        <translation>Статические данные</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="705"/>
-        <source>Variable data</source>
-        <translation>Переменные данные</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="706"/>
-        <source>Temporary files</source>
-        <translation>Временные файлы</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="707"/>
-        <source>Swap files</source>
-        <translation>Файлы подкачки</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="708"/>
-        <source>Swap partition</source>
-        <translation>Раздел подкачки</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="715"/>
-        <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="739"/>
-        <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="740"/>
-        <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="741"/>
-        <source>Most systems built within the last 10 years use EFI.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -729,6 +680,11 @@ Enjoy using %1</source>
         <translation>Виртуальные устройства</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="776"/>
+        <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="777"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Использование виртуальных устройств (помимо сохранения зашифрованных файловых систем) является расширенной функцией. Возможно, вам придётся изменить некоторые файлы (например, initramfs, crypttab, fstab), чтобы убедиться, что используемые виртуальные устройства создаются при загрузке.</translation>
@@ -742,6 +698,51 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="795"/>
+        <source>Install GRUB for Linux and Windows</source>
+        <translation>Установить GRUB для Linux и Windows</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="796"/>
+        <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="797"/>
+        <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="798"/>
+        <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="799"/>
+        <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="800"/>
+        <source>Create a swap file</source>
+        <translation>Создать файла подкачки</translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="801"/>
+        <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="802"/>
+        <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../minstall.cpp" line="803"/>
+        <source>Setting the size to 0 has the same effect as unchecking this option.</source>
+        <translation>Установка размера в 0 равнозначно отключению этого параметра.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="809"/>
@@ -914,6 +915,11 @@ Enjoy using %1</source>
         <translation>&lt;p&gt;&lt;b&gt;Поздравляем!&lt;/b&gt;&lt;br/&gt;Вы завершили установку %1.&lt;/p&gt;&lt;p&gt;&lt;b&gt;Поиск приложений&lt;/b&gt;&lt;br/&gt;Есть сотни великолепных приложений, установленных с %1. Лучший способ узнать о них - просмотреть Меню и попробовать их в работе. Многие из приложений были разработаны специально для проекта %1. Они показаны в основном меню. &lt;p&gt;Кроме того, %1 включает в себя множество стандартных приложений Linux, которые выполняются только из командной строки, и потому не отображены в Меню.&lt;/p&gt;</translation>
     </message>
     <message>
+        <location filename="../minstall.cpp" line="910"/>
+        <source>Enjoy using %1</source>
+        <translation>Приятного использования %1</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="911"/>
         <location filename="../minstall.cpp" line="1180"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
@@ -927,7 +933,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="944"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Старт</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="947"/>
@@ -938,16 +944,6 @@ Enjoy using %1</source>
         <location filename="../minstall.cpp" line="949"/>
         <source>Next</source>
         <translation>Дальше</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="412"/>
-        <source>Configuring sytem. Please wait.</source>
-        <translation>Идёт настройка системы. Пожалуйста, подождите.</translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="416"/>
-        <source>Configuration complete. Restarting system.</source>
-        <translation>Настройка завершена. Перезагрузка системы.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1102"/>
@@ -995,9 +991,14 @@ Do you really want to stop now?</source>
         <translation>Журнал работы</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="158"/>
-        <source>Close</source>
-        <translation>Закрыть</translation>
+        <location filename="../meinstall.ui" line="72"/>
+        <source>Back</source>
+        <translation>Назад</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="78"/>
+        <source>Alt+K</source>
+        <translation>Alt+K</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="85"/>
@@ -1010,6 +1011,26 @@ Do you really want to stop now?</source>
         <translation>Alt+N</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="120"/>
+        <source>Installation in progress</source>
+        <translation>Идёт установка</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="135"/>
+        <source>Abort</source>
+        <translation>Отмена</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="138"/>
+        <source>Alt+A</source>
+        <translation>Alt+A</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="158"/>
+        <source>Close</source>
+        <translation>Закрыть</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="177"/>
         <source>Gathering Information, please stand by.</source>
         <translation>Идёт сбор информации. Пожалуйста, подождите.</translation>
@@ -1020,9 +1041,29 @@ Do you really want to stop now?</source>
         <translation>Условия использования</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="241"/>
+        <source>Keyboard Settings</source>
+        <translation>Настройки клавиатуры</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="256"/>
+        <source>Model:</source>
+        <translation>Модель:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="271"/>
+        <source>Variant:</source>
+        <translation>Вариант:</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="297"/>
         <source>Change Keyboard Settings</source>
         <translation>Изменить настройки клавиатуры</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="309"/>
+        <source>Layout:</source>
+        <translation>Раскладка:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="375"/>
@@ -1045,44 +1086,9 @@ Do you really want to stop now?</source>
         <translation>Использовать диск:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="577"/>
-        <source>Encrypt</source>
-        <translation>Зашифровать</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="747"/>
-        <source>Encryption password:</source>
-        <translation>Пароль для шифрования:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="764"/>
-        <source>Confirm password:</source>
-        <translation>Подтверждение пароля:</translation>
-    </message>
-    <message>
         <location filename="../meinstall.ui" line="450"/>
         <source>Root</source>
         <translation>Корень</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="241"/>
-        <source>Keyboard Settings</source>
-        <translation>Настройки клавиатуры</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="256"/>
-        <source>Model:</source>
-        <translation>Модель:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="271"/>
-        <source>Variant:</source>
-        <translation>Вариант:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="309"/>
-        <source>Layout:</source>
-        <translation>Раскладка:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="460"/>
@@ -1102,24 +1108,14 @@ Do you really want to stop now?</source>
         <translation>Включить поддержку гибернации</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="577"/>
+        <source>Encrypt</source>
+        <translation>Зашифровать</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="612"/>
         <source>Choose partitions</source>
         <translation>Выбор разделов</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="652"/>
-        <source>Query the operating system and reload the layouts of all drives.</source>
-        <translation>Перезагрузить таблицы разделов на всех дисках.</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="685"/>
-        <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
-        <translation>Удалите существующую запись из таблицы разделов. Это возможно только с записями в новой таблице разделов.</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="674"/>
-        <source>Add a new partition entry. This only works with a new layout.</source>
-        <translation>Добавьте новую запись раздела. Это возможно только в новой таблице разделов.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="621"/>
@@ -1137,14 +1133,39 @@ Do you really want to stop now?</source>
         <translation>Отметить выбранный диск для его очистки под новую таблицу разделов.</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="652"/>
+        <source>Query the operating system and reload the layouts of all drives.</source>
+        <translation>Перезагрузить таблицы разделов на всех дисках.</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="663"/>
         <source>Run the partition management application of this operating system.</source>
         <translation>Запустить редактор разделов, имеющийся в системе.</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="674"/>
+        <source>Add a new partition entry. This only works with a new layout.</source>
+        <translation>Добавьте новую запись раздела. Это возможно только в новой таблице разделов.</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="685"/>
+        <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
+        <translation>Удалите существующую запись из таблицы разделов. Это возможно только с записями в новой таблице разделов.</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="741"/>
         <source>Encryption options</source>
         <translation>Настройки шифрования</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="747"/>
+        <source>Encryption password:</source>
+        <translation>Пароль для шифрования:</translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="764"/>
+        <source>Confirm password:</source>
+        <translation>Подтверждение пароля:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="813"/>
@@ -1337,6 +1358,11 @@ Do you really want to stop now?</source>
         <translation>Логин пользователя по умолчанию:</translation>
     </message>
     <message>
+        <location filename="../meinstall.ui" line="1645"/>
+        <source>username</source>
+        <translation>Имя пользователя</translation>
+    </message>
+    <message>
         <location filename="../meinstall.ui" line="1658"/>
         <source>Default user password:</source>
         <translation>Пароль пользователя по умолчанию:</translation>
@@ -1345,11 +1371,6 @@ Do you really want to stop now?</source>
         <location filename="../meinstall.ui" line="1687"/>
         <source>Confirm user password:</source>
         <translation>Подтвердите пароль пользователя:</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="1645"/>
-        <source>username</source>
-        <translation>Имя пользователя</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1719"/>
@@ -1415,31 +1436,6 @@ Do you really want to stop now?</source>
         <location filename="../meinstall.ui" line="1978"/>
         <source>Reminders</source>
         <translation>Напоминания</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="72"/>
-        <source>Back</source>
-        <translation>Назад</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="78"/>
-        <source>Alt+K</source>
-        <translation>Alt+K</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="120"/>
-        <source>Installation in progress</source>
-        <translation>Идёт установка</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="135"/>
-        <source>Abort</source>
-        <translation>Отмена</translation>
-    </message>
-    <message>
-        <location filename="../meinstall.ui" line="138"/>
-        <source>Alt+A</source>
-        <translation>Alt+A</translation>
     </message>
 </context>
 <context>
@@ -1566,14 +1562,6 @@ Please select a different name.</source>
         <translation>Добавить в crypttab</translation>
     </message>
     <message>
-        <source>Active partition</source>
-        <translation type="vanished">Активный раздел</translation>
-    </message>
-    <message>
-        <source>EFI System Partition</source>
-        <translation type="vanished">Системный раздел EFI</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="461"/>
         <source>New subvolume</source>
         <translation>Новый подтом</translation>
@@ -1592,6 +1580,11 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="486"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Сброс таблицы разделов</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="488"/>
+        <source>Layout &amp;Builder...</source>
+        <translation>Конструктор &amp;макетов…</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="509"/>
@@ -1654,6 +1647,11 @@ Please select a different name.</source>
         <translation>Невозможно сохранить /home в корне (/), если будет смонтирован отдельный раздел /home.</translation>
     </message>
     <message>
+        <location filename="../partman.cpp" line="752"/>
+        <source>Prepare %1 partition table on %2</source>
+        <translation>Подготовка %1 таблицы разделов на %2</translation>
+    </message>
+    <message>
         <location filename="../partman.cpp" line="758"/>
         <source>Reuse (no reformat) %1</source>
         <translation type="unfinished"></translation>
@@ -1662,6 +1660,31 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="761"/>
         <source>Format %1</source>
         <translation>Форматировать %1</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="762"/>
+        <source>Format %1 to use for %2</source>
+        <translation>Отформатировать %1 для подключения к %2</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="763"/>
+        <source>Reuse (no reformat) %1 as %2</source>
+        <translation>Использовать (без форматирования) %1 как %2</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="764"/>
+        <source>Delete the data on %1 except for /home, to use for %2</source>
+        <translation>Удаление данных на %1 кроме /home, подключение к %2</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="767"/>
+        <source>Create %1 without formatting</source>
+        <translation>Создать %1 без форматирования</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="768"/>
+        <source>Create %1, format to use for %2</source>
+        <translation>Создать %1, отформатировать для подключения к %2</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="777"/>
@@ -1699,57 +1722,12 @@ Please select a different name.</source>
         <translation>Вы должны указать отдельный раздел boot, если используется шифрованный корневой раздел.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="752"/>
-        <source>Prepare %1 partition table on %2</source>
-        <translation>Подготовка %1 таблицы разделов на %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="762"/>
-        <source>Format %1 to use for %2</source>
-        <translation>Отформатировать %1 для подключения к %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="763"/>
-        <source>Reuse (no reformat) %1 as %2</source>
-        <translation>Использовать (без форматирования) %1 как %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="764"/>
-        <source>Delete the data on %1 except for /home, to use for %2</source>
-        <translation>Удаление данных на %1 кроме /home, подключение к %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="767"/>
-        <source>Create %1 without formatting</source>
-        <translation>Создать %1 без форматирования</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="768"/>
-        <source>Create %1, format to use for %2</source>
-        <translation>Создать %1, отформатировать для подключения к %2</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="905"/>
-        <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
-        <translation>Следующие диски настроены или будут настроены с помощью GPT, но не имеют раздела BIOS-GRUB:</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="907"/>
-        <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
-        <translation>Эта система может не загрузиться с диска GPT, если отсутствует раздел BIOS-GRUB.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="803"/>
         <location filename="../partman.cpp" line="864"/>
         <location filename="../partman.cpp" line="882"/>
         <location filename="../partman.cpp" line="908"/>
         <source>Are you sure you want to continue?</source>
         <translation>Вы действительно хотите продолжить?</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="488"/>
-        <source>Layout &amp;Builder...</source>
-        <translation>Конструктор &amp;макетов…</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="836"/>
@@ -1762,14 +1740,6 @@ Please select a different name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The %1 installer will now perform the requested actions.</source>
-        <translation type="vanished">Сейчас программа установки %1 выполнит требуемые действия.</translation>
-    </message>
-    <message>
-        <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation type="vanished">Действия не закончены. Вы хотите продолжить?</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="875"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation type="unfinished"></translation>
@@ -1778,6 +1748,16 @@ Please select a different name.</source>
         <location filename="../partman.cpp" line="878"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="905"/>
+        <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
+        <translation>Следующие диски настроены или будут настроены с помощью GPT, но не имеют раздела BIOS-GRUB:</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="907"/>
+        <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
+        <translation>Эта система может не загрузиться с диска GPT, если отсутствует раздел BIOS-GRUB.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="945"/>
@@ -1810,16 +1790,6 @@ Please select a different name.</source>
         <translation>Вы хотите продолжить?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1172"/>
-        <source>Failed to format LUKS container.</source>
-        <translation>Не удалось отформатировать контейнер LUKS.</translation>
-    </message>
-    <message>
-        <location filename="../partman.cpp" line="1185"/>
-        <source>Failed to open LUKS container.</source>
-        <translation>Не удалось открыть контейнер LUKS.</translation>
-    </message>
-    <message>
         <location filename="../partman.cpp" line="1053"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Не удалось подготовить необходимые разделы.</translation>
@@ -1835,19 +1805,29 @@ Please select a different name.</source>
         <translation>Подготовка необходимых разделов </translation>
     </message>
     <message>
+        <location filename="../partman.cpp" line="1172"/>
+        <source>Failed to format LUKS container.</source>
+        <translation>Не удалось отформатировать контейнер LUKS.</translation>
+    </message>
+    <message>
         <location filename="../partman.cpp" line="1176"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Создание зашифрованного тома: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1205"/>
-        <source>Formatting: %1</source>
-        <translation>Форматирование: %1</translation>
+        <location filename="../partman.cpp" line="1185"/>
+        <source>Failed to open LUKS container.</source>
+        <translation>Не удалось открыть контейнер LUKS.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1198"/>
         <source>Failed to format partition.</source>
         <translation>Не удалось отформатировать раздел.</translation>
+    </message>
+    <message>
+        <location filename="../partman.cpp" line="1205"/>
+        <source>Formatting: %1</source>
+        <translation>Форматирование: %1</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1263"/>
@@ -2074,6 +2054,16 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 <context>
     <name>SwapMan</name>
     <message>
+        <location filename="../swapman.cpp" line="67"/>
+        <source>Invalid location</source>
+        <translation>Недопустимое расположение</translation>
+    </message>
+    <message>
+        <location filename="../swapman.cpp" line="70"/>
+        <source>Maximum: %1 MB</source>
+        <translation>Максимум: %1 МБ</translation>
+    </message>
+    <message>
         <location filename="../swapman.cpp" line="85"/>
         <source>Failed to create or install swap file.</source>
         <translation>Не удалось создать или установить файл подкачки.</translation>
@@ -2087,16 +2077,6 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
         <location filename="../swapman.cpp" line="103"/>
         <source>Configuring swap file</source>
         <translation>Настройка файла подкачки</translation>
-    </message>
-    <message>
-        <location filename="../swapman.cpp" line="67"/>
-        <source>Invalid location</source>
-        <translation>Недопустимое расположение</translation>
-    </message>
-    <message>
-        <location filename="../swapman.cpp" line="70"/>
-        <source>Maximum: %1 MB</source>
-        <translation>Максимум: %1 МБ</translation>
     </message>
 </context>
 </TS>
