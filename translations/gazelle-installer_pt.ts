@@ -242,7 +242,7 @@ Usufrua do %1</translation>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatar e usar todo o disco (%1) para %2</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -692,12 +692,12 @@ Usufrua do %1</translation>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Revisão Final e Confirmação</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Por favor, reveja esta lista com atenção. Esta é a última oportunidade para verificar e confirmar as ações do processo de instalação antes de continuar.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -1170,7 +1170,7 @@ Interromper realmente o processo agora?</translation>
     <message>
         <location filename="../meinstall.ui" line="813"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmação da Instalação</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="844"/>
