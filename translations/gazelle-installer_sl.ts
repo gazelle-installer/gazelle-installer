@@ -242,7 +242,7 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatiraj in uporabi celoten disk (%1) za %2</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -692,12 +692,12 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Zadnje preverjanje in potrditev</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pazljivo preverite ta seznam. To je zadnja priložnost, da pred nadaljevanjem preverite in potrdite dejanja namestitve.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -1170,7 +1170,7 @@ Ali bi jo res radi zaustavili?</translation>
     <message>
         <location filename="../meinstall.ui" line="813"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Potrditev namestitve</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="844"/>

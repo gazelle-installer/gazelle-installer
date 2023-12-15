@@ -242,7 +242,7 @@ Prova il piacere di usare %1</translation>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatta e usa l&apos;intero disco (%1) per %2</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -693,12 +693,12 @@ Se hai bisogno di un maggior controllo riguardo la posizione di installazione di
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Revisione finale e conferma</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rivedi attentamente questo elenco. Questa è l&apos;ultima opportunità per controllare, rivedere e confermare le azioni del processo di installazione prima di procedere.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -1171,7 +1171,7 @@ Vuoi davvero chiudere ora?</translation>
     <message>
         <location filename="../meinstall.ui" line="813"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Conferma installazione</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="844"/>
