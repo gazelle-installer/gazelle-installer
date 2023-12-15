@@ -242,7 +242,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Formata i usa tot el disc sencer (%1) per %2</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -692,12 +692,12 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprovació final i confirmació</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si us plau, reviseu la llista amb cura- Aquesta és la darrera oportunitat per comprovar, revisar i confirmar les accions del procés d&apos;instal·lació abans de continuar.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -1170,7 +1170,7 @@ De debò voleu aturar-la ara?</translation>
     <message>
         <location filename="../meinstall.ui" line="813"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmació de la instal·lació</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="844"/>
