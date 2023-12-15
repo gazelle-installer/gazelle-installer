@@ -242,7 +242,7 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Formatera och använd hela disken (%1) för %2</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -692,12 +692,12 @@ Ha det så trevligt med %1</translation>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Slutkontroll och Bekräftelse</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Var vänlig se över denna lista noggrant. Detta är den sista möjligheten att kontrollera, se över och bekräfta installationprocessens funktioner innan den fortsätter.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -1170,7 +1170,7 @@ Vill du verkligen sluta nu?</translation>
     <message>
         <location filename="../meinstall.ui" line="813"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Installationsbekräftelse</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="844"/>
