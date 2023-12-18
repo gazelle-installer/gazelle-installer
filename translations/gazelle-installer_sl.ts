@@ -787,7 +787,7 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="831"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
-        <translation>Večina uporabnikov naj ne bi spreminjala priovzetih vrednosti. Uporabniki z manj zmogljivimi računalniki pa si večkrat želijo izklopiti nepotrebne storitve, da bi ohranili čim več pomnilnika. Poskrbite, da veste, kaj delate!</translation>
+        <translation>Večina uporabnikov naj ne bi spreminjala privzetih vrednosti. Uporabniki z manj zmogljivimi računalniki pa si večkrat želijo izklopiti nepotrebne storitve, da bi prihranili čim več pomnilnika. Poskrbite, da veste, kaj delate!</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="837"/>
@@ -960,7 +960,7 @@ Ali bi jo res radi zaustavili?</translation>
     <message>
         <location filename="../minstall.cpp" line="1174"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Popravilo namestitve&lt;/b&gt;&lt;br/&gt;Če %1 na vašem disku preneha delovati, je včasih mogoče težavo odpraviti z zagonom iz živega DVD ali USB pogona in zagonom katerega od vključenih orodji, ki jih %1 vsebuje ali z uporabo katerega od standardnih Linux orodji za popravljanje sistema.&lt;/p&gt;&lt;p&gt;Živi DVD ali SUSB lahko uporabite tudi za reševanje podatkov iz sistemov z MS-Windows!&lt;/p&gt; </translation>
+        <translation>&lt;p&gt;&lt;b&gt;Popravilo namestitve&lt;/b&gt;&lt;br/&gt;Če %1 na vašem disku preneha delovati, je včasih mogoče težavo odpraviti z zagonom iz živega DVD ali USB pogona in zagonom katerega od orodji, ki jih %1 vsebuje ali z uporabo katerega od standardnih Linux orodji za popravljanje sistema.&lt;/p&gt;&lt;p&gt;Živi DVD ali SUSB lahko uporabite tudi za reševanje podatkov iz sistemov z MS-Windows!&lt;/p&gt; </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1188"/>
