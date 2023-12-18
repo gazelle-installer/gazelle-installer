@@ -1333,9 +1333,10 @@ bool PartMan::makeFstab() noexcept
             QString UUID = volume->assocUUID();
             //fallback UUID
             //some btrfs systems show incorrect UUID for volume, and so parent UUID never found
-            if (UUID.isEmpty()){
-                proc.exec("lsblk", {dev, "-no", "UUID"}, nullptr, true);
-                UUID = proc.readOut();
+            if (! UUID.isEmpty()){
+                proc.exec("blkid", {"-p", "-s","UUID", dev}, nullptr, true);
+                UUID = proc.readOut().section("=", 1, 1).section("\"",1,1);
+                qDebug() << "UUID:" << UUID;
             }
             out << "UUID=" << UUID;
         }
@@ -2108,10 +2109,10 @@ void PartMan::Device::driveAutoSetActive() noexcept
 }
 void PartMan::Device::autoFill(unsigned int changed) noexcept
 {
-    if ((changed & (1 << PartMan::COL_FLAG_ESP)) && usefor.isEmpty()) {
-        usefor = "ESP";
-        changed |= (1 << PartMan::COL_USEFOR);
-    }
+//    if ((changed & (1 << PartMan::COL_FLAG_ESP)) && usefor.isEmpty()) {
+//        usefor = "ESP";
+//        changed |= (1 << PartMan::COL_USEFOR);
+//    }
     if (changed & (1 << PartMan::COL_USEFOR)) {
         // Default labels
         if (type == SUBVOLUME) {
