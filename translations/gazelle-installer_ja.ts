@@ -242,7 +242,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>ディスク (%1) 全体をフォーマットして %2 に使用する</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -692,12 +692,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>変更および最終確認</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>画面の表示をよく見てください。この画面で、これから実行するインストール作業の内容チェック・変更・最終確認を行います。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -1170,7 +1170,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="813"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールの確認</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="844"/>
@@ -1844,12 +1844,12 @@ Please select a different name.</source>
         <translation>サブボリュームを準備中</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1373"/>
+        <location filename="../partman.cpp" line="1374"/>
         <source>Failed to mount partition.</source>
         <translation>パーティションのマウントに失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1378"/>
+        <location filename="../partman.cpp" line="1379"/>
         <source>Mounting: %1</source>
         <translation>マウント中: %1</translation>
     </message>
@@ -1857,22 +1857,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2460"/>
+        <location filename="../partman.cpp" line="2461"/>
         <source>&amp;Templates</source>
         <translation>テンプレート(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2468"/>
+        <location filename="../partman.cpp" line="2469"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>圧縮 (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2470"/>
+        <location filename="../partman.cpp" line="2471"/>
         <source>Compression (&amp;LZO)</source>
         <translation>圧縮 (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2472"/>
+        <location filename="../partman.cpp" line="2473"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>圧縮 (&amp;ZLIB)</translation>
     </message>
