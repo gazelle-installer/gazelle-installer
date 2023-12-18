@@ -1851,12 +1851,12 @@ Please select a different name.</source>
         <translation>Προετοιμασία υποτόμων </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1373"/>
+        <location filename="../partman.cpp" line="1374"/>
         <source>Failed to mount partition.</source>
         <translation>Απέτυχε η προσάρτηση του διαμερίσματος.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1378"/>
+        <location filename="../partman.cpp" line="1379"/>
         <source>Mounting: %1</source>
         <translation>Προσάρτηση: %1</translation>
     </message>
@@ -1864,22 +1864,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2460"/>
+        <location filename="../partman.cpp" line="2461"/>
         <source>&amp;Templates</source>
         <translation>&amp;Πρότυπα</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2468"/>
+        <location filename="../partman.cpp" line="2469"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Συμπίεση (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2470"/>
+        <location filename="../partman.cpp" line="2471"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Συμπίεση (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2472"/>
+        <location filename="../partman.cpp" line="2473"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Συμπίεση (&amp; ZLIB)</translation>
     </message>

@@ -1846,12 +1846,12 @@ Kies a.u.b. een andere naam.</translation>
         <translation>Subvolumes voorbereiden</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1373"/>
+        <location filename="../partman.cpp" line="1374"/>
         <source>Failed to mount partition.</source>
         <translation>Koppeling van partitie mislukt.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1378"/>
+        <location filename="../partman.cpp" line="1379"/>
         <source>Mounting: %1</source>
         <translation>Montage: %1</translation>
     </message>
@@ -1859,22 +1859,22 @@ Kies a.u.b. een andere naam.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2460"/>
+        <location filename="../partman.cpp" line="2461"/>
         <source>&amp;Templates</source>
         <translation>&amp;Sjablonen</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2468"/>
+        <location filename="../partman.cpp" line="2469"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compressie (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2470"/>
+        <location filename="../partman.cpp" line="2471"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compressie (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2472"/>
+        <location filename="../partman.cpp" line="2473"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compressie (&amp;ZLIB)</translation>
     </message>
