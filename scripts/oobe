@@ -12,6 +12,16 @@
 ### END INIT INFO
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+#don't start on rpi first boot
+FILE="/etc/rpi_skip_first_boot
+if [ -e "$FILE" ]; then
+	rm "$FILE"
+	exit 0
+fi
+	
+
+
 case "$1" in
   start)
 	# Boot will hold here since the process is not being forked.
