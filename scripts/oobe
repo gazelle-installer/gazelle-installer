@@ -14,7 +14,7 @@
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
 #don't start on rpi first boot
-FILE="/etc/rpi_skip_first_boot
+FILE="/etc/rpi_skip_first_boot"
 if [ -e "$FILE" ]; then
 	rm "$FILE"
 	exit 0
