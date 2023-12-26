@@ -494,6 +494,14 @@ void Oobe::setLocale()
     qDebug() << "Localize repo";
     if (online) proc.exec("localize-repo", {"default"});
     else proc.exec("chroot", {"/mnt/antiX", "localize-repo", "default"});
+    
+    //machine id 
+    if (online){
+        // create a /etc/machine-id file and /var/lib/dbus/machine-id file
+        proc.exec("rm", {"/var/lib/dbus/machine-id", "/etc/machine-id"});
+        proc.exec("dbus-uuidgen", {"--ensure=/etc/machine-id"});
+        proc.exec("dbus-uuidgen", {"--ensure"});
+    }
 }
 
 QWidget *Oobe::validateUserInfo(bool automatic) noexcept
