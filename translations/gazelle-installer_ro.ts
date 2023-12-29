@@ -209,10 +209,6 @@ Enjoy using %1.</translation>
         <translation>Sfârșit</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Configurarea sistemului. Va rugam asteptati.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

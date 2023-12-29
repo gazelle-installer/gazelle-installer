@@ -210,10 +210,6 @@ Shijoni përdorimin e %1-it</translation>
         <translation>U përfundua</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Po formësohet sistemi. Ju lutemi, prisni.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

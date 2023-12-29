@@ -6,12 +6,12 @@
     <message>
         <location filename="../autopart.cpp" line="56"/>
         <source>Root</source>
-        <translation>Root</translation>
+        <translation>root</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="57"/>
         <source>Home</source>
-        <translation>Home</translation>
+        <translation>home</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="138"/>
@@ -87,7 +87,7 @@ home %2%</translation>
     <message>
         <location filename="../bootman.cpp" line="128"/>
         <source>Installing GRUB</source>
-        <translation>GRUB のインストール中</translation>
+        <translation>GRUB をインストール中</translation>
     </message>
     <message>
         <location filename="../bootman.cpp" line="286"/>
@@ -210,13 +210,9 @@ Enjoy using %1</source>
         <translation>完了</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">システムを構成しています。お待ちください。</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>システムを構成しています。お待ちください。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
@@ -1092,12 +1088,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="450"/>
         <source>Root</source>
-        <translation>Root</translation>
+        <translation>root</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="460"/>
         <source>Home</source>
-        <translation>Home</translation>
+        <translation>home</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="535"/>
@@ -1775,7 +1771,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="949"/>
         <source>Smartmon tool output:</source>
-        <translation>Smartmonツールの出力：</translation>
+        <translation>Smartmon ツールの出力：</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="950"/>
@@ -1855,7 +1851,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="1379"/>
         <source>Mounting: %1</source>
-        <translation>マウント中: %1</translation>
+        <translation>%1 をマウント中</translation>
     </message>
 </context>
 <context>

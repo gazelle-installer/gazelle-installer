@@ -210,13 +210,9 @@ Uživajte v sistemu %1!</translation>
         <translation>Končano</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Konfiguriram sistem. Počakajte.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nastavljanje sistema. Počakajte.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>

@@ -210,10 +210,6 @@ Enjoy using %1</source>
         <translation>Bitti</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Sistem yapılandırılıyor. Lütfen bekleyin.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>
