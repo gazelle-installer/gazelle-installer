@@ -199,10 +199,6 @@ Enjoy using %1</source>
         <translation>הושלם</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">המערכת מוגדרת. נא להמתין.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

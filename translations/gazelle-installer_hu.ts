@@ -210,10 +210,6 @@ Használja örömmel az %1-ot</translation>
         <translation>Kész</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">A rendszer beállítása. Kérjük várjon.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

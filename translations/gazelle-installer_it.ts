@@ -210,10 +210,6 @@ Prova il piacere di usare %1</translation>
         <translation>Finito</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Configuro il sistema. Prego attendere.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

@@ -210,13 +210,9 @@ Ha det så trevligt med %1</translation>
         <translation>Avslutad</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Konfigurerar system. Var vänlig vänta.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurerar systemet. Var vänlig vänta.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
