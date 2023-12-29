@@ -209,10 +209,6 @@ Disfruta usando %1.</translation>
         <translation>Rematado</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Configurando o sistema. Agarde.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

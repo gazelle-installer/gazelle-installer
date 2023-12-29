@@ -207,10 +207,6 @@ Enjoy using %1</source>
         <translation>पूर्ण हुआ</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">सिस्टम विन्यास जारी। कृपया प्रतीक्षा करें।</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

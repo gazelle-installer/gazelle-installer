@@ -205,10 +205,6 @@ Mėgaukitės, naudodami %1</translation>
         <translation>Užbaigta</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Konfigūruojama sistema. Palaukite.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

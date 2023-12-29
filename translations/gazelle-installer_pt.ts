@@ -210,10 +210,6 @@ Usufrua do %1</translation>
         <translation>Terminado</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">A configurar sistema. Aguardar.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

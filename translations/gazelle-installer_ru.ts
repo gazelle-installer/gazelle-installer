@@ -210,10 +210,6 @@ Enjoy using %1</source>
         <translation>Завершено</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Идёт настройка системы. Пожалуйста, подождите.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

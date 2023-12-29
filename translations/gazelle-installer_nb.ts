@@ -210,10 +210,6 @@ Lykke til med %1.</translation>
         <translation>Fullført</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Setter opp systemet. Vennligst vent.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>
