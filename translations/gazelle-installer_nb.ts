@@ -210,9 +210,13 @@ Lykke til med %1.</translation>
         <translation>Fullført</translation>
     </message>
     <message>
+        <source>Configuring system. Please wait.</source>
+        <translation type="vanished">Setter opp systemet. Vennligst vent.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="412"/>
-        <source>Configuring sytem. Please wait.</source>
-        <translation>Setter opp systemet. Vennligst vent.</translation>
+        <source>Configuring system. Please wait.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
@@ -1472,61 +1476,61 @@ Velg et annet navn.</translation>
         <translation>Skriv inn en arbeidsgruppe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="505"/>
+        <location filename="../oobe.cpp" line="513"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>Brukernavnet kan ikke inneholde spesialtegn eller mellomrom.
 Velg et annet brukernavn.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="516"/>
+        <location filename="../oobe.cpp" line="524"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Brukernavnet er allerede i bruk.
 Velg et annet brukernavn.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="525"/>
+        <location filename="../oobe.cpp" line="533"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation>Ingen passfrase for %1 ble oppgitt.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="526"/>
+        <location filename="../oobe.cpp" line="534"/>
         <source>Are you sure you want to continue?</source>
         <translation>Vil du virkelig fortsette?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="532"/>
+        <location filename="../oobe.cpp" line="540"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>Root-kontoen mangler passord. Vil du fortsette?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="545"/>
+        <location filename="../oobe.cpp" line="553"/>
         <source>Failed to set user account passwords.</source>
         <translation>Klarte ikke lagre brukerpassord.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="571"/>
+        <location filename="../oobe.cpp" line="579"/>
         <source>Failed to save old home directory.</source>
         <translation>Klarte ikke lagre gammel hjemmemappe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="580"/>
+        <location filename="../oobe.cpp" line="588"/>
         <source>Failed to delete old home directory.</source>
         <translation>Klarte ikke slette gammel hjemmemappe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="601"/>
+        <location filename="../oobe.cpp" line="609"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Klarte ikke opprette brukermappe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="604"/>
+        <location filename="../oobe.cpp" line="612"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Klarte ikke navngi brukermappe.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="640"/>
+        <location filename="../oobe.cpp" line="648"/>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation>Klarte ikke endre eierskap eller rettigheter til brukermappe.</translation>
     </message>
