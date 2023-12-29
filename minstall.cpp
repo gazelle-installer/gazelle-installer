@@ -409,7 +409,7 @@ void MInstall::processNextPhase() noexcept
         // This OOBE phase is only run under --oobe mode.
         if (modeOOBE && phase == PH_READY) {
             phase = PH_OUT_OF_BOX;
-            labelSplash->setText(tr("Configuring sytem. Please wait."));
+            labelSplash->setText(tr("Configuring system. Please wait."));
             gotoPage(Step::SPLASH);
             oobe->process();
             phase = PH_FINISHED;
