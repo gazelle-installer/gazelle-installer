@@ -210,9 +210,13 @@ Enjoy using %1</source>
         <translation>El proceso ha terminado.</translation>
     </message>
     <message>
+        <source>Configuring system. Please wait.</source>
+        <translation type="vanished">Configurando sistema. Espere por favor.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="412"/>
-        <source>Configuring sytem. Please wait.</source>
-        <translation>Configurando sistema. Espere por favor.</translation>
+        <source>Configuring system. Please wait.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
@@ -1470,59 +1474,59 @@ name before proceeding.</source>
         <translation>Por favor ingrese un grupo de trabajo.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="505"/>
+        <location filename="../oobe.cpp" line="513"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>El nombre de usuario no puede contener caracteres especiales ni espacios. Por favor elija otro nombre antes de continuar.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="516"/>
+        <location filename="../oobe.cpp" line="524"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Lo sentimos, ese nombre ya está en uso. Por favor elija un nombre diferente.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="525"/>
+        <location filename="../oobe.cpp" line="533"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation>No ha proporcionado una frase de contraseña para %1.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="526"/>
+        <location filename="../oobe.cpp" line="534"/>
         <source>Are you sure you want to continue?</source>
         <translation>¿Estás seguro que quieres continuar?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="532"/>
+        <location filename="../oobe.cpp" line="540"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>No proporcionó una contraseña para la cuenta root. ¿Desea continuar?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="545"/>
+        <location filename="../oobe.cpp" line="553"/>
         <source>Failed to set user account passwords.</source>
         <translation>Fallo al establecer las contraseñas de la cuenta del usuario. </translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="571"/>
+        <location filename="../oobe.cpp" line="579"/>
         <source>Failed to save old home directory.</source>
         <translation>Fallo al guardar el antiguo directorio home.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="580"/>
+        <location filename="../oobe.cpp" line="588"/>
         <source>Failed to delete old home directory.</source>
         <translation>Fallo al eliminar el antiguo directorio home.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="601"/>
+        <location filename="../oobe.cpp" line="609"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>Lo siento, fallo al crear directorio de usuario.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="604"/>
+        <location filename="../oobe.cpp" line="612"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>Fallo al nombrar directorio de usuario.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="640"/>
+        <location filename="../oobe.cpp" line="648"/>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation>Error al establecer la propiedad o los permisos del directorio de usuario.</translation>
     </message>

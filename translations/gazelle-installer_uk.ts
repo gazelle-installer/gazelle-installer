@@ -209,9 +209,13 @@ Enjoy using %1</source>
         <translation>Завершено</translation>
     </message>
     <message>
+        <source>Configuring system. Please wait.</source>
+        <translation type="vanished">Налаштування системи. Зачекайте.</translation>
+    </message>
+    <message>
         <location filename="../minstall.cpp" line="412"/>
-        <source>Configuring sytem. Please wait.</source>
-        <translation>Налаштування системи. Зачекайте.</translation>
+        <source>Configuring system. Please wait.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
@@ -1473,61 +1477,61 @@ name before proceeding.</source>
         <translation>Введіть робочу групу.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="505"/>
+        <location filename="../oobe.cpp" line="513"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
         <translation>Ім&apos;я користувача не може містити спеціальні символи або пробіли.
 Перш ніж продовжити, виберіть інше ім’я.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="516"/>
+        <location filename="../oobe.cpp" line="524"/>
         <source>Sorry, that name is in use.
 Please select a different name.</source>
         <translation>Вибачте, це вже використовується.
 Виберіть інше.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="525"/>
+        <location filename="../oobe.cpp" line="533"/>
         <source>You did not provide a passphrase for %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="526"/>
+        <location filename="../oobe.cpp" line="534"/>
         <source>Are you sure you want to continue?</source>
         <translation>Ви впевнені, що бажаєте продовжити?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="532"/>
+        <location filename="../oobe.cpp" line="540"/>
         <source>You did not provide a password for the root account. Do you want to continue?</source>
         <translation>Ви не вказали пароль для облікового запису root. Ви хочете продовжити?</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="545"/>
+        <location filename="../oobe.cpp" line="553"/>
         <source>Failed to set user account passwords.</source>
         <translation>Не вдалося встановити паролі облікових записів користувачів.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="571"/>
+        <location filename="../oobe.cpp" line="579"/>
         <source>Failed to save old home directory.</source>
         <translation>Не вдалося зберегти старий домашній каталог.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="580"/>
+        <location filename="../oobe.cpp" line="588"/>
         <source>Failed to delete old home directory.</source>
         <translation>Не вдалося видалити старий домашній каталог.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="601"/>
+        <location filename="../oobe.cpp" line="609"/>
         <source>Sorry, failed to create user directory.</source>
         <translation>На жаль, не вдалось створити каталог користувача.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="604"/>
+        <location filename="../oobe.cpp" line="612"/>
         <source>Sorry, failed to name user directory.</source>
         <translation>На жаль, не вдалось назвати каталог користувача.</translation>
     </message>
     <message>
-        <location filename="../oobe.cpp" line="640"/>
+        <location filename="../oobe.cpp" line="648"/>
         <source>Failed to set ownership or permissions of user directory.</source>
         <translation type="unfinished"></translation>
     </message>
