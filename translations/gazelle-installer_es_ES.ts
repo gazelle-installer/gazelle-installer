@@ -210,13 +210,9 @@ Disfruta usando %1</translation>
         <translation>El proceso ha finalizado</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Configurando el sistema. Espere por favor.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurando el sistema. Espere por favor.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>

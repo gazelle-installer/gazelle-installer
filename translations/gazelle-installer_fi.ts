@@ -210,10 +210,6 @@ Pidä hauskaa käyttäessäsi %1</translation>
         <translation>Viimeistelty</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Määritetään järjestelmää. Ole hyvä ja odota.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

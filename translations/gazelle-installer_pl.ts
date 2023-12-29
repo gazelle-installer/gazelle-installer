@@ -210,10 +210,6 @@ Miłego korzystania z %1</translation>
         <translation>Zakończone</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Konfiguracja systemu. Proszę czekać.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>

@@ -210,10 +210,6 @@ Veel plezier met %1</translation>
         <translation>Voltooid</translation>
     </message>
     <message>
-        <source>Configuring system. Please wait.</source>
-        <translation type="vanished">Systeem configureren. Even geduld aub.</translation>
-    </message>
-    <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
         <translation type="unfinished"></translation>
