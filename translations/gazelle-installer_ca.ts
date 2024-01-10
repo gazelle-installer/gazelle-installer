@@ -212,7 +212,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurant el sistema. Si us plau, espereu.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>

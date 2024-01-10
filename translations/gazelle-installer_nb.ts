@@ -212,7 +212,7 @@ Lykke til med %1.</translation>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Setter opp systemet. Vennligst vent.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>

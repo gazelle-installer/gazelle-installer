@@ -212,7 +212,7 @@ Prova il piacere di usare %1</translation>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurazione del sistema. Per favore attendi.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
