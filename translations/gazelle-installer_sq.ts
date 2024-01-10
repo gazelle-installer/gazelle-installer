@@ -212,7 +212,7 @@ Shijoni përdorimin e %1-it</translation>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Po formësohet sistemi. Ju lutemi, prisni.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>

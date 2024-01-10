@@ -212,7 +212,7 @@ Használja örömmel az %1-ot</translation>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>A rendszer beállítása. Kis türelmet.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
@@ -242,7 +242,7 @@ Használja örömmel az %1-ot</translation>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>A teljes lemez (%1) formázása %2 számára</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -692,12 +692,12 @@ Használja örömmel az %1-ot</translation>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Áttekintés és jóváhagyás</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alaposan nézze át a listát. Ez az utolsó lehetőség az ellenőrzésre és áttekintésre, majd a végrehajtásra kerülő műveletek jóváhagyására, a telepítési folyamat folytatása előtt.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -1170,7 +1170,7 @@ Biztos megszakítja a folyamatot?</translation>
     <message>
         <location filename="../meinstall.ui" line="813"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Telepítés jóváhagyása</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="844"/>

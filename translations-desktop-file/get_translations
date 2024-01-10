@@ -19,6 +19,7 @@ file_filter = po/${APPNAME}_<lang>.po
 source_file = ${APPNAME}.pot
 source_lang = en
 type = po
+minimum_perc = 25
 EOF
 fi    
 
