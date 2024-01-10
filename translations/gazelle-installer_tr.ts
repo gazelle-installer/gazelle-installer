@@ -212,7 +212,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem yapılandırılıyor. Lütfen bekleyin.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
@@ -242,7 +242,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüm diski (%1) %2 için biçimlendirin ve kullanın.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -692,12 +692,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Son İnceleme ve Onay</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lütfen bu listeyi dikkatlice gözden geçirin. İlerlemeden önce kurulum sürecinin eylemlerini kontrol etmek, gözden geçirmek ve onaylamak için son fırsattır.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -1170,7 +1170,7 @@ Gerçekten şimdi durdurmak istiyor musunuz?</translation>
     <message>
         <location filename="../meinstall.ui" line="813"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurulum Onayı</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="844"/>

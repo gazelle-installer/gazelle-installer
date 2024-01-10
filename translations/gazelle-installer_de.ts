@@ -212,7 +212,7 @@ Viel Spaß mit %1</translation>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das System wird konfiguriert. Bitte warten sie.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
