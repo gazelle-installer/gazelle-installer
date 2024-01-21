@@ -45,9 +45,12 @@ Base::Base(MProcess &mproc, PartMan &pman, const QSettings &appConf, const QComm
 
     bootSource = "/live/aufs/boot";
     rootSources << "/live/aufs/bin" << "/live/aufs/dev"
-        << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/libx32" << "/live/aufs/lib64"
+        << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/lib64"
         << "/live/aufs/media" << "/live/aufs/mnt" << "/live/aufs/opt" << "/live/aufs/root"
         << "/live/aufs/sbin" << "/live/aufs/usr" << "/live/aufs/var" << "/live/aufs/home";
+    if (QDir("/live/aufs/libx32").exists()){
+        rootSources << "/live/aufs/libx32" ;
+    }
     PartMan::VolumeSpec &vspecRoot = partman.volSpecs["/"];
     PartMan::VolumeSpec &vspecBoot = partman.volSpecs["/boot"];
     PartMan::VolumeSpec &vspecHome = partman.volSpecs["/home"];
