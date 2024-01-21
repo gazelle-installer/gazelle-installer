@@ -38,7 +38,6 @@ Base::Base(MProcess &mproc, PartMan &pman, const QSettings &appConf, const QComm
 {
     pretend = appArgs.isSet("pretend");
     populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
-    nocopy = appArgs.isSet("nocopy");
     sync = appArgs.isSet("sync");
     bufferRoot = appConf.value("ROOT_BUFFER", 1024).toLongLong() * MB;
     bufferHome = appConf.value("HOME_BUFFER", 1024).toLongLong() * MB;
@@ -247,7 +246,6 @@ void Base::copyLinux(bool skiphome)
     proc.advance(80, sourceInodes);
     proc.status(tr("Copying new system"));
     // Placed here so the progress bar moves to the right position before the next step.
-    if (nocopy) return; // Skip copying on purpose
 
     const QString &joined = MProcess::joinCommand(prog, args);
     qDebug().noquote() << "Exec COPY:" << joined;

@@ -107,7 +107,6 @@ int main(int argc, char *argv[])
             "Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.")},
         {{"f", "poweroff"}, QObject::tr("Shutdown automatically when done installing.")},
         {{"m", "mount-keep"}, QObject::tr("Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.")},
-        {"nocopy", QObject::tr("Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.")},
         {{"o", "oem"}, QObject::tr("Install the operating system, delaying prompts for user-specific options until the first reboot.\n"
             "Upon rebooting, the installer will be run with --oobe so that the user can provide these details.\n"
             "This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.")},

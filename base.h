@@ -32,7 +32,7 @@ class Base
     long long sourceInodes = 1;
     long long bufferRoot = 0, bufferHome = 0;
     bool pretend = false;
-    bool nocopy = false, sync = false;
+    bool sync = false;
     bool populateMediaMounts = false;
     void copyLinux(bool skiphome);
 public:
