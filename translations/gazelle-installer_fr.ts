@@ -42,37 +42,37 @@ Minimum&#xa0;: %2</translation>
 <context>
     <name>Base</name>
     <message>
-        <location filename="../base.cpp" line="55"/>
+        <location filename="../base.cpp" line="63"/>
         <source>Cannot access installation media.</source>
         <translation>Impossible d’accéder au support d’installation.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="152"/>
+        <location filename="../base.cpp" line="160"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Impossible de supprimer l’ancien système sur la destination.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="155"/>
+        <location filename="../base.cpp" line="163"/>
         <source>Deleting old system</source>
         <translation>Effacement de l’ancien système</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="165"/>
+        <location filename="../base.cpp" line="173"/>
         <source>Failed to set the system configuration.</source>
         <translation>Impossible de définir la configuration du système.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="167"/>
+        <location filename="../base.cpp" line="175"/>
         <source>Setting system configuration</source>
         <translation>Paramètre de configuration du système</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="245"/>
+        <location filename="../base.cpp" line="253"/>
         <source>Copying new system</source>
         <translation>Copie du nouveau système</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="275"/>
+        <location filename="../base.cpp" line="282"/>
         <source>Failed to copy the new system.</source>
         <translation>Impossible de copier le nouveau système.</translation>
     </message>
@@ -1103,7 +1103,7 @@ Voulez-vous vraiment quitter maintenant&#xa0;?</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="570"/>
-        <location filename="../meinstall.ui" line="1066"/>
+        <location filename="../meinstall.ui" line="1080"/>
         <source>Enable hibernation support</source>
         <translation>Activer la prise en charge de l’hibernation « veille prolongée »</translation>
     </message>
@@ -1118,322 +1118,327 @@ Voulez-vous vraiment quitter maintenant&#xa0;?</translation>
         <translation>Choix des partitions</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="621"/>
+        <location filename="../meinstall.ui" line="632"/>
         <source>Show Grid</source>
         <translation>Afficher la grille</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="628"/>
+        <location filename="../meinstall.ui" line="639"/>
         <source>Ctrl+G</source>
         <translation>Ctrl+G</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="638"/>
+        <location filename="../meinstall.ui" line="621"/>
         <source>Mark the selected drive to be cleared for a new layout.</source>
         <translation>Marquer le disque sélectionné pour qu’il soit effacé en vue d’une nouvelle configuration.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="652"/>
+        <location filename="../meinstall.ui" line="674"/>
         <source>Query the operating system and reload the layouts of all drives.</source>
         <translation>Interroger le système d’exploitation et recharger les configurations de tous les disques.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="663"/>
+        <location filename="../meinstall.ui" line="652"/>
         <source>Run the partition management application of this operating system.</source>
         <translation>Exécuter l’application de gestion des partitions de ce système d’exploitation.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="674"/>
+        <location filename="../meinstall.ui" line="711"/>
         <source>Add a new partition entry. This only works with a new layout.</source>
         <translation>Ajouter une nouvelle partition. Cela ne fonctionne qu’avec une nouvelle configuration.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="685"/>
+        <location filename="../meinstall.ui" line="663"/>
         <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
         <translation>Supprimer une entrée existante de la configuration. Ne fonctionne qu’avec les entrées d’une nouvelle configuration.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="741"/>
+        <location filename="../meinstall.ui" line="722"/>
+        <source>Show advanced fields.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="755"/>
         <source>Encryption options</source>
         <translation>Options de chiffrement</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="747"/>
+        <location filename="../meinstall.ui" line="761"/>
         <source>Encryption password:</source>
         <translation>Mot de passe de chiffrement&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="764"/>
+        <location filename="../meinstall.ui" line="778"/>
         <source>Confirm password:</source>
         <translation>Confirmer le mot de passe&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="813"/>
+        <location filename="../meinstall.ui" line="827"/>
         <source>Installation Confirmation</source>
         <translation>Confirmation de l’installation</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="844"/>
+        <location filename="../meinstall.ui" line="858"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Installer GRUB pour Linux et Windows</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="868"/>
+        <location filename="../meinstall.ui" line="882"/>
         <source>Master Boot Record</source>
         <translation>Master Boot Record</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="874"/>
+        <location filename="../meinstall.ui" line="888"/>
         <source>MBR</source>
         <translation>MBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="877"/>
+        <location filename="../meinstall.ui" line="891"/>
         <source>Alt+B</source>
         <translation>Alt+B</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="899"/>
+        <location filename="../meinstall.ui" line="913"/>
         <source>EFI System Partition</source>
         <translation>Partition système EFI</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="902"/>
+        <location filename="../meinstall.ui" line="916"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="934"/>
+        <location filename="../meinstall.ui" line="948"/>
         <source>Partition Boot Record</source>
         <translation>Partition Boot Record</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="937"/>
+        <location filename="../meinstall.ui" line="951"/>
         <source>PBR</source>
         <translation>PBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="950"/>
+        <location filename="../meinstall.ui" line="964"/>
         <source>System boot disk:</source>
         <translation>Disque de démarrage du système&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="963"/>
+        <location filename="../meinstall.ui" line="977"/>
         <source>Location to install on:</source>
         <translation>Emplacement de l’installation&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="999"/>
+        <location filename="../meinstall.ui" line="1013"/>
         <source>Create a swap file</source>
         <translation>Créer un fichier swap</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1016"/>
+        <location filename="../meinstall.ui" line="1030"/>
         <source> MB</source>
         <translation> Mo</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1036"/>
+        <location filename="../meinstall.ui" line="1050"/>
         <source>Size:</source>
         <translation>Taille&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1059"/>
+        <location filename="../meinstall.ui" line="1073"/>
         <source>Location:</source>
         <translation>Emplacement&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1098"/>
+        <location filename="../meinstall.ui" line="1112"/>
         <source>Common Services to Enable</source>
         <translation>Services courants à activer</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1117"/>
+        <location filename="../meinstall.ui" line="1131"/>
         <source>Service</source>
         <translation>Service</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1122"/>
+        <location filename="../meinstall.ui" line="1136"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1155"/>
+        <location filename="../meinstall.ui" line="1169"/>
         <source>Computer Network Names</source>
         <translation>Noms de réseau de l’ordinateur</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1182"/>
+        <location filename="../meinstall.ui" line="1196"/>
         <source>Workgroup</source>
         <translation>WORKGROUP</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1195"/>
+        <location filename="../meinstall.ui" line="1209"/>
         <source>Workgroup:</source>
         <translation>Groupe de travail&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1208"/>
+        <location filename="../meinstall.ui" line="1222"/>
         <source>SaMBa Server for MS Networking</source>
         <translation>Serveur SaMBa pour réseaux Microsoft</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1224"/>
+        <location filename="../meinstall.ui" line="1238"/>
         <source>example.dom</source>
         <translation>exemple.dom</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1237"/>
+        <location filename="../meinstall.ui" line="1251"/>
         <source>Computer domain:</source>
         <translation>Nom de domaine&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1263"/>
+        <location filename="../meinstall.ui" line="1277"/>
         <source>Computer name:</source>
         <translation>Nom de l’ordinateur&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1324"/>
+        <location filename="../meinstall.ui" line="1338"/>
         <source>Configure Clock</source>
         <translation>Configuration de l’horloge</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1365"/>
+        <location filename="../meinstall.ui" line="1379"/>
         <source>Format:</source>
         <translation>Format&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1393"/>
+        <location filename="../meinstall.ui" line="1407"/>
         <source>Timezone:</source>
         <translation>Fuseau horaire&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1438"/>
+        <location filename="../meinstall.ui" line="1452"/>
         <source>System clock uses local time</source>
         <translation>L’horloge du système utilise l’heure locale</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1470"/>
+        <location filename="../meinstall.ui" line="1484"/>
         <source>Localization Defaults</source>
         <translation>Valeurs par défaut pour la localisation</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1510"/>
+        <location filename="../meinstall.ui" line="1524"/>
         <source>Locale:</source>
         <translation>Variable locale&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1532"/>
+        <location filename="../meinstall.ui" line="1546"/>
         <source>Service Settings (advanced)</source>
         <translation>Réglages des services (avancé)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1550"/>
+        <location filename="../meinstall.ui" line="1564"/>
         <source>Adjust which services should run at startup</source>
         <translation>Réglez les services qui doivent être exécutés au démarrage</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1553"/>
+        <location filename="../meinstall.ui" line="1567"/>
         <source>View</source>
         <translation>Voir</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1598"/>
+        <location filename="../meinstall.ui" line="1612"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
         <translation>Les modifications du bureau effectuées dans l’environnement « live » seront reportées sur le système installé</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1601"/>
+        <location filename="../meinstall.ui" line="1615"/>
         <source>Save live desktop changes</source>
         <translation>Enregistrer les modifications du bureau opérées en session « live »</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1614"/>
+        <location filename="../meinstall.ui" line="1628"/>
         <source>Default User Account</source>
         <translation>Compte Utilisateur par défaut</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1626"/>
+        <location filename="../meinstall.ui" line="1640"/>
         <source>Default user login name:</source>
         <translation>Nom d’utilisateur par défaut&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1645"/>
+        <location filename="../meinstall.ui" line="1659"/>
         <source>username</source>
         <translation>nom d’utilisateur</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1658"/>
+        <location filename="../meinstall.ui" line="1672"/>
         <source>Default user password:</source>
         <translation>Mot de passe utilisateur par défaut&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1687"/>
+        <location filename="../meinstall.ui" line="1701"/>
         <source>Confirm user password:</source>
         <translation>Confirmer le mot de passe utilisateur&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1719"/>
+        <location filename="../meinstall.ui" line="1733"/>
         <source>Root (administrator) Account</source>
         <translation>Compte root (administrateur)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1737"/>
+        <location filename="../meinstall.ui" line="1751"/>
         <source>Root password:</source>
         <translation>Mot de passe administrateur&#xa0;: </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1766"/>
+        <location filename="../meinstall.ui" line="1780"/>
         <source>Confirm root password:</source>
         <translation>Confirmer le mot de passe administrateur&#xa0;: </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1798"/>
+        <location filename="../meinstall.ui" line="1812"/>
         <source>Autologin</source>
         <translation>Autologin</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1834"/>
+        <location filename="../meinstall.ui" line="1848"/>
         <source>Existing Home Directory</source>
         <translation>Répertoire Home existant</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1843"/>
+        <location filename="../meinstall.ui" line="1857"/>
         <source>What would you like to do with the old directory?</source>
         <translation>Que voudriez-vous faire avec l’ancien répertoire&#xa0;?</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1850"/>
+        <location filename="../meinstall.ui" line="1864"/>
         <source>Re-use it for this installation</source>
         <translation>Le réemployer pour l’installation</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1857"/>
+        <location filename="../meinstall.ui" line="1871"/>
         <source>Rename it and create a new directory</source>
         <translation>Le renommer et créer un nouveau répertoire</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1864"/>
+        <location filename="../meinstall.ui" line="1878"/>
         <source>Delete it and create a new directory</source>
         <translation>Le supprimer et créer un nouveau répertoire</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1909"/>
+        <location filename="../meinstall.ui" line="1923"/>
         <source>Tips</source>
         <translation>Astuces</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1953"/>
+        <location filename="../meinstall.ui" line="1967"/>
         <source>Installation complete</source>
         <translation>Installation terminée</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1959"/>
+        <location filename="../meinstall.ui" line="1973"/>
         <source>Automatically reboot the system when the installer is closed</source>
         <translation>Redémarrer automatiquement le système à la fermeture du programme d’installation</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1978"/>
+        <location filename="../meinstall.ui" line="1992"/>
         <source>Reminders</source>
         <translation>Rappels</translation>
     </message>
@@ -1534,322 +1539,322 @@ Veuillez choisir un nom différent.</translation>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="../partman.cpp" line="214"/>
+        <location filename="../partman.cpp" line="216"/>
         <source>Virtual Devices</source>
         <translation>Périphériques virtuels</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="435"/>
-        <location filename="../partman.cpp" line="482"/>
+        <location filename="../partman.cpp" line="437"/>
+        <location filename="../partman.cpp" line="484"/>
         <source>&amp;Add partition</source>
         <translation>&amp;Ajouter une partition</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="437"/>
+        <location filename="../partman.cpp" line="439"/>
         <source>&amp;Remove partition</source>
         <translation>&amp;Supprimer une partition</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="446"/>
+        <location filename="../partman.cpp" line="448"/>
         <source>&amp;Lock</source>
         <translation>&amp;Verrouiller</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="450"/>
+        <location filename="../partman.cpp" line="452"/>
         <source>&amp;Unlock</source>
         <translation>&amp;Déverrouiller</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="454"/>
-        <location filename="../partman.cpp" line="594"/>
+        <location filename="../partman.cpp" line="456"/>
+        <location filename="../partman.cpp" line="609"/>
         <source>Add to crypttab</source>
         <translation>Ajouter à crypttab</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="461"/>
+        <location filename="../partman.cpp" line="463"/>
         <source>New subvolume</source>
         <translation>Nouveau sous-volume</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="462"/>
+        <location filename="../partman.cpp" line="464"/>
         <source>Scan subvolumes</source>
         <translation>Analyse des sous-volumes</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="485"/>
+        <location filename="../partman.cpp" line="487"/>
         <source>New &amp;layout</source>
         <translation>Nouvelle &amp;configuration</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="486"/>
+        <location filename="../partman.cpp" line="488"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Réinitialiser la configuration</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="488"/>
+        <location filename="../partman.cpp" line="490"/>
         <source>Layout &amp;Builder...</source>
         <translation>Configurer les &amp;partitions</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="509"/>
+        <location filename="../partman.cpp" line="511"/>
         <source>Default subvolume</source>
         <translation>Sous-volume par défaut</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="510"/>
+        <location filename="../partman.cpp" line="512"/>
         <source>Remove subvolume</source>
         <translation>Supprimer un sous-volume</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="592"/>
+        <location filename="../partman.cpp" line="607"/>
         <source>Unlock Drive</source>
         <translation>Déverrouiller le périphérique</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="597"/>
+        <location filename="../partman.cpp" line="612"/>
         <source>Password:</source>
         <translation>Mot de passe&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="623"/>
+        <location filename="../partman.cpp" line="638"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>Impossible de déverrouiller l’appareil. Mot de passe probablement incorrect.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="651"/>
+        <location filename="../partman.cpp" line="666"/>
         <source>Failed to close %1</source>
         <translation>Impossible de fermer %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="695"/>
+        <location filename="../partman.cpp" line="710"/>
         <source>Invalid subvolume label</source>
         <translation>Étiquette de sous-volume non valide</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="704"/>
+        <location filename="../partman.cpp" line="719"/>
         <source>Duplicate subvolume label</source>
         <translation>Doublon d’étiquette de sous-volume</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="714"/>
+        <location filename="../partman.cpp" line="729"/>
         <source>Invalid use for %1: %2</source>
         <translation>Utilisation non valide pour %1 : %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="725"/>
+        <location filename="../partman.cpp" line="740"/>
         <source>%1 is already selected for: %2</source>
         <translation>%1 est déjà sélectionné pour&#xa0;: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="739"/>
+        <location filename="../partman.cpp" line="754"/>
         <source>A root partition of at least %1 is required.</source>
         <translation>Une partition racine « root » d’au moins %1 est requise.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="745"/>
+        <location filename="../partman.cpp" line="760"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>Impossible de préserver /home à l’intérieur de root (/) si une partition /home séparée est également montée.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="752"/>
+        <location filename="../partman.cpp" line="767"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>Préparer la table de partition %1 sur %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="758"/>
+        <location filename="../partman.cpp" line="773"/>
         <source>Reuse (no reformat) %1</source>
         <translation>Réutilisation (pas de reformatage) %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="761"/>
+        <location filename="../partman.cpp" line="776"/>
         <source>Format %1</source>
         <translation>Formatage %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="762"/>
+        <location filename="../partman.cpp" line="777"/>
         <source>Format %1 to use for %2</source>
         <translation>Format %1 à utiliser pour %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="763"/>
+        <location filename="../partman.cpp" line="778"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Réutilisation (pas de reformatage) %1 comme %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="764"/>
+        <location filename="../partman.cpp" line="779"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>Effacer les données sur %1 sauf pour /home, à utiliser pour %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="767"/>
+        <location filename="../partman.cpp" line="782"/>
         <source>Create %1 without formatting</source>
         <translation>Créer %1 sans formatage</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="768"/>
+        <location filename="../partman.cpp" line="783"/>
         <source>Create %1, format to use for %2</source>
         <translation>Créer %1, format à utiliser pour %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="777"/>
+        <location filename="../partman.cpp" line="792"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation>Réutiliser le sous-volume %1 en tant que %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="779"/>
+        <location filename="../partman.cpp" line="794"/>
         <source>Delete subvolume %1</source>
         <translation>Supprimer le sous-volume %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="782"/>
+        <location filename="../partman.cpp" line="797"/>
         <source>Overwrite subvolume %1</source>
         <translation>Écraser le sous-volume %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="783"/>
+        <location filename="../partman.cpp" line="798"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation>Écraser le sous-volume %1 pour l’utiliser pour %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="785"/>
+        <location filename="../partman.cpp" line="800"/>
         <source>Create subvolume %1</source>
         <translation>Créer le sous-volume %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="786"/>
+        <location filename="../partman.cpp" line="801"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation>Créer le sous-volume %1 pour l’utiliser pour %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="802"/>
+        <location filename="../partman.cpp" line="817"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Vous devez choisir une partition d’amorçage « boot partition » séparée lorsque vous cryptez la racine « root ».</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="803"/>
-        <location filename="../partman.cpp" line="864"/>
-        <location filename="../partman.cpp" line="882"/>
-        <location filename="../partman.cpp" line="908"/>
+        <location filename="../partman.cpp" line="818"/>
+        <location filename="../partman.cpp" line="879"/>
+        <location filename="../partman.cpp" line="897"/>
+        <location filename="../partman.cpp" line="923"/>
         <source>Are you sure you want to continue?</source>
         <translation>Êtes-vous certain de vouloir continuer&#xa0;?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="836"/>
+        <location filename="../partman.cpp" line="851"/>
         <source>%1 (%2) requires %3</source>
         <translation>%1 (%2) exige %3</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="862"/>
+        <location filename="../partman.cpp" line="877"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>L’installation peut échouer parce que les volumes suivants sont trop petits&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="875"/>
+        <location filename="../partman.cpp" line="890"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation>Ce système utilise l’EFI, mais aucune partition système EFI valide n’a été attribuée à /boot/efi séparément.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="878"/>
+        <location filename="../partman.cpp" line="893"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation>Le volume attribué à /boot/efi n’est pas une partition système EFI valide.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="905"/>
+        <location filename="../partman.cpp" line="920"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>Les disques suivants sont, ou seront, configurés avec GPT, mais n’ont pas de partition BIOS-GRUB&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="907"/>
+        <location filename="../partman.cpp" line="922"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>Ce système ne peut pas démarrer à partir de disques GPT sans une partition BIOS-GRUB.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="945"/>
+        <location filename="../partman.cpp" line="960"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Les disques contenant les partitions choisies pour l’installation sont défectueux&#xa0;:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="964"/>
         <source>Smartmon tool output:</source>
         <translation>Résultat de l’outil Smartmon&#xa0;: </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="950"/>
+        <location filename="../partman.cpp" line="965"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Les disques avec les partitions que vous avez sélectionnées pour l’installation passent le test du moniteur SMART (smartctl), mais les tests indiquent qu’il aura un taux de défaillance supérieur à la moyenne dans un avenir proche.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="957"/>
+        <location filename="../partman.cpp" line="972"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>En cas de doute, veuillez quitter le programme d’installation et lancer GSmartControl pour plus d’informations.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="961"/>
+        <location filename="../partman.cpp" line="976"/>
         <source>Do you want to abort the installation?</source>
         <translation>Voulez-vous abandonner l’installation&#xa0;?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="967"/>
+        <location filename="../partman.cpp" line="982"/>
         <source>Do you want to continue?</source>
         <translation>Voulez-vous continuer&#xa0;?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1053"/>
+        <location filename="../partman.cpp" line="1068"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Impossible de préparer les partitions requises.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1092"/>
+        <location filename="../partman.cpp" line="1107"/>
         <source>Preparing partition tables</source>
         <translation>Préparation des tables de partition</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1109"/>
+        <location filename="../partman.cpp" line="1124"/>
         <source>Preparing required partitions</source>
         <translation>Préparation des partitions requises</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1172"/>
+        <location filename="../partman.cpp" line="1187"/>
         <source>Failed to format LUKS container.</source>
         <translation>Impossible de formater le conteneur LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1176"/>
+        <location filename="../partman.cpp" line="1191"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Création du disque crypté&#xa0;: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1185"/>
+        <location filename="../partman.cpp" line="1200"/>
         <source>Failed to open LUKS container.</source>
         <translation>Impossible d’ouvrir le conteneur LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1198"/>
+        <location filename="../partman.cpp" line="1213"/>
         <source>Failed to format partition.</source>
         <translation>Impossible de formater la partition.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1205"/>
+        <location filename="../partman.cpp" line="1220"/>
         <source>Formatting: %1</source>
         <translation>Formatage&#xa0;: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1263"/>
+        <location filename="../partman.cpp" line="1278"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>La préparation des sous-volumes a échoué.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1264"/>
+        <location filename="../partman.cpp" line="1279"/>
         <source>Preparing subvolumes</source>
         <translation>Préparation des sous-volumes</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1374"/>
+        <location filename="../partman.cpp" line="1389"/>
         <source>Failed to mount partition.</source>
         <translation>Impossible de monter la partition.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1379"/>
+        <location filename="../partman.cpp" line="1394"/>
         <source>Mounting: %1</source>
         <translation>Montage&#xa0;: %1</translation>
     </message>
@@ -1857,22 +1862,22 @@ Veuillez choisir un nom différent.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2461"/>
+        <location filename="../partman.cpp" line="2476"/>
         <source>&amp;Templates</source>
         <translation>&amp;Modèles</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2469"/>
+        <location filename="../partman.cpp" line="2484"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compression (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2471"/>
+        <location filename="../partman.cpp" line="2486"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compression (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2473"/>
+        <location filename="../partman.cpp" line="2488"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compression (&amp;ZLIB)</translation>
     </message>
@@ -1972,12 +1977,11 @@ Veuillez noter que ceci est expérimental. Les futures versions de l’installat
         <translation>Ne démontez pas /mnt/antiX et ne fermez aucun des conteneurs LUKS associés lorsque vous avez terminé.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="110"/>
         <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation>Un autre mode de test pour l’installateur, les partitions/disques vont être FORMATÉS, il ne copiera pas les fichiers.</translation>
+        <translation type="vanished">Un autre mode de test pour l’installateur, les partitions/disques vont être FORMATÉS, il ne copiera pas les fichiers.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="111"/>
+        <location filename="../app.cpp" line="110"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
@@ -1986,58 +1990,58 @@ Au redémarrage, le programme d’installation sera lancé avec --oobe pour que 
 Ceci est utile pour les installations OEM, pour vendre ou donner un ordinateur avec un système d’exploitation préchargé dessus.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="114"/>
+        <location filename="../app.cpp" line="113"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
         <translation>Option d’expérience hors du commun.
 Il sera lancé automatiquement s’il est installé avec l’option --oem.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="116"/>
+        <location filename="../app.cpp" line="115"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
         <translation>Mode de test pour l’interface graphique GUI, vous pouvez passer à différents écrans sans installer activement.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="117"/>
+        <location filename="../app.cpp" line="116"/>
         <source>Reboots automatically when done installing.</source>
         <translation>Redémarre automatiquement après installation.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="118"/>
+        <location filename="../app.cpp" line="117"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
         <translation>Installation avec rsync au lieu de cp sur un partitionnement personnalisé.
 -- ne formate pas /root et ne fonctionne pas avec le cryptage.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="120"/>
+        <location filename="../app.cpp" line="119"/>
         <source>Always check the installation media at the beginning.</source>
         <translation>Toujours vérifier le support d’installation au début.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="121"/>
+        <location filename="../app.cpp" line="120"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
         <translation>Ne pas vérifier le support d’installation au début.
 Non recommandé sauf si le support d’installation est garanti sans erreur.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="123"/>
+        <location filename="../app.cpp" line="122"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Charger un fichier de configuration tel que spécifié par &lt;config-file&gt;.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="127"/>
+        <location filename="../app.cpp" line="126"/>
         <source>Too many arguments. Please check the command format by running the program with --help</source>
         <translation>Trop d’arguments. Veuillez vérifier le format de la commande en exécutant le programme avec --help</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="132"/>
+        <location filename="../app.cpp" line="131"/>
         <source>%1 Installer</source>
         <translation>%1 Programme d’installation</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="140"/>
+        <location filename="../app.cpp" line="139"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -2045,12 +2049,12 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Veuillez le fermer si possible, ou lancer « pkill minstall » dans un terminal.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="147"/>
+        <location filename="../app.cpp" line="146"/>
         <source>This operation requires root access.</source>
         <translation>Cette opération nécessite un accès root.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="168"/>
+        <location filename="../app.cpp" line="167"/>
         <source>Configuration file (%1) not found.</source>
         <translation>Fichier de configuration (%1) introuvable.</translation>
     </message>
