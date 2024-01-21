@@ -63,8 +63,10 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     gui.treePartitions->setItemDelegate(new ItemDelegate);
     gui.treePartitions->header()->setMinimumSectionSize(5);
     gui.treePartitions->setContextMenuPolicy(Qt::CustomContextMenu);
+    showAdvancedFields(gui.pushAdvancedFields->isChecked());
     connect(gui.treePartitions, &QTreeView::customContextMenuRequested, this, &PartMan::treeMenu);
     connect(gui.treePartitions->selectionModel(), &QItemSelectionModel::selectionChanged, this, &PartMan::treeSelChange);
+    connect(gui.pushAdvancedFields, &QToolButton::toggled, this, &PartMan::showAdvancedFields);
     connect(gui.pushPartClear, &QToolButton::clicked, this, &PartMan::partClearClick);
     connect(gui.pushPartAdd, &QToolButton::clicked, this, &PartMan::partAddClick);
     connect(gui.pushPartRemove, &QToolButton::clicked, this, &PartMan::partRemoveClick);
@@ -515,6 +517,19 @@ void PartMan::treeMenu(const QPoint &)
         QAction *action = menu.exec(QCursor::pos());
         if (action == actDefault) seldev->setActive(action->isChecked());
         else if (action == actRemSubvolume) delete seldev;
+    }
+}
+
+void PartMan::showAdvancedFields(bool show) noexcept
+{
+    for (int ixi = 0; ixi < TREE_COLUMNS; ++ixi) {
+        if (colprops[ixi].advanced) {
+            if (show) {
+                gui.treePartitions->showColumn(ixi);
+            } else {
+                gui.treePartitions->hideColumn(ixi);
+            }
+        }
     }
 }
 
@@ -2272,7 +2287,7 @@ void PartMan::ItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         const QRect &rect = option.rect.adjusted(0, 0, -pen.width(), -pen.width());
         painter->drawRect(rect);
         // Arrow to indicate a drop-down list
-        if(index.column() == PartMan::COL_FORMAT || index.column() == PartMan::COL_USEFOR) {
+        if(colprops[index.column()].dropdown) {
             const int arrowEdgeX = 4, arrowEdgeY = 6, arrowWidth = 8;
             pen.setWidthF(1.5);
             painter->setPen(pen);

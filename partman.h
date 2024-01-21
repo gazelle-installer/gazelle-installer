@@ -60,6 +60,23 @@ public:
         COL_PASS,
         TREE_COLUMNS
     };
+    constexpr static struct ColumnProperties {
+        bool dropdown : 1;
+        bool advanced : 1;
+    } colprops[TREE_COLUMNS] = {
+        {false, false}, // COL_DEVICE
+        {false, false}, // COL_SIZE
+        {false, true}, // COL_FLAG_ACTIVE
+        {false, true}, // COL_FLAG_ESP
+        {true, false}, // COL_USEFOR
+        {false, false}, // COL_LABEL
+        {false, false}, // COL_ENCRYPT
+        {true, false}, // COL_FORMAT
+        {false, false}, // COL_CHECK
+        {false, true}, // COL_OPTIONS
+        {false, true}, // COL_DUMP
+        {false, true} // COL_PASS
+    };
     struct VolumeSpec
     {
         QString defaultLabel;
@@ -117,6 +134,7 @@ private:
     void treeItemChange() noexcept;
     void treeSelChange() noexcept;
     void treeMenu(const QPoint &);
+    void showAdvancedFields(bool show) noexcept;
     void partOptionsMenu(const QPoint &);
     void partClearClick(bool);
     void partAddClick(bool) noexcept;

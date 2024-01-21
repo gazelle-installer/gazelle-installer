@@ -10,6 +10,7 @@
         <file alias="view-refresh">icons/view-refresh.svg</file>
         <file alias="partitionmanager">icons/partitionmanager.svg</file>
         <file alias="show-grid">icons/show-grid.svg</file>
+        <file alias="advanced-fields">icons/advanced-fields.svg</file>
     </qresource>
     <qresource prefix="/gauge">
         <file alias="0">gauge/0.svg</file>
