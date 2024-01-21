@@ -41,37 +41,37 @@ Minimum: %2</source>
 <context>
     <name>Base</name>
     <message>
-        <location filename="../base.cpp" line="55"/>
+        <location filename="../base.cpp" line="63"/>
         <source>Cannot access installation media.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="152"/>
+        <location filename="../base.cpp" line="160"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Не вдалося видалити стару систему на місці призначення.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="155"/>
+        <location filename="../base.cpp" line="163"/>
         <source>Deleting old system</source>
         <translation>Видалення старої системи</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="165"/>
+        <location filename="../base.cpp" line="173"/>
         <source>Failed to set the system configuration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="167"/>
+        <location filename="../base.cpp" line="175"/>
         <source>Setting system configuration</source>
         <translation>Налаштування конфігурації системи</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="245"/>
+        <location filename="../base.cpp" line="253"/>
         <source>Copying new system</source>
         <translation>Копіювання нової системи</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="275"/>
+        <location filename="../base.cpp" line="282"/>
         <source>Failed to copy the new system.</source>
         <translation>Не вдалося скопіювати нову систему.</translation>
     </message>
@@ -1102,7 +1102,7 @@ Do you really want to stop now?</source>
     </message>
     <message>
         <location filename="../meinstall.ui" line="570"/>
-        <location filename="../meinstall.ui" line="1066"/>
+        <location filename="../meinstall.ui" line="1080"/>
         <source>Enable hibernation support</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1117,322 +1117,327 @@ Do you really want to stop now?</source>
         <translation>Вибір розділів</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="621"/>
+        <location filename="../meinstall.ui" line="632"/>
         <source>Show Grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="628"/>
+        <location filename="../meinstall.ui" line="639"/>
         <source>Ctrl+G</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="638"/>
+        <location filename="../meinstall.ui" line="621"/>
         <source>Mark the selected drive to be cleared for a new layout.</source>
         <translation>Позначити вибраний диск, який потрібно очистити для нового макета.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="652"/>
+        <location filename="../meinstall.ui" line="674"/>
         <source>Query the operating system and reload the layouts of all drives.</source>
         <translation>Запит операційної системи та перезавантаження макетів усіх дисків.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="663"/>
+        <location filename="../meinstall.ui" line="652"/>
         <source>Run the partition management application of this operating system.</source>
         <translation>Запустити засіб управління розділами цієї операційної системи.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="674"/>
+        <location filename="../meinstall.ui" line="711"/>
         <source>Add a new partition entry. This only works with a new layout.</source>
         <translation>Додання нового запису розділу. Це працює лише з новим макетом.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="685"/>
+        <location filename="../meinstall.ui" line="663"/>
         <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
         <translation>Вилучити наявний запис із макета. Це працює лише з записами до нового макета.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="741"/>
+        <location filename="../meinstall.ui" line="722"/>
+        <source>Show advanced fields.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="755"/>
         <source>Encryption options</source>
         <translation>Опції шифрування</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="747"/>
+        <location filename="../meinstall.ui" line="761"/>
         <source>Encryption password:</source>
         <translation>Пароль шифрування:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="764"/>
+        <location filename="../meinstall.ui" line="778"/>
         <source>Confirm password:</source>
         <translation>Підтвердьте пароль:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="813"/>
+        <location filename="../meinstall.ui" line="827"/>
         <source>Installation Confirmation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="844"/>
+        <location filename="../meinstall.ui" line="858"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Установити GRUB для Linux та Windows</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="868"/>
+        <location filename="../meinstall.ui" line="882"/>
         <source>Master Boot Record</source>
         <translation>Головний завантажувальний запис</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="874"/>
+        <location filename="../meinstall.ui" line="888"/>
         <source>MBR</source>
         <translation>MBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="877"/>
+        <location filename="../meinstall.ui" line="891"/>
         <source>Alt+B</source>
         <translation>Alt+B</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="899"/>
+        <location filename="../meinstall.ui" line="913"/>
         <source>EFI System Partition</source>
         <translation>Системний розділ EFI</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="902"/>
+        <location filename="../meinstall.ui" line="916"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="934"/>
+        <location filename="../meinstall.ui" line="948"/>
         <source>Partition Boot Record</source>
         <translation>Завантажувальний запис розділу</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="937"/>
+        <location filename="../meinstall.ui" line="951"/>
         <source>PBR</source>
         <translation>PBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="950"/>
+        <location filename="../meinstall.ui" line="964"/>
         <source>System boot disk:</source>
         <translation>Диск завантаження системи:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="963"/>
+        <location filename="../meinstall.ui" line="977"/>
         <source>Location to install on:</source>
         <translation>Розташування для встановлення:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="999"/>
+        <location filename="../meinstall.ui" line="1013"/>
         <source>Create a swap file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1016"/>
+        <location filename="../meinstall.ui" line="1030"/>
         <source> MB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1036"/>
+        <location filename="../meinstall.ui" line="1050"/>
         <source>Size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1059"/>
+        <location filename="../meinstall.ui" line="1073"/>
         <source>Location:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1098"/>
+        <location filename="../meinstall.ui" line="1112"/>
         <source>Common Services to Enable</source>
         <translation>Загальні служби для увімкнення</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1117"/>
+        <location filename="../meinstall.ui" line="1131"/>
         <source>Service</source>
         <translation>Служба</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1122"/>
+        <location filename="../meinstall.ui" line="1136"/>
         <source>Description</source>
         <translation>Опис</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1155"/>
+        <location filename="../meinstall.ui" line="1169"/>
         <source>Computer Network Names</source>
         <translation>Назви комп’ютерних мереж</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1182"/>
+        <location filename="../meinstall.ui" line="1196"/>
         <source>Workgroup</source>
         <translation>Робоча група:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1195"/>
+        <location filename="../meinstall.ui" line="1209"/>
         <source>Workgroup:</source>
         <translation>Робоча група:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1208"/>
+        <location filename="../meinstall.ui" line="1222"/>
         <source>SaMBa Server for MS Networking</source>
         <translation>Сервер SaMBa для мережі MS</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1224"/>
+        <location filename="../meinstall.ui" line="1238"/>
         <source>example.dom</source>
         <translation>example.dom</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1237"/>
+        <location filename="../meinstall.ui" line="1251"/>
         <source>Computer domain:</source>
         <translation>Домен комп&apos;ютера:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1263"/>
+        <location filename="../meinstall.ui" line="1277"/>
         <source>Computer name:</source>
         <translation>Назва комп&apos;ютера:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1324"/>
+        <location filename="../meinstall.ui" line="1338"/>
         <source>Configure Clock</source>
         <translation>Налаштувати годинник</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1365"/>
+        <location filename="../meinstall.ui" line="1379"/>
         <source>Format:</source>
         <translation>Формат:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1393"/>
+        <location filename="../meinstall.ui" line="1407"/>
         <source>Timezone:</source>
         <translation>Часовий пояс:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1438"/>
+        <location filename="../meinstall.ui" line="1452"/>
         <source>System clock uses local time</source>
         <translation>Системний годинник використовує місцевий час</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1470"/>
+        <location filename="../meinstall.ui" line="1484"/>
         <source>Localization Defaults</source>
         <translation>Типова мова</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1510"/>
+        <location filename="../meinstall.ui" line="1524"/>
         <source>Locale:</source>
         <translation>Мова:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1532"/>
+        <location filename="../meinstall.ui" line="1546"/>
         <source>Service Settings (advanced)</source>
         <translation>Налаштування служб (розширені)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1550"/>
+        <location filename="../meinstall.ui" line="1564"/>
         <source>Adjust which services should run at startup</source>
         <translation>Налаштуйте, які служби мають запускатися під час запуску системи</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1553"/>
+        <location filename="../meinstall.ui" line="1567"/>
         <source>View</source>
         <translation>Вигляд</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1598"/>
+        <location filename="../meinstall.ui" line="1612"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
         <translation>Зміни стільниці, зроблені в live-середовищі, будуть перенесені на встановлену ОС</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1601"/>
+        <location filename="../meinstall.ui" line="1615"/>
         <source>Save live desktop changes</source>
         <translation>Зберегти поточні зміни стільниці</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1614"/>
+        <location filename="../meinstall.ui" line="1628"/>
         <source>Default User Account</source>
         <translation>Типовий обліковий запис користувача</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1626"/>
+        <location filename="../meinstall.ui" line="1640"/>
         <source>Default user login name:</source>
         <translation>Типове ім&apos;я користувача для входу:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1645"/>
+        <location filename="../meinstall.ui" line="1659"/>
         <source>username</source>
         <translation>ім&apos;я користувача</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1658"/>
+        <location filename="../meinstall.ui" line="1672"/>
         <source>Default user password:</source>
         <translation>Типовий пароль користувача:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1687"/>
+        <location filename="../meinstall.ui" line="1701"/>
         <source>Confirm user password:</source>
         <translation>Підтвердити пароль користувача:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1719"/>
+        <location filename="../meinstall.ui" line="1733"/>
         <source>Root (administrator) Account</source>
         <translation>Обліковий запис root (адміністратора).</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1737"/>
+        <location filename="../meinstall.ui" line="1751"/>
         <source>Root password:</source>
         <translation>Пароль root:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1766"/>
+        <location filename="../meinstall.ui" line="1780"/>
         <source>Confirm root password:</source>
         <translation>Підтвердити пароль root:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1798"/>
+        <location filename="../meinstall.ui" line="1812"/>
         <source>Autologin</source>
         <translation>Автовхід</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1834"/>
+        <location filename="../meinstall.ui" line="1848"/>
         <source>Existing Home Directory</source>
         <translation>Наявний домашній каталог</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1843"/>
+        <location filename="../meinstall.ui" line="1857"/>
         <source>What would you like to do with the old directory?</source>
         <translation>Що б ви хотіли зробити зі старим каталогом?</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1850"/>
+        <location filename="../meinstall.ui" line="1864"/>
         <source>Re-use it for this installation</source>
         <translation>Повторно використати для цього встановлення</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1857"/>
+        <location filename="../meinstall.ui" line="1871"/>
         <source>Rename it and create a new directory</source>
         <translation>Перейменувати та створити новий каталог</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1864"/>
+        <location filename="../meinstall.ui" line="1878"/>
         <source>Delete it and create a new directory</source>
         <translation>Видалити та створити новий каталог</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1909"/>
+        <location filename="../meinstall.ui" line="1923"/>
         <source>Tips</source>
         <translation>Поради</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1953"/>
+        <location filename="../meinstall.ui" line="1967"/>
         <source>Installation complete</source>
         <translation>Установлення завершено</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1959"/>
+        <location filename="../meinstall.ui" line="1973"/>
         <source>Automatically reboot the system when the installer is closed</source>
         <translation>Автоматично перезавантажити систему після закриття встановлювача</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1978"/>
+        <location filename="../meinstall.ui" line="1992"/>
         <source>Reminders</source>
         <translation>Нагадування</translation>
     </message>
@@ -1535,322 +1540,322 @@ Please select a different name.</source>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="../partman.cpp" line="214"/>
+        <location filename="../partman.cpp" line="216"/>
         <source>Virtual Devices</source>
         <translation>Віртуальні пристрої</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="435"/>
-        <location filename="../partman.cpp" line="482"/>
+        <location filename="../partman.cpp" line="437"/>
+        <location filename="../partman.cpp" line="484"/>
         <source>&amp;Add partition</source>
         <translation>&amp;Додати розділ</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="437"/>
+        <location filename="../partman.cpp" line="439"/>
         <source>&amp;Remove partition</source>
         <translation>&amp;Вилучити розділ</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="446"/>
+        <location filename="../partman.cpp" line="448"/>
         <source>&amp;Lock</source>
         <translation>&amp;Заблокувати</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="450"/>
+        <location filename="../partman.cpp" line="452"/>
         <source>&amp;Unlock</source>
         <translation>&amp;Розблокувати</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="454"/>
-        <location filename="../partman.cpp" line="594"/>
+        <location filename="../partman.cpp" line="456"/>
+        <location filename="../partman.cpp" line="609"/>
         <source>Add to crypttab</source>
         <translation>Додати до crypttab</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="461"/>
+        <location filename="../partman.cpp" line="463"/>
         <source>New subvolume</source>
         <translation>Новий підтом</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="462"/>
+        <location filename="../partman.cpp" line="464"/>
         <source>Scan subvolumes</source>
         <translation>Сканувати підтоми</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="485"/>
+        <location filename="../partman.cpp" line="487"/>
         <source>New &amp;layout</source>
         <translation>Новий &amp;макет</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="486"/>
+        <location filename="../partman.cpp" line="488"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Скинути макет</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="488"/>
+        <location filename="../partman.cpp" line="490"/>
         <source>Layout &amp;Builder...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="509"/>
+        <location filename="../partman.cpp" line="511"/>
         <source>Default subvolume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="510"/>
+        <location filename="../partman.cpp" line="512"/>
         <source>Remove subvolume</source>
         <translation>Вилучити підтом</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="592"/>
+        <location filename="../partman.cpp" line="607"/>
         <source>Unlock Drive</source>
         <translation>Розблокувати диск</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="597"/>
+        <location filename="../partman.cpp" line="612"/>
         <source>Password:</source>
         <translation>Пароль:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="623"/>
+        <location filename="../partman.cpp" line="638"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>Не вдалося розблокувати пристрій. Можливо неправильний пароль.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="651"/>
+        <location filename="../partman.cpp" line="666"/>
         <source>Failed to close %1</source>
         <translation>Не вдалося закрити %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="695"/>
+        <location filename="../partman.cpp" line="710"/>
         <source>Invalid subvolume label</source>
         <translation>Недійсна мітка підтому</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="704"/>
+        <location filename="../partman.cpp" line="719"/>
         <source>Duplicate subvolume label</source>
         <translation>Дубльована мітка підтому</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="714"/>
+        <location filename="../partman.cpp" line="729"/>
         <source>Invalid use for %1: %2</source>
         <translation>Недійсне використання для %1: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="725"/>
+        <location filename="../partman.cpp" line="740"/>
         <source>%1 is already selected for: %2</source>
         <translation>%1 вже обрано для: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="739"/>
+        <location filename="../partman.cpp" line="754"/>
         <source>A root partition of at least %1 is required.</source>
         <translation>Потрібен кореневий (root) розділ принаймні для %1.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="745"/>
+        <location filename="../partman.cpp" line="760"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>Неможливо зберегти /home в корені (/), якщо також змонтовано окремий розділ /home.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="752"/>
+        <location filename="../partman.cpp" line="767"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>Підготувати таблицю розділів %1 на %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="758"/>
+        <location filename="../partman.cpp" line="773"/>
         <source>Reuse (no reformat) %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="761"/>
+        <location filename="../partman.cpp" line="776"/>
         <source>Format %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="762"/>
+        <location filename="../partman.cpp" line="777"/>
         <source>Format %1 to use for %2</source>
         <translation>Форматувати %1 для використання для %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="763"/>
+        <location filename="../partman.cpp" line="778"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Повторне використати (без переформатування) %1 як %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="764"/>
+        <location filename="../partman.cpp" line="779"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>Видалити дані на %1, за винятком /home, для використання для %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="767"/>
+        <location filename="../partman.cpp" line="782"/>
         <source>Create %1 without formatting</source>
         <translation>Створити %1 без форматування</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="768"/>
+        <location filename="../partman.cpp" line="783"/>
         <source>Create %1, format to use for %2</source>
         <translation>Створити %1, форматувати для %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="777"/>
+        <location filename="../partman.cpp" line="792"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="779"/>
+        <location filename="../partman.cpp" line="794"/>
         <source>Delete subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="782"/>
+        <location filename="../partman.cpp" line="797"/>
         <source>Overwrite subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="783"/>
+        <location filename="../partman.cpp" line="798"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="785"/>
+        <location filename="../partman.cpp" line="800"/>
         <source>Create subvolume %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="786"/>
+        <location filename="../partman.cpp" line="801"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="802"/>
+        <location filename="../partman.cpp" line="817"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Ви повинні вибрати окремий завантажувальний розділ під час шифрування root.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="803"/>
-        <location filename="../partman.cpp" line="864"/>
-        <location filename="../partman.cpp" line="882"/>
-        <location filename="../partman.cpp" line="908"/>
+        <location filename="../partman.cpp" line="818"/>
+        <location filename="../partman.cpp" line="879"/>
+        <location filename="../partman.cpp" line="897"/>
+        <location filename="../partman.cpp" line="923"/>
         <source>Are you sure you want to continue?</source>
         <translation>Ви впевнені, що бажаєте продовжити?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="836"/>
+        <location filename="../partman.cpp" line="851"/>
         <source>%1 (%2) requires %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="862"/>
+        <location filename="../partman.cpp" line="877"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="875"/>
+        <location filename="../partman.cpp" line="890"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="878"/>
+        <location filename="../partman.cpp" line="893"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="905"/>
+        <location filename="../partman.cpp" line="920"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>Наступні диски налаштовані або будуть налаштовані за допомогою GPT, але не мають розділу BIOS-GRUB:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="907"/>
+        <location filename="../partman.cpp" line="922"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>Ця система може не завантажуватися з дисків GPT без розділу BIOS-GRUB.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="945"/>
+        <location filename="../partman.cpp" line="960"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Диски з розділами, які ви вибрали для встановлення, несправні:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="964"/>
         <source>Smartmon tool output:</source>
         <translation>Підсумок засобу Smartmon:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="950"/>
+        <location filename="../partman.cpp" line="965"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Диски з розділами, які ви вибрали для встановлення, пройшли перевірку монітора SMART (smartctl), але перевірки вказують на те, що найближчим часом частота відмов буде вищою за середню.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="957"/>
+        <location filename="../partman.cpp" line="972"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>Якщо ви не впевнені, вийдіть з установлювача та запустіть GSmartControl, щоб отримати подробиці.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="961"/>
+        <location filename="../partman.cpp" line="976"/>
         <source>Do you want to abort the installation?</source>
         <translation>Ви хочете перервати встановлення? </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="967"/>
+        <location filename="../partman.cpp" line="982"/>
         <source>Do you want to continue?</source>
         <translation>Бажаєте продовжити? </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1053"/>
+        <location filename="../partman.cpp" line="1068"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Не вдалося підготувати необхідні розділи.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1092"/>
+        <location filename="../partman.cpp" line="1107"/>
         <source>Preparing partition tables</source>
         <translation>Підготування таблиць розділів</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1109"/>
+        <location filename="../partman.cpp" line="1124"/>
         <source>Preparing required partitions</source>
         <translation>Підготування потрібних розділів</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1172"/>
+        <location filename="../partman.cpp" line="1187"/>
         <source>Failed to format LUKS container.</source>
         <translation>Не вдалося відформатувати контейнер LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1176"/>
+        <location filename="../partman.cpp" line="1191"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Створення зашифрованого тому: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1185"/>
+        <location filename="../partman.cpp" line="1200"/>
         <source>Failed to open LUKS container.</source>
         <translation>Не вдалося відкрити контейнер LUKS.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1198"/>
+        <location filename="../partman.cpp" line="1213"/>
         <source>Failed to format partition.</source>
         <translation>Не вдалося відформатувати розділ.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1205"/>
+        <location filename="../partman.cpp" line="1220"/>
         <source>Formatting: %1</source>
         <translation>Форматування: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1263"/>
+        <location filename="../partman.cpp" line="1278"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>Не вдалося підготувати підтоми.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1264"/>
+        <location filename="../partman.cpp" line="1279"/>
         <source>Preparing subvolumes</source>
         <translation>Підготування підтомів</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1374"/>
+        <location filename="../partman.cpp" line="1389"/>
         <source>Failed to mount partition.</source>
         <translation>Не вдалося змонтувати розділ.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1379"/>
+        <location filename="../partman.cpp" line="1394"/>
         <source>Mounting: %1</source>
         <translation>Монтування: %1</translation>
     </message>
@@ -1858,22 +1863,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2461"/>
+        <location filename="../partman.cpp" line="2476"/>
         <source>&amp;Templates</source>
         <translation>&amp;Шаблони</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2469"/>
+        <location filename="../partman.cpp" line="2484"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Стиснення (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2471"/>
+        <location filename="../partman.cpp" line="2486"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Стиснення (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2473"/>
+        <location filename="../partman.cpp" line="2488"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Стиснення (&amp;ZLIB)</translation>
     </message>
@@ -1973,12 +1978,11 @@ Please note, this is experimental. Future installer versions may break compatibi
         <translation>Не відмонтовуйте /mnt/antiX і не закривайте жодного з пов’язаних контейнерів LUKS після завершення.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="110"/>
         <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation>Інший режим тестування для встановлювача, розділи/диски буде ФОРМАТОВАНО, копіювання файлів буде пропущено.</translation>
+        <translation type="vanished">Інший режим тестування для встановлювача, розділи/диски буде ФОРМАТОВАНО, копіювання файлів буде пропущено.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="111"/>
+        <location filename="../app.cpp" line="110"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
@@ -1987,57 +1991,57 @@ This is useful for OEM installations, selling or giving away a computer with an 
 Це корисно для встановлення OEM, продажу чи роздачі комп’ютера з попередньо завантаженою ОС.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="114"/>
+        <location filename="../app.cpp" line="113"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
         <translation>Опція Out Of Box Experience.
 Вона запуститься автоматично, якщо встановлено з опцією --oem.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="116"/>
+        <location filename="../app.cpp" line="115"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
         <translation>Тестовий режим для GUI, ви можете переходити до різних екранів без фактичного встановлення.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="117"/>
+        <location filename="../app.cpp" line="116"/>
         <source>Reboots automatically when done installing.</source>
         <translation>Після встановлення автоматично перезавантажується.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="118"/>
+        <location filename="../app.cpp" line="117"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
         <translation>Встановлення за допомогою rsync замість cp на спеціальному розділі.
 -- не форматує /root і не працює з шифруванням.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="120"/>
+        <location filename="../app.cpp" line="119"/>
         <source>Always check the installation media at the beginning.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="121"/>
+        <location filename="../app.cpp" line="120"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="123"/>
+        <location filename="../app.cpp" line="122"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Вантаження файлу конфігурації, як зазначено в &lt;config-file&gt;.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="127"/>
+        <location filename="../app.cpp" line="126"/>
         <source>Too many arguments. Please check the command format by running the program with --help</source>
         <translation>Забагато аргументів. Перевірте формат команди, запустивши програму за допомогою --help</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="132"/>
+        <location filename="../app.cpp" line="131"/>
         <source>%1 Installer</source>
         <translation>Установлювач %1</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="140"/>
+        <location filename="../app.cpp" line="139"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -2046,12 +2050,12 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Закрийте його, якщо можливо, або запустіть «pkill minstall» у консолі.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="147"/>
+        <location filename="../app.cpp" line="146"/>
         <source>This operation requires root access.</source>
         <translation>Для цієї операції потрібен доступ root.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="168"/>
+        <location filename="../app.cpp" line="167"/>
         <source>Configuration file (%1) not found.</source>
         <translation>Файл конфігурації (%1) не знайдено.</translation>
     </message>

@@ -42,37 +42,37 @@ En az: %2</translation>
 <context>
     <name>Base</name>
     <message>
-        <location filename="../base.cpp" line="55"/>
+        <location filename="../base.cpp" line="63"/>
         <source>Cannot access installation media.</source>
         <translation>Kurulum ortamına erişilemiyor.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="152"/>
+        <location filename="../base.cpp" line="160"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Hedefdeki eski sistem silinemedi.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="155"/>
+        <location filename="../base.cpp" line="163"/>
         <source>Deleting old system</source>
         <translation>Eski sistem siliniyor</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="165"/>
+        <location filename="../base.cpp" line="173"/>
         <source>Failed to set the system configuration.</source>
         <translation>Sistem yapılandırması ayarlanamadı.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="167"/>
+        <location filename="../base.cpp" line="175"/>
         <source>Setting system configuration</source>
         <translation>Sistem yapılandırma ayarları</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="245"/>
+        <location filename="../base.cpp" line="253"/>
         <source>Copying new system</source>
         <translation>Yeni sistem kopyalanıyor</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="275"/>
+        <location filename="../base.cpp" line="282"/>
         <source>Failed to copy the new system.</source>
         <translation>Yeni sistem kopyalanamadı.</translation>
     </message>
@@ -1103,7 +1103,7 @@ Gerçekten şimdi durdurmak istiyor musunuz?</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="570"/>
-        <location filename="../meinstall.ui" line="1066"/>
+        <location filename="../meinstall.ui" line="1080"/>
         <source>Enable hibernation support</source>
         <translation>Hazırda bekletme desteğini etkinleştir</translation>
     </message>
@@ -1118,322 +1118,327 @@ Gerçekten şimdi durdurmak istiyor musunuz?</translation>
         <translation>Bölümleri seçin</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="621"/>
+        <location filename="../meinstall.ui" line="632"/>
         <source>Show Grid</source>
         <translation>Izgarayı Göster</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="628"/>
+        <location filename="../meinstall.ui" line="639"/>
         <source>Ctrl+G</source>
         <translation>Ctrl+G</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="638"/>
+        <location filename="../meinstall.ui" line="621"/>
         <source>Mark the selected drive to be cleared for a new layout.</source>
         <translation>Yeni bir düzen için temizlenecek sürücüyü seçip işaretleyin. </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="652"/>
+        <location filename="../meinstall.ui" line="674"/>
         <source>Query the operating system and reload the layouts of all drives.</source>
         <translation>İşletim sistemini sorgulayın ve tüm sürücülerin düzenlerini yeniden yükleyin. </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="663"/>
+        <location filename="../meinstall.ui" line="652"/>
         <source>Run the partition management application of this operating system.</source>
         <translation>Bu işletim sisteminin bölümlendime yönetimi uygulamasını çalıştırın. </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="674"/>
+        <location filename="../meinstall.ui" line="711"/>
         <source>Add a new partition entry. This only works with a new layout.</source>
         <translation>Yeni bir bölüm girdisi ekleyin. Bu yalnızca yeni bir düzen ile çalışır. </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="685"/>
+        <location filename="../meinstall.ui" line="663"/>
         <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
         <translation>Var olan bir girişi yerleşimden kaldırın. Bu, yalnızca yeni bir yerleşime yapılan girişlerle çalışır.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="741"/>
+        <location filename="../meinstall.ui" line="722"/>
+        <source>Show advanced fields.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="755"/>
         <source>Encryption options</source>
         <translation>Şifreleme seçenekleri</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="747"/>
+        <location filename="../meinstall.ui" line="761"/>
         <source>Encryption password:</source>
         <translation>Şifreleme parolası:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="764"/>
+        <location filename="../meinstall.ui" line="778"/>
         <source>Confirm password:</source>
         <translation>Parolayı onayla:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="813"/>
+        <location filename="../meinstall.ui" line="827"/>
         <source>Installation Confirmation</source>
         <translation>Kurulum Onayı</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="844"/>
+        <location filename="../meinstall.ui" line="858"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Windows ve Linux için GRUB kur</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="868"/>
+        <location filename="../meinstall.ui" line="882"/>
         <source>Master Boot Record</source>
         <translation>Ana Önyükleme Kaydı</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="874"/>
+        <location filename="../meinstall.ui" line="888"/>
         <source>MBR</source>
         <translation>MBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="877"/>
+        <location filename="../meinstall.ui" line="891"/>
         <source>Alt+B</source>
         <translation>Alt+B</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="899"/>
+        <location filename="../meinstall.ui" line="913"/>
         <source>EFI System Partition</source>
         <translation>EFİ Sistem Bölümü</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="902"/>
+        <location filename="../meinstall.ui" line="916"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="934"/>
+        <location filename="../meinstall.ui" line="948"/>
         <source>Partition Boot Record</source>
         <translation>Bölüm Önyükleme Kaydı</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="937"/>
+        <location filename="../meinstall.ui" line="951"/>
         <source>PBR</source>
         <translation>PBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="950"/>
+        <location filename="../meinstall.ui" line="964"/>
         <source>System boot disk:</source>
         <translation>Sistem Önyükleme Diski:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="963"/>
+        <location filename="../meinstall.ui" line="977"/>
         <source>Location to install on:</source>
         <translation>Kurulacak yer:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="999"/>
+        <location filename="../meinstall.ui" line="1013"/>
         <source>Create a swap file</source>
         <translation>Takas dosyası oluştur</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1016"/>
+        <location filename="../meinstall.ui" line="1030"/>
         <source> MB</source>
         <translation> MB</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1036"/>
+        <location filename="../meinstall.ui" line="1050"/>
         <source>Size:</source>
         <translation>Boyut:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1059"/>
+        <location filename="../meinstall.ui" line="1073"/>
         <source>Location:</source>
         <translation>Konum:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1098"/>
+        <location filename="../meinstall.ui" line="1112"/>
         <source>Common Services to Enable</source>
         <translation>Etkinleştirilecek Ortak Hizmetler</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1117"/>
+        <location filename="../meinstall.ui" line="1131"/>
         <source>Service</source>
         <translation>Hizmet</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1122"/>
+        <location filename="../meinstall.ui" line="1136"/>
         <source>Description</source>
         <translation>Açıklama</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1155"/>
+        <location filename="../meinstall.ui" line="1169"/>
         <source>Computer Network Names</source>
         <translation>Bilgisayar Ağ Adları</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1182"/>
+        <location filename="../meinstall.ui" line="1196"/>
         <source>Workgroup</source>
         <translation>Çalışmagrubu</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1195"/>
+        <location filename="../meinstall.ui" line="1209"/>
         <source>Workgroup:</source>
         <translation>Çalışma grubu:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1208"/>
+        <location filename="../meinstall.ui" line="1222"/>
         <source>SaMBa Server for MS Networking</source>
         <translation>MS Ağ iletişimi için SaMBa Sunucusu</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1224"/>
+        <location filename="../meinstall.ui" line="1238"/>
         <source>example.dom</source>
         <translation>örnek.dom</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1237"/>
+        <location filename="../meinstall.ui" line="1251"/>
         <source>Computer domain:</source>
         <translation>Bilgisayar alan adı:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1263"/>
+        <location filename="../meinstall.ui" line="1277"/>
         <source>Computer name:</source>
         <translation>Bilgisayar adı:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1324"/>
+        <location filename="../meinstall.ui" line="1338"/>
         <source>Configure Clock</source>
         <translation>Saati Yapılandır</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1365"/>
+        <location filename="../meinstall.ui" line="1379"/>
         <source>Format:</source>
         <translation>Biçimlendirme:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1393"/>
+        <location filename="../meinstall.ui" line="1407"/>
         <source>Timezone:</source>
         <translation>Saat dilimi:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1438"/>
+        <location filename="../meinstall.ui" line="1452"/>
         <source>System clock uses local time</source>
         <translation>Sistem saati yerel saati kullanır </translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1470"/>
+        <location filename="../meinstall.ui" line="1484"/>
         <source>Localization Defaults</source>
         <translation>Yerelleştirme Öntanımlıları</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1510"/>
+        <location filename="../meinstall.ui" line="1524"/>
         <source>Locale:</source>
         <translation>Bölge</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1532"/>
+        <location filename="../meinstall.ui" line="1546"/>
         <source>Service Settings (advanced)</source>
         <translation>Hizmet Ayarları (gelişmiş)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1550"/>
+        <location filename="../meinstall.ui" line="1564"/>
         <source>Adjust which services should run at startup</source>
         <translation>Hangi hizmetlerin başlangıçta çalışacağını ayarlayın</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1553"/>
+        <location filename="../meinstall.ui" line="1567"/>
         <source>View</source>
         <translation>Görünüm</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1598"/>
+        <location filename="../meinstall.ui" line="1612"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
         <translation>Canlı ortamda yapılan masaüstü değişiklikleri kurulu işletim sistemine taşınır</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1601"/>
+        <location filename="../meinstall.ui" line="1615"/>
         <source>Save live desktop changes</source>
         <translation>Canlı ortamdaki değişiklikleri kaydet</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1614"/>
+        <location filename="../meinstall.ui" line="1628"/>
         <source>Default User Account</source>
         <translation>Öntanımlı Kullanıcı Hesabı</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1626"/>
+        <location filename="../meinstall.ui" line="1640"/>
         <source>Default user login name:</source>
         <translation>Öntanımlı kullanıcı giriş adı:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1645"/>
+        <location filename="../meinstall.ui" line="1659"/>
         <source>username</source>
         <translation>kullanıcı adı</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1658"/>
+        <location filename="../meinstall.ui" line="1672"/>
         <source>Default user password:</source>
         <translation>Öntanımlı kullanıcı parolası:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1687"/>
+        <location filename="../meinstall.ui" line="1701"/>
         <source>Confirm user password:</source>
         <translation>Kullanıcı parolasını onayla:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1719"/>
+        <location filename="../meinstall.ui" line="1733"/>
         <source>Root (administrator) Account</source>
         <translation>Kök (yönetici) Hesabı</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1737"/>
+        <location filename="../meinstall.ui" line="1751"/>
         <source>Root password:</source>
         <translation>Kök parolası:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1766"/>
+        <location filename="../meinstall.ui" line="1780"/>
         <source>Confirm root password:</source>
         <translation>Kök parolasını onayla:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1798"/>
+        <location filename="../meinstall.ui" line="1812"/>
         <source>Autologin</source>
         <translation>Otomatik Oturum Aç</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1834"/>
+        <location filename="../meinstall.ui" line="1848"/>
         <source>Existing Home Directory</source>
         <translation>Mevcut Ev Dizini</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1843"/>
+        <location filename="../meinstall.ui" line="1857"/>
         <source>What would you like to do with the old directory?</source>
         <translation>Eski dizine ne yapmak istersiniz?</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1850"/>
+        <location filename="../meinstall.ui" line="1864"/>
         <source>Re-use it for this installation</source>
         <translation>Bu kurulum için yeniden kullanın</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1857"/>
+        <location filename="../meinstall.ui" line="1871"/>
         <source>Rename it and create a new directory</source>
         <translation>Yeniden adlandır ve yeni bir dizin oluştur</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1864"/>
+        <location filename="../meinstall.ui" line="1878"/>
         <source>Delete it and create a new directory</source>
         <translation>Sil ve yeni bir dizin oluştur</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1909"/>
+        <location filename="../meinstall.ui" line="1923"/>
         <source>Tips</source>
         <translation>İpuçları</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1953"/>
+        <location filename="../meinstall.ui" line="1967"/>
         <source>Installation complete</source>
         <translation>Kurulum tamamlandı</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1959"/>
+        <location filename="../meinstall.ui" line="1973"/>
         <source>Automatically reboot the system when the installer is closed</source>
         <translation>Yükleyici kapatıldıktan sonra sistemi otomatik yeniden başlat</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1978"/>
+        <location filename="../meinstall.ui" line="1992"/>
         <source>Reminders</source>
         <translation>Anımsatıcılar</translation>
     </message>
@@ -1536,322 +1541,322 @@ Farklı bir ad seçin.</translation>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="../partman.cpp" line="214"/>
+        <location filename="../partman.cpp" line="216"/>
         <source>Virtual Devices</source>
         <translation>Sanal Cihazlar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="435"/>
-        <location filename="../partman.cpp" line="482"/>
+        <location filename="../partman.cpp" line="437"/>
+        <location filename="../partman.cpp" line="484"/>
         <source>&amp;Add partition</source>
         <translation>Bölüm ekle</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="437"/>
+        <location filename="../partman.cpp" line="439"/>
         <source>&amp;Remove partition</source>
         <translation>Bölümü kaldır</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="446"/>
+        <location filename="../partman.cpp" line="448"/>
         <source>&amp;Lock</source>
         <translation>&amp;Kilitle</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="450"/>
+        <location filename="../partman.cpp" line="452"/>
         <source>&amp;Unlock</source>
         <translation>Kilidi &amp;Aç</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="454"/>
-        <location filename="../partman.cpp" line="594"/>
+        <location filename="../partman.cpp" line="456"/>
+        <location filename="../partman.cpp" line="609"/>
         <source>Add to crypttab</source>
         <translation>crypttab’a ekle</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="461"/>
+        <location filename="../partman.cpp" line="463"/>
         <source>New subvolume</source>
         <translation>Yeni altbirim</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="462"/>
+        <location filename="../partman.cpp" line="464"/>
         <source>Scan subvolumes</source>
         <translation>Altbirimleri tara</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="485"/>
+        <location filename="../partman.cpp" line="487"/>
         <source>New &amp;layout</source>
         <translation>Yeni &amp;düzen</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="486"/>
+        <location filename="../partman.cpp" line="488"/>
         <source>&amp;Reset layout</source>
         <translation>&amp;Düzeni sıfırla</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="488"/>
+        <location filename="../partman.cpp" line="490"/>
         <source>Layout &amp;Builder...</source>
         <translation>Yerleşim &amp;Oluşturucu...</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="509"/>
+        <location filename="../partman.cpp" line="511"/>
         <source>Default subvolume</source>
         <translation>Varsayılan alt birim</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="510"/>
+        <location filename="../partman.cpp" line="512"/>
         <source>Remove subvolume</source>
         <translation>Altbirimi kaldır</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="592"/>
+        <location filename="../partman.cpp" line="607"/>
         <source>Unlock Drive</source>
         <translation>Sürücü Kilidini Aç</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="597"/>
+        <location filename="../partman.cpp" line="612"/>
         <source>Password:</source>
         <translation>Parola:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="623"/>
+        <location filename="../partman.cpp" line="638"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>Cihazın kilidi açılamadı. Muhtemelen yanlış şifre.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="651"/>
+        <location filename="../partman.cpp" line="666"/>
         <source>Failed to close %1</source>
         <translation>%1 kapatılamadı</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="695"/>
+        <location filename="../partman.cpp" line="710"/>
         <source>Invalid subvolume label</source>
         <translation>Geçersiz altbirim etiketi</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="704"/>
+        <location filename="../partman.cpp" line="719"/>
         <source>Duplicate subvolume label</source>
         <translation>Altbirim etiketini çiftle</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="714"/>
+        <location filename="../partman.cpp" line="729"/>
         <source>Invalid use for %1: %2</source>
         <translation>%1 için geçersiz kullanım: %2 </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="725"/>
+        <location filename="../partman.cpp" line="740"/>
         <source>%1 is already selected for: %2</source>
         <translation>Şunun için %1 zaten seçildi: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="739"/>
+        <location filename="../partman.cpp" line="754"/>
         <source>A root partition of at least %1 is required.</source>
         <translation>En az %1’lik bir kök bölüm gereklidir.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="745"/>
+        <location filename="../partman.cpp" line="760"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>Ayrı bir /home bölümü de bağlıysa (/) kök içindeki /home korunamaz.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="752"/>
+        <location filename="../partman.cpp" line="767"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>%2 üzerinde %1 bölüm tablosu hazırla</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="758"/>
+        <location filename="../partman.cpp" line="773"/>
         <source>Reuse (no reformat) %1</source>
         <translation>Yeniden kullan (biçimlendirmeden) %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="761"/>
+        <location filename="../partman.cpp" line="776"/>
         <source>Format %1</source>
         <translation>%1’i Biçimlendir</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="762"/>
+        <location filename="../partman.cpp" line="777"/>
         <source>Format %1 to use for %2</source>
         <translation>%1’i %2 için kullanmak üzere biçimlendir</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="763"/>
+        <location filename="../partman.cpp" line="778"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Yeniden kullan (yeniden biçimlendirme yok) %1, %2 olarak </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="764"/>
+        <location filename="../partman.cpp" line="779"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>%2 için kullanmak üzere %1 üzerinde olan /home dışındaki verileri silin</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="767"/>
+        <location filename="../partman.cpp" line="782"/>
         <source>Create %1 without formatting</source>
         <translation>Biçimlendirmeden %1 oluştur</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="768"/>
+        <location filename="../partman.cpp" line="783"/>
         <source>Create %1, format to use for %2</source>
         <translation>%2 biçiminde %1 oluştur</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="777"/>
+        <location filename="../partman.cpp" line="792"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation>%1 alt birimini %2 olarak yeniden kullan</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="779"/>
+        <location filename="../partman.cpp" line="794"/>
         <source>Delete subvolume %1</source>
         <translation>%1 alt birimini sil</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="782"/>
+        <location filename="../partman.cpp" line="797"/>
         <source>Overwrite subvolume %1</source>
         <translation>%1 alt biriminin üzerine yaz</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="783"/>
+        <location filename="../partman.cpp" line="798"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation>%2 için kullanmak üzere %1 alt biriminin üzerine yaz</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="785"/>
+        <location filename="../partman.cpp" line="800"/>
         <source>Create subvolume %1</source>
         <translation>%1 alt birimi oluştur</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="786"/>
+        <location filename="../partman.cpp" line="801"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation>%2 için kullanmak üzere %1 alt birimi oluşturun</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="802"/>
+        <location filename="../partman.cpp" line="817"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Kök bölümünü şifrelerken ayrı bir önyükleme bölümü seçmelisiniz.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="803"/>
-        <location filename="../partman.cpp" line="864"/>
-        <location filename="../partman.cpp" line="882"/>
-        <location filename="../partman.cpp" line="908"/>
+        <location filename="../partman.cpp" line="818"/>
+        <location filename="../partman.cpp" line="879"/>
+        <location filename="../partman.cpp" line="897"/>
+        <location filename="../partman.cpp" line="923"/>
         <source>Are you sure you want to continue?</source>
         <translation>Devam etmek istediğinize emin misiniz?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="836"/>
+        <location filename="../partman.cpp" line="851"/>
         <source>%1 (%2) requires %3</source>
         <translation>%1 (%2) %3 gerektirir</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="862"/>
+        <location filename="../partman.cpp" line="877"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>Aşağıdaki birimler çok küçük olduğu için yükleme başarısız olabilir:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="875"/>
+        <location filename="../partman.cpp" line="890"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation>Bu sistem EFI kullanır, ancak /boot/efi’ye ayrıca geçerli bir EFI sistem bölümü atanmamıştır.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="878"/>
+        <location filename="../partman.cpp" line="893"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation>/boot/efi’ye atanan birim, geçerli bir EFI sistem bölümü değil.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="905"/>
+        <location filename="../partman.cpp" line="920"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>Aşağıdaki sürücüler GPT ile kurulu veya kurulacak, ancak BIOS-GRUB bölümü yok:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="907"/>
+        <location filename="../partman.cpp" line="922"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>Bu sistem, BIOS-GRUB bölümü olmayan GPT sürücülerinden önyükleme yapmayabilir.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="945"/>
+        <location filename="../partman.cpp" line="960"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Kurulum için bölümlerini seçtiğiniz diskler başarısız oluyor:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="964"/>
         <source>Smartmon tool output:</source>
         <translation>Smartmon aracı çıktısı:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="950"/>
+        <location filename="../partman.cpp" line="965"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Kurulum için seçtiğiniz bölümlü disk SMART izleme testini (smartctl) geçiyor, ancak testler yakın gelecekte ortalama hata oranından daha yüksek olacağını gösteriyor.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="957"/>
+        <location filename="../partman.cpp" line="972"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>Emin değilseniz, lütfen kurulumdan çıkın ve daha fazla bilgi için GSmartControl’u çalıştırın</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="961"/>
+        <location filename="../partman.cpp" line="976"/>
         <source>Do you want to abort the installation?</source>
         <translation>Kurulumu iptal etmek mi istiyorsunuz?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="967"/>
+        <location filename="../partman.cpp" line="982"/>
         <source>Do you want to continue?</source>
         <translation>Devam etmek istiyor musunuz?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1053"/>
+        <location filename="../partman.cpp" line="1068"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Gerekli bölümler hazırlanamadı.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1092"/>
+        <location filename="../partman.cpp" line="1107"/>
         <source>Preparing partition tables</source>
         <translation>Bölümleme tablosu hazırlanıyor</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1109"/>
+        <location filename="../partman.cpp" line="1124"/>
         <source>Preparing required partitions</source>
         <translation>Gerekli bölümler hazırlanıyor</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1172"/>
+        <location filename="../partman.cpp" line="1187"/>
         <source>Failed to format LUKS container.</source>
         <translation>LUKS kapsayıcısı biçimlendirilemedi.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1176"/>
+        <location filename="../partman.cpp" line="1191"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Şifreli birim oluşturuluyor: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1185"/>
+        <location filename="../partman.cpp" line="1200"/>
         <source>Failed to open LUKS container.</source>
         <translation>LUKS kapsayıcısı açılamadı.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1198"/>
+        <location filename="../partman.cpp" line="1213"/>
         <source>Failed to format partition.</source>
         <translation>Bölüm biçimlendirilemedi.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1205"/>
+        <location filename="../partman.cpp" line="1220"/>
         <source>Formatting: %1</source>
         <translation>Biçimlendiriliyor: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1263"/>
+        <location filename="../partman.cpp" line="1278"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>Altbölümler hazırlanamadı.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1264"/>
+        <location filename="../partman.cpp" line="1279"/>
         <source>Preparing subvolumes</source>
         <translation>Altbirimlerin hazırlanıyor</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1374"/>
+        <location filename="../partman.cpp" line="1389"/>
         <source>Failed to mount partition.</source>
         <translation>Bölüm bağlanamadı.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1379"/>
+        <location filename="../partman.cpp" line="1394"/>
         <source>Mounting: %1</source>
         <translation>Bağlanıyor: %1</translation>
     </message>
@@ -1859,22 +1864,22 @@ Farklı bir ad seçin.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2461"/>
+        <location filename="../partman.cpp" line="2476"/>
         <source>&amp;Templates</source>
         <translation>&amp;Şablonlar</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2469"/>
+        <location filename="../partman.cpp" line="2484"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Sıkıştırma (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2471"/>
+        <location filename="../partman.cpp" line="2486"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Sıkıştırma (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2473"/>
+        <location filename="../partman.cpp" line="2488"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Sıkıştırma (&amp;ZLIB)</translation>
     </message>
@@ -1974,12 +1979,11 @@ Lütfen bunun deneysel olduğunu unutmayın. Gelecekteki yükleyici sürümleri,
         <translation>Bittiğinde /mnt/antiX bağlantısını kesmeyin veya ilişkili LUKS kaplarından herhangi birini kapatmayın.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="110"/>
         <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation>Yükleyici için başka bir test modu, bölümler/sürücüler FORMATLANACAK, dosyaları kopyalama atlanacak.</translation>
+        <translation type="vanished">Yükleyici için başka bir test modu, bölümler/sürücüler FORMATLANACAK, dosyaları kopyalama atlanacak.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="111"/>
+        <location filename="../app.cpp" line="110"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
@@ -1988,58 +1992,58 @@ Yeniden başlatmanın ardından, kullanıcının bu ayrıntıları sağlayabilme
 Bu, işletim sistemi önceden yüklenmiş bir bilgisayarı satan veya başka birine veren OEM kurulumları için kullanışlıdır.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="114"/>
+        <location filename="../app.cpp" line="113"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
         <translation>Kutu Dışı Deneyim seçeneği.
 --oem seçeneği ile kurulursa bu otomatik olarak başlayacaktır.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="116"/>
+        <location filename="../app.cpp" line="115"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
         <translation>(GUI) Grafik Arabirim için test modu, gerçekten yüklemeden farklı ekranlara ilerleyebilirsiniz.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="117"/>
+        <location filename="../app.cpp" line="116"/>
         <source>Reboots automatically when done installing.</source>
         <translation>Yükleme tamamlandığında otomatik olarak yeniden başlatılır.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="118"/>
+        <location filename="../app.cpp" line="117"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
         <translation>Özel bölümlemede cp yerine rsync ile yükleme.
 -- /kök biçimlendirmez ve şifreleme çalışmaz.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="120"/>
+        <location filename="../app.cpp" line="119"/>
         <source>Always check the installation media at the beginning.</source>
         <translation>Her zaman başlangıçtakurulum ortamını kontrol edin.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="121"/>
+        <location filename="../app.cpp" line="120"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
         <translation>Kurulum ortamını başlangıçta kontrol etmeyin.
 Kurulum ortamının hatasız olduğu garanti edilmedikçe önerilmez.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="123"/>
+        <location filename="../app.cpp" line="122"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>&lt;config-file&gt; tarafından belirtildiği gibi bir yapılandırma dosyası yükleyin .</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="127"/>
+        <location filename="../app.cpp" line="126"/>
         <source>Too many arguments. Please check the command format by running the program with --help</source>
         <translation>Çok fazla seçenek belirtildi. Lütfen programı --help ile çalıştırarak komut biçimini kontrol edin.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="132"/>
+        <location filename="../app.cpp" line="131"/>
         <source>%1 Installer</source>
         <translation>%1 Yükleyici</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="140"/>
+        <location filename="../app.cpp" line="139"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -2048,12 +2052,12 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Lütfen mümkünse kapatın veya uçbirimde ’pkill minstall’ komutunu çalıştırın.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="147"/>
+        <location filename="../app.cpp" line="146"/>
         <source>This operation requires root access.</source>
         <translation>Bu işlem kök erişimi gerektirir.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="168"/>
+        <location filename="../app.cpp" line="167"/>
         <source>Configuration file (%1) not found.</source>
         <translation>Yapılandırma dosyası (%1) bulunamadı.</translation>
     </message>

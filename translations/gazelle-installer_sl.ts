@@ -42,37 +42,37 @@ Najmanj: %2</translation>
 <context>
     <name>Base</name>
     <message>
-        <location filename="../base.cpp" line="55"/>
+        <location filename="../base.cpp" line="63"/>
         <source>Cannot access installation media.</source>
         <translation>Ne moremo dostopati do namestitvenega nosilca.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="152"/>
+        <location filename="../base.cpp" line="160"/>
         <source>Failed to delete old system on destination.</source>
         <translation>Neuspešno brisanje starega sistema.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="155"/>
+        <location filename="../base.cpp" line="163"/>
         <source>Deleting old system</source>
         <translation>Brisanje starega sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="165"/>
+        <location filename="../base.cpp" line="173"/>
         <source>Failed to set the system configuration.</source>
         <translation>Nastavljanje sistemske konfiguracije ni bilo uspešno</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="167"/>
+        <location filename="../base.cpp" line="175"/>
         <source>Setting system configuration</source>
         <translation>Nastavitev konfiguracije sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="245"/>
+        <location filename="../base.cpp" line="253"/>
         <source>Copying new system</source>
         <translation>Kopiranje novega sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="275"/>
+        <location filename="../base.cpp" line="282"/>
         <source>Failed to copy the new system.</source>
         <translation>Kopiranje novega sistema ni bilo uspešno.</translation>
     </message>
@@ -1103,7 +1103,7 @@ Ali bi jo res radi zaustavili?</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="570"/>
-        <location filename="../meinstall.ui" line="1066"/>
+        <location filename="../meinstall.ui" line="1080"/>
         <source>Enable hibernation support</source>
         <translation>Vklopi podporo za spanje</translation>
     </message>
@@ -1118,322 +1118,327 @@ Ali bi jo res radi zaustavili?</translation>
         <translation>Izberite razdelke</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="621"/>
+        <location filename="../meinstall.ui" line="632"/>
         <source>Show Grid</source>
         <translation>Prikaži mrežo</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="628"/>
+        <location filename="../meinstall.ui" line="639"/>
         <source>Ctrl+G</source>
         <translation>Ctrl+G</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="638"/>
+        <location filename="../meinstall.ui" line="621"/>
         <source>Mark the selected drive to be cleared for a new layout.</source>
         <translation>Označi izbrane pogone za brisanje ob ustvarjanju novega razporeda.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="652"/>
+        <location filename="../meinstall.ui" line="674"/>
         <source>Query the operating system and reload the layouts of all drives.</source>
         <translation>Izvedi poizvedbo operacijskega sistema in ponovno naloži razporeditev vseh pogonov.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="663"/>
+        <location filename="../meinstall.ui" line="652"/>
         <source>Run the partition management application of this operating system.</source>
         <translation>Zaženi upravljalnik razdelkov tega operacijskega sistema</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="674"/>
+        <location filename="../meinstall.ui" line="711"/>
         <source>Add a new partition entry. This only works with a new layout.</source>
         <translation>Dodaj zapis za nov razdelek. To deluje le z novo razporeditvijo.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="685"/>
+        <location filename="../meinstall.ui" line="663"/>
         <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
         <translation>Odstrani obstoječ zapis iz razporeditve. To deluje le, kadar zapisujemo novo razporeditev.</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="741"/>
+        <location filename="../meinstall.ui" line="722"/>
+        <source>Show advanced fields.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../meinstall.ui" line="755"/>
         <source>Encryption options</source>
         <translation>Možnosti šifriranja</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="747"/>
+        <location filename="../meinstall.ui" line="761"/>
         <source>Encryption password:</source>
         <translation>Šifrirno geslo:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="764"/>
+        <location filename="../meinstall.ui" line="778"/>
         <source>Confirm password:</source>
         <translation>Potrdite geslo:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="813"/>
+        <location filename="../meinstall.ui" line="827"/>
         <source>Installation Confirmation</source>
         <translation>Potrditev namestitve</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="844"/>
+        <location filename="../meinstall.ui" line="858"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Namesti GRUB za Linux in Windows</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="868"/>
+        <location filename="../meinstall.ui" line="882"/>
         <source>Master Boot Record</source>
         <translation>Master Boot Record</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="874"/>
+        <location filename="../meinstall.ui" line="888"/>
         <source>MBR</source>
         <translation>MBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="877"/>
+        <location filename="../meinstall.ui" line="891"/>
         <source>Alt+B</source>
         <translation>Alt+B</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="899"/>
+        <location filename="../meinstall.ui" line="913"/>
         <source>EFI System Partition</source>
         <translation>EFI sistemski razdelek</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="902"/>
+        <location filename="../meinstall.ui" line="916"/>
         <source>ESP</source>
         <translation>ESP</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="934"/>
+        <location filename="../meinstall.ui" line="948"/>
         <source>Partition Boot Record</source>
         <translation>Partition Boot Record</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="937"/>
+        <location filename="../meinstall.ui" line="951"/>
         <source>PBR</source>
         <translation>PBR</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="950"/>
+        <location filename="../meinstall.ui" line="964"/>
         <source>System boot disk:</source>
         <translation>Zagonski disk sistema:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="963"/>
+        <location filename="../meinstall.ui" line="977"/>
         <source>Location to install on:</source>
         <translation>Lokacija za namestitev:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="999"/>
+        <location filename="../meinstall.ui" line="1013"/>
         <source>Create a swap file</source>
         <translation>Ustvari izmenjevalno swap datoteko</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1016"/>
+        <location filename="../meinstall.ui" line="1030"/>
         <source> MB</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1036"/>
+        <location filename="../meinstall.ui" line="1050"/>
         <source>Size:</source>
         <translation>Velikost:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1059"/>
+        <location filename="../meinstall.ui" line="1073"/>
         <source>Location:</source>
         <translation>Lokacija:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1098"/>
+        <location filename="../meinstall.ui" line="1112"/>
         <source>Common Services to Enable</source>
         <translation>Omogoči pogoste storitve:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1117"/>
+        <location filename="../meinstall.ui" line="1131"/>
         <source>Service</source>
         <translation>Storitev</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1122"/>
+        <location filename="../meinstall.ui" line="1136"/>
         <source>Description</source>
         <translation>Opis</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1155"/>
+        <location filename="../meinstall.ui" line="1169"/>
         <source>Computer Network Names</source>
         <translation>Imena računalnikov v mreži</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1182"/>
+        <location filename="../meinstall.ui" line="1196"/>
         <source>Workgroup</source>
         <translation>Delovna skupina</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1195"/>
+        <location filename="../meinstall.ui" line="1209"/>
         <source>Workgroup:</source>
         <translation>Delovna skupina:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1208"/>
+        <location filename="../meinstall.ui" line="1222"/>
         <source>SaMBa Server for MS Networking</source>
         <translation>SaMBa strežnik za MS Networking</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1224"/>
+        <location filename="../meinstall.ui" line="1238"/>
         <source>example.dom</source>
         <translation>primer.dom</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1237"/>
+        <location filename="../meinstall.ui" line="1251"/>
         <source>Computer domain:</source>
         <translation>Domena računalnika:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1263"/>
+        <location filename="../meinstall.ui" line="1277"/>
         <source>Computer name:</source>
         <translation>Ime računalnika:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1324"/>
+        <location filename="../meinstall.ui" line="1338"/>
         <source>Configure Clock</source>
         <translation>Nastavitve časa:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1365"/>
+        <location filename="../meinstall.ui" line="1379"/>
         <source>Format:</source>
         <translation>Format:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1393"/>
+        <location filename="../meinstall.ui" line="1407"/>
         <source>Timezone:</source>
         <translation>Časovni pas:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1438"/>
+        <location filename="../meinstall.ui" line="1452"/>
         <source>System clock uses local time</source>
         <translation>Sistemska ura uporablja krajevni čas</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1470"/>
+        <location filename="../meinstall.ui" line="1484"/>
         <source>Localization Defaults</source>
         <translation>Privzete lokalne nastavitve</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1510"/>
+        <location filename="../meinstall.ui" line="1524"/>
         <source>Locale:</source>
         <translation>Lokalizacija:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1532"/>
+        <location filename="../meinstall.ui" line="1546"/>
         <source>Service Settings (advanced)</source>
         <translation>Nastavitve storitev (napredno)</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1550"/>
+        <location filename="../meinstall.ui" line="1564"/>
         <source>Adjust which services should run at startup</source>
         <translation>Določi, katere storitve naj se zaženejo ob zagonu</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1553"/>
+        <location filename="../meinstall.ui" line="1567"/>
         <source>View</source>
         <translation>Ogled</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1598"/>
+        <location filename="../meinstall.ui" line="1612"/>
         <source>Desktop modifications made in the live environment will be carried over to the installed OS</source>
         <translation>Modifikacije namizja, ki so bile opravljene v živem okolju, bodo prenešene na nameščen OS</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1601"/>
+        <location filename="../meinstall.ui" line="1615"/>
         <source>Save live desktop changes</source>
         <translation>Shrani spremembe iz živega namizja</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1614"/>
+        <location filename="../meinstall.ui" line="1628"/>
         <source>Default User Account</source>
         <translation>Privzeti uporabniški račun</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1626"/>
+        <location filename="../meinstall.ui" line="1640"/>
         <source>Default user login name:</source>
         <translation>Ime privzetega uporabnika:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1645"/>
+        <location filename="../meinstall.ui" line="1659"/>
         <source>username</source>
         <translation>uporabniško ime</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1658"/>
+        <location filename="../meinstall.ui" line="1672"/>
         <source>Default user password:</source>
         <translation>Geslo privzetega uporabnika:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1687"/>
+        <location filename="../meinstall.ui" line="1701"/>
         <source>Confirm user password:</source>
         <translation>Potrdi geslo uporabnika:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1719"/>
+        <location filename="../meinstall.ui" line="1733"/>
         <source>Root (administrator) Account</source>
         <translation>Korenski (administratorski) račun</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1737"/>
+        <location filename="../meinstall.ui" line="1751"/>
         <source>Root password:</source>
         <translation>Korensko geslo:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1766"/>
+        <location filename="../meinstall.ui" line="1780"/>
         <source>Confirm root password:</source>
         <translation>Potrdite korensko geslo:</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1798"/>
+        <location filename="../meinstall.ui" line="1812"/>
         <source>Autologin</source>
         <translation>Samodejna prijava</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1834"/>
+        <location filename="../meinstall.ui" line="1848"/>
         <source>Existing Home Directory</source>
         <translation>Obstoječi /home direktorij</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1843"/>
+        <location filename="../meinstall.ui" line="1857"/>
         <source>What would you like to do with the old directory?</source>
         <translation>Kaj bi radi storili s starim direktorijom?</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1850"/>
+        <location filename="../meinstall.ui" line="1864"/>
         <source>Re-use it for this installation</source>
         <translation>Ponovno uporabi za to namestitev</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1857"/>
+        <location filename="../meinstall.ui" line="1871"/>
         <source>Rename it and create a new directory</source>
         <translation>Preimenuj in ustvari nov direktorij</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1864"/>
+        <location filename="../meinstall.ui" line="1878"/>
         <source>Delete it and create a new directory</source>
         <translation>Izbriši in ustvari nov direktorij</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1909"/>
+        <location filename="../meinstall.ui" line="1923"/>
         <source>Tips</source>
         <translation>Namigi</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1953"/>
+        <location filename="../meinstall.ui" line="1967"/>
         <source>Installation complete</source>
         <translation>Namestitev je dokončana</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1959"/>
+        <location filename="../meinstall.ui" line="1973"/>
         <source>Automatically reboot the system when the installer is closed</source>
         <translation>Samodejni ponovni zagon po tem, ko se namestitveni program zapre</translation>
     </message>
     <message>
-        <location filename="../meinstall.ui" line="1978"/>
+        <location filename="../meinstall.ui" line="1992"/>
         <source>Reminders</source>
         <translation>Opomniki</translation>
     </message>
@@ -1536,322 +1541,322 @@ Izberite drugo ime.</translation>
 <context>
     <name>PartMan</name>
     <message>
-        <location filename="../partman.cpp" line="214"/>
+        <location filename="../partman.cpp" line="216"/>
         <source>Virtual Devices</source>
         <translation>Virtualne naprave</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="435"/>
-        <location filename="../partman.cpp" line="482"/>
+        <location filename="../partman.cpp" line="437"/>
+        <location filename="../partman.cpp" line="484"/>
         <source>&amp;Add partition</source>
         <translation>Dod&amp;aj razdelek</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="437"/>
+        <location filename="../partman.cpp" line="439"/>
         <source>&amp;Remove partition</source>
         <translation>Odstrani &amp;razdelek</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="446"/>
+        <location filename="../partman.cpp" line="448"/>
         <source>&amp;Lock</source>
         <translation>Zak&amp;leni</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="450"/>
+        <location filename="../partman.cpp" line="452"/>
         <source>&amp;Unlock</source>
         <translation>&amp;Odklep</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="454"/>
-        <location filename="../partman.cpp" line="594"/>
+        <location filename="../partman.cpp" line="456"/>
+        <location filename="../partman.cpp" line="609"/>
         <source>Add to crypttab</source>
         <translation>Dodaj v crypttab</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="461"/>
+        <location filename="../partman.cpp" line="463"/>
         <source>New subvolume</source>
         <translation>Nov podpogon</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="462"/>
+        <location filename="../partman.cpp" line="464"/>
         <source>Scan subvolumes</source>
         <translation>Poišči podpogone</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="485"/>
+        <location filename="../partman.cpp" line="487"/>
         <source>New &amp;layout</source>
         <translation>Nova &amp;razdelitev</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="486"/>
+        <location filename="../partman.cpp" line="488"/>
         <source>&amp;Reset layout</source>
         <translation>Ponastavi &amp;razdelitev</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="488"/>
+        <location filename="../partman.cpp" line="490"/>
         <source>Layout &amp;Builder...</source>
         <translation>&amp;Razdeljevalnik...</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="509"/>
+        <location filename="../partman.cpp" line="511"/>
         <source>Default subvolume</source>
         <translation>Privzeti podrazdelek</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="510"/>
+        <location filename="../partman.cpp" line="512"/>
         <source>Remove subvolume</source>
         <translation>Odstrani podpogon</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="592"/>
+        <location filename="../partman.cpp" line="607"/>
         <source>Unlock Drive</source>
         <translation>Odkleni pogon</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="597"/>
+        <location filename="../partman.cpp" line="612"/>
         <source>Password:</source>
         <translation>&quot;Geslo:&quot;</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="623"/>
+        <location filename="../partman.cpp" line="638"/>
         <source>Could not unlock device. Possible incorrect password.</source>
         <translation>Naprave ni bilo mogoče odkleniti. Preverite geslo.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="651"/>
+        <location filename="../partman.cpp" line="666"/>
         <source>Failed to close %1</source>
         <translation>Napaka pri zapiranju %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="695"/>
+        <location filename="../partman.cpp" line="710"/>
         <source>Invalid subvolume label</source>
         <translation>Napačna oznaka podpogona</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="704"/>
+        <location filename="../partman.cpp" line="719"/>
         <source>Duplicate subvolume label</source>
         <translation>Podvoji oznako podpogona</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="714"/>
+        <location filename="../partman.cpp" line="729"/>
         <source>Invalid use for %1: %2</source>
         <translation>Neveljavna raba za %1: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="725"/>
+        <location filename="../partman.cpp" line="740"/>
         <source>%1 is already selected for: %2</source>
         <translation>%1 je že izbran za: %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="739"/>
+        <location filename="../partman.cpp" line="754"/>
         <source>A root partition of at least %1 is required.</source>
         <translation>Potreben je korenski razdelek z najmanj %1.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="745"/>
+        <location filename="../partman.cpp" line="760"/>
         <source>Cannot preserve /home inside root (/) if a separate /home partition is also mounted.</source>
         <translation>Ne morem ohraniti doma /home v korenu /root, če je priklopljen tudi ločen razdelek /home.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="752"/>
+        <location filename="../partman.cpp" line="767"/>
         <source>Prepare %1 partition table on %2</source>
         <translation>Pripravi %1 tabelo razdelkov na %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="758"/>
+        <location filename="../partman.cpp" line="773"/>
         <source>Reuse (no reformat) %1</source>
         <translation>Ponovno uporabi (brez formatiranja) %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="761"/>
+        <location filename="../partman.cpp" line="776"/>
         <source>Format %1</source>
         <translation>Formatiraj %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="762"/>
+        <location filename="../partman.cpp" line="777"/>
         <source>Format %1 to use for %2</source>
         <translation>Formatiraj %1 za uporabo kot %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="763"/>
+        <location filename="../partman.cpp" line="778"/>
         <source>Reuse (no reformat) %1 as %2</source>
         <translation>Ponovno uporabi (brez formatiranja) %1 kot %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="764"/>
+        <location filename="../partman.cpp" line="779"/>
         <source>Delete the data on %1 except for /home, to use for %2</source>
         <translation>Izbriši podatke na %1, razen za /home za rabo z %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="767"/>
+        <location filename="../partman.cpp" line="782"/>
         <source>Create %1 without formatting</source>
         <translation>Ustvari %1 brez formatiranja</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="768"/>
+        <location filename="../partman.cpp" line="783"/>
         <source>Create %1, format to use for %2</source>
         <translation>Ustvari %1, formatiraj za rabo kot %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="777"/>
+        <location filename="../partman.cpp" line="792"/>
         <source>Reuse subvolume %1 as %2</source>
         <translation>Ponovno uporabi podrazdelek %1 kot %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="779"/>
+        <location filename="../partman.cpp" line="794"/>
         <source>Delete subvolume %1</source>
         <translation>Izbriši podrazdelek %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="782"/>
+        <location filename="../partman.cpp" line="797"/>
         <source>Overwrite subvolume %1</source>
         <translation>Prepiši podrazdelek %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="783"/>
+        <location filename="../partman.cpp" line="798"/>
         <source>Overwrite subvolume %1 to use for %2</source>
         <translation>Prepiši podrazdelek %1 za uporabo z %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="785"/>
+        <location filename="../partman.cpp" line="800"/>
         <source>Create subvolume %1</source>
         <translation>Ustvari podrazdelek %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="786"/>
+        <location filename="../partman.cpp" line="801"/>
         <source>Create subvolume %1 to use for %2</source>
         <translation>Ustvari podrazdelek %1 za uporabo z %2</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="802"/>
+        <location filename="../partman.cpp" line="817"/>
         <source>You must choose a separate boot partition when encrypting root.</source>
         <translation>Za šifriranje korena oz. root, je potrebno ustvariti ločen zagonski razdelek.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="803"/>
-        <location filename="../partman.cpp" line="864"/>
-        <location filename="../partman.cpp" line="882"/>
-        <location filename="../partman.cpp" line="908"/>
+        <location filename="../partman.cpp" line="818"/>
+        <location filename="../partman.cpp" line="879"/>
+        <location filename="../partman.cpp" line="897"/>
+        <location filename="../partman.cpp" line="923"/>
         <source>Are you sure you want to continue?</source>
         <translation>Želite nadaljevati?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="836"/>
+        <location filename="../partman.cpp" line="851"/>
         <source>%1 (%2) requires %3</source>
         <translation>%1 (%2) potrebuje %3</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="862"/>
+        <location filename="../partman.cpp" line="877"/>
         <source>The installation may fail because the following volumes are too small:</source>
         <translation>Namestitev morda ne bo uspela, ker so ti pogoni premajhni:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="875"/>
+        <location filename="../partman.cpp" line="890"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
         <translation>Ta sistem uporablja EFI, vendar ni bila določen ločen EFI sistemski razdelek za /boot/efi.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="878"/>
+        <location filename="../partman.cpp" line="893"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
         <translation>Pogon določen za /boot/efi ni ustrezen EFI sistemski razdelek.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="905"/>
+        <location filename="../partman.cpp" line="920"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
         <translation>Naslednji pogoni so ali bodo nameščeni z GPT, a nimajo BIOS-GRUB razdelka:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="907"/>
+        <location filename="../partman.cpp" line="922"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
         <translation>Sistem se morda ne bo mogel zagnati z GPT pogonov, ki nimajo BIOS-GRUB razdelka.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="945"/>
+        <location filename="../partman.cpp" line="960"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
         <translation>Diski z razdelki, ki ste jih izbrali, odpovedujejo:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="949"/>
+        <location filename="../partman.cpp" line="964"/>
         <source>Smartmon tool output:</source>
         <translation>Izpis za Smarton orodje:</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="950"/>
+        <location filename="../partman.cpp" line="965"/>
         <source>The disks with the partitions you selected for installation pass the SMART monitor test (smartctl), but the tests indicate it will have a higher than average failure rate in the near future.</source>
         <translation>Diski z izbranimi razdelki za namestitev so sicer prestali SMART monitor test (smartctl), a je test pokazal, da bodo v bližnji prihodnosti imeli večjo možnost za napake.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="957"/>
+        <location filename="../partman.cpp" line="972"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
         <translation>Če niste prepričani, zaprite namestitveni program in zaženite GSmartControl za več informacij.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="961"/>
+        <location filename="../partman.cpp" line="976"/>
         <source>Do you want to abort the installation?</source>
         <translation>Želite prekiniti namestitev?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="967"/>
+        <location filename="../partman.cpp" line="982"/>
         <source>Do you want to continue?</source>
         <translation>Želite nadaljevati?</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1053"/>
+        <location filename="../partman.cpp" line="1068"/>
         <source>Failed to prepare required partitions.</source>
         <translation>Ni bilo mogoče pripraviti zahtevanih razdelkov</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1092"/>
+        <location filename="../partman.cpp" line="1107"/>
         <source>Preparing partition tables</source>
         <translation>Priprava tabel razdelkov</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1109"/>
+        <location filename="../partman.cpp" line="1124"/>
         <source>Preparing required partitions</source>
         <translation>Pripravljanje zahtevanih razdelkov</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1172"/>
+        <location filename="../partman.cpp" line="1187"/>
         <source>Failed to format LUKS container.</source>
         <translation>LUKS vsebnika ni bilo mogoče oblikovati.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1176"/>
+        <location filename="../partman.cpp" line="1191"/>
         <source>Creating encrypted volume: %1</source>
         <translation>Ustvarjanje šifriranega nosilca: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1185"/>
+        <location filename="../partman.cpp" line="1200"/>
         <source>Failed to open LUKS container.</source>
         <translation>LUKS vsebnika ni bilo mogoče odpreti.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1198"/>
+        <location filename="../partman.cpp" line="1213"/>
         <source>Failed to format partition.</source>
         <translation>Formatiranje razdelka ni uspelo.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1205"/>
+        <location filename="../partman.cpp" line="1220"/>
         <source>Formatting: %1</source>
         <translation>Formatiranje: %1</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1263"/>
+        <location filename="../partman.cpp" line="1278"/>
         <source>Failed to prepare subvolumes.</source>
         <translation>Neuspešna priprava podpogona.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1264"/>
+        <location filename="../partman.cpp" line="1279"/>
         <source>Preparing subvolumes</source>
         <translation>Pripravljanje podpogonov</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1374"/>
+        <location filename="../partman.cpp" line="1389"/>
         <source>Failed to mount partition.</source>
         <translation>Priklapljanje razdelka ni uspelo.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1379"/>
+        <location filename="../partman.cpp" line="1394"/>
         <source>Mounting: %1</source>
         <translation>Priklapljanje: %1</translation>
     </message>
@@ -1859,22 +1864,22 @@ Izberite drugo ime.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2461"/>
+        <location filename="../partman.cpp" line="2476"/>
         <source>&amp;Templates</source>
         <translation>&amp;Predloge</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2469"/>
+        <location filename="../partman.cpp" line="2484"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Stiskanje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2471"/>
+        <location filename="../partman.cpp" line="2486"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Stiskanje (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2473"/>
+        <location filename="../partman.cpp" line="2488"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Stiskanje (&amp;ZLIB)</translation>
     </message>
@@ -1974,12 +1979,11 @@ Pomnite, da je to eksperimentalno. Prihodnji namestilniki so lahko nezdružljivi
         <translation>Ko končate, ne odklopite /mnt/antiX ali katerega od povezanih vsebnikov, </translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="110"/>
         <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation>Še en poskusni način namestilnika. Razdelki/pogoni bodo FORMATIRANI, datoteke pa ne bodo skopirane.</translation>
+        <translation type="vanished">Še en poskusni način namestilnika. Razdelki/pogoni bodo FORMATIRANI, datoteke pa ne bodo skopirane.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="111"/>
+        <location filename="../app.cpp" line="110"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
@@ -1988,58 +1992,58 @@ Ob zagonu bo namestilnik zagnan z --oobe, tako da lahko uporabnik poda pte podro
 To je uporabno za OEM namestitve, z namenom prodaje ali oddaje računalnika, ki bo imel prednameščen OS.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="114"/>
+        <location filename="../app.cpp" line="113"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
         <translation>Možnost izbire Izkušnje iz škatle.
 To bo samodejno zagnano ob namestitvi z --oem možnostjo.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="116"/>
+        <location filename="../app.cpp" line="115"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
         <translation>Poskusni način za grafični vmesnik. Lahko preizkusite različne zaslone, ne da bi dejansko kaj namestili.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="117"/>
+        <location filename="../app.cpp" line="116"/>
         <source>Reboots automatically when done installing.</source>
         <translation>Samodejni ponovni zagon po namestitvi.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="118"/>
+        <location filename="../app.cpp" line="117"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
         <translation>Namestitev z rsync namesto cp na prilagojeni razdelitvi razdelkov.
 - ne formatira korena /root in ne deluje s šifriranjem.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="120"/>
+        <location filename="../app.cpp" line="119"/>
         <source>Always check the installation media at the beginning.</source>
         <translation>Vedno na začetku preveri namestitveni nosilec.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="121"/>
+        <location filename="../app.cpp" line="120"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
         <translation>Na začetku ne preveri namestitvenega nosilca.
 Ni priporočljivo, razen v primerih, ko je nosilec zagotovo brez napak.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="123"/>
+        <location filename="../app.cpp" line="122"/>
         <source>Load a configuration file as specified by &lt;config-file&gt;.</source>
         <translation>Naloži namestitveno datoteko, kot je določeno od &lt;config-file&gt;.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="127"/>
+        <location filename="../app.cpp" line="126"/>
         <source>Too many arguments. Please check the command format by running the program with --help</source>
         <translation>Preveč argumentov. Preverite format ukaza z uporabo --help argumenta.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="132"/>
+        <location filename="../app.cpp" line="131"/>
         <source>%1 Installer</source>
         <translation>%1 Namestilnik</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="140"/>
+        <location filename="../app.cpp" line="139"/>
         <source>The installer won&apos;t launch because it appears to be running already in the background.
 
 Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</source>
@@ -2048,12 +2052,12 @@ Please close it if possible, or run &apos;pkill minstall&apos; in terminal.</sou
 Prosimo, zaprite ga, če je to mogoče, ali v terminalu zaženite &apos;pkill minstall&apos;.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="147"/>
+        <location filename="../app.cpp" line="146"/>
         <source>This operation requires root access.</source>
         <translation>To dejanje zahteva korenski dostop.</translation>
     </message>
     <message>
-        <location filename="../app.cpp" line="168"/>
+        <location filename="../app.cpp" line="167"/>
         <source>Configuration file (%1) not found.</source>
         <translation>Konfiguracijska datoteka (%1) ni bila najdena.</translation>
     </message>
