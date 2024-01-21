@@ -48,7 +48,7 @@ Base::Base(MProcess &mproc, PartMan &pman, const QSettings &appConf, const QComm
         << "/live/aufs/etc" << "/live/aufs/lib" << "/live/aufs/lib64"
         << "/live/aufs/media" << "/live/aufs/mnt" << "/live/aufs/opt" << "/live/aufs/root"
         << "/live/aufs/sbin" << "/live/aufs/usr" << "/live/aufs/var" << "/live/aufs/home";
-    if (QDir("/live/aufs/libx32").exists()){
+    if (QFileInfo::exists("/live/aufs/libx32")){
         rootSources << "/live/aufs/libx32" ;
     }
     PartMan::VolumeSpec &vspecRoot = partman.volSpecs["/"];
