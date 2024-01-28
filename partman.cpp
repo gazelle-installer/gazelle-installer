@@ -1356,7 +1356,13 @@ bool PartMan::makeFstab() noexcept
             out << "UUID=" << UUID;
         }
         // Mount point, file system
-        const QString &fsfmt = volume->finalFormat();
+        QString fsfmt;
+        if (volume->type == Device::SUBVOLUME){
+           fsfmt = "btrfs";
+        } else {
+         fsfmt = volume->finalFormat();
+        }
+
         if (fsfmt == "SWAP") out << " swap swap";
         else {
             out << ' ' << it.first;
