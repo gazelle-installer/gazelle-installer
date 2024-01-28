@@ -163,9 +163,17 @@ void Base::install()
         proc.status(tr("Deleting old system"));
         proc.exec("find", {"/mnt/antiX/boot", "-mindepth", "1", "-maxdepth", "1",
             "!", "-name", "efi", "-exec", "rm", "-r", "{}", "+"});
+        if (QDir("/mnt/antiX/swap").exists()){
+            proc.exec("find", {"/mnt/antiX/swap", "-mindepth", "1", "-maxdepth", "1",
+                               "-exec", "rm", "-r", "{}", "+"});
         proc.status();
         proc.exec("find", {"/mnt/antiX", "-mindepth", "1", "-maxdepth", "1",
-            "!", "-name", "home", "!", "-name", "boot", "-exec", "rm", "-r", "{}", "+"});
+            "!", "-name", "home", "!", "-name", "boot", "!", "-name", "swap", "-exec", "rm", "-r", "{}", "+"});
+        } else {
+            proc.status();
+            proc.exec("find", {"/mnt/antiX", "-mindepth", "1", "-maxdepth", "1",
+                "!", "-name", "home", "!", "-name", "boot", "-exec", "rm", "-r", "{}", "+"});
+        }
     }
 
     copyLinux(skiphome);
