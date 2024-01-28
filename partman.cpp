@@ -1412,6 +1412,9 @@ void PartMan::mountPartitions()
         if (!opts.contains("noiversion")) opts.append("noiversion");
         if (!opts.contains("noatime")) opts.append("noatime");
         proc.exec("mount", {"--mkdir", "-o", opts.join(','), dev, point});
+        if (it.first == "/swap"){
+            proc.exec("swapoff",{"-a"});
+        }
     }
 }
 
@@ -2055,8 +2058,13 @@ QStringList PartMan::Device::allowedFormats() const noexcept
     } else if (type == SUBVOLUME) {
         list.append("CREATE");
         if (flags.oldLayout) {
-            list.append("DELETE");
-            allowPreserve = true;
+            if (usefor == "/swap"){
+                //list.append("DELETE")
+                allowPreserve = false;
+            } else {
+                list.append("DELETE");
+                allowPreserve = true;
+            }
         }
     }
 
