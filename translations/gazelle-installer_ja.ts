@@ -24,7 +24,7 @@ Minimum: %2</source>
     <message>
         <location filename="../autopart.cpp" line="177"/>
         <source>Layout Builder</source>
-        <translation>Layout Builder</translation>
+        <translation>レイアウトビルダ</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="320"/>
@@ -57,22 +57,22 @@ home %2%</translation>
         <translation>以前のシステムを削除中</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="173"/>
+        <location filename="../base.cpp" line="181"/>
         <source>Failed to set the system configuration.</source>
         <translation>システムの設定に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="175"/>
+        <location filename="../base.cpp" line="183"/>
         <source>Setting system configuration</source>
         <translation>システムの設定を行っています</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="253"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Copying new system</source>
         <translation>新しいシステムをコピー中</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="282"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Failed to copy the new system.</source>
         <translation>新しいシステムのコピーに失敗しました。</translation>
     </message>
@@ -312,7 +312,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="676"/>
         <source>Move the slider to the right to increase the space for &lt;b&gt;root&lt;/b&gt;. Move it to the left to increase the space for &lt;b&gt;home&lt;/b&gt;.</source>
-        <translation>スライダーを右に動かすと、&lt;b&gt;root&lt;/b&gt;の容量が増えます。左に動かすと&lt;b&gt;home&lt;/b&gt;の容量が増えます。</translation>
+        <translation>スライダを右に動かすと、&lt;b&gt;root&lt;/b&gt;の容量が増えます。左に動かすと&lt;b&gt;home&lt;/b&gt;の容量が増えます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="677"/>
@@ -960,12 +960,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../minstall.cpp" line="1174"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;インストールの修復&lt;/b&gt;&lt;br/&gt;%1 はハードドライブから作業を停止した場合、LiveDVD や LiveUSB からブートして、 %1 ツールのユーティリティまたはシステムを修復するための通常の Linux ツールを使用して問題を解決することが可能です。&lt;/p&gt;&lt;p&gt;また、MS-Windows システムからデータを回復するために %1 LiveDVD や LiveUSB を使用することができます！&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;インストールの修復&lt;/b&gt;&lt;br/&gt;%1 はハードドライブから作業を停止した場合、Live-DVD や Live-USB からブートして、 %1 ツールのユーティリティまたはシステムを修復するための通常の Linux ツールを使用して問題を解決することが可能です。&lt;/p&gt;&lt;p&gt;また、MS-Windows システムからデータを回復するために %1 Live-DVD や Live-USB を使用することができます！&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1188"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;サウンドミキサーの調整&lt;/b&gt;&lt;br/&gt;%1 はサウンドミキサーを設定します。ときには音を聞くためボリュームを上げたり、ミキサーのミュート解除が必要になるかもしれません。&lt;/p&gt; &lt;p&gt;ミキサーのショートカットはメニューにあります。ミキサーを開くにはこれをクリックしてください。 &lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;サウンドミキサの調整&lt;/b&gt;&lt;br/&gt;%1 はサウンドミキサを設定します。ときには音を聞くためボリュームを上げたり、ミキサのミュート解除が必要になるかもしれません。&lt;/p&gt; &lt;p&gt;ミキサのショートカットはメニューにあります。ミキサを開くにはこれをクリックしてください。 &lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1196"/>
@@ -1150,12 +1150,12 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="663"/>
         <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
-        <translation>レイアウトから既存のエントリーを削除します。これは、新しいレイアウトへのエントリーでのみ機能します。</translation>
+        <translation>レイアウトから既存のエントリを削除します。これは、新しいレイアウトへのエントリーでのみ機能します。</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="722"/>
         <source>Show advanced fields.</source>
-        <translation type="unfinished"></translation>
+        <translation>詳細な設定項目を表示します。</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="755"/>
@@ -1440,7 +1440,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1992"/>
         <source>Reminders</source>
-        <translation>リマインダー</translation>
+        <translation>リマインダ</translation>
     </message>
 </context>
 <context>
@@ -1448,14 +1448,14 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../oobe.cpp" line="334"/>
         <source>Please enter a computer name.</source>
-        <translation>コンピューター名を入力してください。</translation>
+        <translation>コンピュータ名を入力してください。</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="338"/>
         <source>Sorry, your computer name contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>申しわけありませんがコンピューター名に無効な文字列が含まれています。
+        <translation>申しわけありませんがコンピュータ名に無効な文字列が含まれています。
 先へ進むには別の名前を選んでください。</translation>
     </message>
     <message>
@@ -1468,7 +1468,7 @@ name before proceeding.</source>
         <source>Sorry, your computer domain contains invalid characters.
 You&apos;ll have to select a different
 name before proceeding.</source>
-        <translation>申しわけありませんがコンピューターのドメインに無効な文字列が含まれています。
+        <translation>申しわけありませんがコンピュータのドメインに無効な文字列が含まれています。
 先へ進むには別の名前を選んでください。</translation>
     </message>
     <message>
@@ -1598,7 +1598,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="511"/>
         <source>Default subvolume</source>
-        <translation>デフォルトのサブボリューム</translation>
+        <translation>既定のサブボリューム</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="512"/>
@@ -1849,12 +1849,12 @@ Please select a different name.</source>
         <translation>サブボリュームを準備中</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1389"/>
+        <location filename="../partman.cpp" line="1395"/>
         <source>Failed to mount partition.</source>
         <translation>パーティションのマウントに失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1394"/>
+        <location filename="../partman.cpp" line="1400"/>
         <source>Mounting: %1</source>
         <translation>%1 をマウント中</translation>
     </message>
@@ -1862,22 +1862,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2490"/>
         <source>&amp;Templates</source>
         <translation>テンプレート(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2498"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>圧縮 (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2486"/>
+        <location filename="../partman.cpp" line="2500"/>
         <source>Compression (&amp;LZO)</source>
         <translation>圧縮 (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2488"/>
+        <location filename="../partman.cpp" line="2502"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>圧縮 (&amp;ZLIB)</translation>
     </message>
@@ -1960,7 +1960,7 @@ The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a c
 The installer will not write any passwords or ignored settings to the new configuration file.
 Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.</source>
         <translation>&lt;config-file&gt; で指定された設定ファイルを読み込みます。
-デフォルトでは /etc/minstall.conf を使用します。
+既定では /etc/minstall.conf を使用します。
 この設定は、--auto と併用することで、自動インストールが可能です。
 インストーラは、パスワードや無視された設定を新しい設定ファイルに書き込みません。インストーラは、/mnt/antiX/etc/minstall.conf を作成（または上書き）し、将来使用するために /etc/minstalled.conf にコピーを保存します。
 インストーラは、パスワードや無視された設定を新しい設定ファイルには書き込みません。
@@ -1975,10 +1975,6 @@ Please note, this is experimental. Future installer versions may break compatibi
         <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>完了時には、/mnt/antiX をアンマウントしたり、関連する LUKS コンテナを閉じたりしないでください。</translation>
-    </message>
-    <message>
-        <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="vanished">インストーラの別のテストモードでは、パーティション/ドライブがフォーマットされ、ファイルのコピーがスキップされます。</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="110"/>

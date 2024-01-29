@@ -57,22 +57,22 @@ Najmanj: %2</translation>
         <translation>Brisanje starega sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="173"/>
+        <location filename="../base.cpp" line="181"/>
         <source>Failed to set the system configuration.</source>
         <translation>Nastavljanje sistemske konfiguracije ni bilo uspešno</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="175"/>
+        <location filename="../base.cpp" line="183"/>
         <source>Setting system configuration</source>
         <translation>Nastavitev konfiguracije sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="253"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Copying new system</source>
         <translation>Kopiranje novega sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="282"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Failed to copy the new system.</source>
         <translation>Kopiranje novega sistema ni bilo uspešno.</translation>
     </message>
@@ -1155,7 +1155,7 @@ Ali bi jo res radi zaustavili?</translation>
     <message>
         <location filename="../meinstall.ui" line="722"/>
         <source>Show advanced fields.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prikaži napredna polja.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="755"/>
@@ -1851,12 +1851,12 @@ Izberite drugo ime.</translation>
         <translation>Pripravljanje podpogonov</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1389"/>
+        <location filename="../partman.cpp" line="1395"/>
         <source>Failed to mount partition.</source>
         <translation>Priklapljanje razdelka ni uspelo.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1394"/>
+        <location filename="../partman.cpp" line="1400"/>
         <source>Mounting: %1</source>
         <translation>Priklapljanje: %1</translation>
     </message>
@@ -1864,22 +1864,22 @@ Izberite drugo ime.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2490"/>
         <source>&amp;Templates</source>
         <translation>&amp;Predloge</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2498"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Stiskanje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2486"/>
+        <location filename="../partman.cpp" line="2500"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Stiskanje (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2488"/>
+        <location filename="../partman.cpp" line="2502"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Stiskanje (&amp;ZLIB)</translation>
     </message>
@@ -1977,10 +1977,6 @@ Pomnite, da je to eksperimentalno. Prihodnji namestilniki so lahko nezdružljivi
         <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>Ko končate, ne odklopite /mnt/antiX ali katerega od povezanih vsebnikov, </translation>
-    </message>
-    <message>
-        <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="vanished">Še en poskusni način namestilnika. Razdelki/pogoni bodo FORMATIRANI, datoteke pa ne bodo skopirane.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="110"/>
