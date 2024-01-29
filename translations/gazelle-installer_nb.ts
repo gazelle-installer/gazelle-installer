@@ -57,22 +57,22 @@ Minimum: %2</translation>
         <translation>Sletter gammelt system</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="173"/>
+        <location filename="../base.cpp" line="181"/>
         <source>Failed to set the system configuration.</source>
         <translation>Klarte ikke lagre systemoppsettet.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="175"/>
+        <location filename="../base.cpp" line="183"/>
         <source>Setting system configuration</source>
         <translation>Setter opp systemet</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="253"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Copying new system</source>
         <translation>Kopierer nytt system</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="282"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Failed to copy the new system.</source>
         <translation>Klarte ikke kopiere det nye systemet.</translation>
     </message>
@@ -1155,7 +1155,7 @@ Vil du virkelig avbryte nå?</translation>
     <message>
         <location filename="../meinstall.ui" line="722"/>
         <source>Show advanced fields.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis avanserte felt.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="755"/>
@@ -1849,12 +1849,12 @@ Velg et annet brukernavn.</translation>
         <translation>Forbereder underområder for data</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1389"/>
+        <location filename="../partman.cpp" line="1395"/>
         <source>Failed to mount partition.</source>
         <translation>Klarte ikke montere partisjon.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1394"/>
+        <location filename="../partman.cpp" line="1400"/>
         <source>Mounting: %1</source>
         <translation>Monterer: %1</translation>
     </message>
@@ -1862,22 +1862,22 @@ Velg et annet brukernavn.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2490"/>
         <source>&amp;Templates</source>
         <translation>&amp;Maler</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2498"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Komprimering (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2486"/>
+        <location filename="../partman.cpp" line="2500"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Komprimering (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2488"/>
+        <location filename="../partman.cpp" line="2502"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Komprimering (&amp;ZLIB)</translation>
     </message>
@@ -1975,10 +1975,6 @@ Legg merke til at dette er eksperimentelt. Framtidige versjoner vil ikke nødven
         <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>Ikke avmonter /mnt/antiX eller lukk noen tilknyttede LUKS-beholdere ved fullføring.</translation>
-    </message>
-    <message>
-        <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="vanished">Testmodus for installasjonsprogrammet. Partisjoner/disker vil FORMATERES uten at filer kopieres.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="110"/>

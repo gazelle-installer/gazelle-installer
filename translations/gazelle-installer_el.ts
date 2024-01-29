@@ -57,22 +57,22 @@ Minimum: %2</source>
         <translation>Διαγραφή παλιού συστήματος</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="173"/>
+        <location filename="../base.cpp" line="181"/>
         <source>Failed to set the system configuration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="175"/>
+        <location filename="../base.cpp" line="183"/>
         <source>Setting system configuration</source>
         <translation>Ρύθμιση διαμόρφωσης συστήματος</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="253"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Copying new system</source>
         <translation>Αντιγραφή του νέου συστήματος</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="282"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Failed to copy the new system.</source>
         <translation>Αποτυχία αντιγραφής του νέου συστήματος.</translation>
     </message>
@@ -1856,12 +1856,12 @@ Please select a different name.</source>
         <translation>Προετοιμασία υποτόμων </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1389"/>
+        <location filename="../partman.cpp" line="1395"/>
         <source>Failed to mount partition.</source>
         <translation>Απέτυχε η προσάρτηση του διαμερίσματος.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1394"/>
+        <location filename="../partman.cpp" line="1400"/>
         <source>Mounting: %1</source>
         <translation>Προσάρτηση: %1</translation>
     </message>
@@ -1869,22 +1869,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2490"/>
         <source>&amp;Templates</source>
         <translation>&amp;Πρότυπα</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2498"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Συμπίεση (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2486"/>
+        <location filename="../partman.cpp" line="2500"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Συμπίεση (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2488"/>
+        <location filename="../partman.cpp" line="2502"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Συμπίεση (&amp; ZLIB)</translation>
     </message>
@@ -1982,10 +1982,6 @@ Please note, this is experimental. Future installer versions may break compatibi
         <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>Μην αποσυναρμολογείτε /mnt/antiX και μην κλείνετε κανένα από τα σχετικά δοχεία LUKS όταν τελειώσετε.</translation>
-    </message>
-    <message>
-        <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="vanished">Ένας άλλος τρόπος δοκιμής για το πρόγραμμα εγκατάστασης, τα διαμερίσματα/μονάδες δίσκου πρόκειται να διαμορφωθεί, θα παραλείψει την αντιγραφή των αρχείων.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="110"/>

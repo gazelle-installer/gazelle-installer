@@ -11,7 +11,7 @@
     <message>
         <location filename="../autopart.cpp" line="57"/>
         <source>Home</source>
-        <translation>Kotihakemisto</translation>
+        <translation>Koti</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="138"/>
@@ -57,22 +57,22 @@ Minimi: %2</translation>
         <translation>Poistetaan vanhaa järjestelmää</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="173"/>
+        <location filename="../base.cpp" line="181"/>
         <source>Failed to set the system configuration.</source>
         <translation>Järjestelmän asetusten määritys epäonnistui.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="175"/>
+        <location filename="../base.cpp" line="183"/>
         <source>Setting system configuration</source>
         <translation>Asetetaan järjestelmän kokoonpano</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="253"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Copying new system</source>
         <translation>Kopioidaan uutta järjestelmää</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="282"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Failed to copy the new system.</source>
         <translation>Uuden järjestelmän kopioiminen epäonnistui.</translation>
     </message>
@@ -462,7 +462,7 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="715"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitsemalla &lt;b&gt;Säilytä /home&lt;/b&gt; se säilyttää /home hakemiston sisällön, mutta poistaa kaiken muun. Tätä voidaan käyttää vain kun /home on samassa osiossa kuin root osio.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="717"/>
@@ -547,17 +547,17 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="739"/>
         <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos tietokoneesi käyttää Extensible Firmware Interface (EFI) niin tarvitset osion, joka tunnetaan nimellä EFI System Partition (ESP). Tämä käynnistää järjestelmän.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="740"/>
         <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nämä eivät vaadi aktiiviseksi merkittyä osiota, vaan ne edellyttävät FAT-tiedostojärjestelmällä alustettua osiota, joka on merkitty ESP:ksi.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="741"/>
         <source>Most systems built within the last 10 years use EFI.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tietokoneet, jotka on tehty viimeisen 10 vuoden aikana käyttävät EFI menetelmää.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="742"/>
@@ -592,7 +592,7 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="748"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
-        <translation type="unfinished"></translation>
+        <translation>Paina hiiren oikeaa ja valitse valikosta &lt;b&gt;Layout Builder&lt;/b&gt;. Tämä voi luoda tavallisen asennuksen kaltaisen asettelun.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="749"/>
@@ -602,22 +602,22 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="750"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and select &lt;b&gt;Preserve&lt;/b&gt; as the format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos haluat päivittää jo olemassa olevan Linux-asennuksen, valitse sama kotiosio kuin ennen ja valitse &lt;b&gt;Säilytä&lt;/b&gt; formaatikisi.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="751"/>
         <source>If you do not use a separate home partition, select &lt;b&gt;Preserve /home&lt;/b&gt; on the root file system entry to preserve the existing /home directory located on your root partition. The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos et käytä erillistä kotiosiota, valitse &lt;b&gt;Säilytä /home&lt;/b&gt; säilyttääksesi samassa root juuriosiossa olevan /home kotihakemiston. Asennusohjelma säilyttää vain /home hakemiston ja poistaa kaiken muun. Tämän takia asennus kestää tavallista kauemmin.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="753"/>
         <source>Preferred Filesystem Type</source>
-        <translation>Suositeltu Tiedostojärjestelmätyyppi</translation>
+        <translation>Tiedostojärjestelmän suositeltu tyyppi</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="754"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kohdassa %1 voit formatoida osiot ext2, ext3, ext4, f2fs, jfs, xfs tai btrfs.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="755"/>
@@ -627,12 +627,12 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="757"/>
         <source>System partition management tool</source>
-        <translation>Järjestelmän osioiden hallintatyökalu</translation>
+        <translation>Järjestelmän osiohallinta työkalu</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="758"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voit hallita asemaa (kuten muuttaa levyllä olevaa asettelua) painamalla osiohallinta painiketta (%1). Tämä käynnistää käyttöjärjestelmän osiohallinta työkalun, jonka avulla voit luoda osiot juuri tarvitsemasi asettelun mukaan.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="764"/>
@@ -1140,7 +1140,7 @@ Haluatko varmasti lopettaa nyt?</translation>
     <message>
         <location filename="../meinstall.ui" line="652"/>
         <source>Run the partition management application of this operating system.</source>
-        <translation>Suorita tämän käyttöjärjestelmän osioiden hallintasovellus.</translation>
+        <translation>Suorita tämän käyttöjärjestelmän osiohallinta työkalu.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="711"/>
@@ -1155,7 +1155,7 @@ Haluatko varmasti lopettaa nyt?</translation>
     <message>
         <location filename="../meinstall.ui" line="722"/>
         <source>Show advanced fields.</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä lisäkentät.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="755"/>
@@ -1175,7 +1175,7 @@ Haluatko varmasti lopettaa nyt?</translation>
     <message>
         <location filename="../meinstall.ui" line="827"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Asennuksen vahvistus</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="858"/>
@@ -1851,12 +1851,12 @@ Valitse eri nimi.</translation>
         <translation>Valmistellaan alitaltioita</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1389"/>
+        <location filename="../partman.cpp" line="1395"/>
         <source>Failed to mount partition.</source>
         <translation>Osion kiinnitys epäonnistui.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1394"/>
+        <location filename="../partman.cpp" line="1400"/>
         <source>Mounting: %1</source>
         <translation>Kiinnitetään: %1</translation>
     </message>
@@ -1864,22 +1864,22 @@ Valitse eri nimi.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2490"/>
         <source>&amp;Templates</source>
         <translation>&amp;Mallit</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2498"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Pakkaus (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2486"/>
+        <location filename="../partman.cpp" line="2500"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Pakkaus (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2488"/>
+        <location filename="../partman.cpp" line="2502"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Pakkaus (&amp;ZLIB)</translation>
     </message>
