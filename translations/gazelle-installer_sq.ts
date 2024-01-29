@@ -57,22 +57,22 @@ Shtëpia e %2%</translation>
         <translation>Po fshihet sistemi i vjetër</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="173"/>
+        <location filename="../base.cpp" line="181"/>
         <source>Failed to set the system configuration.</source>
         <translation>S’u arrit të ujdisej formësimi i sistemit.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="175"/>
+        <location filename="../base.cpp" line="183"/>
         <source>Setting system configuration</source>
         <translation>Po ujdiset formësim sistemi</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="253"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Copying new system</source>
         <translation>Po kopjohet sistemi i ri</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="282"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Failed to copy the new system.</source>
         <translation>S’u arrit të kopjohej sistemi i ri.</translation>
     </message>
@@ -1155,7 +1155,7 @@ Doni vërtet të ndalet tani?</translation>
     <message>
         <location filename="../meinstall.ui" line="722"/>
         <source>Show advanced fields.</source>
-        <translation type="unfinished"></translation>
+        <translation>Shfaq fusha të thelluara.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="755"/>
@@ -1851,12 +1851,12 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
         <translation>Po përgatitet nënvëllime</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1389"/>
+        <location filename="../partman.cpp" line="1395"/>
         <source>Failed to mount partition.</source>
         <translation>S’u arrit të montohej pjesë.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1394"/>
+        <location filename="../partman.cpp" line="1400"/>
         <source>Mounting: %1</source>
         <translation>Po montohet: %1</translation>
     </message>
@@ -1864,22 +1864,22 @@ Ju lutemi, përzgjidhni një emër tjetër.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2490"/>
         <source>&amp;Templates</source>
         <translation>&amp;Gjedhe</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2498"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Ngjeshje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2486"/>
+        <location filename="../partman.cpp" line="2500"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Ngjeshje (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2488"/>
+        <location filename="../partman.cpp" line="2502"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Ngjeshje (&amp;ZLIB)</translation>
     </message>
@@ -1977,10 +1977,6 @@ Ju lutemi, kini parasysh, kjo është eksperimentale. Versione të ardhshëm të
         <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>Kur përfundohet, mos çmontoni /mnt/antiX, apo të mbyllni çfarëdo kontejneri LUKS të përshoqëruar.</translation>
-    </message>
-    <message>
-        <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="vanished">Një tjetër mënyrë testimi për instaluesin, pjesët/disqet do të FORMATOHEN, kopjimi i kartelave do të anashkalohet.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="110"/>

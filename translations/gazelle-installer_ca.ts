@@ -57,22 +57,22 @@ Mínim: %2</translation>
         <translation>Esborrant el sistema antic </translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="173"/>
+        <location filename="../base.cpp" line="181"/>
         <source>Failed to set the system configuration.</source>
         <translation>Ha fallat en definir la configuració del sistema.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="175"/>
+        <location filename="../base.cpp" line="183"/>
         <source>Setting system configuration</source>
         <translation>Configuració dels paràmetres del sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="253"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Copying new system</source>
         <translation>Copiant el nou sistema </translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="282"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Failed to copy the new system.</source>
         <translation>Ha fallat en copiar el nou sistema.</translation>
     </message>
@@ -116,7 +116,7 @@ Mínim: %2</translation>
     <message>
         <location filename="../checkmd5.cpp" line="35"/>
         <source>Checking installation media.</source>
-        <translation>Comprovant el suport d&apos;instal·lació</translation>
+        <translation>Comprovant el suport d&apos;instal·lació.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="36"/>
@@ -147,7 +147,7 @@ Mínim: %2</translation>
 We recommend you quit now and restart in Legacy Boot
 
 Do you want to continue the installation?</source>
-        <translation>Esteu executant un S.O. de 32bit arrencat en mode UEFI de 64 bit; el sistema no podrà arrencar llevat que seleccioneu Legacy Boot o semblant en tornar a engegar.
+        <translation>Esteu executant un S.O. de 32bit arrencat en mode UEFI de 64 bit; el sistema no podrà arrencar llevat que seleccioneu Legacy Boot o semblant en reiniciar.
 Us recomanem que sortiu ara i torneu a arrencar en mode Legacy Boot.
 
 Voleu continuar la instal·lació?</translation>
@@ -227,7 +227,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="445"/>
         <source>Pretending to install %1</source>
-        <translation>Provant a instal·lar %1 </translation>
+        <translation>Provant d&apos;instal·lar %1 </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="516"/>
@@ -322,7 +322,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="678"/>
         <source>Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier. This can also improve overall performance by constraining the system files to a defined portion of the drive.</source>
-        <translation>Tenir el directori home en una partició separada millora la fiabilitat de les actualitzacions del Sistema Operatiu. també facilita les còpies de seguretat i la recuperació. També pot millorar el rendiment en mantenir els fitxers de sistema en una part definida del disc.</translation>
+        <translation>Tenir el directori home en una partició separada millora la fiabilitat de les actualitzacions del Sistema Operatiu. També facilita les còpies de seguretat i la recuperació. Alhora, pot millorar el rendiment en mantenir els fitxers de sistema en una part definida del disc.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="680"/>
@@ -356,7 +356,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="685"/>
         <source>If you need more control over where %1 is installed to, select &quot;&lt;b&gt;%2&lt;/b&gt;&quot; and click &lt;b&gt;Next&lt;/b&gt;. On the next page, you will then be able to select and configure the storage devices and partitions you need.</source>
-        <translation>Si us cal més control sobre on s&apos;instal·la %1 trieu &quot;&lt;b&gt;%2&lt;/b&gt;&quot; i cliqueu&lt;b&gt;D&apos;acord&lt;/b&gt;. A la propera pàgina, podreu triar i configurar els dispositius d&apos;emmagatzematge i les particions que necessiteu.</translation>
+        <translation>Si us cal més control sobre on s&apos;instal·la %1 trieu &quot;&lt;b&gt;%2&lt;/b&gt;&quot; i cliqueu&lt;b&gt;D&apos;acord&lt;/b&gt;. A la pròxima pàgina, podreu triar i configurar els dispositius d&apos;emmagatzematge i les particions que necessiteu.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="691"/>
@@ -381,7 +381,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="695"/>
         <source>&lt;i&gt;Use For&lt;/i&gt; - To use this partition in an installation, you must select something here.</source>
-        <translation>&lt;i&gt;Usa Per&lt;/i&gt; - Per usar aquesta partició en la instal·lació, cal que hi seleccioneu quelcom aquí.</translation>
+        <translation>&lt;i&gt;Usa Per&lt;/i&gt; - Per usar aquesta partició en la instal·lació, cal que seleccioneu quelcom aquí.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="697"/>
@@ -507,7 +507,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="726"/>
         <source>The installer cannot modify the layout already on the drive. To create a custom layout, mark the drive for a new layout with the &lt;b&gt;New layout&lt;/b&gt; menu action or button (%1). This clears the existing layout.</source>
-        <translation>L&apos;instal·lador no pot modificar la disposició que ja té la unitat. Per crear una disposició a mida, marqueu la unitat per a una nova disposiciṕ amb l&apos;acció de menú o botó (%1) &lt;b&gt;Nova disposició&lt;/b&gt; . Això neteja la disposició existent.</translation>
+        <translation>L&apos;instal·lador no pot modificar la disposició que ja té la unitat. Per crear una disposició a mida, marqueu la unitat per a una nova disposició amb l&apos;acció de menú o botó (%1) &lt;b&gt;Nova disposició&lt;/b&gt;. Això neteja la disposició existent.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="729"/>
@@ -527,7 +527,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="734"/>
         <source>Active partition</source>
-        <translation>Particiô activa</translation>
+        <translation>Partició activa</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="735"/>
@@ -567,7 +567,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="743"/>
         <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
-        <translation>Aquesta partició normalment només és necessària per particions arrel en dispositius virtuals com els encriptats, LVM o volums RAID per programari.</translation>
+        <translation>Aquesta partició normalment només és necessària per particions arrel en dispositius virtuals com els xifrats, LVM o volums RAID per programari.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="744"/>
@@ -597,7 +597,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="749"/>
         <source>Upgrading</source>
-        <translation>Actualització</translation>
+        <translation>Actualitzant</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="750"/>
@@ -672,7 +672,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="774"/>
         <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
-        <translation>Es poden preservar els subvolums actuals, tanmateix el nom ha de ser el mateix. </translation>
+        <translation>Es poden preservar els subvolums actuals, tanmateix, el nom ha de ser el mateix. </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="775"/>
@@ -797,7 +797,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="838"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
-        <translation>L&apos;usuari principal és semblant a l&apos;Administrador en altres Sistemes Operatius. No hauríeu d&apos;usar l&apos;usuari principal per a les tasques habituals. Si us plau, entre el nom per a un nou compte d&apos;usuari per a les tasques diàries. Si cal, podeu afegir altres comptes més endavant amb el Gestor d&apos;Usuaris %1.  </translation>
+        <translation>L&apos;usuari principal és semblant a l&apos;Administrador en altres Sistemes Operatius. No hauríeu d&apos;usar l&apos;usuari principal per a les tasques habituals. Si us plau, entreu el nom per a un nou compte d&apos;usuari (per omissió) i per a les tasques diàries. Si cal, podeu afegir altres comptes més endavant amb el Gestor d&apos;Usuaris %1.  </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="842"/>
@@ -847,7 +847,7 @@ Gaudiu usant %1</translation>
     <message>
         <location filename="../minstall.cpp" line="862"/>
         <source>Rename it and create a new directory</source>
-        <translation>Canviar-li el nom i crear un nou directori</translation>
+        <translation>Canvia el nom i crea un nou directori</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="863"/>
@@ -1155,7 +1155,7 @@ De debò voleu aturar-la ara?</translation>
     <message>
         <location filename="../meinstall.ui" line="722"/>
         <source>Show advanced fields.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostra els camps avançats.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="755"/>
@@ -1851,12 +1851,12 @@ Si us plau, trieu un nom diferent. </translation>
         <translation>Preparant subvolums</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1389"/>
+        <location filename="../partman.cpp" line="1395"/>
         <source>Failed to mount partition.</source>
         <translation>Ha fallat en muntar la partició.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1394"/>
+        <location filename="../partman.cpp" line="1400"/>
         <source>Mounting: %1</source>
         <translation>Muntant: %1</translation>
     </message>
@@ -1864,22 +1864,22 @@ Si us plau, trieu un nom diferent. </translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2490"/>
         <source>&amp;Templates</source>
         <translation>Plan&amp;tilles</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2498"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compressió (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2486"/>
+        <location filename="../partman.cpp" line="2500"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compressió (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2488"/>
+        <location filename="../partman.cpp" line="2502"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compressió (&amp;ZLIB)</translation>
     </message>
@@ -1979,15 +1979,13 @@ Tingueu en compte que això és experimental. Les futures versions de l&apos;ins
         <translation>No desmunteu /mnt/antiX o tanqueu cap dels contenidors LUKS associats en acabar.</translation>
     </message>
     <message>
-        <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="vanished">Un altre mode de prova per a l&apos;instal·lador, es FORMATARAN les particions/unitats, però no copiarà els fitxers.</translation>
-    </message>
-    <message>
         <location filename="../app.cpp" line="110"/>
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
-        <translation>Instal·la el Sistema Operatiu, retardant les preguntes per a les opcions específiques de l&apos;usuari fins a la propera arrencada.</translation>
+        <translation>Instal·la el Sistema Operatiu, retardant les preguntes per a les opcions específiques de l&apos;usuari fins a la pròxima arrencada.
+Un cop reiniciat, l&apos;instal·lador s&apos;executarà amb l&apos;opció -oobe, per tal que l&apos;usuari pugui facilitar aquests detalls.
+Això pot ser interessant per a les instal·lacions OEM, per vendre o regalar un ordinador amb un S.O. preinstal·lat.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="113"/>
@@ -2010,7 +2008,7 @@ Arrencarà automàticament si s&apos;ha instal·lat amb l&apos;opció --oem.</tr
         <location filename="../app.cpp" line="117"/>
         <source>Installing with rsync instead of cp on custom partitioning.
 -- doesn&apos;t format /root and it doesn&apos;t work with encryption.</source>
-        <translation>Instal·lació amb rsync  per comptes de cp. en particionat a mida. 
+        <translation>Instal·lació amb rsync  en comptes de cp en particionat a mida. 
 -- No formata /root i no funciona amb encriptació.</translation>
     </message>
     <message>
@@ -2053,7 +2051,7 @@ Si us plau, tanqueu-lo si podeu, o executeu &apos;pkill minstall&apos; en un ter
     <message>
         <location filename="../app.cpp" line="146"/>
         <source>This operation requires root access.</source>
-        <translation>Per fer aquesta opció cal accés com a administrador.</translation>
+        <translation>Per aquesta opció cal accedir com a administrador.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="167"/>

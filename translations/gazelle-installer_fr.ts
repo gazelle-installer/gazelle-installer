@@ -57,22 +57,22 @@ Minimum&#xa0;: %2</translation>
         <translation>Effacement de l’ancien système</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="173"/>
+        <location filename="../base.cpp" line="181"/>
         <source>Failed to set the system configuration.</source>
         <translation>Impossible de définir la configuration du système.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="175"/>
+        <location filename="../base.cpp" line="183"/>
         <source>Setting system configuration</source>
         <translation>Paramètre de configuration du système</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="253"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Copying new system</source>
         <translation>Copie du nouveau système</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="282"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Failed to copy the new system.</source>
         <translation>Impossible de copier le nouveau système.</translation>
     </message>
@@ -1155,7 +1155,7 @@ Voulez-vous vraiment quitter maintenant&#xa0;?</translation>
     <message>
         <location filename="../meinstall.ui" line="722"/>
         <source>Show advanced fields.</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les champs avancés.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="755"/>
@@ -1849,12 +1849,12 @@ Veuillez choisir un nom différent.</translation>
         <translation>Préparation des sous-volumes</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1389"/>
+        <location filename="../partman.cpp" line="1395"/>
         <source>Failed to mount partition.</source>
         <translation>Impossible de monter la partition.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1394"/>
+        <location filename="../partman.cpp" line="1400"/>
         <source>Mounting: %1</source>
         <translation>Montage&#xa0;: %1</translation>
     </message>
@@ -1862,22 +1862,22 @@ Veuillez choisir un nom différent.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2490"/>
         <source>&amp;Templates</source>
         <translation>&amp;Modèles</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2498"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compression (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2486"/>
+        <location filename="../partman.cpp" line="2500"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compression (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2488"/>
+        <location filename="../partman.cpp" line="2502"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compression (&amp;ZLIB)</translation>
     </message>
@@ -1975,10 +1975,6 @@ Veuillez noter que ceci est expérimental. Les futures versions de l’installat
         <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>Ne démontez pas /mnt/antiX et ne fermez aucun des conteneurs LUKS associés lorsque vous avez terminé.</translation>
-    </message>
-    <message>
-        <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="vanished">Un autre mode de test pour l’installateur, les partitions/disques vont être FORMATÉS, il ne copiera pas les fichiers.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="110"/>

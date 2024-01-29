@@ -56,22 +56,22 @@ Minimum: %2</source>
         <translation>Se șterge sistemul vechi</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="173"/>
+        <location filename="../base.cpp" line="181"/>
         <source>Failed to set the system configuration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="175"/>
+        <location filename="../base.cpp" line="183"/>
         <source>Setting system configuration</source>
         <translation>Configurare a sistemului</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="253"/>
+        <location filename="../base.cpp" line="261"/>
         <source>Copying new system</source>
         <translation>Copiere sistem nou</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="282"/>
+        <location filename="../base.cpp" line="290"/>
         <source>Failed to copy the new system.</source>
         <translation>A eșuat copierea noului sistem.</translation>
     </message>
@@ -1850,12 +1850,12 @@ Alegeți un nume diferit.</translation>
         <translation>Pregătirea subvolumelor</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1389"/>
+        <location filename="../partman.cpp" line="1395"/>
         <source>Failed to mount partition.</source>
         <translation>Nu s-a putut monta partiția.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1394"/>
+        <location filename="../partman.cpp" line="1400"/>
         <source>Mounting: %1</source>
         <translation>Montare: %1</translation>
     </message>
@@ -1863,22 +1863,22 @@ Alegeți un nume diferit.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2476"/>
+        <location filename="../partman.cpp" line="2490"/>
         <source>&amp;Templates</source>
         <translation>&amp;Șabloane</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2484"/>
+        <location filename="../partman.cpp" line="2498"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Comprimare (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2486"/>
+        <location filename="../partman.cpp" line="2500"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Comprimare (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2488"/>
+        <location filename="../partman.cpp" line="2502"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Comprimare (&amp;ZLIB)</translation>
     </message>
@@ -1976,10 +1976,6 @@ Vă rugăm să luați în considerare că acestă opțiune este experimentală. 
         <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
         <translation>Nu se demontează /mnt/antiX și nu se închide niciunul dintre containerele LUKS asociate la sfârșit.</translation>
-    </message>
-    <message>
-        <source>Another testing mode for installer, partitions/drives are going to be FORMATED, it will skip copying the files.</source>
-        <translation type="vanished">Un alt mod de testare pentru instalator, partițiile/unitățile vor fi FORMATATE, se va omite copierea fișierelor.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="110"/>
