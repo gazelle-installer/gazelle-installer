@@ -1412,9 +1412,6 @@ void PartMan::mountPartitions()
         if (!opts.contains("noiversion")) opts.append("noiversion");
         if (!opts.contains("noatime")) opts.append("noatime");
         proc.exec("mount", {"--mkdir", "-o", opts.join(','), dev, point});
-        if (it.first == "/swap"){
-            proc.exec("swapoff",{"-a"});
-        }
     }
 }
 
