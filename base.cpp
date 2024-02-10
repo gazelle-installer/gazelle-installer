@@ -152,7 +152,7 @@ void Base::install()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     if (proc.halted()) return;
-    proc.advance(1, 2);
+    proc.advance(1, 1);
 
     const PartMan::Device *mount = partman.mounts.at("/");
     const bool skiphome = !mount->willFormat();
@@ -161,19 +161,20 @@ void Base::install()
         // if root was not formatted and not using --sync option then re-use it
         // remove all folders in root except for /home
         proc.status(tr("Deleting old system"));
-        proc.exec("find", {"/mnt/antiX/boot", "-mindepth", "1", "-maxdepth", "1",
-            "!", "-name", "efi", "-exec", "rm", "-r", "{}", "+"});
-        if (QDir("/mnt/antiX/swap").exists()){
-            proc.exec("find", {"/mnt/antiX/swap", "-mindepth", "1", "-maxdepth", "1",
-                               "-exec", "rm", "-r", "{}", "+"});
-        proc.status();
-        proc.exec("find", {"/mnt/antiX", "-mindepth", "1", "-maxdepth", "1",
-            "!", "-name", "home", "!", "-name", "boot", "!", "-name", "swap", "-exec", "rm", "-r", "{}", "+"});
-        } else {
-            proc.status();
-            proc.exec("find", {"/mnt/antiX", "-mindepth", "1", "-maxdepth", "1",
-                "!", "-name", "home", "!", "-name", "boot", "-exec", "rm", "-r", "{}", "+"});
+        QStringList findargs({"/mnt/antiX", "-mindepth", "1", "-xdev"});
+        // Preserve mount points of other file systems.
+        for (auto &it : partman.mounts) {
+            if (it.first.at(0) == '/' && it.first != "/") {
+                findargs << "!" << "-path" << "/mnt/antiX" + it.first;
+            }
         }
+        // Preserve /home even if not a separate file system.
+        if (partman.mounts.count("/home") < 1) {
+            findargs << "!" << "-path" << "/mnt/antiX/home/*";
+            findargs << "!" << "-path" << "/mnt/antiX/home";
+        }
+        findargs << "-delete";
+        proc.exec("find", findargs);
     }
 
     copyLinux(skiphome);
