@@ -134,14 +134,14 @@ bool MProcess::exec(const QString &program, const QStringList &arguments, const 
     ++execount;
     const QString &cmd = joinCommand(program, arguments);
     qDebug().nospace().noquote() << "Exec #" << execount << ": " << cmd;
-    return exec(program, arguments, input, needRead, log(cmd, LOG_EXEC));
+    return exec(program, arguments, input, needRead, log(cmd, LOG_EXEC, false));
 }
 bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead)
 {
     if (checkHalt()) return false;
     ++execount;
     qDebug().nospace().noquote() << "Bash #" << execount << ": " << cmd;
-    return exec("/usr/bin/bash", {"-c", cmd}, input, needRead, log(cmd, LOG_EXEC));
+    return exec("/usr/bin/bash", {"-c", cmd}, input, needRead, log(cmd, LOG_EXEC, false));
 }
 
 QString MProcess::readOut(bool everything) noexcept
@@ -275,7 +275,7 @@ void MProcess::sleep(const int msec, const bool silent) noexcept
     QListWidgetItem *logEntry = nullptr;
     if (!silent) {
         ++sleepcount;
-        logEntry = log(QString("SLEEP: %1ms").arg(msec), LOG_EXEC);
+        logEntry = log(QString("SLEEP: %1ms").arg(msec), LOG_EXEC, false);
         qDebug().nospace() << "Sleep #" << sleepcount << ": " << msec << "ms";
     }
     QTimer cstimer(this);
@@ -293,7 +293,7 @@ bool MProcess::mkpath(const QString &path, mode_t mode, bool force)
     if (checkHalt()) return false;
     if (!force && QFileInfo::exists(path)) return true;
 
-    QListWidgetItem *logEntry = log("MKPATH: "+path, LOG_EXEC);
+    QListWidgetItem *logEntry = log("MKPATH: "+path, LOG_EXEC, false);
     bool rc = QDir().mkpath(path);
     if (mode && rc) rc = (chmod(path.toUtf8().constData(), mode) == 0);
     qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
@@ -343,14 +343,18 @@ MProcess::Section::Section(class MProcess &mproc) noexcept
 MProcess::Section::~Section() noexcept
 {
     const char *oldroot = oldsection ? oldsection->rootdir : nullptr;
-    if (qstrcmp(oldroot, rootdir)) proc.log(QString("Revert root: ")+oldroot, LOG_LOG);
+    if (qstrcmp(oldroot, rootdir)) {
+        proc.log(QString("Revert root: ")+oldroot, LOG_LOG);
+    }
     proc.section = oldsection;
 }
 
 // Note: newroot must be valid and unchanged for the life of the chroot.
 void MProcess::Section::setRoot(const char *newroot) noexcept
 {
-    if (qstrcmp(newroot, rootdir)) proc.log(QString("Change root: ")+newroot, LOG_LOG);
+    if (qstrcmp(newroot, rootdir)) {
+        proc.log(QString("Change root: ")+newroot, LOG_LOG);
+    }
     rootdir = newroot; // Might be different pointers to the same text.
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
