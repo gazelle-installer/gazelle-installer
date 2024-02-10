@@ -2055,13 +2055,8 @@ QStringList PartMan::Device::allowedFormats() const noexcept
     } else if (type == SUBVOLUME) {
         list.append("CREATE");
         if (flags.oldLayout) {
-            if (usefor == "/swap"){
-                //list.append("DELETE")
-                allowPreserve = false;
-            } else {
-                list.append("DELETE");
-                allowPreserve = true;
-            }
+            list.append("DELETE");
+            allowPreserve = true;
         }
     }
 
