@@ -1363,7 +1363,7 @@ bool PartMan::makeFstab() noexcept
          fsfmt = volume->finalFormat();
         }
 
-        if (fsfmt == "SWAP") out << " swap swap";
+        if (fsfmt.toLower() == "swap") out << " swap swap";
         else {
             out << ' ' << it.first;
             if (fsfmt.startsWith("FAT")) out << " vfat";
@@ -1382,7 +1382,7 @@ bool PartMan::makeFstab() noexcept
             out << ' ' << (volume->dump ? 1 : 0);
             out << ' ' << volume->pass;
         }
-        if (fsfmt =="SWAP") out <<" 0 0";
+        if (fsfmt.toLower() == "swap") out <<" 0 0";
         out << '\n';
     }
     file.close();
