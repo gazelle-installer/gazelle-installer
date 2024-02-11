@@ -26,7 +26,7 @@ case "$1" in
   start)
 	# Boot will hold here since the process is not being forked.
 	echo "Loading Out-of-Box Experience..."
-	startx /usr/sbin/minstall --oobe --config 2>/dev/null
+	startx /usr/bin/oobe.sh2>/dev/null
 	# Boot will continue after the OOBE application and X exits.
 	;;
 esac
