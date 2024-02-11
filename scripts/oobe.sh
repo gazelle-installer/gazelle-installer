@@ -11,6 +11,11 @@ if [ -e "/etc/default/locale" ]; then
 fi
 
 #now run localized oobe
+
+if [ "$LANG" = '' ]; then
+	LANG=C
+fi
+
 LC_ALL=$LANG /usr/sbin/minstall --oobe --config 2>/dev/null
 
 exit 0
