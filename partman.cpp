@@ -702,9 +702,9 @@ bool PartMan::composeValidate(bool automatic) noexcept
         if (volume->type == Device::SUBVOLUME) {
             // Ensure the subvolume label entry is valid.
             bool ok = true;
-            const QString &cmptext = volume->label.trimmed().toUpper();
+            const QString &cmptext = volume->label.trimmed();
             if (cmptext.isEmpty()) ok = false;
-            if (cmptext.count(QRegularExpression("[^A-Z0-9\\/\\@\\.\\-\\_]|\\/\\/"))) ok = false;
+            if (cmptext.count(QRegularExpression("[^A-Za-z0-9\\/\\@\\.\\-\\_]|\\/\\/"))) ok = false;
             if (cmptext.startsWith('/') || cmptext.endsWith('/')) ok = false;
             if (!ok) {
                 QMessageBox::critical(gui.boxMain, QString(), tr("Invalid subvolume label"));
@@ -715,7 +715,7 @@ bool PartMan::composeValidate(bool automatic) noexcept
             assert(pit != nullptr);
             for (Device *sdevice : pit->children) {
                 if (sdevice == volume) continue;
-                if (sdevice->label.trimmed().toUpper() == cmptext) {
+                if (sdevice->label.trimmed().compare(cmptext, Qt::CaseInsensitive) == 0) {
                     QMessageBox::critical(gui.boxMain, QString(), tr("Duplicate subvolume label"));
                     return false;
                 }
@@ -1357,14 +1357,15 @@ bool PartMan::makeFstab() noexcept
         }
         // Mount point, file system
         QString fsfmt;
-        if (volume->type == Device::SUBVOLUME){
-           fsfmt = "btrfs";
+        if (volume->type == Device::SUBVOLUME) {
+            fsfmt = "btrfs";
         } else {
-         fsfmt = volume->finalFormat();
+            fsfmt = volume->finalFormat();
         }
 
-        if (fsfmt.toLower() == "swap") out << " swap swap";
-        else {
+        if (fsfmt.compare("swap", Qt::CaseInsensitive) == 0) {
+            out << " swap swap";
+        } else {
             out << ' ' << it.first;
             if (fsfmt.startsWith("FAT")) out << " vfat";
             else out << ' ' << fsfmt;
@@ -1382,7 +1383,9 @@ bool PartMan::makeFstab() noexcept
             out << ' ' << (volume->dump ? 1 : 0);
             out << ' ' << volume->pass;
         }
-        if (fsfmt.toLower() == "swap") out <<" 0 0";
+        if (fsfmt.compare("swap", Qt::CaseInsensitive) == 0) {
+            out <<" 0 0";
+        }
         out << '\n';
     }
     file.close();
