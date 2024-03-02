@@ -57,22 +57,22 @@ Minimum: %2</source>
         <translation>Διαγραφή παλιού συστήματος</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="181"/>
+        <location filename="../base.cpp" line="182"/>
         <source>Failed to set the system configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Αποτυχία ρύθμισης παραμέτρων συστήματος.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="183"/>
+        <location filename="../base.cpp" line="184"/>
         <source>Setting system configuration</source>
         <translation>Ρύθμιση διαμόρφωσης συστήματος</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="261"/>
+        <location filename="../base.cpp" line="262"/>
         <source>Copying new system</source>
         <translation>Αντιγραφή του νέου συστήματος</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="290"/>
+        <location filename="../base.cpp" line="291"/>
         <source>Failed to copy the new system.</source>
         <translation>Αποτυχία αντιγραφής του νέου συστήματος.</translation>
     </message>
@@ -212,7 +212,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Διαμόρφωση συστήματος. Παρακαλώ περιμένετε.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
@@ -242,7 +242,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="552"/>
         <source>Format and use the entire disk (%1) for %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Μορφοποιήστε και χρησιμοποιήστε ολόκληρο τον δίσκο (%1) για το %2</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="567"/>
@@ -682,7 +682,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="776"/>
         <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Εάν το πρόγραμμα εγκατάστασης εντοπίσει οποιεσδήποτε εικονικές συσκευές, όπως ανοιχτά διαμερίσματα LUKS, λογικούς τόμους LVM ή τόμους RAID που βασίζονται σε λογισμικό, ενδέχεται να χρησιμοποιηθούν για την εγκατάσταση.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="777"/>
@@ -692,12 +692,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Τελική αναθεώρηση και επιβεβαίωση</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ελέγξτε προσεκτικά αυτήν τη λίστα. Αυτή είναι η τελευταία ευκαιρία να ελέγξετε, να ελέγξετε και να επιβεβαιώσετε τις ενέργειες της διαδικασίας εγκατάστασης πριν προχωρήσετε.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -1157,7 +1157,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="722"/>
         <source>Show advanced fields.</source>
-        <translation type="unfinished"></translation>
+        <translation>Εμφάνιση σύνθετων πεδίων.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="755"/>
@@ -1177,7 +1177,7 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="827"/>
         <source>Installation Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Επιβεβαίωση εγκατάστασης</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="858"/>
@@ -1602,7 +1602,7 @@ Please select a different name.</source>
     <message>
         <location filename="../partman.cpp" line="511"/>
         <source>Default subvolume</source>
-        <translation type="unfinished"></translation>
+        <translation>Προεπιλεγμένος υποτόμος</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="512"/>
@@ -1856,12 +1856,12 @@ Please select a different name.</source>
         <translation>Προετοιμασία υποτόμων </translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1395"/>
+        <location filename="../partman.cpp" line="1398"/>
         <source>Failed to mount partition.</source>
         <translation>Απέτυχε η προσάρτηση του διαμερίσματος.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1400"/>
+        <location filename="../partman.cpp" line="1403"/>
         <source>Mounting: %1</source>
         <translation>Προσάρτηση: %1</translation>
     </message>
@@ -1869,22 +1869,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2490"/>
+        <location filename="../partman.cpp" line="2485"/>
         <source>&amp;Templates</source>
         <translation>&amp;Πρότυπα</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2498"/>
+        <location filename="../partman.cpp" line="2493"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Συμπίεση (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2500"/>
+        <location filename="../partman.cpp" line="2495"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Συμπίεση (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2502"/>
+        <location filename="../partman.cpp" line="2497"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Συμπίεση (&amp; ZLIB)</translation>
     </message>

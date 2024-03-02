@@ -57,22 +57,22 @@ home %2%</translation>
         <translation>以前のシステムを削除中</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="181"/>
+        <location filename="../base.cpp" line="182"/>
         <source>Failed to set the system configuration.</source>
         <translation>システムの設定に失敗しました。</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="183"/>
+        <location filename="../base.cpp" line="184"/>
         <source>Setting system configuration</source>
         <translation>システムの設定を行っています</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="261"/>
+        <location filename="../base.cpp" line="262"/>
         <source>Copying new system</source>
         <translation>新しいシステムをコピー中</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="290"/>
+        <location filename="../base.cpp" line="291"/>
         <source>Failed to copy the new system.</source>
         <translation>新しいシステムのコピーに失敗しました。</translation>
     </message>
@@ -277,7 +277,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="666"/>
         <source>Remember, this software is provided AS-IS with no warranty what-so-ever. It is solely your responsibility to backup your data before proceeding.</source>
-        <translation>このソフトウェアは現状のままで提供され、一切の保証はありません。作業を続行する前にデータをバックアップするのは全てユーザーの責任です。</translation>
+        <translation>このソフトウェアは現状のままで提供され、一切の保証はありません。作業を続行する前にデータをバックアップするのは全部ユーザの責任です。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="670"/>
@@ -297,7 +297,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="673"/>
         <source>The drive can be divided into separate system (root) and user data (home) partitions using the slider.</source>
-        <translation>スライダを使用して、ドライブを個別のシステム (root) パーティションとユーザーデータ (home) パーティションに分割できます。</translation>
+        <translation>スライダを使用して、ドライブを個別のシステム (root) パーティションとユーザデータ (home) パーティションに分割できます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="674"/>
@@ -412,7 +412,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="703"/>
         <source>User data</source>
-        <translation>ユーザーデータ</translation>
+        <translation>ユーザデータ</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="704"/>
@@ -762,7 +762,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="824"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
-        <translation>既定の言語と地域を設定します。これは、後でユーザーが上書きしない限り、適用されます。</translation>
+        <translation>既定の言語と地域を設定します。これは、後でユーザが上書きしない限り、適用されます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="825"/>
@@ -772,7 +772,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="826"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
-        <translation>Apple または純粋な Unixコンピュータの場合、デフォルトではシステムクロックはグリニッジ標準時（GMT）または協定世界時（UTC）に設定されています。これを変更するには、「&lt;b&gt;システムクロックは現地時刻を使う&lt;/b&gt;」のボックスをチェックします。</translation>
+        <translation>Apple または純粋な Unixコンピュータの場合、既定ではシステムクロックはグリニッジ標準時（GMT）または協定世界時（UTC）に設定されています。これを変更するには、「&lt;b&gt;システムクロックは現地時刻を使う&lt;/b&gt;」のボックスをチェックします。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="828"/>
@@ -787,17 +787,17 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="831"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
-        <translation>たいていのユーザーはデフォルト値を変更しないでください。ただし、リソースの少ないコンピューターでは、RAMの使用量をできるだけ少なくするために、必要のないサービスを無効にしたい場合があります。自分が何をしようとしているのか良く考えましょう。</translation>
+        <translation>多くのユーザは、既定値を変更するべきではありません。ただし、リソースの少ないコンピュータでは、RAM の使用量をできるだけ少なくするために、必要のないサービスを無効にする場合があります。自分で何をしているのか、しっかり把握しておきましょう！</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="837"/>
         <source>Default User Login</source>
-        <translation>既定のユーザーログイン</translation>
+        <translation>既定のユーザログイン</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="838"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
-        <translation>root ユーザーは、他のいくつかのオペレーティングシステムにおける管理者アカウントに似ています。通常使用するユーザーアカウントとして root ユーザーを使用しないでください。日常的に使用する新しい (既定の) ユーザー アカウントの名前を入力してください。もし必要な場合は、あとから %1 ユーザー管理 でアカウントの追加を行うことができます。</translation>
+        <translation>root ユーザは、他の一部のオペレーティングシステムにおける管理者アカウントに似ています。通常使用するユーザアカウントとして root ユーザを使用しないでください。日常的に使用する新しい (既定の) ユーザアカウントの名前を入力してください。もし必要な場合は、あとから %1 ユーザマネージャでアカウントの追加を行うことができます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="842"/>
@@ -807,7 +807,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="843"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
-        <translation>既定のユーザーアカウントと root アカウントの新規パスワードを入力してください。パスワードは、それぞれ 2回入力する必要があります。</translation>
+        <translation>既定のユーザアカウントと root アカウントの新規パスワードを入力してください。パスワードは、それぞれ 2回入力する必要があります。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="845"/>
@@ -817,12 +817,12 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="846"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
-        <translation>既定のユーザーアカウントにパスワードを設定したくない場合は、そのパスワード入力欄を空白にしてください。これで、パスワードを要求されずにログインすることができます。</translation>
+        <translation>既定のユーザアカウントにパスワードを設定したくない場合は、そのパスワード入力欄を空白にしてください。これで、パスワードを要求されずにログインすることができます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="848"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
-        <translation>もちろん、これは公共の端末などで、ユーザーアカウントの安全性を確保する必要がない場合にのみ行うべきものです。</translation>
+        <translation>もちろん、これは公共の端末などで、ユーザアカウントの安全性を確保する必要がない場合にのみ行うべきものです。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="856"/>
@@ -832,7 +832,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="857"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
-        <translation>選択したユーザー名の home ディレクトリが既に存在しています。この画面で、そのディレクトリをどうするか選択することができます。</translation>
+        <translation>選択したユーザ名の home ディレクトリが既に存在しています。この画面で、そのディレクトリをどうするか選択することができます。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="859"/>
@@ -842,7 +842,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="860"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
-        <translation>古い home ディレクトリ用にこのユーザーアカウントを使用します。これはアップグレードの際に良い選択であり、ファイルや設定がすぐ利用できるようになります。</translation>
+        <translation>古い home ディレクトリ用にこのユーザアカウントを使用します。これはアップグレードの際に良い選択であり、ファイルや設定がすぐ利用できるようになります。</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="862"/>
@@ -1355,22 +1355,22 @@ Do you really want to stop now?</source>
     <message>
         <location filename="../meinstall.ui" line="1628"/>
         <source>Default User Account</source>
-        <translation>既定のユーザーアカウント</translation>
+        <translation>既定のユーザアカウント</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1640"/>
         <source>Default user login name:</source>
-        <translation>既定のユーザーログイン名:</translation>
+        <translation>既定のユーザログイン名:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1659"/>
         <source>username</source>
-        <translation>ユーザー名</translation>
+        <translation>ユーザ名</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1672"/>
         <source>Default user password:</source>
-        <translation>既定のユーザーパスワード:</translation>
+        <translation>既定のユーザパスワード:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1701"/>
@@ -1480,8 +1480,8 @@ name before proceeding.</source>
         <location filename="../oobe.cpp" line="513"/>
         <source>The user name cannot contain special characters or spaces.
 Please choose another name before proceeding.</source>
-        <translation>ユーザー名には特殊文字や空白を含むことができません。
-先へ進むには別の名前を選んで下さい。</translation>
+        <translation>ユーザ名には特殊文字や空白を含むことができません。
+先へ進むには別の名前を選んでください。</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="524"/>
@@ -1508,7 +1508,7 @@ Please select a different name.</source>
     <message>
         <location filename="../oobe.cpp" line="553"/>
         <source>Failed to set user account passwords.</source>
-        <translation>ユーザーアカウントのパスワード設定に失敗しました。</translation>
+        <translation>ユーザアカウントのパスワード設定に失敗しました。</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="579"/>
@@ -1523,17 +1523,17 @@ Please select a different name.</source>
     <message>
         <location filename="../oobe.cpp" line="609"/>
         <source>Sorry, failed to create user directory.</source>
-        <translation>ユーザーディレクトリの生成に失敗しました。</translation>
+        <translation>ユーザディレクトリの生成に失敗しました。</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="612"/>
         <source>Sorry, failed to name user directory.</source>
-        <translation>ユーザーディレクトリの命名に失敗しました。</translation>
+        <translation>ユーザディレクトリの命名に失敗しました。</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="648"/>
         <source>Failed to set ownership or permissions of user directory.</source>
-        <translation>ユーザーディレクトリの権限またはパーミッションの設定に失敗しました。</translation>
+        <translation>ユーザディレクトリの権限またはパーミッションの設定に失敗しました。</translation>
     </message>
 </context>
 <context>
@@ -1849,12 +1849,12 @@ Please select a different name.</source>
         <translation>サブボリュームを準備中</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1395"/>
+        <location filename="../partman.cpp" line="1398"/>
         <source>Failed to mount partition.</source>
         <translation>パーティションのマウントに失敗しました。</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1400"/>
+        <location filename="../partman.cpp" line="1403"/>
         <source>Mounting: %1</source>
         <translation>%1 をマウント中</translation>
     </message>
@@ -1862,22 +1862,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2490"/>
+        <location filename="../partman.cpp" line="2485"/>
         <source>&amp;Templates</source>
         <translation>テンプレート(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2498"/>
+        <location filename="../partman.cpp" line="2493"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>圧縮 (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2500"/>
+        <location filename="../partman.cpp" line="2495"/>
         <source>Compression (&amp;LZO)</source>
         <translation>圧縮 (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2502"/>
+        <location filename="../partman.cpp" line="2497"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>圧縮 (&amp;ZLIB)</translation>
     </message>
@@ -1981,9 +1981,9 @@ Please note, this is experimental. Future installer versions may break compatibi
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
-        <translation>オペレーティングシステムをインストールし、ユーザー特有のオプションの表示を最初の再起動まで遅延します。
-再起動時に --oobe を付けてインストーラが実行されるので、ユーザーにはこうした情報が提供されます
-これは、OEMインストールや、OSがプリインストールされたコンピュータを販売したり、譲ったりする際に便利です。</translation>
+        <translation>オペレーティングシステムをインストールし、ユーザ特有のオプションの表示を最初の再起動まで遅延します。
+再起動時に --oobe を付けてインストーラが実行されるので、ユーザにはこうした情報が提供されます
+これは、OEM インストールや、OS がプリインストールされたコンピュータを販売したり、譲ったりする際に便利です。</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="113"/>
