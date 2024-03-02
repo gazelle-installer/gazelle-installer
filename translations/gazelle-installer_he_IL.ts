@@ -23,7 +23,7 @@ Minimum: %2</source>
     <message>
         <location filename="../autopart.cpp" line="177"/>
         <source>Layout Builder</source>
-        <translation type="unfinished"></translation>
+        <translation>בונה פריסות</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="320"/>
@@ -55,22 +55,22 @@ Minimum: %2</source>
         <translation>המערכת הישנה נמחקת</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="181"/>
+        <location filename="../base.cpp" line="182"/>
         <source>Failed to set the system configuration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="183"/>
+        <location filename="../base.cpp" line="184"/>
         <source>Setting system configuration</source>
         <translation>תצורת המערכת מוגדרת</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="261"/>
+        <location filename="../base.cpp" line="262"/>
         <source>Copying new system</source>
         <translation>כעת בהעתקת המערכת החדשה</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="290"/>
+        <location filename="../base.cpp" line="291"/>
         <source>Failed to copy the new system.</source>
         <translation>העתקת המערכת החדשה נכשלה.</translation>
     </message>
@@ -119,17 +119,17 @@ Minimum: %2</source>
     <message>
         <location filename="../checkmd5.cpp" line="36"/>
         <source>Press ESC to skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>ESC לדילוג.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="53"/>
         <source>The installation media is corrupt.</source>
-        <translation type="unfinished"></translation>
+        <translation>אמצעי ההתקנה פגום.</translation>
     </message>
     <message>
         <location filename="../checkmd5.cpp" line="117"/>
         <source>Are you sure you want to skip checking the installation media?</source>
-        <translation type="unfinished"></translation>
+        <translation>לדלג על בדיקת אמצעי ההתקנה?</translation>
     </message>
 </context>
 <context>
@@ -155,7 +155,7 @@ Do you want to continue the installation?</source>
     <message>
         <location filename="../minstall.cpp" line="179"/>
         <source>These actions cannot be undone. Do you want to continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>אלו פעולות בלתי הפיכות. להמשיך?</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="192"/>
@@ -201,7 +201,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="412"/>
         <source>Configuring system. Please wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>המערכת מוגדרת. נא להמתין.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="416"/>
@@ -211,7 +211,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="421"/>
         <source>The installation was aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>ההתקנה בוטלה</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="445"/>
@@ -391,7 +391,7 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="701"/>
         <source>Boot manager</source>
-        <translation type="unfinished"></translation>
+        <translation>מנהל אתחול</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="702"/>
@@ -401,32 +401,32 @@ Enjoy using %1</source>
     <message>
         <location filename="../minstall.cpp" line="703"/>
         <source>User data</source>
-        <translation type="unfinished"></translation>
+        <translation>נתוני המשתמש</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="704"/>
         <source>Static data</source>
-        <translation type="unfinished"></translation>
+        <translation>נתונים קבועים</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="705"/>
         <source>Variable data</source>
-        <translation type="unfinished"></translation>
+        <translation>נתונים משתנים</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="706"/>
         <source>Temporary files</source>
-        <translation type="unfinished"></translation>
+        <translation>קבצים זמניים</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="707"/>
         <source>Swap files</source>
-        <translation type="unfinished"></translation>
+        <translation>קובצי החלפה</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="708"/>
         <source>Swap partition</source>
-        <translation type="unfinished"></translation>
+        <translation>מחיצת החלפה</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="710"/>
@@ -1837,12 +1837,12 @@ Please select a different name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1395"/>
+        <location filename="../partman.cpp" line="1398"/>
         <source>Failed to mount partition.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1400"/>
+        <location filename="../partman.cpp" line="1403"/>
         <source>Mounting: %1</source>
         <translation>עיגון: %1</translation>
     </message>
@@ -1850,22 +1850,22 @@ Please select a different name.</source>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2490"/>
+        <location filename="../partman.cpp" line="2485"/>
         <source>&amp;Templates</source>
         <translation>&amp;תבניות</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2498"/>
+        <location filename="../partman.cpp" line="2493"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>דחיסה (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2500"/>
+        <location filename="../partman.cpp" line="2495"/>
         <source>Compression (&amp;LZO)</source>
         <translation>דחיסה (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2502"/>
+        <location filename="../partman.cpp" line="2497"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>דחיסה (&amp;ZLIB)</translation>
     </message>
