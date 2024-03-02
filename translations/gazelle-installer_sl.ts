@@ -57,22 +57,22 @@ Najmanj: %2</translation>
         <translation>Brisanje starega sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="181"/>
+        <location filename="../base.cpp" line="182"/>
         <source>Failed to set the system configuration.</source>
         <translation>Nastavljanje sistemske konfiguracije ni bilo uspešno</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="183"/>
+        <location filename="../base.cpp" line="184"/>
         <source>Setting system configuration</source>
         <translation>Nastavitev konfiguracije sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="261"/>
+        <location filename="../base.cpp" line="262"/>
         <source>Copying new system</source>
         <translation>Kopiranje novega sistema</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="290"/>
+        <location filename="../base.cpp" line="291"/>
         <source>Failed to copy the new system.</source>
         <translation>Kopiranje novega sistema ni bilo uspešno.</translation>
     </message>
@@ -807,7 +807,7 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="843"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
-        <translation>Vnesite novo geslo za svoj privzeti uporabniški račun in za korenski račun. Vsako geslo mora biti vnešeno dvakrat,</translation>
+        <translation>Vnesite novo geslo za svoj privzeti uporabniški račun in za korenski račun. Vsako geslo mora biti vneseno dvakrat,</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="845"/>
@@ -1851,12 +1851,12 @@ Izberite drugo ime.</translation>
         <translation>Pripravljanje podpogonov</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1395"/>
+        <location filename="../partman.cpp" line="1398"/>
         <source>Failed to mount partition.</source>
         <translation>Priklapljanje razdelka ni uspelo.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1400"/>
+        <location filename="../partman.cpp" line="1403"/>
         <source>Mounting: %1</source>
         <translation>Priklapljanje: %1</translation>
     </message>
@@ -1864,22 +1864,22 @@ Izberite drugo ime.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2490"/>
+        <location filename="../partman.cpp" line="2485"/>
         <source>&amp;Templates</source>
         <translation>&amp;Predloge</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2498"/>
+        <location filename="../partman.cpp" line="2493"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Stiskanje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2500"/>
+        <location filename="../partman.cpp" line="2495"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Stiskanje (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2502"/>
+        <location filename="../partman.cpp" line="2497"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Stiskanje (&amp;ZLIB)</translation>
     </message>

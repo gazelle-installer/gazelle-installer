@@ -57,22 +57,22 @@ Minimum&#xa0;: %2</translation>
         <translation>Effacement de l’ancien système</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="181"/>
+        <location filename="../base.cpp" line="182"/>
         <source>Failed to set the system configuration.</source>
         <translation>Impossible de définir la configuration du système.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="183"/>
+        <location filename="../base.cpp" line="184"/>
         <source>Setting system configuration</source>
         <translation>Paramètre de configuration du système</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="261"/>
+        <location filename="../base.cpp" line="262"/>
         <source>Copying new system</source>
         <translation>Copie du nouveau système</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="290"/>
+        <location filename="../base.cpp" line="291"/>
         <source>Failed to copy the new system.</source>
         <translation>Impossible de copier le nouveau système.</translation>
     </message>
@@ -1849,12 +1849,12 @@ Veuillez choisir un nom différent.</translation>
         <translation>Préparation des sous-volumes</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1395"/>
+        <location filename="../partman.cpp" line="1398"/>
         <source>Failed to mount partition.</source>
         <translation>Impossible de monter la partition.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1400"/>
+        <location filename="../partman.cpp" line="1403"/>
         <source>Mounting: %1</source>
         <translation>Montage&#xa0;: %1</translation>
     </message>
@@ -1862,22 +1862,22 @@ Veuillez choisir un nom différent.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2490"/>
+        <location filename="../partman.cpp" line="2485"/>
         <source>&amp;Templates</source>
         <translation>&amp;Modèles</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2498"/>
+        <location filename="../partman.cpp" line="2493"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Compression (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2500"/>
+        <location filename="../partman.cpp" line="2495"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Compression (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2502"/>
+        <location filename="../partman.cpp" line="2497"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Compression (&amp;ZLIB)</translation>
     </message>
