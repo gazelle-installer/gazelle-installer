@@ -24,7 +24,7 @@ Minimi: %2</translation>
     <message>
         <location filename="../autopart.cpp" line="177"/>
         <source>Layout Builder</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout Builder</translation>
     </message>
     <message>
         <location filename="../autopart.cpp" line="320"/>
@@ -57,22 +57,22 @@ Minimi: %2</translation>
         <translation>Poistetaan vanhaa järjestelmää</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="181"/>
+        <location filename="../base.cpp" line="182"/>
         <source>Failed to set the system configuration.</source>
         <translation>Järjestelmän asetusten määritys epäonnistui.</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="183"/>
+        <location filename="../base.cpp" line="184"/>
         <source>Setting system configuration</source>
         <translation>Asetetaan järjestelmän kokoonpano</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="261"/>
+        <location filename="../base.cpp" line="262"/>
         <source>Copying new system</source>
         <translation>Kopioidaan uutta järjestelmää</translation>
     </message>
     <message>
-        <location filename="../base.cpp" line="290"/>
+        <location filename="../base.cpp" line="291"/>
         <source>Failed to copy the new system.</source>
         <translation>Uuden järjestelmän kopioiminen epäonnistui.</translation>
     </message>
@@ -637,12 +637,12 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="764"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos haluat säilyttää salatun osion, paina sitä hiirellä ja valitse &lt;b&gt;Avaa lukitus&lt;/b&gt;. Kirjoita tulevaan valintaikkunaan virtuaalilaitteen nimi ja salasana. Kun laitteen lukitus on avattu, valitsemasi nimi näkyy kohdassa &lt;i&gt;Virtuaalilaitteet&lt;/i&gt;. Sillänä on samanlaiset asetukset kuin tavallisella osiolla.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="766"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jotta salattu osio avataan käynnistyksen yhteydessä, se on lisättävä crypttab-tiedostoon. Käytä &lt;b&gt;Lisää taulukkoon Crypttab&lt;/b&gt;.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="767"/>
@@ -652,7 +652,7 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="768"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Asennusohjelma sallii muiden osioiden luomisen tai käyttämisen eri tarkoituksiin. Muista, että vanhemmat järjestelmät eivät pysty käsittelemään asemia, joissa on enemmän kuin 4 osiota.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="769"/>
@@ -682,22 +682,22 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="776"/>
         <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos asennusohjelma havaitsee virtuaalilaitteita, kuten avattuja LUKS-osioita, LVM-loogisia asemia tai ohjelmistopohjaisia RAID-taltioita. Niitä voidaan käyttää asennuksessa.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="777"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Virtuaalilaitteiden käyttö (salattujen tiedostojärjestelmien säilyttäminen) on edistynyt ominaisuus. Saatat joutua muokkaamaan joitain tiedostoja (esim. initramfs, crypttab, fstab) varmistaaksesi, että käytetyt virtuaalilaitteet luodaan käynnistyksen yhteydessä.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="787"/>
         <source>Final Review and Confirmation</source>
-        <translation type="unfinished"></translation>
+        <translation>Lopullinen tarkistus ja vahvistus</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="788"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lue tämä luettelo huolellisesti. Tämä on viimeinen tilaisuus tarkistaa ja vahvistaa asennusprosessi ennen kuin jatkat.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="795"/>
@@ -707,22 +707,22 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="796"/>
         <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 käyttää GRUB-käynnistyslatainta %1 ja Microsoft Windowsin käynnistämiseen.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="797"/>
         <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletuksena GRUB asennetaan käynnistysasemasi Master Boot Record (MBR) tai ESP (EFI System Partition for 64bit UEFI boot system) osioon ja korvaa aiemmin käyttämäsi lataajan. Tämä on normaalia.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="798"/>
         <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos päättäisit sen sijaan asentaa GRUB osion käynnistystietueeseen (PBR) niin GRUB asennetaan asetetun osion alkuun. Tämä asetus on vain asiantuntijoille.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="799"/>
         <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos poistat valinnan ruudusta &quot;Asenna GRUB&quot; niin sitä ei asenneta. Tämä asetus on vain asiantuntijoille.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="800"/>
@@ -742,7 +742,7 @@ Pidä hauskaa käyttäessäsi %1</translation>
     <message>
         <location filename="../minstall.cpp" line="803"/>
         <source>Setting the size to 0 has the same effect as unchecking this option.</source>
-        <translation type="unfinished"></translation>
+        <translation>Koon asettaminen arvoon 0 vaikuttaa samalla tavalla kuin tämän asetuksen valinnan poistaminen.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="809"/>
@@ -1495,7 +1495,7 @@ Valitse eri nimi.</translation>
     <message>
         <location filename="../oobe.cpp" line="533"/>
         <source>You did not provide a passphrase for %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Et antanut salasanaa kohteelle %1.</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="534"/>
@@ -1535,7 +1535,7 @@ Valitse eri nimi.</translation>
     <message>
         <location filename="../oobe.cpp" line="648"/>
         <source>Failed to set ownership or permissions of user directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttäjän oman hakemiston omistajuuden tai käyttöoikeuksien asettaminen epäonnistui.</translation>
     </message>
 </context>
 <context>
@@ -1570,7 +1570,7 @@ Valitse eri nimi.</translation>
         <location filename="../partman.cpp" line="456"/>
         <location filename="../partman.cpp" line="609"/>
         <source>Add to crypttab</source>
-        <translation>Lisää crypttab:iin</translation>
+        <translation>Lisää taulukkoon Crypttab</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="463"/>
@@ -1595,7 +1595,7 @@ Valitse eri nimi.</translation>
     <message>
         <location filename="../partman.cpp" line="490"/>
         <source>Layout &amp;Builder...</source>
-        <translation type="unfinished"></translation>
+        <translation>Layout &amp;Builder...</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="511"/>
@@ -1748,27 +1748,27 @@ Valitse eri nimi.</translation>
     <message>
         <location filename="../partman.cpp" line="877"/>
         <source>The installation may fail because the following volumes are too small:</source>
-        <translation type="unfinished"></translation>
+        <translation>Asennus voi epäonnistua, koska seuraavat asemat ovat liian pieniä:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="890"/>
         <source>This system uses EFI, but no valid EFI system partition was assigned to /boot/efi separately.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä tietokone käyttää EFI:ä, mutta kelvollista EFI osiota ei ole määritetty /boot/efi:lle erikseen.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="893"/>
         <source>The volume assigned to /boot/efi is not a valid EFI system partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedostolle /boot/efi määritetty asema ei ole kelvollinen EFI-järjestelmäosio.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="920"/>
         <source>The following drives are, or will be, setup with GPT, but do not have a BIOS-GRUB partition:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seuraavat asemat on asennettu tai tullaan asentamaan GPT:n kanssa, mutta niissä ei ole BIOS-GRUB osiota:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="922"/>
         <source>This system may not boot from GPT drives without a BIOS-GRUB partition.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä tietokone ei välttämättä käynnisty GPT-asemilta ilman BIOS-GRUB osiota.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="960"/>
@@ -1851,12 +1851,12 @@ Valitse eri nimi.</translation>
         <translation>Valmistellaan alitaltioita</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1395"/>
+        <location filename="../partman.cpp" line="1398"/>
         <source>Failed to mount partition.</source>
         <translation>Osion kiinnitys epäonnistui.</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="1400"/>
+        <location filename="../partman.cpp" line="1403"/>
         <source>Mounting: %1</source>
         <translation>Kiinnitetään: %1</translation>
     </message>
@@ -1864,22 +1864,22 @@ Valitse eri nimi.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2490"/>
+        <location filename="../partman.cpp" line="2485"/>
         <source>&amp;Templates</source>
         <translation>&amp;Mallit</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2498"/>
+        <location filename="../partman.cpp" line="2493"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Pakkaus (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2500"/>
+        <location filename="../partman.cpp" line="2495"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Pakkaus (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2502"/>
+        <location filename="../partman.cpp" line="2497"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Pakkaus (&amp;ZLIB)</translation>
     </message>
@@ -1950,7 +1950,8 @@ Valitse eri nimi.</translation>
         <location filename="../app.cpp" line="100"/>
         <source>Overrules sanity checks on partitions and drives, causing them to be displayed.
 -- WARNING: this can break things, use it only if you don&apos;t care about data on drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohittaa osioiden ja asemien tarkistukset, jolloin ne näytetään.
+-- VAROITUS: tämä voi rikkoa asioita. Käytä vain tapauksessa jossa aseman tietietojen häviämisellä ei ole merkitystä.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="102"/>
@@ -1960,12 +1961,17 @@ This configuration can be used with --auto for an unattended installation.
 The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.
 The installer will not write any passwords or ignored settings to the new configuration file.
 Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lataa konfiguraatio, jonka määritetään &lt;config-file&gt;oletuksena
+käyttämällä /etc/minstall.conf-tiedostoa.
+Voidaan käyttää yhdessä --auto vivulla asennuksessa ilman valvontaa.
+Asennusohjelma luo (tai korvaa) tiedoston /mnt/antiX/etc/minstall.conf ja tallentaa kopion tiedostoon /etc/minstalled.conf myöhempää käyttöä varten.
+Asennusohjelma ei kirjoita salasanoja uuteen asetustiedostoon.
+Huomaa, että tämä on kokeellista. Tulevat ohjelmaversiot voivat rikkoa yhteensopivuuden olemassa olevien määritystiedostojen kanssa.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="108"/>
         <source>Shutdown automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sammuta automaattisesti kun asennus on valmis.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="109"/>
@@ -1977,13 +1983,14 @@ Please note, this is experimental. Future installer versions may break compatibi
         <source>Install the operating system, delaying prompts for user-specific options until the first reboot.
 Upon rebooting, the installer will be run with --oobe so that the user can provide these details.
 This is useful for OEM installations, selling or giving away a computer with an OS pre-loaded on it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Asenna käyttöjärjestelmä viivyttämällä käyttäjälle liittyvien asetusten kohteita ensimmäiseen uudelleenkäynnistykseen saakka. Käynnistyksen jälkeen asennusohjelma suoritetaan komennolla --oobe, jotta käyttäjä voi antaa omat tiedot. Tämä on hyödyllistä OEM-asennuksissa, myydessä tai luovuttaessa tietokonetta, jossa on valmiiksi ladattu käyttöjärjestelmä.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="113"/>
         <source>Out Of the Box Experience option.
 This will start automatically if installed with --oem option.</source>
-        <translation type="unfinished"></translation>
+        <translation>Suoraan paketista asetukset.
+Käynnistyy automaattisesti, jos se asennetaan --oem-optiolla.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="115"/>
@@ -1993,7 +2000,7 @@ This will start automatically if installed with --oem option.</source>
     <message>
         <location filename="../app.cpp" line="116"/>
         <source>Reboots automatically when done installing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käynnistyy automaattisesti uudelleen kun asennus on valmis.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="117"/>
@@ -2005,13 +2012,13 @@ This will start automatically if installed with --oem option.</source>
     <message>
         <location filename="../app.cpp" line="119"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarkasta asennusmedia aina alussa.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="120"/>
         <source>Do not check the installation media at the beginning.
 Not recommended unless the installation media is guaranteed to be free from errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Älä tarkista asennusmediaa alussa. Ei suositella, ellei asennusmediassa ole taatusti virheitä.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="122"/>
