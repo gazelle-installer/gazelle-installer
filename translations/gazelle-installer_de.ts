@@ -452,7 +452,7 @@ Viel Spaß mit %1</translation>
     <message>
         <location filename="../minstall.cpp" line="712"/>
         <source>&lt;i&gt;Encrypt&lt;/i&gt; - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.</source>
-        <translation>&lt;i&gt;Verschlüsseln&lt;/i&gt; —  LUKS Verschlüsselung für diese Partition verwenden. Das Paßwort gilt für alle Partitionen, für welche die Option zur Verschlüsselung ausgewählt wurde.</translation>
+        <translation>&lt;i&gt;Verschlüsseln&lt;/i&gt; —  LUKS Verschlüsselung für diese Partition verwenden. Das Passwort gilt für alle Partitionen, für welche die Option zur Verschlüsselung ausgewählt wurde.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="713"/>
@@ -472,7 +472,7 @@ Viel Spaß mit %1</translation>
     <message>
         <location filename="../minstall.cpp" line="718"/>
         <source>&lt;i&gt;Check&lt;/i&gt; - Check and correct for bad blocks on the drive (not supported for all formats). This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
-        <translation>&lt;i&gt;Prüfen&lt;/i&gt; - Überprüfen und korrigieren des Laufwerks auf fehlerhafte Blöcke (wird nicht von allen Formaten unterstützt). Dies ist sehr zeitaufwendig, daher sollten Sie diesen Schritt überspringen, es sei denn, Sie vermuten, dass Ihr Laufwerk fehlerhafte Blöcke enthält.</translation>
+        <translation>&lt;i&gt;Prüfen&lt;/i&gt; - Überprüfen und Korrigieren des Laufwerks auf fehlerhafte Blöcke (wird nicht von allen Formaten unterstützt). Dies ist sehr zeitaufwendig, daher sollten Sie diesen Schritt überspringen, es sei denn, Sie vermuten, dass Ihr Laufwerk fehlerhafte Blöcke enthält.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="720"/>
@@ -637,7 +637,7 @@ Viel Spaß mit %1</translation>
     <message>
         <location filename="../minstall.cpp" line="764"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
-        <translation>Um eine bestehende verschlüsselte Partition zu übernehmen, klicken Sie mit der rechten Maustaste darauf und wählen Sie &lt;b&gt;Aufschließen&lt;/b&gt;. Im darauffolgenden Dialogfenster geben Sie einen Namen für das virtuelle Gerät und sein Paßwort an. Nachdem das Gerät entschlüsselt wurde, erscheint es mit dem von Ihnen gewählten Namen unter &lt;i&gt;Virtuelle Geräte&lt;/i&gt; und mit Optionen ähnlich jenen normaler Partitionen.</translation>
+        <translation>Um eine bestehende verschlüsselte Partition zu übernehmen, klicken Sie mit der rechten Maustaste darauf und wählen Sie &lt;b&gt;Aufschließen&lt;/b&gt;. Im folgenden Dialogfenster geben Sie einen Namen für das virtuelle Gerät und das Passwort an. Nachdem das Gerät entschlüsselt wurde, erscheint es mit dem von Ihnen gewählten Namen unter &lt;i&gt;Virtuelle Geräte&lt;/i&gt; mit vergleichbaren Optionen einer regulären Partition.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="766"/>
@@ -753,7 +753,7 @@ Wählen Sie hier die Systemdienste, die Sie in Ihrer Systemkonfiguration haben w
     <message>
         <location filename="../minstall.cpp" line="813"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Computer Identifikation&lt;/b&gt;&lt;br/&gt;Der “Computername” ist ein gewöhnlicher, nicht mehrfach vergebener Name, der Ihren Computer, falls er einem Netzwerk angeschlossen ist, eindeutig identifiziert. Der “Domainname” muß auf dem Computer nur eingetragen werden, falls Ihr Internetdienstleister oder das lokale Netzwerk dies erfordern.&lt;/p&gt;&lt;p&gt;Die Computer- und Domainnamen dürfen nur alphanumerische Zeichen, Punkte und Bindestriche enthalten. Sie dürfen keine Leerzeichen enthalten und nicht mit einem Bindestrich beginnen oder enden.&lt;/p&gt;&lt;p&gt;Der “SaMBa” Server muss aktiviert werden, sofern Sie beabsichtigen, einige Ihrer Verzeichnisse oder Drucker mit anderen Computern gemeinsam zu nutzen, die mit Betriebssystemen wie “MS-Windows” oder “Mac OS X” arbeiten.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Computer-Identifikation&lt;/b&gt;&lt;br/&gt;Der Computername ist ein gewöhnlicher, nicht mehrfach vergebener Name, der Ihren Computer, falls er einem Netzwerk angeschlossen ist, eindeutig identifiziert. Der Domainname muß auf dem Computer nur eingetragen werden, falls Ihr Internetdienstleister oder das lokale Netzwerk dies erfordern.&lt;/p&gt;&lt;p&gt;Die Computer- und Domainnamen dürfen nur alphanumerische Zeichen, Punkte und Bindestriche enthalten. Sie dürfen keine Leerzeichen enthalten und nicht mit einem Bindestrich beginnen oder enden.&lt;/p&gt;&lt;p&gt;Der SaMBa-Server muss aktiviert werden, sofern Sie beabsichtigen, einige Ihrer Verzeichnisse oder Drucker mit anderen Computern, die mit Betriebssystemen wie MS-Windows oder Mac OS X arbeiten, gemeinsam zu nutzen.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="823"/>
@@ -808,7 +808,7 @@ Wählen Sie hier die Systemdienste, die Sie in Ihrer Systemkonfiguration haben w
     <message>
         <location filename="../minstall.cpp" line="843"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
-        <translation>Geben Sie ein neues Passwort für ihr Standardbenutzerkonto und für das Administratorkonto ein. Jedes Passwort muss zweimal eingegeben werden.</translation>
+        <translation>Geben Sie ein neues Passwort für Ihr Standardbenutzerkonto und für das Administratorkonto ein. Jedes Passwort muss zweimal eingegeben werden.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="845"/>
@@ -971,12 +971,12 @@ Möchten Sie wirklich den Vorgang beenden?</translation>
     <message>
         <location filename="../minstall.cpp" line="1196"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Halten Sie ihr %1 stets aktuell&lt;/b&gt;&lt;br/&gt;Für Aktualisierungen und weitere Informationen besuchen Sie bitte &lt;/p&gt;&lt;p&gt;%2.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Halten Sie Ihr %1 stets aktuell&lt;/b&gt;&lt;br/&gt;Für Aktualisierungen und weitere Informationen besuchen Sie bitte &lt;/p&gt;&lt;p&gt;%2.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="1201"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Danksagung&lt;/b&gt;&lt;br/&gt;Herzlichen Dank an alle, die %1 unterstützen mit Zeit, Geld, Vorschlägen, Arbeit, Lob, Ideen, Weiterempfehlungen, und/oder Zuspruch.&lt;/p&gt;&lt;p&gt;Ohne Euch gäbe es kein %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Danksagung&lt;/b&gt;&lt;br/&gt;Herzlichen Dank an alle, die %1 mit Zeit, Geld, Vorschlägen, Arbeit, Lob, Ideen, Weiterempfehlungen, und Zuspruch unterstützen.&lt;/p&gt;&lt;p&gt;Ohne Euch gäbe es kein %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -1014,7 +1014,7 @@ Möchten Sie wirklich den Vorgang beenden?</translation>
     <message>
         <location filename="../meinstall.ui" line="120"/>
         <source>Installation in progress</source>
-        <translation>Installation wird durchgeführt</translation>
+        <translation>Die Installation wird durchgeführt</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="135"/>
@@ -1151,12 +1151,12 @@ Möchten Sie wirklich den Vorgang beenden?</translation>
     <message>
         <location filename="../meinstall.ui" line="663"/>
         <source>Remove an existing entry from the layout. This only works with entries to a new layout.</source>
-        <translation>Entferne eine zur Neuanlage vorgemerkte Partition aus der zusammengestellten Laufwerksstruktur</translation>
+        <translation>Entferne eine zur Neuanlage vorgemerkte Partition aus der zusammengestellten Laufwerksstruktur.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="722"/>
         <source>Show advanced fields.</source>
-        <translation>Zusatzfelder anzeigen.</translation>
+        <translation>Zusatzoptionen anzeigen.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="755"/>
@@ -1266,12 +1266,12 @@ Möchten Sie wirklich den Vorgang beenden?</translation>
     <message>
         <location filename="../meinstall.ui" line="1169"/>
         <source>Computer Network Names</source>
-        <translation>Computer Netzwerknamen</translation>
+        <translation>Computer-Netzwerknamen</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1196"/>
         <source>Workgroup</source>
-        <translation>Workgroup</translation>
+        <translation>Arbeitsgruppe</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1209"/>
@@ -1281,7 +1281,7 @@ Möchten Sie wirklich den Vorgang beenden?</translation>
     <message>
         <location filename="../meinstall.ui" line="1222"/>
         <source>SaMBa Server for MS Networking</source>
-        <translation>Samba Server für MS-Netzwerk</translation>
+        <translation>Samba-Server für MS-Netzwerk</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1238"/>
@@ -1406,12 +1406,12 @@ Möchten Sie wirklich den Vorgang beenden?</translation>
     <message>
         <location filename="../meinstall.ui" line="1857"/>
         <source>What would you like to do with the old directory?</source>
-        <translation>Wie wollen Sie mit dem alten Verzeichnis verfahren ?</translation>
+        <translation>Wie soll mit dem alten Verzeichnis verfahren werden?</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1864"/>
         <source>Re-use it for this installation</source>
-        <translation>Wiederverwenden für diese Neuinstallation.</translation>
+        <translation>Für diese Neuinstallation wiederverwenden.</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1871"/>
@@ -1510,7 +1510,7 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../oobe.cpp" line="553"/>
         <source>Failed to set user account passwords.</source>
-        <translation>Festlegung des Benutzerpassworts fehlgeschlagen.</translation>
+        <translation>Festlegen des Benutzerpassworts fehlgeschlagen.</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="579"/>
@@ -1525,12 +1525,12 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../oobe.cpp" line="609"/>
         <source>Sorry, failed to create user directory.</source>
-        <translation>Konnte das Benutzer-Verzeichnis nicht anlegen.</translation>
+        <translation>Das Benutzerverzeichnis konnte nicht anlegt werden.</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="612"/>
         <source>Sorry, failed to name user directory.</source>
-        <translation>Konnte das Benutzer-Verzeichnis nicht umbenennen.</translation>
+        <translation>Das Benutzerverzeichnis konnte nicht anlegt werden.</translation>
     </message>
     <message>
         <location filename="../oobe.cpp" line="648"/>
@@ -1615,12 +1615,12 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../partman.cpp" line="612"/>
         <source>Password:</source>
-        <translation>Paßwort:</translation>
+        <translation>Passwort:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="638"/>
         <source>Could not unlock device. Possible incorrect password.</source>
-        <translation>Das Gerät konnte nicht entschlüsselt werden. Falsches Paßwort?</translation>
+        <translation>Das Gerät konnte nicht entschlüsselt werden. Falsches Passwort?</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="666"/>
@@ -1680,7 +1680,7 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../partman.cpp" line="778"/>
         <source>Reuse (no reformat) %1 as %2</source>
-        <translation>Verwende %1 als %2 wieder, ohne Neuformatierung.</translation>
+        <translation>Verwende %1 als %2 wieder (ohne Neuformatierung).</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="779"/>
@@ -1773,12 +1773,12 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../partman.cpp" line="960"/>
         <source>The disks with the partitions you selected for installation are failing:</source>
-        <translation>Die Festplatten mit den für die Installtion gewählten Partitionen ist fehlerhaft :</translation>
+        <translation>Die Festplatten mit den für die Installation gewählten Partitionen ist fehlerhaft :</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="964"/>
         <source>Smartmon tool output:</source>
-        <translation>Ausgabe des Prüfprogramms Smartmon :</translation>
+        <translation>Ergebnis des Prüfprogramms Smartmon:</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="965"/>
@@ -1788,7 +1788,7 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../partman.cpp" line="972"/>
         <source>If unsure, please exit the Installer and run GSmartControl for more information.</source>
-        <translation>Im Zweifel brechen Sie bitte die Installation ab und führen GSmartControl aus, um weitere Informationen zu erhalten.</translation>
+        <translation>Im Zweifel bitte die Installation abrechen und GSmartControl ausführen, um weitere Informationen zu erhalten.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="976"/>
@@ -1853,7 +1853,7 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../partman.cpp" line="1398"/>
         <source>Failed to mount partition.</source>
-        <translation>Mount der Partition fehlgeschlagen.</translation>
+        <translation>Einhängen der Partition fehlgeschlagen.</translation>
     </message>
     <message>
         <location filename="../partman.cpp" line="1403"/>
@@ -1924,12 +1924,12 @@ Bitte einen anderen Namen wählen.</translation>
     <message>
         <location filename="../passedit.cpp" line="179"/>
         <source>Hide the password</source>
-        <translation>Paßwort verbergen</translation>
+        <translation>Passwort verbergen</translation>
     </message>
     <message>
         <location filename="../passedit.cpp" line="179"/>
         <source>Show the password</source>
-        <translation>Paßwort anzeigen</translation>
+        <translation>Passwort anzeigen</translation>
     </message>
 </context>
 <context>
@@ -1944,7 +1944,7 @@ Bitte einen anderen Namen wählen.</translation>
         <source>Installs automatically using the configuration file (more information below).
 -- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.</source>
         <translation>Automatische Installation auf Basis einer Konfigurationsdatei. (Details siehe unten).
--- VORSICHT !  Diese Option löscht Partitionen ohne Rückfrage automatisch und ist daher riskant.</translation>
+-- VORSICHT: Diese Option löscht Partitionen automatisch ohne Rückfrage und ist daher riskant.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="100"/>
@@ -1961,22 +1961,22 @@ This configuration can be used with --auto for an unattended installation.
 The installer creates (or overwrites) /mnt/antiX/etc/minstall.conf and saves a copy to /etc/minstalled.conf for future use.
 The installer will not write any passwords or ignored settings to the new configuration file.
 Please note, this is experimental. Future installer versions may break compatibility with existing configuration files.</source>
-        <translation>Einlesen einer unter &lt;config-file&gt; angegeben Konfigurationsdatei.
+        <translation>Einer unter &lt;config-file&gt; angegeben Konfigurationsdatei einlesen.
 Als Standard wird /etc/minstall.conf verwendet.
 Diese Konfiguration kann mit der Option --auto für eine unbeaufsichtigte Installation genutzt werden.
-Das Installationsprogramm legt die Datei /mnt/antiX/etc/minstall.conf an bzw. überschreibt sie sofern vorhanden, und erzeugt eine Kopie /etc/minstalled.conf zur späteren Verwendung.
-Weder Paßworte noch abgewählte Einstellungen werden in die Konfigurationsdateien aufgenommen.
-Zur Beachtung: Diese Funktion ist experimentell. Zukünftige Versionen des Installationsprogramms können inkompatibel zu Konfigurationsdateien früherer Versionen sein.</translation>
+Das Installationsprogramm legt die Datei /mnt/antiX/etc/minstall.conf an (oder überschreibt) sie und erzeugt eine Kopie /etc/minstalled.conf zur späteren Verwendung.
+Weder Passworte noch abgewählte Einstellungen werden in die neue Konfigurationsdatei aufgenommen.
+Hinweis: Diese Funktion ist experimentell. Zukünftige Versionen des Installationsprogramms können inkompatibel zu Konfigurationsdateien früherer Versionen sein.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="108"/>
         <source>Shutdown automatically when done installing.</source>
-        <translation>Nach der Installation automatisch abschalten.</translation>
+        <translation>Nach der Installation automatisch herunterfahren.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="109"/>
         <source>Do not unmount /mnt/antiX or close any of the associated LUKS containers when finished.</source>
-        <translation>Hängen Sie /mnt/antiX nicht aus und schließen Sie auch keinen der zugeordneten »LUKS«-Container nach Fertigstellung!</translation>
+        <translation>Hängen Sie /mnt/antiX nicht aus und schließen Sie nach Fertigstellung auch keinen der zugeordneten »LUKS«-Container.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="110"/>
@@ -1997,12 +1997,12 @@ Automatischer Start, sofern mit der Option --oem installiert.</translation>
     <message>
         <location filename="../app.cpp" line="115"/>
         <source>Test mode for GUI, you can advance to different screens without actially installing.</source>
-        <translation>Testmodus für die grafische Benutzeroberfläche (GUI). Verschiedene Oberflächen sind ohne endgültige Installation zugänglich.</translation>
+        <translation>Testmodus für die grafische Benutzeroberfläche. Verschiedene Oberflächen sind ohne endgültige Installation zugänglich.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="116"/>
         <source>Reboots automatically when done installing.</source>
-        <translation>Automatischer Reboot nach Abschluss der Installation.</translation>
+        <translation>Nach Abschluss der Installation das System automatisch neustarten.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="117"/>
@@ -2014,7 +2014,7 @@ Automatischer Start, sofern mit der Option --oem installiert.</translation>
     <message>
         <location filename="../app.cpp" line="119"/>
         <source>Always check the installation media at the beginning.</source>
-        <translation>Das Installationsmedien immer zuerst überprüfen</translation>
+        <translation>Das Installationsmedien immer zuerst überprüfen.</translation>
     </message>
     <message>
         <location filename="../app.cpp" line="120"/>
