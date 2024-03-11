@@ -887,7 +887,7 @@ Uživajte v sistemu %1!</translation>
     <message>
         <location filename="../minstall.cpp" line="886"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
-        <translation>%1 se namešča. Sveža namestitev bo vzela med 3-20 minut, odvisno od hitrosti sistema in velikosti razdelkov, ki jih ponovno formatirate.</translation>
+        <translation>%1 se namešča. Sveža namestitev bo trajala od 3-20 minut, odvisno od hitrosti sistema in velikosti razdelkov, ki jih ponovno formatirate.</translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="888"/>
@@ -923,7 +923,7 @@ Uživajte v sistemu %1!</translation>
         <location filename="../minstall.cpp" line="911"/>
         <location filename="../minstall.cpp" line="1180"/>
         <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Podpora za %1&lt;/b&gt;&lt;br/&gt;%1 je podprt s strani ljudi, kakršnih ste vi. Nekateri pomagajo drugim preko podpornega foruma -%2 - drugi s prevajanjem pomoči v druge jezike, podajanjem predlogov, pisanjem dokumentacije ali preizkušanjem novih programov.&lt;/p&gt; </translation>
+        <translation>&lt;p&gt;&lt;b&gt;Podpora za %1&lt;/b&gt;&lt;br/&gt;%1 podpirajo ljudi, kot ste vi. Nekateri pomagajo drugim preko podpornega foruma -%2 - drugi s prevajanjem pomoči v druge jezike, podajanjem predlogov, pisanjem dokumentacije ali preizkušanjem novih programov.&lt;/p&gt; </translation>
     </message>
     <message>
         <location filename="../minstall.cpp" line="941"/>
@@ -1305,7 +1305,7 @@ Ali bi jo res radi zaustavili?</translation>
     <message>
         <location filename="../meinstall.ui" line="1379"/>
         <source>Format:</source>
-        <translation>Format:</translation>
+        <translation>Oblika:</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1407"/>
@@ -1350,7 +1350,7 @@ Ali bi jo res radi zaustavili?</translation>
     <message>
         <location filename="../meinstall.ui" line="1615"/>
         <source>Save live desktop changes</source>
-        <translation>Shrani spremembe iz živega namizja</translation>
+        <translation>Shrani spremembe živega namizja</translation>
     </message>
     <message>
         <location filename="../meinstall.ui" line="1628"/>
