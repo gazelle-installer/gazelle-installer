@@ -280,11 +280,12 @@ void PartMan::scanVirtualDevices(bool rescan)
 
 bool PartMan::manageConfig(MSettings &config, bool save) noexcept
 {
+    config.beginGroup("Storage");
     for (Device *drive : root->children) {
         // Check if the drive is to be cleared and formatted.
         size_t partCount = drive->children.size();
         bool drvPreserve = drive->flags.oldLayout;
-        config.beginGroup("Storage." + drive->name);
+        config.beginGroup(drive->name);
         if (save) {
             if (!drvPreserve) {
                 config.setValue("Format", drive->format);
@@ -297,7 +298,6 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
             partCount = config.value("Partitions").toUInt();
             if (partCount > PARTMAN_MAX_PARTS) return false;
         }
-        config.endGroup();
         // Partition configuration.
         const long long sizeMax = drive->size - PARTMAN_SAFETY;
         long long sizeTotal = 0;
@@ -311,7 +311,7 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                 part->name = joinName(drive->name, ixPart+1);
             }
             // Configuration management, accounting for automatic control correction order.
-            const QString &groupPart = "Storage." + drive->name + ".Partition" + QString::number(ixPart+1);
+            const QString &groupPart = "Partition" + QString::number(ixPart+1);
             config.beginGroup(groupPart);
             if (save) {
                 config.setValue("Size", part->size);
@@ -352,14 +352,13 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                     config.setValue("Subvolumes", static_cast<uint>(subvolCount));
                 }
             }
-            config.endGroup();
             // Btrfs subvolume configuration.
             for (size_t ixSV=0; ixSV<subvolCount; ++ixSV) {
                 Device *subvol = nullptr;
                 if (save) subvol = part->child(ixSV);
                 else subvol = new Device(Device::SUBVOLUME, part);
                 if (!subvol) return false;
-                config.beginGroup(groupPart + ".Subvolume" + QString::number(ixSV+1));
+                config.beginGroup("Subvolume" + QString::number(ixSV+1));
                 if (save) {
                     if (subvol->isActive()) config.setValue("Default", true);
                     if (!subvol->usefor.isEmpty()) config.setValue("UseFor", subvol->usefor);
@@ -375,11 +374,14 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                     subvol->dump = config.value("Dump").toBool();
                     subvol->pass = config.value("Pass").toInt();
                 }
-                config.endGroup();
+                config.endGroup(); // Subvolume#
             }
+            config.endGroup(); // Partition#
             if (!save) gui.treePartitions->expand(index(part));
         }
+        config.endGroup(); // (drive name)
     }
+    config.endGroup(); // Storage
     treeSelChange();
     return true;
 }

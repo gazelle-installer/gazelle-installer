@@ -25,6 +25,8 @@ class MSettings : public QSettings
 {
     bool saving = false;
     class QWidget *group = nullptr;
+    static bool readFunc(class QIODevice &device, QSettings::SettingsMap &map) noexcept;
+    static bool writeFunc(class QIODevice &device, const QSettings::SettingsMap &map) noexcept;
 public:
     MSettings(const QString &fileName, QObject *parent = Q_NULLPTR) noexcept;
     bool bad = false;
