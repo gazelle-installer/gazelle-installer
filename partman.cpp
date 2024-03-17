@@ -289,14 +289,14 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
         config.beginGroup(drive->name);
         if (save) {
             if (!drvPreserve) {
-                config.setValue("Format", drive->format);
-                config.setValue("Partitions", static_cast<uint>(partCount));
+                config.setString("Format", drive->format);
+                config.setInteger("Partitions", partCount);
             }
         } else if (config.contains("Format")) {
-            drive->format = config.value("Format").toString();
+            drive->format = config.getString("Format");
             drvPreserve = false;
             drive->clear();
-            partCount = config.value("Partitions").toUInt();
+            partCount = config.getInteger("Partitions");
             if (partCount > PARTMAN_MAX_PARTS) return false;
         }
         // Partition configuration.
@@ -315,42 +315,42 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
             const QString &groupPart = "Partition" + QString::number(ixPart+1);
             config.beginGroup(groupPart);
             if (save) {
-                config.setValue("Size", part->size);
-                if (part->isActive()) config.setValue("Active", true);
-                if (part->flags.sysEFI) config.setValue("ESP", true);
-                if (part->addToCrypttab) config.setValue("AddToCrypttab", true);
-                if (!part->usefor.isEmpty()) config.setValue("UseFor", part->usefor);
-                if (!part->format.isEmpty()) config.setValue("Format", part->format);
-                config.setValue("Encrypt", part->encrypt);
-                if (!part->label.isEmpty()) config.setValue("Label", part->label);
-                if (!part->options.isEmpty()) config.setValue("Options", part->options);
-                config.setValue("CheckBadBlocks", part->chkbadblk);
-                config.setValue("Dump", part->dump);
-                config.setValue("Pass", part->pass);
+                config.setInteger("Size", part->size);
+                if (part->isActive()) config.setBoolean("Active", true);
+                if (part->flags.sysEFI) config.setBoolean("ESP", true);
+                if (part->addToCrypttab) config.setBoolean("AddToCrypttab", true);
+                if (!part->usefor.isEmpty()) config.setString("UseFor", part->usefor);
+                if (!part->format.isEmpty()) config.setString("Format", part->format);
+                config.setBoolean("Encrypt", part->encrypt);
+                if (!part->label.isEmpty()) config.setString("Label", part->label);
+                if (!part->options.isEmpty()) config.setString("Options", part->options);
+                config.setBoolean("CheckBadBlocks", part->chkbadblk);
+                config.setBoolean("Dump", part->dump);
+                config.setInteger("Pass", part->pass);
             } else {
                 if (!drvPreserve && config.contains("Size")) {
-                    part->size = config.value("Size").toLongLong();
+                    part->size = config.getInteger("Size");
                     sizeTotal += part->size;
                     if (sizeTotal > sizeMax) return false;
-                    if (config.value("Active").toBool()) part->setActive(true);
+                    if (config.getBoolean("Active")) part->setActive(true);
                 }
-                part->flags.sysEFI = config.value("ESP", part->flags.sysEFI).toBool();
-                part->usefor = config.value("UseFor", part->usefor).toString();
-                part->format = config.value("Format", part->format).toString();
-                part->chkbadblk = config.value("CheckBadBlocks", part->chkbadblk).toBool();
-                part->encrypt = config.value("Encrypt", part->encrypt).toBool();
-                part->addToCrypttab = config.value("AddToCrypttab", part->encrypt).toBool();
-                part->label = config.value("Label", part->label).toString();
-                part->options = config.value("Options", part->options).toString();
-                part->dump = config.value("Dump", part->dump).toBool();
-                part->pass = config.value("Pass", part->pass).toInt();
+                part->flags.sysEFI = config.getBoolean("ESP", part->flags.sysEFI);
+                part->usefor = config.getString("UseFor", part->usefor);
+                part->format = config.getString("Format", part->format);
+                part->chkbadblk = config.getBoolean("CheckBadBlocks", part->chkbadblk);
+                part->encrypt = config.getBoolean("Encrypt", part->encrypt);
+                part->addToCrypttab = config.getBoolean("AddToCrypttab", part->encrypt);
+                part->label = config.getString("Label", part->label);
+                part->options = config.getString("Options", part->options);
+                part->dump = config.getBoolean("Dump", part->dump);
+                part->pass = config.getInteger("Pass", part->pass);
             }
             size_t subvolCount = 0;
             if (part->format == "btrfs") {
-                if (!save) subvolCount = config.value("Subvolumes").toUInt();
+                if (!save) subvolCount = config.getInteger("Subvolumes");
                 else {
                     subvolCount = part->children.size();
-                    config.setValue("Subvolumes", static_cast<uint>(subvolCount));
+                    config.setInteger("Subvolumes", subvolCount);
                 }
             }
             // Btrfs subvolume configuration.
@@ -361,19 +361,19 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
                 if (!subvol) return false;
                 config.beginGroup("Subvolume" + QString::number(ixSV+1));
                 if (save) {
-                    if (subvol->isActive()) config.setValue("Default", true);
-                    if (!subvol->usefor.isEmpty()) config.setValue("UseFor", subvol->usefor);
-                    if (!subvol->label.isEmpty()) config.setValue("Label", subvol->label);
-                    if (!subvol->options.isEmpty()) config.setValue("Options", subvol->options);
-                    config.setValue("Dump", subvol->dump);
-                    config.setValue("Pass", subvol->pass);
+                    if (subvol->isActive()) config.setBoolean("Default", true);
+                    if (!subvol->usefor.isEmpty()) config.setString("UseFor", subvol->usefor);
+                    if (!subvol->label.isEmpty()) config.setString("Label", subvol->label);
+                    if (!subvol->options.isEmpty()) config.setString("Options", subvol->options);
+                    config.setBoolean("Dump", subvol->dump);
+                    config.setInteger("Pass", subvol->pass);
                 } else {
-                    if (config.value("Default").toBool()) subvol->setActive(true);
-                    subvol->usefor = config.value("UseFor").toString();
-                    subvol->label = config.value("Label").toString();
-                    subvol->options = config.value("Options").toString();
-                    subvol->dump = config.value("Dump").toBool();
-                    subvol->pass = config.value("Pass").toInt();
+                    if (config.getBoolean("Default")) subvol->setActive(true);
+                    subvol->usefor = config.getString("UseFor");
+                    subvol->label = config.getString("Label");
+                    subvol->options = config.getString("Options");
+                    subvol->dump = config.getBoolean("Dump");
+                    subvol->pass = config.getInteger("Pass");
                 }
                 config.endGroup(); // Subvolume#
             }

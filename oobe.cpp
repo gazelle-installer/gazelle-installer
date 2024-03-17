@@ -125,10 +125,10 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
     while (*it) {
         if ((*it)->parent() != nullptr) {
             const QString &itext = (*it)->text(0);
-            const QVariant checkval((*it)->checkState(0) == Qt::Checked);
-            if (save) config.setValue(itext, checkval);
+            const bool checkval = ((*it)->checkState(0) == Qt::Checked);
+            if (save) config.setBoolean(itext, checkval);
             else {
-                const bool val = config.value(itext, checkval).toBool();
+                const bool val = config.getBoolean(itext, checkval);
                 (*it)->setCheckState(0, val ? Qt::Checked : Qt::Unchecked);
             }
         }
@@ -150,10 +150,9 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
     QRadioButton *clockRadios[] = {gui.radioClock24, gui.radioClock12};
     config.manageRadios("ClockHours", 2, clockChoices, clockRadios);
     if (save) {
-        config.setValue("Timezone", gui.comboTimeZone->currentData().toString());
+        config.setString("Timezone", gui.comboTimeZone->currentData().toString());
     } else {
-        QVariant def = QString(QTimeZone::systemTimeZoneId());
-        const int rc = selectTimeZone(config.value("Timezone", def).toString());
+        const int rc = selectTimeZone(config.getString("Timezone", QTimeZone::systemTimeZoneId()));
         if (rc == 1) config.markBadWidget(gui.comboTimeArea);
         else if (rc == 2) config.markBadWidget(gui.comboTimeZone);
     }
@@ -170,10 +169,10 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
     config.manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
     config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);
     if (!save || oem) { // Transfer default passwords under OEM mode.
-        const QString &upass = config.value("UserPass").toString();
+        const QString &upass = config.getString("UserPass");
         gui.textUserPass->setText(upass);
         gui.textUserPass2->setText(upass);
-        const QString &rpass = config.value("RootPass").toString();
+        const QString &rpass = config.getString("RootPass");
         gui.textRootPass->setText(rpass);
         gui.textRootPass2->setText(rpass);
     }

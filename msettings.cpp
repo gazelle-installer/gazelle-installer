@@ -17,7 +17,6 @@
  * This file is part of the gazelle-installer.
  ***************************************************************************/
 
-#include <QIODevice>
 #include <QFile>
 #include <QGroupBox>
 #include <QComboBox>
@@ -190,7 +189,41 @@ QString MSettings::getString(const QString &key, const QString &defaultValue) co
 }
 void MSettings::setString(const QString &key, const QString &value) noexcept
 {
-    sections[cursection][curgroup][key] = value;
+    sections[cursection][curgroup].insert_or_assign(key, value);
+}
+
+bool MSettings::getBoolean(const QString &key, bool defaultValue, enum ValState *valid) const noexcept
+{
+    const QString &val = getString(key);
+    if (valid) *valid = VAL_NOTFOUND;
+    if (!val.isNull()) {
+        bool ok = true;
+        if (!val.compare("true", Qt::CaseInsensitive)) defaultValue = true;
+        else if (!val.compare("false", Qt::CaseInsensitive)) defaultValue = false;
+        else defaultValue = (val.toInt(&ok) != 0);
+        if (valid) *valid = ok ? VAL_OK : VAL_INVALID;
+    }
+    return defaultValue;
+}
+void MSettings::setBoolean(const QString &key, const bool value) noexcept
+{
+    setString(key, value ? "true" : "false");
+}
+
+long long MSettings::getInteger(const QString &key, long long defaultValue, enum ValState *valid, int base) const noexcept
+{
+    const QString &val = getString(key);
+    if (valid) *valid = VAL_NOTFOUND;
+    if (!val.isNull()) {
+        bool ok = false;
+        defaultValue = val.toLongLong(&ok, base);
+        if (valid) *valid = ok ? VAL_OK : VAL_INVALID;
+    }
+    return defaultValue;
+}
+void MSettings::setInteger(const QString &key, const long long value) noexcept
+{
+    setString(key, QString::number(value));
 }
 
 void MSettings::setSave(bool save) noexcept
@@ -237,57 +270,71 @@ bool MSettings::isBadWidget(QWidget *widget) noexcept
 
 void MSettings::manageComboBox(const QString &key, QComboBox *combo, const bool useData) noexcept
 {
-    const QVariant &comboval = useData ? combo->currentData() : QVariant(combo->currentText());
-    if (saving) setValue(key, comboval);
-    else if (contains(key)) {
-        const QVariant &val = value(key, comboval);
-        const int icombo = useData ? combo->findData(val, Qt::UserRole, Qt::MatchFixedString)
-                         : combo->findText(val.toString(), Qt::MatchFixedString);
-        if (icombo >= 0) combo->setCurrentIndex(icombo);
-        else markBadWidget(combo);
+    if (saving) {
+        setString(key, useData ? combo->currentData().toString() : combo->currentText());
+    } else {
+        const QString &val = getString(key);
+        if (!val.isNull()) {
+            const int icombo = useData ? combo->findData(val, Qt::UserRole, Qt::MatchFixedString)
+                             : combo->findText(val, Qt::MatchFixedString);
+            if (icombo >= 0) combo->setCurrentIndex(icombo);
+            else markBadWidget(combo);
+        }
     }
 }
 
 void MSettings::manageCheckBox(const QString &key, QCheckBox *checkbox) noexcept
 {
-    const QVariant state(checkbox->isChecked());
-    if (saving) setValue(key, state);
-    else if (contains(key)) checkbox->setChecked(value(key, state).toBool());
+    if (saving) setBoolean(key, checkbox->isChecked());
+    else {
+        ValState vstate = VAL_NOTFOUND;
+        const bool val = getBoolean(key, false, &vstate);
+        if (vstate == VAL_OK) checkbox->setChecked(val);
+    }
 }
 
 void MSettings::manageGroupCheckBox(const QString &key, QGroupBox *groupbox) noexcept
 {
-    const QVariant state(groupbox->isChecked());
-    if (saving) setValue(key, state);
-    else if (contains(key)) groupbox->setChecked(value(key, state).toBool());
+    if (saving) setBoolean(key, groupbox->isChecked());
+    else {
+        ValState vstate = VAL_NOTFOUND;
+        const bool val = getBoolean(key, false, &vstate);
+        if (vstate == VAL_OK) groupbox->setChecked(val);
+    }
 }
 
 void MSettings::manageLineEdit(const QString &key, QLineEdit *lineedit) noexcept
 {
-    const QString &text = lineedit->text();
-    if (saving) setValue(key, text);
-    else if (contains(key)) lineedit->setText(value(key, text).toString());
+    if (saving) setString(key, lineedit->text());
+    else {
+        const QString &val = getString(key);
+        if (!val.isNull()) lineedit->setText(val);
+    }
 }
 
 void MSettings::manageSpinBox(const QString &key, QSpinBox *spinbox) noexcept
 {
-    const QVariant spinval(spinbox->value());
-    if (saving) setValue(key, spinval);
-    else if (contains(key)) {
-        const int val = value(key, spinval).toInt();
-        spinbox->setValue(val);
-        if (val != spinbox->value()) markBadWidget(spinbox);
+    if (saving) setInteger(key, spinbox->value());
+    else {
+        ValState vstate = VAL_NOTFOUND;
+        const int spinval = getInteger(key, 0, &vstate);
+        if (vstate != VAL_NOTFOUND) {
+            spinbox->setValue(spinval);
+            if (vstate != VAL_OK || spinval != spinbox->value()) {
+                markBadWidget(spinbox);
+            }
+        }
     }
 }
 
 int MSettings::manageEnum(const QString &key, const int nchoices,
         const char *choices[], const int curval) noexcept
 {
-    QVariant choice(curval >= 0 ? choices[curval] : "");
+    const char *choice = (curval >= 0 ? choices[curval] : "");
     if (saving) {
-        if (curval >= 0) setValue(key, choice);
+        if (curval >= 0) setString(key, choice);
     } else {
-        const QString &val = value(key, choice).toString();
+        const QString &val = getString(key, choice);
         for (int ixi = 0; ixi < nchoices; ++ixi) {
             if (!val.compare(QString(choices[ixi]), Qt::CaseInsensitive)) {
                 return ixi;

@@ -67,9 +67,9 @@ void AutoPart::manageConfig(MSettings &config) noexcept
     config.manageComboBox("Drive", gui.comboDisk, true);
     config.manageCheckBox("DriveEncrypt", gui.checkEncryptAuto);
     if (config.isSave()) {
-        config.setValue("RootPortion", gui.sliderPart->value());
+        config.setInteger("RootPortion", gui.sliderPart->value());
     } else if (config.contains("RootPortion")) {
-         const int portion = config.value("RootPortion").toInt();
+         const int portion = config.getInteger("RootPortion");
          gui.sliderPart->setSliderPosition(portion);
          if (gui.sliderPart->value() != portion) {
              config.markBadWidget(gui.boxSliderPart);

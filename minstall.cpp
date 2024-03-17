@@ -463,8 +463,8 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     if (mode == CONFIG_SAVE) {
         config->setSave(true);
         config->clear();
-        config->setValue("Version", VERSION);
-        config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
+        config->setString("Version", VERSION);
+        config->setString("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
     if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
         // Automatic or Manual partitioning
@@ -484,7 +484,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         // Encryption
         config->setSection("Encryption", targetIsDrive ? pageDisk : pagePartitions);
         if (mode != CONFIG_SAVE) {
-            const QString &epass = config->value("Pass").toString();
+            const QString &epass = config->getString("Pass");
             textCryptoPass->setText(epass);
             textCryptoPass2->setText(epass);
         }

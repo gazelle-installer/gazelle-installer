@@ -20,7 +20,7 @@
 #define MSETTINGS_H
 
 #include <map>
-#include <QVariant>
+#include <QString>
 
 class MSettings
 {
@@ -46,16 +46,19 @@ public:
     bool load(const QString &filename) noexcept;
     bool save(const QString &filename) const noexcept;
     bool contains(const QString &key) const noexcept;
+    enum ValState {
+        VAL_NOTFOUND,
+        VAL_OK,
+        VAL_INVALID
+    };
     QString getString(const QString &key, const QString &defaultValue = QString()) const noexcept;
     void setString(const QString &key, const QString &value) noexcept;
-    QVariant value(const QString &key, const QVariant &defaultValue = QVariant()) const noexcept
-    {
-        return getString(key, defaultValue.toString());
-    }
-    void setValue(const QString &key, const QVariant &value) noexcept
-    {
-        setString(key, value.toString());
-    }
+    bool getBoolean(const QString &key, bool defaultValue = false, enum ValState *valid = nullptr) const noexcept;
+    void setBoolean(const QString &key, const bool value) noexcept;
+    long long getInteger(const QString &key, long long defaultValue = 0,
+        enum ValState *valid = nullptr, int base = 10) const noexcept;
+    void setInteger(const QString &key, const long long value) noexcept;
+
     // widget management
     void markBadWidget(class QWidget *widget) noexcept;
     static bool isBadWidget(class QWidget *widget) noexcept;
