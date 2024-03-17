@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <QDebug>
+#include <QSettings>
 #include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>

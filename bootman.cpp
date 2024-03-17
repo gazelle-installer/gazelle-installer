@@ -22,6 +22,7 @@
 
 #include <sys/stat.h>
 #include <QDebug>
+#include <QSettings>
 #include <QMessageBox>
 #include <QFileInfo>
 #include "mprocess.h"

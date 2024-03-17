@@ -69,7 +69,8 @@ enum Step {
 static const QRegularExpression configCensor("Encryption\\/Pass|User\\/.*Pass/i");
 
 MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
-    : proc(this), appConf(acfg), appArgs(args), helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
+    : proc(this), appConf(acfg), appArgs(args), cfgfile(cfgfile),
+      helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
     setupUi(this);
     listLog->addItem("Version " VERSION);
@@ -99,7 +100,8 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     gotoPage(Step::SPLASH);
 
     // config file
-    config = new MSettings(cfgfile, this);
+    config = new MSettings();
+    config->load(cfgfile);
 
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
@@ -455,11 +457,7 @@ void MInstall::pretendNextPhase() noexcept
 
 void MInstall::manageConfig(enum ConfigAction mode) noexcept
 {
-    if (mode == CONFIG_SAVE) {
-        delete config;
-        config = new MSettings(pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf", this);
-    }
-    if (!config) return;
+    assert(config != nullptr);
     config->bad = false;
 
     if (mode == CONFIG_SAVE) {
@@ -504,17 +502,20 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         oobe->manageConfig(*config, false);
     }
 
-    if (mode == CONFIG_SAVE && !pretend) {
-        config->sync();
-        QFile::remove("/etc/minstalled.conf");
-        QFile::copy(config->fileName(), "/etc/minstalled.conf");
-        chmod(config->fileName().toUtf8().constData(), 0600);
+    if (mode == CONFIG_SAVE) {
+        if (!pretend) {
+            config->save("/etc/minstalled.conf");
+            config->save("/mnt/antiX/etc/minstall.conf");
+            chmod("/mnt/antiX/etc/minstall.conf", 0600);
+        } else {
+            config->save("./minstall.conf");
+        }
     }
 
     if (config->bad) {
         QMessageBox::critical(this, windowTitle(),
             tr("Invalid settings found in configuration file (%1)."
-               " Please review marked fields as you encounter them.").arg(config->fileName()));
+               " Please review marked fields as you encounter them.").arg(cfgfile));
     }
 }
 

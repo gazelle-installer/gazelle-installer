@@ -25,6 +25,7 @@
 #include <iterator>
 #include <sys/stat.h>
 #include <QDebug>
+#include <QSettings>
 #include <QLocale>
 #include <QFileInfo>
 #include <QDir>

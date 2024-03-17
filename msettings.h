@@ -19,22 +19,36 @@
 #ifndef MSETTINGS_H
 #define MSETTINGS_H
 
-#include <QSettings>
+#include <map>
+#include <QVariant>
 
-class MSettings : public QSettings
+class MSettings
 {
     bool saving = false;
     class QWidget *group = nullptr;
-    static bool readFunc(class QIODevice &device, QSettings::SettingsMap &map) noexcept;
-    static bool writeFunc(class QIODevice &device, const QSettings::SettingsMap &map) noexcept;
+    typedef std::map<QString, std::map<QString, QString>> SettingsMap;
+    std::map<QString, SettingsMap> sections;
+    SettingsMap *psection = nullptr;
+    QString sectname;
+    QString curprefix;
 public:
-    MSettings(const QString &fileName, QObject *parent = Q_NULLPTR) noexcept;
+    MSettings() noexcept;
     bool bad = false;
     void dumpDebug(const class QRegularExpression *censor = nullptr) noexcept;
     void setSave(bool save) noexcept;
     bool isSave() const noexcept { return saving; }
+    void setSection(const QString &name, class QWidget *wgroup) noexcept;
+    QString section() const noexcept { return sectname; }
     void startGroup(const QString &prefix, class QWidget *wgroup) noexcept;
+    void beginGroup(const QString &prefix) noexcept;
+    void endGroup() noexcept;
     void setGroupWidget(class QWidget *wgroup) noexcept;
+    void clear() noexcept;
+    bool load(const QString &filename) noexcept;
+    bool save(const QString &filename) noexcept;
+    bool contains(const QString &key) noexcept;
+    QVariant value(const QString &key, const QVariant &defaultValue = "") const noexcept;
+    void setValue(const QString &key, const QVariant &value) noexcept;
     // widget management
     void markBadWidget(class QWidget *widget) noexcept;
     static bool isBadWidget(class QWidget *widget) noexcept;

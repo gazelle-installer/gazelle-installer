@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include <QIODevice>
+#include <QFile>
 #include <QGroupBox>
 #include <QComboBox>
 #include <QCheckBox>
@@ -29,113 +30,116 @@
 
 #include "msettings.h"
 
-MSettings::MSettings(const QString &fileName, QObject *parent) noexcept
-    : QSettings(fileName, QSettings::registerFormat("ini", &readFunc, &writeFunc, Qt::CaseInsensitive), parent)
+MSettings::MSettings() noexcept
 {
+    clear();
 }
 
-bool MSettings::readFunc(QIODevice &device, QSettings::SettingsMap &map) noexcept
+void MSettings::clear() noexcept
 {
-    QString section;
-    while (!device.atEnd()) {
-        const QByteArray &line = device.readLine().trimmed();
+    curprefix.clear();
+    sectname.clear();
+    sections.clear();
+    psection = &sections[""];
+}
+bool MSettings::load(const QString &filename) noexcept
+{
+    QFile file(filename);
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        return false;
+    }
+    clear();
+    while (!file.atEnd()) {
+        const QByteArray &line = file.readLine().trimmed();
         if (line.isEmpty() || line.startsWith(';') || line.startsWith('#')) {
             // Empty lines or comment lines to be ignored.
             continue;
         } else if (line.startsWith('[')) {
-            // Sections.
-            if (line.size() < 3 || !line.endsWith(']') || section.contains('/')) {
-                return false; // Incomplete bracket set, empty section, or section inside a subsection.
+            // Section.
+            if (line.size() < 3 || !line.endsWith(']') || !curprefix.isEmpty()) {
+                return false; // Incomplete bracket set, empty section, or section inside a group.
             }
-            section = line.mid(1, line.size()-2);
+            sectname = line.mid(1, line.size()-2);
+            psection = &sections[sectname];
         } else if (line == "}") {
-            const int subpos = section.lastIndexOf('/');
-            if (subpos < 0) {
-                return false; // Mismatched subsection ending.
+            if (curprefix.isEmpty()) {
+                return false; // Mismatched group ending.
             }
-            section.truncate(subpos);
+            endGroup();
         } else {
             const int delimpos = line.indexOf('=');
             if (delimpos > 0) {
-                QString setting(section);
-                if (!setting.isEmpty()) {
-                    setting.append('/');
-                }
-                setting += line.left(delimpos).trimmed();
-                map[setting] = QString(line.mid(delimpos+1).trimmed());
+                setValue(line.left(delimpos).trimmed(), line.mid(delimpos+1).trimmed());
             } else if (delimpos < 0 && line.endsWith('{')) {
-                section += '/' + line.chopped(1).trimmed();
+                // Group (prefix)
+                beginGroup(line.chopped(1).trimmed());
             } else {
-                return false; // Line starts with '=' or not invalid subsection starter.
+                return false; // Line starts with '=' or not invalid group starter.
             }
         }
     }
     return true;
 }
-bool MSettings::writeFunc(QIODevice &device, const QSettings::SettingsMap &map) noexcept
+bool MSettings::save(const QString &filename) noexcept
 {
-    std::multimap<int, QString> levels;
-    std::map<QString, int> sections;
-    int maxlevel = 0;
-    for (QSettings::SettingsMap::const_iterator i = map.constBegin(); i != map.constEnd(); ++i) {
-        const int level = i.key().count('/');
-        levels.insert({level, i.key()});
-        if (level > 0) {
-            for (int ixi = level-1; ixi >= 0; --ixi) {
-                sections[i.key().section('/', 0, ixi)];
-            }
-            sections[i.key().section('/', 0, level-1)]++;
-        }
-        if (level > maxlevel) {
-            maxlevel = level;
-        }
+    QFile file(filename);
+    if (!file.open(QFile::ReadWrite | QFile::Truncate | QFile::Text)) {
+        return false;
     }
 
-    // Root
-    {
-        const auto ilev = levels.equal_range(0);
-        for (auto i = ilev.first; i != ilev.second; ++i) {
-            device.write(i->second.toUtf8());
-            device.write("=");
-            device.write(map[i->second].toString().toUtf8());
-            device.write("\n");
-        }
-    }
-
-    int prevdepth = -1;
-    const std::vector<char> tabs(maxlevel, '\t');
     for (const auto &section : sections) {
-        const int depth = section.first.count('/');
-        // Close braces of previous subsections.
-        for (int ixi = prevdepth; ixi >= depth && ixi > 0; --ixi) {
-            device.write(tabs.data(), ixi-1);
-            device.write("}\n");
-        }
-        // New section or subsection
-        if (depth == 0) {
-            device.write(device.pos()>0 ? "\n[" : "[");
-            device.write(section.first.toUtf8());
-            device.write("]\n");
-        } else {
-            if (depth > 1) {
-                device.write(tabs.data(), depth-1); // Indentation (sub-sections only)
-            }
-            device.write(section.first.section('/', depth).toUtf8());
-            device.write("{\n");
+        if (!section.first.isEmpty()) {
+            file.write(file.pos()>0 ? "\n[" : "[");
+            file.write(section.first.toUtf8());
+            file.write("]\n");
         }
 
-        const auto ilev = levels.equal_range(depth + 1);
-        const QString &prefix = section.first + '/';
-        for (auto i = ilev.first; i != ilev.second; ++i) {
-            if (i->second.startsWith(prefix)) {
-                device.write(tabs.data(), depth); // Tabulation (sub-sections only)
-                device.write(i->second.mid(prefix.size()).toUtf8());
-                device.write("=");
-                device.write(map[i->second].toString().toUtf8());
-                device.write("\n");
+        int prevdepth = 0;
+        QString prevprefix;
+        for (const auto &group : section.second) {
+            const int depth = group.first.count('/');
+            const QString &prefix = group.first;
+            // The first segment of the current and previous group that differs.
+            int pivot = 0;
+            for (int ixi = 0; ixi < depth; ++ixi) {
+                if(prevprefix.section('/', ixi, ixi) != prefix.section('/', ixi, ixi)) {
+                    pivot = ixi;
+                    break;
+                }
+            }
+            const std::vector<char> tabs(std::max(depth, prevdepth), '\t');
+            // Close braces of previous groups.
+            for (int ixi = prevdepth; ixi > pivot; --ixi) {
+                file.write(tabs.data(), ixi-1);
+                file.write("}\n");
+            }
+            // Open braces of new groups.
+            for(int ixi = pivot; ixi < depth; ++ixi) {
+                file.write(tabs.data(), ixi);
+                file.write(prefix.section('/', ixi, ixi).toUtf8());
+                file.write(" {\n");
+            }
+            // Settings
+            for (const auto &setting : group.second) {
+                file.write(tabs.data(), depth);
+                file.write(setting.first.toUtf8());
+                file.write("=");
+                file.write(setting.second.toUtf8());
+                file.write("\n");
+            }
+            prevprefix = prefix;
+            prevdepth = depth;
+        }
+
+        // Close open groups before moving on to the next section (or the end).
+        if (prevdepth > 0) {
+            --prevdepth;
+            const std::vector<char> tabs(prevdepth, '\t');
+            for (int ixi = prevdepth; ixi >= 0; --ixi) {
+                file.write(tabs.data(), ixi);
+                file.write("}\n");
             }
         }
-        prevdepth = depth;
     }
 
     return true;
@@ -143,29 +147,56 @@ bool MSettings::writeFunc(QIODevice &device, const QSettings::SettingsMap &map) 
 
 void MSettings::dumpDebug(const QRegularExpression *censor) noexcept
 {
-    qDebug().noquote() << "Configuration:" << fileName();
-    // top-level settings (version, etc)
-    QStringList chkeys = childKeys();
-    for (QString &strkey : chkeys) {
-        qDebug().noquote().nospace() << " - " << strkey
-                                     << ": " << value(strkey).toString();
-    }
-    // iterate through groups
-    const auto &groups = childGroups();
-    for (const QString &strgroup : groups) {
-        beginGroup(strgroup);
-        qDebug().noquote().nospace() << " = " << strgroup << ":";
-        QStringList chkeys = childKeys();
-        for (QString &strkey : chkeys) {
-            QString val(value(strkey).toString());
-            if (censor && !val.isEmpty()) {
-                if (QString(strgroup+'/'+strkey).contains(*censor)) val = "???";
-            }
-            qDebug().noquote().nospace() << "   - " << strkey << ": " << val;
+    qDebug().noquote() << "Configuration";
+    for (const auto &section : sections) {
+        const bool topsect = section.first.isEmpty(); // top-level settings (version, etc)
+        if (!topsect) {
+            qDebug().noquote().nospace() << " = " << section.first << ":";
         }
-        endGroup();
+        for (const auto &group : section.second) {
+            for (const auto &setting : group.second) {
+                const QString &fullkey = group.first + setting.first;
+                QString val(setting.second);
+                if (censor && !val.isEmpty()) {
+                    if (QString(fullkey).contains(*censor)) {
+                        val = "???";
+                    }
+                }
+                qDebug().noquote().nospace() << (topsect ? " - " : "   - ") << fullkey << ": " << val;
+            }
+        }
     }
     qDebug() << "End of configuration.";
+}
+
+bool MSettings::contains(const QString &key) noexcept
+{
+    assert(psection != nullptr);
+    const QString &fullkey = curprefix + key;
+    const int pivot = fullkey.lastIndexOf('/') + 1;
+    if (auto gsearch = psection->find(fullkey.left(pivot)); gsearch != psection->end()) {
+        return gsearch->second.count(fullkey.mid(pivot));
+    }
+    return false;
+}
+QVariant MSettings::value(const QString &key, const QVariant &defaultValue) const noexcept
+{
+    assert(psection != nullptr);
+    const QString &fullkey = curprefix + key;
+    const int pivot = fullkey.lastIndexOf('/') + 1;
+    if (auto gsearch = psection->find(fullkey.left(pivot)); gsearch != psection->end()) {
+        if (auto ssearch = gsearch->second.find(fullkey.mid(pivot)); ssearch != gsearch->second.end()) {
+            return QVariant(ssearch->second);
+        }
+    }
+    return defaultValue;
+}
+void MSettings::setValue(const QString &key, const QVariant &value) noexcept
+{
+    assert(psection != nullptr);
+    const QString &fullkey = curprefix + key;
+    const int pivot = fullkey.lastIndexOf('/') + 1;
+    (*psection)[fullkey.left(pivot)][fullkey.mid(pivot)] = value.toString();
 }
 
 void MSettings::setSave(bool save) noexcept
@@ -173,10 +204,26 @@ void MSettings::setSave(bool save) noexcept
     saving = save;
 }
 
+void MSettings::setSection(const QString &name, QWidget *wgroup) noexcept
+{
+    psection = &sections[name];
+    sectname = name;
+    group = wgroup;
+}
+
 void MSettings::startGroup(const QString &prefix, QWidget *wgroup) noexcept
 {
     beginGroup(prefix);
     group = wgroup;
+}
+void MSettings::beginGroup(const QString &prefix) noexcept
+{
+    curprefix += prefix + '/';
+}
+void MSettings::endGroup() noexcept
+{
+    curprefix.chop(1);
+    curprefix.truncate(curprefix.lastIndexOf('/') + 1);
 }
 
 void MSettings::setGroupWidget(QWidget *wgroup) noexcept
