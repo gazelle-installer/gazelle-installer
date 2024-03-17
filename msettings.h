@@ -24,27 +24,19 @@
 
 class MSettings
 {
-    bool saving = false;
-    class QWidget *group = nullptr;
     typedef std::map<QString, QString> SettingsMap;
     typedef std::map<QString, SettingsMap> SettingsGroup;
     std::map<QString, SettingsGroup> sections;
-    QString cursection;
-    QString curgroup;
+    QString cursection, curgroup;
 public:
     MSettings() noexcept;
-    bool bad = false;
-    void dumpDebug(const class QRegularExpression *censor = nullptr) const noexcept;
-    void setSave(bool save) noexcept;
-    bool isSave() const noexcept { return saving; }
-    void setSection(const QString &name, class QWidget *wgroup) noexcept;
-    QString section() const noexcept { return cursection; }
-    void beginGroup(const QString &path) noexcept;
-    void endGroup() noexcept;
-    void setGroupWidget(class QWidget *wgroup) noexcept;
     void clear() noexcept;
     bool load(const QString &filename) noexcept;
     bool save(const QString &filename) const noexcept;
+    void setSection(const QString &name) noexcept;
+    QString section() const noexcept { return cursection; }
+    void beginGroup(const QString &path) noexcept;
+    void endGroup() noexcept;
     bool contains(const QString &key) const noexcept;
     enum ValState {
         VAL_NOTFOUND,
@@ -58,8 +50,14 @@ public:
     long long getInteger(const QString &key, long long defaultValue = 0,
         enum ValState *valid = nullptr, int base = 10) const noexcept;
     void setInteger(const QString &key, const long long value) noexcept;
+    void dumpDebug(const class QRegularExpression *censor = nullptr) const noexcept;
 
     // widget management
+    bool bad = false;
+    void setSave(bool save) noexcept;
+    bool isSave() const noexcept { return saving; }
+    void setGroupWidget(class QWidget *widget) noexcept;
+    void setSection(const QString &name, class QWidget *widget) noexcept;
     void markBadWidget(class QWidget *widget) noexcept;
     static bool isBadWidget(class QWidget *widget) noexcept;
     void manageComboBox(const QString &key, class QComboBox *combo, const bool useData) noexcept;
@@ -71,6 +69,9 @@ public:
             const char *choices[], const int curval) noexcept;
     void manageRadios(const QString &key, const int nchoices,
             const char *choices[], class QRadioButton *radios[]) noexcept;
+private:
+    bool saving = false;
+    class QWidget *wgroup = nullptr;
 };
 
 #endif // MSETTINGS_H

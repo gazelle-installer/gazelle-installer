@@ -143,28 +143,20 @@ bool MSettings::save(const QString &filename) const noexcept
     return true;
 }
 
-void MSettings::dumpDebug(const QRegularExpression *censor) const noexcept
+void MSettings::setSection(const QString &name) noexcept
 {
-    qDebug().noquote() << "Configuration";
-    for (const auto &section : sections) {
-        const bool topsect = section.first.isEmpty(); // top-level settings (version, etc)
-        if (!topsect) {
-            qDebug().noquote().nospace() << " = " << section.first << ":";
-        }
-        for (const auto &group : section.second) {
-            for (const auto &setting : group.second) {
-                const QString &fullkey = group.first + setting.first;
-                QString val(setting.second);
-                if (censor && !val.isEmpty()) {
-                    if (QString(fullkey).contains(*censor)) {
-                        val = "???";
-                    }
-                }
-                qDebug().noquote().nospace() << (topsect ? " - " : "   - ") << fullkey << ": " << val;
-            }
-        }
-    }
-    qDebug() << "End of configuration.";
+    cursection = name;
+    curgroup.clear();
+}
+
+void MSettings::beginGroup(const QString &path) noexcept
+{
+    curgroup += path + '/';
+}
+void MSettings::endGroup() noexcept
+{
+    curgroup.chop(1);
+    curgroup.truncate(curgroup.lastIndexOf('/') + 1);
 }
 
 bool MSettings::contains(const QString &key) const noexcept
@@ -226,31 +218,45 @@ void MSettings::setInteger(const QString &key, const long long value) noexcept
     setString(key, QString::number(value));
 }
 
+void MSettings::dumpDebug(const QRegularExpression *censor) const noexcept
+{
+    qDebug().noquote() << "Configuration";
+    for (const auto &section : sections) {
+        const bool topsect = section.first.isEmpty(); // top-level settings (version, etc)
+        if (!topsect) {
+            qDebug().noquote().nospace() << " = " << section.first << ":";
+        }
+        for (const auto &group : section.second) {
+            for (const auto &setting : group.second) {
+                const QString &fullkey = group.first + setting.first;
+                QString val(setting.second);
+                if (censor && !val.isEmpty()) {
+                    if (QString(fullkey).contains(*censor)) {
+                        val = "???";
+                    }
+                }
+                qDebug().noquote().nospace() << (topsect ? " - " : "   - ") << fullkey << ": " << val;
+            }
+        }
+    }
+    qDebug() << "End of configuration.";
+}
+
+/* Widget management */
+
 void MSettings::setSave(bool save) noexcept
 {
     saving = save;
 }
 
-void MSettings::setSection(const QString &name, QWidget *wgroup) noexcept
+void MSettings::setGroupWidget(QWidget *widget) noexcept
 {
-    cursection = name;
-    curgroup.clear();
-    group = wgroup;
+    wgroup = widget;
 }
-
-void MSettings::beginGroup(const QString &path) noexcept
+void MSettings::setSection(const QString &name, QWidget *widget) noexcept
 {
-    curgroup += path + '/';
-}
-void MSettings::endGroup() noexcept
-{
-    curgroup.chop(1);
-    curgroup.truncate(curgroup.lastIndexOf('/') + 1);
-}
-
-void MSettings::setGroupWidget(QWidget *wgroup) noexcept
-{
-    group = wgroup;
+    setSection(name);
+    setGroupWidget(widget);
 }
 
 void MSettings::markBadWidget(QWidget *widget) noexcept
@@ -260,7 +266,7 @@ void MSettings::markBadWidget(QWidget *widget) noexcept
                               "QPushButton:!pressed { border-style: outset; }\n"
                               "QRadioButton { border-style: dotted; }");
     }
-    if (group) group->setProperty("BAD", true);
+    if (wgroup) wgroup->setProperty("BAD", true);
     bad = true;
 }
 bool MSettings::isBadWidget(QWidget *widget) noexcept
