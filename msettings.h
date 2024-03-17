@@ -26,29 +26,36 @@ class MSettings
 {
     bool saving = false;
     class QWidget *group = nullptr;
-    typedef std::map<QString, std::map<QString, QString>> SettingsMap;
-    std::map<QString, SettingsMap> sections;
-    SettingsMap *psection = nullptr;
-    QString sectname;
-    QString curprefix;
+    typedef std::map<QString, QString> SettingsMap;
+    typedef std::map<QString, SettingsMap> SettingsGroup;
+    std::map<QString, SettingsGroup> sections;
+    QString cursection;
+    QString curgroup;
 public:
     MSettings() noexcept;
     bool bad = false;
-    void dumpDebug(const class QRegularExpression *censor = nullptr) noexcept;
+    void dumpDebug(const class QRegularExpression *censor = nullptr) const noexcept;
     void setSave(bool save) noexcept;
     bool isSave() const noexcept { return saving; }
     void setSection(const QString &name, class QWidget *wgroup) noexcept;
-    QString section() const noexcept { return sectname; }
-    void startGroup(const QString &prefix, class QWidget *wgroup) noexcept;
-    void beginGroup(const QString &prefix) noexcept;
+    QString section() const noexcept { return cursection; }
+    void beginGroup(const QString &path) noexcept;
     void endGroup() noexcept;
     void setGroupWidget(class QWidget *wgroup) noexcept;
     void clear() noexcept;
     bool load(const QString &filename) noexcept;
-    bool save(const QString &filename) noexcept;
-    bool contains(const QString &key) noexcept;
-    QVariant value(const QString &key, const QVariant &defaultValue = "") const noexcept;
-    void setValue(const QString &key, const QVariant &value) noexcept;
+    bool save(const QString &filename) const noexcept;
+    bool contains(const QString &key) const noexcept;
+    QString getString(const QString &key, const QString &defaultValue = QString()) const noexcept;
+    void setString(const QString &key, const QString &value) noexcept;
+    QVariant value(const QString &key, const QVariant &defaultValue = QVariant()) const noexcept
+    {
+        return getString(key, defaultValue.toString());
+    }
+    void setValue(const QString &key, const QVariant &value) noexcept
+    {
+        setString(key, value.toString());
+    }
     // widget management
     void markBadWidget(class QWidget *widget) noexcept;
     static bool isBadWidget(class QWidget *widget) noexcept;

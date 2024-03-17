@@ -468,10 +468,10 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     }
     if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
         // Automatic or Manual partitioning
-        config->setGroupWidget(pageDisk);
+        config->setSection("Storage", pageDisk);
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {radioEntireDisk, radioCustomPart};
-        config->manageRadios("Storage/Target", 2, diskChoices, diskRadios);
+        config->manageRadios("Target", 2, diskChoices, diskRadios);
         const bool targetIsDrive = radioEntireDisk->isChecked();
 
         // Storage and partition management
@@ -482,13 +482,12 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         }
 
         // Encryption
-        config->startGroup("Encryption", targetIsDrive ? pageDisk : pagePartitions);
+        config->setSection("Encryption", targetIsDrive ? pageDisk : pagePartitions);
         if (mode != CONFIG_SAVE) {
             const QString &epass = config->value("Pass").toString();
             textCryptoPass->setText(epass);
             textCryptoPass2->setText(epass);
         }
-        config->endGroup();
     }
 
     if (!modeOOBE) {

@@ -44,14 +44,13 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
 
 void SwapMan::manageConfig(MSettings &config, bool advanced) noexcept
 {
-    config.startGroup("Swap", gui.pageBoot);
+    config.setSection("Swap", gui.pageBoot);
     if (advanced || !config.isSave()) {
         config.manageGroupCheckBox("Install", gui.boxSwap);
         config.manageLineEdit("File", gui.textSwapFile);
         config.manageSpinBox("Size", gui.spinSwapSize);
     }
     config.manageCheckBox("Hibernation", gui.checkHibernation);
-    config.endGroup();
 }
 void SwapMan::setupDefaults() noexcept
 {

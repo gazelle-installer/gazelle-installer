@@ -120,7 +120,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, QSettings &appCo
 void Oobe::manageConfig(MSettings &config, bool save) noexcept
 {
     // Services page
-    config.startGroup("Services", gui.pageServices);
+    config.setSection("Services", gui.pageServices);
     QTreeWidgetItemIterator it(gui.treeServices);
     while (*it) {
         if ((*it)->parent() != nullptr) {
@@ -134,18 +134,16 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
         }
         ++it;
     }
-    config.endGroup();
 
     // Network page
-    config.startGroup("Network", gui.pageNetwork);
+    config.setSection("Network", gui.pageNetwork);
     config.manageLineEdit("ComputerName", gui.textComputerName);
     config.manageLineEdit("Domain", gui.textComputerDomain);
     config.manageLineEdit("Workgroup", gui.textComputerGroup);
     config.manageCheckBox("Samba", gui.checkSamba);
-    config.endGroup();
 
     // Localization page
-    config.startGroup("Localization", gui.pageLocalization);
+    config.setSection("Localization", gui.pageLocalization);
     config.manageComboBox("Locale", gui.comboLocale, true);
     config.manageCheckBox("LocalClock", gui.checkLocalClock);
     const char *clockChoices[] = {"24", "12"};
@@ -160,10 +158,9 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
         else if (rc == 2) config.markBadWidget(gui.comboTimeZone);
     }
     config.manageComboBox("Timezone", gui.comboTimeZone, true);
-    config.endGroup();
 
     // User Accounts page
-    config.startGroup("User", gui.pageUserAccounts);
+    config.setSection("User", gui.pageUserAccounts);
     config.manageLineEdit("Username", gui.textUserName);
     config.manageCheckBox("Autologin", gui.checkAutoLogin);
     config.manageCheckBox("SaveDesktop", gui.checkSaveDesktop);
@@ -180,7 +177,6 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
         gui.textRootPass->setText(rpass);
         gui.textRootPass2->setText(rpass);
     }
-    config.endGroup();
 }
 
 void Oobe::enable()

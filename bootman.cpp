@@ -47,13 +47,12 @@ BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
 
 void BootMan::manageConfig(MSettings &config) noexcept
 {
-    config.startGroup("GRUB", gui.pageBoot);
+    config.setSection("GRUB", gui.pageBoot);
     config.manageGroupCheckBox("Install", gui.boxBoot);
     const char *grubChoices[] = {"MBR", "PBR", "ESP"};
     QRadioButton *grubRadios[] = {gui.radioBootMBR, gui.radioBootPBR, gui.radioBootESP};
     config.manageRadios("TargetType", 3, grubChoices, grubRadios);
     if (!gui.radioBootESP->isChecked()) config.manageComboBox("Location", gui.comboBoot, true);
-    config.endGroup();
 }
 
 void BootMan::selectBootMain() noexcept

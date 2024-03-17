@@ -37,10 +37,9 @@ MSettings::MSettings() noexcept
 
 void MSettings::clear() noexcept
 {
-    curprefix.clear();
-    sectname.clear();
+    curgroup.clear();
+    cursection.clear();
     sections.clear();
-    psection = &sections[""];
 }
 bool MSettings::load(const QString &filename) noexcept
 {
@@ -56,22 +55,22 @@ bool MSettings::load(const QString &filename) noexcept
             continue;
         } else if (line.startsWith('[')) {
             // Section.
-            if (line.size() < 3 || !line.endsWith(']') || !curprefix.isEmpty()) {
+            if (line.size() < 3 || !line.endsWith(']') || !curgroup.isEmpty()) {
                 return false; // Incomplete bracket set, empty section, or section inside a group.
             }
-            sectname = line.mid(1, line.size()-2);
-            psection = &sections[sectname];
+            cursection = line.mid(1, line.size()-2);
         } else if (line == "}") {
-            if (curprefix.isEmpty()) {
+            if (curgroup.isEmpty()) {
                 return false; // Mismatched group ending.
             }
             endGroup();
         } else {
             const int delimpos = line.indexOf('=');
             if (delimpos > 0) {
-                setValue(line.left(delimpos).trimmed(), line.mid(delimpos+1).trimmed());
+                // Value
+                setString(line.left(delimpos).trimmed(), line.mid(delimpos+1).trimmed());
             } else if (delimpos < 0 && line.endsWith('{')) {
-                // Group (prefix)
+                // Group
                 beginGroup(line.chopped(1).trimmed());
             } else {
                 return false; // Line starts with '=' or not invalid group starter.
@@ -80,7 +79,7 @@ bool MSettings::load(const QString &filename) noexcept
     }
     return true;
 }
-bool MSettings::save(const QString &filename) noexcept
+bool MSettings::save(const QString &filename) const noexcept
 {
     QFile file(filename);
     if (!file.open(QFile::ReadWrite | QFile::Truncate | QFile::Text)) {
@@ -95,14 +94,14 @@ bool MSettings::save(const QString &filename) noexcept
         }
 
         int prevdepth = 0;
-        QString prevprefix;
+        QString prevgpath;
         for (const auto &group : section.second) {
             const int depth = group.first.count('/');
-            const QString &prefix = group.first;
+            const QString &gpath = group.first;
             // The first segment of the current and previous group that differs.
             int pivot = 0;
             for (int ixi = 0; ixi < depth; ++ixi) {
-                if(prevprefix.section('/', ixi, ixi) != prefix.section('/', ixi, ixi)) {
+                if(prevgpath.section('/', ixi, ixi) != gpath.section('/', ixi, ixi)) {
                     pivot = ixi;
                     break;
                 }
@@ -116,7 +115,7 @@ bool MSettings::save(const QString &filename) noexcept
             // Open braces of new groups.
             for(int ixi = pivot; ixi < depth; ++ixi) {
                 file.write(tabs.data(), ixi);
-                file.write(prefix.section('/', ixi, ixi).toUtf8());
+                file.write(gpath.section('/', ixi, ixi).toUtf8());
                 file.write(" {\n");
             }
             // Settings
@@ -127,7 +126,7 @@ bool MSettings::save(const QString &filename) noexcept
                 file.write(setting.second.toUtf8());
                 file.write("\n");
             }
-            prevprefix = prefix;
+            prevgpath = gpath;
             prevdepth = depth;
         }
 
@@ -145,7 +144,7 @@ bool MSettings::save(const QString &filename) noexcept
     return true;
 }
 
-void MSettings::dumpDebug(const QRegularExpression *censor) noexcept
+void MSettings::dumpDebug(const QRegularExpression *censor) const noexcept
 {
     qDebug().noquote() << "Configuration";
     for (const auto &section : sections) {
@@ -169,34 +168,29 @@ void MSettings::dumpDebug(const QRegularExpression *censor) noexcept
     qDebug() << "End of configuration.";
 }
 
-bool MSettings::contains(const QString &key) noexcept
+bool MSettings::contains(const QString &key) const noexcept
 {
-    assert(psection != nullptr);
-    const QString &fullkey = curprefix + key;
-    const int pivot = fullkey.lastIndexOf('/') + 1;
-    if (auto gsearch = psection->find(fullkey.left(pivot)); gsearch != psection->end()) {
-        return gsearch->second.count(fullkey.mid(pivot));
+    if (auto ssearch = sections.find(cursection); ssearch != sections.end()) {
+        if (auto gsearch = ssearch->second.find(curgroup); gsearch != ssearch->second.end()) {
+            return (gsearch->second.count(key) > 0);
+        }
     }
     return false;
 }
-QVariant MSettings::value(const QString &key, const QVariant &defaultValue) const noexcept
+QString MSettings::getString(const QString &key, const QString &defaultValue) const noexcept
 {
-    assert(psection != nullptr);
-    const QString &fullkey = curprefix + key;
-    const int pivot = fullkey.lastIndexOf('/') + 1;
-    if (auto gsearch = psection->find(fullkey.left(pivot)); gsearch != psection->end()) {
-        if (auto ssearch = gsearch->second.find(fullkey.mid(pivot)); ssearch != gsearch->second.end()) {
-            return QVariant(ssearch->second);
+    if (auto ssearch = sections.find(cursection); ssearch != sections.end()) {
+        if (auto gsearch = ssearch->second.find(curgroup); gsearch != ssearch->second.end()) {
+            if (auto vsearch = gsearch->second.find(key); vsearch != gsearch->second.end()) {
+                return vsearch->second;
+            }
         }
     }
     return defaultValue;
 }
-void MSettings::setValue(const QString &key, const QVariant &value) noexcept
+void MSettings::setString(const QString &key, const QString &value) noexcept
 {
-    assert(psection != nullptr);
-    const QString &fullkey = curprefix + key;
-    const int pivot = fullkey.lastIndexOf('/') + 1;
-    (*psection)[fullkey.left(pivot)][fullkey.mid(pivot)] = value.toString();
+    sections[cursection][curgroup][key] = value;
 }
 
 void MSettings::setSave(bool save) noexcept
@@ -206,24 +200,19 @@ void MSettings::setSave(bool save) noexcept
 
 void MSettings::setSection(const QString &name, QWidget *wgroup) noexcept
 {
-    psection = &sections[name];
-    sectname = name;
+    cursection = name;
+    curgroup.clear();
     group = wgroup;
 }
 
-void MSettings::startGroup(const QString &prefix, QWidget *wgroup) noexcept
+void MSettings::beginGroup(const QString &path) noexcept
 {
-    beginGroup(prefix);
-    group = wgroup;
-}
-void MSettings::beginGroup(const QString &prefix) noexcept
-{
-    curprefix += prefix + '/';
+    curgroup += path + '/';
 }
 void MSettings::endGroup() noexcept
 {
-    curprefix.chop(1);
-    curprefix.truncate(curprefix.lastIndexOf('/') + 1);
+    curgroup.chop(1);
+    curgroup.truncate(curgroup.lastIndexOf('/') + 1);
 }
 
 void MSettings::setGroupWidget(QWidget *wgroup) noexcept

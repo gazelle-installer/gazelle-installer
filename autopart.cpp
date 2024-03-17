@@ -63,7 +63,7 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
 
 void AutoPart::manageConfig(MSettings &config) noexcept
 {
-    config.startGroup("Storage", gui.pageDisk);
+    config.setSection("Storage", gui.pageDisk);
     config.manageComboBox("Drive", gui.comboDisk, true);
     config.manageCheckBox("DriveEncrypt", gui.checkEncryptAuto);
     if (config.isSave()) {
@@ -75,7 +75,6 @@ void AutoPart::manageConfig(MSettings &config) noexcept
              config.markBadWidget(gui.boxSliderPart);
          }
     }
-    config.endGroup();
 }
 
 void AutoPart::scan() noexcept
