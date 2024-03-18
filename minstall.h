@@ -74,7 +74,6 @@ private:
     bool oem, modeOOBE, mountkeep;
     // configuration management
     class MSettings *config = nullptr;
-    QString cfgfile;
     enum ConfigAction { CONFIG_SAVE, CONFIG_LOAD1, CONFIG_LOAD2 };
 
     // auto-mount setup

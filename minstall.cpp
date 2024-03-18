@@ -69,7 +69,7 @@ enum Step {
 static const QRegularExpression configCensor("Encryption\\/Pass|User\\/.*Pass/i");
 
 MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
-    : proc(this), appConf(acfg), appArgs(args), cfgfile(cfgfile),
+    : proc(this), appConf(acfg), appArgs(args),
       helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
     setupUi(this);
@@ -100,8 +100,7 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     gotoPage(Step::SPLASH);
 
     // config file
-    config = new MSettings();
-    config->load(cfgfile);
+    config = new MSettings(cfgfile);
 
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
@@ -502,19 +501,21 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     }
 
     if (mode == CONFIG_SAVE) {
+        const char *filename = "./minstall.conf";
         if (!pretend) {
-            config->save("/etc/minstalled.conf");
-            config->save("/mnt/antiX/etc/minstall.conf");
-            chmod("/mnt/antiX/etc/minstall.conf", 0600);
-        } else {
-            config->save("./minstall.conf");
+            config->setFileName("/etc/minstalled.conf");
+            config->save();
+            filename = "/mnt/antiX/etc/minstall.conf";
         }
+        config->setFileName(filename);
+        config->save();
+        chmod(filename, 0600);
     }
 
     if (config->bad) {
         QMessageBox::critical(this, windowTitle(),
             tr("Invalid settings found in configuration file (%1)."
-               " Please review marked fields as you encounter them.").arg(cfgfile));
+               " Please review marked fields as you encounter them.").arg(config->fileName()));
     }
 }
 

@@ -29,9 +29,13 @@
 
 #include "msettings.h"
 
-MSettings::MSettings() noexcept
+MSettings::MSettings(const QString &filename) noexcept
+    : confile(filename)
 {
     clear();
+    if (!confile.isEmpty()) {
+        load();
+    }
 }
 
 void MSettings::clear() noexcept
@@ -40,9 +44,9 @@ void MSettings::clear() noexcept
     cursection.clear();
     sections.clear();
 }
-bool MSettings::load(const QString &filename) noexcept
+bool MSettings::load() noexcept
 {
-    QFile file(filename);
+    QFile file(confile);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
         return false;
     }
@@ -78,9 +82,9 @@ bool MSettings::load(const QString &filename) noexcept
     }
     return true;
 }
-bool MSettings::save(const QString &filename) const noexcept
+bool MSettings::save() const noexcept
 {
-    QFile file(filename);
+    QFile file(confile);
     if (!file.open(QFile::ReadWrite | QFile::Truncate | QFile::Text)) {
         return false;
     }
@@ -220,7 +224,7 @@ void MSettings::setInteger(const QString &key, const long long value) noexcept
 
 void MSettings::dumpDebug(const QRegularExpression *censor) const noexcept
 {
-    qDebug().noquote() << "Configuration";
+    qDebug().noquote() << "Configuration:" << confile;
     for (const auto &section : sections) {
         const bool topsect = section.first.isEmpty(); // top-level settings (version, etc)
         if (!topsect) {

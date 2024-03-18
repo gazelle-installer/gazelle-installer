@@ -28,11 +28,14 @@ class MSettings
     typedef std::map<QString, SettingsMap> SettingsGroup;
     std::map<QString, SettingsGroup> sections;
     QString cursection, curgroup;
+    QString confile;
 public:
-    MSettings() noexcept;
+    MSettings(const QString &filename = "") noexcept;
     void clear() noexcept;
-    bool load(const QString &filename) noexcept;
-    bool save(const QString &filename) const noexcept;
+    QString fileName() const noexcept { return confile; }
+    void setFileName(const QString &filename) noexcept { confile = filename; }
+    bool load() noexcept;
+    bool save() const noexcept;
     void setSection(const QString &name) noexcept;
     QString section() const noexcept { return cursection; }
     void beginGroup(const QString &path) noexcept;
