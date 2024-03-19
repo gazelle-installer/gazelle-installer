@@ -500,7 +500,11 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         oobe->manageConfig(*config, false);
     }
 
-    if (mode == CONFIG_SAVE) {
+    if (config->bad) {
+        QMessageBox::critical(this, windowTitle(),
+            tr("Invalid settings found in configuration file (%1)."
+               " Please review marked fields as you encounter them.").arg(config->fileName()));
+    } else if (mode == CONFIG_SAVE) {
         const char *filename = "./minstall.conf";
         if (!pretend) {
             config->setFileName("/etc/minstalled.conf");
@@ -510,12 +514,6 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         config->setFileName(filename);
         config->save();
         chmod(filename, 0600);
-    }
-
-    if (config->bad) {
-        QMessageBox::critical(this, windowTitle(),
-            tr("Invalid settings found in configuration file (%1)."
-               " Please review marked fields as you encounter them.").arg(config->fileName()));
     }
 }
 
