@@ -73,7 +73,7 @@ private:
     bool pretend, automatic;
     bool oem, modeOOBE, mountkeep;
     // configuration management
-    class MSettings *config = nullptr;
+    QString configFile;
     enum ConfigAction { CONFIG_SAVE, CONFIG_LOAD1, CONFIG_LOAD2 };
 
     // auto-mount setup

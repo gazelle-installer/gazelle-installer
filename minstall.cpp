@@ -69,7 +69,8 @@ enum Step {
 static const QRegularExpression configCensor("Encryption\\/Pass|User\\/.*Pass/i");
 
 MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
-    : proc(this), appConf(acfg), appArgs(args), helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
+    : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile),
+    helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
     setupUi(this);
     listLog->addItem("Version " VERSION);
@@ -97,9 +98,6 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     PROJECTFORUM = appConf.value("FORUM_URL").toString();
 
     gotoPage(Step::SPLASH);
-
-    // config file
-    config = new MSettings(cfgfile, this);
 
     // ensure the help widgets are displayed correctly when started
     // Qt will delete the heap-allocated event object when posted
@@ -456,65 +454,63 @@ void MInstall::pretendNextPhase() noexcept
 void MInstall::manageConfig(enum ConfigAction mode) noexcept
 {
     if (mode == CONFIG_SAVE) {
-        delete config;
-        config = new MSettings(pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf", this);
+        configFile = pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf";
     }
-    if (!config) return;
-    config->bad = false;
+    MSettings config(configFile, this);
 
     if (mode == CONFIG_SAVE) {
-        config->setSave(true);
-        config->clear();
-        config->setValue("Version", VERSION);
-        config->setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
+        config.setSave(true);
+        config.setValue("Version", VERSION);
+        config.setValue("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
     if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
         // Automatic or Manual partitioning
-        config->setGroupWidget(pageDisk);
+        config.setGroupWidget(pageDisk);
         const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *diskRadios[] = {radioEntireDisk, radioCustomPart};
-        config->manageRadios("Storage/Target", 2, diskChoices, diskRadios);
+        config.manageRadios("Storage/Target", 2, diskChoices, diskRadios);
         const bool targetIsDrive = radioEntireDisk->isChecked();
 
         // Storage and partition management
-        if(targetIsDrive || mode!=CONFIG_SAVE) autopart->manageConfig(*config);
+        if(targetIsDrive || mode!=CONFIG_SAVE) autopart->manageConfig(config);
         if (!targetIsDrive || mode!=CONFIG_SAVE) {
-            config->setGroupWidget(pagePartitions);
-            partman->manageConfig(*config, mode==CONFIG_SAVE);
+            config.setGroupWidget(pagePartitions);
+            partman->manageConfig(config, mode==CONFIG_SAVE);
         }
 
         // Encryption
-        config->startGroup("Encryption", targetIsDrive ? pageDisk : pagePartitions);
+        config.startGroup("Encryption", targetIsDrive ? pageDisk : pagePartitions);
         if (mode != CONFIG_SAVE) {
-            const QString &epass = config->value("Pass").toString();
+            const QString &epass = config.value("Pass").toString();
             textCryptoPass->setText(epass);
             textCryptoPass2->setText(epass);
         }
-        config->endGroup();
+        config.endGroup();
     }
 
     if (!modeOOBE) {
         const bool advanced = radioCustomPart->isChecked();
         if (mode == CONFIG_SAVE || mode == CONFIG_LOAD2) {
-            swapman->manageConfig(*config, advanced);
-            if (advanced) bootman->manageConfig(*config);
-            oobe->manageConfig(*config, mode==CONFIG_SAVE);
+            swapman->manageConfig(config, advanced);
+            if (advanced) bootman->manageConfig(config);
+            oobe->manageConfig(config, mode==CONFIG_SAVE);
         }
     } else if (mode == CONFIG_LOAD2) {
-        oobe->manageConfig(*config, false);
+        oobe->manageConfig(config, false);
     }
 
     if (mode == CONFIG_SAVE && !pretend) {
-        config->sync();
+        config.sync();
+        config.dumpDebug(&configCensor);
         QFile::remove("/etc/minstalled.conf");
-        QFile::copy(config->fileName(), "/etc/minstalled.conf");
-        chmod(config->fileName().toUtf8().constData(), 0600);
+        QFile::copy(configFile, "/etc/minstalled.conf");
+        chmod(configFile.toUtf8().constData(), 0600);
     }
 
-    if (config->bad) {
+    if (config.bad) {
         QMessageBox::critical(this, windowTitle(),
             tr("Invalid settings found in configuration file (%1)."
-               " Please review marked fields as you encounter them.").arg(config->fileName()));
+               " Please review marked fields as you encounter them.").arg(configFile));
     }
 }
 
@@ -1132,8 +1128,6 @@ void MInstall::cleanup()
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     if (pretend) return;
 
-    if (config) config->dumpDebug(&configCensor);
-    else qDebug() << "NO CONFIG";
     const char *destlog = "/mnt/antiX/var/log/minstall.log";
     QFile::remove(destlog);
     bool ok = QFile::copy("/var/log/minstall.log", destlog);
