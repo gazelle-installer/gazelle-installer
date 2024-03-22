@@ -17,6 +17,7 @@
  ****************************************************************************/
 
 #include <cstdlib>
+#include <utility>
 #include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -310,7 +311,7 @@ void MInstall::setupAutoMount(bool enabled)
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
         proc.mkpath("/run/udev/rules.d");
-        for (const QString &rule : qAsConst(udev_temp_mdadm_rules)) {
+        for (const QString &rule : std::as_const(udev_temp_mdadm_rules)) {
             proc.exec("touch", {rule});
         }
 
@@ -329,7 +330,7 @@ void MInstall::setupAutoMount(bool enabled)
             proc.exec("service", {"udev", "start"});
         }
         // clear the rules that were temporarily overridden
-        for (const QString &rule : qAsConst(udev_temp_mdadm_rules)) {
+        for (const QString &rule : std::as_const(udev_temp_mdadm_rules)) {
             proc.shell("rm -f " + rule); // TODO: check if each rule is a single file name.
         }
 

@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 #include <sys/stat.h>
 #include <QDebug>
 #include <QLocale>
@@ -678,7 +679,7 @@ void PartMan::scanSubvolumes(Device *part)
     proc.exec("btrfs", {"subvolume", "list", "/mnt/btrfs-scratch"}, nullptr, true);
     lines = proc.readOutLines();
     proc.exec("umount", {"/mnt/btrfs-scratch"});
-    for (const QString &line : qAsConst(lines)) {
+    for (const QString &line : std::as_const(lines)) {
         const int start = line.indexOf("path") + 5;
         if (line.length() <= start) goto END;
         Device *subvol = new Device(Device::SUBVOLUME, part);
@@ -1095,7 +1096,7 @@ void PartMan::preparePartitions()
         const QStringList swaps = proc.readOutLines();
         proc.exec("findmnt", {"--raw", "-o", "SOURCE"}, nullptr, true);
         const QStringList fsmounts = proc.readOutLines();
-        for (const QString &devpath : qAsConst(listToUnmount)) {
+        for (const QString &devpath : std::as_const(listToUnmount)) {
             if (swaps.contains(devpath)) proc.exec("swapoff", {devpath});
             if (fsmounts.contains(devpath)) proc.exec("umount", {"-q", devpath});
         }
@@ -1915,7 +1916,9 @@ void PartMan::Device::sortChildren() noexcept
         return l->name < r->name;
     };
     std::sort(children.begin(), children.end(), cmp);
-    for (Device *c : qAsConst(children)) partman.notifyChange(c);
+    for (Device *c : std::as_const(children)) {
+        partman.notifyChange(c);
+    }
 }
 /* Helpers */
 void PartMan::Device::setActive(bool on) noexcept
