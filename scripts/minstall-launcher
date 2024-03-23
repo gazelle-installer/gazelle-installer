@@ -7,7 +7,7 @@
 
 #exit early if not live or parameter given
 
-if [ -n "$1" ] || ! grep -sq '^overlay /live/aufs' /proc/mounts; then
+if [ -n "$1" ] || ! grep -sq 'upperdir=/live/aufs' /proc/mounts; then
     echo ""
     echo "INFORMATION: Non-live enviroment or options not supported"
     echo "             use alternate authentication to launch installer"
