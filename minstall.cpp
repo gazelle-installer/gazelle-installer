@@ -17,6 +17,7 @@
  ****************************************************************************/
 
 #include <cstdlib>
+#include <algorithm>
 #include <utility>
 #include <fcntl.h>
 #include <unistd.h>
@@ -240,6 +241,7 @@ void MInstall::splashSetThrobber(bool active) noexcept
         if (throbber) return;
         labelSplash->installEventFilter(this);
         throbber = new QTimer(this);
+        throbPos = 0;
         connect(throbber, &QTimer::timeout, this, [=]() noexcept {
             ++throbPos;
             labelSplash->update();
@@ -997,17 +999,16 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
         painter.translate(lW / 2, lH / 2);
         painter.scale(lW / 200.0, lH / 200.0);
         // Draw the load indicator on the splash screen.
-        const int blades = 12;
-        const qreal angle = 360.0 / blades;
+        constexpr int blades = 12;
+        constexpr qreal angle = 360.0 / blades;
         painter.rotate(angle * throbPos);
         float hue = 1.0, alpha = 0.18;
-        const float revs = throbPos / blades;
-        const float huestep = ((120.0 + (revs<240 ? revs : 240))/360.0) / blades;
-        const float alphastep = 0.18 / blades;
+        const float huestep = std::min(throbPos, 60) / (60.0 * blades);
+        constexpr float alphastep = 0.18 / blades;
         QPen pen;
         pen.setWidth(3);
         pen.setJoinStyle(Qt::MiterJoin);
-        for (int ixi=0; ixi<blades; ++ixi) {
+        for (unsigned int ixi=blades; ixi>0; --ixi) {
             const QColor &color = QColor::fromHsvF(hue, 1.0, 1.0, alpha);
             hue -= huestep, alpha += alphastep;
             painter.setBrush(color);
