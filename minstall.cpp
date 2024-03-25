@@ -241,7 +241,6 @@ void MInstall::splashSetThrobber(bool active) noexcept
         if (throbber) return;
         labelSplash->installEventFilter(this);
         throbber = new QTimer(this);
-        throbPos = 0;
         connect(throbber, &QTimer::timeout, this, [=]() noexcept {
             ++throbPos;
             labelSplash->update();
