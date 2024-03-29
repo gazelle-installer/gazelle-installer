@@ -92,11 +92,10 @@ private:
 
     QPixmap helpBackdrop;
     // Splash screen
-    int throbPos = 0;
     QTimer *throbber = nullptr;
+    int throbPos = 0;
     // for the tips display
-    int ixTip = 0;
-    int ixTipStart = -1;
+    int ixTip = -1, ixTipStart = -1;
     int iLastProgress = -1;
 
     // info needed for Phase 2 of the process

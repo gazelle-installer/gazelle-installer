@@ -876,10 +876,6 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::PROGRESS:
-        if (ixTipStart >= 0) {
-            iLastProgress = progInstall->value();
-            on_progInstall_valueChanged(iLastProgress);
-        }
         textHelp->setText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
             + tr("%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
             + "</p><p>"
@@ -1142,20 +1138,31 @@ void MInstall::cleanup()
 
 void MInstall::on_progInstall_valueChanged(int value) noexcept
 {
-    if (ixTipStart < 0 || widgetStack->currentWidget() != pageProgress) {
-        return; // no point displaying a new hint if it will be invisible
-    }
-
-    const int tipcount = 6;
-    ixTip = tipcount;
-    if (ixTipStart < tipcount) {
-        int imax = (progInstall->maximum() - iLastProgress) / (tipcount - ixTipStart);
-        if (imax != 0) {
-            ixTip = ixTipStart + (value - iLastProgress) / imax;
+    int newtip = 0;
+    if (ixTipStart < 0) {
+        ixTipStart = 0; // First invocation of this function.
+    } else {
+        if (widgetStack->currentWidget() != pageProgress) {
+            iLastProgress = -1;
+            return; // No point loading a new tip when will be invisible.
+        } else if (iLastProgress < 0) {
+            iLastProgress = value; // First invocation since progress page last shown.
+        }
+        const int tipcount = 6;
+        newtip = tipcount;
+        if (ixTipStart < tipcount) {
+            int imax = (progInstall->maximum() - iLastProgress) / (tipcount - ixTipStart);
+            if (imax != 0) {
+                newtip = ixTipStart + (value - iLastProgress) / imax;
+            }
+        }
+        if (newtip == ixTip) {
+            return; // No point loading a tip that is already visible.
         }
     }
+    ixTip = newtip;
 
-    switch(ixTip)
+    switch(newtip)
     {
     case 0:
         textTips->setText(tr("<p><b>Getting Help</b><br/>"
