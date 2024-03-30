@@ -74,12 +74,12 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile),
     helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
-    setupUi(this);
-    listLog->addItem("Version " VERSION);
-    proc.setupUI(listLog, progInstall);
+    gui.setupUi(this);
+    gui.listLog->addItem("Version " VERSION);
+    proc.setupUI(gui.listLog, gui.progInstall);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
-    textHelp->installEventFilter(this);
-    boxInstall->hide();
+    gui.textHelp->installEventFilter(this);
+    gui.boxInstall->hide();
 
     modeOOBE = args.isSet("oobe");
     pretend = args.isSet("pretend");
@@ -89,7 +89,7 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
         mountkeep = args.isSet("mount-keep");
     } else {
         automatic = oem = false;
-        pushClose->setText(tr("Shutdown"));
+        gui.pushClose->setText(tr("Shutdown"));
     }
 
     // setup system variables
@@ -113,7 +113,7 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
             const bool closenow = (!msg || !*msg);
             if(!closenow) {
                 proc.log(QStringLiteral("FAILED START - ") + msg, MProcess::LOG_FAIL);
-                labelSplash->setText(tr(msg));
+                gui.labelSplash->setText(tr(msg));
             }
             abortEndUI(closenow);
         }
@@ -135,7 +135,7 @@ MInstall::~MInstall() {
 void MInstall::startup()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
-    connect(pushClose, &QPushButton::clicked, this, &MInstall::close);
+    connect(gui.pushClose, &QPushButton::clicked, this, &MInstall::close);
 
     if (!modeOOBE) {
         // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
@@ -162,24 +162,24 @@ void MInstall::startup()
         else if (appArgs.isSet("no-media-check")) nocheck = true;
         if(nocheck) proc.log("No media check");
         else {
-            checkmd5 = new CheckMD5(proc, labelSplash);
+            checkmd5 = new CheckMD5(proc, gui.labelSplash);
             checkmd5->check(); // Must be separate from constructor for halt() to work.
             delete checkmd5;
             checkmd5 = nullptr;
         }
 
-        partman = new PartMan(proc, *this, appConf, appArgs);
+        partman = new PartMan(proc, gui, appConf, appArgs);
         base = new Base(proc, *partman, appConf, appArgs);
-        bootman = new BootMan(proc, *partman, *this, appConf, appArgs);
-        swapman = new SwapMan(proc, *partman, *this);
-        autopart = new AutoPart(proc, partman, *this, appConf);
+        bootman = new BootMan(proc, *partman, gui, appConf, appArgs);
+        swapman = new SwapMan(proc, *partman, gui);
+        autopart = new AutoPart(proc, partman, gui, appConf);
         partman->autopart = autopart;
-        connect(radioEntireDisk, &QRadioButton::toggled, boxAutoPart, &QGroupBox::setEnabled);
-        labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
+        connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
+        gui.labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
             + "<br/><img src=':/dialog-warning'/>" + tr("These actions cannot be undone. Do you want to continue?")
             + "<img src=':/dialog-warning'/>");
 
-        // Link block
+        // set some distro-centric text
         QString link_block;
         appConf.beginGroup("LINKS");
         const QStringList &links = appConf.childKeys();
@@ -187,52 +187,50 @@ void MInstall::startup()
             link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + appConf.value(link).toString();
         }
         appConf.endGroup();
-
-        // set some distro-centric text
-        textReminders->setPlainText(tr("Support %1\n\n"
+        gui.textReminders->setPlainText(tr("Support %1\n\n"
             "%1 is supported by people like you. Some help others at the support forum - %2,"
             " or translate help files into different languages, or make suggestions,"
             " write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
             + "\n" + link_block);
 
         // Password box setup
-        passCrypto = new PassEdit(textCryptoPass, textCryptoPass2, 1, this);
-        connect(passCrypto, &PassEdit::validationChanged, pushNext, &QPushButton::setEnabled);
+        passCrypto = new PassEdit(gui.textCryptoPass, gui.textCryptoPass2, 1, this);
+        connect(passCrypto, &PassEdit::validationChanged, gui.pushNext, &QPushButton::setEnabled);
     }
 
     setupkeyboardbutton();
 
-    oobe = new Oobe(proc, *this, this, appConf, oem, modeOOBE);
+    oobe = new Oobe(proc, gui, this, appConf, oem, modeOOBE);
 
     if (modeOOBE) manageConfig(CONFIG_LOAD2);
     else {
         // Build disk widgets
         partman->scan();
         autopart->scan();
-        if (comboDisk->count() > 0) {
-            comboDisk->setCurrentIndex(0);
-            radioEntireDisk->setChecked(true);
+        if (gui.comboDisk->count() > 0) {
+            gui.comboDisk->setCurrentIndex(0);
+            gui.radioEntireDisk->setChecked(true);
             for (PartMan::Iterator it(*partman); *it; it.next()) {
                 if ((*it)->isVolume()) {
                     // found at least one partition
-                    radioCustomPart->setChecked(true);
+                    gui.radioCustomPart->setChecked(true);
                     break;
                 }
             }
         } else {
-            radioEntireDisk->setEnabled(false);
-            boxAutoPart->setEnabled(false);
-            radioCustomPart->setChecked(true);
+            gui.radioEntireDisk->setEnabled(false);
+            gui.boxAutoPart->setEnabled(false);
+            gui.radioCustomPart->setChecked(true);
         }
         // Override with whatever is in the config.
         manageConfig(CONFIG_LOAD1);
         // Hibernation check box (regular install).
-        checkHibernationReg->setChecked(checkHibernation->isChecked());
-        connect(checkHibernationReg, &QCheckBox::clicked, checkHibernation, &QCheckBox::setChecked);
+        gui.checkHibernationReg->setChecked(gui.checkHibernation->isChecked());
+        connect(gui.checkHibernationReg, &QCheckBox::clicked, gui.checkHibernation, &QCheckBox::setChecked);
     }
     oobe->stashServices(true);
 
-    textCopyright->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
+    gui.textCopyright->setPlainText(tr("%1 is an independent Linux distribution based on Debian Stable.\n\n"
         "%1 uses some components from MEPIS Linux which are released under an Apache free license."
         " Some MEPIS components have been modified for %1.\n\nEnjoy using %1").arg(PROJECTNAME));
     gotoPage(Step::TERMS);
@@ -242,20 +240,20 @@ void MInstall::splashSetThrobber(bool active) noexcept
 {
     if (active) {
         if (throbber) return;
-        labelSplash->installEventFilter(this);
+        gui.labelSplash->installEventFilter(this);
         throbber = new QTimer(this);
         connect(throbber, &QTimer::timeout, this, [=]() noexcept {
             ++throbPos;
-            labelSplash->update();
+            gui.labelSplash->update();
         });
         throbber->start(120);
     } else {
         if (!throbber) return;
         delete throbber;
         throbber = nullptr;
-        labelSplash->removeEventFilter(this);
+        gui.labelSplash->removeEventFilter(this);
     }
-    labelSplash->update();
+    gui.labelSplash->update();
 }
 
 void MInstall::setupZRam()
@@ -350,7 +348,7 @@ void MInstall::setupAutoMount(bool enabled)
 void MInstall::processNextPhase() noexcept
 {
     try {
-        widgetStack->setEnabled(true);
+        gui.widgetStack->setEnabled(true);
         if (proc.halted()) throw ""; // Abortion
         if (pretend) {
             pretendNextPhase();
@@ -371,19 +369,19 @@ void MInstall::processNextPhase() noexcept
             proc.advance(11, partman->countPrepSteps());
             partman->prepStorage();
             base->install();
-            if (widgetStack->currentWidget() != pageProgress) {
-                progInstall->setEnabled(false);
+            if (gui.widgetStack->currentIndex() != Step::PROGRESS) {
+                gui.progInstall->setEnabled(false);
                 // Using proc.status() prepends the percentage to the text.
-                progInstall->setFormat(tr("Paused for required operator input"));
-                proc.log(progInstall->format(), MProcess::LOG_STATUS);
+                gui.progInstall->setFormat(tr("Paused for required operator input"));
+                proc.log(gui.progInstall->format(), MProcess::LOG_STATUS);
                 QApplication::beep();
             }
             phase = PH_WAITING_FOR_INFO;
         }
-        if (phase == PH_WAITING_FOR_INFO && widgetStack->currentWidget() == pageProgress) {
+        if (phase == PH_WAITING_FOR_INFO && gui.widgetStack->currentIndex() == Step::PROGRESS) {
             phase = PH_CONFIGURING;
-            progInstall->setEnabled(true);
-            pushBack->setEnabled(false);
+            gui.progInstall->setEnabled(true);
+            gui.pushBack->setEnabled(false);
 
             proc.advance(1, 1);
             proc.status(tr("Setting system configuration"));
@@ -412,11 +410,11 @@ void MInstall::processNextPhase() noexcept
         // This OOBE phase is only run under --oobe mode.
         if (modeOOBE && phase == PH_READY) {
             phase = PH_OUT_OF_BOX;
-            labelSplash->setText(tr("Configuring system. Please wait."));
+            gui.labelSplash->setText(tr("Configuring system. Please wait."));
             gotoPage(Step::SPLASH);
             oobe->process();
             phase = PH_FINISHED;
-            labelSplash->setText(tr("Configuration complete. Restarting system."));
+            gui.labelSplash->setText(tr("Configuration complete. Restarting system."));
             proc.exec("/usr/sbin/reboot");
         }
     } catch (const char *msg) {
@@ -426,7 +424,7 @@ void MInstall::processNextPhase() noexcept
         proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::LOG_FAIL);
 
         const bool closing = (abortion == AB_CLOSING);
-        labelSplash->setText(tr(msg));
+        gui.labelSplash->setText(tr(msg));
         abortUI(false, closing);
         proc.unhalt();
         if (!modeOOBE) {
@@ -449,7 +447,7 @@ void MInstall::pretendNextPhase() noexcept
             phase = PH_WAITING_FOR_INFO;
         }
     }
-    if (phase == PH_WAITING_FOR_INFO && widgetStack->currentWidget() == pageProgress) {
+    if (phase == PH_WAITING_FOR_INFO && gui.widgetStack->currentIndex() == Step::PROGRESS) {
         manageConfig(CONFIG_SAVE);
         phase = PH_FINISHED;
         gotoPage(Step::END);
@@ -470,31 +468,31 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     }
     if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
         // Automatic or Manual partitioning
-        config.setGroupWidget(pageDisk);
+        config.setGroupWidget(gui.pageDisk);
         const char *diskChoices[] = {"Drive", "Partitions"};
-        QRadioButton *diskRadios[] = {radioEntireDisk, radioCustomPart};
+        QRadioButton *diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
         config.manageRadios("Storage/Target", 2, diskChoices, diskRadios);
-        const bool targetIsDrive = radioEntireDisk->isChecked();
+        const bool targetIsDrive = gui.radioEntireDisk->isChecked();
 
         // Storage and partition management
         if(targetIsDrive || mode!=CONFIG_SAVE) autopart->manageConfig(config);
         if (!targetIsDrive || mode!=CONFIG_SAVE) {
-            config.setGroupWidget(pagePartitions);
+            config.setGroupWidget(gui.pagePartitions);
             partman->manageConfig(config, mode==CONFIG_SAVE);
         }
 
         // Encryption
-        config.startGroup("Encryption", targetIsDrive ? pageDisk : pagePartitions);
+        config.startGroup("Encryption", targetIsDrive ? gui.pageDisk : gui.pagePartitions);
         if (mode != CONFIG_SAVE) {
             const QString &epass = config.value("Pass").toString();
-            textCryptoPass->setText(epass);
-            textCryptoPass2->setText(epass);
+            gui.textCryptoPass->setText(epass);
+            gui.textCryptoPass2->setText(epass);
         }
         config.endGroup();
     }
 
     if (!modeOOBE) {
-        const bool advanced = radioCustomPart->isChecked();
+        const bool advanced = gui.radioCustomPart->isChecked();
         if (mode == CONFIG_SAVE || mode == CONFIG_LOAD2) {
             swapman->manageConfig(config, advanced);
             if (advanced) bootman->manageConfig(config);
@@ -523,18 +521,18 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
 int MInstall::showPage(int curr, int next) noexcept
 {
     if (next == Step::SPLASH) { // Enter splash screen
-        boxMain->setCursor(Qt::WaitCursor);
+        gui.boxMain->setCursor(Qt::WaitCursor);
         splashSetThrobber(appConf.value("SPLASH_THROBBER", true).toBool());
     } else if (curr == Step::SPLASH) { // Leave splash screen
-        labelSplash->clear();
+        gui.labelSplash->clear();
         splashSetThrobber(false);
-        boxMain->unsetCursor();
+        gui.boxMain->unsetCursor();
     } else if (curr == Step::TERMS && next > curr) {
         if (modeOOBE) return Step::NETWORK;
     } else if (curr == Step::DISK && next > curr) {
-        if (radioEntireDisk->isChecked()) {
+        if (gui.radioEntireDisk->isChecked()) {
             if (!automatic && !proc.detectEFI()) {
-                PartMan::Device *device = partman->findByPath("/dev/" + comboDisk->currentData().toString());
+                PartMan::Device *device = partman->findByPath("/dev/" + gui.comboDisk->currentData().toString());
                 if (device && device->size >= 2*TB) {
                     const int ans = QMessageBox::warning(this, windowTitle(),
                         tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
@@ -544,23 +542,23 @@ int MInstall::showPage(int curr, int next) noexcept
                 }
             }
             partman->clearAllUses();
-            autopart->buildLayout(autopart->partSize(), checkEncryptAuto->isChecked());
+            autopart->buildLayout(autopart->partSize(), gui.checkEncryptAuto->isChecked());
             if (!partman->composeValidate(true)) {
-                nextFocus = treePartitions;
+                nextFocus = gui.treePartitions;
                 return Step::PARTITIONS;
             }
-            listConfirm->clear();
-            listConfirm->addItem(tr("Format and use the entire disk (%1) for %2").arg(
-                comboDisk->currentData().toString(), PROJECTNAME));
-            if (checkEncryptAuto->isChecked()) {
+            gui.listConfirm->clear();
+            gui.listConfirm->addItem(tr("Format and use the entire disk (%1) for %2").arg(
+                gui.comboDisk->currentData().toString(), PROJECTNAME));
+            if (gui.checkEncryptAuto->isChecked()) {
                 return Step::ENCRYPTION;
             }
             return Step::CONFIRM;
         }
     } else if (curr == Step::PARTITIONS && next > curr) {
-        listConfirm->clear();
+        gui.listConfirm->clear();
         if (!partman->composeValidate(automatic)) {
-            nextFocus = treePartitions;
+            nextFocus = gui.treePartitions;
             return curr;
         }
         if (!pretend && !(base && base->saveHomeBasic())) {
@@ -576,7 +574,7 @@ int MInstall::showPage(int curr, int next) noexcept
         }
         return Step::CONFIRM;
     } else if (curr == Step::ENCRYPTION && next < curr) {
-        if (radioEntireDisk->isChecked()) {
+        if (gui.radioEntireDisk->isChecked()) {
             partman->scan(autopart->selectedDrive()); // Clear the auto layout.
             return Step::DISK;
         }
@@ -584,8 +582,8 @@ int MInstall::showPage(int curr, int next) noexcept
     } else if (curr == Step::CONFIRM) {
         if (next > curr) {
             bootman->buildBootLists(); // Load default boot options
-            if (radioEntireDisk->isChecked()) {
-                checkHibernation->setChecked(checkHibernationReg->isChecked());
+            if (gui.radioEntireDisk->isChecked()) {
+                gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
                 swapman->setupDefaults();
                 manageConfig(CONFIG_LOAD2);
                 return oem ? Step::PROGRESS : Step::NETWORK;
@@ -595,7 +593,7 @@ int MInstall::showPage(int curr, int next) noexcept
                 return Step::BOOT;
             }
         } else {
-            if (radioEntireDisk->isChecked()) {
+            if (gui.radioEntireDisk->isChecked()) {
                 partman->scan(autopart->selectedDrive()); // Clear the auto layout.
                 return Step::DISK;
             }
@@ -617,11 +615,11 @@ int MInstall::showPage(int curr, int next) noexcept
         nextFocus = oobe->validateUserInfo(automatic);
         if (nextFocus) return curr;
         // Check for pre-existing /home directory, see if user directory already exists.
-        haveOldHome = base && base->homes.contains(textUserName->text());
+        haveOldHome = base && base->homes.contains(gui.textUserName->text());
         if (!haveOldHome) return Step::PROGRESS; // Skip pageOldHome
         else {
             const QString &str = tr("The home directory for %1 already exists.");
-            labelOldHome->setText(str.arg(textUserName->text()));
+            gui.labelOldHome->setText(str.arg(gui.textUserName->text()));
         }
     } else if (curr == Step::OLD_HOME && next < curr) { // Backward
         if (!pretend && oobe->haveSnapshotUserAccounts) {
@@ -647,19 +645,18 @@ void MInstall::pageDisplayed(int next) noexcept
 {
     bool enableBack = true, enableNext = true;
     if (!modeOOBE) {
-        const int ixProgress = widgetStack->indexOf(pageProgress);
         // progress bar shown only for install and configuration pages.
-        boxInstall->setVisible(next >= widgetStack->indexOf(pageBoot) && next <= ixProgress);
+        gui.boxInstall->setVisible(next >= Step::BOOT && next <= Step::PROGRESS);
         // save the last tip and stop it updating when the progress page is hidden.
-        if (next != ixProgress) ixTipStart = ixTip;
+        if (next != Step::PROGRESS) ixTipStart = ixTip;
     }
 
     // This prevents the user accidentally skipping the confirmation.
-    pushNext->setDefault(next != Step::CONFIRM);
+    gui.pushNext->setDefault(next != Step::CONFIRM);
 
     switch (next) {
     case Step::TERMS:
-        textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
             + (modeOOBE ? "" : (tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p><p>"))
             + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
                 " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
@@ -668,7 +665,7 @@ void MInstall::pageDisplayed(int next) noexcept
                 " It is solely your responsibility to backup your data before proceeding.") + "</p>");
         break;
     case Step::DISK:
-        textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
             + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
             "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
             + tr("The drive can be divided into separate system (root) and user data (home) partitions using the slider.") + "</p>"
@@ -685,11 +682,11 @@ void MInstall::pageDisplayed(int next) noexcept
             "<p><b>" + tr("Using a custom disk layout") + "</b><br/>"
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
-                " partitions you need.").arg(PROJECTNAME, radioCustomPart->text().remove('&')) + "</p>");
+                " partitions you need.").arg(PROJECTNAME, gui.radioCustomPart->text().remove('&')) + "</p>");
         break;
 
     case Step::PARTITIONS:
-        textHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
             + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"
             "<p>" + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"
             "<p>" + tr("<i>Size</i> - The size of the partition. This can only be changed on a new layout.") + "</p>"
@@ -779,13 +776,13 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::ENCRYPTION: // Disk encryption.
-        textHelp->setText("<p><b>" + tr("Encryption") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("Encryption") + "</b><br/>"
             + ("You have chosen to encrypt at least one volume, and more information is required before continuing.") + "</p>");
         enableNext = passCrypto->valid();
         break;
 
     case Step::CONFIRM: // Confirmation and review.
-        textHelp->setText("<p><b>" + tr("Final Review and Confirmation") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("Final Review and Confirmation") + "</b><br/>"
             + tr("Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.") + "</p>");
         if (!automatic) {
             proc.sleep(500, true); // Prevent accidentally skipping the confirmation.
@@ -793,7 +790,7 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::BOOT: // Start of installation.
-        textHelp->setText("<p><b>" + tr("Install GRUB for Linux and Windows") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("Install GRUB for Linux and Windows") + "</b><br/>"
             + tr("%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.").arg(PROJECTNAME) + "</p>"
             "<p>" + tr("By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.") + "</p>"
             "<p>" + tr("If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.") + "</p>"
@@ -807,21 +804,21 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::SERVICES:
-        textHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
+        gui.textHelp->setText(tr("<p><b>Common Services to Enable</b><br/>Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.</p>").arg(PROJECTNAME));
         break;
 
     case Step::NETWORK:
-        textHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
+        gui.textHelp->setText(tr("<p><b>Computer Identity</b><br/>The computer name is a common unique name which will identify your computer if it is on a network. "
                              "The computer domain is unlikely to be used unless your ISP or local network requires it.</p>"
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
         if (modeOOBE) enableBack = true;
-        else enableBack = radioCustomPart->isChecked();
+        else enableBack = gui.radioCustomPart->isChecked();
         break;
 
     case Step::LOCALIZATION:
-        textHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
             + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"
             "<p><b>" + tr("Configure Clock") + "</b><br/>"
             + tr("If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC)."
@@ -835,7 +832,7 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::USER_ACCOUNTS:
-        textHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
         + tr("The root user is similar to the Administrator user in some other operating systems."
             " You should not use the root user as your daily user account."
             " Please enter the name for a new (default) user account that you will use on a daily basis."
@@ -848,13 +845,13 @@ void MInstall::pageDisplayed(int next) noexcept
             " This allows you to log in without requiring a password.") + "<br/>"
         + tr("Obviously, this should only be done in situations where the user account"
             " does not need to be secure, such as a public terminal.") + "</p>");
-        if (!nextFocus) nextFocus = textUserName;
+        if (!nextFocus) nextFocus = gui.textUserName;
         oobe->userPassValidationChanged();
-        enableNext = pushNext->isEnabled();
+        enableNext = gui.pushNext->isEnabled();
         break;
 
     case Step::OLD_HOME:
-        textHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
             + tr("A home directory already exists for the user name you have chosen."
                 " This screen allows you to choose what happens to this directory.") + "</p>"
             "<p><b>" + tr("Re-use it for this installation") + "</b><br/>"
@@ -872,14 +869,14 @@ void MInstall::pageDisplayed(int next) noexcept
         // disable the Next button if none of the old home options are selected
         oobe->oldHomeToggled();
         // if the Next button is disabled, avoid enabling both Back and Next at the end
-        if (!pushNext->isEnabled()) {
+        if (!gui.pushNext->isEnabled()) {
             enableBack = true;
             enableNext = false;
         }
         break;
 
     case Step::PROGRESS:
-        textHelp->setText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
+        gui.textHelp->setText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
             + tr("%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
             + "</p><p>"
             + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
@@ -889,13 +886,13 @@ void MInstall::pageDisplayed(int next) noexcept
             + "</p><p>"
             + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
             + "</p>");
-        enableBack = !oem || radioCustomPart->isChecked();
+        enableBack = !oem || gui.radioCustomPart->isChecked();
         enableNext = false;
         break;
 
     case Step::END:
-        pushClose->setEnabled(false);
-        textHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
+        gui.pushClose->setEnabled(false);
+        gui.textHelp->setText(tr("<p><b>Congratulations!</b><br/>You have completed the installation of %1</p>"
                              "<p><b>Finding Applications</b><br/>There are hundreds of excellent applications installed with %1 "
                              "The best way to learn about them is to browse through the Menu and try them. "
                              "Many of the apps were developed specifically for the %1 project. "
@@ -904,61 +901,61 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     default: // other
-        textHelp->setText("<p><b>" + tr("Enjoy using %1").arg(PROJECTNAME) + "</b></p>");
+        gui.textHelp->setText("<p><b>" + tr("Enjoy using %1").arg(PROJECTNAME) + "</b></p>");
 
-        pushNext->setDefault(true);
+        gui.pushNext->setDefault(true);
         break;
     }
 
-    pushBack->setEnabled(enableBack);
-    pushNext->setEnabled(enableNext);
+    gui.pushBack->setEnabled(enableBack);
+    gui.pushNext->setEnabled(enableNext);
 }
 
 void MInstall::gotoPage(int next) noexcept
 {
-    pushBack->setEnabled(false);
-    pushNext->setEnabled(false);
-    widgetStack->setEnabled(false);
-    int curr = widgetStack->currentIndex();
+    gui.pushBack->setEnabled(false);
+    gui.pushNext->setEnabled(false);
+    gui.widgetStack->setEnabled(false);
+    int curr = gui.widgetStack->currentIndex();
     next = showPage(curr, next);
 
     // modify ui for standard cases
-    pushClose->setHidden(next == 0);
-    pushBack->setHidden(next <= 1);
-    pushNext->setHidden(next == 0);
+    gui.pushClose->setHidden(next == 0);
+    gui.pushBack->setHidden(next <= 1);
+    gui.pushNext->setHidden(next == 0);
 
-    QSize isize = pushNext->iconSize();
+    QSize isize = gui.pushNext->iconSize();
     isize.setWidth(isize.height());
     if (next >= Step::END) {
         // entering the last page
-        pushBack->hide();
-        pushNext->setText(tr("Finish"));
+        gui.pushBack->hide();
+        gui.pushNext->setText(tr("Finish"));
     } else if (next == Step::CONFIRM) {
         isize.setWidth(0);
-        pushNext->setText(tr("Start"));
+        gui.pushNext->setText(tr("Start"));
     } else if (next == Step::SERVICES){
         isize.setWidth(0);
-        pushNext->setText(tr("OK"));
+        gui.pushNext->setText(tr("OK"));
     } else {
-        pushNext->setText(tr("Next"));
+        gui.pushNext->setText(tr("Next"));
     }
-    pushNext->setIconSize(isize);
+    gui.pushNext->setIconSize(isize);
     if (next > Step::END) {
         // finished
         qApp->setOverrideCursor(Qt::WaitCursor);
-        if (!pretend && checkExitReboot->isChecked()) {
+        if (!pretend && gui.checkExitReboot->isChecked()) {
             proc.shell("/usr/local/bin/persist-config --shutdown --command reboot &");
         }
         qApp->exit(EXIT_SUCCESS);
         return;
     }
     // display the next page
-    widgetStack->setCurrentIndex(next);
+    gui.widgetStack->setCurrentIndex(next);
     qApp->processEvents();
 
     // anything to do after displaying the page
     pageDisplayed(next);
-    widgetStack->setEnabled(true);
+    gui.widgetStack->setEnabled(true);
     if (nextFocus) {
         nextFocus->setFocus();
         nextFocus = nullptr;
@@ -966,8 +963,8 @@ void MInstall::gotoPage(int next) noexcept
 
     // automatic installation
     if (automatic) {
-        if (!MSettings::isBadWidget(widgetStack->currentWidget()) && next > curr) {
-            QTimer::singleShot(0, pushNext, &QPushButton::click);
+        if (!MSettings::isBadWidget(gui.widgetStack->currentWidget()) && next > curr) {
+            QTimer::singleShot(0, gui.pushNext, &QPushButton::click);
         } else if (curr!=0) { // failed validation
             automatic = false;
         }
@@ -975,7 +972,7 @@ void MInstall::gotoPage(int next) noexcept
 
     // process next installation phase
     if (next == Step::BOOT || next == Step::PROGRESS
-        || (radioEntireDisk->isChecked() && next == Step::NETWORK)) {
+        || (gui.radioEntireDisk->isChecked() && next == Step::NETWORK)) {
         processNextPhase();
     }
 }
@@ -986,11 +983,11 @@ void MInstall::gotoPage(int next) noexcept
 bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
 {
     if (event->type() != QEvent::Paint) return false;
-    else if (watched == labelSplash) {
+    else if (watched == gui.labelSplash) {
         // Setup needed to draw the load indicator.
-        QPainter painter(labelSplash);
+        QPainter painter(gui.labelSplash);
         painter.setRenderHints(QPainter::Antialiasing);
-        const int lW = labelSplash->width(), lH = labelSplash->height();
+        const int lW = gui.labelSplash->width(), lH = gui.labelSplash->height();
         painter.translate(lW / 2, lH / 2);
         painter.scale(lW / 200.0, lH / 200.0);
         // Draw the load indicator on the splash screen.
@@ -1013,11 +1010,11 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
             painter.drawConvexPolygon(blade, 4);
             painter.rotate(angle);
         }
-    } else if (watched == textHelp) {
+    } else if (watched == gui.textHelp) {
         // Draw the help pane backdrop image, which goes through the alpha-channel background.
-        QPainter painter(textHelp);
+        QPainter painter(gui.textHelp);
         painter.setRenderHints(QPainter::Antialiasing);
-        painter.drawPixmap(textHelp->viewport()->rect(), helpBackdrop, helpBackdrop.rect());
+        painter.drawPixmap(gui.textHelp->viewport()->rect(), helpBackdrop, helpBackdrop.rect());
     }
     return false;
 }
@@ -1026,11 +1023,11 @@ void MInstall::changeEvent(QEvent *event) noexcept
 {
     const QEvent::Type etype = event->type();
     if (etype == QEvent::ApplicationPaletteChange || etype == QEvent::PaletteChange || etype == QEvent::StyleChange) {
-        QPalette pal = qApp->palette(textHelp);
+        QPalette pal = qApp->palette(gui.textHelp);
         QColor col = pal.color(QPalette::Base);
         col.setAlpha(200);
         pal.setColor(QPalette::Base, col);
-        textHelp->setPalette(pal);
+        gui.textHelp->setPalette(pal);
         if (autopart) autopart->refresh();
     }
 }
@@ -1044,7 +1041,7 @@ void MInstall::closeEvent(QCloseEvent *event) noexcept
     } else if (modeOOBE) {
         // Shutdown for pending or fully aborted OOBE
         event->ignore();
-        labelSplash->clear();
+        gui.labelSplash->clear();
         gotoPage(Step::SPLASH);
         proc.unhalt();
         proc.exec("/usr/sbin/shutdown", {"-hP", "now"});
@@ -1067,11 +1064,11 @@ void MInstall::reject() noexcept
 
 void MInstall::on_pushNext_clicked() noexcept
 {
-    gotoPage(widgetStack->currentIndex() + 1);
+    gotoPage(gui.widgetStack->currentIndex() + 1);
 }
 void MInstall::on_pushBack_clicked() noexcept
 {
-    gotoPage(widgetStack->currentIndex() - 1);
+    gotoPage(gui.widgetStack->currentIndex() - 1);
 }
 
 void MInstall::on_pushAbort_clicked() noexcept
@@ -1110,12 +1107,12 @@ void MInstall::abortEndUI(bool closenow) noexcept
     if (closenow) qApp->exit(EXIT_FAILURE); // this->close() doesn't work.
     else {
         splashSetThrobber(false);
-        boxMain->unsetCursor();
+        gui.boxMain->unsetCursor();
         // Close should be the right button at this stage.
-        disconnect(pushNext);
-        connect(pushNext, &QPushButton::clicked, this, &MInstall::close);
-        pushNext->setText(pushClose->text());
-        pushNext->show();
+        disconnect(gui.pushNext);
+        connect(gui.pushNext, &QPushButton::clicked, this, &MInstall::close);
+        gui.pushNext->setText(gui.pushClose->text());
+        gui.pushNext->show();
     }
 }
 
@@ -1142,7 +1139,7 @@ void MInstall::on_progInstall_valueChanged(int value) noexcept
     if (ixTipStart < 0) {
         ixTipStart = 0; // First invocation of this function.
     } else {
-        if (widgetStack->currentWidget() != pageProgress) {
+        if (gui.widgetStack->currentIndex() != Step::PROGRESS) {
             iLastProgress = -1;
             return; // No point loading a new tip when will be invisible.
         } else if (iLastProgress < 0) {
@@ -1151,7 +1148,7 @@ void MInstall::on_progInstall_valueChanged(int value) noexcept
         constexpr int tipcount = 5;
         newtip = tipcount;
         if (ixTipStart < tipcount) {
-            int imax = (progInstall->maximum() - iLastProgress) / (tipcount - ixTipStart);
+            int imax = (gui.progInstall->maximum() - iLastProgress) / (tipcount - ixTipStart);
             if (imax != 0) {
                 newtip = ixTipStart + (value - iLastProgress) / imax;
             }
@@ -1165,7 +1162,7 @@ void MInstall::on_progInstall_valueChanged(int value) noexcept
     switch(newtip)
     {
     case 0:
-        textTips->setText(tr("<p><b>Getting Help</b><br/>"
+        gui.textTips->setText(tr("<p><b>Getting Help</b><br/>"
                              "Basic information about %1 is at %2.</p><p>"
                              "There are volunteers to help you at the %3 forum, %4</p>"
                              "<p>If you ask for help, please remember to describe your problem and your computer "
@@ -1173,13 +1170,13 @@ void MInstall::on_progInstall_valueChanged(int value) noexcept
         break;
 
     case 1:
-        textTips->setText(tr("<p><b>Repairing Your Installation</b><br/>"
+        gui.textTips->setText(tr("<p><b>Repairing Your Installation</b><br/>"
                              "If %1 stops working from the hard drive, sometimes it's possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.</p>"
                              "<p>You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!</p>").arg(PROJECTNAME));
         break;
 
     case 3:
-        textTips->setText(tr("<p><b>Adjusting Your Sound Mixer</b><br/>"
+        gui.textTips->setText(tr("<p><b>Adjusting Your Sound Mixer</b><br/>"
                              " %1 attempts to configure the sound mixer for you but sometimes it will be "
                              "necessary for you to turn up volumes and unmute channels in the mixer "
                              "in order to hear sound.</p> "
@@ -1187,12 +1184,12 @@ void MInstall::on_progInstall_valueChanged(int value) noexcept
         break;
 
     case 4:
-        textTips->setText(tr("<p><b>Keep Your Copy of %1 up-to-date</b><br/>"
+        gui.textTips->setText(tr("<p><b>Keep Your Copy of %1 up-to-date</b><br/>"
                              "For more information and updates please visit</p><p> %2</p>").arg(PROJECTNAME, PROJECTFORUM));
         break;
 
     default:
-        textTips->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
+        gui.textTips->setText(tr("<p><b>Special Thanks</b><br/>Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.</p>"
                              "<p>Without you there would be no %1.</p>"
                              "<p>%2 Dev Team</p>").arg(PROJECTNAME, PROJECTSHORTNAME));
         break;
@@ -1206,9 +1203,9 @@ void MInstall::setupkeyboardbutton() noexcept
     while (!file.atEnd()) {
         QString line(file.readLine().trimmed());
         QLabel *plabel = nullptr;
-        if (line.startsWith("XKBMODEL")) plabel = labelKeyboardModel;
-        else if (line.startsWith("XKBLAYOUT")) plabel = labelKeyboardLayout;
-        else if (line.startsWith("XKBVARIANT")) plabel = labelKeyboardVariant;
+        if (line.startsWith("XKBMODEL")) plabel = gui.labelKeyboardModel;
+        else if (line.startsWith("XKBLAYOUT")) plabel = gui.labelKeyboardLayout;
+        else if (line.startsWith("XKBVARIANT")) plabel = gui.labelKeyboardVariant;
         if (plabel != nullptr) {
             line = line.section('=', 1);
             line.replace(",", " ");

@@ -18,7 +18,7 @@
 #include "ui_meinstall.h"
 #include "mprocess.h"
 
-class MInstall : public QDialog, public Ui::MeInstall {
+class MInstall : public QDialog {
     Q_OBJECT
 protected:
     void changeEvent(QEvent *event) noexcept;
@@ -49,6 +49,7 @@ private slots:
     void on_progInstall_valueChanged(int value) noexcept;
 
 private:
+    Ui::MeInstall gui;
     MProcess proc;
     class QSettings &appConf;
     const class QCommandLineParser &appArgs;
