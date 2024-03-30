@@ -137,7 +137,6 @@ void MInstall::startup()
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     connect(gui.pushClose, &QPushButton::clicked, this, &MInstall::close);
     connect(gui.progInstall, &QProgressBar::valueChanged, this, &MInstall::progressUpdate);
-
     // Lambda slots
     connect(gui.pushBack, &QPushButton::clicked, this, [=]() noexcept {
         gotoPage(gui.widgetStack->currentIndex() - 1);
@@ -1007,7 +1006,7 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
             painter.setBrush(color);
             pen.setColor(color.darker());
             painter.setPen(pen);
-            const QPoint blade[] = {{-15, -6}, {15, -75}, {0, -93}, {-15, -75}};
+            constexpr QPoint blade[] = {{-15, -6}, {15, -75}, {0, -93}, {-15, -75}};
             painter.drawConvexPolygon(blade, 4);
             painter.rotate(angle);
         }
@@ -1077,7 +1076,7 @@ void MInstall::abortUI(bool manual, bool closing) noexcept
     abortion = closing ? AB_CLOSING : AB_ABORTING;
     gotoPage(Step::SPLASH);
     proc.halt(true);
-    // Early phase bump if waiting on input to trigger abortion cleanup.
+    // Early phase bump if waiting on input, to trigger abortion cleanup.
     if (manual && phase == PH_WAITING_FOR_INFO) processNextPhase();
 }
 void MInstall::abortEndUI(bool closenow) noexcept
