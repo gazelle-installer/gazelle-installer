@@ -136,6 +136,21 @@ void MInstall::startup()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     connect(gui.pushClose, &QPushButton::clicked, this, &MInstall::close);
+    connect(gui.progInstall, &QProgressBar::valueChanged, this, &MInstall::progressUpdate);
+
+    // Lambda slots
+    connect(gui.pushBack, &QPushButton::clicked, this, [=]() noexcept {
+        gotoPage(gui.widgetStack->currentIndex() - 1);
+    });
+    connect(gui.pushNext, &QPushButton::clicked, this, [=]() noexcept {
+        gotoPage(gui.widgetStack->currentIndex() + 1);
+    });
+    connect(gui.pushAbort, &QPushButton::clicked, this, [=]() noexcept {
+        abortUI(true, false);
+    });
+    connect(gui.pushServices, &QPushButton::clicked, this, [=]() noexcept {
+        gotoPage(Step::SERVICES);
+    });
 
     if (!modeOOBE) {
         // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
@@ -199,6 +214,7 @@ void MInstall::startup()
     }
 
     setupkeyboardbutton();
+    connect(gui.pushSetKeyboard, &QPushButton::clicked, this, &MInstall::runKeyboardSetup);
 
     oobe = new Oobe(proc, gui, this, appConf, oem, modeOOBE);
 
@@ -1059,29 +1075,6 @@ void MInstall::reject() noexcept
     if (checkmd5) checkmd5->halt();
 }
 
-/////////////////////////////////////////////////////////////////////////
-// slots
-
-void MInstall::on_pushNext_clicked() noexcept
-{
-    gotoPage(gui.widgetStack->currentIndex() + 1);
-}
-void MInstall::on_pushBack_clicked() noexcept
-{
-    gotoPage(gui.widgetStack->currentIndex() - 1);
-}
-
-void MInstall::on_pushAbort_clicked() noexcept
-{
-    abortUI(true, false);
-}
-
-// clicking advanced button to go to Services page
-void MInstall::on_pushServices_clicked() noexcept
-{
-    gotoPage(Step::SERVICES);
-}
-
 void MInstall::abortUI(bool manual, bool closing) noexcept
 {
     // ask for confirmation when installing (except for some steps that don't need confirmation)
@@ -1133,7 +1126,7 @@ void MInstall::cleanup()
     setupAutoMount(true);
 }
 
-void MInstall::on_progInstall_valueChanged(int value) noexcept
+void MInstall::progressUpdate(int value) noexcept
 {
     int newtip = 0;
     if (ixTipStart < 0) {
@@ -1216,7 +1209,7 @@ void MInstall::setupkeyboardbutton() noexcept
     file.close();
 }
 
-void MInstall::on_pushSetKeyboard_clicked() noexcept
+void MInstall::runKeyboardSetup() noexcept
 {
     this->setEnabled(false);
     if (proc.shell("command -v  system-keyboard-qt >/dev/null 2>&1")) {

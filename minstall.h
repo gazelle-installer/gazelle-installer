@@ -39,15 +39,6 @@ public:
     void gotoPage(int next) noexcept;
     void pageDisplayed(int next) noexcept;
 
-private slots:
-    void on_pushAbort_clicked() noexcept;
-    void on_pushBack_clicked() noexcept;
-    void on_pushSetKeyboard_clicked() noexcept;
-    void on_pushNext_clicked() noexcept;
-    void on_pushServices_clicked() noexcept;
-
-    void on_progInstall_valueChanged(int value) noexcept;
-
 private:
     Ui::MeInstall gui;
     MProcess proc;
@@ -104,7 +95,9 @@ private:
 
     void startup();
     void splashSetThrobber(bool active) noexcept;
+    void progressUpdate(int value) noexcept;
     void setupkeyboardbutton() noexcept;
+    void runKeyboardSetup() noexcept;
     void abortUI(bool manual, bool closing) noexcept;
     void abortEndUI(bool closenow) noexcept;
     void cleanup();
