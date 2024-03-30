@@ -658,6 +658,9 @@ void MInstall::pageDisplayed(int next) noexcept
     gui.pushNext->setDefault(next != Step::CONFIRM);
 
     switch (next) {
+    case Step::SPLASH:
+        if (phase > PH_READY) break;
+        [[fallthrough]];
     case Step::TERMS:
         gui.textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
             + (modeOOBE ? "" : (tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p><p>"))
@@ -900,13 +903,8 @@ void MInstall::pageDisplayed(int next) noexcept
                              "The best way to learn about them is to browse through the Menu and try them. "
                              "Many of the apps were developed specifically for the %1 project. "
                              "These are shown in the main menus. "
-                             "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME));
-        break;
-
-    default: // other
-        gui.textHelp->setText("<p><b>" + tr("Enjoy using %1").arg(PROJECTNAME) + "</b></p>");
-
-        gui.pushNext->setDefault(true);
+                             "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME)
+                             + "<p><b>" + tr("Enjoy using %1").arg(PROJECTNAME) + "</b></p>");
         break;
     }
 
