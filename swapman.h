@@ -38,6 +38,7 @@ public:
     void manageConfig(class MSettings &config, bool advanced) noexcept;
     void setupDefaults() noexcept;
     void install(QStringList &cmdboot_out);
+    void setupZRam() const;
     static long long recommended(bool hibernation) noexcept;
 };
 

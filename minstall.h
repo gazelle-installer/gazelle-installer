@@ -102,7 +102,6 @@ private:
     void abortEndUI(bool closenow) noexcept;
     void cleanup();
     // private functions
-    void setupZRam();
     void setupAutoMount(bool enabled);
     void processNextPhase() noexcept;
     void pretendNextPhase() noexcept;
