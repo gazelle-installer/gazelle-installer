@@ -182,15 +182,18 @@ void MInstall::startup()
         // Link block
         QString link_block;
         appConf.beginGroup("LINKS");
-        QStringList links = appConf.childKeys();
+        const QStringList &links = appConf.childKeys();
         for (const QString &link : links) {
             link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + appConf.value(link).toString();
         }
         appConf.endGroup();
 
         // set some distro-centric text
-        textReminders->setPlainText(tr("Support %1\n\n%1 is supported by people like you. Some help others at the support forum - %2, or translate help files into different languages, or make suggestions, write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
-                            + "\n" + link_block);
+        textReminders->setPlainText(tr("Support %1\n\n"
+            "%1 is supported by people like you. Some help others at the support forum - %2,"
+            " or translate help files into different languages, or make suggestions,"
+            " write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
+            + "\n" + link_block);
 
         // Password box setup
         passCrypto = new PassEdit(textCryptoPass, textCryptoPass2, 1, this);
@@ -901,11 +904,8 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     default: // other
-        textHelp->setText("<p><b>" + tr("Enjoy using %1").arg(PROJECTNAME) + "</b></p>"
-        + tr("<p><b>Support %1</b><br/>"
-            "%1 is supported by people like you. Some help others at the "
-            "support forum - %2 - or translate help files into different "
-            "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME, PROJECTFORUM));
+        textHelp->setText("<p><b>" + tr("Enjoy using %1").arg(PROJECTNAME) + "</b></p>");
+
         pushNext->setDefault(true);
         break;
     }
@@ -1148,7 +1148,7 @@ void MInstall::on_progInstall_valueChanged(int value) noexcept
         } else if (iLastProgress < 0) {
             iLastProgress = value; // First invocation since progress page last shown.
         }
-        const int tipcount = 6;
+        constexpr int tipcount = 5;
         newtip = tipcount;
         if (ixTipStart < tipcount) {
             int imax = (progInstall->maximum() - iLastProgress) / (tipcount - ixTipStart);
@@ -1176,14 +1176,6 @@ void MInstall::on_progInstall_valueChanged(int value) noexcept
         textTips->setText(tr("<p><b>Repairing Your Installation</b><br/>"
                              "If %1 stops working from the hard drive, sometimes it's possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.</p>"
                              "<p>You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!</p>").arg(PROJECTNAME));
-        break;
-
-    case 2:
-        textTips->setText(tr("<p><b>Support %1</b><br/>"
-                             "%1 is supported by people like you. Some help others at the "
-                             "support forum - %2 - or translate help files into different "
-                             "languages, or make suggestions, write documentation, or help test new software.</p>").arg(PROJECTNAME, PROJECTFORUM));
-
         break;
 
     case 3:
