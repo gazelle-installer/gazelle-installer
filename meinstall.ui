@@ -100,12 +100,6 @@
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
         </spacer>
        </item>
        <item row="1" column="0" colspan="6">
@@ -164,9 +158,6 @@
        </item>
        <item row="2" column="0" colspan="6">
         <widget class="QStackedWidget" name="widgetStack">
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
          <widget class="QLabel" name="labelSplash">
           <property name="font">
            <font>
@@ -283,12 +274,6 @@
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
                  </spacer>
                 </item>
                 <item row="6" column="1" colspan="3">
@@ -317,12 +302,6 @@
                  <spacer>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
                   </property>
                  </spacer>
                 </item>
@@ -354,12 +333,6 @@
             <spacer>
              <property name="orientation">
               <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
              </property>
             </spacer>
            </item>
@@ -406,9 +379,6 @@
                 <layout class="QFormLayout">
                  <item row="0" column="1">
                   <widget class="QLabel" name="labelDisk">
-                   <property name="font">
-                    <font/>
-                   </property>
                    <property name="text">
                     <string>Use disk:</string>
                    </property>
@@ -684,24 +654,12 @@ QSlider::handle:horizontal:disabled {
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
                </spacer>
               </item>
               <item row="4" column="2">
                <spacer>
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
                 </property>
                </spacer>
               </item>
@@ -736,7 +694,7 @@ QSlider::handle:horizontal:disabled {
           </layout>
          </widget>
          <widget class="QWidget" name="pageEncryption">
-          <layout class="QVBoxLayout" name="verticalLayout">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -754,7 +712,7 @@ QSlider::handle:horizontal:disabled {
              <property name="title">
               <string>Encryption options</string>
              </property>
-             <layout class="QFormLayout" name="_2">
+             <layout class="QFormLayout">
               <item row="0" column="0">
                <widget class="QLabel" name="labelCryptoPass">
                 <property name="text">
@@ -793,22 +751,16 @@ QSlider::handle:horizontal:disabled {
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer">
+            <spacer>
              <property name="orientation">
               <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>341</height>
-              </size>
              </property>
             </spacer>
            </item>
           </layout>
          </widget>
          <widget class="QWidget" name="pageConfirm">
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -826,7 +778,7 @@ QSlider::handle:horizontal:disabled {
              <property name="title">
               <string>Installation Confirmation</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
+             <layout class="QVBoxLayout">
               <item>
                <widget class="QLabel" name="labelConfirm"/>
               </item>
@@ -922,12 +874,6 @@ QSlider::handle:horizontal:disabled {
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
                </spacer>
               </item>
               <item row="0" column="2">
@@ -998,12 +944,6 @@ QSlider::handle:horizontal:disabled {
             <spacer>
              <property name="orientation">
               <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
              </property>
             </spacer>
            </item>
@@ -1260,9 +1200,6 @@ QSlider::handle:horizontal:disabled {
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="placeholderText">
-                 <string/>
-                </property>
                </widget>
               </item>
               <item row="0" column="0" colspan="2">
@@ -1286,12 +1223,6 @@ QSlider::handle:horizontal:disabled {
                 <property name="sizeType">
                  <enum>QSizePolicy::Fixed</enum>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>12</width>
-                  <height>4</height>
-                 </size>
-                </property>
                </spacer>
               </item>
              </layout>
@@ -1301,12 +1232,6 @@ QSlider::handle:horizontal:disabled {
             <spacer>
              <property name="orientation">
               <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
              </property>
             </spacer>
            </item>
@@ -1365,12 +1290,6 @@ QSlider::handle:horizontal:disabled {
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
                </spacer>
               </item>
               <item row="3" column="0">
@@ -1412,12 +1331,6 @@ QSlider::handle:horizontal:disabled {
                  <spacer>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
                   </property>
                  </spacer>
                 </item>
@@ -1463,12 +1376,6 @@ QSlider::handle:horizontal:disabled {
              </property>
              <property name="sizeType">
               <enum>QSizePolicy::Expanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
              </property>
             </spacer>
            </item>
@@ -1516,9 +1423,6 @@ QSlider::handle:horizontal:disabled {
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-                <property name="font">
-                 <font/>
                 </property>
                 <property name="text">
                  <string>Locale:</string>
@@ -1572,12 +1476,6 @@ QSlider::handle:horizontal:disabled {
                <spacer>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
                 </property>
                </spacer>
               </item>
@@ -1652,9 +1550,6 @@ QSlider::handle:horizontal:disabled {
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="text">
-                 <string/>
-                </property>
                 <property name="placeholderText">
                  <string>username</string>
                 </property>
@@ -1681,9 +1576,6 @@ QSlider::handle:horizontal:disabled {
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="text">
-                 <string/>
-                </property>
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
                 </property>
@@ -1709,9 +1601,6 @@ QSlider::handle:horizontal:disabled {
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-                <property name="text">
-                 <string/>
                 </property>
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
@@ -1760,9 +1649,6 @@ QSlider::handle:horizontal:disabled {
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="text">
-                 <string/>
-                </property>
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
                 </property>
@@ -1789,9 +1675,6 @@ QSlider::handle:horizontal:disabled {
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="text">
-                 <string/>
-                </property>
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
                 </property>
@@ -1817,12 +1700,6 @@ QSlider::handle:horizontal:disabled {
             <spacer>
              <property name="orientation">
               <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
              </property>
             </spacer>
            </item>
@@ -1883,12 +1760,6 @@ QSlider::handle:horizontal:disabled {
                <spacer>
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
                 </property>
                </spacer>
               </item>
@@ -2027,7 +1898,6 @@ QSlider::handle:horizontal:disabled {
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>MTreeView</class>
@@ -2089,5 +1959,4 @@ QSlider::handle:horizontal:disabled {
  <resources>
   <include location="images.qrc"/>
  </resources>
- <connections/>
 </ui>
