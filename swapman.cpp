@@ -120,6 +120,19 @@ void SwapMan::install(QStringList &cmdboot_out)
     }
 }
 
+void SwapMan::setupZRam() const
+{
+    struct sysinfo sinfo;
+    if (sysinfo(&sinfo) != 0) return;
+    const long long zrsize = (long long)sinfo.totalram * sinfo.mem_unit;
+    // Reported compressed data can be inaccurate if zswap is enabled, especially on Liquorix.
+    proc.shell("echo 0 > /sys/module/zswap/parameters/enabled");
+    proc.exec("modprobe", {"zram"});
+    if (!proc.exec("zramctl", {"zram0", "-a","zstd", "-s", QString::number(zrsize)})) return;
+    if (!proc.exec("mkswap", {"-q", "/dev/zram0"})) return;
+    proc.exec("swapon", {"-p","32767", "/dev/zram0"});
+}
+
 long long SwapMan::recommended(bool hibernation) noexcept
 {
     struct sysinfo sinfo;

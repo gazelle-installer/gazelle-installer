@@ -272,19 +272,6 @@ void MInstall::splashSetThrobber(bool active) noexcept
     gui.labelSplash->update();
 }
 
-void MInstall::setupZRam()
-{
-    struct sysinfo sinfo;
-    if (sysinfo(&sinfo) != 0) return;
-    const long long zrsize = (long long)sinfo.totalram * sinfo.mem_unit;
-    // Reported compressed data can be inaccurate if zswap is enabled, especially on Liquorix.
-    proc.shell("echo 0 > /sys/module/zswap/parameters/enabled");
-    proc.exec("modprobe", {"zram"});
-    if (!proc.exec("zramctl", {"zram0", "-a","zstd", "-s", QString::number(zrsize)})) return;
-    if (!proc.exec("mkswap", {"-q", "/dev/zram0"})) return;
-    proc.exec("swapon", {"-p","32767", "/dev/zram0"});
-}
-
 // turn auto-mount off and on
 void MInstall::setupAutoMount(bool enabled)
 {
@@ -375,7 +362,7 @@ void MInstall::processNextPhase() noexcept
             proc.advance(-1, -1);
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
 
-            setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
+            swapman->setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
             if (!partman->checkTargetDrivesOK()) throw "";
             autoMountEnabled = true; // disable auto mount by force
             setupAutoMount(false);
