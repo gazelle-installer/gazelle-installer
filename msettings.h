@@ -22,7 +22,7 @@
 #include <map>
 #include <QFile>
 
-class MSettings
+class MIni
 {
     QFile file;
     typedef std::map<QString, QString> SettingsMap;
@@ -30,8 +30,8 @@ class MSettings
     std::map<QString, SettingsGroup> sections;
     QString cursection, curgroup;
 public:
-    MSettings(const QString &filename, bool readOnly = false) noexcept;
-    ~MSettings() noexcept;
+    MIni(const QString &filename, bool readOnly = false) noexcept;
+    ~MIni() noexcept;
     void clear() noexcept;
     QString fileName() const noexcept { return file.fileName(); }
     bool load() noexcept;
@@ -55,8 +55,12 @@ public:
         enum ValState *valid = nullptr, int base = 10) const noexcept;
     void setInteger(const QString &key, const long long value) noexcept;
     void dumpDebug(const class QRegularExpression *censor = nullptr) const noexcept;
+};
 
-    // widget management
+class MSettings: public MIni
+{
+public:
+    MSettings(const QString &filename, bool readOnly = false) noexcept : MIni(filename, readOnly) {}
     bool bad = false;
     void setSave(bool save) noexcept;
     bool isSave() const noexcept { return saving; }

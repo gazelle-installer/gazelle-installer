@@ -28,25 +28,25 @@
 
 #include "msettings.h"
 
-MSettings::MSettings(const QString &filename, bool readOnly) noexcept
+MIni::MIni(const QString &filename, bool readOnly) noexcept
     : file(filename)
 {
     if (file.open(QFile::Text | (readOnly ? QFile::ReadOnly : QFile::ReadWrite))) {
         load();
     }
 }
-MSettings::~MSettings() noexcept
+MIni::~MIni() noexcept
 {
     sync();
 }
 
-void MSettings::clear() noexcept
+void MIni::clear() noexcept
 {
     curgroup.clear();
     cursection.clear();
     sections.clear();
 }
-bool MSettings::load() noexcept
+bool MIni::load() noexcept
 {
     if (!(file.openMode() & QFile::ReadOnly)) {
         return false;
@@ -84,7 +84,7 @@ bool MSettings::load() noexcept
     }
     return true;
 }
-bool MSettings::sync() noexcept
+bool MIni::sync() noexcept
 {
     if (!(file.openMode() & QFile::WriteOnly)) {
         return false;
@@ -147,7 +147,7 @@ bool MSettings::sync() noexcept
     }
     return true;
 }
-bool MSettings::copyTo(const QString &filename) noexcept
+bool MIni::copyTo(const QString &filename) noexcept
 {
     sync();
     const QFile::OpenMode mode = file.openMode();
@@ -159,23 +159,23 @@ bool MSettings::copyTo(const QString &filename) noexcept
     return ok;
 }
 
-void MSettings::setSection(const QString &name) noexcept
+void MIni::setSection(const QString &name) noexcept
 {
     cursection = name;
     curgroup.clear();
 }
 
-void MSettings::beginGroup(const QString &path) noexcept
+void MIni::beginGroup(const QString &path) noexcept
 {
     curgroup += path + '/';
 }
-void MSettings::endGroup() noexcept
+void MIni::endGroup() noexcept
 {
     curgroup.chop(1);
     curgroup.truncate(curgroup.lastIndexOf('/') + 1);
 }
 
-bool MSettings::contains(const QString &key) const noexcept
+bool MIni::contains(const QString &key) const noexcept
 {
     if (auto ssearch = sections.find(cursection); ssearch != sections.end()) {
         if (auto gsearch = ssearch->second.find(curgroup); gsearch != ssearch->second.end()) {
@@ -184,7 +184,7 @@ bool MSettings::contains(const QString &key) const noexcept
     }
     return false;
 }
-QString MSettings::getString(const QString &key, const QString &defaultValue) const noexcept
+QString MIni::getString(const QString &key, const QString &defaultValue) const noexcept
 {
     if (auto ssearch = sections.find(cursection); ssearch != sections.end()) {
         if (auto gsearch = ssearch->second.find(curgroup); gsearch != ssearch->second.end()) {
@@ -195,12 +195,12 @@ QString MSettings::getString(const QString &key, const QString &defaultValue) co
     }
     return defaultValue;
 }
-void MSettings::setString(const QString &key, const QString &value) noexcept
+void MIni::setString(const QString &key, const QString &value) noexcept
 {
     sections[cursection][curgroup].insert_or_assign(key, value);
 }
 
-bool MSettings::getBoolean(const QString &key, bool defaultValue, enum ValState *valid) const noexcept
+bool MIni::getBoolean(const QString &key, bool defaultValue, enum ValState *valid) const noexcept
 {
     const QString &val = getString(key);
     if (valid) *valid = VAL_NOTFOUND;
@@ -213,12 +213,12 @@ bool MSettings::getBoolean(const QString &key, bool defaultValue, enum ValState 
     }
     return defaultValue;
 }
-void MSettings::setBoolean(const QString &key, const bool value) noexcept
+void MIni::setBoolean(const QString &key, const bool value) noexcept
 {
     setString(key, value ? "true" : "false");
 }
 
-long long MSettings::getInteger(const QString &key, long long defaultValue, enum ValState *valid, int base) const noexcept
+long long MIni::getInteger(const QString &key, long long defaultValue, enum ValState *valid, int base) const noexcept
 {
     const QString &val = getString(key);
     if (valid) *valid = VAL_NOTFOUND;
@@ -229,12 +229,12 @@ long long MSettings::getInteger(const QString &key, long long defaultValue, enum
     }
     return defaultValue;
 }
-void MSettings::setInteger(const QString &key, const long long value) noexcept
+void MIni::setInteger(const QString &key, const long long value) noexcept
 {
     setString(key, QString::number(value));
 }
 
-void MSettings::dumpDebug(const QRegularExpression *censor) const noexcept
+void MIni::dumpDebug(const QRegularExpression *censor) const noexcept
 {
     qDebug().noquote() << "Configuration:" << fileName();
     for (const auto &section : sections) {
@@ -271,7 +271,7 @@ void MSettings::setGroupWidget(QWidget *widget) noexcept
 }
 void MSettings::setSection(const QString &name, QWidget *widget) noexcept
 {
-    setSection(name);
+    MIni::setSection(name);
     setGroupWidget(widget);
 }
 
