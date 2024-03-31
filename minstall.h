@@ -18,7 +18,7 @@
 #include "ui_meinstall.h"
 #include "mprocess.h"
 
-class MInstall : public QDialog, public Ui::MeInstall {
+class MInstall : public QDialog {
     Q_OBJECT
 protected:
     void changeEvent(QEvent *event) noexcept;
@@ -39,16 +39,8 @@ public:
     void gotoPage(int next) noexcept;
     void pageDisplayed(int next) noexcept;
 
-private slots:
-    void on_pushAbort_clicked() noexcept;
-    void on_pushBack_clicked() noexcept;
-    void on_pushSetKeyboard_clicked() noexcept;
-    void on_pushNext_clicked() noexcept;
-    void on_pushServices_clicked() noexcept;
-
-    void on_progInstall_valueChanged(int value) noexcept;
-
 private:
+    Ui::MeInstall gui;
     MProcess proc;
     class QSettings &appConf;
     const class QCommandLineParser &appArgs;
@@ -73,7 +65,7 @@ private:
     bool pretend, automatic;
     bool oem, modeOOBE, mountkeep;
     // configuration management
-    class MSettings *config = nullptr;
+    QString configFile;
     enum ConfigAction { CONFIG_SAVE, CONFIG_LOAD1, CONFIG_LOAD2 };
 
     // auto-mount setup
@@ -92,11 +84,10 @@ private:
 
     QPixmap helpBackdrop;
     // Splash screen
-    int throbPos = 0;
     QTimer *throbber = nullptr;
+    int throbPos = 0;
     // for the tips display
-    int ixTip = 0;
-    int ixTipStart = -1;
+    int ixTip = -1, ixTipStart = -1;
     int iLastProgress = -1;
 
     // info needed for Phase 2 of the process
@@ -104,12 +95,13 @@ private:
 
     void startup();
     void splashSetThrobber(bool active) noexcept;
+    void progressUpdate(int value) noexcept;
     void setupkeyboardbutton() noexcept;
+    void runKeyboardSetup() noexcept;
     void abortUI(bool manual, bool closing) noexcept;
     void abortEndUI(bool closenow) noexcept;
     void cleanup();
     // private functions
-    void setupZRam();
     void setupAutoMount(bool enabled);
     void processNextPhase() noexcept;
     void pretendNextPhase() noexcept;

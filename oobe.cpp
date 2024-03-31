@@ -20,6 +20,7 @@
  * This file is part of the gazelle-installer.
  ***************************************************************************/
 
+#include <utility>
 #include <sys/stat.h>
 #include <QDebug>
 #include <QSettings>
@@ -51,7 +52,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, QSettings &appCo
             "-mindepth", "2", "-type", "f", "-printf", "%P\\n"}, nullptr, true);
     timeZones = proc.readOutLines();
     gui.comboTimeArea->clear();
-    for (const QString &zone : qAsConst(timeZones)) {
+    for (const QString &zone : std::as_const(timeZones)) {
         const QString &area = zone.section('/', 0, 0);
         if (gui.comboTimeArea->findData(QVariant(area)) < 0) {
             QString text(area);
@@ -694,7 +695,7 @@ void Oobe::timeAreaIndexChanged(int index) noexcept
     if (index < 0 || index >= gui.comboTimeArea->count()) return;
     const QString &area = gui.comboTimeArea->itemData(index).toString();
     gui.comboTimeZone->clear();
-    for (const QString &zone : qAsConst(timeZones)) {
+    for (const QString &zone : std::as_const(timeZones)) {
         if (zone.startsWith(area)) {
             QString text(QString(zone).section('/', 1));
             text.replace('_', ' ');

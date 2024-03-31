@@ -32,10 +32,13 @@
 MSettings::MSettings(const QString &filename) noexcept
     : confile(filename)
 {
-    clear();
     if (!confile.isEmpty()) {
         load();
     }
+}
+MSettings::~MSettings() noexcept
+{
+    sync();
 }
 
 void MSettings::clear() noexcept
@@ -82,7 +85,7 @@ bool MSettings::load() noexcept
     }
     return true;
 }
-bool MSettings::save() const noexcept
+bool MSettings::sync() const noexcept
 {
     QFile file(confile);
     if (!file.open(QFile::ReadWrite | QFile::Truncate | QFile::Text)) {

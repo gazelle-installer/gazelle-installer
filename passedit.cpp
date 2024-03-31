@@ -30,9 +30,9 @@
 #include "passedit.h"
 
 // Password generator parameters applicable accross every PassEdit instance.
-static const qsizetype GEN_WORD_MAX     = 6;    // Maximum number of characters per word.
-static const size_t GEN_NUMBER_MAX      = 999;  // Numbers will go from 0 to GEN_NUMBER_MAX without duplicates.
-static const size_t GEN_WORD_NUM_RATIO  = 3;    // Ratio N:1 of words to numbers (if less than GEN_NUMBER_MAX).
+static constexpr qsizetype GEN_WORD_MAX     = 6;    // Maximum number of characters per word.
+static constexpr size_t GEN_NUMBER_MAX      = 999;  // Numbers will go from 0 to GEN_NUMBER_MAX without duplicates.
+static constexpr size_t GEN_WORD_NUM_RATIO  = 3;    // Ratio N:1 of words to numbers (if less than GEN_NUMBER_MAX).
 
 PassEdit::PassEdit(QLineEdit *master, QLineEdit *slave, int min, QObject *parent) noexcept
     : QObject(parent), master(master), slave(slave), min(min)

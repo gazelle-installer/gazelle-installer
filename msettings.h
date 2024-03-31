@@ -31,11 +31,11 @@ class MSettings
     QString confile;
 public:
     MSettings(const QString &filename = "") noexcept;
+    ~MSettings() noexcept;
     void clear() noexcept;
     QString fileName() const noexcept { return confile; }
-    void setFileName(const QString &filename) noexcept { confile = filename; }
     bool load() noexcept;
-    bool save() const noexcept;
+    bool sync() const noexcept;
     void setSection(const QString &name) noexcept;
     QString section() const noexcept { return cursection; }
     void beginGroup(const QString &path) noexcept;
