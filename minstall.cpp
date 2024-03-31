@@ -461,7 +461,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     if (mode == CONFIG_SAVE) {
         configFile = pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf";
     }
-    MSettings config(configFile);
+    MSettings config(configFile, mode!=CONFIG_SAVE);
 
     if (mode == CONFIG_SAVE) {
         config.setSave(true);
@@ -507,10 +507,8 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
             tr("Invalid settings found in configuration file (%1)."
                " Please review marked fields as you encounter them.").arg(configFile));
     } else if (mode == CONFIG_SAVE && !pretend) {
-        config.sync();
         config.dumpDebug(&configCensor);
-        QFile::remove("/etc/minstalled.conf");
-        QFile::copy(configFile, "/etc/minstalled.conf");
+        config.copyTo("/etc/minstalled.conf");
         chmod(configFile.toUtf8().constData(), 0600);
     }
 

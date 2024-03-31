@@ -17,7 +17,6 @@
  * This file is part of the gazelle-installer.
  ***************************************************************************/
 
-#include <QFile>
 #include <QGroupBox>
 #include <QComboBox>
 #include <QCheckBox>
@@ -29,10 +28,10 @@
 
 #include "msettings.h"
 
-MSettings::MSettings(const QString &filename) noexcept
-    : confile(filename)
+MSettings::MSettings(const QString &filename, bool readOnly) noexcept
+    : file(filename)
 {
-    if (!confile.isEmpty()) {
+    if (file.open(QFile::Text | (readOnly ? QFile::ReadOnly : QFile::ReadWrite))) {
         load();
     }
 }
@@ -49,11 +48,11 @@ void MSettings::clear() noexcept
 }
 bool MSettings::load() noexcept
 {
-    QFile file(confile);
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    if (!(file.openMode() & QFile::ReadOnly)) {
         return false;
     }
     clear();
+    file.seek(0);
     while (!file.atEnd()) {
         const QByteArray &line = file.readLine().trimmed();
         if (line.isEmpty() || line.startsWith(';') || line.startsWith('#')) {
@@ -85,13 +84,13 @@ bool MSettings::load() noexcept
     }
     return true;
 }
-bool MSettings::sync() const noexcept
+bool MSettings::sync() noexcept
 {
-    QFile file(confile);
-    if (!file.open(QFile::ReadWrite | QFile::Truncate | QFile::Text)) {
+    if (!(file.openMode() & QFile::WriteOnly)) {
         return false;
     }
-
+    file.resize(0);
+    file.seek(0);
     for (const auto &section : sections) {
         if (!section.first.isEmpty()) {
             file.write(file.pos()>0 ? "\n[" : "[");
@@ -146,8 +145,18 @@ bool MSettings::sync() const noexcept
             }
         }
     }
-
     return true;
+}
+bool MSettings::copyTo(const QString &filename) noexcept
+{
+    sync();
+    const QFile::OpenMode mode = file.openMode();
+    QFile::remove(filename);
+    bool ok = file.copy(filename);
+    if (mode != QFile::NotOpen) {
+        ok &= file.open(QFile::Text | mode);
+    }
+    return ok;
 }
 
 void MSettings::setSection(const QString &name) noexcept
@@ -227,7 +236,7 @@ void MSettings::setInteger(const QString &key, const long long value) noexcept
 
 void MSettings::dumpDebug(const QRegularExpression *censor) const noexcept
 {
-    qDebug().noquote() << "Configuration:" << confile;
+    qDebug().noquote() << "Configuration:" << fileName();
     for (const auto &section : sections) {
         const bool topsect = section.first.isEmpty(); // top-level settings (version, etc)
         if (!topsect) {

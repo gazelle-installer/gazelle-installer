@@ -20,22 +20,23 @@
 #define MSETTINGS_H
 
 #include <map>
-#include <QString>
+#include <QFile>
 
 class MSettings
 {
+    QFile file;
     typedef std::map<QString, QString> SettingsMap;
     typedef std::map<QString, SettingsMap> SettingsGroup;
     std::map<QString, SettingsGroup> sections;
     QString cursection, curgroup;
-    QString confile;
 public:
-    MSettings(const QString &filename = "") noexcept;
+    MSettings(const QString &filename, bool readOnly = false) noexcept;
     ~MSettings() noexcept;
     void clear() noexcept;
-    QString fileName() const noexcept { return confile; }
+    QString fileName() const noexcept { return file.fileName(); }
     bool load() noexcept;
-    bool sync() const noexcept;
+    bool sync() noexcept;
+    bool copyTo(const QString &filename) noexcept;
     void setSection(const QString &name) noexcept;
     QString section() const noexcept { return cursection; }
     void beginGroup(const QString &path) noexcept;
