@@ -30,9 +30,11 @@ class MIni
     typedef std::map<QString, SettingsMap, decltype(&lessCaseInsensitive)> SettingsGroup;
     std::map<QString, SettingsGroup, decltype(&lessCaseInsensitive)> sections;
     QString cursection, curgroup;
+    bool allOK = false;
 public:
     MIni(const QString &filename, bool readOnly = false) noexcept;
     ~MIni() noexcept;
+    bool isOK() noexcept { return allOK; }
     void clear() noexcept;
     QString fileName() const noexcept { return file.fileName(); }
     bool load() noexcept;
@@ -49,6 +51,8 @@ public:
         VAL_INVALID
     };
     QStringList getKeys() const noexcept;
+    QString getRaw(const QString &key, const QString &defaultValue = QString()) const noexcept;
+    void setRaw(const QString &key, const QString &value) noexcept;
     QString getString(const QString &key, const QString &defaultValue = QString()) const noexcept;
     void setString(const QString &key, const QString &value) noexcept;
     bool getBoolean(const QString &key, bool defaultValue = false, enum ValState *valid = nullptr) const noexcept;

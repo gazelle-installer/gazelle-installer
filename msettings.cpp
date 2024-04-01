@@ -32,7 +32,7 @@ MIni::MIni(const QString &filename, bool readOnly) noexcept
     : file(filename), sections(&MIni::lessCaseInsensitive)
 {
     if (file.open(QFile::Text | (readOnly ? QFile::ReadOnly : QFile::ReadWrite))) {
-        load();
+        allOK = load();
     }
 }
 MIni::~MIni() noexcept
@@ -73,7 +73,7 @@ bool MIni::load() noexcept
             const int delimpos = line.indexOf('=');
             if (delimpos > 0) {
                 // Value
-                setString(line.left(delimpos).trimmed(), line.mid(delimpos+1).trimmed());
+                setRaw(line.left(delimpos).trimmed(), line.mid(delimpos+1).trimmed());
             } else if (delimpos < 0 && line.endsWith('{')) {
                 // Group
                 beginGroup(line.chopped(1).trimmed());
@@ -180,7 +180,7 @@ bool MIni::contains(const QString &key) const noexcept
     }
     return false;
 }
-QString MIni::getString(const QString &key, const QString &defaultValue) const noexcept
+QString MIni::getRaw(const QString &key, const QString &defaultValue) const noexcept
 {
     if (auto ssearch = sections.find(cursection); ssearch != sections.end()) {
         if (auto gsearch = ssearch->second.find(curgroup); gsearch != ssearch->second.end()) {
@@ -191,11 +191,26 @@ QString MIni::getString(const QString &key, const QString &defaultValue) const n
     }
     return defaultValue;
 }
-void MIni::setString(const QString &key, const QString &value) noexcept
+void MIni::setRaw(const QString &key, const QString &value) noexcept
 {
     const auto &snew = sections.try_emplace(cursection, &MIni::lessCaseInsensitive).first;
     const auto &gnew = snew->second.try_emplace(curgroup, &MIni::lessCaseInsensitive).first;
     gnew->second.insert_or_assign(key, value);
+}
+
+QString MIni::getString(const QString &key, const QString &defaultValue) const noexcept
+{
+    const QString &val = getRaw(key, defaultValue);
+    if (val.size()>=2) {
+        if (const QChar c = val.front(); c == val.back() && c == '"') {
+            return val.mid(1, val.size()-2);
+        }
+    }
+    return val;
+}
+void MIni::setString(const QString &key, const QString &value) noexcept
+{
+    setRaw(key, value);
 }
 
 bool MIni::getBoolean(const QString &key, bool defaultValue, enum ValState *valid) const noexcept
@@ -213,7 +228,7 @@ bool MIni::getBoolean(const QString &key, bool defaultValue, enum ValState *vali
 }
 void MIni::setBoolean(const QString &key, const bool value) noexcept
 {
-    setString(key, value ? "true" : "false");
+    setRaw(key, value ? "true" : "false");
 }
 
 long long MIni::getInteger(const QString &key, long long defaultValue, enum ValState *valid, int base) const noexcept
@@ -229,7 +244,7 @@ long long MIni::getInteger(const QString &key, long long defaultValue, enum ValS
 }
 void MIni::setInteger(const QString &key, const long long value) noexcept
 {
-    setString(key, QString::number(value));
+    setRaw(key, QString::number(value));
 }
 
 QStringList MIni::getKeys() const noexcept

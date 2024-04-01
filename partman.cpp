@@ -89,10 +89,8 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const MIni &appConf, const 
     }
 
     // UUID of the device that the live system is booted from.
-    if (QFile::exists("/live/config/initrd.out")) {
-        MIni livecfg("/live/config/initrd.out", true);
-        bootUUID = livecfg.getString("BOOT_UUID");
-    }
+    MIni livecfg("/live/config/initrd.out", true);
+    bootUUID = livecfg.getString("BOOT_UUID");
 }
 PartMan::~PartMan()
 {

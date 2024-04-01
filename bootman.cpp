@@ -179,18 +179,20 @@ void BootMan::install(const QStringList &cmdextra)
             sect.setRoot(nullptr);
         }
 
-        //get /etc/default/grub codes
-        const MIni grubSettings("/etc/default/grub", true);
-        const QString &grubDefault = grubSettings.getString("GRUB_CMDLINE_LINUX_DEFAULT");
-        qDebug() << "grubDefault is " << grubDefault;
-
-        //added non-live boot codes to those in /etc/default/grub, remove duplicates
+        // Get non-live boot codes.
         proc.shell("/live/bin/non-live-cmdline", nullptr, true); // Get non-live boot codes
         QStringList finalcmdline = proc.readOut().split(" ");
-        finalcmdline.append(grubDefault.split(" "));
+
+        {
+            // Add the codes from /etc/default/grub to non-live boot codes.
+            const MIni grubSettings("/etc/default/grub", true);
+            const QString &grubDefault = grubSettings.getString("GRUB_CMDLINE_LINUX_DEFAULT");
+            qDebug() << "grubDefault is " << grubDefault;
+            finalcmdline.append(grubDefault.split(" "));
+        }
 
         // remove any leftover resume parameter
-        const QRegularExpression re("^(resume=|resume_offset=)", QRegularExpression::CaseInsensitiveOption);
+        static const QRegularExpression re("^(resume=|resume_offset=)", QRegularExpression::CaseInsensitiveOption);
         const auto toRemove = finalcmdline.filter(re);
         for(const auto &item : toRemove) {
             finalcmdline.removeAll(item);
@@ -199,12 +201,14 @@ void BootMan::install(const QStringList &cmdextra)
         finalcmdline.append(cmdextra);
         qDebug() << "intermediate" << finalcmdline;
 
-        //get built-in config_cmdline
-        proc.shell("grep ^CONFIG_CMDLINE= /boot/config-$(uname -r) | cut -d '\"' -f2", nullptr, true);
-        const QStringList confcmdline = proc.readOut().split(" ");
-
-        for (const QString &confparameter : confcmdline) {
-            finalcmdline.removeAll(confparameter);
+        {
+            // Add built-in config_cmdline.
+            proc.exec("uname", {"-r"});
+            const MIni bootconf("/boot/config-" + proc.readOut(true).trimmed(), true);
+            const QStringList confcmdline = bootconf.getString("CONFIG_CMDLINE").split(" ");
+            for (const QString &confparameter : confcmdline) {
+                finalcmdline.removeAll(confparameter);
+            }
         }
 
         //remove any duplicate codes in list (typically splash)

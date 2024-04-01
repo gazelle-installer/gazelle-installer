@@ -1169,22 +1169,10 @@ void MInstall::progressUpdate(int value) noexcept
 
 void MInstall::setupkeyboardbutton() noexcept
 {
-    QFile file("/etc/default/keyboard");
-    if (!file.open(QFile::ReadOnly | QFile::Text)) return;
-    while (!file.atEnd()) {
-        QString line(file.readLine().trimmed());
-        QLabel *plabel = nullptr;
-        if (line.startsWith("XKBMODEL")) plabel = gui.labelKeyboardModel;
-        else if (line.startsWith("XKBLAYOUT")) plabel = gui.labelKeyboardLayout;
-        else if (line.startsWith("XKBVARIANT")) plabel = gui.labelKeyboardVariant;
-        if (plabel != nullptr) {
-            line = line.section('=', 1);
-            line.replace(",", " ");
-            line.remove(QChar('"'));
-            plabel->setText(line);
-        }
-    }
-    file.close();
+    const MIni ini("/etc/default/keyboard", true);
+    gui.labelKeyboardModel->setText(ini.getString("XKBMODEL"));
+    gui.labelKeyboardLayout->setText(ini.getString("XKBLAYOUT"));
+    gui.labelKeyboardVariant->setText(ini.getString("XKBVARIANT"));
 }
 
 void MInstall::runKeyboardSetup() noexcept
