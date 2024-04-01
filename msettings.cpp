@@ -82,7 +82,8 @@ bool MIni::load() noexcept
             }
         }
     }
-    return true;
+    cursection.clear();
+    return curgroup.isEmpty(); // All groups must be closed at this point.
 }
 bool MIni::sync() noexcept
 {
