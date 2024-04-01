@@ -29,7 +29,7 @@
 #include "msettings.h"
 
 MIni::MIni(const QString &filename, bool readOnly) noexcept
-    : file(filename)
+    : file(filename), sections(&MIni::lessCaseInsensitive)
 {
     if (file.open(QFile::Text | (readOnly ? QFile::ReadOnly : QFile::ReadWrite))) {
         load();
@@ -193,7 +193,9 @@ QString MIni::getString(const QString &key, const QString &defaultValue) const n
 }
 void MIni::setString(const QString &key, const QString &value) noexcept
 {
-    sections[cursection][curgroup].insert_or_assign(key, value);
+    const auto &snew = sections.try_emplace(cursection, &MIni::lessCaseInsensitive).first;
+    const auto &gnew = snew->second.try_emplace(curgroup, &MIni::lessCaseInsensitive).first;
+    gnew->second.insert_or_assign(key, value);
 }
 
 bool MIni::getBoolean(const QString &key, bool defaultValue, enum ValState *valid) const noexcept
@@ -265,6 +267,12 @@ void MIni::dumpDebug(const QRegularExpression *censor) const noexcept
         }
     }
     qDebug() << "End of configuration.";
+}
+
+/* Case-insensitive key comparison for maps. */
+bool MIni::lessCaseInsensitive(const QString &a, const QString &b) noexcept
+{
+    return (a.compare(b, Qt::CaseInsensitive) < 0);
 }
 
 /* Widget management */

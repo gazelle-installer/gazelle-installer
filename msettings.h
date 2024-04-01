@@ -24,10 +24,11 @@
 
 class MIni
 {
+    static bool lessCaseInsensitive(const QString &a, const QString &b) noexcept;
     QFile file;
-    typedef std::map<QString, QString> SettingsMap;
-    typedef std::map<QString, SettingsMap> SettingsGroup;
-    std::map<QString, SettingsGroup> sections;
+    typedef std::map<QString, QString, decltype(&lessCaseInsensitive)> SettingsMap;
+    typedef std::map<QString, SettingsMap, decltype(&lessCaseInsensitive)> SettingsGroup;
+    std::map<QString, SettingsGroup, decltype(&lessCaseInsensitive)> sections;
     QString cursection, curgroup;
 public:
     MIni(const QString &filename, bool readOnly = false) noexcept;
