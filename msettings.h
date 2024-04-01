@@ -36,7 +36,7 @@ public:
     QString fileName() const noexcept { return file.fileName(); }
     bool load() noexcept;
     bool sync() noexcept;
-    bool copyTo(const QString &filename) noexcept;
+    bool closeAndCopyTo(const QString &filename) noexcept;
     void setSection(const QString &name) noexcept;
     QString section() const noexcept { return cursection; }
     void beginGroup(const QString &path) noexcept;

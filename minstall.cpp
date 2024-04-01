@@ -508,7 +508,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
                " Please review marked fields as you encounter them.").arg(configFile));
     } else if (mode == CONFIG_SAVE && !pretend) {
         config.dumpDebug(&configCensor);
-        config.copyTo("/etc/minstalled.conf");
+        config.closeAndCopyTo("/etc/minstalled.conf");
         chmod(configFile.toUtf8().constData(), 0600);
     }
 

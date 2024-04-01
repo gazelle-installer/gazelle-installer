@@ -147,16 +147,11 @@ bool MIni::sync() noexcept
     }
     return true;
 }
-bool MIni::copyTo(const QString &filename) noexcept
+bool MIni::closeAndCopyTo(const QString &filename) noexcept
 {
     sync();
-    const QFile::OpenMode mode = file.openMode();
     QFile::remove(filename);
-    bool ok = file.copy(filename);
-    if (mode != QFile::NotOpen) {
-        ok &= file.open(QFile::Text | mode);
-    }
-    return ok;
+    return file.copy(filename);
 }
 
 void MIni::setSection(const QString &name) noexcept
