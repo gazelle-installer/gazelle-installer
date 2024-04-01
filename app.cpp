@@ -31,11 +31,11 @@
 #include <QScreen>
 #include <QString>
 #include <QStringList>
-#include <QSettings>
 #include <QTranslator>
 #include <QLockFile>
 
 #include "minstall.h"
+#include "msettings.h"
 #include "version.h"
 
 static QFile logFile("/var/log/minstall.log");
@@ -127,8 +127,8 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    QSettings appConf("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
-    a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.value("PROJECT_NAME").toString()));
+    MIni appConf("/usr/share/gazelle-installer-data/installer.conf", true);
+    a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.getString("PROJECT_NAME")));
 
     // The lock is released when this object is destroyed.
     QLockFile lockfile("/var/lock/gazelle-installer.lock");

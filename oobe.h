@@ -40,7 +40,7 @@ class Oobe : public QObject
     bool online = false;
     QStringList timeZones; // cached time zone list
     PassEdit passUser, passRoot;
-    void buildServiceList(class QSettings &appconf) noexcept;
+    void buildServiceList(class MIni &appconf) noexcept;
     int selectTimeZone(const QString &zone) noexcept;
     void resetBlueman();
     // Slots
@@ -50,7 +50,7 @@ class Oobe : public QObject
 public:
     bool haveSnapshotUserAccounts = false;
     Oobe(class MProcess &mproc, Ui::MeInstall &ui, QWidget *parent,
-        class QSettings &appConf, bool oem, bool modeOOBE);
+        class MIni &appConf, bool oem, bool modeOOBE);
     void manageConfig(class MSettings &config, bool save) noexcept;
     void enable();
     void process();

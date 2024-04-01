@@ -20,7 +20,6 @@
 #include <QApplication>
 #include <QStringLiteral>
 #include <QToolTip>
-#include <QSettings>
 #include <QFormLayout>
 #include <QDialogButtonBox>
 
@@ -29,7 +28,7 @@
 #include "swapman.h"
 #include "autopart.h"
 
-AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const class QSettings &appConf) noexcept
+AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const MIni &appConf) noexcept
     : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman)
 {
     connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
@@ -57,7 +56,7 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     strHome = tr("Home");
     strNone = "----";
     gui.spinHome->setSpecialValueText(strNone);
-    installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
+    installFromRootDevice = appConf.getBoolean("INSTALL_FROM_ROOT_DEVICE");
     refresh();
 }
 

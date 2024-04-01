@@ -89,7 +89,7 @@ public:
     std::map<QString, Device *> mounts;
     class AutoPart *autopart = nullptr;
     PartMan(class MProcess &mproc, class Ui::MeInstall &ui,
-        const class QSettings &appConf, const QCommandLineParser &appArgs);
+        const class MIni &appConf, const QCommandLineParser &appArgs);
     ~PartMan();
     void scan(Device *drvstart = nullptr);
     bool manageConfig(class MSettings &config, bool save) noexcept;

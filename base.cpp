@@ -23,7 +23,6 @@
 #include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <QDebug>
-#include <QSettings>
 #include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -34,14 +33,14 @@
 
 #define BASE_BLOCK  (4*KB)
 
-Base::Base(MProcess &mproc, PartMan &pman, const QSettings &appConf, const QCommandLineParser &appArgs)
+Base::Base(MProcess &mproc, PartMan &pman, const MIni &appConf, const QCommandLineParser &appArgs)
     : proc(mproc), partman(pman)
 {
     pretend = appArgs.isSet("pretend");
-    populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
+    populateMediaMounts = appConf.getBoolean("POPULATE_MEDIA_MOUNTPOINTS");
     sync = appArgs.isSet("sync");
-    bufferRoot = appConf.value("ROOT_BUFFER", 1024).toLongLong() * MB;
-    bufferHome = appConf.value("HOME_BUFFER", 1024).toLongLong() * MB;
+    bufferRoot = appConf.getInteger("ROOT_BUFFER", 1024) * MB;
+    bufferHome = appConf.getInteger("HOME_BUFFER", 1024) * MB;
 
     bootSource = "/live/aufs/boot";
     rootSources << "/live/aufs/bin" << "/live/aufs/dev"
@@ -72,16 +71,16 @@ Base::Base(MProcess &mproc, PartMan &pman, const QSettings &appConf, const QComm
     if (vspecBoot.preferred < 1*GB) vspecBoot.preferred = 1*GB;
 
     // Root space required.
-    QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
-    const QString &sqpath = '/' + liveInfo.value("SQFILE_PATH", "antiX").toString();
-    const QString &sqtoram = liveInfo.value("TORAM_MP", "/live/to-ram").toString() + sqpath;
-    const QString &sqloc = liveInfo.value("SQFILE_DIR", "/live/boot-dev/antiX").toString();
+    MIni liveInfo("/live/config/initrd.out", true);
+    const QString &sqpath = '/' + liveInfo.getString("SQFILE_PATH", "antiX");
+    const QString &sqtoram = liveInfo.getString("TORAM_MP", "/live/to-ram") + sqpath;
+    const QString &sqloc = liveInfo.getString("SQFILE_DIR", "/live/boot-dev/antiX");
     bool floatOK = false;
     QString infile = sqtoram + "/linuxfs.info";
     if (!QFile::exists(infile)) infile = sqloc + "/linuxfs.info";
     if (QFile::exists(infile)) {
-        const QSettings squashInfo(infile, QSettings::IniFormat);
-        vspecRoot.image = squashInfo.value("UncompressedSizeKB").toFloat(&floatOK) * KB;
+        const MIni squashInfo(infile, true);
+        vspecRoot.image = squashInfo.getString("UncompressedSizeKB").toFloat(&floatOK) * KB;
     }
     if (!floatOK) {
         rootSources.prepend("-scb");

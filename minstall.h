@@ -26,7 +26,7 @@ protected:
     void reject() noexcept;
 
 public:
-    MInstall(class QSettings &acfg, const class QCommandLineParser &args, const QString &cfgfile) noexcept;
+    MInstall(class MIni &acfg, const class QCommandLineParser &args, const QString &cfgfile) noexcept;
     ~MInstall();
 
     QString PROJECTFORUM;
@@ -42,7 +42,7 @@ public:
 private:
     Ui::MeInstall gui;
     MProcess proc;
-    class QSettings &appConf;
+    class MIni &appConf;
     const class QCommandLineParser &appArgs;
     enum Phase {
         PH_STARTUP = -1, // Must be less than Ready. -1 for log cosmetics.

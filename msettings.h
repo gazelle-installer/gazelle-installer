@@ -1,7 +1,7 @@
 /***************************************************************************
- * MSettings class - Installer-specific extensions to QSettings.
+ * MIni and MSettings class - INI format parser and settings management.
  *
- *   Copyright (C) 2019 by AK-47
+ *   Copyright (C) 2019-2024 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -47,6 +47,7 @@ public:
         VAL_OK,
         VAL_INVALID
     };
+    QStringList getKeys() const noexcept;
     QString getString(const QString &key, const QString &defaultValue = QString()) const noexcept;
     void setString(const QString &key, const QString &value) noexcept;
     bool getBoolean(const QString &key, bool defaultValue = false, enum ValState *valid = nullptr) const noexcept;

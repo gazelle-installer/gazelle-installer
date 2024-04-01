@@ -20,9 +20,9 @@
 #include <QFileInfo>
 #include <QCryptographicHash>
 #include <QDirIterator>
-#include <QSettings>
 #include <QMessageBox>
 #include "checkmd5.h"
+#include "msettings.h"
 
 CheckMD5::CheckMD5(MProcess &mproc, QLabel *splash) noexcept
     : proc(mproc), labelSplash(splash)
@@ -37,12 +37,12 @@ void CheckMD5::check()
     labelSplash->setText(nsplash.arg(0));
 
     checking = true;
-    QSettings liveInfo("/live/config/initrd.out", QSettings::IniFormat);
-    const QString &sqtoram = liveInfo.value("TORAM_MP", "/live/to-ram").toString()
-        + '/' + liveInfo.value("SQFILE_PATH", "antiX").toString();
-    const QString &sqfile = liveInfo.value("SQFILE_NAME", "linuxfs").toString();
+    MIni liveInfo("/live/config/initrd.out", true);
+    const QString &sqtoram = liveInfo.getString("TORAM_MP", "/live/to-ram")
+        + '/' + liveInfo.getString("SQFILE_PATH", "antiX");
+    const QString &sqfile = liveInfo.getString("SQFILE_NAME", "linuxfs");
     const QString &path = QFile::exists(sqtoram+'/'+sqfile)
-        ? sqtoram : liveInfo.value("SQFILE_DIR", "/live/boot-dev/antiX").toString();
+        ? sqtoram : liveInfo.getString("SQFILE_DIR", "/live/boot-dev/antiX");
 
     qint64 btotal = 0;
     struct FileHash {

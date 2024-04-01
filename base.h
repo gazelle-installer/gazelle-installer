@@ -42,7 +42,7 @@ public:
     QStringList homes;
 
     Base(class MProcess &mproc, class PartMan &pman,
-        const class QSettings &appConf, const QCommandLineParser &appArgs);
+        const class MIni &appConf, const QCommandLineParser &appArgs);
     bool saveHomeBasic() noexcept;
     void install();
 };

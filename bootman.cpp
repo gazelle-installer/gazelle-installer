@@ -22,7 +22,6 @@
 
 #include <sys/stat.h>
 #include <QDebug>
-#include <QSettings>
 #include <QMessageBox>
 #include <QFileInfo>
 #include "mprocess.h"
@@ -31,13 +30,13 @@
 #include "bootman.h"
 
 BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
-    const QSettings &appConf, const QCommandLineParser &appArgs) noexcept
+    const MIni &appConf, const QCommandLineParser &appArgs) noexcept
     : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
-    loaderID = appConf.value("PROJECT_SHORTNAME").toString();
-    loaderLabel = appConf.value("PROJECT_NAME").toString();
-    installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
-    removeNoSplash = appConf.value("REMOVE_NOSPLASH").toBool();
+    loaderID = appConf.getString("PROJECT_SHORTNAME");
+    loaderLabel = appConf.getString("PROJECT_NAME");
+    installFromRootDevice = appConf.getBoolean("INSTALL_FROM_ROOT_DEVICE");
+    removeNoSplash = appConf.getBoolean("REMOVE_NOSPLASH");
     brave = appArgs.isSet("brave");
 
     connect(gui.radioBootMBR, &QRadioButton::toggled, this, &BootMan::chosenBootMBR);
@@ -181,8 +180,8 @@ void BootMan::install(const QStringList &cmdextra)
         }
 
         //get /etc/default/grub codes
-        const QSettings grubSettings("/etc/default/grub", QSettings::NativeFormat);
-        const QString &grubDefault = grubSettings.value("GRUB_CMDLINE_LINUX_DEFAULT").toString();
+        const MIni grubSettings("/etc/default/grub", true);
+        const QString &grubDefault = grubSettings.getString("GRUB_CMDLINE_LINUX_DEFAULT");
         qDebug() << "grubDefault is " << grubDefault;
 
         //added non-live boot codes to those in /etc/default/grub, remove duplicates

@@ -26,7 +26,6 @@
 #include <utility>
 #include <sys/stat.h>
 #include <QDebug>
-#include <QSettings>
 #include <QLocale>
 #include <QFileInfo>
 #include <QDir>
@@ -48,15 +47,15 @@
 #include "autopart.h"
 #include "partman.h"
 
-PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, const QCommandLineParser &appArgs)
+PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const MIni &appConf, const QCommandLineParser &appArgs)
     : QAbstractItemModel(ui.boxMain), proc(mproc), gui(ui)
 {
     root = new Device(*this);
-    const QString &projShort = appConf.value("PROJECT_SHORTNAME").toString();
+    const QString &projShort = appConf.getString("PROJECT_SHORTNAME");
     volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
     volSpecs["/boot"] = {"boot"};
     volSpecs["/boot/efi"] = volSpecs["ESP"] = {"EFI-SYSTEM"};
-    volSpecs["/"] = {"root" + projShort + appConf.value("VERSION").toString()};
+    volSpecs["/"] = {"root" + projShort + appConf.getString("VERSION")};
     volSpecs["/home"] = {"home" + projShort};
     volSpecs["SWAP"] = {"swap" + projShort};
     brave = appArgs.isSet("brave");
@@ -91,8 +90,8 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
 
     // UUID of the device that the live system is booted from.
     if (QFile::exists("/live/config/initrd.out")) {
-        QSettings livecfg("/live/config/initrd.out", QSettings::NativeFormat);
-        bootUUID = livecfg.value("BOOT_UUID").toString();
+        MIni livecfg("/live/config/initrd.out", true);
+        bootUUID = livecfg.getString("BOOT_UUID");
     }
 }
 PartMan::~PartMan()

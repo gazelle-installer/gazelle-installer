@@ -27,7 +27,6 @@
 #include <sys/sysinfo.h>
 
 #include <QCommandLineParser>
-#include <QSettings>
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QFile>
@@ -70,7 +69,7 @@ enum Step {
 // The values of settings ("GROUP/KEY") matching this regex will not be logged.
 static const QRegularExpression configCensor("Encryption\\/Pass|User\\/.*Pass/i");
 
-MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
+MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
     : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile),
       helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
 {
@@ -93,11 +92,11 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     }
 
     // setup system variables
-    PROJECTNAME = appConf.value("PROJECT_NAME").toString();
-    PROJECTSHORTNAME = appConf.value("PROJECT_SHORTNAME").toString();
-    PROJECTVERSION = appConf.value("VERSION").toString();
-    PROJECTURL = appConf.value("PROJECT_URL").toString();
-    PROJECTFORUM = appConf.value("FORUM_URL").toString();
+    PROJECTNAME = appConf.getString("PROJECT_NAME");
+    PROJECTSHORTNAME = appConf.getString("PROJECT_SHORTNAME");
+    PROJECTVERSION = appConf.getString("VERSION");
+    PROJECTURL = appConf.getString("PROJECT_URL");
+    PROJECTFORUM = appConf.getString("FORUM_URL");
 
     gotoPage(Step::SPLASH);
 
@@ -196,9 +195,9 @@ void MInstall::startup()
         // set some distro-centric text
         QString link_block;
         appConf.beginGroup("LINKS");
-        const QStringList &links = appConf.childKeys();
+        const QStringList &links = appConf.getKeys();
         for (const QString &link : links) {
-            link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + appConf.value(link).toString();
+            link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + appConf.getString(link);
         }
         appConf.endGroup();
         gui.textReminders->setPlainText(tr("Support %1\n\n"
@@ -519,7 +518,7 @@ int MInstall::showPage(int curr, int next) noexcept
 {
     if (next == Step::SPLASH) { // Enter splash screen
         gui.boxMain->setCursor(Qt::WaitCursor);
-        splashSetThrobber(appConf.value("SPLASH_THROBBER", true).toBool());
+        splashSetThrobber(appConf.getBoolean("SPLASH_THROBBER", true));
     } else if (curr == Step::SPLASH) { // Leave splash screen
         gui.labelSplash->clear();
         splashSetThrobber(false);

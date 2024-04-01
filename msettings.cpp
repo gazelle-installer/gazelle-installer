@@ -1,7 +1,7 @@
 /***************************************************************************
- * MSettings class - Installer-specific extensions to QSettings.
+ * MIni and MSettings class - INI format parser and settings management.
  *
- *   Copyright (C) 2019 by AK-47
+ *   Copyright (C) 2019-2024 by AK-47
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
  *   You may obtain a copy of the License at
@@ -227,6 +227,19 @@ long long MIni::getInteger(const QString &key, long long defaultValue, enum ValS
 void MIni::setInteger(const QString &key, const long long value) noexcept
 {
     setString(key, QString::number(value));
+}
+
+QStringList MIni::getKeys() const noexcept
+{
+    QStringList list;
+    if (auto ssearch = sections.find(cursection); ssearch != sections.end()) {
+        if (auto gsearch = ssearch->second.find(curgroup); gsearch != ssearch->second.end()) {
+            for (auto &setting : gsearch->second) {
+                list.append(setting.first);
+            }
+        }
+    }
+    return list;
 }
 
 void MIni::dumpDebug(const QRegularExpression *censor) const noexcept

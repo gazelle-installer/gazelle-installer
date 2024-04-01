@@ -23,7 +23,6 @@
 #include <utility>
 #include <sys/stat.h>
 #include <QDebug>
-#include <QSettings>
 #include <QMessageBox>
 #include <QFileInfo>
 #include <QLocale>
@@ -32,7 +31,7 @@
 #include "msettings.h"
 #include "oobe.h"
 
-Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, QSettings &appConf, bool oem, bool modeOOBE)
+Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, bool oem, bool modeOOBE)
     : QObject(parent), proc(mproc), gui(ui), master(parent), oem(oem), online(modeOOBE),
     passUser(ui.textUserPass, ui.textUserPass2, 0, this), passRoot(ui.textRootPass, ui.textRootPass2, 0, this)
 {
@@ -229,29 +228,26 @@ void Oobe::process()
 
 /* Services */
 
-void Oobe::buildServiceList(QSettings &appconf) noexcept
+void Oobe::buildServiceList(MIni &appconf) noexcept
 {
     //setup treeServices
     gui.treeServices->header()->setMinimumSectionSize(150);
     gui.treeServices->header()->resizeSection(0,150);
 
-    QSettings services_desc("/usr/share/gazelle-installer-data/services.list", QSettings::NativeFormat);
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-    services_desc.setIniCodec("UTF-8");
-#endif
+    MIni services_desc("/usr/share/gazelle-installer-data/services.list", true);
 
-    gui.textComputerName->setText(appconf.value("DEFAULT_HOSTNAME").toString());
-    appconf.beginGroup("SERVICES");
-    for (const QString &service : appconf.allKeys()) {
+    gui.textComputerName->setText(appconf.getString("DEFAULT_HOSTNAME"));
+    appconf.setSection("SERVICES");
+    for (const QString &service : appconf.getKeys()) {
         const QString &lang = QLocale::system().bcp47Name().toLower();
-        QStringList list = services_desc.value(lang + '/' + service).toStringList();
-        if (list.size() != 2) {
-            list = services_desc.value(service).toStringList(); // Use English definition
-            if (list.size() != 2) continue;
+        services_desc.setSection(lang);
+        if (!services_desc.contains(service)) {
+            services_desc.setSection(""); // Use English definition
         }
-        QString category, description;
-        category = list.at(0);
-        description = list.at(1);
+        QStringList list = services_desc.getString(service).split(',');
+        if (list.size() != 2) continue;
+        const QString &category = list.at(0).trimmed();
+        const QString &description = list.at(1).trimmed();
 
         if (QFile::exists("/etc/init.d/"+service) || QFile::exists("/etc/sv/"+service)) {
             QList<QTreeWidgetItem *> found_items = gui.treeServices->findItems(category, Qt::MatchExactly, 0);
@@ -268,10 +264,9 @@ void Oobe::buildServiceList(QSettings &appconf) noexcept
             item = new QTreeWidgetItem(parent);
             item->setText(0, service);
             item->setText(1, description);
-            item->setCheckState(0, appconf.value(service).toBool() ? Qt::Checked : Qt::Unchecked);
+            item->setCheckState(0, appconf.getBoolean(service) ? Qt::Checked : Qt::Unchecked);
         }
     }
-    appconf.endGroup();
 
     gui.treeServices->expandAll();
     gui.treeServices->resizeColumnToContents(0);
@@ -645,8 +640,8 @@ void Oobe::setUserInfo()
     sect.setExceptionMode(QT_TR_NOOP("Failed to set ownership or permissions of user directory."));
     proc.exec("chown", {"-R", "demo:demo", dpath});
     // Set permissions according to /etc/adduser.conf
-    QSettings addusercfg("/etc/adduser.conf", QSettings::NativeFormat);
-    mode_t mode = addusercfg.value("DIR_MODE", "0700").toString().toUInt(&ok, 8);
+    MIni addusercfg("/etc/adduser.conf", true);
+    mode_t mode = addusercfg.getString("DIR_MODE", "0700").toUInt(&ok, 8);
     if (chmod(dpath.toUtf8().constData(), mode) != 0) throw sect.failMessage();
 
     // change in files
