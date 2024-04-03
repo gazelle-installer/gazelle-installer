@@ -26,9 +26,10 @@ class MIni
 {
     static bool lessCaseInsensitive(const QString &a, const QString &b) noexcept;
     QFile file;
-    typedef std::map<QString, QString, decltype(&lessCaseInsensitive)> SettingsMap;
-    typedef std::map<QString, SettingsMap, decltype(&lessCaseInsensitive)> SettingsGroup;
-    std::map<QString, SettingsGroup, decltype(&lessCaseInsensitive)> sections;
+    typedef std::map<QString, QString, decltype(&lessCaseInsensitive)> GroupMap;
+    typedef std::map<QString, GroupMap, decltype(&lessCaseInsensitive)> SectionMap;
+    typedef std::map<QString, SectionMap, decltype(&lessCaseInsensitive)> SettingsMap;
+    SettingsMap sections;
     QString cursection, curgroup;
     bool allOK = false;
 public:
@@ -40,17 +41,21 @@ public:
     bool load() noexcept;
     bool sync() noexcept;
     bool closeAndCopyTo(const QString &filename) noexcept;
-    void setSection(const QString &name) noexcept;
+    void setSection(const QString &name = QString()) noexcept;
     QString section() const noexcept { return cursection; }
+    void setGroup(const QString &path = QString()) noexcept;
+    QString group() const noexcept { return curgroup; }
     void beginGroup(const QString &path) noexcept;
     void endGroup() noexcept;
+    QStringList getSections() const noexcept;
+    QStringList getGroups() const noexcept;
+    QStringList getKeys() const noexcept;
     bool contains(const QString &key) const noexcept;
     enum ValState {
         VAL_NOTFOUND,
         VAL_OK,
         VAL_INVALID
     };
-    QStringList getKeys() const noexcept;
     QString getRaw(const QString &key, const QString &defaultValue = QString()) const noexcept;
     void setRaw(const QString &key, const QString &value) noexcept;
     QString getString(const QString &key, const QString &defaultValue = QString()) const noexcept;
@@ -60,6 +65,7 @@ public:
     long long getInteger(const QString &key, long long defaultValue = 0,
         enum ValState *valid = nullptr, int base = 10) const noexcept;
     void setInteger(const QString &key, const long long value) noexcept;
+
     void dumpDebug(const class QRegularExpression *censor = nullptr) const noexcept;
 };
 

@@ -102,7 +102,7 @@ bool MIni::sync() noexcept
         int prevdepth = 0;
         QString prevgpath;
         for (const auto &group : section.second) {
-            const int depth = group.first.count('/');
+            const int depth = group.first.isEmpty() ? 0 : (1 + group.first.count('/'));
             const QString &gpath = group.first;
             // The first segment of the current and previous group that differs.
             int pivot = 0;
@@ -160,15 +160,50 @@ void MIni::setSection(const QString &name) noexcept
     cursection = name;
     curgroup.clear();
 }
+void MIni::setGroup(const QString &path) noexcept
+{
+    curgroup = path;
+}
 
 void MIni::beginGroup(const QString &path) noexcept
 {
-    curgroup += path + '/';
+    if (curgroup.isEmpty()) curgroup = path;
+    else curgroup += '/' + path;
 }
 void MIni::endGroup() noexcept
 {
-    curgroup.chop(1);
-    curgroup.truncate(curgroup.lastIndexOf('/') + 1);
+    curgroup.truncate(curgroup.lastIndexOf('/'));
+}
+
+QStringList MIni::getSections() const noexcept
+{
+    QStringList list;
+    for (auto &section : sections) {
+        list.append(section.first);
+    }
+    return list;
+}
+QStringList MIni::getGroups() const noexcept
+{
+    QStringList list;
+    if (auto ssearch = sections.find(cursection); ssearch != sections.end()) {
+        for (auto &group : ssearch->second) {
+            list.append(group.first);
+        }
+    }
+    return list;
+}
+QStringList MIni::getKeys() const noexcept
+{
+    QStringList list;
+    if (auto ssearch = sections.find(cursection); ssearch != sections.end()) {
+        if (auto gsearch = ssearch->second.find(curgroup); gsearch != ssearch->second.end()) {
+            for (auto &setting : gsearch->second) {
+                list.append(setting.first);
+            }
+        }
+    }
+    return list;
 }
 
 bool MIni::contains(const QString &key) const noexcept
@@ -247,37 +282,29 @@ void MIni::setInteger(const QString &key, const long long value) noexcept
     setRaw(key, QString::number(value));
 }
 
-QStringList MIni::getKeys() const noexcept
-{
-    QStringList list;
-    if (auto ssearch = sections.find(cursection); ssearch != sections.end()) {
-        if (auto gsearch = ssearch->second.find(curgroup); gsearch != ssearch->second.end()) {
-            for (auto &setting : gsearch->second) {
-                list.append(setting.first);
-            }
-        }
-    }
-    return list;
-}
-
 void MIni::dumpDebug(const QRegularExpression *censor) const noexcept
 {
     qDebug().noquote() << "Configuration:" << fileName();
     for (const auto &section : sections) {
-        const bool topsect = section.first.isEmpty(); // top-level settings (version, etc)
-        if (!topsect) {
-            qDebug().noquote().nospace() << " = " << section.first << ":";
+        const char *bullet = " - ";
+        if (!section.first.isEmpty()) {
+            qDebug().noquote().nospace() << " = " << section.first << ':';
+            bullet = "   - ";
         }
         for (const auto &group : section.second) {
+            if (!group.first.isEmpty()) {
+                qDebug().noquote().nospace() << "   + " << group.first << ':';
+                bullet = "     - ";
+            }
             for (const auto &setting : group.second) {
-                const QString &fullkey = group.first + setting.first;
+                const QString &fullkey = group.first + '/' + setting.first;
                 QString val(setting.second);
                 if (censor && !val.isEmpty()) {
                     if (QString(fullkey).contains(*censor)) {
                         val = "???";
                     }
                 }
-                qDebug().noquote().nospace() << (topsect ? " - " : "   - ") << fullkey << ": " << val;
+                qDebug().noquote().nospace() << bullet << setting.first << ": " << val;
             }
         }
     }
