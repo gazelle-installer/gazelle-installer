@@ -505,10 +505,12 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         QMessageBox::critical(this, windowTitle(),
             tr("Invalid settings found in configuration file (%1)."
                " Please review marked fields as you encounter them.").arg(configFile));
-    } else if (mode == CONFIG_SAVE && !pretend) {
+    } else if (mode == CONFIG_SAVE) {
         config.dumpDebug(&configCensor);
-        config.closeAndCopyTo("/etc/minstalled.conf");
-        chmod(configFile.toUtf8().constData(), 0600);
+        if (!pretend) {
+            config.closeAndCopyTo("/etc/minstalled.conf");
+            chmod(configFile.toUtf8().constData(), 0600);
+        }
     }
 
 }
