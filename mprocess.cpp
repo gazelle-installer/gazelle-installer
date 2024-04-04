@@ -56,6 +56,20 @@ void MProcess::setupUI(QListWidget *listLog, QProgressBar *progInstall) noexcept
     });
 }
 
+void MProcess::syncRoot() noexcept
+{
+    if (section && section->rootdir) {
+        setChildProcessModifier([this]() {
+            if (section && section->rootdir) {
+                if (chroot(section->rootdir) != 0) exit(255);
+                if (chdir("/") != 0) exit(255);
+            }
+        });
+    } else {
+        setChildProcessModifier(nullptr);
+    }
+}
+
 inline bool MProcess::checkHalt()
 {
     if (halting == THROW_HALT) throw("");
@@ -337,6 +351,7 @@ MProcess::Section::~Section() noexcept
         proc.log(QString("Revert root: ")+oldroot, LOG_LOG);
     }
     proc.section = oldsection;
+    proc.syncRoot();
 }
 
 // Note: newroot must be valid and unchanged for the life of the chroot.
@@ -346,15 +361,5 @@ void MProcess::Section::setRoot(const char *newroot) noexcept
         proc.log(QString("Change root: ")+newroot, LOG_LOG);
     }
     rootdir = newroot; // Might be different pointers to the same text.
-
-    if (qstrlen(rootdir) > 0) {
-        proc.setChildProcessModifier([this]() {
-            if (rootdir) {
-                if (chroot(rootdir) != 0) _exit(255);
-                if (chdir("/") != 0) _exit(255);
-            }
-        });
-    } else {
-        proc.setChildProcessModifier(nullptr);
-    }
+    proc.syncRoot();
 }

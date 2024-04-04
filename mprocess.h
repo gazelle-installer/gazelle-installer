@@ -85,6 +85,7 @@ private:
     bool exec(const QString &program, const QStringList &arguments,
         const QByteArray *input, bool needRead, class QListWidgetItem *logEntry);
     bool checkHalt();
+    void syncRoot() noexcept;
 };
 
 // A section with specific error handling or chroot requirements.
