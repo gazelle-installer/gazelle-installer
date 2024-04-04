@@ -65,10 +65,6 @@ public:
     // Operating system
     const QString &detectArch();
     int detectEFI(bool noTest = false);
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-protected:
-    void setupChildProcess() noexcept override;
-#endif
 
 private:
     friend class ExceptionInfo;
