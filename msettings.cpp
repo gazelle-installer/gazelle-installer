@@ -31,7 +31,9 @@
 MIni::MIni(const QString &filename, bool readOnly) noexcept
     : file(filename), sections(&MIni::lessCaseInsensitive)
 {
-    if (file.open(QFile::Text | (readOnly ? QFile::ReadOnly : QFile::ReadWrite))) {
+    if (filename.isEmpty()) {
+        allOK = true;
+    } else if (file.open(QFile::Text | (readOnly ? QFile::ReadOnly : QFile::ReadWrite))) {
         allOK = load();
     }
 }
@@ -318,6 +320,12 @@ void MSettings::dumpDebug() const noexcept
 }
 
 /* Widget management */
+
+MSettings::MSettings(const QString &filename, bool readOnly) noexcept
+    : MIni(filename, readOnly)
+{
+    bad = !isOK();
+}
 
 void MSettings::setSave(bool save) noexcept
 {

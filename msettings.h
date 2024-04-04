@@ -72,8 +72,8 @@ class MSettings: public MIni
 {
     QStringList filter;
 public:
-    MSettings(const QString &filename, bool readOnly = false) noexcept : MIni(filename, readOnly) {}
-    bool bad = false;
+    bool bad;
+    MSettings(const QString &filename, bool readOnly = false) noexcept;
     void addFilter(const QString &key);
     void dumpDebug() const noexcept;
     void setSave(bool save) noexcept;
