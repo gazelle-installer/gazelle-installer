@@ -282,7 +282,17 @@ void MIni::setInteger(const QString &key, const long long value) noexcept
     setRaw(key, QString::number(value));
 }
 
-void MIni::dumpDebug(const QRegularExpression *censor) const noexcept
+/* Case-insensitive key comparison for maps. */
+bool MIni::lessCaseInsensitive(const QString &a, const QString &b) noexcept
+{
+    return (a.compare(b, Qt::CaseInsensitive) < 0);
+}
+
+void MSettings::addFilter(const QString &key)
+{
+    filter.append(cursection + '/' + curgroup + '/' + key);
+}
+void MSettings::dumpDebug() const noexcept
 {
     qDebug().noquote() << "Configuration:" << fileName();
     for (const auto &section : sections) {
@@ -297,24 +307,14 @@ void MIni::dumpDebug(const QRegularExpression *censor) const noexcept
                 bullet = "     - ";
             }
             for (const auto &setting : group.second) {
-                const QString &fullkey = group.first + '/' + setting.first;
-                QString val(setting.second);
-                if (censor && !val.isEmpty()) {
-                    if (QString(fullkey).contains(*censor)) {
-                        val = "???";
-                    }
-                }
-                qDebug().noquote().nospace() << bullet << setting.first << ": " << val;
+                const bool show = (setting.second.isEmpty()
+                    || !filter.contains(section.first + '/' + group.first + '/' + setting.first));
+                qDebug().noquote().nospace() << bullet << setting.first
+                    << ": " << (show ? setting.second : "<filter>");
             }
         }
     }
     qDebug() << "End of configuration.";
-}
-
-/* Case-insensitive key comparison for maps. */
-bool MIni::lessCaseInsensitive(const QString &a, const QString &b) noexcept
-{
-    return (a.compare(b, Qt::CaseInsensitive) < 0);
 }
 
 /* Widget management */

@@ -168,6 +168,8 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
     QRadioButton *oldHomeRadios[] = {gui.radioOldHomeUse, gui.radioOldHomeSave, gui.radioOldHomeDelete};
     config.manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
     config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);
+    config.addFilter("UserPass");
+    config.addFilter("RootPass");
     if (!save || oem) { // Transfer default passwords under OEM mode.
         const QString &upass = config.getString("UserPass");
         gui.textUserPass->setText(upass);

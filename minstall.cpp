@@ -66,9 +66,6 @@ enum Step {
     END
 };
 
-// The values of settings ("GROUP/KEY") matching this regex will not be logged.
-static const QRegularExpression configCensor("Encryption\\/Pass|User\\/.*Pass/i");
-
 MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
     : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile),
       helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
@@ -483,6 +480,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
 
         // Encryption
         config.setSection("Encryption", targetIsDrive ? gui.pageDisk : gui.pagePartitions);
+        config.addFilter("Pass");
         if (mode != CONFIG_SAVE) {
             const QString &epass = config.getString("Pass");
             gui.textCryptoPass->setText(epass);
@@ -506,7 +504,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
             tr("Invalid settings found in configuration file (%1)."
                " Please review marked fields as you encounter them.").arg(configFile));
     } else if (mode == CONFIG_SAVE) {
-        config.dumpDebug(&configCensor);
+        config.dumpDebug();
         if (!pretend) {
             config.closeAndCopyTo("/etc/minstalled.conf");
             chmod(configFile.toUtf8().constData(), 0600);

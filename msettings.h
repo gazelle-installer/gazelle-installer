@@ -24,6 +24,7 @@
 
 class MIni
 {
+    friend class MSettings;
     static bool lessCaseInsensitive(const QString &a, const QString &b) noexcept;
     QFile file;
     typedef std::map<QString, QString, decltype(&lessCaseInsensitive)> GroupMap;
@@ -65,15 +66,16 @@ public:
     long long getInteger(const QString &key, long long defaultValue = 0,
         enum ValState *valid = nullptr, int base = 10) const noexcept;
     void setInteger(const QString &key, const long long value) noexcept;
-
-    void dumpDebug(const class QRegularExpression *censor = nullptr) const noexcept;
 };
 
 class MSettings: public MIni
 {
+    QStringList filter;
 public:
     MSettings(const QString &filename, bool readOnly = false) noexcept : MIni(filename, readOnly) {}
     bool bad = false;
+    void addFilter(const QString &key);
+    void dumpDebug() const noexcept;
     void setSave(bool save) noexcept;
     bool isSave() const noexcept { return saving; }
     void setGroupWidget(class QWidget *widget) noexcept;
@@ -84,6 +86,7 @@ public:
     void manageCheckBox(const QString &key, class QCheckBox *checkbox) noexcept;
     void manageGroupCheckBox(const QString &key, class QGroupBox *groupbox) noexcept;
     void manageLineEdit(const QString &key, class QLineEdit *lineedit) noexcept;
+    void managePassEdit(const QString &key, class QLineEdit *master, class QLineEdit *slave, bool force = false) noexcept;
     void manageSpinBox(const QString &key, class QSpinBox *spinbox) noexcept;
     int manageEnum(const QString &key, const int nchoices,
             const char *choices[], const int curval) noexcept;
