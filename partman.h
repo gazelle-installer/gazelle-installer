@@ -60,7 +60,7 @@ public:
         COL_PASS,
         TREE_COLUMNS
     };
-    constexpr static struct ColumnProperties {
+    static constexpr struct ColumnProperties {
         bool dropdown : 1;
         bool checkbox : 1;
         bool advanced : 1;
