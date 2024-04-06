@@ -388,7 +388,13 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
 void PartMan::resizeColumnsToFit() noexcept
 {
     for (int ixi = TREE_COLUMNS - 1; ixi >= 0; --ixi) {
-        gui.treePartitions->resizeColumnToContents(ixi);
+        if (!gui.treePartitions->isColumnHidden(ixi)) {
+            gui.treePartitions->resizeColumnToContents(ixi);
+        } else {
+            gui.treePartitions->showColumn(ixi);
+            gui.treePartitions->resizeColumnToContents(ixi);
+            gui.treePartitions->hideColumn(ixi);
+        }
     }
 }
 
@@ -1711,11 +1717,13 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
         case COL_DUMP: break;
         case COL_PASS: break;
         }
-    } else if (role == Qt::FontRole && (section == COL_FLAG_ACTIVE || section == COL_FLAG_ESP
-        || section == COL_ENCRYPT || section == COL_CHECK || section == COL_DUMP)) {
-        QFont smallFont;
-        smallFont.setPointSizeF(smallFont.pointSizeF() * 0.5);
-        return smallFont;
+    } else if (role == Qt::FontRole) {
+        QFont font;
+        if (colprops[section].checkbox) {
+            font.setPointSizeF(font.pointSizeF() * 0.5);
+        }
+        font.setItalic(colprops[section].advanced);
+        return font;
     }
     return QVariant();
 }

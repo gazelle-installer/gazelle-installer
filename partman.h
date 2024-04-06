@@ -62,20 +62,21 @@ public:
     };
     constexpr static struct ColumnProperties {
         bool dropdown : 1;
+        bool checkbox : 1;
         bool advanced : 1;
     } colprops[TREE_COLUMNS] = {
-        {false, false}, // COL_DEVICE
-        {false, false}, // COL_SIZE
-        {false, true}, // COL_FLAG_ACTIVE
-        {false, true}, // COL_FLAG_ESP
-        {true, false}, // COL_USEFOR
-        {false, false}, // COL_LABEL
-        {false, false}, // COL_ENCRYPT
-        {true, false}, // COL_FORMAT
-        {false, false}, // COL_CHECK
-        {false, true}, // COL_OPTIONS
-        {false, true}, // COL_DUMP
-        {false, true} // COL_PASS
+        {false, false, false}, // COL_DEVICE
+        {false, false, false}, // COL_SIZE
+        {false, true, true}, // COL_FLAG_ACTIVE
+        {false, true, true}, // COL_FLAG_ESP
+        {true, false, false}, // COL_USEFOR
+        {false, false, false}, // COL_LABEL
+        {false, true, false}, // COL_ENCRYPT
+        {true, false, false}, // COL_FORMAT
+        {false, true, false}, // COL_CHECK
+        {false, false, true}, // COL_OPTIONS
+        {false, true, true}, // COL_DUMP
+        {false, false, true} // COL_PASS
     };
     struct VolumeSpec
     {
