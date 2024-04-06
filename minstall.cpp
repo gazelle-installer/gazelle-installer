@@ -471,8 +471,8 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
         // Automatic or Manual partitioning
         config.setGroupWidget(gui.pageDisk);
-        const char *diskChoices[] = {"Drive", "Partitions"};
-        QRadioButton *diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
+        static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
+        QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
         config.manageRadios("Storage/Target", 2, diskChoices, diskRadios);
         const bool targetIsDrive = gui.radioEntireDisk->isChecked();
 
