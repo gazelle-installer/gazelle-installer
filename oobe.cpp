@@ -323,11 +323,12 @@ void Oobe::setService(const QString &service, bool enabled)
 
 QWidget *Oobe::validateComputerName() noexcept
 {
+    const QRegularExpression nametest("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\.");
     // see if name is reasonable
     if (gui.textComputerName->text().isEmpty()) {
         QMessageBox::critical(master, master->windowTitle(), tr("Please enter a computer name."));
         return gui.textComputerName;
-    } else if (gui.textComputerName->text().contains(QRegularExpression("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
+    } else if (gui.textComputerName->text().contains(nametest)) {
         QMessageBox::critical(master, master->windowTitle(),
             tr("Sorry, your computer name contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return gui.textComputerName;
@@ -336,7 +337,7 @@ QWidget *Oobe::validateComputerName() noexcept
     if (gui.textComputerDomain->text().isEmpty()) {
         QMessageBox::critical(master, master->windowTitle(), tr("Please enter a domain name."));
         return gui.textComputerDomain;
-    } else if (gui.textComputerDomain->text().contains(QRegularExpression("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\."))) {
+    } else if (gui.textComputerDomain->text().contains(nametest)) {
         QMessageBox::critical(master, master->windowTitle(),
                               tr("Sorry, your computer domain contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return gui.textComputerDomain;
