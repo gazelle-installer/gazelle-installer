@@ -136,7 +136,7 @@ void MSettings::manageSpinBox(const QString &key, QSpinBox *spinbox) noexcept
 }
 
 int MSettings::manageEnum(const QString &key, const int nchoices,
-        const char *choices[], const int curval) noexcept
+        const char * const *choices, const int curval) noexcept
 {
     QVariant choice(curval >= 0 ? choices[curval] : "");
     if (saving) {
@@ -154,7 +154,7 @@ int MSettings::manageEnum(const QString &key, const int nchoices,
 }
 
 void MSettings::manageRadios(const QString &key, const int nchoices,
-        const char *choices[], QRadioButton *radios[]) noexcept
+        const char * const *choices, QRadioButton *radios[]) noexcept
 {
     // obtain the current choice
     int ixradio = -1;

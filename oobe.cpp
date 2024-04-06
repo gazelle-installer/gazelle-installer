@@ -148,7 +148,7 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
     config.startGroup("Localization", gui.pageLocalization);
     config.manageComboBox("Locale", gui.comboLocale, true);
     config.manageCheckBox("LocalClock", gui.checkLocalClock);
-    const char *clockChoices[] = {"24", "12"};
+    static constexpr const char *clockChoices[] = {"24", "12"};
     QRadioButton *clockRadios[] = {gui.radioClock24, gui.radioClock12};
     config.manageRadios("ClockHours", 2, clockChoices, clockRadios);
     if (save) {
@@ -168,7 +168,7 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
     config.manageCheckBox("Autologin", gui.checkAutoLogin);
     config.manageCheckBox("SaveDesktop", gui.checkSaveDesktop);
     if (online) gui.checkSaveDesktop->setCheckState(Qt::Unchecked);
-    const char *oldHomeActions[] = {"Use", "Save", "Delete"};
+    static constexpr const char *oldHomeActions[] = {"Use", "Save", "Delete"};
     QRadioButton *oldHomeRadios[] = {gui.radioOldHomeUse, gui.radioOldHomeSave, gui.radioOldHomeDelete};
     config.manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
     config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);

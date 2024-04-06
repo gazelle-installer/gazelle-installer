@@ -1686,7 +1686,7 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
 {
     assert(orientation == Qt::Horizontal);
     if (role == Qt::DisplayRole) {
-        static const char *text[TREE_COLUMNS] = {
+        static constexpr const char *text[TREE_COLUMNS] = {
             QT_TR_NOOP("Device"),   // COL_DEVICE
             QT_TR_NOOP("Size"),     // COL_SIZE
             QT_TR_NOOP("Active"),   // COL_FLAG_ACTIVE
