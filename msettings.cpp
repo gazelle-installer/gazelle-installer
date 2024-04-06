@@ -290,7 +290,8 @@ bool MIni::lessCaseInsensitive(const QString &a, const QString &b) noexcept
     return (a.compare(b, Qt::CaseInsensitive) < 0);
 }
 
-void MSettings::addFilter(const QString &key)
+/* Print to console and debug log. */
+void MSettings::addFilter(const QString &key) noexcept
 {
     filter.append(cursection + '/' + curgroup + '/' + key);
 }

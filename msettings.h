@@ -74,7 +74,7 @@ class MSettings: public MIni
 public:
     bool bad;
     MSettings(const QString &filename, bool readOnly = false) noexcept;
-    void addFilter(const QString &key);
+    void addFilter(const QString &key) noexcept;
     void dumpDebug() const noexcept;
     void setSave(bool save) noexcept;
     bool isSave() const noexcept { return saving; }
