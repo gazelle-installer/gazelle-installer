@@ -149,7 +149,7 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
     config.manageComboBox("Locale", gui.comboLocale, true);
     config.manageCheckBox("LocalClock", gui.checkLocalClock);
     static constexpr const char *clockChoices[] = {"24", "12"};
-    QRadioButton *clockRadios[] = {gui.radioClock24, gui.radioClock12};
+    QRadioButton *const clockRadios[] = {gui.radioClock24, gui.radioClock12};
     config.manageRadios("ClockHours", 2, clockChoices, clockRadios);
     if (save) {
         config.setValue("Timezone", gui.comboTimeZone->currentData().toString());
@@ -169,7 +169,7 @@ void Oobe::manageConfig(MSettings &config, bool save) noexcept
     config.manageCheckBox("SaveDesktop", gui.checkSaveDesktop);
     if (online) gui.checkSaveDesktop->setCheckState(Qt::Unchecked);
     static constexpr const char *oldHomeActions[] = {"Use", "Save", "Delete"};
-    QRadioButton *oldHomeRadios[] = {gui.radioOldHomeUse, gui.radioOldHomeSave, gui.radioOldHomeDelete};
+    QRadioButton *const oldHomeRadios[] = {gui.radioOldHomeUse, gui.radioOldHomeSave, gui.radioOldHomeDelete};
     config.manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
     config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);
     if (!save || oem) { // Transfer default passwords under OEM mode.
