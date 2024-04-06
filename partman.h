@@ -92,7 +92,7 @@ public:
         const class MIni &appConf, const QCommandLineParser &appArgs);
     ~PartMan();
     void scan(Device *drvstart = nullptr);
-    bool manageConfig(class MSettings &config, bool save) noexcept;
+    bool manageConfig(class MSettings &config) noexcept;
     bool composeValidate(bool automatic) noexcept;
     bool checkTargetDrivesOK() const;
     Device *selectedDriveAuto() noexcept;

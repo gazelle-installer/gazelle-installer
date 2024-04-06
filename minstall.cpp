@@ -456,11 +456,11 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
 {
     if (mode == CONFIG_SAVE) {
         configFile = pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf";
+        QFile::rename(configFile, configFile+".bak");
     }
-    MSettings config(configFile, mode!=CONFIG_SAVE);
+    MSettings config(configFile, mode==CONFIG_SAVE);
 
     if (mode == CONFIG_SAVE) {
-        config.setSave(true);
         config.setString("Version", VERSION);
         config.setString("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
@@ -475,7 +475,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         // Storage and partition management
         if(targetIsDrive || mode!=CONFIG_SAVE) autopart->manageConfig(config);
         if (!targetIsDrive || mode!=CONFIG_SAVE) {
-            partman->manageConfig(config, mode==CONFIG_SAVE);
+            partman->manageConfig(config);
         }
 
         // Encryption
@@ -493,10 +493,10 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         if (mode == CONFIG_SAVE || mode == CONFIG_LOAD2) {
             swapman->manageConfig(config, advanced);
             if (advanced) bootman->manageConfig(config);
-            oobe->manageConfig(config, mode==CONFIG_SAVE);
+            oobe->manageConfig(config);
         }
     } else if (mode == CONFIG_LOAD2) {
-        oobe->manageConfig(config, false);
+        oobe->manageConfig(config);
     }
 
     if (config.bad) {

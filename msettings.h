@@ -73,10 +73,9 @@ class MSettings: public MIni
     QStringList filter;
 public:
     bool bad;
-    MSettings(const QString &filename, bool readOnly = false) noexcept;
+    MSettings(const QString &filename, bool saveMode) noexcept;
     void addFilter(const QString &key) noexcept;
     void dumpDebug() const noexcept;
-    void setSave(bool save) noexcept;
     bool isSave() const noexcept { return saving; }
     void setGroupWidget(class QWidget *widget) noexcept;
     void setSection(const QString &name, class QWidget *widget) noexcept;

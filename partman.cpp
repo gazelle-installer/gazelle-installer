@@ -277,8 +277,9 @@ void PartMan::scanVirtualDevices(bool rescan)
     gui.treePartitions->expand(index(virtdevs));
 }
 
-bool PartMan::manageConfig(MSettings &config, bool save) noexcept
+bool PartMan::manageConfig(MSettings &config) noexcept
 {
+    const bool save = config.isSave();
     config.setSection("Storage", gui.treePartitions);
     for (Device *drive : root->children) {
         // Check if the drive is to be cleared and formatted.

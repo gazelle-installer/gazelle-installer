@@ -322,15 +322,10 @@ void MSettings::dumpDebug() const noexcept
 
 /* Widget management */
 
-MSettings::MSettings(const QString &filename, bool readOnly) noexcept
-    : MIni(filename, readOnly)
+MSettings::MSettings(const QString &filename, bool saveMode) noexcept
+    : MIni(filename, !saveMode), saving(saveMode)
 {
     bad = !isOK();
-}
-
-void MSettings::setSave(bool save) noexcept
-{
-    saving = save;
 }
 
 void MSettings::setGroupWidget(QWidget *widget) noexcept

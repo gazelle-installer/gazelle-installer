@@ -117,8 +117,9 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     buildServiceList(appConf);
 }
 
-void Oobe::manageConfig(MSettings &config, bool save) noexcept
+void Oobe::manageConfig(MSettings &config) noexcept
 {
+    const bool save = config.isSave();
     // Services page
     config.setSection("Services", gui.pageServices);
     QTreeWidgetItemIterator it(gui.treeServices);

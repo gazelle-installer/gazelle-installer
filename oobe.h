@@ -51,7 +51,7 @@ public:
     bool haveSnapshotUserAccounts = false;
     Oobe(class MProcess &mproc, Ui::MeInstall &ui, QWidget *parent,
         class MIni &appConf, bool oem, bool modeOOBE);
-    void manageConfig(class MSettings &config, bool save) noexcept;
+    void manageConfig(class MSettings &config) noexcept;
     void enable();
     void process();
     void stashServices(bool save) noexcept;
