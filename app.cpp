@@ -73,11 +73,7 @@ int main(int argc, char *argv[])
     a.setApplicationVersion(VERSION);
     a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
 
-#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
     const QString &transpath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
-#else
-    const QString &transpath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
-#endif
     QTranslator qtTran;
     if (qtTran.load(QLocale::system(), "qt", "_", transpath)) {
         a.installTranslator(&qtTran);

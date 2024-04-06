@@ -88,7 +88,7 @@ void CheckMD5::check()
             while (checking && !file.atEnd()) {
                 const qint64 rlen = file.read(buf.get(), bufsize);
                 if(rlen < 0) break; // I/O error
-                hash.addData(buf.get(), rlen);
+                hash.addData({buf.get(), rlen});
                 bprog += rlen;
                 labelSplash->setText(nsplash.arg((bprog * 100) / btotal));
                 qApp->processEvents();
