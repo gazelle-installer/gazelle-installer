@@ -42,9 +42,9 @@ public:
     void manageLineEdit(const QString &key, class QLineEdit *lineedit) noexcept;
     void manageSpinBox(const QString &key, class QSpinBox *spinbox) noexcept;
     int manageEnum(const QString &key, const int nchoices,
-            const char *choices[], const int curval) noexcept;
+            const char *const choices[], const int curval) noexcept;
     void manageRadios(const QString &key, const int nchoices,
-            const char *choices[], class QRadioButton *radios[]) noexcept;
+            const char *const choices[], class QRadioButton *const radios[]) noexcept;
 };
 
 #endif // MSETTINGS_H

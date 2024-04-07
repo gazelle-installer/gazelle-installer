@@ -471,8 +471,8 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
         // Automatic or Manual partitioning
         config.setGroupWidget(gui.pageDisk);
-        const char *diskChoices[] = {"Drive", "Partitions"};
-        QRadioButton *diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
+        static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
+        QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
         config.manageRadios("Storage/Target", 2, diskChoices, diskRadios);
         const bool targetIsDrive = gui.radioEntireDisk->isChecked();
 
@@ -991,12 +991,12 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
         painter.translate(lW / 2, lH / 2);
         painter.scale(lW / 200.0, lH / 200.0);
         // Draw the load indicator on the splash screen.
-        constexpr int blades = 12;
-        constexpr qreal angle = 360.0 / blades;
+        static constexpr int blades = 12;
+        static constexpr qreal angle = 360.0 / blades;
         painter.rotate(angle * throbPos);
         float hue = 1.0, alpha = 0.18;
         const float huestep = std::min(throbPos, 60) / (60.0 * blades);
-        constexpr float alphastep = 0.18 / blades;
+        static constexpr float alphastep = 0.18 / blades;
         QPen pen;
         pen.setWidth(3);
         pen.setJoinStyle(Qt::MiterJoin);
@@ -1006,7 +1006,7 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
             painter.setBrush(color);
             pen.setColor(color.darker());
             painter.setPen(pen);
-            constexpr QPoint blade[] = {{-15, -6}, {15, -75}, {0, -93}, {-15, -75}};
+            static constexpr QPoint blade[] = {{-15, -6}, {15, -75}, {0, -93}, {-15, -75}};
             painter.drawConvexPolygon(blade, 4);
             painter.rotate(angle);
         }
@@ -1122,7 +1122,7 @@ void MInstall::progressUpdate(int value) noexcept
         } else if (iLastProgress < 0) {
             iLastProgress = value; // First invocation since progress page last shown.
         }
-        constexpr int tipcount = 5;
+        static constexpr int tipcount = 5;
         newtip = tipcount;
         if (ixTipStart < tipcount) {
             int imax = (gui.progInstall->maximum() - iLastProgress) / (tipcount - ixTipStart);

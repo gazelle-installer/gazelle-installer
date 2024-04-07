@@ -388,7 +388,13 @@ bool PartMan::manageConfig(MSettings &config, bool save) noexcept
 void PartMan::resizeColumnsToFit() noexcept
 {
     for (int ixi = TREE_COLUMNS - 1; ixi >= 0; --ixi) {
-        gui.treePartitions->resizeColumnToContents(ixi);
+        if (!gui.treePartitions->isColumnHidden(ixi)) {
+            gui.treePartitions->resizeColumnToContents(ixi);
+        } else {
+            gui.treePartitions->showColumn(ixi);
+            gui.treePartitions->resizeColumnToContents(ixi);
+            gui.treePartitions->hideColumn(ixi);
+        }
     }
 }
 
@@ -1680,21 +1686,21 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
 {
     assert(orientation == Qt::Horizontal);
     if (role == Qt::DisplayRole) {
-        switch (section)
-        {
-        case COL_DEVICE: return tr("Device"); break;
-        case COL_SIZE: return tr("Size"); break;
-        case COL_FLAG_ACTIVE: return tr("Active"); break;
-        case COL_FLAG_ESP: return "ESP"; break;
-        case COL_USEFOR: return tr("Use For"); break;
-        case COL_LABEL: return tr("Label"); break;
-        case COL_ENCRYPT: return tr("Encrypt"); break;
-        case COL_FORMAT: return tr("Format"); break;
-        case COL_CHECK: return tr("Check"); break;
-        case COL_OPTIONS: return tr("Options"); break;
-        case COL_DUMP: return tr("Dump"); break;
-        case COL_PASS: return tr("Pass"); break;
-        }
+        static constexpr const char *text[TREE_COLUMNS] = {
+            QT_TR_NOOP("Device"),   // COL_DEVICE
+            QT_TR_NOOP("Size"),     // COL_SIZE
+            QT_TR_NOOP("Active"),   // COL_FLAG_ACTIVE
+            QT_TR_NOOP("ESP"),      // COL_FLAG_ESP
+            QT_TR_NOOP("Use For"),  // COL_USEFOR
+            QT_TR_NOOP("Label"),    // COL_LABEL
+            QT_TR_NOOP("Encrypt"),  // COL_ENCRYPT
+            QT_TR_NOOP("Format"),   // COL_FORMAT
+            QT_TR_NOOP("Check"),    // COL_CHECK
+            QT_TR_NOOP("Options"),  // COL_OPTIONS
+            QT_TR_NOOP("Dump"),     // COL_DUMP
+            QT_TR_NOOP("Pass")      // COL_PASS
+        };
+        return tr(text[section]);
     } else if (role == Qt::ToolTipRole) {
         switch (section)
         {
@@ -1711,11 +1717,13 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
         case COL_DUMP: break;
         case COL_PASS: break;
         }
-    } else if (role == Qt::FontRole && (section == COL_FLAG_ACTIVE || section == COL_FLAG_ESP
-        || section == COL_ENCRYPT || section == COL_CHECK || section == COL_DUMP)) {
-        QFont smallFont;
-        smallFont.setPointSizeF(smallFont.pointSizeF() * 0.5);
-        return smallFont;
+    } else if (role == Qt::FontRole) {
+        QFont font;
+        if (colprops[section].checkbox) {
+            font.setPointSizeF(font.pointSizeF() * 0.5);
+        }
+        font.setItalic(colprops[section].advanced);
+        return font;
     }
     return QVariant();
 }
