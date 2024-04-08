@@ -80,7 +80,7 @@ bool MIni::load() noexcept
                 // Group
                 beginGroup(line.chopped(1).trimmed());
             } else {
-                return false; // Line starts with '=' or not invalid group starter.
+                return false; // Line starts with '=' or invalid group starter.
             }
         }
     }
