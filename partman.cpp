@@ -1418,9 +1418,13 @@ void PartMan::mountPartitions()
         opts.removeAll("defaults");
         opts.removeAll("atime");
         opts.removeAll("relatime");
+        if (it.second->finalFormat() == "ext4" && !opts.contains("noinit_itable")) {
+            opts.append("noinit_itable");
+        }
         if (!opts.contains("async")) opts.append("async");
         if (!opts.contains("noiversion")) opts.append("noiversion");
         if (!opts.contains("noatime")) opts.append("noatime");
+        if (!opts.contains("lazytime")) opts.append("lazytime");
         proc.exec("mount", {"--mkdir", "-o", opts.join(','), dev, point});
     }
 }
