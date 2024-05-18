@@ -1119,9 +1119,11 @@ void PartMan::preparePartitions()
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
         // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
         const long long length = (4*MB + (gran - 1)) / gran; // ceiling
+        sect.setExceptionMode(false);
         if (proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'")) {
             opts = "-fvz"; // Force zeroing under VirtualBox due to a bug where TRIM fails.
         }
+        sect.setExceptionMode(true);
         proc.exec("blkdiscard", {opts, "-l", QString::number(length*gran), drive->path});
         // Last 17KB = secondary partition table (for GPT disks).
         const long long offset = (drive->size - 4*MB) / gran; // floor
@@ -1231,9 +1233,12 @@ void PartMan::formatPartitions()
         if (volume->usefor == "FORMAT") proc.status(fmtstatus.arg(volume->name));
         else proc.status(fmtstatus.arg(volume->usefor));
         if (volume->usefor == "BIOS-GRUB") {
+        sect.setExceptionMode(false);
         if (proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'")) {
+            sect.setExceptionMode(true);
             proc.exec("blkdiscard", {"-fvz", dev}); // Force zeroing under VirtualBox due to a bug where TRIM fails.
         } else {
+            sect.setExceptionMode(true);
             proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev});
         }
             const NameParts &devsplit = splitName(dev);
