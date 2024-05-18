@@ -224,7 +224,7 @@ void Base::install()
     sect.setRoot(nullptr);
 
     // Disable VirtualBox Guest Additions if not running in VirtualBox.
-    if(!proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'")) {
+    if(!proc.detectVirtualBox()) {
         proc.shell("mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1");
         proc.shell("mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1");
         proc.shell("mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");

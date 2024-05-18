@@ -341,6 +341,17 @@ int MProcess::detectEFI(bool noTest)
     }
     return testEFI;
 }
+bool MProcess::detectVirtualBox()
+{
+    if (testVirtualBox < 0) {
+        Section sect(*this);
+        sect.setExceptionMode(false);
+        const bool rc = shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'");
+        qDebug() << "Detect VirtualBox:" << rc;
+        testVirtualBox = rc ? 1 : 0;
+    }
+    return (testVirtualBox != 0);
+}
 
 // Local execution environment
 
