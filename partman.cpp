@@ -1116,6 +1116,9 @@ void PartMan::preparePartitions()
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
         const int gran = std::max(drive->discgran, drive->physec);
         const char *opts = drive->discgran ? "-fv" : "-fvz";
+        if (proc.detectVirtualBox()) {
+            opts = "-fvz"; // VirtualBox incorrectly reports TRIM support.
+        }
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
         // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
         const long long length = (4*MB + (gran - 1)) / gran; // ceiling
@@ -1228,7 +1231,11 @@ void PartMan::formatPartitions()
         if (volume->usefor == "FORMAT") proc.status(fmtstatus.arg(volume->name));
         else proc.status(fmtstatus.arg(volume->usefor));
         if (volume->usefor == "BIOS-GRUB") {
-            proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev});
+            if (proc.detectVirtualBox()) {
+                proc.exec("blkdiscard", {"-fvz", dev}); // VirtualBox incorrectly reports TRIM support.
+            } else {
+                proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev});
+            }
             const NameParts &devsplit = splitName(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
         } else if (volume->usefor == "SWAP") {
@@ -1418,9 +1425,13 @@ void PartMan::mountPartitions()
         opts.removeAll("defaults");
         opts.removeAll("atime");
         opts.removeAll("relatime");
+        if (it.second->finalFormat() == "ext4" && !opts.contains("noinit_itable")) {
+            opts.append("noinit_itable");
+        }
         if (!opts.contains("async")) opts.append("async");
         if (!opts.contains("noiversion")) opts.append("noiversion");
         if (!opts.contains("noatime")) opts.append("noatime");
+        if (!opts.contains("lazytime")) opts.append("lazytime");
         proc.exec("mount", {"--mkdir", "-o", opts.join(','), dev, point});
     }
 }

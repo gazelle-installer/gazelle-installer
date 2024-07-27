@@ -65,6 +65,7 @@ public:
     // Operating system
     const QString &detectArch();
     int detectEFI(bool noTest = false);
+    bool detectVirtualBox();
 
 private:
     friend class ExceptionInfo;
@@ -81,6 +82,7 @@ private:
     // System detection results
     QString testArch;
     int testEFI = -1;
+    int testVirtualBox = -1;
     // Common execution core
     bool exec(const QString &program, const QStringList &arguments,
         const QByteArray *input, bool needRead, class QListWidgetItem *logEntry);
