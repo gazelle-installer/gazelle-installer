@@ -88,9 +88,9 @@ public:
     void managePassEdit(const QString &key, class QLineEdit *master, class QLineEdit *slave, bool force = false) noexcept;
     void manageSpinBox(const QString &key, class QSpinBox *spinbox) noexcept;
     int manageEnum(const QString &key, const int nchoices,
-            const char *choices[], const int curval) noexcept;
+            const char *const choices[], const int curval) noexcept;
     void manageRadios(const QString &key, const int nchoices,
-            const char *choices[], class QRadioButton *radios[]) noexcept;
+            const char *const choices[], class QRadioButton *const radios[]) noexcept;
 private:
     bool saving = false;
     class QWidget *wgroup = nullptr;

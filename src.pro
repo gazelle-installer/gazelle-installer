@@ -3,6 +3,7 @@ DEFINES += QT_DISABLE_DEPRECATED_UP_TO=0x060400
 
 TEMPLATE = app
 TARGET = minstall
+VERSION = 6.0-ALPHA
 CONFIG += debug_and_release warn_on strict_c++ c++20
 CONFIG(release, debug|release) {
     DEFINES += NDEBUG
@@ -10,6 +11,8 @@ CONFIG(release, debug|release) {
     QMAKE_LFLAGS += -flto=auto
 }
 TRANSLATIONS += translations/gazelle-installer_en.ts
+
+DEFINES += CODEBASE_VERSION=\\\"$${VERSION}\\\"
 
 FORMS += meinstall.ui
 HEADERS += \

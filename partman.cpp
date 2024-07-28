@@ -388,7 +388,13 @@ bool PartMan::manageConfig(MSettings &config) noexcept
 void PartMan::resizeColumnsToFit() noexcept
 {
     for (int ixi = TREE_COLUMNS - 1; ixi >= 0; --ixi) {
-        gui.treePartitions->resizeColumnToContents(ixi);
+        if (!gui.treePartitions->isColumnHidden(ixi)) {
+            gui.treePartitions->resizeColumnToContents(ixi);
+        } else {
+            gui.treePartitions->showColumn(ixi);
+            gui.treePartitions->resizeColumnToContents(ixi);
+            gui.treePartitions->hideColumn(ixi);
+        }
     }
 }
 
@@ -1110,6 +1116,9 @@ void PartMan::preparePartitions()
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
         const int gran = std::max(drive->discgran, drive->physec);
         const char *opts = drive->discgran ? "-fv" : "-fvz";
+        if (proc.detectVirtualBox()) {
+            opts = "-fvz"; // VirtualBox incorrectly reports TRIM support.
+        }
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
         // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
         const long long length = (4*MB + (gran - 1)) / gran; // ceiling
@@ -1222,7 +1231,11 @@ void PartMan::formatPartitions()
         if (volume->usefor == "FORMAT") proc.status(fmtstatus.arg(volume->name));
         else proc.status(fmtstatus.arg(volume->usefor));
         if (volume->usefor == "BIOS-GRUB") {
-            proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev});
+            if (proc.detectVirtualBox()) {
+                proc.exec("blkdiscard", {"-fvz", dev}); // VirtualBox incorrectly reports TRIM support.
+            } else {
+                proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev});
+            }
             const NameParts &devsplit = splitName(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
         } else if (volume->usefor == "SWAP") {
@@ -1412,9 +1425,13 @@ void PartMan::mountPartitions()
         opts.removeAll("defaults");
         opts.removeAll("atime");
         opts.removeAll("relatime");
+        if (it.second->finalFormat() == "ext4" && !opts.contains("noinit_itable")) {
+            opts.append("noinit_itable");
+        }
         if (!opts.contains("async")) opts.append("async");
         if (!opts.contains("noiversion")) opts.append("noiversion");
         if (!opts.contains("noatime")) opts.append("noatime");
+        if (!opts.contains("lazytime")) opts.append("lazytime");
         proc.exec("mount", {"--mkdir", "-o", opts.join(','), dev, point});
     }
 }
@@ -1680,21 +1697,21 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
 {
     assert(orientation == Qt::Horizontal);
     if (role == Qt::DisplayRole) {
-        switch (section)
-        {
-        case COL_DEVICE: return tr("Device"); break;
-        case COL_SIZE: return tr("Size"); break;
-        case COL_FLAG_ACTIVE: return tr("Active"); break;
-        case COL_FLAG_ESP: return "ESP"; break;
-        case COL_USEFOR: return tr("Use For"); break;
-        case COL_LABEL: return tr("Label"); break;
-        case COL_ENCRYPT: return tr("Encrypt"); break;
-        case COL_FORMAT: return tr("Format"); break;
-        case COL_CHECK: return tr("Check"); break;
-        case COL_OPTIONS: return tr("Options"); break;
-        case COL_DUMP: return tr("Dump"); break;
-        case COL_PASS: return tr("Pass"); break;
-        }
+        static constexpr const char *text[TREE_COLUMNS] = {
+            QT_TR_NOOP("Device"),   // COL_DEVICE
+            QT_TR_NOOP("Size"),     // COL_SIZE
+            QT_TR_NOOP("Active"),   // COL_FLAG_ACTIVE
+            QT_TR_NOOP("ESP"),      // COL_FLAG_ESP
+            QT_TR_NOOP("Use For"),  // COL_USEFOR
+            QT_TR_NOOP("Label"),    // COL_LABEL
+            QT_TR_NOOP("Encrypt"),  // COL_ENCRYPT
+            QT_TR_NOOP("Format"),   // COL_FORMAT
+            QT_TR_NOOP("Check"),    // COL_CHECK
+            QT_TR_NOOP("Options"),  // COL_OPTIONS
+            QT_TR_NOOP("Dump"),     // COL_DUMP
+            QT_TR_NOOP("Pass")      // COL_PASS
+        };
+        return tr(text[section]);
     } else if (role == Qt::ToolTipRole) {
         switch (section)
         {
@@ -1711,11 +1728,13 @@ QVariant PartMan::headerData(int section, [[maybe_unused]] Qt::Orientation orien
         case COL_DUMP: break;
         case COL_PASS: break;
         }
-    } else if (role == Qt::FontRole && (section == COL_FLAG_ACTIVE || section == COL_FLAG_ESP
-        || section == COL_ENCRYPT || section == COL_CHECK || section == COL_DUMP)) {
-        QFont smallFont;
-        smallFont.setPointSizeF(smallFont.pointSizeF() * 0.5);
-        return smallFont;
+    } else if (role == Qt::FontRole) {
+        QFont font;
+        if (colprops[section].checkbox) {
+            font.setPointSizeF(font.pointSizeF() * 0.5);
+        }
+        font.setItalic(colprops[section].advanced);
+        return font;
     }
     return QVariant();
 }
