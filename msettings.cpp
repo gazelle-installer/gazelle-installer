@@ -101,7 +101,7 @@ bool MIni::sync() noexcept
             file.write("]\n");
         }
 
-        int prevdepth = 0;
+        int prevgnest = -1;
         QString prevgpath;
         for (const auto &group : section.second) {
             const int depth = group.first.isEmpty() ? 0 : (1 + group.first.count('/'));
@@ -114,10 +114,10 @@ bool MIni::sync() noexcept
                     break;
                 }
             }
-            const std::vector<char> tabs(std::max(depth, prevdepth), '\t');
+            const std::vector<char> tabs(std::max(depth, prevgnest), '\t');
             // Close braces of previous groups.
-            for (int ixi = prevdepth; ixi > pivot; --ixi) {
-                file.write(tabs.data(), ixi-1);
+            for (int ixi = prevgnest; ixi >= pivot; --ixi) {
+                file.write(tabs.data(), ixi);
                 file.write("}\n");
             }
             // Open braces of new groups.
@@ -135,14 +135,13 @@ bool MIni::sync() noexcept
                 file.write("\n");
             }
             prevgpath = gpath;
-            prevdepth = depth;
+            prevgnest = depth - 1;
         }
 
         // Close open groups before moving on to the next section (or the end).
-        if (prevdepth > 0) {
-            --prevdepth;
-            const std::vector<char> tabs(prevdepth, '\t');
-            for (int ixi = prevdepth; ixi >= 0; --ixi) {
+        if (prevgnest >= 0) {
+            const std::vector<char> tabs(prevgnest, '\t');
+            for (int ixi = prevgnest; ixi >= 0; --ixi) {
                 file.write(tabs.data(), ixi);
                 file.write("}\n");
             }
