@@ -461,7 +461,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
     MSettings config(configFile, mode==CONFIG_SAVE);
 
     if (mode == CONFIG_SAVE) {
-        config.setString("Version", VERSION);
+        config.setString("Version", CODEBASE_VERSION);
         config.setString("Product", PROJECTNAME + " " + PROJECTVERSION);
     }
     if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
