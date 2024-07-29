@@ -40,7 +40,7 @@ public:
     void clear() noexcept;
     QString fileName() const noexcept { return file.fileName(); }
     bool load() noexcept;
-    bool sync() noexcept;
+    bool save() noexcept;
     bool closeAndCopyTo(const QString &filename) noexcept;
     void setSection(const QString &name = QString()) noexcept;
     QString section() const noexcept { return cursection; }

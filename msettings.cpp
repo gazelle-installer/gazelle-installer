@@ -39,7 +39,7 @@ MIni::MIni(const QString &filename, bool readOnly) noexcept
 }
 MIni::~MIni() noexcept
 {
-    sync();
+    save();
 }
 
 void MIni::clear() noexcept
@@ -87,7 +87,7 @@ bool MIni::load() noexcept
     cursection.clear();
     return curgroup.isEmpty(); // All groups must be closed at this point.
 }
-bool MIni::sync() noexcept
+bool MIni::save() noexcept
 {
     if (!(file.openMode() & QFile::WriteOnly)) {
         return false;
@@ -151,7 +151,7 @@ bool MIni::sync() noexcept
 }
 bool MIni::closeAndCopyTo(const QString &filename) noexcept
 {
-    sync();
+    save();
     QFile::remove(filename);
     return file.copy(filename);
 }
