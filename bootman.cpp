@@ -185,7 +185,7 @@ void BootMan::install(const QStringList &cmdextra)
 
         {
             // Add the codes from /etc/default/grub to non-live boot codes.
-            const MIni grubSettings("/etc/default/grub", true);
+            const MIni grubSettings("/etc/default/grub", MIni::ReadOnly);
             const QString &grubDefault = grubSettings.getString("GRUB_CMDLINE_LINUX_DEFAULT");
             qDebug() << "grubDefault is " << grubDefault;
             finalcmdline.append(grubDefault.split(" "));
@@ -204,7 +204,7 @@ void BootMan::install(const QStringList &cmdextra)
         {
             // Add built-in config_cmdline.
             proc.exec("uname", {"-r"});
-            const MIni bootconf("/boot/config-" + proc.readOut(true).trimmed(), true);
+            const MIni bootconf("/boot/config-" + proc.readOut(true).trimmed(), MIni::ReadOnly);
             const QStringList confcmdline = bootconf.getString("CONFIG_CMDLINE").split(" ");
             for (const QString &confparameter : confcmdline) {
                 finalcmdline.removeAll(confparameter);

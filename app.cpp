@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    MIni appConf("/usr/share/gazelle-installer-data/installer.conf", true);
+    MIni appConf("/usr/share/gazelle-installer-data/installer.conf", MIni::ReadOnly);
     a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.getString("PROJECT_NAME")));
 
     // The lock is released when this object is destroyed.

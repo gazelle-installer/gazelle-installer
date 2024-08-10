@@ -237,7 +237,7 @@ void Oobe::buildServiceList(MIni &appconf) noexcept
     gui.treeServices->header()->setMinimumSectionSize(150);
     gui.treeServices->header()->resizeSection(0,150);
 
-    MIni services_desc("/usr/share/gazelle-installer-data/services.list", true);
+    MIni services_desc("/usr/share/gazelle-installer-data/services.list", MIni::ReadOnly);
 
     gui.textComputerName->setText(appconf.getString("DEFAULT_HOSTNAME"));
     appconf.setSection("SERVICES");
@@ -644,7 +644,7 @@ void Oobe::setUserInfo()
     sect.setExceptionMode(QT_TR_NOOP("Failed to set ownership or permissions of user directory."));
     proc.exec("chown", {"-R", "demo:demo", dpath});
     // Set permissions according to /etc/adduser.conf
-    MIni addusercfg("/etc/adduser.conf", true);
+    const MIni addusercfg("/etc/adduser.conf", MIni::ReadOnly);
     mode_t mode = addusercfg.getString("DIR_MODE", "0700").toUInt(&ok, 8);
     if (chmod(dpath.toUtf8().constData(), mode) != 0) throw sect.failMessage();
 

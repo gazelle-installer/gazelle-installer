@@ -499,7 +499,7 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         oobe->manageConfig(config);
     }
 
-    if (config.bad) {
+    if (!config.good) {
         QMessageBox::critical(this, windowTitle(),
             tr("Invalid settings found in configuration file (%1)."
                " Please review marked fields as you encounter them.").arg(configFile));
@@ -1169,7 +1169,7 @@ void MInstall::progressUpdate(int value) noexcept
 
 void MInstall::setupkeyboardbutton() noexcept
 {
-    const MIni ini("/etc/default/keyboard", true);
+    const MIni ini("/etc/default/keyboard", MIni::ReadOnly);
     gui.labelKeyboardModel->setText(ini.getString("XKBMODEL"));
     gui.labelKeyboardLayout->setText(ini.getString("XKBLAYOUT"));
     gui.labelKeyboardVariant->setText(ini.getString("XKBVARIANT"));

@@ -37,7 +37,7 @@ void CheckMD5::check()
     labelSplash->setText(nsplash.arg(0));
 
     checking = true;
-    MIni liveInfo("/live/config/initrd.out", true);
+    const MIni liveInfo("/live/config/initrd.out", MIni::ReadOnly);
     const QString &sqtoram = liveInfo.getString("TORAM_MP", "/live/to-ram")
         + '/' + liveInfo.getString("SQFILE_PATH", "antiX");
     const QString &sqfile = liveInfo.getString("SQFILE_NAME", "linuxfs");

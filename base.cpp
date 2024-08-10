@@ -71,7 +71,7 @@ Base::Base(MProcess &mproc, PartMan &pman, const MIni &appConf, const QCommandLi
     if (vspecBoot.preferred < 1*GB) vspecBoot.preferred = 1*GB;
 
     // Root space required.
-    MIni liveInfo("/live/config/initrd.out", true);
+    const MIni liveInfo("/live/config/initrd.out", MIni::ReadOnly);
     const QString &sqpath = '/' + liveInfo.getString("SQFILE_PATH", "antiX");
     const QString &sqtoram = liveInfo.getString("TORAM_MP", "/live/to-ram") + sqpath;
     const QString &sqloc = liveInfo.getString("SQFILE_DIR", "/live/boot-dev/antiX");
@@ -79,7 +79,7 @@ Base::Base(MProcess &mproc, PartMan &pman, const MIni &appConf, const QCommandLi
     QString infile = sqtoram + "/linuxfs.info";
     if (!QFile::exists(infile)) infile = sqloc + "/linuxfs.info";
     if (QFile::exists(infile)) {
-        const MIni squashInfo(infile, true);
+        const MIni squashInfo(infile, MIni::ReadOnly);
         vspecRoot.image = squashInfo.getString("UncompressedSizeKB").toFloat(&floatOK) * KB;
     }
     if (!floatOK) {

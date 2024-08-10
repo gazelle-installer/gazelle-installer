@@ -28,14 +28,17 @@
 
 #include "msettings.h"
 
-MIni::MIni(const QString &filename, bool readOnly) noexcept
+MIni::MIni(const QString &filename, OpenMode mode, bool *loadOK) noexcept
     : file(filename), sections(&MIni::lessCaseInsensitive)
 {
-    if (filename.isEmpty()) {
-        allOK = true;
-    } else if (file.open(QFile::Text | (readOnly ? QFile::ReadOnly : QFile::ReadWrite))) {
-        allOK = load();
+    bool ok = false;
+    if (!filename.isEmpty()) {
+        ok = file.open(QFile::Text | static_cast<QFile::OpenMode>(mode));
+        if (ok && (mode & OpenMode::ReadOnly)) {
+            ok = load();
+        }
     }
+    if (loadOK) *loadOK = ok;
 }
 MIni::~MIni() noexcept
 {
@@ -322,9 +325,11 @@ void MSettings::dumpDebug() const noexcept
 /* Widget management */
 
 MSettings::MSettings(const QString &filename, bool saveMode) noexcept
-    : MIni(filename, !saveMode), saving(saveMode)
+    : MIni(filename, saveMode ? MIni::WriteOnly : MIni::ReadOnly, &good), saving(saveMode)
 {
-    bad = !isOK();
+    if (filename.isEmpty()) {
+        good = true; // File-less configuration buffer.
+    }
 }
 
 void MSettings::setGroupWidget(QWidget *widget) noexcept
@@ -345,7 +350,7 @@ void MSettings::markBadWidget(QWidget *widget) noexcept
                               "QRadioButton { border-style: dotted; }");
     }
     if (wgroup) wgroup->setProperty("BAD", true);
-    bad = true;
+    good = false;
 }
 bool MSettings::isBadWidget(QWidget *widget) noexcept
 {

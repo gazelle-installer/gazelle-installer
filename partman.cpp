@@ -89,7 +89,7 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const MIni &appConf, const 
     }
 
     // UUID of the device that the live system is booted from.
-    MIni livecfg("/live/config/initrd.out", true);
+    const MIni livecfg("/live/config/initrd.out", MIni::ReadOnly);
     bootUUID = livecfg.getString("BOOT_UUID");
 }
 PartMan::~PartMan()

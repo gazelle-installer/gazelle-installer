@@ -32,11 +32,17 @@ class MIni
     typedef std::map<QString, SectionMap, decltype(&lessCaseInsensitive)> SettingsMap;
     SettingsMap sections;
     QString cursection, curgroup;
-    bool allOK = false;
 public:
-    MIni(const QString &filename, bool readOnly = false) noexcept;
+    enum OpenMode {
+        NotOpen = QIODeviceBase::NotOpen, // 0x0000
+        ReadOnly = QIODeviceBase::ReadOnly, // 0x0001
+        WriteOnly = QIODeviceBase::WriteOnly, // 0x0002
+        ReadWrite = QIODeviceBase::ReadWrite, // 0x0003 (ReadOnly | WriteOnly)
+        NewOnly = QIODeviceBase::NewOnly, // 0x0040
+        ExistingOnly = QIODeviceBase::ExistingOnly // 0x0080
+    };
+    MIni(const QString &filename, OpenMode mode = OpenMode::ReadWrite, bool *loadOK = nullptr) noexcept;
     ~MIni() noexcept;
-    bool isOK() noexcept { return allOK; }
     void clear() noexcept;
     QString fileName() const noexcept { return file.fileName(); }
     bool load() noexcept;
@@ -72,7 +78,7 @@ class MSettings: public MIni
 {
     QStringList filter;
 public:
-    bool bad;
+    bool good;
     MSettings(const QString &filename, bool saveMode) noexcept;
     void addFilter(const QString &key) noexcept;
     void dumpDebug() const noexcept;
