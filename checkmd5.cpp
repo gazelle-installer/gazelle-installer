@@ -16,7 +16,13 @@
  *
  * This file is part of the gazelle-installer.
 \***************************************************************************/
+
+#define _FILE_OFFSET_BITS 64
+#define _DEFAULT_SOURCE
 #include <vector>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include <QFileInfo>
 #include <QCryptographicHash>
 #include <QDirIterator>
@@ -44,12 +50,14 @@ void CheckMD5::check()
     const QString &path = QFile::exists(sqtoram+'/'+sqfile)
         ? sqtoram : liveInfo.value("SQFILE_DIR", "/live/boot-dev/antiX").toString();
 
-    qint64 btotal = 0;
-    struct FileHash {
+    off_t btotal = 0;
+    struct HashTarget {
         QString path;
         QByteArray hash;
+        off_t size;
+        blksize_t blksize;
     };
-    std::vector<FileHash> hashes;
+    std::vector<HashTarget> targets;
     static const char *failmsg = QT_TR_NOOP("The installation media is corrupt.");
     // Obtain a list of MD5 hashes and their files.
     QDirIterator it(path, {"*.md5"}, QDir::Files);
@@ -57,47 +65,64 @@ void CheckMD5::check()
     if (!QFile::exists("/live/config/did-toram") || QFile::exists("/live/config/toram-all")) {
         missing << "vmlinuz" << "initrd.gz";
     }
+    size_t bufsize = 0;
     while (it.hasNext()) {
         QFile file(it.next());
         if (!file.open(QFile::ReadOnly | QFile::Text)) throw failmsg;
         while (!file.atEnd()) {
             QString line(file.readLine().trimmed());
             const QString &fname = line.section(' ', 1, 1, QString::SectionSkipEmpty);
+            const QString &fpath = it.path() + '/' + fname;
             missing.removeOne(fname);
-            FileHash sfhash = {
-                .path = it.path() + '/' + fname,
-                .hash = QByteArray::fromHex(line.section(' ', 0, 0, QString::SectionSkipEmpty).toUtf8())
-            };
-            hashes.push_back(sfhash);
-            btotal += QFileInfo(sfhash.path).size();
+            struct stat sb;
+            if (stat(fpath.toUtf8().constData(), &sb) == 0) {
+                HashTarget target = {
+                    .path = fpath,
+                    .hash = QByteArray::fromHex(line.section(' ', 0, 0, QString::SectionSkipEmpty).toUtf8()),
+                    .size = sb.st_size,
+                    .blksize = sb.st_blksize
+                };
+                bufsize = std::max<size_t>(bufsize, sb.st_blksize);
+                targets.push_back(target);
+                btotal += target.size;
+            } else {
+                throw failmsg;
+            }
             qApp->processEvents();
         }
     }
     if(!missing.isEmpty()) throw failmsg;
+
     // Check the MD5 hash of each file.
-    const size_t bufsize = 65536;
     std::unique_ptr<char[]> buf(new char[bufsize]);
     qint64 bprog = 0;
-    for(const auto &fh : hashes) {
-        auto logEntry = proc.log("Check MD5: " + fh.path, MProcess::LOG_EXEC);
-        QFile file(fh.path);
+    for(const auto &target : targets) {
+        auto logEntry = proc.log("Check MD5: " + target.path, MProcess::LOG_EXEC);
+        const int fd = open(target.path.toUtf8().constData(), O_RDONLY);
         MProcess::Status status = MProcess::STATUS_OK;
-        if (!file.open(QFile::ReadOnly)) status = MProcess::STATUS_CRITICAL;
-        else {
+        if (fd > 0) {
+            posix_fadvise(fd, 0, 0, POSIX_FADV_SEQUENTIAL);
             QCryptographicHash hash(QCryptographicHash::Md5);
-            while (checking && !file.atEnd()) {
-                const qint64 rlen = file.read(buf.get(), bufsize);
-                if(rlen < 0) break; // I/O error
+            for (off_t remain = target.size; remain>0 && checking;) {
+                const ssize_t rlen = read(fd, buf.get(), target.blksize);
+                if(rlen < 0) {
+                    status = MProcess::STATUS_CRITICAL;
+                    break;
+                }
                 hash.addData(buf.get(), rlen);
+                remain -= rlen;
                 bprog += rlen;
-                labelSplash->setText(nsplash.arg((bprog * 100) / btotal));
+                labelSplash->setText(nsplash.arg((100*bprog) / btotal));
                 qApp->processEvents();
             }
+            close(fd);
 
             if (!checking) status = MProcess::STATUS_ERROR; // Halted
-            else if (!file.atEnd() || hash.result() != fh.hash) {
+            else if (hash.result() != target.hash) {
                 status = MProcess::STATUS_CRITICAL; // I/O error or hash mismatch
             }
+        } else {
+            status = MProcess::STATUS_CRITICAL;
         }
         proc.log(logEntry, status);
         if (status == MProcess::STATUS_CRITICAL) throw failmsg;
