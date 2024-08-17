@@ -57,7 +57,9 @@ bool MIni::load() noexcept
         return false;
     }
     clear();
-    file.seek(0);
+    if (!file.seek(0)) {
+        return false;
+    }
     while (!file.atEnd()) {
         const QByteArray &line = file.readLine().trimmed();
         if (line.isEmpty() || line.startsWith(';') || line.startsWith('#')) {
@@ -95,13 +97,27 @@ bool MIni::save() noexcept
     if (!(file.openMode() & QFile::WriteOnly)) {
         return false;
     }
-    file.resize(0);
-    file.seek(0);
+    bool ok = (file.resize(0) && file.seek(0));
     for (const auto &section : sections) {
+        auto fileWriteC = [this, &ok](const char *data, qint64 size = -1) {
+            if (ok) {
+                if (size < 0) {
+                    size = strlen(data);
+                }
+                ok = (file.write(data, size) == size);
+            }
+        };
+        auto fileWriteQ = [this, &ok](const QString &data) {
+            if (ok) {
+                const QByteArray &bytes = data.toUtf8();
+                ok = (file.write(bytes) == bytes.size());
+            }
+        };
+
         if (!section.first.isEmpty()) {
-            file.write(file.pos()>0 ? "\n[" : "[");
-            file.write(section.first.toUtf8());
-            file.write("]\n");
+            fileWriteC(file.pos()>0 ? "\n[" : "[");
+            fileWriteQ(section.first);
+            fileWriteC("]\n");
         }
 
         int prevgnest = -1;
@@ -120,22 +136,22 @@ bool MIni::save() noexcept
             const std::vector<char> tabs(std::max(depth, prevgnest), '\t');
             // Close braces of previous groups.
             for (int ixi = prevgnest; ixi >= pivot; --ixi) {
-                file.write(tabs.data(), ixi);
-                file.write("}\n");
+                fileWriteC(tabs.data(), ixi);
+                fileWriteC("}\n");
             }
             // Open braces of new groups.
             for(int ixi = pivot; ixi < depth; ++ixi) {
-                file.write(tabs.data(), ixi);
-                file.write(gpath.section('/', ixi, ixi).toUtf8());
-                file.write(" {\n");
+                fileWriteC(tabs.data(), ixi);
+                fileWriteQ(gpath.section('/', ixi, ixi));
+                fileWriteC(" {\n");
             }
             // Settings
             for (const auto &setting : group.second) {
-                file.write(tabs.data(), depth);
-                file.write(setting.first.toUtf8());
-                file.write("=");
-                file.write(setting.second.toUtf8());
-                file.write("\n");
+                fileWriteC(tabs.data(), depth);
+                fileWriteQ(setting.first);
+                fileWriteC("=");
+                fileWriteQ(setting.second);
+                fileWriteC("\n");
             }
             prevgpath = gpath;
             prevgnest = depth - 1;
@@ -145,18 +161,20 @@ bool MIni::save() noexcept
         if (prevgnest >= 0) {
             const std::vector<char> tabs(prevgnest, '\t');
             for (int ixi = prevgnest; ixi >= 0; --ixi) {
-                file.write(tabs.data(), ixi);
-                file.write("}\n");
+                fileWriteC(tabs.data(), ixi);
+                fileWriteC("}\n");
             }
         }
     }
-    return true;
+    return ok;
 }
 bool MIni::closeAndCopyTo(const QString &filename) noexcept
 {
-    save();
+    if (file.openMode() & QFile::WriteOnly) {
+        if (!save()) return false;
+    }
     QFile::remove(filename);
-    return file.copy(filename);
+    return file.copy(filename); // QFile::copy() closes the file before copying.
 }
 
 void MIni::setSection(const QString &name) noexcept
