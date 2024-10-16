@@ -99,8 +99,8 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     PROJECTURL = appConf.value("PROJECT_URL").toString();
     PROJECTFORUM = appConf.value("FORUM_URL").toString();
 
-    //secret option:  hide save desktop changes checkbox, for pesky desktop environments
-    if (QFile("/usr/share/gazelle-installer-data/hide_save_desktop_changes_checkbox").exists()){
+    //hide save desktop changes checkbox, for pesky desktop environments
+    if (appConf.value("HIDE_SAVE_DESKTOP_CHANGES_CHECKBOX").toBool()){
         gui.checkSaveDesktop->hide();
     }
 

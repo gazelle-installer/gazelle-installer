@@ -126,8 +126,13 @@ int main(int argc, char *argv[])
         qDebug() << QObject::tr("Too many arguments. Please check the command format by running the program with --help");
         return EXIT_FAILURE;
     }
+    QString installer_conf_file = "/usr/share/gazelle-installer-data/installer.conf";
 
-    QSettings appConf("/usr/share/gazelle-installer-data/installer.conf", QSettings::NativeFormat);
+    if (QFile("/etc/gazelle-installer-data/installer.conf").exists()){
+        installer_conf_file = "/etc/gazelle-installer-data/installer.conf";
+    }
+
+    QSettings appConf(installer_conf_file, QSettings::NativeFormat);
     a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.value("PROJECT_NAME").toString()));
 
     // The lock is released when this object is destroyed.
