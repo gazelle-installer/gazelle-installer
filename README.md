@@ -21,6 +21,9 @@ Services tab supports sysVinit enable/disable actions and systemd systemctl enab
 
 See gazelle-installer-data services.list and installer.conf for instructions on configuration options.
 
+A secret option to hide the "Save Desktop Changes" checkbox on user setup is enabled by
+    "sudo touch /usr/share/gazelle-installer-data/hide_save_desktop_changes_checkbox"
+
 gazelle-installer is maintained by the MX Linux and antiX Linux Projects.
 
 Development Notes
