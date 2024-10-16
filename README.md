@@ -21,6 +21,8 @@ Services tab supports sysVinit enable/disable actions and systemd systemctl enab
 
 See gazelle-installer-data services.list and installer.conf for instructions on configuration options.
 
+installer.conf can also be read from /etc/gazelle-installer-data/installer.conf.  this file will take precdence.  all values must be in the file.
+
 gazelle-installer is maintained by the MX Linux and antiX Linux Projects.
 
 Development Notes
