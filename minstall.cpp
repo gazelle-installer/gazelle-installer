@@ -72,8 +72,9 @@ static const QRegularExpression configCensor("Encryption\\/Pass|User\\/.*Pass/i"
 
 MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
     : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile),
-    helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
+    helpBackdrop(appConf.value("HELP-BACKDROP-IMAGE", "/usr/share/gazelle-installer-data/backdrop-textbox.png").toString())
 {
+    setWindowIcon(QIcon(appConf.value("LOGO-IMAGE","/usr/share/gazelle-installer-data/logo.png").toString()));
     gui.setupUi(this);
     gui.listLog->addItem("Version " VERSION);
     proc.setupUI(gui.listLog, gui.progInstall);
@@ -375,7 +376,7 @@ void MInstall::processNextPhase() noexcept
             phase = PH_INSTALLING;
             proc.advance(11, partman->countPrepSteps());
             partman->prepStorage();
-            base->install();
+            base->install(appConf);
             if (gui.widgetStack->currentIndex() != Step::PROGRESS) {
                 gui.progInstall->setEnabled(false);
                 // Using proc.status() prepends the percentage to the text.
