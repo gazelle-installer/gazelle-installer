@@ -77,6 +77,7 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     setWindowIcon(QIcon(appConf.value("LOGO-IMAGE","/usr/share/gazelle-installer-data/logo.png").toString()));
     gui.setupUi(this);
     gui.listLog->addItem("Version " VERSION);
+    gui.tabsMain->setCurrentIndex(0);
     proc.setupUI(gui.listLog, gui.progInstall);
     setWindowFlags(Qt::Window); // for the close, min and max buttons
     gui.textHelp->installEventFilter(this);
