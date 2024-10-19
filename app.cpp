@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     if (defskin) a.setStyleSheet("QDialog { border: 2px ridge gray; }");
     a.setApplicationVersion(VERSION);
-    a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
+    //a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
     const QString &transpath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);

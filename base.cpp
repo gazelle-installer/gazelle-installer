@@ -148,7 +148,7 @@ bool Base::saveHomeBasic() noexcept
     return ok;
 }
 
-void Base::install()
+void Base::install(QSettings &appConf)
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     if (proc.halted()) return;
@@ -186,7 +186,9 @@ void Base::install()
     proc.mkpath("/mnt/antiX/opt", 0755);
     proc.mkpath("/mnt/antiX/tmp", 01777, true);
     // Fix live setup to install before creating a chroot environment.
-    proc.shell("/usr/sbin/live-to-installed /mnt/antiX");
+    // allow custom live-to-installed script
+    QString live_to_installed = appConf.value("LIVE_TO_INSTALLED_SCRIPT", "/usr/sbin/live-to-installed").toString();
+    proc.shell(live_to_installed + " /mnt/antiX");
     if (!partman.installTabs()) throw sect.failMessage();
     // Create a chroot environment.
     proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
