@@ -145,16 +145,16 @@ void MInstall::startup()
     connect(gui.pushClose, &QPushButton::clicked, this, &MInstall::close);
     connect(gui.progInstall, &QProgressBar::valueChanged, this, &MInstall::progressUpdate);
     // Lambda slots
-    connect(gui.pushBack, &QPushButton::clicked, this, [=]() noexcept {
+    connect(gui.pushBack, &QPushButton::clicked, this, [this]() noexcept {
         gotoPage(gui.widgetStack->currentIndex() - 1);
     });
-    connect(gui.pushNext, &QPushButton::clicked, this, [=]() noexcept {
+    connect(gui.pushNext, &QPushButton::clicked, this, [this]() noexcept {
         gotoPage(gui.widgetStack->currentIndex() + 1);
     });
-    connect(gui.pushAbort, &QPushButton::clicked, this, [=]() noexcept {
+    connect(gui.pushAbort, &QPushButton::clicked, this, [this]() noexcept {
         abortUI(true, false);
     });
-    connect(gui.pushServices, &QPushButton::clicked, this, [=]() noexcept {
+    connect(gui.pushServices, &QPushButton::clicked, this, [this]() noexcept {
         gotoPage(Step::SERVICES);
     });
 
@@ -264,7 +264,7 @@ void MInstall::splashSetThrobber(bool active) noexcept
         if (throbber) return;
         gui.labelSplash->installEventFilter(this);
         throbber = new QTimer(this);
-        connect(throbber, &QTimer::timeout, this, [=]() noexcept {
+        connect(throbber, &QTimer::timeout, this, [this]() noexcept {
             ++throbPos;
             gui.labelSplash->update();
         });

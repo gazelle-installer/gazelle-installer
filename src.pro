@@ -1,11 +1,10 @@
 QT       += core gui widgets
-DEFINES += QT_DEPRECATED_WARNINGS
-DEFINES += QT_DISABLE_DEPRECATED_UP_TO=0x050F00
+DEFINES += QT_DISABLE_DEPRECATED_UP_TO=0x060400
 
 TEMPLATE = app
 TARGET = minstall
-VERSION = 5.2
-CONFIG += debug_and_release warn_on strict_c++ c++17
+VERSION = 6.0-ALPHA
+CONFIG += debug_and_release warn_on strict_c++ c++20
 CONFIG(release, debug|release) {
     DEFINES += NDEBUG
     QMAKE_CXXFLAGS += -flto=auto

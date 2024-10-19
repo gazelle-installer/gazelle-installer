@@ -111,7 +111,7 @@ void CheckMD5::check()
                     status = MProcess::STATUS_CRITICAL;
                     break;
                 }
-                hash.addData(buf.get(), rlen);
+                hash.addData({buf.get(), rlen});
                 remain -= rlen;
                 bprog += rlen;
                 labelSplash->setText(nsplash.arg((100*bprog) / btotal));

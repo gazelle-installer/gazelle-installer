@@ -66,10 +66,6 @@ public:
     const QString &detectArch();
     int detectEFI(bool noTest = false);
     bool detectVirtualBox();
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
-protected:
-    void setupChildProcess() noexcept override;
-#endif
 
 private:
     friend class ExceptionInfo;
@@ -91,9 +87,7 @@ private:
     bool exec(const QString &program, const QStringList &arguments,
         const QByteArray *input, bool needRead, class QListWidgetItem *logEntry);
     bool checkHalt();
-#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
     void syncRoot() noexcept;
-#endif
 };
 
 // A section with specific error handling or chroot requirements.
