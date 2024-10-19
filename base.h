@@ -44,7 +44,7 @@ public:
     Base(class MProcess &mproc, class PartMan &pman,
         const class QSettings &appConf, const QCommandLineParser &appArgs);
     bool saveHomeBasic() noexcept;
-    void install();
+    void install(QSettings &appConf);
 };
 
 #endif // BASE_H
