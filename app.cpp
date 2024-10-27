@@ -174,7 +174,15 @@ int main(int argc, char *argv[])
     qDebug() << "Installer version:" << VERSION;
     MInstall minstall(appConf, parser, cfgfile);
     const QRect &geo = a.primaryScreen()->availableGeometry();
-    minstall.setGeometry(0,0,geo.width()/1.5,geo.height()/1.5);
+    int width = 800;
+    int height = 600;
+    if (geo.width() > 1200) {
+        width = geo.width()/1.5;
+    }
+    if (geo.height() > 900){
+        height = geo.height()/1.5;
+    }
+    minstall.setGeometry(0,0,width,height);
     minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
     minstall.show();
     return a.exec();
