@@ -47,10 +47,19 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, QSettings &appCo
 
     // timezone lists
     connect(gui.comboTimeArea, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Oobe::timeAreaIndexChanged);
-    proc.exec("find", {"-L", "/usr/share/zoneinfo/posix",
-            "-mindepth", "2", "-type", "f", "-printf", "%P\\n"}, nullptr, true);
+
+    //search top level zoneinfo folder rather than posix subfolder
+    //posix subfolder doesn't existing in trixie/sid
+    proc.exec("find", {"-L", "/usr/share/zoneinfo/",
+                "-mindepth", "2", "-type", "f",
+                "-not", "-path", "/usr/share/zoneinfo/posix/*",
+                "-not", "-path", "/usr/share/zoneinfo/right/*",
+                "-printf", "%P\\n"}, nullptr, true);
+
     timeZones = proc.readOutLines();
+
     gui.comboTimeArea->clear();
+
     for (const QString &zone : std::as_const(timeZones)) {
         const QString &area = zone.section('/', 0, 0);
         if (gui.comboTimeArea->findData(QVariant(area)) < 0) {
