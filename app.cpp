@@ -183,12 +183,10 @@ int main(int argc, char *argv[])
     if (geo.width() > 1200) {
         width = geo.width()/1.5;
         if (width >1280) width = 1280;
-        qDebug() << "width " << width;
     }
     if (geo.height() > 900){
         height = geo.height()/1.5;
         if (height > 720) height = 720;
-        qDebug() << "height " << height;
     }
     minstall.setGeometry(0,0,width,height);
     minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
