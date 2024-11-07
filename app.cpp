@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
     int height = 600;
     if (geo.width() > 1200) {
         width = geo.width()/1.5;
-        if (width >1280) width = 1280;
+        if (width > 1280) width = 1280;
     }
     if (geo.height() > 900){
         height = geo.height()/1.5;
