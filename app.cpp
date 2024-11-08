@@ -182,11 +182,11 @@ int main(int argc, char *argv[])
     int height = 600;
     if (geo.width() > 1200) {
         width = geo.width()/1.5;
-        if (width > 1280) width = 1280;
+        if (width > 1280) width = 1280; //  1920 / 1.5
     }
     if (geo.height() > 900){
         height = geo.height()/1.5;
-        if (height > 720) height = 720;
+        if (height > 720) height = 720; // 1080 / 1.5
     }
     minstall.setGeometry(0,0,width,height);
     minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
