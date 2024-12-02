@@ -2220,8 +2220,9 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
     }
     if ((changed & ((1 << PartMan::COL_USEFOR) | (1 << PartMan::COL_FORMAT))) && canMount(false)) {
         // Default options, dump and pass
-        if (usefor == "SWAP") options = discgran ? "discard" : "defaults";
-        else if (finalFormat().startsWith("FAT")) {
+        if (usefor == "SWAP") {
+            options = discgran ? "discard=once" : "defaults";
+        } else if (finalFormat().startsWith("FAT")) {
             options = "noatime,dmask=0002,fmask=0113";
             pass = 0;
             dump = false;
@@ -2232,8 +2233,6 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
             options.clear();
             const bool btrfs = (format == "btrfs" || type == SUBVOLUME);
             if (!flags.rotational && btrfs) options += "ssd,";
-            if (discgran && (format == "ext4" || format == "xfs")) options += "discard,";
-            else if (discgran && btrfs) options += "discard=async,";
             options += "noatime";
             if (btrfs && usefor != "/swap") options += ",compress=zstd:1";
             dump = true;
@@ -2522,7 +2521,6 @@ void PartMan::ItemDelegate::partOptionsMenu() noexcept
     if ((part->type == PartMan::Device::PARTITION && selFS == "btrfs") || part->type == PartMan::Device::SUBVOLUME) {
         QString tcommon;
         if (!part->flags.rotational) tcommon = "ssd,";
-        if (part->discgran) tcommon = "discard=async,";
         tcommon += "noatime";
         QAction *action = menuTemplates->addAction(tr("Compression (Z&STD)"));
         action->setData(tcommon + ",compress=zstd");
