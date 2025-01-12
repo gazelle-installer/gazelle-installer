@@ -190,788 +190,784 @@ Uživajte v sistemu %1!</translation>
         <translation>Priprava na namestitev %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="384"/>
+        <location filename="../minstall.cpp" line="385"/>
         <source>Paused for required operator input</source>
         <translation>Čakam na zahtevan vnos</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="396"/>
+        <location filename="../minstall.cpp" line="397"/>
         <source>Setting system configuration</source>
         <translation>Nastavitev konfiguracije sistema</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="406"/>
+        <location filename="../minstall.cpp" line="407"/>
         <source>Cleaning up</source>
         <translation>Čiščenje</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="410"/>
+        <location filename="../minstall.cpp" line="411"/>
         <source>Finished</source>
         <translation>Končano</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="422"/>
+        <location filename="../minstall.cpp" line="423"/>
         <source>Configuring system. Please wait.</source>
         <translation>Nastavljanje sistema. Počakajte.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="426"/>
+        <location filename="../minstall.cpp" line="427"/>
         <source>Configuration complete. Restarting system.</source>
         <translation>Konfiguriranje je končasno. Ponovno zaganjam sistem.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="431"/>
+        <location filename="../minstall.cpp" line="432"/>
         <source>The installation was aborted.</source>
         <translation>Namestitev je bila prekinjena</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="455"/>
+        <location filename="../minstall.cpp" line="456"/>
         <source>Pretending to install %1</source>
         <translation>Pretvarjam se, da nameščam %1</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="524"/>
+        <location filename="../minstall.cpp" line="525"/>
         <source>Invalid settings found in configuration file (%1). Please review marked fields as you encounter them.</source>
         <translation>V konfiguracijski datoteki (%1) so bile najdene napačne nastavitve. Prosimo, preverite označena polja.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="547"/>
+        <location filename="../minstall.cpp" line="548"/>
         <source>WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT. On some systems, a GPT-formatted disk will not boot.</source>
         <translation>OPOZORILO: Izbrani pogon ima zmogljivost vsaj 2TB in mora biti formatiran z uporabo GPT. Na nekaterih sistemih diski, ki so formatirani z GPT, ne morejo izvesti zagona.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="560"/>
+        <location filename="../minstall.cpp" line="561"/>
         <source>Format and use the entire disk (%1) for %2</source>
         <translation>Formatiraj in uporabi celoten disk (%1) za %2</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="575"/>
+        <location filename="../minstall.cpp" line="576"/>
         <source>The data in /home cannot be preserved because the required information could not be obtained.</source>
         <translation>Podatki v /home ne morejo biti ohranjeni, ker ni bilo mogoče pridobiti potrebnih podatkov.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="630"/>
+        <location filename="../minstall.cpp" line="631"/>
         <source>The home directory for %1 already exists.</source>
         <translation>Domači /home direktorij za %1 že obstaja.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="671"/>
+        <location filename="../minstall.cpp" line="672"/>
         <source>General Instructions</source>
         <translation>Splošna navodila</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="672"/>
+        <location filename="../minstall.cpp" line="673"/>
         <source>BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.</source>
         <translation>PRED NADALJEVANJEM ZAPRITE VSE OSTALE APLIKACIJE.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="673"/>
+        <location filename="../minstall.cpp" line="674"/>
         <source>On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed. You will be prompted for confirmation before any destructive actions are performed.</source>
         <translation>Prosimo, da na vsaki strani preberete navodila, naredite izbor in potem kliknete Naprej, ko ste pripravljeni za nadaljevanje. Pozvani boste k potrditvi izbire, preden se izvedejo kakšne destruktivne akcije.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="675"/>
+        <location filename="../minstall.cpp" line="676"/>
         <source>Limitations</source>
         <translation>Omejitve</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="676"/>
+        <location filename="../minstall.cpp" line="677"/>
         <source>Remember, this software is provided AS-IS with no warranty what-so-ever. It is solely your responsibility to backup your data before proceeding.</source>
         <translation>Pomnite, da je ta programska oprema na voljo TAKO KOT JE, brez kakršnekoli garancije. Zgolj vaša odgovornost je, da poskrbite za ustrezno varnostno kopiranje vaših podatkov, preden nadaljujete.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="680"/>
+        <location filename="../minstall.cpp" line="681"/>
         <source>Installation Options</source>
         <translation>Možnosti namestitve</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="681"/>
+        <location filename="../minstall.cpp" line="682"/>
         <source>If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system&apos;s software to set up partitions and boot manager before installing.</source>
         <translation>Če poganjate Mac OS ali Windows OS (od različice Vista naprej), boste morda morali pred namestitvijo uporabiti orodja teh sistemov za ustvarjanje razdelkov in zagonskega upravljalnika.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="682"/>
+        <location filename="../minstall.cpp" line="683"/>
         <source>Using the root-home space slider</source>
         <translation>Uporaba drsnika za velikost root-home razdelka</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="683"/>
+        <location filename="../minstall.cpp" line="684"/>
         <source>The drive can be divided into separate system (root) and user data (home) partitions using the slider.</source>
         <translation>Pogon je mogoče razdeliti v ločena razdelka za sistem (root) in uporabniške podatke (home) s pomočjo drsnika.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="684"/>
+        <location filename="../minstall.cpp" line="685"/>
         <source>The &lt;b&gt;root&lt;/b&gt; partition will contain the operating system and applications.</source>
         <translation>Korenski razdelek &lt;b&gt;root&lt;/b&gt; bo vseboval operacijski sistem in programe.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="685"/>
+        <location filename="../minstall.cpp" line="686"/>
         <source>The &lt;b&gt;home&lt;/b&gt; partition will contain the data of all users, such as their settings, files, documents, pictures, music, videos, etc.</source>
         <translation>Domači razdelek &lt;b&gt;home&lt;/b&gt; bo vseboval podatke uporabnikov, kot so nastavitve, datoteke, dokumente, slike, glasbo, video posnetke, itd.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="686"/>
+        <location filename="../minstall.cpp" line="687"/>
         <source>Move the slider to the right to increase the space for &lt;b&gt;root&lt;/b&gt;. Move it to the left to increase the space for &lt;b&gt;home&lt;/b&gt;.</source>
         <translation>Premaknite drsnik na desno, če želite povečasti prosgtor za korenski &lt;b&gt;root&lt;/b&gt;. Pfremaknite ga na levo, če želite povečati prostor za  domači &lt;/b&gt;home&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="687"/>
+        <location filename="../minstall.cpp" line="688"/>
         <source>Move the slider all the way to the right if you want both root and home on the same partition.</source>
         <translation>Premaknite drsnik popolnoma na desno, če želite imeti root in home na istem razdelku.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="688"/>
+        <location filename="../minstall.cpp" line="689"/>
         <source>Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier. This can also improve overall performance by constraining the system files to a defined portion of the drive.</source>
         <translation>Ločitev domačega (home) direktorija izboljša zanesljivost nadgrajevanja operacijskega sistema. Poleg tega poenostavi varnostno kopiranje in obnavljanje. Z določitvijo sistemskih datotek na točno določen del diska je mogoče tudi izboljšati zmogljivost delovanja sistema.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="690"/>
-        <location filename="../minstall.cpp" line="771"/>
-        <location filename="../minstall.cpp" line="791"/>
+        <location filename="../minstall.cpp" line="691"/>
+        <location filename="../minstall.cpp" line="772"/>
+        <location filename="../minstall.cpp" line="792"/>
         <source>Encryption</source>
         <translation>Šifriranje</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="691"/>
-        <location filename="../minstall.cpp" line="772"/>
+        <location filename="../minstall.cpp" line="692"/>
+        <location filename="../minstall.cpp" line="773"/>
         <source>Encryption is possible via LUKS. A password is required.</source>
         <translation>Šifriranje je možno preko LUKS. Zahtevano je geslo.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="692"/>
-        <location filename="../minstall.cpp" line="773"/>
+        <location filename="../minstall.cpp" line="693"/>
+        <location filename="../minstall.cpp" line="774"/>
         <source>A separate unencrypted boot partition is required.</source>
         <translation>Potreben je ločen nešifriran zagosnki razdelek.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="693"/>
+        <location filename="../minstall.cpp" line="694"/>
         <source>When encryption is used with autoinstall, the separate boot partition will be automatically created.</source>
         <translation>Če se šifriranje uporablja skupaj z opcijo za samodejno namestitev, bo samodejno ustvarjen ločen zagonski razdelek.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="694"/>
+        <location filename="../minstall.cpp" line="695"/>
         <source>Using a custom disk layout</source>
         <translation>Uporaba lastne razdelitve</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="695"/>
+        <location filename="../minstall.cpp" line="696"/>
         <source>If you need more control over where %1 is installed to, select &quot;&lt;b&gt;%2&lt;/b&gt;&quot; and click &lt;b&gt;Next&lt;/b&gt;. On the next page, you will then be able to select and configure the storage devices and partitions you need.</source>
         <translation>Če potrebujete več nadzora nad tem, kje bo nameščen %1, izberite &quot;&lt;b&gt;%2&lt;/b&gt;&quot; in kliknite &lt;b&gt;Naprej&lt;/b&gt;. Na naslednji strani boste lahko izbrali nosilec podatkov in razdelke, ki jih potrebujete.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="701"/>
+        <location filename="../minstall.cpp" line="702"/>
         <source>Choose Partitions</source>
         <translation>Izberite razdelke</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="702"/>
+        <location filename="../minstall.cpp" line="703"/>
         <source>The partition list allows you to choose what partitions are used for this installation.</source>
         <translation>Seznam razdelkov omogoča izbiro razdelkov, ki bodo uporabljeni za namestitev.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="703"/>
+        <location filename="../minstall.cpp" line="704"/>
         <source>&lt;i&gt;Device&lt;/i&gt; - This is the block device name that is, or will be, assigned to the created partition.</source>
         <translation>&lt;i&gt;Naprava&lt;/i&gt; - To je ime bločne naprave, ki je ali bo določena za ustvarjeni razdelek.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="704"/>
+        <location filename="../minstall.cpp" line="705"/>
         <source>&lt;i&gt;Size&lt;/i&gt; - The size of the partition. This can only be changed on a new layout.</source>
         <translation>&lt;i&gt;Velikost&lt;/i&gt; - Velikost razdelka. To je mogoče spremeniti le v novi razporeditvi.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="705"/>
+        <location filename="../minstall.cpp" line="706"/>
         <source>&lt;i&gt;Use For&lt;/i&gt; - To use this partition in an installation, you must select something here.</source>
         <translation>&lt;i&gt;Uporabi za&lt;/i&gt; - Da bi ta razdelek uporabili pri namestitvi, morate tu nekaj izbrati.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="707"/>
+        <location filename="../minstall.cpp" line="708"/>
         <source>Format without mounting</source>
         <translation>Formatiraj brez priklapljanja</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="708"/>
+        <location filename="../minstall.cpp" line="709"/>
         <source>BIOS Boot GPT partition for GRUB</source>
         <translation>BIOS zagonski GPT razdelek za GRUB</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="709"/>
-        <location filename="../minstall.cpp" line="748"/>
+        <location filename="../minstall.cpp" line="710"/>
+        <location filename="../minstall.cpp" line="749"/>
         <source>EFI System Partition</source>
         <translation>EFI sistemski razdelek</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="711"/>
+        <location filename="../minstall.cpp" line="712"/>
         <source>Boot manager</source>
         <translation>Upravljalnik zagona</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="712"/>
+        <location filename="../minstall.cpp" line="713"/>
         <source>System root</source>
         <translation>Sistemski koren (root)</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="713"/>
+        <location filename="../minstall.cpp" line="714"/>
         <source>User data</source>
         <translation>Uporabniški podatki</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="714"/>
+        <location filename="../minstall.cpp" line="715"/>
         <source>Static data</source>
         <translation>Statični podatki</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="715"/>
+        <location filename="../minstall.cpp" line="716"/>
         <source>Variable data</source>
         <translation>Spremenljivi podatki</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="716"/>
+        <location filename="../minstall.cpp" line="717"/>
         <source>Temporary files</source>
         <translation>Začasne datoteke</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="717"/>
+        <location filename="../minstall.cpp" line="718"/>
         <source>Swap files</source>
         <translation>Swap datoteke</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="718"/>
+        <location filename="../minstall.cpp" line="719"/>
         <source>Swap partition</source>
         <translation>Swap razdelek</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="720"/>
+        <location filename="../minstall.cpp" line="721"/>
         <source>In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (&quot;/&quot;).</source>
         <translation>Poleg naštetih je mogoče ustvariti tudi svojo točko priklopa. Lastne pirklopne točke se morajo začeti s poševnico (&quot;/&quot;).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="721"/>
+        <location filename="../minstall.cpp" line="722"/>
         <source>&lt;i&gt;Label&lt;/i&gt; - The label that is assigned to the partition once it has been formatted.</source>
         <translation>&lt;i&gt;Label&lt;/i&gt; - Oznaka se pripiše razdelku po formatiranju.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="722"/>
+        <location filename="../minstall.cpp" line="723"/>
         <source>&lt;i&gt;Encrypt&lt;/i&gt; - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.</source>
         <translation>&lt;i&gt;Šifriranje&lt;/i&gt; - Za ta razdelek uporabi LUKS šifriranje. Geslo se nanaša na vse razdelke, ki so označeni za šifriranje.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="723"/>
+        <location filename="../minstall.cpp" line="724"/>
         <source>&lt;i&gt;Format&lt;/i&gt; - This is the partition&apos;s format. Available formats depend on what the partition is used for. When working with an existing layout, you may be able to preserve the format of the partition by selecting &lt;b&gt;Preserve&lt;/b&gt;.</source>
         <translation>&lt;i&gt;Format&lt;/i&gt; - To je format oz. vrsta razdelka. Vrste, ki so na voljo, so odvisne od rabe razdelka. Če delate z obstoječim razporedom, lahko tudi ohranite vrsto razdelka z izbiro &lt;b&gt;Ohrani&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="725"/>
+        <location filename="../minstall.cpp" line="726"/>
         <source>Selecting &lt;b&gt;Preserve /home&lt;/b&gt; for the root partition preserves the contents of the /home directory, deleting everything else. This option can only be used when /home is on the same partition as the root partition.</source>
         <translation>Izbira &lt;b&gt;Ohrani /home&lt;/b&gt; za korenski razdelek ohrani vsebino /home mape in izbriše vse drugo. To možnost je mogoče izbrati le, če se /home nahaja na istem razdelku kot root.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="727"/>
+        <location filename="../minstall.cpp" line="728"/>
         <source>The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.</source>
         <translation>Podprti so Linux datotečni sistemi ext2, ext3, ext4, jfs, xfs in  btrfs, priporočna je raba ext4.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="728"/>
+        <location filename="../minstall.cpp" line="729"/>
         <source>&lt;i&gt;Check&lt;/i&gt; - Check and correct for bad blocks on the drive (not supported for all formats). This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.</source>
         <translation>&lt;i&gt;Preveri&lt;/i&gt; - Preveri in popravi okvarjene sektorje na disku (ni podprto za vse formate). To zahteva veliko časa, zato to preskočite, če ne sumite, da ima diska okvarjene sektorje.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="730"/>
+        <location filename="../minstall.cpp" line="731"/>
         <source>&lt;i&gt;Mount Options&lt;/i&gt; - This specifies mounting options that will be used for this partition.</source>
         <translation>&lt;i&gt;Možnosti priklopa&lt;/i&gt; - Tu določite možnosti priklopa, ki bodo uporabljene za ta razdelek.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="731"/>
+        <location filename="../minstall.cpp" line="732"/>
         <source>&lt;i&gt;Dump&lt;/i&gt; - Instructs the dump utility to include this partition in the backup.</source>
         <translation>&lt;i&gt;Deponiraj&lt;/i&gt; - Ukaže orodju za deponiranje, da v varnostno kopijo vključi tudi ta razdelek.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="732"/>
+        <location filename="../minstall.cpp" line="733"/>
         <source>&lt;i&gt;Pass&lt;/i&gt; - The sequence in which this file system is to be checked at boot. If zero, the file system is not checked.</source>
         <translation>&lt;i&gt;Prehod&lt;/i&gt; - Zaporedje preizkusa datotečnega sistema ob zagonu. Če je nič, datotečni sistem ne bo preizkušen.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="733"/>
+        <location filename="../minstall.cpp" line="734"/>
         <source>Menus and actions</source>
         <translation>Meniji in dejanja</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="734"/>
+        <location filename="../minstall.cpp" line="735"/>
         <source>A variety of actions are available by right-clicking any drive or partition item in the list.</source>
         <translation>Na voljo so različna dejanja, do katerih dostopate z desnim klikom na razdelku v seznamu.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="735"/>
+        <location filename="../minstall.cpp" line="736"/>
         <source>The buttons to the right of the list can also be used to manipulate the entries.</source>
         <translation>Za spreminjanje vnosov je mogoče uporabiti tudi gumbe desno od seznama.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="736"/>
+        <location filename="../minstall.cpp" line="737"/>
         <source>The installer cannot modify the layout already on the drive. To create a custom layout, mark the drive for a new layout with the &lt;b&gt;New layout&lt;/b&gt; menu action or button (%1). This clears the existing layout.</source>
         <translation>Namestitveni program ne more spreminjati razporeda, ki je že na pogonu. Da bi oblikovali lastno razporeditev, označite pogon kot nov razdelek z izbiro &lt;b&gt;Nova razdelitev&lt;/b&gt;v meniju dejanj ali s pritiksom na  (%1). To bo počistilo obstoječo shemo.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="739"/>
+        <location filename="../minstall.cpp" line="740"/>
         <source>Basic layout requirements</source>
         <translation>Osnovne zahteve pri razdeljevanju</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="740"/>
+        <location filename="../minstall.cpp" line="741"/>
         <source>%1 requires a root partition. The swap partition is optional but highly recommended. If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.</source>
         <translation>%1 potrebuje korenski /root razdelek. Izmenjevalni swap razdelek je opcijski, a je zelo priporočljiv. Če želite uporabljati funkcijo Hiberniraj na disku, ki jo ponuja %1, boste potrebovali swap razdelek, ki je večji od velikosti fizičnega pomnilnika.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="742"/>
+        <location filename="../minstall.cpp" line="743"/>
         <source>If you choose a separate /home partition it will be easier for you to upgrade in the future, but this will not be possible if you are upgrading from an installation that does not have a separate home partition.</source>
         <translation>Če izberete ločen /home razdelek, bo v prihodnje lažje nadgraditi vaš računalnik, vendar le v primeru, da ne gre za nadgrajevanje namestitve, ki nima ločenega /home razdelka</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="744"/>
+        <location filename="../minstall.cpp" line="745"/>
         <source>Active partition</source>
         <translation>Aktivni razdelek</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="745"/>
+        <location filename="../minstall.cpp" line="746"/>
         <source>For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.</source>
         <translation>Da bi se nameščeni operacijski sistem zagnal, mora biti kot aktiven označen ustreen razdelek (ponavadi razdelek boot ali root).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="746"/>
+        <location filename="../minstall.cpp" line="747"/>
         <source>The active partition of a drive can be chosen using the &lt;b&gt;Active partition&lt;/b&gt; menu action.</source>
         <translation>Aktivni razdelek pogona je mogoče izbrati preko možnosti menija &lt;b&gt;Aktivni razdelek&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="747"/>
+        <location filename="../minstall.cpp" line="748"/>
         <source>A partition with an asterisk (*) next to its device name is, or will become, the active partition.</source>
         <translation>Razdelek z zvezdico (*) ob imenu je ali bo postal aktivni razdelek</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="749"/>
+        <location filename="../minstall.cpp" line="750"/>
         <source>If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.</source>
         <translation>Če sistem uporablja  Extensible Firmware Interface (EFI), je za zagon sistema potreben EFI sistemski razdelek (ESP).</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="750"/>
+        <location filename="../minstall.cpp" line="751"/>
         <source>These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.</source>
         <translation>Ti sistemi ne potrebujejo razdelka, ki je označen za aktivnega. Namesto tega zahtevajo razdelek, ki je formatiran z datotečnim sistemom FAT in je oznažen kot ESP.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="751"/>
+        <location filename="../minstall.cpp" line="752"/>
         <source>Most systems built within the last 10 years use EFI.</source>
         <translation>Večina sistemov narejenih v zadnjih desetih letihuporablja EFI.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="752"/>
+        <location filename="../minstall.cpp" line="753"/>
         <source>Boot partition</source>
         <translation>Zagonski razdelek</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="753"/>
+        <location filename="../minstall.cpp" line="754"/>
         <source>This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.</source>
         <translation>Ta razdelek je na splošno potreben le za korenske razdelke na virtualnih napravah, kot so šifrirani, LVM ali programski RAID nosilci.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="754"/>
+        <location filename="../minstall.cpp" line="755"/>
         <source>It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.</source>
         <translation>Vsebuje osnovno jedro in gonilnike, ki so potrebni za dostop do šifriranega diska ali virtualnih naprav.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="755"/>
+        <location filename="../minstall.cpp" line="756"/>
         <source>BIOS-GRUB partition</source>
         <translation>BIOS-GRUB razdelek</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="756"/>
+        <location filename="../minstall.cpp" line="757"/>
         <source>When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.</source>
         <translation>Če je uporabljen GPT formatiran disk v ne-EFI sistemu, je potreben 1MB BIOS zagonski razdelek, da bi lahko uproabljali GRUB.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="757"/>
+        <location filename="../minstall.cpp" line="758"/>
         <source>Need help creating a layout?</source>
         <translation>Potrebujete pomoč pri razdeljevanju?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="758"/>
+        <location filename="../minstall.cpp" line="759"/>
         <source>Just right-click on a drive and select &lt;b&gt;Layout Builder&lt;/b&gt; from the menu. This can create a layout similar to that of the regular install.</source>
         <translation>Zgolj kliknite na pogon in izberite &lt;b&gt;Razdeljevalnik&lt;/b&gt; iz menija. To lahko ustvari razpored, ki je pododben običajni namestitvi.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="759"/>
+        <location filename="../minstall.cpp" line="760"/>
         <source>Upgrading</source>
         <translation>Nadgrajujem</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="760"/>
+        <location filename="../minstall.cpp" line="761"/>
         <source>To upgrade from an existing Linux installation, select the same home partition as before and select &lt;b&gt;Preserve&lt;/b&gt; as the format.</source>
         <translation>Za nadgradnjo obstoječe Linux namestitve izberite isti domači home razdelek in izberite &lt;b&gt;Ohrani&lt;/b&gt; kot format.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="761"/>
+        <location filename="../minstall.cpp" line="762"/>
         <source>If you do not use a separate home partition, select &lt;b&gt;Preserve /home&lt;/b&gt; on the root file system entry to preserve the existing /home directory located on your root partition. The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.</source>
         <translation>Če ne uporabljate ločenega domačega razdelka, izberite &lt;b&gt;Ohrani /home&lt;/b&gt; na korenskem datotečnem sistemu, da ohranite direktorij /home na korenskem razdelku. Namestilnik bo ohranil le /home, ostalo pa bo izbrisal. Tovrstna namestitev potrebuje mnogo več časa.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="763"/>
+        <location filename="../minstall.cpp" line="764"/>
         <source>Preferred Filesystem Type</source>
         <translation>Zaželjen datotečni sistem</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="764"/>
+        <location filename="../minstall.cpp" line="765"/>
         <source>For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.</source>
         <translation>Za %1 lahko izberete formatiranje v obliko ext2, ext3, ext4, f2fs, jfs, xfs ali btrfs.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="765"/>
+        <location filename="../minstall.cpp" line="766"/>
         <source>Additional compression options are available for drives using btrfs. Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.</source>
         <translation>Dodatne možnosti za stiskanje podatkov so na voljo za pogone, ki uproabljajo btrfs, vendar je stopnja kompresije manjša. Zlib je počasnejši, a ima večjo stopnjo stiskanja.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="767"/>
+        <location filename="../minstall.cpp" line="768"/>
         <source>System partition management tool</source>
         <translation>Orodje za upravljanje razdelkov</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="768"/>
+        <location filename="../minstall.cpp" line="769"/>
         <source>For more control over the drive layouts (such as modifying the existing layout on a disk), click the partition management button (%1). This will run the operating system&apos;s partition management tool, which will allow you to create the exact layout you need.</source>
         <translation>Za več nadzora nad razporeditvami pogonov (kot je denimo spreminjanje obstoječe razporeditve na disku) kliknite na gumb za upravljanje z razdelki (%1). To pa zagnalo upravjlalnik razdelkov operacijskega sistema, ki omogoča ustvarjanje točno takšnega razporeda, kot ga potrebujete.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="774"/>
+        <location filename="../minstall.cpp" line="775"/>
         <source>To preserve an encrypted partition, right-click on it and select &lt;b&gt;Unlock&lt;/b&gt;. In the dialog that appears, enter a name for the virtual device and the password. When the device is unlocked, the name you chose will appear under &lt;i&gt;Virtual Devices&lt;/i&gt;, with similar options to that of a regular partition.</source>
         <translation>Za ohranitev šifriranega razdelka nanj desno kliknite in izberite &lt;b&gt;Odklep&lt;/b&gt;. V dialog vnesite ime virtualne naprave in geslo. Ko je naprava odklenjena, se bo izbrano ime pojavilo pod &lt;i&gt;Virtualne naprave&lt;/i&gt; s podobnimi možnostmi, kot jih imajo navadni razdelki.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="776"/>
+        <location filename="../minstall.cpp" line="777"/>
         <source>For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the &lt;b&gt;Add to crypttab&lt;/b&gt; menu action to do this.</source>
         <translation>Za odklepanje šifiriranega razdelka ob zagonu ga je potrebno dodativ crypttab datoteko. Za to uporabite meni &lt;b&gt;Dodaj v crypttab&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="777"/>
+        <location filename="../minstall.cpp" line="778"/>
         <source>Other partitions</source>
         <translation>Drugi razdelki</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="778"/>
+        <location filename="../minstall.cpp" line="779"/>
         <source>The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.</source>
         <translation>Namestitveni program omogoča uporabo ali ustvarjanje drugih razdelkov za druge namene, vendar je dobro vedeti, da starejši sistemi ne morejo delati z več kot 4 razdelki.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="779"/>
+        <location filename="../minstall.cpp" line="780"/>
         <source>Subvolumes</source>
         <translation>Pod-pogoni</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="780"/>
+        <location filename="../minstall.cpp" line="781"/>
         <source>Some file systems, such as Btrfs, support multiple subvolumes in a single partition. These are not physical subdivisions, and so their order does not matter.</source>
         <translation>Nekateri datotečni sistemi, kot denimo Btrfs, podpirajo več podpogonov na enem razdelku. Ker ne gre za fizično razdelitev, njihov vrstni red ni pomemben.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="782"/>
+        <location filename="../minstall.cpp" line="783"/>
         <source>Use the &lt;b&gt;Scan subvolumes&lt;/b&gt; menu action to search an existing Btrfs partition for subvolumes. To create a new subvolume, use the &lt;b&gt;New subvolume&lt;/b&gt; menu action.</source>
         <translation>Uporabite meni &lt;b&gt;Pošči podpogone&lt;/b&gt;za iskanje obstoječih Btrfs razdelkov in podpogonov. Nov podpogon ustvarite z menijem &lt;b&gt;Nov podpogon&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="784"/>
+        <location filename="../minstall.cpp" line="785"/>
         <source>Existing subvolumes can be preserved, however the name must remain the same.</source>
         <translation>Obstoječe podpogone je mogoče ohraniti, vendar mora ime ostati enako.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="785"/>
+        <location filename="../minstall.cpp" line="786"/>
         <source>Virtual Devices</source>
         <translation>Virtualne naprave</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="786"/>
+        <location filename="../minstall.cpp" line="787"/>
         <source>If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.</source>
         <translation>Če namestilnik odkrije virtualno napravo, kot je denimo odprti LUKS razdelek, LVM logični nosilec ali programsko ustvarjeni RAID, se lahko ta uporabi za namestitev.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="787"/>
+        <location filename="../minstall.cpp" line="788"/>
         <source>The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.</source>
         <translation>Raba virtualnih naprav (z izjemo ohranjanja šifriranih datotečni sistemov) je napredna funkcija, za katero je mogoče potrebno urediti nekaj datotek (npr.initramfs, crypttab, fstab), ki zagotavljajo, da so virtualne naprave ustvarjene ob zagonu.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="797"/>
+        <location filename="../minstall.cpp" line="798"/>
         <source>Final Review and Confirmation</source>
         <translation>Zadnje preverjanje in potrditev</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="798"/>
+        <location filename="../minstall.cpp" line="799"/>
         <source>Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.</source>
         <translation>Pazljivo preverite ta seznam. To je zadnja priložnost, da pred nadaljevanjem preverite in potrdite dejanja namestitve.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="805"/>
+        <location filename="../minstall.cpp" line="806"/>
         <source>Install GRUB for Linux and Windows</source>
         <translation>Namesti GRUB za Linux in Windows</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="806"/>
+        <location filename="../minstall.cpp" line="807"/>
         <source>%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.</source>
         <translation>%1 uporablja GRUB zagonski nalagalnik za zagon %1 in Microsoft Windows.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="807"/>
+        <location filename="../minstall.cpp" line="808"/>
         <source>By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.</source>
         <translation>Privzeto je GRUB nameščen na Master Boot Record (MBR) ali ESP (EFI System Partition za 64-bitne UEFI zagonske sisteme) razdelku zagonskega nosilca in nadomešča zagonski nalagalnik, ki je bil prej v uporabi. To je normalno.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="808"/>
+        <location filename="../minstall.cpp" line="809"/>
         <source>If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.</source>
         <translation>Če izberete namesto tega namestitev GRUB v Partition Boot Record (PBR), bo GRUB nameščen na začetku določenega razdelaka. Le za izkušene uporabnike.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="809"/>
+        <location filename="../minstall.cpp" line="810"/>
         <source>If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.</source>
         <translation>Če ste odznačili namesitev GRUB, ta ne bo nameščen. Le za izkušene uporabnike.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="810"/>
+        <location filename="../minstall.cpp" line="811"/>
         <source>Create a swap file</source>
         <translation>Ustvari izmenjevalno swap datoteko</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="811"/>
+        <location filename="../minstall.cpp" line="812"/>
         <source>A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.</source>
         <translation>Izmenjevalna datoteka je bolj fleksibilna kot izmenjevalni razdelek, saj ji je mogoče lažje spreminjati velikost, če se pojavi potreba zaradi rabe sistema.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="812"/>
+        <location filename="../minstall.cpp" line="813"/>
         <source>By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.</source>
         <translation>To je provzeto označeno, če ni bil določen noben izmenjevalni razdelek. To možnost naj spreminjajo le izkušeni uporabniki.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="813"/>
+        <location filename="../minstall.cpp" line="814"/>
         <source>Setting the size to 0 has the same effect as unchecking this option.</source>
         <translation>Nastavitev velikosti na 0 ima enak učinek, kot odznačitev te možnosti.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="819"/>
+        <location filename="../minstall.cpp" line="820"/>
         <source>&lt;p&gt;&lt;b&gt;Common Services to Enable&lt;/b&gt;&lt;br/&gt;Select any of these common services that you might need with your system configuration and the services will be started automatically when you start %1.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Omogoči pogoste storitve&lt;/b&gt;&lt;br/&gt; Izberite poljubne občičajne storitve, ki bi jihlahko potrebovali v svojih konfiguraciji sistema in storitve se bodo samodejno zagnale, ko zaženete %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="823"/>
+        <location filename="../minstall.cpp" line="824"/>
         <source>&lt;p&gt;&lt;b&gt;Computer Identity&lt;/b&gt;&lt;br/&gt;The computer name is a common unique name which will identify your computer if it is on a network. The computer domain is unlikely to be used unless your ISP or local network requires it.&lt;/p&gt;&lt;p&gt;The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens&lt;/p&gt;&lt;p&gt;The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer with a local computer that is running MS-Windows or Mac OSX.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Identiteta računalnika&lt;/b&gt;&lt;br/&gt;Ime računalnika je unikatno ime, ki identificira vaš računalnik, kadar se nahaja v mreži. Domena računalnika se uporablja le, kadar to zahteva vaš ponudnik interneta ali vaše lokalno omrežje. &lt;/p&gt;&lt;p&gt;Ime računalnika ali domene lahko vsebuje le alfanumerične znake, pike in vezaje. Ne more vsebovati presledkov ali se začeti oziroma končati z vezajem. &lt;/p&gt;&lt;p&gt;Če želite deliti katerega od direktorijev ali tiskalnikov za rabo z lokalnim računalnikom, ki poganja MS-Windows ali Mac OSX, je potrebno aktivirati SaMBa strežnik. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="833"/>
+        <location filename="../minstall.cpp" line="834"/>
         <source>Localization Defaults</source>
         <translation>Privzete krajevne nastavitve</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="834"/>
+        <location filename="../minstall.cpp" line="835"/>
         <source>Set the default locale. This will apply unless they are overridden later by the user.</source>
         <translation>Določi privzete krajevne nastavitve. To bo uporabljno, razen če jih uporabnik kasneje ne zavrže.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="835"/>
+        <location filename="../minstall.cpp" line="836"/>
         <source>Configure Clock</source>
         <translation>Nastavitve časa:</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="836"/>
+        <location filename="../minstall.cpp" line="837"/>
         <source>If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC). To change this, check the &quot;&lt;b&gt;System clock uses local time&lt;/b&gt;&quot; box.</source>
         <translation>Če imate Apple ali čisti Unix računalnik, bo sistemska ura privzeto nastavljena na Greenwichi čas (GMT) ali univerzalni čas (UTC). Za spreminjanje označite polje &quot;&lt;b&gt;Sistemska ura uporablja krajevni čas&lt;/b&gt;&quot;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="838"/>
+        <location filename="../minstall.cpp" line="839"/>
         <source>The system boots with the timezone preset to GMT/UTC. To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.</source>
         <translation>Sistem se zažene s prednastavitvijo za časovni pas GMT/UTC. Za spremembo časovnega pasu ob zagonu, po namestitivi kliknite z desno na uro v panoju in izberite Lastnosti.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="840"/>
+        <location filename="../minstall.cpp" line="841"/>
         <source>Service Settings</source>
         <translation>Nastavitve storitve</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="841"/>
+        <location filename="../minstall.cpp" line="842"/>
         <source>Most users should not change the defaults. Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible. Make sure you know what you are doing!</source>
         <translation>Večina uporabnikov naj ne bi spreminjala privzetih vrednosti. Uporabniki z manj zmogljivimi računalniki pa si večkrat želijo izklopiti nepotrebne storitve, da bi prihranili čim več pomnilnika. Poskrbite, da veste, kaj delate!</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="847"/>
+        <location filename="../minstall.cpp" line="848"/>
         <source>Default User Login</source>
         <translation>Privzeta prijava uporabnika</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="848"/>
+        <location filename="../minstall.cpp" line="849"/>
         <source>The root user is similar to the Administrator user in some other operating systems. You should not use the root user as your daily user account. Please enter the name for a new (default) user account that you will use on a daily basis. If needed, you can add other user accounts later with %1 User Manager.</source>
         <translation>Korenski ali root uporabnik ima podobno funkcijo kot administrator v nekaterih drugih operacijskih sistemih. Tega uporabnika naj ne bi uporabljali kot svoj običajen račun. Vnesite ime za nov (privzeti) uporabniški račun, ki ga boste uporabljali pri vsakodnevnih opravilih. Če je potrebno, lahko kasneje dodate še druge uporabniške račune z %1  Upravljalnik uporabnikov.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="852"/>
+        <location filename="../minstall.cpp" line="853"/>
         <source>Passwords</source>
         <translation>Gesla</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="853"/>
+        <location filename="../minstall.cpp" line="854"/>
         <source>Enter a new password for your default user account and for the root account. Each password must be entered twice.</source>
         <translation>Vnesite novo geslo za svoj privzeti uporabniški račun in za korenski račun. Vsako geslo mora biti vneseno dvakrat,</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="855"/>
+        <location filename="../minstall.cpp" line="856"/>
         <source>No passwords</source>
         <translation>Ni gesel</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="856"/>
+        <location filename="../minstall.cpp" line="857"/>
         <source>If you want the default user account to have no password, leave its password fields empty. This allows you to log in without requiring a password.</source>
         <translation>Če želite imeti privzet uporabniški račun brez gesla, pustite polja za geslo prazna. To omogoča prijavo brez vnosa gesla.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="858"/>
+        <location filename="../minstall.cpp" line="859"/>
         <source>Obviously, this should only be done in situations where the user account does not need to be secure, such as a public terminal.</source>
         <translation>Očitno je, da je to smiselno le, le uporabniški račun ni potrebno ščititi, kot npr. kadar gre za javno dostopen terminal.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="866"/>
+        <location filename="../minstall.cpp" line="867"/>
         <source>Old Home Directory</source>
         <translation>Stari /home direktorij</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="867"/>
+        <location filename="../minstall.cpp" line="868"/>
         <source>A home directory already exists for the user name you have chosen. This screen allows you to choose what happens to this directory.</source>
         <translation>Za izbrano uporabniško ime že obstaja domači /home direktorij. Ta zaslon vam omogoča, da določite, kaj se zgodi s tem direktorijom.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="869"/>
+        <location filename="../minstall.cpp" line="870"/>
         <source>Re-use it for this installation</source>
         <translation>Ponovno uporabi za to namestitev</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="870"/>
+        <location filename="../minstall.cpp" line="871"/>
         <source>The old home directory will be used for this user account. This is a good choice when upgrading, and your files and settings will be readily available.</source>
         <translation>Za ta uporabniški račun bo uporabljen stari direktorij /home. To je dobra izbira za nadgradnjo, saj bodo datoteke in nastavitve ostale nedotaknjene.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="872"/>
+        <location filename="../minstall.cpp" line="873"/>
         <source>Rename it and create a new directory</source>
         <translation>Preimenuj in ustvari nov direktorij</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="873"/>
+        <location filename="../minstall.cpp" line="874"/>
         <source>A new home directory will be created for the user, but the old home directory will be renamed. Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.</source>
         <translation>Za uporabnika bo ustvarjen nov /home direktorij, stari pa bo preimenovan. Vaše datoteke in nastavitve v novi namestitvi ne bodo takoj vidne, a se lahko do njih dostopa v preimenovanem direktoriju.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="875"/>
+        <location filename="../minstall.cpp" line="876"/>
         <source>The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.</source>
         <translation>Stari direktorij bo imel na koncu številko, ki je odvisna od tega, kolikokrat poprej je bil direktorij že preimenovan.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="876"/>
+        <location filename="../minstall.cpp" line="877"/>
         <source>Delete it and create a new directory</source>
         <translation>Izbriši in ustvari nov direktorij</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="877"/>
+        <location filename="../minstall.cpp" line="878"/>
         <source>The old home directory will be deleted, and a new one will be created from scratch.</source>
         <translation>Stari direktorij /home bo izbrisan in ustvarjena bo povsem nov.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="878"/>
+        <location filename="../minstall.cpp" line="879"/>
         <source>Warning</source>
         <translation>Opozorilo</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="879"/>
+        <location filename="../minstall.cpp" line="880"/>
         <source>All files and settings will be deleted permanently if this option is selected. Your chances of recovering them are low.</source>
         <translation>Vse datoteke in nastavitve bodo za stalno izbrisane, če je izbrana ta možnost. Vaše možnosti za njihovo obnovitev bodo majhne.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="891"/>
+        <location filename="../minstall.cpp" line="892"/>
         <source>Installation in Progress</source>
         <translation>Namestitev poteka</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="892"/>
+        <location filename="../minstall.cpp" line="893"/>
         <source>%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.</source>
         <translation>%1 se namešča. Sveža namestitev bo trajala od 3-20 minut, odvisno od hitrosti sistema in velikosti razdelkov, ki jih ponovno formatirate.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="894"/>
+        <location filename="../minstall.cpp" line="895"/>
         <source>If you click the Abort button, the installation will be stopped as soon as possible.</source>
         <translation>Če pritisnete tipko Prekini, se bo namestitev zaustavila, takoj ko bo to mogoče.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="896"/>
+        <location filename="../minstall.cpp" line="897"/>
         <source>Change settings while you wait</source>
         <translation>Med nameščanjem spremenite nastavitve</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="897"/>
+        <location filename="../minstall.cpp" line="898"/>
         <source>While %1 is being installed, you can click on the &lt;b&gt;Next&lt;/b&gt; or &lt;b&gt;Back&lt;/b&gt; buttons to enter other information required for the installation.</source>
         <translation>Medtem, ko se %1 namešča, lahko kliknete na tipki &lt;b&gt;Naprej&lt;/b&gt; ali &lt;b&gt;Nazaj&lt;/b&gt; in vnesete druge informacije za namestitev.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="899"/>
+        <location filename="../minstall.cpp" line="900"/>
         <source>Complete these steps at your own pace. The installer will wait for your input if necessary.</source>
         <translation>Te korake opravite v svojem ritmu. Namestitveni program vas bo počakal, če je to potrebno.</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="907"/>
+        <location filename="../minstall.cpp" line="908"/>
         <source>&lt;p&gt;&lt;b&gt;Congratulations!&lt;/b&gt;&lt;br/&gt;You have completed the installation of %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Finding Applications&lt;/b&gt;&lt;br/&gt;There are hundreds of excellent applications installed with %1 The best way to learn about them is to browse through the Menu and try them. Many of the apps were developed specifically for the %1 project. These are shown in the main menus. &lt;p&gt;In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Čestitke!&lt;/b&gt;&lt;br/&gt;Uspešno ste zaključili namestitev za %1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Iskanje programov&lt;/b&gt;&lt;br/&gt;%1 ima nameščenih na stotine odličnih programov. Najbolje je, da jih spoznavate tako, da jih poiščete v meniju in preizkusite. Mnogo aplikacij je bilo razvitih posebej za %1 projekt. Te so prikazane v glavnem meniju.&lt;p&gt;Poleg tega %1 vsebuje mnogo standardnih Linux programov, ki jih je mogoče zagnati le iz terminala in zato niso prikazani v meniju.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="913"/>
+        <location filename="../minstall.cpp" line="914"/>
         <source>Enjoy using %1</source>
         <translation>Uživajte v uporabi %1</translation>
     </message>
     <message>
-        <source>&lt;p&gt;&lt;b&gt;Support %1&lt;/b&gt;&lt;br/&gt;%1 is supported by people like you. Some help others at the support forum - %2 - or translate help files into different languages, or make suggestions, write documentation, or help test new software.&lt;/p&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;b&gt;Podpora za %1&lt;/b&gt;&lt;br/&gt;%1 podpirajo ljudi, kot ste vi. Nekateri pomagajo drugim preko podpornega foruma -%2 - drugi s prevajanjem pomoči v druge jezike, podajanjem predlogov, pisanjem dokumentacije ali preizkušanjem novih programov.&lt;/p&gt; </translation>
-    </message>
-    <message>
-        <location filename="../minstall.cpp" line="939"/>
+        <location filename="../minstall.cpp" line="940"/>
         <source>Finish</source>
         <translation>Zaključi</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="942"/>
+        <location filename="../minstall.cpp" line="943"/>
         <source>Start</source>
         <translation>Začni</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="945"/>
+        <location filename="../minstall.cpp" line="946"/>
         <source>OK</source>
         <translation>V redu</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="947"/>
+        <location filename="../minstall.cpp" line="948"/>
         <source>Next</source>
         <translation>Naslednji</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1076"/>
+        <location filename="../minstall.cpp" line="1077"/>
         <source>The installation and configuration is incomplete.
 Do you really want to stop now?</source>
         <translation>Namestitev in konfiguracija nista končani.
 Ali bi jo res radi zaustavili?</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1149"/>
+        <location filename="../minstall.cpp" line="1150"/>
         <source>&lt;p&gt;&lt;b&gt;Getting Help&lt;/b&gt;&lt;br/&gt;Basic information about %1 is at %2.&lt;/p&gt;&lt;p&gt;There are volunteers to help you at the %3 forum, %4&lt;/p&gt;&lt;p&gt;If you ask for help, please remember to describe your problem and your computer in some detail. Usually statements like &apos;it didn&apos;t work&apos; are not helpful.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Kam po pomoč?&lt;/b&gt;&lt;br/&gt;Osnovne inoformacije o sistemu %1 se nahajajo na %2. &lt;/p&gt;&lt;p&gt;Prostovoljce, ki nudijo pomoč, je mogoče najti na %3 forumu, %4.&lt;/p&gt;&lt;p&gt;Če iščete pomoč, čim bolj podrobno opišite svojo težavo in računalnik. Ponavadi stavki tipa &apos;ne deluje&apos; niso dovolj.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1157"/>
+        <location filename="../minstall.cpp" line="1158"/>
         <source>&lt;p&gt;&lt;b&gt;Repairing Your Installation&lt;/b&gt;&lt;br/&gt;If %1 stops working from the hard drive, sometimes it&apos;s possible to fix the problem by booting from LiveDVD or LiveUSB and running one of the included utilities in %1 or by using one of the regular Linux tools to repair the system.&lt;/p&gt;&lt;p&gt;You can also use your %1 LiveDVD or LiveUSB to recover data from MS-Windows systems!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Popravilo namestitve&lt;/b&gt;&lt;br/&gt;Če %1 na vašem disku preneha delovati, je včasih mogoče težavo odpraviti z zagonom iz živega DVD ali USB pogona in zagonom katerega od orodji, ki jih %1 vsebuje ali z uporabo katerega od standardnih Linux orodji za popravljanje sistema.&lt;/p&gt;&lt;p&gt;Živi DVD ali SUSB lahko uporabite tudi za reševanje podatkov iz sistemov z MS-Windows!&lt;/p&gt; </translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1163"/>
+        <location filename="../minstall.cpp" line="1164"/>
         <source>&lt;p&gt;&lt;b&gt;Adjusting Your Sound Mixer&lt;/b&gt;&lt;br/&gt; %1 attempts to configure the sound mixer for you but sometimes it will be necessary for you to turn up volumes and unmute channels in the mixer in order to hear sound.&lt;/p&gt; &lt;p&gt;The mixer shortcut is located in the menu. Click on it to open the mixer. &lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;%1 bo samodejno poskusil&lt;/b&gt;&lt;br/&gt;nastaviti zvočni mikser, vendar je včasih potrebno, da uporabnik nastavi glasnost in vklopi kanale na miskerju, da bi se zvok slišal.&lt;/p&gt; &lt;p&gt;Bljižnica do mikserja se nahaja v menuju. Kliknite nanjo, da bi ga odprli. &lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1171"/>
+        <location filename="../minstall.cpp" line="1172"/>
         <source>&lt;p&gt;&lt;b&gt;Keep Your Copy of %1 up-to-date&lt;/b&gt;&lt;br/&gt;For more information and updates please visit&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Poskrbite, da bo vaš %1 ažuriran&lt;/b&gt;&lt;br/&gt;Za več informacij in posodobitve obiščite&lt;/p&gt;&lt;p&gt; %2&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../minstall.cpp" line="1176"/>
+        <location filename="../minstall.cpp" line="1177"/>
         <source>&lt;p&gt;&lt;b&gt;Special Thanks&lt;/b&gt;&lt;br/&gt;Thanks to everyone who has chosen to support %1 with their time, money, suggestions, work, praise, ideas, promotion, and/or encouragement.&lt;/p&gt;&lt;p&gt;Without you there would be no %1.&lt;/p&gt;&lt;p&gt;%2 Dev Team&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Posebna zahvala&lt;/b&gt;&lt;br/&gt;Hvala vsem, ki se odločili podpreti %1 s svojim časom, denarjem, predlogi, delom, pohvalami, idejami, promoviranjem in/ali spodbujanjem.&lt;/p&gt;&lt;p&gt;Brez vas %1 ne bi obstajal.&lt;/p&gt;&lt;p&gt;%2 razvojna skupina&lt;/p&gt;</translation>
     </message>
@@ -1862,22 +1858,22 @@ Izberite drugo ime.</translation>
 <context>
     <name>PartMan::ItemDelegate</name>
     <message>
-        <location filename="../partman.cpp" line="2519"/>
+        <location filename="../partman.cpp" line="2518"/>
         <source>&amp;Templates</source>
         <translation>&amp;Predloge</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2527"/>
+        <location filename="../partman.cpp" line="2525"/>
         <source>Compression (Z&amp;STD)</source>
         <translation>Stiskanje (Z&amp;STD)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2529"/>
+        <location filename="../partman.cpp" line="2527"/>
         <source>Compression (&amp;LZO)</source>
         <translation>Stiskanje (&amp;LZO)</translation>
     </message>
     <message>
-        <location filename="../partman.cpp" line="2531"/>
+        <location filename="../partman.cpp" line="2529"/>
         <source>Compression (&amp;ZLIB)</source>
         <translation>Stiskanje (&amp;ZLIB)</translation>
     </message>
