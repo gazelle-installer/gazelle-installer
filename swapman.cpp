@@ -96,7 +96,7 @@ void SwapMan::install(QStringList &cmdboot_out)
         proc.exec("truncate", {"--size=0", instpath});
         proc.exec("chattr", {"+C", instpath});
     }
-    proc.exec("fallocate", {"-l", QStringLiteral("%1M").arg(size), instpath});
+    proc.exec("dd", {"status=none", "if=/dev/zero", "of="+instpath, "bs=1M", QStringLiteral("count=%1").arg(size)});
     chmod(instpath.toUtf8().constData(), 0600);
     proc.exec("mkswap", {"-q", instpath});
 
