@@ -96,9 +96,13 @@ void SwapMan::install(QStringList &cmdboot_out)
         proc.exec("truncate", {"--size=0", instpath});
         proc.exec("chattr", {"+C", instpath});
     }
-    proc.exec("fallocate", {"-l", QStringLiteral("%1M").arg(size), instpath});
+#if 0 // TODO: Use for trixie
+    proc.exec("mkswap", {"-q", "-U","clear", "--size",QStringLiteral("%1M").arg(size), "--file", instpath});
+#else
+    proc.exec("dd", {"status=none", "if=/dev/zero", "of="+instpath, "bs=1M", QStringLiteral("count=%1").arg(size)});
     chmod(instpath.toUtf8().constData(), 0600);
     proc.exec("mkswap", {"-q", instpath});
+#endif
 
     proc.status(tr("Configuring swap file"));
     // Append the fstab with the swap file entry.

@@ -368,7 +368,8 @@ void MInstall::processNextPhase() noexcept
             proc.advance(-1, -1);
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
 
-            swapman->setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
+            // Disable ZRam because it creates problems with Debian kernel 6.1.0-29-amd64
+            /*swapman->setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.*/
             if (!partman->checkTargetDrivesOK()) throw "";
             autoMountEnabled = true; // disable auto mount by force
             setupAutoMount(false);
