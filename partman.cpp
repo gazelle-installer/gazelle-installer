@@ -41,6 +41,7 @@
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
+#include <QStandardPaths>
 
 #include "mprocess.h"
 #include "msettings.h"
@@ -2080,7 +2081,10 @@ QStringList PartMan::Device::allowedFormats() const noexcept
                 list << "ext4";
                 if (usefor != "/boot") {
                     list << "ext3" << "ext2";
-                    list << "f2fs" << "jfs" << "xfs" << "btrfs";
+                    if (!QStandardPaths::findExecutable("mkfs.f2fs").isEmpty()) list << "f2fs";
+                    if (!QStandardPaths::findExecutable("mkfs.jfs").isEmpty()) list << "jfs";
+                    if (!QStandardPaths::findExecutable("mkfs.xfs").isEmpty()) list << "xfs";
+                    if (!QStandardPaths::findExecutable("mkfs.btrfs").isEmpty()) list << "btrfs";
                 }
             }
             if (size <= (2*TB - 64*KB)) list.append("FAT32");
