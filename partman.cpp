@@ -312,8 +312,7 @@ bool PartMan::manageConfig(MSettings &config) noexcept
                 part->name = joinName(drive->name, ixPart+1);
             }
             // Configuration management, accounting for automatic control correction order.
-            const QString &groupPart = "Partition" + QString::number(ixPart+1);
-            config.beginGroup(groupPart);
+            config.beginGroup("Partition" + QString::number(ixPart+1));
             if (save) {
                 config.setInteger("Size", part->size);
                 if (part->isActive()) config.setBoolean("Active", true);
