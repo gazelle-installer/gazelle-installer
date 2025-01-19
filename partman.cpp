@@ -41,6 +41,7 @@
 #include <QLineEdit>
 #include <QFormLayout>
 #include <QDialogButtonBox>
+#include <QStandardPaths>
 
 #include "mprocess.h"
 #include "msettings.h"
@@ -1122,7 +1123,14 @@ void PartMan::preparePartitions()
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
         // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
         const long long length = (4*MB + (gran - 1)) / gran; // ceiling
-        proc.exec("blkdiscard", {opts, "-l", QString::number(length*gran), drive->path});
+        sect.setExceptionMode(false);
+        if (proc.exec("blkdiscard", {opts, "-l", QString::number(length*gran), drive->path})) {
+            sect.setExceptionMode(true);
+        } else {
+            sect.setExceptionMode(true);
+            opts = "-fvz"; // use zero instead of failing - but reported - trim support
+            proc.exec("blkdiscard", {opts, "-l", QString::number(length*gran), drive->path});
+        }
         // Last 17KB = secondary partition table (for GPT disks).
         const long long offset = (drive->size - 4*MB) / gran; // floor
         proc.exec("blkdiscard", {opts, "-o", QString::number(offset*gran), drive->path});
@@ -1234,7 +1242,12 @@ void PartMan::formatPartitions()
             if (proc.detectVirtualBox()) {
                 proc.exec("blkdiscard", {"-fvz", dev}); // VirtualBox incorrectly reports TRIM support.
             } else {
-                proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev});
+                sect.setExceptionMode(false);
+                if (! proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev})) {
+                    sect.setExceptionMode(true);
+                    proc.exec("blkdiscard", {"-fvz", dev});
+                }
+                sect.setExceptionMode(true);
             }
             const NameParts &devsplit = splitName(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});
@@ -2068,7 +2081,10 @@ QStringList PartMan::Device::allowedFormats() const noexcept
                 list << "ext4";
                 if (usefor != "/boot") {
                     list << "ext3" << "ext2";
-                    list << "f2fs" << "jfs" << "xfs" << "btrfs";
+                    if (!QStandardPaths::findExecutable("mkfs.f2fs").isEmpty()) list << "f2fs";
+                    if (!QStandardPaths::findExecutable("mkfs.jfs").isEmpty()) list << "jfs";
+                    if (!QStandardPaths::findExecutable("mkfs.xfs").isEmpty()) list << "xfs";
+                    if (!QStandardPaths::findExecutable("mkfs.btrfs").isEmpty()) list << "btrfs";
                 }
             }
             if (size <= (2*TB - 64*KB)) list.append("FAT32");
@@ -2208,8 +2224,9 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
     }
     if ((changed & ((1 << PartMan::COL_USEFOR) | (1 << PartMan::COL_FORMAT))) && canMount(false)) {
         // Default options, dump and pass
-        if (usefor == "SWAP") options = discgran ? "discard" : "defaults";
-        else if (finalFormat().startsWith("FAT")) {
+        if (usefor == "SWAP") {
+            options = discgran ? "discard=once" : "defaults";
+        } else if (finalFormat().startsWith("FAT")) {
             options = "noatime,dmask=0002,fmask=0113";
             pass = 0;
             dump = false;
@@ -2220,8 +2237,6 @@ void PartMan::Device::autoFill(unsigned int changed) noexcept
             options.clear();
             const bool btrfs = (format == "btrfs" || type == SUBVOLUME);
             if (!flags.rotational && btrfs) options += "ssd,";
-            if (discgran && (format == "ext4" || format == "xfs")) options += "discard,";
-            else if (discgran && btrfs) options += "discard=async,";
             options += "noatime";
             if (btrfs && usefor != "/swap") options += ",compress=zstd:1";
             dump = true;
@@ -2510,7 +2525,6 @@ void PartMan::ItemDelegate::partOptionsMenu() noexcept
     if ((part->type == PartMan::Device::PARTITION && selFS == "btrfs") || part->type == PartMan::Device::SUBVOLUME) {
         QString tcommon;
         if (!part->flags.rotational) tcommon = "ssd,";
-        if (part->discgran) tcommon = "discard=async,";
         tcommon += "noatime";
         QAction *action = menuTemplates->addAction(tr("Compression (Z&STD)"));
         action->setData(tcommon + ",compress=zstd");

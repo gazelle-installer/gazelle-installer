@@ -68,7 +68,7 @@ enum Step {
 
 MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
     : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile),
-      helpBackdrop("/usr/share/gazelle-installer-data/backdrop-textbox.png")
+      helpBackdrop(appConf.getString("HELP-BACKDROP-IMAGE", "/usr/share/gazelle-installer-data/backdrop-textbox.png"))
 {
     gui.setupUi(this);
     gui.listLog->addItem("Version " VERSION);
@@ -94,6 +94,11 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     PROJECTVERSION = appConf.getString("VERSION");
     PROJECTURL = appConf.getString("PROJECT_URL");
     PROJECTFORUM = appConf.getString("FORUM_URL");
+
+    //hide save desktop changes checkbox, for pesky desktop environments
+    if (appConf.getBoolean("HIDE_SAVE_DESKTOP_CHANGES_CHECKBOX")){
+        gui.checkSaveDesktop->hide();
+    }
 
     gotoPage(Step::SPLASH);
 
@@ -357,7 +362,8 @@ void MInstall::processNextPhase() noexcept
             proc.advance(-1, -1);
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
 
-            swapman->setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
+            // Disable ZRam because it creates problems with Debian kernel 6.1.0-29-amd64
+            /*swapman->setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.*/
             if (!partman->checkTargetDrivesOK()) throw "";
             autoMountEnabled = true; // disable auto mount by force
             setupAutoMount(false);

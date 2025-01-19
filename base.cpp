@@ -41,6 +41,7 @@ Base::Base(MProcess &mproc, PartMan &pman, const MIni &appConf, const QCommandLi
     sync = appArgs.isSet("sync");
     bufferRoot = appConf.getInteger("ROOT_BUFFER", 1024) * MB;
     bufferHome = appConf.getInteger("HOME_BUFFER", 1024) * MB;
+    liveToInstalled = appConf.getString("LIVE_TO_INSTALLED_SCRIPT", "/usr/sbin/live-to-installed");
 
     bootSource = "/live/aufs/boot";
     rootSources << "/live/aufs/bin" << "/live/aufs/dev"
@@ -186,7 +187,8 @@ void Base::install()
     proc.mkpath("/mnt/antiX/opt", 0755);
     proc.mkpath("/mnt/antiX/tmp", 01777, true);
     // Fix live setup to install before creating a chroot environment.
-    proc.shell("/usr/sbin/live-to-installed /mnt/antiX");
+    // allow custom live-to-installed script
+    proc.shell(liveToInstalled + " /mnt/antiX");
     if (!partman.installTabs()) throw sect.failMessage();
     // Create a chroot environment.
     proc.exec("mount", {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});

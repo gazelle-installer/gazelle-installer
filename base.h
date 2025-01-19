@@ -29,6 +29,7 @@ class Base
     Q_DECLARE_TR_FUNCTIONS(Base)
     class MProcess &proc;
     class PartMan &partman;
+    QString liveToInstalled;
     long long sourceInodes = 1;
     long long bufferRoot = 0, bufferHome = 0;
     bool pretend = false;

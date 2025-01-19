@@ -21,6 +21,8 @@ Services tab supports sysVinit enable/disable actions and systemd systemctl enab
 
 See gazelle-installer-data services.list and installer.conf for instructions on configuration options.
 
+installer.conf can also be read from /etc/gazelle-installer-data/installer.conf.  this file will take precdence.  all values must be in the file.
+
 gazelle-installer is maintained by the MX Linux and antiX Linux Projects.
 
 Development Notes
@@ -49,6 +51,9 @@ Because both MX Linux and antiX Linux use packages with slightly different versi
 Many partition manager fixes and improvements. Support for virtual devices (eg LUKS or LVM).
 Swap file and hibernation support, and Btrfs improvements.
 Integrated installation media MD5 checker which runs at the start.
+#### Version 5.3
+Many improvements such as UX improvements, customisability of logos, reliability of the installed OS on solid state media, see commit history for details.
+Since there are so many updates, why not. New year, new version.
 #### Version 5.2
 Allow the installer to compile with Qt 6. Since this is not a major re-write, no major version increment.
 MX Linux 10th anniversary special: 5×2=10

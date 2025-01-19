@@ -55,7 +55,7 @@ void CheckMD5::check()
         QString path;
         QByteArray hash;
         off_t size;
-        blksize_t blksize;
+        size_t blksize;
     };
     std::vector<HashTarget> targets;
     static const char *failmsg = QT_TR_NOOP("The installation media is corrupt.");
@@ -80,9 +80,11 @@ void CheckMD5::check()
                     .path = fpath,
                     .hash = QByteArray::fromHex(line.section(' ', 0, 0, QString::SectionSkipEmpty).toUtf8()),
                     .size = sb.st_size,
-                    .blksize = sb.st_blksize
+                    .blksize = static_cast<size_t>(sb.st_blksize)
                 };
-                bufsize = std::max<size_t>(bufsize, sb.st_blksize);
+                if (bufsize < target.blksize) {
+                    bufsize = target.blksize;
+                }
                 targets.push_back(target);
                 btotal += target.size;
             } else {

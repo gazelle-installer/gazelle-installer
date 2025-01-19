@@ -47,10 +47,19 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
 
     // timezone lists
     connect(gui.comboTimeArea, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Oobe::timeAreaIndexChanged);
-    proc.exec("find", {"-L", "/usr/share/zoneinfo/posix",
-            "-mindepth", "2", "-type", "f", "-printf", "%P\\n"}, nullptr, true);
+
+    //search top level zoneinfo folder rather than posix subfolder
+    //posix subfolder doesn't existing in trixie/sid
+    proc.exec("find", {"-L", "/usr/share/zoneinfo/",
+                "-mindepth", "2", "-type", "f",
+                "-not", "-path", "/usr/share/zoneinfo/posix/*",
+                "-not", "-path", "/usr/share/zoneinfo/right/*",
+                "-printf", "%P\\n"}, nullptr, true);
+
     timeZones = proc.readOutLines();
+
     gui.comboTimeArea->clear();
+
     for (const QString &zone : std::as_const(timeZones)) {
         const QString &area = zone.section('/', 0, 0);
         if (gui.comboTimeArea->findData(QVariant(area)) < 0) {
@@ -367,13 +376,14 @@ void Oobe::setComputerName()
     }
     //replaceStringInFile(PROJECTSHORTNAME + "1", textComputerName->text(), "/mnt/antiX/etc/hosts");
     const QString &compname = gui.textComputerName->text();
+    const QString &domainname = gui.textComputerDomain->text();
     QString cmd("sed -E -i '/localhost/! s/^(127\\.0\\.0\\.1|127\\.0\\.1\\.1).*/\\1    " + compname + "/'");
     proc.shell(cmd + " " + etcpath + "/hosts");
     proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/hostname");
     proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/mailname");
     proc.shell("sed -i 's/.*send host-name.*/send host-name \""
         + compname + "\";/g' " + etcpath + "/dhcp/dhclient.conf");
-    proc.shell("echo \"" + compname + "\" | cat > " + etcpath + "/defaultdomain");
+    proc.shell("echo \"" + domainname + "\" | cat > " + etcpath + "/defaultdomain");
 }
 
 // return 0 = success, 1 = bad area, 2 = bad zone

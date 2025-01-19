@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     if (defskin) a.setStyleSheet("QDialog { border: 2px ridge gray; }");
     a.setApplicationVersion(VERSION);
-    a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
+    //a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
 
     const QString &transpath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
     QTranslator qtTran;
@@ -124,6 +124,7 @@ int main(int argc, char *argv[])
     }
 
     MIni appConf("/usr/share/gazelle-installer-data/installer.conf", MIni::ReadOnly);
+    a.setWindowIcon(QIcon(appConf.getString("LOGO-IMAGE", "/usr/share/gazelle-installer-data/logo.png")));
     a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.getString("PROJECT_NAME")));
 
     // The lock is released when this object is destroyed.
@@ -169,9 +170,17 @@ int main(int argc, char *argv[])
     qDebug() << "Installer version:" << VERSION;
     MInstall minstall(appConf, parser, cfgfile);
     const QRect &geo = a.primaryScreen()->availableGeometry();
-    if (parser.isSet("oobe")) {
-        minstall.setGeometry(0,0,geo.width()/1.5,geo.height()/1.5);
+    int width = 800;
+    int height = 600;
+    if (geo.width() > 1200) {
+        width = geo.width()/1.5;
+        if (width > 1280) width = 1280; //  1920 / 1.5
     }
+    if (geo.height() > 900){
+        height = geo.height()/1.5;
+        if (height > 720) height = 720; // 1080 / 1.5
+    }
+    minstall.setGeometry(0,0,width,height);
     minstall.move((geo.width() - minstall.width()) / 2, (geo.height() - minstall.height()) / 2);
     minstall.show();
     return a.exec();
