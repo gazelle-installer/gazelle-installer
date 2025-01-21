@@ -35,6 +35,9 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     : QObject(parent), proc(mproc), gui(ui), master(parent), oem(oem), online(modeOOBE),
     passUser(ui.textUserPass, ui.textUserPass2, 0, this), passRoot(ui.textRootPass, ui.textRootPass2, 0, this)
 {
+    appConf.setSection("OOBE");
+    gui.boxRootAccount->setChecked(appConf.getBoolean("ROOT_ACCOUNT_DEFAULT"));
+    appConf.setSection();
     // User accounts
     connect(&passUser, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
     connect(&passRoot, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);

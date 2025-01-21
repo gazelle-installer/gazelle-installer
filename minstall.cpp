@@ -837,10 +837,13 @@ void MInstall::pageDisplayed(int next) noexcept
 
     case Step::USER_ACCOUNTS:
         gui.textHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
-        + tr("The root user is similar to the Administrator user in some other operating systems."
-            " You should not use the root user as your daily user account."
-            " Please enter the name for a new (default) user account that you will use on a daily basis."
+        + tr("Please enter the name for a new (default) user account that you will use on a daily basis."
             " If needed, you can add other user accounts later with %1 User Manager.").arg(PROJECTNAME) + "</p>"
+        "<p><b>" + tr("Root (administrator) account") + "</b><br/>"
+        + tr("The root user is similar to the Administrator user in some other operating systems."
+            " You should not use the root user as your daily user account.") + "<br/>"
+        + tr("The root account is disabled on MX Linux, as administrative tasks are performed with an elevation prompt for the default user.") + "<br/>"
+        "<i>" + tr("Enabling the root account is strongly recommended for antiX Linux.") + "</i></p>"
         "<p><b>" + tr("Passwords") + "</b><br/>"
         + tr("Enter a new password for your default user account and for the root account."
             " Each password must be entered twice.") + "</p>"
