@@ -36,8 +36,17 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, QSettings &appCo
     passUser(ui.textUserPass, ui.textUserPass2, 0, this), passRoot(ui.textRootPass, ui.textRootPass2, 0, this)
 {
     appConf.beginGroup("OOBE");
+
+    gui.textComputerName->setText(appConf.value("DEFAULT_HOSTNAME").toString());
     gui.boxRootAccount->setChecked(appConf.value("ROOT_ACCOUNT_DEFAULT").toBool());
+
+    //hide save desktop changes checkbox, for pesky desktop environments
+    if (appConf.value("HIDE_SAVE_DESKTOP_CHANGES_CHECKBOX").toBool()){
+        gui.checkSaveDesktop->hide();
+    }
+
     appConf.endGroup();
+
     // User accounts
     connect(&passUser, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
     connect(&passRoot, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
@@ -256,7 +265,6 @@ void Oobe::buildServiceList(QSettings &appconf) noexcept
     services_desc.setIniCodec("UTF-8");
 #endif
 
-    gui.textComputerName->setText(appconf.value("DEFAULT_HOSTNAME").toString());
     appconf.beginGroup("SERVICES");
     for (const QString &service : appconf.allKeys()) {
         const QString &lang = QLocale::system().bcp47Name().toLower();
