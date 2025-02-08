@@ -42,8 +42,7 @@ public:
     QStringList rootSources;
     QStringList homes;
 
-    Base(class MProcess &mproc, class PartMan &pman,
-        const class MIni &appConf, const QCommandLineParser &appArgs);
+    Base(class MProcess &mproc, class PartMan &pman, class MIni &appConf, const QCommandLineParser &appArgs);
     bool saveHomeBasic() noexcept;
     void install();
 };

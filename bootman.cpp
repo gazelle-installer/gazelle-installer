@@ -30,13 +30,16 @@
 #include "bootman.h"
 
 BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
-    const MIni &appConf, const QCommandLineParser &appArgs) noexcept
+    MIni &appConf, const QCommandLineParser &appArgs) noexcept
     : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
 {
-    loaderID = appConf.getString("PROJECT_SHORTNAME");
-    loaderLabel = appConf.getString("PROJECT_NAME");
-    installFromRootDevice = appConf.getBoolean("INSTALL_FROM_ROOT_DEVICE");
-    removeNoSplash = appConf.getBoolean("REMOVE_NOSPLASH");
+    appConf.setSection("Storage");
+    installFromRootDevice = appConf.getBoolean("InstallFromRootDevice");
+    appConf.setSection("OOBE");
+    removeNoSplash = appConf.getBoolean("RemoveNosplash");
+    appConf.setSection();
+    loaderID = appConf.getString("ShortName");
+    loaderLabel = appConf.getString("Name");
     brave = appArgs.isSet("brave");
 
     connect(gui.radioBootMBR, &QRadioButton::toggled, this, &BootMan::chosenBootMBR);

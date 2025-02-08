@@ -33,15 +33,17 @@
 
 #define BASE_BLOCK  (4*KB)
 
-Base::Base(MProcess &mproc, PartMan &pman, const MIni &appConf, const QCommandLineParser &appArgs)
+Base::Base(MProcess &mproc, PartMan &pman, MIni &appConf, const QCommandLineParser &appArgs)
     : proc(mproc), partman(pman)
 {
     pretend = appArgs.isSet("pretend");
-    populateMediaMounts = appConf.getBoolean("POPULATE_MEDIA_MOUNTPOINTS");
+    appConf.setSection("Storage");
+    populateMediaMounts = appConf.getBoolean("PopulateMediaMountPoints");
     sync = appArgs.isSet("sync");
-    bufferRoot = appConf.getInteger("ROOT_BUFFER", 1024) * MB;
-    bufferHome = appConf.getInteger("HOME_BUFFER", 1024) * MB;
-    liveToInstalled = appConf.getString("LIVE_TO_INSTALLED_SCRIPT", "/usr/sbin/live-to-installed");
+    bufferRoot = appConf.getInteger("RootBuffer", 1024) * MB;
+    bufferHome = appConf.getInteger("HomeBuffer", 1024) * MB;
+    appConf.setSection();
+    liveToInstalled = appConf.getString("LiveToInstalledScript", "/usr/sbin/live-to-installed");
 
     bootSource = "/live/aufs/boot";
     rootSources << "/live/aufs/bin" << "/live/aufs/dev"
@@ -234,7 +236,7 @@ void Base::install()
         proc.shell("mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
     }
 
-    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
+    // if PopulateMediaMountPoints is true in gazelle-installer-data, then use the --mntpnt switch
     if (populateMediaMounts) {
         proc.shell("make-fstab -O --install=/mnt/antiX --mntpnt=/media");
     } else {

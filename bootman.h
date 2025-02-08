@@ -43,7 +43,7 @@ class BootMan : public QObject
     void chosenBootESP(bool checked) noexcept;
 public:
     BootMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui,
-        const class MIni &appConf, const QCommandLineParser &appArgs) noexcept;
+        class MIni &appConf, const QCommandLineParser &appArgs) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void buildBootLists() noexcept;
     void install(const QStringList &cmdextra = {});

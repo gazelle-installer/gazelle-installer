@@ -48,7 +48,7 @@ class AutoPart : public QObject
     void sliderActionTriggered(int action) noexcept;
     void sliderValueChanged(int value) noexcept;
 public:
-    AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, const class MIni &appConf) noexcept;
+    AutoPart(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, MIni &appConf) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void scan() noexcept;
     void refresh() noexcept;

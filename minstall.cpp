@@ -67,9 +67,12 @@ enum Step {
 };
 
 MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
-    : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile),
-      helpBackdrop(appConf.getString("HELP-BACKDROP-IMAGE", "/usr/share/gazelle-installer-data/backdrop-textbox.png"))
+    : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile)
 {
+    appConf.setSection("GUI");
+    setWindowIcon(QIcon(appConf.getString("Logo", "/usr/share/gazelle-installer-data/logo.png")));
+    helpBackdrop = appConf.getString("HelpBackdrop", "/usr/share/gazelle-installer-data/backdrop-textbox.png");
+    appConf.setSection();
     gui.setupUi(this);
     gui.listLog->addItem("Version " VERSION);
     proc.setupUI(gui.listLog, gui.progInstall);
@@ -89,16 +92,13 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     }
 
     // setup system variables
-    PROJECTNAME = appConf.getString("PROJECT_NAME");
-    PROJECTSHORTNAME = appConf.getString("PROJECT_SHORTNAME");
-    PROJECTVERSION = appConf.getString("VERSION");
-    PROJECTURL = appConf.getString("PROJECT_URL");
-    PROJECTFORUM = appConf.getString("FORUM_URL");
-
-    //hide save desktop changes checkbox, for pesky desktop environments
-    if (appConf.getBoolean("HIDE_SAVE_DESKTOP_CHANGES_CHECKBOX")){
-        gui.checkSaveDesktop->hide();
-    }
+    PROJECTNAME = appConf.getString("Name");
+    PROJECTSHORTNAME = appConf.getString("ShortName");
+    PROJECTVERSION = appConf.getString("Version");
+    appConf.setSection("Links");
+    PROJECTURL = appConf.getString("Website");
+    PROJECTFORUM = appConf.getString("Forum");
+    appConf.setSection();
 
     gotoPage(Step::SPLASH);
 
@@ -196,12 +196,12 @@ void MInstall::startup()
 
         // set some distro-centric text
         QString link_block;
-        appConf.beginGroup("LINKS");
+        appConf.setSection("Links");
         const QStringList &links = appConf.getKeys();
         for (const QString &link : links) {
             link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + appConf.getString(link);
         }
-        appConf.endGroup();
+        appConf.setSection();
         gui.textReminders->setPlainText(tr("Support %1\n\n"
             "%1 is supported by people like you. Some help others at the support forum - %2,"
             " or translate help files into different languages, or make suggestions,"
@@ -523,7 +523,9 @@ int MInstall::showPage(int curr, int next) noexcept
 {
     if (next == Step::SPLASH) { // Enter splash screen
         gui.boxMain->setCursor(Qt::WaitCursor);
-        splashSetThrobber(appConf.getBoolean("SPLASH_THROBBER", true));
+        appConf.setSection("GUI");
+        splashSetThrobber(appConf.getBoolean("SplashThrobber", true));
+        appConf.setSection();
     } else if (curr == Step::SPLASH) { // Leave splash screen
         gui.labelSplash->clear();
         splashSetThrobber(false);

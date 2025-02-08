@@ -41,7 +41,7 @@ if [ "$EUID" != 0 ]; then
         export WAYLAND_DISPLAY=$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY
     fi
 
-    AUTHENTICATION="$(grep AUTHENTICATION /usr/share/gazelle-installer-data/installer.conf |cut -d= -f2)"
+    AUTHENTICATION="$(grep -i Authentication /usr/share/gazelle-installer-data/installer.conf |cut -d= -f2)"
     if [ -z "$AUTHENTICATION" ]; then
         AUTHENTICATION="su-to-root -X -c"
     fi

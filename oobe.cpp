@@ -36,8 +36,17 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     passUser(ui.textUserPass, ui.textUserPass2, 0, this), passRoot(ui.textRootPass, ui.textRootPass2, 0, this)
 {
     appConf.setSection("OOBE");
-    gui.boxRootAccount->setChecked(appConf.getBoolean("ROOT_ACCOUNT_DEFAULT"));
+
+    gui.textComputerName->setText(appConf.getString("DefaultHostName"));
+    gui.boxRootAccount->setChecked(appConf.getBoolean("RootAccountDefault"));
+
+    //hide save desktop changes checkbox, for pesky desktop environments
+    if (!appConf.getBoolean("CanSaveDesktopChanges", true)){
+        gui.checkSaveDesktop->hide();
+    }
+
     appConf.setSection();
+
     // User accounts
     connect(&passUser, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
     connect(&passRoot, &PassEdit::validationChanged, this, &Oobe::userPassValidationChanged);
@@ -251,8 +260,7 @@ void Oobe::buildServiceList(MIni &appconf) noexcept
 
     MIni services_desc("/usr/share/gazelle-installer-data/services.list", MIni::ReadOnly);
 
-    gui.textComputerName->setText(appconf.getString("DEFAULT_HOSTNAME"));
-    appconf.setSection("SERVICES");
+    appconf.setSection("Services");
     for (const QString &service : appconf.getKeys()) {
         const QString &lang = QLocale::system().bcp47Name().toLower();
         services_desc.setSection(lang);
@@ -282,6 +290,7 @@ void Oobe::buildServiceList(MIni &appconf) noexcept
             item->setCheckState(0, appconf.getBoolean(service) ? Qt::Checked : Qt::Unchecked);
         }
     }
+    appconf.setSection();
 
     gui.treeServices->expandAll();
     gui.treeServices->resizeColumnToContents(0);

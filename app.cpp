@@ -123,9 +123,13 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    MIni appConf("/usr/share/gazelle-installer-data/installer.conf", MIni::ReadOnly);
+    QString confPath = "/usr/share/gazelle-installer-data/installer.conf";
+    if (QFile::exists("/etc/gazelle-installer-data/installer.conf")) {
+        confPath = "/etc/gazelle-installer-data/installer.conf";
+    }
+    MIni appConf(confPath, MIni::ReadOnly);
     a.setWindowIcon(QIcon(appConf.getString("LOGO-IMAGE", "/usr/share/gazelle-installer-data/logo.png")));
-    a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.getString("PROJECT_NAME")));
+    a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.getString("Name")));
 
     // The lock is released when this object is destroyed.
     QLockFile lockfile("/var/lock/gazelle-installer.lock");
