@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
     }
 
     QSettings appConf(installer_conf_file, QSettings::NativeFormat);
-    a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.value("PROJECT_NAME").toString()));
+    a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.value("Name").toString()));
 
     // The lock is released when this object is destroyed.
     QLockFile lockfile("/var/lock/gazelle-installer.lock");

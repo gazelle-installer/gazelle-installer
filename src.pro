@@ -4,7 +4,7 @@ DEFINES += QT_DISABLE_DEPRECATED_UP_TO=0x050F00
 
 TEMPLATE = app
 TARGET = minstall
-VERSION = 5.3
+VERSION = 5.4
 CONFIG += debug_and_release warn_on strict_c++ c++17
 CONFIG(release, debug|release) {
     DEFINES += NDEBUG

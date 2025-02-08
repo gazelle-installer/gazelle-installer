@@ -52,11 +52,11 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const QSettings &appConf, c
     : QAbstractItemModel(ui.boxMain), proc(mproc), gui(ui)
 {
     root = new Device(*this);
-    const QString &projShort = appConf.value("PROJECT_SHORTNAME").toString();
+    const QString &projShort = appConf.value("ShortName").toString();
     volSpecs["BIOS-GRUB"] = {"BIOS GRUB"};
     volSpecs["/boot"] = {"boot"};
     volSpecs["/boot/efi"] = volSpecs["ESP"] = {"EFI-SYSTEM"};
-    volSpecs["/"] = {"root" + projShort + appConf.value("VERSION").toString()};
+    volSpecs["/"] = {"root" + projShort + appConf.value("Version").toString()};
     volSpecs["/home"] = {"home" + projShort};
     volSpecs["SWAP"] = {"swap" + projShort};
     brave = appArgs.isSet("brave");

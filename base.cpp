@@ -33,14 +33,16 @@
 
 #define BASE_BLOCK  (4*KB)
 
-Base::Base(MProcess &mproc, PartMan &pman, const QSettings &appConf, const QCommandLineParser &appArgs)
+Base::Base(MProcess &mproc, PartMan &pman, QSettings &appConf, const QCommandLineParser &appArgs)
     : proc(mproc), partman(pman)
 {
     pretend = appArgs.isSet("pretend");
-    populateMediaMounts = appConf.value("POPULATE_MEDIA_MOUNTPOINTS").toBool();
+    appConf.beginGroup("Storage");
+    populateMediaMounts = appConf.value("PopulateMediaMountPoints").toBool();
     sync = appArgs.isSet("sync");
-    bufferRoot = appConf.value("ROOT_BUFFER", 1024).toLongLong() * MB;
-    bufferHome = appConf.value("HOME_BUFFER", 1024).toLongLong() * MB;
+    bufferRoot = appConf.value("RootBuffer", 1024).toLongLong() * MB;
+    bufferHome = appConf.value("HomeBuffer", 1024).toLongLong() * MB;
+    appConf.endGroup();
 
     bootSource = "/live/aufs/boot";
     rootSources << "/live/aufs/bin" << "/live/aufs/dev"
@@ -187,7 +189,7 @@ void Base::install(QSettings &appConf)
     proc.mkpath("/mnt/antiX/tmp", 01777, true);
     // Fix live setup to install before creating a chroot environment.
     // allow custom live-to-installed script
-    QString live_to_installed = appConf.value("LIVE_TO_INSTALLED_SCRIPT", "/usr/sbin/live-to-installed").toString();
+    QString live_to_installed = appConf.value("LiveToInstalledScript", "/usr/sbin/live-to-installed").toString();
     proc.shell(live_to_installed + " /mnt/antiX");
     if (!partman.installTabs()) throw sect.failMessage();
     // Create a chroot environment.
@@ -234,7 +236,7 @@ void Base::install(QSettings &appConf)
         proc.shell("mv -f /mnt/antiX/etc/rcS.d/S*virtualbox-guest-x11 /mnt/antiX/etc/rcS.d/K21virtualbox-guest-x11 >/dev/null 2>&1");
     }
 
-    // if POPULATE_MEDIA_MOUNTPOINTS is true in gazelle-installer-data, then use the --mntpnt switch
+    // if PopulateMediaMountPoints is true in gazelle-installer-data, then use the --mntpnt switch
     if (populateMediaMounts) {
         proc.shell("make-fstab -O --install=/mnt/antiX --mntpnt=/media");
     } else {

@@ -72,9 +72,9 @@ static const QRegularExpression configCensor("Encryption\\/Pass|User\\/.*Pass/i"
 
 MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
     : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile),
-    helpBackdrop(appConf.value("HELP-BACKDROP-IMAGE", "/usr/share/gazelle-installer-data/backdrop-textbox.png").toString())
+    helpBackdrop(appConf.value("GUI/HelpBackdrop", "/usr/share/gazelle-installer-data/backdrop-textbox.png").toString())
 {
-    setWindowIcon(QIcon(appConf.value("LOGO-IMAGE","/usr/share/gazelle-installer-data/logo.png").toString()));
+    setWindowIcon(QIcon(appConf.value("GUI/Logo","/usr/share/gazelle-installer-data/logo.png").toString()));
     gui.setupUi(this);
     gui.listLog->addItem("Version " VERSION);
     gui.tabsMain->setCurrentIndex(0);
@@ -95,11 +95,11 @@ MInstall::MInstall(QSettings &acfg, const QCommandLineParser &args, const QStrin
     }
 
     // setup system variables
-    PROJECTNAME = appConf.value("PROJECT_NAME").toString();
-    PROJECTSHORTNAME = appConf.value("PROJECT_SHORTNAME").toString();
-    PROJECTVERSION = appConf.value("VERSION").toString();
-    PROJECTURL = appConf.value("PROJECT_URL").toString();
-    PROJECTFORUM = appConf.value("FORUM_URL").toString();
+    PROJECTNAME = appConf.value("Name").toString();
+    PROJECTSHORTNAME = appConf.value("ShortName").toString();
+    PROJECTVERSION = appConf.value("Version").toString();
+    PROJECTURL = appConf.value("Links/Website").toString();
+    PROJECTFORUM = appConf.value("Links/Forum").toString();
 
     gotoPage(Step::SPLASH);
 
@@ -197,7 +197,7 @@ void MInstall::startup()
 
         // set some distro-centric text
         QString link_block;
-        appConf.beginGroup("LINKS");
+        appConf.beginGroup("Links");
         const QStringList &links = appConf.childKeys();
         for (const QString &link : links) {
             link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + appConf.value(link).toString();
@@ -527,7 +527,7 @@ int MInstall::showPage(int curr, int next) noexcept
 {
     if (next == Step::SPLASH) { // Enter splash screen
         gui.boxMain->setCursor(Qt::WaitCursor);
-        splashSetThrobber(appConf.value("SPLASH_THROBBER", true).toBool());
+        splashSetThrobber(appConf.value("GUI/SplashThrobber", true).toBool());
     } else if (curr == Step::SPLASH) { // Leave splash screen
         gui.labelSplash->clear();
         splashSetThrobber(false);

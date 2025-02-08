@@ -57,7 +57,7 @@ AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, const clas
     strHome = tr("Home");
     strNone = "----";
     gui.spinHome->setSpecialValueText(strNone);
-    installFromRootDevice = appConf.value("INSTALL_FROM_ROOT_DEVICE").toBool();
+    installFromRootDevice = appConf.value("Storage/InstallFromRootDevice").toBool();
     refresh();
 }
 
