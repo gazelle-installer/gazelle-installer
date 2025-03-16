@@ -234,6 +234,7 @@ public:
     QStringList allowedUsesFor(bool all = true) const noexcept;
     QStringList allowedFormats() const noexcept;
     QString finalFormat() const noexcept;
+    QString finalLabel() const noexcept;
     QString shownFormat(const QString &fmt) const noexcept;
     inline QString shownFormat() const noexcept { return shownFormat(format); }
     inline bool isVolume() const noexcept { return (type == PARTITION || type == VIRTUAL); }

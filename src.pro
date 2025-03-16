@@ -24,6 +24,7 @@ HEADERS += \
     mtreeview.h \
     oobe.h \
     passedit.h \
+    replacer.h \
     swapman.h \
     version.h \
     msettings.h \
@@ -42,6 +43,7 @@ SOURCES += \
     partman.cpp \
     passedit.cpp \
     mprocess.cpp \
+    replacer.cpp \
     swapman.cpp
 LIBS += -lzxcvbn
 

@@ -1961,7 +1961,7 @@ void PartMan::Device::setActive(bool on) noexcept
     parentItem->active = on ? this : nullptr;
     partman.notifyChange(this);
 }
-inline bool PartMan::Device::isActive() const noexcept
+bool PartMan::Device::isActive() const noexcept
 {
     if (!parentItem) return false;
     return (parentItem->active == this);
@@ -2116,6 +2116,11 @@ QString PartMan::Device::finalFormat() const noexcept
     if (type == SUBVOLUME) return parentItem->format;
     return (type != DRIVE && (usefor.isEmpty() || format == "PRESERVE")) ? curFormat : format;
 }
+QString PartMan::Device::finalLabel() const noexcept
+{
+    if (type == SUBVOLUME) return parentItem->label;
+    return (type != DRIVE && (usefor.isEmpty() || format == "PRESERVE")) ? curLabel : label;
+}
 QString PartMan::Device::shownFormat(const QString &fmt) const noexcept
 {
     if (fmt == "CREATE") return flags.oldLayout ? tr("Overwrite") : tr("Create");
@@ -2260,8 +2265,9 @@ void PartMan::Device::addToCombo(QComboBox *combo, bool warnNasty) const noexcep
 {
     QString strout(QLocale::system().formattedDataSize(size, 1, QLocale::DataSizeTraditionalFormat));
     strout += ' ' + finalFormat();
-    if (!label.isEmpty()) strout += " - " + label;
-    if (!model.isEmpty()) strout += (label.isEmpty() ? " - " : "; ") + model;
+    const QString &flabel = finalLabel();
+    if (!flabel.isEmpty()) strout += " - " + flabel;
+    if (!model.isEmpty()) strout += (flabel.isEmpty() ? " - " : "; ") + model;
     QString stricon;
     if (!flags.oldLayout || !usefor.isEmpty()) stricon = ":/appointment-soon";
     else if (flags.nasty && warnNasty) stricon = ":/dialog-warning";

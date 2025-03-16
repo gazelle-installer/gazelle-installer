@@ -76,6 +76,7 @@ private:
     class CheckMD5 *checkmd5 = nullptr;
     class PartMan *partman = nullptr;
     class AutoPart *autopart = nullptr;
+    class Replacer *replacer = nullptr;
     class Base *base = nullptr;
     class Oobe *oobe = nullptr;
     class BootMan *bootman = nullptr;

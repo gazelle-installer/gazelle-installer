@@ -41,6 +41,7 @@
 #include "checkmd5.h"
 #include "partman.h"
 #include "autopart.h"
+#include "replacer.h"
 #include "base.h"
 #include "oobe.h"
 #include "bootman.h"
@@ -53,6 +54,7 @@ enum Step {
     SPLASH,
     TERMS,
     DISK,
+    REPLACE,
     PARTITIONS,
     ENCRYPTION,
     CONFIRM,
@@ -189,6 +191,7 @@ void MInstall::startup()
         swapman = new SwapMan(proc, *partman, gui);
         autopart = new AutoPart(proc, partman, gui, appConf);
         partman->autopart = autopart;
+        replacer = new Replacer(proc, partman, gui, appConf);
         connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
         gui.labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
             + "<br/><img src=':/dialog-warning'/>" + tr("These actions cannot be undone. Do you want to continue?")
@@ -223,6 +226,7 @@ void MInstall::startup()
         // Build disk widgets
         partman->scan();
         autopart->scan();
+        replacer->scan();
         if (gui.comboDisk->count() > 0) {
             gui.comboDisk->setCurrentIndex(0);
             gui.radioEntireDisk->setChecked(true);
@@ -557,25 +561,36 @@ int MInstall::showPage(int curr, int next) noexcept
                 return Step::ENCRYPTION;
             }
             return Step::CONFIRM;
+        } else if (gui.radioCustomPart->isChecked()) {
+            return Step::PARTITIONS;
         }
-    } else if (curr == Step::PARTITIONS && next > curr) {
-        gui.listConfirm->clear();
-        if (!partman->composeValidate(automatic)) {
-            nextFocus = gui.treePartitions;
+    } else if (curr == Step::REPLACE && next > curr) {
+        if (!replacer->composeValidate(automatic)) {
+            nextFocus = gui.tableExistInst;
             return curr;
-        }
-        if (!pretend && !(base && base->saveHomeBasic())) {
-            QMessageBox::critical(this, windowTitle(),
-                tr("The data in /home cannot be preserved because"
-                    " the required information could not be obtained."));
-            return curr;
-        }
-        for (PartMan::Iterator it(*partman); *it; it.next()) {
-            if ((*it)->willEncrypt()) {
-                return Step::ENCRYPTION;
-            }
         }
         return Step::CONFIRM;
+    } else if (curr == Step::PARTITIONS) {
+        if (next > curr) {
+            gui.listConfirm->clear();
+            if (!partman->composeValidate(automatic)) {
+                nextFocus = gui.treePartitions;
+                return curr;
+            }
+            if (!pretend && !(base && base->saveHomeBasic())) {
+                QMessageBox::critical(this, windowTitle(),
+                    tr("The data in /home cannot be preserved because"
+                        " the required information could not be obtained."));
+                return curr;
+            }
+            for (PartMan::Iterator it(*partman); *it; it.next()) {
+                if ((*it)->willEncrypt()) {
+                    return Step::ENCRYPTION;
+                }
+            }
+            return Step::CONFIRM;
+        }
+        return Step::DISK;
     } else if (curr == Step::ENCRYPTION && next < curr) {
         if (gui.radioEntireDisk->isChecked()) {
             partman->scan(autopart->selectedDrive()); // Clear the auto layout.
@@ -599,8 +614,11 @@ int MInstall::showPage(int curr, int next) noexcept
             if (gui.radioEntireDisk->isChecked()) {
                 partman->scan(autopart->selectedDrive()); // Clear the auto layout.
                 return Step::DISK;
+            } else if (gui.radioCustomPart->isChecked()) {
+                return Step::PARTITIONS;
+            } else if (gui.radioReplace->isChecked()) {
+                return Step::REPLACE;
             }
-            return Step::PARTITIONS;
         }
     } else if (curr == Step::BOOT && next > curr) {
         return oem ? Step::PROGRESS : Step::NETWORK;
@@ -689,6 +707,17 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
                 " partitions you need.").arg(PROJECTNAME, gui.radioCustomPart->text().remove('&')) + "</p>");
+        break;
+
+    case Step::REPLACE:
+        gui.textHelp->setText("<p><b>" + tr("Replace existing installation") + "</b><br/>"
+            + tr("If you have an existing installation, you can use this function to replace it with a fresh installation.") + "</p>"
+            "<p>" + tr("This is particularly useful if you are upgrading from a previous version and want to preserve your data.") + "<br/>"
+            + tr("There is no guarantee of this working successfully. Ensure you have a good working backup of all important data before continuing.") + "</p>");
+
+        if(gui.tableExistInst->rowCount() <= 0) {
+            replacer->scan(true);
+        }
         break;
 
     case Step::PARTITIONS:
