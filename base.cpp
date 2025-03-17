@@ -121,12 +121,9 @@ bool Base::saveHomeBasic() noexcept
     MProcess::Section sect(proc, nullptr);
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     QString homedir("/");
-    const auto fit = partman.mounts.find("/home");
-    const PartMan::Device *mount = nullptr;
-    if (fit != partman.mounts.cend() && !fit->second->willFormat()) {
-        mount = fit->second;
-    } else {
-        mount = partman.mounts.at("/"); // Must have '/' at this point.
+    const PartMan::Device *mount = partman.findByMount("/home");
+    if (mount == nullptr) {
+        mount = partman.findByMount("/"); // Must have '/' at this point.
         homedir = "/home";
     }
     assert(mount != nullptr);
@@ -157,8 +154,9 @@ void Base::install()
     if (proc.halted()) return;
     proc.advance(1, 1);
 
-    const PartMan::Device *mount = partman.mounts.at("/");
-    const bool skiphome = !mount->willFormat();
+    const PartMan::Device *rootdev = partman.findByMount("/");
+    assert(rootdev != nullptr);
+    const bool skiphome = !rootdev->willFormat();
     if (skiphome) {
         MProcess::Section sect(proc, QT_TR_NOOP("Failed to delete old system on destination."));
         // if root was not formatted and not using --sync option then re-use it
@@ -166,13 +164,17 @@ void Base::install()
         proc.status(tr("Deleting old system"));
         QStringList findargs({"/mnt/antiX", "-mindepth", "1", "-xdev"});
         // Preserve mount points of other file systems.
-        for (auto &it : partman.mounts) {
-            if (it.first.at(0) == '/' && it.first != "/") {
-                findargs << "!" << "-path" << "/mnt/antiX" + it.first;
+        bool homeSeparate = false;
+        for (PartMan::Iterator it(partman); *it; it.next()) {
+            const QString &mount = (*it)->mountPoint();
+            if (mount != "/" && mount.startsWith('/')) {
+                findargs << "!" << "-path" << "/mnt/antiX" + mount;
+            } else if (mount == "/home") {
+                homeSeparate = true;
             }
         }
         // Preserve /home even if not a separate file system.
-        if (partman.mounts.count("/home") < 1) {
+        if (!homeSeparate) {
             findargs << "!" << "-path" << "/mnt/antiX/home/*";
             findargs << "!" << "-path" << "/mnt/antiX/home";
         }
@@ -206,14 +208,17 @@ void Base::install()
     proc.exec("chroot", {"/mnt/antiX", "desktop-menu", "--write-out-global"});
 
     // Disable hibernation inside initramfs.
-    if (partman.isEncrypt("SWAP")) {
-        proc.exec("touch", {"/mnt/antiX/initramfs-tools/conf.d/resume"});
-        QFile file("/mnt/antiX/etc/initramfs-tools/conf.d/resume");
-        if (file.open(QIODevice::WriteOnly)) {
-            QTextStream out(&file);
-            out << "RESUME=none";
+    for (PartMan::Iterator it(partman); PartMan::Device *dev = *it; it.next()) {
+        if (dev->mountPoint() == "swap" && dev->willEncrypt()) {
+            proc.exec("touch", {"/mnt/antiX/initramfs-tools/conf.d/resume"});
+            QFile file("/mnt/antiX/etc/initramfs-tools/conf.d/resume");
+            if (file.open(QIODevice::WriteOnly)) {
+                QTextStream out(&file);
+                out << "RESUME=none";
+            }
+            file.close();
+            break;
         }
-        file.close();
     }
 
     //remove home unless a demo home is found in remastered linuxfs

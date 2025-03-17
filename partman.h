@@ -87,14 +87,13 @@ public:
     };
     std::map<QString, struct VolumeSpec> volSpecs;
     QString bootUUID;
-    std::map<QString, Device *> mounts;
     class AutoPart *autopart = nullptr;
     PartMan(class MProcess &mproc, class Ui::MeInstall &ui,
         const class MIni &appConf, const QCommandLineParser &appArgs);
     ~PartMan();
     void scan(Device *drvstart = nullptr);
     bool manageConfig(class MSettings &config) noexcept;
-    bool composeValidate(bool automatic) noexcept;
+    bool validate(bool automatic) const noexcept;
     bool checkTargetDrivesOK() const;
     Device *selectedDriveAuto() noexcept;
     void clearAllUses() noexcept;
@@ -102,9 +101,8 @@ public:
     void prepStorage();
     bool installTabs() noexcept;
     void clearWorkArea();
-    int swapCount() const noexcept;
-    int isEncrypt(const QString &point) const noexcept;
     Device *findByPath(const QString &devpath) const noexcept;
+    Device *findByMount(const QString &mount) const noexcept;
     Device *findHostDev(const QString &path) const noexcept;
     struct VolumeSpec volSpecTotal(const QString &path, const QStringList &vols) const noexcept;
     struct VolumeSpec volSpecTotal(const QString &path) const noexcept;
@@ -145,8 +143,8 @@ private:
     void partMenuUnlock(class Device *part);
     void partMenuLock(class Device *volume);
     void scanSubvolumes(class Device *part);
-    bool confirmSpace(class QMessageBox &msgbox) noexcept;
-    bool confirmBootable(class QMessageBox &msgbox) noexcept;
+    bool confirmSpace(class QMessageBox &msgbox) const noexcept;
+    bool confirmBootable(class QMessageBox &msgbox) const noexcept;
     void luksFormat();
     void luksOpen(class Device *part, const QByteArray &password);
 
@@ -237,7 +235,8 @@ public:
     QString shownFormat(const QString &fmt) const noexcept;
     inline QString shownFormat() const noexcept { return shownFormat(format); }
     inline bool isVolume() const noexcept { return (type == PARTITION || type == VIRTUAL); }
-    bool canMount(bool pointonly = true) const noexcept;
+    QString mountPoint() const noexcept;
+    bool canMount(bool fsonly = true) const noexcept;
     long long driveFreeSpace(bool inclusive = false) const noexcept;
     /* Convenience */
     void addToCombo(QComboBox *combo, bool warnNasty = false) const noexcept;
