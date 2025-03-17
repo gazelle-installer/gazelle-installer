@@ -881,7 +881,14 @@ QSlider::handle:horizontal:disabled {
                <widget class="QLabel" name="labelConfirm"/>
               </item>
               <item>
-               <widget class="QListWidget" name="listConfirm"/>
+               <widget class="QTreeWidget" name="treeConfirm">
+                <attribute name="headerVisible">
+                 <bool>false</bool>
+                </attribute>
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::NoSelection</enum>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
@@ -1159,9 +1166,6 @@ QSlider::handle:horizontal:disabled {
                  </sizepolicy>
                 </property>
                 <property name="alternatingRowColors">
-                 <bool>true</bool>
-                </property>
-                <property name="rootIsDecorated">
                  <bool>true</bool>
                 </property>
                 <column>

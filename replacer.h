@@ -32,6 +32,7 @@ public:
     Replacer(class MProcess &mproc, class PartMan *pman, class Ui::MeInstall &ui, class MIni &appConf);
     void scan(bool full = false) noexcept;
     bool validate(bool automatic) const noexcept;
+    bool preparePartMan() const noexcept;
 private:
     std::vector<RootBase> bases;
     class MProcess &proc;

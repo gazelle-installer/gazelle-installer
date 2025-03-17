@@ -69,7 +69,6 @@ void Replacer::scan(bool full) noexcept
 
 bool Replacer::validate(bool automatic) const noexcept
 {
-    gui.listConfirm->clear();
     const int currow = gui.tableExistInst->currentRow();
     assert(gui.tableExistInst->rowCount() == bases.size());
     if (currow < 0 || currow >= (int)bases.size()) {
@@ -78,7 +77,20 @@ bool Replacer::validate(bool automatic) const noexcept
         }
         return false;
     }
+    const auto &rbase = bases.at(currow);
 
+    gui.treeConfirm->clear();
+    QTreeWidgetItem *twit = new QTreeWidgetItem(gui.treeConfirm);
+    twit->setText(0, tr("Replace the installation in %1 (%2)").arg(rbase.devpath, rbase.release));
+    return true;
+}
+bool Replacer::preparePartMan() const noexcept
+{
+    const int currow = gui.tableExistInst->currentRow();
+    assert(gui.tableExistInst->rowCount() == bases.size());
+    assert(currow >= 0 && currow < (int)bases.size());
+
+    partman->scan();
     // Populate layout usage information based on the selected existing installation.
     const auto &rbase = bases.at(currow);
     for(const auto &mount : rbase.mounts) {
@@ -96,8 +108,6 @@ bool Replacer::validate(bool automatic) const noexcept
             }
         }
     }
-
-    gui.listConfirm->addItem(tr("Replace the installation in %1 (%2)").arg(rbase.devpath, rbase.release));
     return partman->validate(true);
 }
 

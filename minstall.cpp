@@ -366,7 +366,21 @@ void MInstall::processNextPhase() noexcept
             proc.advance(-1, -1);
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
 
-            swapman->setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
+            // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
+            swapman->setupZRam();
+
+            if (gui.radioEntireDisk->isChecked()) {
+                partman->scan();
+                PartMan::Device *drive = autopart->selectedDrive();
+                if (!drive) throw QT_TR_NOOP("Cannot find selected drive.");
+                autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
+                bootman->buildBootLists(); // Load default boot options
+            } else if (gui.radioReplace->isChecked()) {
+                if (!replacer->preparePartMan()) {
+                    throw QT_TR_NOOP("Unable to prepare for replacement.");
+                }
+                bootman->buildBootLists(); // Load default boot options
+            }
             if (!partman->checkTargetDrivesOK()) throw "";
             autoMountEnabled = true; // disable auto mount by force
             setupAutoMount(false);
@@ -538,25 +552,9 @@ int MInstall::showPage(int curr, int next) noexcept
         if (modeOOBE) return Step::NETWORK;
     } else if (curr == Step::DISK && next > curr) {
         if (gui.radioEntireDisk->isChecked()) {
-            if (!automatic && !proc.detectEFI()) {
-                PartMan::Device *device = partman->findByPath("/dev/" + gui.comboDisk->currentData().toString());
-                if (device && device->size >= 2*TB) {
-                    const int ans = QMessageBox::warning(this, windowTitle(),
-                        tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
-                           " On some systems, a GPT-formatted disk will not boot."),
-                        QMessageBox::Yes, QMessageBox::No);
-                    if (ans != QMessageBox::Yes) return curr; // don't format - stop install
-                }
+            if (!autopart->validate(automatic, PROJECTNAME)) {
+                return curr;
             }
-            partman->clearAllUses();
-            autopart->buildLayout(autopart->partSize(), gui.checkEncryptAuto->isChecked());
-            if (!partman->validate(true)) {
-                nextFocus = gui.treePartitions;
-                return Step::PARTITIONS;
-            }
-            gui.listConfirm->clear();
-            gui.listConfirm->addItem(tr("Format and use the entire disk (%1) for %2").arg(
-                gui.comboDisk->currentData().toString(), PROJECTNAME));
             if (gui.checkEncryptAuto->isChecked()) {
                 return Step::ENCRYPTION;
             }
@@ -572,11 +570,12 @@ int MInstall::showPage(int curr, int next) noexcept
         return Step::CONFIRM;
     } else if (curr == Step::PARTITIONS) {
         if (next > curr) {
-            gui.listConfirm->clear();
+            gui.treeConfirm->clear();
             if (!partman->validate(automatic)) {
                 nextFocus = gui.treePartitions;
                 return curr;
             }
+            gui.treeConfirm->expandAll();
             if (!pretend && !(base && base->saveHomeBasic())) {
                 QMessageBox::critical(this, windowTitle(),
                     tr("The data in /home cannot be preserved because"
@@ -593,26 +592,24 @@ int MInstall::showPage(int curr, int next) noexcept
         return Step::DISK;
     } else if (curr == Step::ENCRYPTION && next < curr) {
         if (gui.radioEntireDisk->isChecked()) {
-            partman->scan(autopart->selectedDrive()); // Clear the auto layout.
             return Step::DISK;
         }
         return Step::PARTITIONS;
     } else if (curr == Step::CONFIRM) {
         if (next > curr) {
-            bootman->buildBootLists(); // Load default boot options
-            if (gui.radioEntireDisk->isChecked()) {
+            if (gui.radioCustomPart->isChecked()) {
+                bootman->buildBootLists(); // Load default boot options
+                swapman->setupDefaults();
+                manageConfig(CONFIG_LOAD2);
+                return Step::BOOT;
+            } else {
                 gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
                 swapman->setupDefaults();
                 manageConfig(CONFIG_LOAD2);
                 return oem ? Step::PROGRESS : Step::NETWORK;
-            } else {
-                swapman->setupDefaults();
-                manageConfig(CONFIG_LOAD2);
-                return Step::BOOT;
             }
         } else {
             if (gui.radioEntireDisk->isChecked()) {
-                partman->scan(autopart->selectedDrive()); // Clear the auto layout.
                 return Step::DISK;
             } else if (gui.radioCustomPart->isChecked()) {
                 return Step::PARTITIONS;

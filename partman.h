@@ -93,10 +93,9 @@ public:
     ~PartMan();
     void scan(Device *drvstart = nullptr);
     bool manageConfig(class MSettings &config) noexcept;
-    bool validate(bool automatic) const noexcept;
+    bool validate(bool automatic, QTreeWidgetItem *confroot = nullptr) const noexcept;
     bool checkTargetDrivesOK() const;
     Device *selectedDriveAuto() noexcept;
-    void clearAllUses() noexcept;
     int countPrepSteps() noexcept;
     void prepStorage();
     bool installTabs() noexcept;
