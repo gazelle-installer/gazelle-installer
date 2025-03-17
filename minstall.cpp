@@ -370,6 +370,7 @@ void MInstall::processNextPhase() noexcept
                 PartMan::Device *drive = autopart->selectedDrive();
                 if (!drive) throw QT_TR_NOOP("Cannot find selected drive.");
                 autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
+                bootman->buildBootLists(); // Load default boot options
             }
             if (!partman->checkTargetDrivesOK()) throw "";
             autoMountEnabled = true; // disable auto mount by force
@@ -576,13 +577,13 @@ int MInstall::showPage(int curr, int next) noexcept
         return Step::PARTITIONS;
     } else if (curr == Step::CONFIRM) {
         if (next > curr) {
-            bootman->buildBootLists(); // Load default boot options
             if (gui.radioEntireDisk->isChecked()) {
                 gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
                 swapman->setupDefaults();
                 manageConfig(CONFIG_LOAD2);
                 return oem ? Step::PROGRESS : Step::NETWORK;
             } else {
+                bootman->buildBootLists(); // Load default boot options
                 swapman->setupDefaults();
                 manageConfig(CONFIG_LOAD2);
                 return Step::BOOT;
