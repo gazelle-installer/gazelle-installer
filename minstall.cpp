@@ -550,7 +550,7 @@ int MInstall::showPage(int curr, int next) noexcept
             }
             partman->clearAllUses();
             autopart->buildLayout(autopart->partSize(), gui.checkEncryptAuto->isChecked());
-            if (!partman->composeValidate(true)) {
+            if (!partman->validate(true)) {
                 nextFocus = gui.treePartitions;
                 return Step::PARTITIONS;
             }
@@ -565,7 +565,7 @@ int MInstall::showPage(int curr, int next) noexcept
             return Step::PARTITIONS;
         }
     } else if (curr == Step::REPLACE && next > curr) {
-        if (!replacer->composeValidate(automatic)) {
+        if (!replacer->validate(automatic)) {
             nextFocus = gui.tableExistInst;
             return curr;
         }
@@ -573,7 +573,7 @@ int MInstall::showPage(int curr, int next) noexcept
     } else if (curr == Step::PARTITIONS) {
         if (next > curr) {
             gui.listConfirm->clear();
-            if (!partman->composeValidate(automatic)) {
+            if (!partman->validate(automatic)) {
                 nextFocus = gui.treePartitions;
                 return curr;
             }

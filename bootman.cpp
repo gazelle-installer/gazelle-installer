@@ -59,8 +59,11 @@ void BootMan::manageConfig(MSettings &config) noexcept
 
 void BootMan::selectBootMain() noexcept
 {
-    const auto fit = partman.mounts.find("/boot");
-    const PartMan::Device *device = (fit != partman.mounts.end() ? fit->second : partman.mounts.at("/"));
+    const PartMan::Device *device = partman.findByMount("/boot");
+    if (!device) {
+        device = partman.findByMount("/");
+    }
+    assert(device != nullptr);
 
     if (device->origin) device = device->origin;
     while (device && device->type != PartMan::Device::PARTITION) {
@@ -153,10 +156,10 @@ void BootMan::install(const QStringList &cmdextra)
             QStringList grubinstargs({"--no-nvram", "--force-extra-removable",
                 (efisize==32 ? "--target=i386-efi" : "--target=x86_64-efi"),
                 "--bootloader-id=" + loaderID, "--recheck"});
-            auto fitesp = partman.mounts.find("/boot/efi");
-            if (fitesp == partman.mounts.end()) fitesp = partman.mounts.find("/boot");
-            if (fitesp != partman.mounts.end() && fitesp->second->flags.sysEFI) {
-                grubinstargs << "--efi-directory=" + fitesp->first;
+            const PartMan::Device *espdev = partman.findByMount("/boot/efi");
+            if (!espdev) espdev = partman.findByMount("/boot");
+            if (espdev != nullptr && espdev->flags.sysEFI) {
+                grubinstargs << "--efi-directory=" + espdev->mountPoint();
             }
             proc.exec("grub-install", grubinstargs);
 
@@ -173,8 +176,8 @@ void BootMan::install(const QStringList &cmdextra)
                 }
             }
             // Add a new NVRAM boot variable.
-            if (fitesp != partman.mounts.end()) {
-                const PartMan::NameParts &bs = PartMan::splitName(fitesp->second->name);
+            if (espdev != nullptr) {
+                const PartMan::NameParts &bs = PartMan::splitName(espdev->name);
                 proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", "/dev/"+bs.drive, "-p", bs.partition,
                     "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
             }
@@ -340,9 +343,9 @@ void BootMan::chosenBootPBR() noexcept
 void BootMan::chosenBootESP(bool checked) noexcept
 {
     gui.comboBoot->clear();
-    auto fit = partman.mounts.find("/boot/efi");
-    if (fit == partman.mounts.end()) fit = partman.mounts.find("/boot");
-    if (fit != partman.mounts.end()) fit->second->addToCombo(gui.comboBoot);
+    const PartMan::Device *dev = partman.findByMount("/boot/efi");
+    if (!dev) dev = partman.findByMount("/boot");
+    if (dev) dev->addToCombo(gui.comboBoot);
     gui.comboBoot->setDisabled(checked);
     gui.labelBoot->setText(tr("Partition to use:"));
 }

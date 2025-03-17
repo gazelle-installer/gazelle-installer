@@ -564,7 +564,7 @@ QSlider::handle:horizontal:disabled {
           </layout>
          </widget>
          <widget class="QWidget" name="pageReplace">
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <layout class="QVBoxLayout">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -588,7 +588,7 @@ QSlider::handle:horizontal:disabled {
              <property name="title">
               <string>Replace an existing installation</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout">
+             <layout class="QGridLayout">
               <item row="0" column="0" colspan="2">
                <widget class="QTableWidget" name="tableExistInst">
                 <property name="selectionMode">
@@ -641,7 +641,7 @@ QSlider::handle:horizontal:disabled {
              <property name="title">
               <string>Replacement options</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout">
+             <layout class="QVBoxLayout">
               <item>
                <widget class="QCheckBox" name="checkReplacePackages">
                 <property name="text">

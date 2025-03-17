@@ -67,7 +67,7 @@ void Replacer::scan(bool full) noexcept
     gui.tableExistInst->setEnabled(bases.size() > 0);
 }
 
-bool Replacer::composeValidate(bool automatic) noexcept
+bool Replacer::validate(bool automatic) const noexcept
 {
     gui.listConfirm->clear();
     const int currow = gui.tableExistInst->currentRow();
@@ -98,7 +98,7 @@ bool Replacer::composeValidate(bool automatic) noexcept
     }
 
     gui.listConfirm->addItem(tr("Replace the installation in %1 (%2)").arg(rbase.devpath, rbase.release));
-    return partman->composeValidate(true);
+    return partman->validate(true);
 }
 
 Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept

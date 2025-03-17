@@ -699,11 +699,11 @@ void PartMan::scanSubvolumes(Device *part)
     qApp->restoreOverrideCursor();
 }
 
-bool PartMan::composeValidate(bool automatic) noexcept
+ bool PartMan::validate(bool automatic) const noexcept
 {
-    mounts.clear();
+    std::map<QString, Device *> mounts;
     // Partition use and other validation
-    int swapnum = 0;
+    Device *rootdev = nullptr;
     for (Iterator it(*this); Device *volume = *it; it.next()) {
         if (volume->type == Device::DRIVE || volume->type == Device::VIRTUAL_DEVICES) continue;
         if (volume->type == Device::SUBVOLUME) {
@@ -728,17 +728,14 @@ bool PartMan::composeValidate(bool automatic) noexcept
                 }
             }
         }
-        QString mount = volume->usefor;
+        QString mount = volume->mountPoint();
         if (mount.isEmpty()) continue;
-        if (mount == "ESP") mount = "/boot/efi";
-        if (!mount.startsWith("/") && !volume->allowedUsesFor().contains(mount)) {
+        if (mount == "/") {
+            rootdev = volume;
+        } else if (!mount.startsWith("/") && !volume->allowedUsesFor().contains(mount)) {
             QMessageBox::critical(gui.boxMain, QString(),
                 tr("Invalid use for %1: %2").arg(volume->shownDevice(), mount));
             return false;
-        }
-        if (mount == "SWAP") {
-            ++swapnum;
-            if (swapnum > 1) mount+=QString::number(swapnum);
         }
 
         // The mount can only be selected once.
@@ -747,13 +744,12 @@ bool PartMan::composeValidate(bool automatic) noexcept
             QMessageBox::critical(gui.boxMain, QString(), tr("%1 is already"
                 " selected for: %2").arg(fit->second->shownDevice(), fit->second->usefor));
             return false;
-        } else if(volume->canMount(false)) {
+        } else if(volume->canMount(true)) {
             mounts[mount] = volume;
         }
     }
 
-    const auto fitroot = mounts.find("/");
-    if (fitroot == mounts.cend()) {
+    if (rootdev == nullptr) {
         const long long rootMin = volSpecTotal("/").minimum;
         const QString &tMinRoot = QLocale::system().formattedDataSize(rootMin,
             1, QLocale::DataSizeTraditionalFormat);
@@ -762,7 +758,7 @@ bool PartMan::composeValidate(bool automatic) noexcept
         return false;
     }
 
-    if (!fitroot->second->willFormat() && mounts.count("/home")>0) {
+    if (!rootdev->willFormat() && mounts.count("/home")>0) {
         QMessageBox::critical(gui.boxMain, QString(),
             tr("Cannot preserve /home inside root (/) if a separate /home partition is also mounted."));
         return false;
@@ -820,7 +816,7 @@ bool PartMan::composeValidate(bool automatic) noexcept
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         msgbox.setDefaultButton(QMessageBox::No);
 
-        if (fitroot->second->willEncrypt() && mounts.count("/boot")==0) {
+        if (rootdev->willEncrypt() && mounts.count("/boot")==0) {
             msgbox.setText(tr("You must choose a separate boot partition when encrypting root.")
                 + '\n' + tr("Are you sure you want to continue?"));
             if (msgbox.exec() != QMessageBox::Yes) return false;
@@ -831,7 +827,7 @@ bool PartMan::composeValidate(bool automatic) noexcept
 
     return true;
 }
-bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
+bool PartMan::confirmSpace(QMessageBox &msgbox) const noexcept
 {
     // Isolate used points from each other in total calculations
     QStringList vols;
@@ -888,15 +884,15 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) noexcept
     }
     return true;
 }
-bool PartMan::confirmBootable(QMessageBox &msgbox) noexcept
+bool PartMan::confirmBootable(QMessageBox &msgbox) const noexcept
 {
     if (proc.detectEFI()) {
         const char *msgtext = nullptr;
-        auto fitefi = mounts.find("/boot/efi");
-        if (fitefi == mounts.end()) {
+        const PartMan::Device *efidev = findByMount("/boot/efi");
+        if (efidev == nullptr) {
             msgtext = QT_TR_NOOP("This system uses EFI, but no valid"
                 " EFI system partition was assigned to /boot/efi separately.");
-        } else if (!fitefi->second->flags.sysEFI) {
+        } else if (!efidev->flags.sysEFI) {
             msgtext = QT_TR_NOOP("The volume assigned to /boot/efi"
                 " is not a valid EFI system partition.");
         }
@@ -1038,9 +1034,11 @@ void PartMan::prepStorage()
 {
     // For debugging
     qDebug() << "Mount points:";
-    for (const auto &it : mounts) {
-        qDebug() << " -" << it.first << '-' << it.second->shownDevice()
-            << it.second->map << it.second->path;
+    for (Iterator it(*this); Device *dev = *it; it.next()) {
+        if (dev->canMount(false)) {
+            qDebug() << " -" << dev->mountPoint()
+                << '-' << dev->shownDevice() << dev->map << dev->path;
+        }
     }
 
     // Prepare and mount storage
@@ -1362,6 +1360,14 @@ bool PartMan::makeFstab() noexcept
     if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
     out << "# Pluggable devices are handled by uDev, they are not in fstab\n";
+    // Use std::map to arrange mounts in alphabetical (thus, hierarchical) order.
+    std::map<QString, Device *> mounts;
+    for (Iterator it(*this); Device *dev = *it; it.next()) {
+        const QString &mount = dev->mountPoint();
+        if (!mount.isEmpty()) {
+            mounts[mount] = dev;
+        }
+    }
     // File systems and swap space.
     for (auto &it : mounts) {
         const Device *volume = it.second;
@@ -1392,7 +1398,7 @@ bool PartMan::makeFstab() noexcept
         if (fsfmt.compare("swap", Qt::CaseInsensitive) == 0) {
             out << " swap swap";
         } else {
-            out << ' ' << it.first;
+            out << ' ' << volume->mountPoint();
             if (fsfmt.startsWith("FAT")) out << " vfat";
             else out << ' ' << fsfmt;
         }
@@ -1422,8 +1428,16 @@ void PartMan::mountPartitions()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to mount partition."));
+
+    // Use std::map to arrange mounts in alphabetical (thus, hierarchical) order.
+    std::map<QString, Device *> mounts;
+    for (Iterator it(*this); Device *dev = *it; it.next()) {
+        const QString &mount = dev->mountPoint();
+        if (!mount.isEmpty() && mount.at(0) == '/') {
+            mounts[mount] = dev;
+        }
+    }
     for (auto &it : mounts) {
-        if (it.first.at(0) != '/') continue;
         const QString point("/mnt/antiX" + it.first);
         const QString &dev = it.second->mappedDevice();
         proc.status(tr("Mounting: %1").arg(it.first));
@@ -1467,38 +1481,17 @@ void PartMan::clearWorkArea()
     }
 }
 
-// Public properties
-int PartMan::swapCount() const noexcept
-{
-    int count = 0;
-    for (const auto &mount : mounts) {
-        if (mount.first.startsWith("SWAP")) ++count;
-    }
-    return count;
-}
-
-int PartMan::isEncrypt(const QString &point) const noexcept
-{
-    int count = 0;
-    if (point.isEmpty()) {
-        for (const auto &mount : mounts) {
-            if (mount.second->willEncrypt()) ++count;
-        }
-    } else if (point == "SWAP") {
-        for (const auto &mount : mounts) {
-            if (mount.first.startsWith("SWAP") && mount.second->willEncrypt()) ++count;
-        }
-    } else {
-        const auto fit = mounts.find(point);
-        if (fit != mounts.cend() && fit->second->willEncrypt()) ++count;
-    }
-    return count;
-}
-
 PartMan::Device *PartMan::findByPath(const QString &devpath) const noexcept
 {
     for (Iterator it(*this); *it; it.next()) {
         if ((*it)->path == devpath) return *it;
+    }
+    return nullptr;
+}
+PartMan::Device *PartMan::findByMount(const QString &mount) const noexcept
+{
+    for (Iterator it(*this); *it; it.next()) {
+        if ((*it)->mountPoint() == mount) return *it;
     }
     return nullptr;
 }
@@ -1508,8 +1501,7 @@ PartMan::Device *PartMan::findHostDev(const QString &path) const noexcept
     Device *device = nullptr;
     do {
         spath = QDir::cleanPath(QFileInfo(spath).path());
-        const auto fit = mounts.find(spath);
-        if (fit != mounts.cend()) device = mounts.at(spath);
+        device = findByMount(spath);
     } while(!device && !spath.isEmpty() && spath != '/' && spath != '.');
     return device;
 }
@@ -1532,7 +1524,11 @@ struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path, const QStr
 struct PartMan::VolumeSpec PartMan::volSpecTotal(const QString &path) const noexcept
 {
     QStringList vols;
-    for (const auto &mount : mounts) vols.append(mount.first);
+    for (Iterator it(*this); *it; it.next()) {
+        if ((*it)->canMount()) {
+            vols.append((*it)->mountPoint());
+        }
+    }
     return volSpecTotal(path, vols);
 }
 
@@ -2132,10 +2128,17 @@ QString PartMan::Device::shownFormat(const QString &fmt) const noexcept
         else return tr("Preserve /home (%1)").arg(curFormat);
     }
 }
-bool PartMan::Device::canMount(bool pointonly) const noexcept
+QString PartMan::Device::mountPoint() const noexcept
+{
+    if (!canMount(false)) return QString();
+    else if (usefor == "ESP") return "/boot/efi";
+    else if (usefor == "SWAP") return "swap";
+    return usefor;
+}
+bool PartMan::Device::canMount(bool fsonly) const noexcept
 {
     return !usefor.isEmpty() && usefor != "FORMAT" && usefor != "BIOS-GRUB"
-        && (!pointonly || usefor != "SWAP");
+        && (!fsonly || usefor != "SWAP");
 }
 long long PartMan::Device::driveFreeSpace(bool inclusive) const noexcept
 {
@@ -2162,7 +2165,7 @@ void PartMan::Device::driveAutoSetActive() noexcept
 {
     if (active) return;
     if (partman.proc.detectEFI() && format=="GPT") return;
-    // Cannot use partman.mounts map here as it may not be populated.
+
     for (const QString &pref : QStringList({"/boot", "/"})) {
         for (PartMan::Iterator it(this); Device *device = *it; it.next()) {
             if (device->usefor == pref) {

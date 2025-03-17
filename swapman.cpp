@@ -54,7 +54,7 @@ void SwapMan::manageConfig(MSettings &config, bool advanced) noexcept
 }
 void SwapMan::setupDefaults() noexcept
 {
-    gui.boxSwap->setChecked(partman.swapCount() <= 0);
+    gui.boxSwap->setChecked(partman.findByMount("swap") == nullptr);
     setupBounds();
     sizeResetClicked();
 }
