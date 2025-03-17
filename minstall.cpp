@@ -545,25 +545,27 @@ int MInstall::showPage(int curr, int next) noexcept
                 }
             }
             partman->clearAllUses();
+            gui.treeConfirm->clear();
+            QTreeWidgetItem *twit = new QTreeWidgetItem(gui.treeConfirm);
+            twit->setText(0, tr("Format and use the entire disk (%1) for %2").arg(
+                gui.comboDisk->currentData().toString(), PROJECTNAME));
             autopart->buildLayout(autopart->partSize(), gui.checkEncryptAuto->isChecked());
-            if (!partman->validate(true)) {
+            if (!partman->validate(true, twit)) {
                 nextFocus = gui.treePartitions;
                 return Step::PARTITIONS;
             }
-            gui.listConfirm->clear();
-            gui.listConfirm->addItem(tr("Format and use the entire disk (%1) for %2").arg(
-                gui.comboDisk->currentData().toString(), PROJECTNAME));
             if (gui.checkEncryptAuto->isChecked()) {
                 return Step::ENCRYPTION;
             }
             return Step::CONFIRM;
         }
     } else if (curr == Step::PARTITIONS && next > curr) {
-        gui.listConfirm->clear();
+        gui.treeConfirm->clear();
         if (!partman->validate(automatic)) {
             nextFocus = gui.treePartitions;
             return curr;
         }
+        gui.treeConfirm->expandAll();
         if (!pretend && !(base && base->saveHomeBasic())) {
             QMessageBox::critical(this, windowTitle(),
                 tr("The data in /home cannot be preserved because"

@@ -699,8 +699,9 @@ void PartMan::scanSubvolumes(Device *part)
     qApp->restoreOverrideCursor();
 }
 
- bool PartMan::validate(bool automatic) const noexcept
+bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
 {
+    if (!confroot) confroot = gui.treeConfirm->invisibleRootItem();
     std::map<QString, Device *> mounts;
     // Partition use and other validation
     Device *rootdev = nullptr;
@@ -766,8 +767,11 @@ void PartMan::scanSubvolumes(Device *part)
 
     // Confirmation page action list
     for (const Device *drive : std::as_const(root->children)) {
+        QTreeWidgetItem *twdrive = new QTreeWidgetItem(confroot);
         if (!drive->flags.oldLayout && drive->type != Device::VIRTUAL_DEVICES) {
-            gui.listConfirm->addItem(tr("Prepare %1 partition table on %2").arg(drive->format, drive->name));
+            twdrive->setText(0, tr("Prepare %1 partition table on %2").arg(drive->format, drive->name));
+        } else {
+            twdrive->setText(0, tr("Re-use partition table on %1").arg(drive->name));
         }
         for (const Device *part : std::as_const(drive->children)) {
             QString actmsg;
@@ -786,7 +790,8 @@ void PartMan::scanSubvolumes(Device *part)
                 else actmsg = tr("Create %1, format to use for %2");
             }
             // QString::arg() emits warnings if a marker is not in the string.
-            gui.listConfirm->addItem(actmsg.replace("%1", part->shownDevice()).replace("%2", part->usefor));
+            QTreeWidgetItem *twpart = new QTreeWidgetItem(twdrive);
+            twpart->setText(0, actmsg.replace("%1", part->shownDevice()).replace("%2", part->usefor));
 
             for (const Device *subvol : std::as_const(part->children)) {
                 const bool svnouse = subvol->usefor.isEmpty();
@@ -805,9 +810,11 @@ void PartMan::scanSubvolumes(Device *part)
                     }
                 }
                 // QString::arg() emits warnings if a marker is not in the string.
-                gui.listConfirm->addItem(" + " + actmsg.replace("%1", subvol->label).replace("%2", subvol->usefor));
+                QTreeWidgetItem *twsubvol = new QTreeWidgetItem(twpart);
+                twsubvol->setText(0, actmsg.replace("%1", subvol->label).replace("%2", subvol->usefor));
             }
         }
+        if (twdrive->childCount() < 1) delete twdrive;
     }
     if (!automatic) {
         // Warning messages
@@ -1003,8 +1010,15 @@ PartMan::Device *PartMan::selectedDriveAuto() noexcept
 void PartMan::clearAllUses() noexcept
 {
     for (Iterator it(*this); Device *device = *it; it.next()) {
+        if (device->finalFormat() == "btrfs") {
+            while (device->children.size()) {
+                delete device->child(0);
+            }
+        }
         device->usefor.clear();
-        if (device->type == Device::PARTITION) device->setActive(false);
+        if (device->type == Device::PARTITION) {
+            device->setActive(false);
+        }
         notifyChange(device);
     }
 }
