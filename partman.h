@@ -96,7 +96,6 @@ public:
     bool validate(bool automatic, QTreeWidgetItem *confroot = nullptr) const noexcept;
     bool checkTargetDrivesOK() const;
     Device *selectedDriveAuto() noexcept;
-    void clearAllUses() noexcept;
     int countPrepSteps() noexcept;
     void prepStorage();
     bool installTabs() noexcept;

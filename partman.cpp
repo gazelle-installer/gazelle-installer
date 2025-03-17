@@ -1007,22 +1007,6 @@ PartMan::Device *PartMan::selectedDriveAuto() noexcept
     return nullptr;
 }
 
-void PartMan::clearAllUses() noexcept
-{
-    for (Iterator it(*this); Device *device = *it; it.next()) {
-        if (device->finalFormat() == "btrfs") {
-            while (device->children.size()) {
-                delete device->child(0);
-            }
-        }
-        device->usefor.clear();
-        if (device->type == Device::PARTITION) {
-            device->setActive(false);
-        }
-        notifyChange(device);
-    }
-}
-
 int PartMan::countPrepSteps() noexcept
 {
     int nstep = 0;

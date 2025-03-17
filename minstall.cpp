@@ -362,7 +362,15 @@ void MInstall::processNextPhase() noexcept
             proc.advance(-1, -1);
             proc.status(tr("Preparing to install %1").arg(PROJECTNAME));
 
-            swapman->setupZRam(); // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
+            // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
+            swapman->setupZRam();
+
+            if (gui.radioEntireDisk->isChecked()) {
+                partman->scan();
+                PartMan::Device *drive = autopart->selectedDrive();
+                if (!drive) throw QT_TR_NOOP("Cannot find selected drive.");
+                autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
+            }
             if (!partman->checkTargetDrivesOK()) throw "";
             autoMountEnabled = true; // disable auto mount by force
             setupAutoMount(false);
@@ -534,25 +542,8 @@ int MInstall::showPage(int curr, int next) noexcept
         if (modeOOBE) return Step::NETWORK;
     } else if (curr == Step::DISK && next > curr) {
         if (gui.radioEntireDisk->isChecked()) {
-            if (!automatic && !proc.detectEFI()) {
-                PartMan::Device *device = partman->findByPath("/dev/" + gui.comboDisk->currentData().toString());
-                if (device && device->size >= 2*TB) {
-                    const int ans = QMessageBox::warning(this, windowTitle(),
-                        tr("WARNING: The selected drive has a capacity of at least 2TB and must be formatted using GPT."
-                           " On some systems, a GPT-formatted disk will not boot."),
-                        QMessageBox::Yes, QMessageBox::No);
-                    if (ans != QMessageBox::Yes) return curr; // don't format - stop install
-                }
-            }
-            partman->clearAllUses();
-            gui.treeConfirm->clear();
-            QTreeWidgetItem *twit = new QTreeWidgetItem(gui.treeConfirm);
-            twit->setText(0, tr("Format and use the entire disk (%1) for %2").arg(
-                gui.comboDisk->currentData().toString(), PROJECTNAME));
-            autopart->buildLayout(autopart->partSize(), gui.checkEncryptAuto->isChecked());
-            if (!partman->validate(true, twit)) {
-                nextFocus = gui.treePartitions;
-                return Step::PARTITIONS;
+            if (!autopart->validate(automatic, PROJECTNAME)) {
+                return curr;
             }
             if (gui.checkEncryptAuto->isChecked()) {
                 return Step::ENCRYPTION;
@@ -580,7 +571,6 @@ int MInstall::showPage(int curr, int next) noexcept
         return Step::CONFIRM;
     } else if (curr == Step::ENCRYPTION && next < curr) {
         if (gui.radioEntireDisk->isChecked()) {
-            partman->scan(autopart->selectedDrive()); // Clear the auto layout.
             return Step::DISK;
         }
         return Step::PARTITIONS;
@@ -599,7 +589,6 @@ int MInstall::showPage(int curr, int next) noexcept
             }
         } else {
             if (gui.radioEntireDisk->isChecked()) {
-                partman->scan(autopart->selectedDrive()); // Clear the auto layout.
                 return Step::DISK;
             }
             return Step::PARTITIONS;
