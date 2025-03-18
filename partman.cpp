@@ -1385,15 +1385,10 @@ bool PartMan::makeFstab() noexcept
             }
             out << "UUID=" << UUID;
         }
-        // Mount point, file system
-        QString fsfmt;
-        if (volume->type == Device::SUBVOLUME) {
-            fsfmt = "btrfs";
-        } else {
-            fsfmt = volume->finalFormat();
-        }
-
+        // Mount point
         out << ' ' << it.first;
+        // File system
+        const QString &fsfmt = volume->finalFormat();
         if (fsfmt.startsWith("FAT")) out << " vfat";
         else out << ' ' << fsfmt;
         // Options
@@ -1405,6 +1400,7 @@ bool PartMan::makeFstab() noexcept
             if (mountopts.isEmpty()) out << " defaults";
             else out << ' ' << mountopts;
         }
+        // Dump, pass
         out << ' ' << (volume->dump ? 1 : 0) << ' ' << volume->pass << '\n';
     }
     file.close();
