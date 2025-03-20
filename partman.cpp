@@ -1385,21 +1385,12 @@ bool PartMan::makeFstab() noexcept
             }
             out << "UUID=" << UUID;
         }
-        // Mount point, file system
-        QString fsfmt;
-        if (volume->type == Device::SUBVOLUME) {
-            fsfmt = "btrfs";
-        } else {
-            fsfmt = volume->finalFormat();
-        }
-
-        if (fsfmt.compare("swap", Qt::CaseInsensitive) == 0) {
-            out << " swap swap";
-        } else {
-            out << ' ' << volume->mountPoint();
-            if (fsfmt.startsWith("FAT")) out << " vfat";
-            else out << ' ' << fsfmt;
-        }
+        // Mount point
+        out << ' ' << it.first;
+        // File system
+        const QString &fsfmt = volume->finalFormat();
+        if (fsfmt.startsWith("FAT")) out << " vfat";
+        else out << ' ' << fsfmt;
         // Options
         const QString &mountopts = volume->options;
         if (volume->type == Device::SUBVOLUME) {
@@ -1409,14 +1400,8 @@ bool PartMan::makeFstab() noexcept
             if (mountopts.isEmpty()) out << " defaults";
             else out << ' ' << mountopts;
         }
-        if (volume->canMount()) {
-            out << ' ' << (volume->dump ? 1 : 0);
-            out << ' ' << volume->pass;
-        }
-        if (fsfmt.compare("swap", Qt::CaseInsensitive) == 0) {
-            out <<" 0 0";
-        }
-        out << '\n';
+        // Dump, pass
+        out << ' ' << (volume->dump ? 1 : 0) << ' ' << volume->pass << '\n';
     }
     file.close();
     return true;
@@ -2067,7 +2052,7 @@ QStringList PartMan::Device::allowedFormats() const noexcept
         if (usefor.isEmpty()) return QStringList();
         else if (usefor == "BIOS-GRUB") list.append("BIOS-GRUB");
         else if (usefor == "SWAP") {
-            list.append("SWAP");
+            list.append("swap");
             allowPreserve = list.contains(curFormat, Qt::CaseInsensitive);
         } else {
             if (!flags.sysEFI) {

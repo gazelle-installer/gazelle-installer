@@ -326,14 +326,10 @@ void BootMan::chosenBootPBR() noexcept
     gui.comboBoot->clear();
     for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::PARTITION && (!device->flags.bootRoot || installFromRootDevice)) {
-            if (device->flags.sysEFI) continue;
-            else if (!device->format.compare("SWAP", Qt::CaseInsensitive)) continue;
-            else if (device->format == "crypto_LUKS") continue;
-            else if (device->format.isEmpty() || device->format == "PRESERVE") {
-                if (device->curFormat == "crypto_LUKS") continue;
-                if (!device->curFormat.compare("SWAP", Qt::CaseInsensitive)) continue;
+            const QString &ff = device->finalFormat();
+            if (!device->flags.sysEFI && ff != "swap" && ff != "crypto_LUKS" && (!device->flags.nasty || brave)) {
+                device->addToCombo(gui.comboBoot, true);
             }
-            if (!device->flags.nasty || brave) device->addToCombo(gui.comboBoot, true);
         }
     }
     selectBootMain();
