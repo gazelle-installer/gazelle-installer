@@ -58,6 +58,7 @@ enum Step {
     ENCRYPTION,
     CONFIRM,
     BOOT,
+    SWAP,
     SERVICES,
     NETWORK,
     LOCALIZATION,
@@ -483,9 +484,10 @@ void MInstall::loadConfig(int stage) noexcept
         crypto->manageConfig(config);
     } else if (stage == 2) {
         if (!modeOOBE) {
-            const bool advanced = gui.radioCustomPart->isChecked();
-            swapman->manageConfig(config, advanced);
-            if (advanced) bootman->manageConfig(config);
+            if (gui.radioCustomPart->isChecked()) {
+                bootman->manageConfig(config);
+            }
+            swapman->manageConfig(config);
         }
         oobe->manageConfig(config);
     }
@@ -519,9 +521,10 @@ void MInstall::saveConfig() noexcept
     }
     crypto->manageConfig(config);
 
-    const bool advanced = gui.radioCustomPart->isChecked();
-    swapman->manageConfig(config, advanced);
-    if (advanced) bootman->manageConfig(config);
+    if (gui.radioCustomPart->isChecked()) {
+        bootman->manageConfig(config);
+    }
+    swapman->manageConfig(config);
     oobe->manageConfig(config);
 
     config.dumpDebug();
@@ -585,7 +588,7 @@ int MInstall::showPage(int curr, int next) noexcept
                 gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
                 swapman->setupDefaults();
                 loadConfig(2);
-                return oem ? Step::PROGRESS : Step::NETWORK;
+                return oem ? Step::PROGRESS : Step::SWAP;
             } else {
                 bootman->buildBootLists(); // Load default boot options
                 swapman->setupDefaults();
@@ -598,14 +601,18 @@ int MInstall::showPage(int curr, int next) noexcept
             }
             return Step::PARTITIONS;
         }
-    } else if (curr == Step::BOOT && next > curr) {
+    } else if (curr == Step::BOOT) {
+        return next;
+    } else if (curr == Step::SWAP && next > curr) {
         return oem ? Step::PROGRESS : Step::NETWORK;
-    } else if (curr == Step::NETWORK && next > curr) {
-        nextFocus = oobe->validateComputerName();
-        if (nextFocus) return curr;
-    } else if (curr == Step::NETWORK && next < curr) { // Backward
-        if (modeOOBE) return Step::TERMS;
-        else return Step::BOOT; // Skip pageServices
+    } else if (curr == Step::NETWORK) {
+        if(next > curr) {
+            nextFocus = oobe->validateComputerName();
+            if (nextFocus) return curr;
+        } else { // Backward
+            if (modeOOBE) return Step::TERMS;
+            else return Step::SWAP;
+        }
     } else if (curr == Step::LOCALIZATION && next > curr) {
         if (!pretend && oobe->haveSnapshotUserAccounts) {
             return Step::PROGRESS; // Skip pageUserAccounts and pageOldHome
@@ -796,13 +803,17 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.").arg(PROJECTNAME) + "</p>"
             "<p>" + tr("By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.") + "</p>"
             "<p>" + tr("If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.") + "</p>"
-            "<p>" + tr("If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.") + "</p>"
-            "<p><b>" + tr("Create a swap file") + "</b><br/>"
+            "<p>" + tr("If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.") + "</p>");
+        enableBack = false;
+        break;
+
+    case Step::SWAP:
+        gui.textHelp->setText("<p><b>" + tr("Create a swap file") + "</b><br/>"
             + tr("A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.") + "</p>"
             "<p>" + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "<br/>"
             + tr("Setting the size to 0 has the same effect as unchecking this option.") + "</p>");
-
-        enableBack = false;
+        if (modeOOBE) enableBack = true;
+        else enableBack = gui.radioCustomPart->isChecked();
         break;
 
     case Step::SERVICES:
@@ -815,8 +826,6 @@ void MInstall::pageDisplayed(int next) noexcept
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
-        if (modeOOBE) enableBack = true;
-        else enableBack = gui.radioCustomPart->isChecked();
         break;
 
     case Step::LOCALIZATION:

@@ -42,14 +42,12 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
     });
 }
 
-void SwapMan::manageConfig(MSettings &config, bool advanced) noexcept
+void SwapMan::manageConfig(MSettings &config) noexcept
 {
     config.setSection("Swap", gui.pageBoot);
-    if (advanced || !config.isSave()) {
-        config.manageGroupCheckBox("Install", gui.boxSwap);
-        config.manageLineEdit("File", gui.textSwapFile);
-        config.manageSpinBox("Size", gui.spinSwapSize);
-    }
+    config.manageGroupCheckBox("Install", gui.boxSwap);
+    config.manageLineEdit("File", gui.textSwapFile);
+    config.manageSpinBox("Size", gui.spinSwapSize);
     config.manageCheckBox("Hibernation", gui.checkHibernation);
 }
 void SwapMan::setupDefaults() noexcept

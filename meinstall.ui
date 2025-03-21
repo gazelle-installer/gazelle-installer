@@ -811,6 +811,13 @@ QSlider::handle:horizontal:disabled {
            <property name="bottomMargin">
             <number>0</number>
            </property>
+           <item row="1" column="0">
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </spacer>
+           </item>
            <item row="0" column="0">
             <widget class="QGroupBox" name="boxBoot">
              <property name="title">
@@ -947,14 +954,23 @@ QSlider::handle:horizontal:disabled {
              </layout>
             </widget>
            </item>
-           <item row="2" column="0">
-            <spacer>
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="0">
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pageSwap">
+          <layout class="QVBoxLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
             <widget class="QGroupBox" name="boxSwap">
              <property name="title">
               <string>Create a swap file</string>
@@ -1030,6 +1046,13 @@ QSlider::handle:horizontal:disabled {
               </item>
              </layout>
             </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
