@@ -45,11 +45,13 @@
 
 #include "mprocess.h"
 #include "msettings.h"
+#include "crypto.h"
 #include "autopart.h"
 #include "partman.h"
 
-PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const MIni &appConf, const QCommandLineParser &appArgs)
-    : QAbstractItemModel(ui.boxMain), proc(mproc), gui(ui)
+PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, Crypto &cman,
+    const MIni &appConf, const QCommandLineParser &appArgs)
+    : QAbstractItemModel(ui.boxMain), proc(mproc), gui(ui), crypto(cman)
 {
     root = new Device(*this);
     const QString &projShort = appConf.getString("ShortName");
@@ -83,9 +85,7 @@ PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, const MIni &appConf, const 
     connect(gui.pushGrid, &QToolButton::toggled, gui.treePartitions, &MTreeView::setGrid);
 
     // Hide encryption options if cryptsetup not present.
-    QFileInfo cryptsetup("/usr/sbin/cryptsetup");
-    QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
-    if (!cryptsetup.exists() || !cryptsetup.isExecutable() || !crypsetupinitramfs.exists()) {
+    if (!crypto.supported()) {
         gui.treePartitions->setColumnHidden(COL_ENCRYPT, true);
     }
 
@@ -643,7 +643,7 @@ void PartMan::partMenuUnlock(Device *part)
         qApp->setOverrideCursor(Qt::WaitCursor);
         gui.boxMain->setEnabled(false);
         try {
-            luksOpen(part, editPass->text().toUtf8());
+            crypto.open(part, editPass->text().toUtf8());
             part->usefor.clear();
             part->addToCrypttab = checkCrypttab->isChecked();
             part->mapCount++;
@@ -1056,7 +1056,7 @@ void PartMan::prepStorage()
 
     // Prepare and mount storage
     preparePartitions();
-    luksFormat();
+    crypto.formatAll(*this);
     formatPartitions();
     mountPartitions();
     // Refresh the UUIDs
@@ -1076,7 +1076,7 @@ bool PartMan::installTabs() noexcept
 {
     proc.log("Install tabs");
     if (!makeFstab()) return false;
-    if (!makeCrypttab()) return false;
+    if (!crypto.makeCrypttab(*this)) return false;
     return true;
 }
 
@@ -1210,31 +1210,6 @@ void PartMan::preparePartitions()
     }
 }
 
-void PartMan::luksFormat()
-{
-    MProcess::Section sect(proc, QT_TR_NOOP("Failed to format LUKS container."));
-    const QByteArray &encPass = gui.textCryptoPass->text().toUtf8();
-    for (Iterator it(*this); Device *part = *it; it.next()) {
-        if (!part->encrypt || !part->willFormat()) continue;
-        proc.status(tr("Creating encrypted volume: %1").arg(part->name));
-        proc.exec("cryptsetup", {"--batch-mode", "--key-size=512",
-            "--hash=sha512", "luksFormat", part->path}, &encPass);
-        proc.status();
-        luksOpen(part, encPass);
-    }
-}
-void PartMan::luksOpen(Device *part, const QByteArray &password)
-{
-    MProcess::Section sect(proc, QT_TR_NOOP("Failed to open LUKS container."));
-    if (part->map.isEmpty()) {
-        proc.exec("cryptsetup", {"luksUUID", part->path}, nullptr, true);
-        part->map = "luks-" + proc.readAll().trimmed();
-    }
-    QStringList cargs({"open", part->path, part->map, "--type", "luks"});
-    if (part->discgran) cargs.prepend("--allow-discards");
-    proc.exec("cryptsetup", cargs, &password);
-}
-
 void PartMan::formatPartitions()
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
@@ -1341,29 +1316,6 @@ void PartMan::prepareSubvolumes(Device *part)
     }
     proc.exec("umount", {"/mnt/btrfs-scratch"});
     if (errmsg) throw errmsg;
-}
-
-// write out crypttab if encrypting for auto-opening
-bool PartMan::makeCrypttab() noexcept
-{
-    // Count the number of crypttab entries.
-    int cryptcount = 0;
-    for (Iterator it(*this); Device *device = *it; it.next()) {
-        if (device->addToCrypttab) ++cryptcount;
-    }
-    // Add devices to crypttab.
-    QFile file("/mnt/antiX/etc/crypttab");
-    if (!file.open(QIODevice::WriteOnly)) return false;
-    QTextStream out(&file);
-    for (Iterator it(*this); Device *device = *it; it.next()) {
-        if (!device->addToCrypttab) continue;
-        out << device->map << " UUID=" << device->uuid << " none luks";
-        if (cryptcount > 1) out << ",keyscript=decrypt_keyctl";
-        if (!device->flags.rotational) out << ",no-read-workqueue,no-write-workqueue";
-        if (device->discgran) out << ",discard";
-        out << '\n';
-    }
-    return true;
 }
 
 // create /etc/fstab file

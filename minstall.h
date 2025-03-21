@@ -75,11 +75,11 @@ private:
     class CheckMD5 *checkmd5 = nullptr;
     class PartMan *partman = nullptr;
     class AutoPart *autopart = nullptr;
+    class Crypto *crypto = nullptr;
     class Base *base = nullptr;
     class Oobe *oobe = nullptr;
     class BootMan *bootman = nullptr;
     class SwapMan *swapman = nullptr;
-    class PassEdit *passCrypto = nullptr;
 
     QPixmap helpBackdrop;
     // Splash screen

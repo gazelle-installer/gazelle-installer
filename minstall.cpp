@@ -41,6 +41,7 @@
 #include "checkmd5.h"
 #include "partman.h"
 #include "autopart.h"
+#include "crypto.h"
 #include "base.h"
 #include "oobe.h"
 #include "bootman.h"
@@ -127,9 +128,9 @@ MInstall::~MInstall() {
     if (bootman) delete bootman;
     if (swapman) delete swapman;
     if (partman) delete partman;
+    if (crypto) delete crypto;
     if (autopart) delete autopart;
     if (throbber) delete throbber;
-    if (passCrypto) delete passCrypto;
 }
 
 // meant to be run after the installer becomes visible
@@ -183,7 +184,8 @@ void MInstall::startup()
             checkmd5 = nullptr;
         }
 
-        partman = new PartMan(proc, gui, appConf, appArgs);
+        crypto = new Crypto(proc, gui);
+        partman = new PartMan(proc, gui, *crypto, appConf, appArgs);
         base = new Base(proc, *partman, appConf, appArgs);
         bootman = new BootMan(proc, *partman, gui, appConf, appArgs);
         swapman = new SwapMan(proc, *partman, gui);
@@ -207,10 +209,6 @@ void MInstall::startup()
             " or translate help files into different languages, or make suggestions,"
             " write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
             + "\n" + link_block);
-
-        // Password box setup
-        passCrypto = new PassEdit(gui.textCryptoPass, gui.textCryptoPass2, 1, this);
-        connect(passCrypto, &PassEdit::validationChanged, gui.pushNext, &QPushButton::setEnabled);
     }
 
     setupkeyboardbutton();
@@ -482,13 +480,7 @@ void MInstall::loadConfig(int stage) noexcept
         // Storage and partition management
         autopart->manageConfig(config);
         partman->loadConfig(config);
-
-        // Encryption
-        config.setSection("Encryption", gui.pageEncryption);
-
-        const QString &epass = config.getString("Pass");
-        gui.textCryptoPass->setText(epass);
-        gui.textCryptoPass2->setText(epass);
+        crypto->manageConfig(config);
     } else if (stage == 2) {
         if (!modeOOBE) {
             const bool advanced = gui.radioCustomPart->isChecked();
@@ -525,10 +517,7 @@ void MInstall::saveConfig() noexcept
     } else {
         partman->saveConfig(config);
     }
-
-    // Encryption
-    config.setSection("Encryption", gui.pageEncryption);
-    config.addFilter("Pass");
+    crypto->manageConfig(config);
 
     const bool advanced = gui.radioCustomPart->isChecked();
     swapman->manageConfig(config, advanced);
@@ -791,7 +780,7 @@ void MInstall::pageDisplayed(int next) noexcept
     case Step::ENCRYPTION: // Disk encryption.
         gui.textHelp->setText("<p><b>" + tr("Encryption") + "</b><br/>"
             + ("You have chosen to encrypt at least one volume, and more information is required before continuing.") + "</p>");
-        enableNext = passCrypto->valid();
+        enableNext = crypto->valid();
         break;
 
     case Step::CONFIRM: // Confirmation and review.

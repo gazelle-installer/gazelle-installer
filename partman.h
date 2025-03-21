@@ -88,7 +88,7 @@ public:
     std::map<QString, struct VolumeSpec> volSpecs;
     QString bootUUID;
     class AutoPart *autopart = nullptr;
-    PartMan(class MProcess &mproc, class Ui::MeInstall &ui,
+    PartMan(class MProcess &mproc, class Ui::MeInstall &ui, class Crypto &cman,
         const class MIni &appConf, const QCommandLineParser &appArgs);
     ~PartMan();
     void scan(Device *drvstart = nullptr);
@@ -121,13 +121,13 @@ private:
     class Device *root = nullptr;
     class Device *changing = nullptr;
     Ui::MeInstall &gui;
+    class Crypto &crypto;
     bool brave;
     void scanVirtualDevices(bool rescan);
     void resizeColumnsToFit() noexcept;
     void preparePartitions();
     void formatPartitions();
     void prepareSubvolumes(Device *part);
-    bool makeCrypttab() noexcept;
     bool makeFstab() noexcept;
     void mountPartitions();
     void treeItemChange() noexcept;
@@ -145,8 +145,6 @@ private:
     void scanSubvolumes(class Device *part);
     bool confirmSpace(class QMessageBox &msgbox) const noexcept;
     bool confirmBootable(class QMessageBox &msgbox) const noexcept;
-    void luksFormat();
-    void luksOpen(class Device *part, const QByteArray &password);
 
     // Model View Controller
     class ItemDelegate;
