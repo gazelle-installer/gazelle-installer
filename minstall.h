@@ -66,7 +66,6 @@ private:
     bool oem, modeOOBE, mountkeep;
     // configuration management
     QString configFile;
-    enum ConfigAction { CONFIG_SAVE, CONFIG_LOAD1, CONFIG_LOAD2 };
 
     // auto-mount setup
     QString listMaskedMounts;
@@ -105,6 +104,7 @@ private:
     void setupAutoMount(bool enabled);
     void processNextPhase() noexcept;
     void pretendNextPhase() noexcept;
-    void manageConfig(enum ConfigAction mode) noexcept;
+    void loadConfig(int stage) noexcept;
+    void saveConfig() noexcept;
     bool eventFilter(QObject *watched, QEvent *event) noexcept;
 };

@@ -278,21 +278,15 @@ void PartMan::scanVirtualDevices(bool rescan)
     gui.treePartitions->expand(index(virtdevs));
 }
 
-bool PartMan::manageConfig(MSettings &config) noexcept
+bool PartMan::loadConfig(MSettings &config) noexcept
 {
-    const bool save = config.isSave();
     config.setSection("Storage", gui.treePartitions);
-    for (Device *drive : root->children) {
+    for (Device *const drive : root->children) {
         // Check if the drive is to be cleared and formatted.
         size_t partCount = drive->children.size();
         bool drvPreserve = drive->flags.oldLayout;
         config.beginGroup(drive->name);
-        if (save) {
-            if (!drvPreserve) {
-                config.setString("Format", drive->format);
-                config.setInteger("Partitions", partCount);
-            }
-        } else if (config.contains("Format")) {
+        if (config.contains("Format")) {
             drive->format = config.getString("Format");
             drvPreserve = false;
             drive->clear();
@@ -304,85 +298,106 @@ bool PartMan::manageConfig(MSettings &config) noexcept
         long long sizeTotal = 0;
         for (size_t ixPart = 0; ixPart < partCount; ++ixPart) {
             Device *part = nullptr;
-            if (save || drvPreserve) {
+            if (drvPreserve) {
                 part = drive->child(ixPart);
-                if (!save) part->flags.oldLayout = true;
+                part->flags.oldLayout = true;
             } else {
                 part = new Device(Device::PARTITION, drive);
                 part->name = joinName(drive->name, ixPart+1);
             }
             // Configuration management, accounting for automatic control correction order.
             config.beginGroup("Partition" + QString::number(ixPart+1));
-            if (save) {
-                config.setInteger("Size", part->size);
-                if (part->isActive()) config.setBoolean("Active", true);
-                if (part->flags.sysEFI) config.setBoolean("ESP", true);
-                if (part->addToCrypttab) config.setBoolean("AddToCrypttab", true);
-                if (!part->usefor.isEmpty()) config.setString("UseFor", part->usefor);
-                if (!part->format.isEmpty()) config.setString("Format", part->format);
-                config.setBoolean("Encrypt", part->encrypt);
-                if (!part->label.isEmpty()) config.setString("Label", part->label);
-                if (!part->options.isEmpty()) config.setString("Options", part->options);
-                config.setBoolean("CheckBadBlocks", part->chkbadblk);
-                config.setBoolean("Dump", part->dump);
-                config.setInteger("Pass", part->pass);
-            } else {
-                if (!drvPreserve && config.contains("Size")) {
-                    part->size = config.getInteger("Size");
-                    sizeTotal += part->size;
-                    if (sizeTotal > sizeMax) return false;
-                    if (config.getBoolean("Active")) part->setActive(true);
-                }
-                part->flags.sysEFI = config.getBoolean("ESP", part->flags.sysEFI);
-                part->usefor = config.getString("UseFor", part->usefor);
-                part->format = config.getString("Format", part->format);
-                part->chkbadblk = config.getBoolean("CheckBadBlocks", part->chkbadblk);
-                part->encrypt = config.getBoolean("Encrypt", part->encrypt);
-                part->addToCrypttab = config.getBoolean("AddToCrypttab", part->encrypt);
-                part->label = config.getString("Label", part->label);
-                part->options = config.getString("Options", part->options);
-                part->dump = config.getBoolean("Dump", part->dump);
-                part->pass = config.getInteger("Pass", part->pass);
+            if (!drvPreserve && config.contains("Size")) {
+                part->size = config.getInteger("Size");
+                sizeTotal += part->size;
+                if (sizeTotal > sizeMax) return false;
+                if (config.getBoolean("Active")) part->setActive(true);
             }
+            part->flags.sysEFI = config.getBoolean("ESP", part->flags.sysEFI);
+            part->usefor = config.getString("UseFor", part->usefor);
+            part->format = config.getString("Format", part->format);
+            part->chkbadblk = config.getBoolean("CheckBadBlocks", part->chkbadblk);
+            part->encrypt = config.getBoolean("Encrypt", part->encrypt);
+            part->addToCrypttab = config.getBoolean("AddToCrypttab", part->encrypt);
+            part->label = config.getString("Label", part->label);
+            part->options = config.getString("Options", part->options);
+            part->dump = config.getBoolean("Dump", part->dump);
+            part->pass = config.getInteger("Pass", part->pass);
             size_t subvolCount = 0;
             if (part->format == "btrfs") {
-                if (!save) subvolCount = config.getInteger("Subvolumes");
-                else {
-                    subvolCount = part->children.size();
-                    config.setInteger("Subvolumes", subvolCount);
-                }
+                subvolCount = config.getInteger("Subvolumes");
             }
             // Btrfs subvolume configuration.
             for (size_t ixSV=0; ixSV<subvolCount; ++ixSV) {
-                Device *subvol = nullptr;
-                if (save) subvol = part->child(ixSV);
-                else subvol = new Device(Device::SUBVOLUME, part);
-                if (!subvol) return false;
+                Device *subvol = new Device(Device::SUBVOLUME, part);
+                assert(subvol != nullptr);
                 config.beginGroup("Subvolume" + QString::number(ixSV+1));
-                if (save) {
-                    if (subvol->isActive()) config.setBoolean("Default", true);
-                    if (!subvol->usefor.isEmpty()) config.setString("UseFor", subvol->usefor);
-                    if (!subvol->label.isEmpty()) config.setString("Label", subvol->label);
-                    if (!subvol->options.isEmpty()) config.setString("Options", subvol->options);
-                    config.setBoolean("Dump", subvol->dump);
-                    config.setInteger("Pass", subvol->pass);
-                } else {
-                    if (config.getBoolean("Default")) subvol->setActive(true);
-                    subvol->usefor = config.getString("UseFor");
-                    subvol->label = config.getString("Label");
-                    subvol->options = config.getString("Options");
-                    subvol->dump = config.getBoolean("Dump");
-                    subvol->pass = config.getInteger("Pass");
-                }
+                if (config.getBoolean("Default")) subvol->setActive(true);
+                subvol->usefor = config.getString("UseFor");
+                subvol->label = config.getString("Label");
+                subvol->options = config.getString("Options");
+                subvol->dump = config.getBoolean("Dump");
+                subvol->pass = config.getInteger("Pass");
                 config.endGroup(); // Subvolume#
             }
             config.endGroup(); // Partition#
-            if (!save) gui.treePartitions->expand(index(part));
+            gui.treePartitions->expand(index(part));
         }
         config.endGroup(); // (drive name)
     }
     treeSelChange();
     return true;
+}
+void PartMan::saveConfig(MSettings &config) const noexcept
+{
+    config.setSection("Storage", gui.treePartitions);
+    for (const Device *const drive : root->children) {
+        // Check if the drive is to be cleared and formatted.
+        const size_t partCount = drive->children.size();
+        config.beginGroup(drive->name);
+        if (!drive->flags.oldLayout) {
+            config.setString("Format", drive->format);
+            config.setInteger("Partitions", partCount);
+        }
+        // Partition configuration.
+        for (size_t ixPart = 0; ixPart < partCount; ++ixPart) {
+            const Device *const part = drive->child(ixPart);
+            // Configuration management, accounting for automatic control correction order.
+            config.beginGroup("Partition" + QString::number(ixPart+1));
+            config.setInteger("Size", part->size);
+            if (part->isActive()) config.setBoolean("Active", true);
+            if (part->flags.sysEFI) config.setBoolean("ESP", true);
+            if (part->addToCrypttab) config.setBoolean("AddToCrypttab", true);
+            if (!part->usefor.isEmpty()) config.setString("UseFor", part->usefor);
+            if (!part->format.isEmpty()) config.setString("Format", part->format);
+            config.setBoolean("Encrypt", part->encrypt);
+            if (!part->label.isEmpty()) config.setString("Label", part->label);
+            if (!part->options.isEmpty()) config.setString("Options", part->options);
+            config.setBoolean("CheckBadBlocks", part->chkbadblk);
+            config.setBoolean("Dump", part->dump);
+            config.setInteger("Pass", part->pass);
+            size_t subvolCount = 0;
+            if (part->format == "btrfs") {
+                subvolCount = part->children.size();
+                config.setInteger("Subvolumes", subvolCount);
+            }
+            // Btrfs subvolume configuration.
+            for (size_t ixSV=0; ixSV<subvolCount; ++ixSV) {
+                const Device *const subvol = part->child(ixSV);
+                assert(subvol != nullptr);
+                config.beginGroup("Subvolume" + QString::number(ixSV+1));
+                if (subvol->isActive()) config.setBoolean("Default", true);
+                if (!subvol->usefor.isEmpty()) config.setString("UseFor", subvol->usefor);
+                if (!subvol->label.isEmpty()) config.setString("Label", subvol->label);
+                if (!subvol->options.isEmpty()) config.setString("Options", subvol->options);
+                config.setBoolean("Dump", subvol->dump);
+                config.setInteger("Pass", subvol->pass);
+                config.endGroup(); // Subvolume#
+            }
+            config.endGroup(); // Partition#
+        }
+        config.endGroup(); // (drive name)
+    }
 }
 
 void PartMan::resizeColumnsToFit() noexcept

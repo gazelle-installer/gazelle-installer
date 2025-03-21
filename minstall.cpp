@@ -218,7 +218,7 @@ void MInstall::startup()
 
     oobe = new Oobe(proc, gui, this, appConf, oem, modeOOBE);
 
-    if (modeOOBE) manageConfig(CONFIG_LOAD2);
+    if (modeOOBE) loadConfig(2);
     else {
         // Build disk widgets
         partman->scan();
@@ -239,7 +239,7 @@ void MInstall::startup()
             gui.radioCustomPart->setChecked(true);
         }
         // Override with whatever is in the config.
-        manageConfig(CONFIG_LOAD1);
+        loadConfig(1);
         // Hibernation check box (regular install).
         gui.checkHibernationReg->setChecked(gui.checkHibernation->isChecked());
         connect(gui.checkHibernationReg, &QCheckBox::clicked, gui.checkHibernation, &QCheckBox::setChecked);
@@ -399,7 +399,9 @@ void MInstall::processNextPhase() noexcept
             proc.status(tr("Setting system configuration"));
             if (oem) oobe->enable();
             oobe->process();
-            manageConfig(CONFIG_SAVE);
+            if (!modeOOBE) {
+                saveConfig();
+            }
             proc.exec("sync"); // the sync(2) system call will block the GUI
             QStringList grubextra;
             swapman->install(grubextra);
@@ -440,7 +442,7 @@ void MInstall::processNextPhase() noexcept
         abortUI(false, closing);
         proc.unhalt();
         if (!modeOOBE) {
-            manageConfig(CONFIG_SAVE);
+            saveConfig();
             cleanup();
         }
 
@@ -460,56 +462,39 @@ void MInstall::pretendNextPhase() noexcept
         }
     }
     if (phase == PH_WAITING_FOR_INFO && gui.widgetStack->currentIndex() == Step::PROGRESS) {
-        manageConfig(CONFIG_SAVE);
+        saveConfig();
         phase = PH_FINISHED;
         gotoPage(Step::END);
     }
 }
 
-void MInstall::manageConfig(enum ConfigAction mode) noexcept
+void MInstall::loadConfig(int stage) noexcept
 {
-    if (mode == CONFIG_SAVE) {
-        configFile = pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf";
-        QFile::rename(configFile, configFile+".bak");
-    }
-    MSettings config(configFile, mode==CONFIG_SAVE);
+    MSettings config(configFile, false);
 
-    if (mode == CONFIG_SAVE) {
-        config.setString("Version", CODEBASE_VERSION);
-        config.setString("Product", PROJECTNAME + " " + PROJECTVERSION);
-    }
-    if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
+    if (stage == 1) {
         // Automatic or Manual partitioning
         config.setSection("Storage", gui.pageDisk);
         static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
         config.manageRadios("Target", 2, diskChoices, diskRadios);
-        const bool targetIsDrive = gui.radioEntireDisk->isChecked();
 
         // Storage and partition management
-        if(targetIsDrive || mode!=CONFIG_SAVE) autopart->manageConfig(config);
-        if (!targetIsDrive || mode!=CONFIG_SAVE) {
-            partman->manageConfig(config);
-        }
+        autopart->manageConfig(config);
+        partman->loadConfig(config);
 
         // Encryption
-        config.setSection("Encryption", targetIsDrive ? gui.pageDisk : gui.pagePartitions);
-        config.addFilter("Pass");
-        if (mode != CONFIG_SAVE) {
-            const QString &epass = config.getString("Pass");
-            gui.textCryptoPass->setText(epass);
-            gui.textCryptoPass2->setText(epass);
-        }
-    }
+        config.setSection("Encryption", gui.pageEncryption);
 
-    if (!modeOOBE) {
-        const bool advanced = gui.radioCustomPart->isChecked();
-        if (mode == CONFIG_SAVE || mode == CONFIG_LOAD2) {
+        const QString &epass = config.getString("Pass");
+        gui.textCryptoPass->setText(epass);
+        gui.textCryptoPass2->setText(epass);
+    } else if (stage == 2) {
+        if (!modeOOBE) {
+            const bool advanced = gui.radioCustomPart->isChecked();
             swapman->manageConfig(config, advanced);
             if (advanced) bootman->manageConfig(config);
-            oobe->manageConfig(config);
         }
-    } else if (mode == CONFIG_LOAD2) {
         oobe->manageConfig(config);
     }
 
@@ -517,14 +502,44 @@ void MInstall::manageConfig(enum ConfigAction mode) noexcept
         QMessageBox::critical(this, windowTitle(),
             tr("Invalid settings found in configuration file (%1)."
                " Please review marked fields as you encounter them.").arg(configFile));
-    } else if (mode == CONFIG_SAVE) {
-        config.dumpDebug();
-        if (!pretend) {
-            config.closeAndCopyTo("/etc/minstalled.conf");
-            chmod(configFile.toUtf8().constData(), 0600);
-        }
+    }
+}
+void MInstall::saveConfig() noexcept
+{
+    configFile = pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf";
+    QFile::rename(configFile, configFile+".bak");
+    MSettings config(configFile, true);
+
+    config.setString("Version", CODEBASE_VERSION);
+    config.setString("Product", PROJECTNAME + " " + PROJECTVERSION);
+
+    // Automatic or Manual partitioning
+    config.setSection("Storage", gui.pageDisk);
+    static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
+    QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
+    config.manageRadios("Target", 2, diskChoices, diskRadios);
+
+    // Storage and partition management
+    if(gui.radioEntireDisk->isChecked()) {
+        autopart->manageConfig(config);
+    } else {
+        partman->saveConfig(config);
     }
 
+    // Encryption
+    config.setSection("Encryption", gui.pageEncryption);
+    config.addFilter("Pass");
+
+    const bool advanced = gui.radioCustomPart->isChecked();
+    swapman->manageConfig(config, advanced);
+    if (advanced) bootman->manageConfig(config);
+    oobe->manageConfig(config);
+
+    config.dumpDebug();
+    if (!pretend) {
+        config.closeAndCopyTo("/etc/minstalled.conf");
+        chmod(configFile.toUtf8().constData(), 0600);
+    }
 }
 
 // logic displaying pages
@@ -580,12 +595,12 @@ int MInstall::showPage(int curr, int next) noexcept
             if (gui.radioEntireDisk->isChecked()) {
                 gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
                 swapman->setupDefaults();
-                manageConfig(CONFIG_LOAD2);
+                loadConfig(2);
                 return oem ? Step::PROGRESS : Step::NETWORK;
             } else {
                 bootman->buildBootLists(); // Load default boot options
                 swapman->setupDefaults();
-                manageConfig(CONFIG_LOAD2);
+                loadConfig(2);
                 return Step::BOOT;
             }
         } else {
