@@ -364,13 +364,6 @@ void MInstall::processNextPhase() noexcept
             // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
             swapman->setupZRam();
 
-            if (gui.radioEntireDisk->isChecked()) {
-                partman->scan();
-                PartMan::Device *drive = autopart->selectedDrive();
-                if (!drive) throw QT_TR_NOOP("Cannot find selected drive.");
-                autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
-                bootman->buildBootLists(); // Load default boot options
-            }
             if (!partman->checkTargetDrivesOK()) throw "";
             autoMountEnabled = true; // disable auto mount by force
             setupAutoMount(false);
@@ -484,9 +477,7 @@ void MInstall::loadConfig(int stage) noexcept
         crypto->manageConfig(config);
     } else if (stage == 2) {
         if (!modeOOBE) {
-            if (gui.radioCustomPart->isChecked()) {
-                bootman->manageConfig(config);
-            }
+            bootman->manageConfig(config);
             swapman->manageConfig(config);
         }
         oobe->manageConfig(config);
@@ -521,9 +512,7 @@ void MInstall::saveConfig() noexcept
     }
     crypto->manageConfig(config);
 
-    if (gui.radioCustomPart->isChecked()) {
-        bootman->manageConfig(config);
-    }
+    bootman->manageConfig(config);
     swapman->manageConfig(config);
     oobe->manageConfig(config);
 
@@ -586,20 +575,21 @@ int MInstall::showPage(int curr, int next) noexcept
         if (next > curr) {
             if (gui.radioEntireDisk->isChecked()) {
                 gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
-                swapman->setupDefaults();
-                loadConfig(2);
-                return oem ? Step::PROGRESS : Step::SWAP;
-            } else {
-                bootman->buildBootLists(); // Load default boot options
-                swapman->setupDefaults();
-                loadConfig(2);
-                return Step::BOOT;
+                partman->scan();
+                PartMan::Device *drive = autopart->selectedDrive();
+                if (!drive) {
+                    gui.labelSplash->setText(tr("Cannot find selected drive."));
+                    abortEndUI(false);
+                    return Step::SPLASH;
+                }
+                autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
+                next = (oem ? Step::PROGRESS : Step::NETWORK);
             }
+            bootman->buildBootLists();
+            swapman->setupDefaults();
+            loadConfig(2);
         } else {
-            if (gui.radioEntireDisk->isChecked()) {
-                return Step::DISK;
-            }
-            return Step::PARTITIONS;
+            return gui.radioEntireDisk->isChecked() ? Step::DISK : Step::PARTITIONS;
         }
     } else if (curr == Step::BOOT) {
         return next;
@@ -610,8 +600,12 @@ int MInstall::showPage(int curr, int next) noexcept
             nextFocus = oobe->validateComputerName();
             if (nextFocus) return curr;
         } else { // Backward
-            if (modeOOBE) return Step::TERMS;
-            else return Step::SWAP;
+            if (modeOOBE) {
+                return Step::TERMS;
+            } else if (gui.radioEntireDisk->isChecked()) {
+                return Step::BOOT;
+            }
+            return Step::SWAP;
         }
     } else if (curr == Step::LOCALIZATION && next > curr) {
         if (!pretend && oobe->haveSnapshotUserAccounts) {
@@ -812,8 +806,6 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.") + "</p>"
             "<p>" + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "<br/>"
             + tr("Setting the size to 0 has the same effect as unchecking this option.") + "</p>");
-        if (modeOOBE) enableBack = true;
-        else enableBack = gui.radioCustomPart->isChecked();
         break;
 
     case Step::SERVICES:
@@ -949,6 +941,17 @@ void MInstall::gotoPage(int next) noexcept
         gui.pushNext->setText(tr("Next"));
     }
     gui.pushNext->setIconSize(isize);
+
+    isize = gui.pushBack->iconSize();
+    if (next == Step::NETWORK && gui.radioEntireDisk->isChecked()) {
+        isize.setWidth(0);
+        gui.pushBack->setText(tr("Advanced"));
+    } else {
+        isize.setWidth(isize.height());
+        gui.pushBack->setText(tr("Back"));
+    }
+    gui.pushBack->setIconSize(isize);
+
     if (next > Step::END) {
         // finished
         qApp->setOverrideCursor(Qt::WaitCursor);
