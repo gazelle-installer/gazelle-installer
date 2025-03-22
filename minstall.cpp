@@ -804,8 +804,7 @@ void MInstall::pageDisplayed(int next) noexcept
     case Step::SWAP:
         gui.textHelp->setText("<p><b>" + tr("Create a swap file") + "</b><br/>"
             + tr("A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.") + "</p>"
-            "<p>" + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "<br/>"
-            + tr("Setting the size to 0 has the same effect as unchecking this option.") + "</p>");
+            "<p>" + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "</p>");
         break;
 
     case Step::SERVICES:

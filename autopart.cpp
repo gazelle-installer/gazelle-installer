@@ -250,7 +250,7 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
 
     if (dialog.exec() == QDialog::Accepted) {
         buildLayout(drive, sizeRoot, checkEncrypt->isChecked());
-        gui.boxSwap->setChecked(checkSwapFile->isChecked());
+        gui.boxSwapFile->setChecked(checkSwapFile->isChecked());
         gui.checkHibernation->setChecked(checkHibernation->isChecked());
     }
     // Return the partition slider assembly back to the disk page.

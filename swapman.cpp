@@ -36,23 +36,40 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
     connect(ui.spinSwapSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &SwapMan::spinSizeChanged);
     connect(ui.pushSwapSizeReset, &QToolButton::clicked, this, &SwapMan::sizeResetClicked);
     connect(ui.checkHibernation, &QCheckBox::clicked, this, &SwapMan::checkHibernationClicked);
-    connect(ui.boxSwap, &QGroupBox::toggled, this, [this](bool on) {
+    connect(ui.boxSwapFile, &QGroupBox::toggled, this, [this](bool on) {
         if (on) gui.pushNext->setEnabled(true);
         else gui.pushNext->setEnabled(setupBounds());
     });
+
+    connect(ui.radioZramPercent, &QRadioButton::toggled, ui.spinZramPercent, &QSpinBox::setEnabled);
+    connect(ui.radioZramPercent, &QRadioButton::toggled, ui.labelZramRecPercent, &QSpinBox::setEnabled);
+    connect(ui.radioZramSize, &QRadioButton::toggled, ui.spinZramSize, &QSpinBox::setEnabled);
+    connect(ui.radioZramSize, &QRadioButton::toggled, ui.labelZramRecSize, &QLabel::setEnabled);
+    // Set the size spin box.
+    struct sysinfo sinfo;
+    if (sysinfo(&sinfo) == 0) {
+        const int physram = ((long long)sinfo.totalram * sinfo.mem_unit) / MB;
+        gui.spinZramSize->setMaximum(10 * physram);
+        gui.spinZramSize->setValue(physram);
+        gui.labelZramRecSize->setText(tr("Recommended maximum: %1 MB").arg(physram));
+    } else {
+        gui.radioZramSize->setEnabled(false);
+        gui.labelZramRecSize->setText(tr("Unable to query RAM size."));
+        gui.spinZramSize->setMaximum(0);
+    }
 }
 
 void SwapMan::manageConfig(MSettings &config) noexcept
 {
     config.setSection("Swap", gui.pageBoot);
-    config.manageGroupCheckBox("Install", gui.boxSwap);
+    config.manageGroupCheckBox("Install", gui.boxSwapFile);
     config.manageLineEdit("File", gui.textSwapFile);
     config.manageSpinBox("Size", gui.spinSwapSize);
     config.manageCheckBox("Hibernation", gui.checkHibernation);
 }
 void SwapMan::setupDefaults() noexcept
 {
-    gui.boxSwap->setChecked(partman.findByMount("swap") == nullptr);
+    gui.boxSwapFile->setChecked(partman.findByMount("swap") == nullptr);
     setupBounds();
     sizeResetClicked();
 }
@@ -77,8 +94,17 @@ void SwapMan::install(QStringList &cmdboot_out)
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
     proc.advance(1, 2);
-    const int size = gui.spinSwapSize->value();
-    if (!gui.boxSwap->isChecked() || size <= 0) return;
+    if (gui.boxSwapFile->isChecked()) {
+        installSwapFile(cmdboot_out);
+    }
+    if (gui.boxSwapZram->isChecked()) {
+        if (!configureZRam()) {
+            throw QT_TR_NOOP("Failed to configure zram swap.");
+        }
+    }
+}
+void SwapMan::installSwapFile(QStringList &cmdboot_out) const
+{
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to create or install swap file."));
     const QString &swapfile = QDir::cleanPath(gui.textSwapFile->text().trimmed());
     const QString &instpath = "/mnt/antiX" + swapfile;
@@ -89,7 +115,7 @@ void SwapMan::install(QStringList &cmdboot_out)
     // Create a blank swap file.
     proc.mkpath(QFileInfo(instpath).path(), 0700);
     const bool btrfs = (device->type == PartMan::Device::SUBVOLUME || device->finalFormat() == "btrfs");
-    const QString &strsize = QStringLiteral("%1M").arg(size);
+    const QString &strsize = QStringLiteral("%1M").arg(gui.spinSwapSize->value());
     if (btrfs) {
         proc.exec("btrfs", {"filesystem", "mkswapfile", "--size", strsize, instpath});
     } else {
@@ -114,6 +140,21 @@ void SwapMan::install(QStringList &cmdboot_out)
         }
         cmdboot_out.append("resume_offset=" + proc.readAll().trimmed());
     }
+}
+bool SwapMan::configureZRam() const noexcept
+{
+    const QString zramfile("/mnt/antiX/etc/default/zramswap");
+    QFile::rename(zramfile, zramfile+".bak");
+    bool ok = false;
+    MIni zramcfg(zramfile, MIni::NewOnly, &ok);
+    if (!ok) return false;
+
+    if (gui.radioZramPercent->isChecked()) {
+        zramcfg.setInteger("PERCENT", gui.spinZramPercent->value());
+    } else {
+        zramcfg.setInteger("SIZE", gui.spinZramSize->value());
+    }
+    return zramcfg.save();
 }
 
 void SwapMan::setupZRam() const

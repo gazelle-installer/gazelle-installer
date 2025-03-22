@@ -33,6 +33,8 @@ class SwapMan : public QObject
     void sizeResetClicked() noexcept;
     void spinSizeChanged(int i) noexcept;
     void checkHibernationClicked(bool checked) noexcept;
+    void installSwapFile(QStringList &cmdboot_out) const;
+    bool configureZRam() const noexcept;
 public:
     SwapMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui) noexcept;
     void manageConfig(class MSettings &config) noexcept;
