@@ -138,14 +138,14 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     buildServiceList(appConf);
 
     // Current user details
-    curUser = QString::fromUtf8(getlogin());
+    curUser = getlogin();
     if (curUser.isEmpty()) {
         curUser = "demo";
     }
     // Using $HOME results in the wrong directory when run as root (with su).
     MProcess::Section sect(proc, nullptr);
     proc.shell("echo ~" + curUser, nullptr, true);
-    curHome = proc.readOut();
+    curHome = proc.readOut().trimmed();
     if (curHome.isEmpty()) {
         curHome = "/home/" + curUser;
     }
