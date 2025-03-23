@@ -210,7 +210,7 @@ void BootMan::install(const QStringList &cmdextra)
         {
             // Add built-in config_cmdline.
             proc.exec("uname", {"-r"});
-            const MIni bootconf("/boot/config-" + proc.readOut(true).trimmed(), MIni::ReadOnly);
+            const MIni bootconf("/boot/config-" + proc.readOut(true), MIni::ReadOnly);
             const QStringList confcmdline = bootconf.getString("CONFIG_CMDLINE").split(" ");
             for (const QString &confparameter : confcmdline) {
                 finalcmdline.removeAll(confparameter);

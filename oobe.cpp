@@ -145,7 +145,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     // Using $HOME results in the wrong directory when run as root (with su).
     MProcess::Section sect(proc, nullptr);
     proc.shell("echo ~" + curUser, nullptr, true);
-    curHome = proc.readOut().trimmed();
+    curHome = proc.readOut(true);
     if (curHome.isEmpty()) {
         curHome = "/home/" + curUser;
     }

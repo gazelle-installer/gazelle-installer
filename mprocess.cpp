@@ -152,7 +152,7 @@ QString MProcess::readOut(bool everything) noexcept
 {
     QString strout(readAllStandardOutput().trimmed());
     if (everything) return strout;
-    return strout.section("\n", 0, 0);
+    return strout.section("\n", 0, 0).trimmed();
 }
 QStringList MProcess::readOutLines() noexcept
 {
