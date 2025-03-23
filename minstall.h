@@ -64,9 +64,9 @@ private:
     // command line options
     bool pretend, automatic;
     bool oem, modeOOBE, mountkeep;
+    bool advanced = false; // Always enabled with custom partitions.
     // configuration management
     QString configFile;
-    enum ConfigAction { CONFIG_SAVE, CONFIG_LOAD1, CONFIG_LOAD2 };
 
     // auto-mount setup
     QString listMaskedMounts;
@@ -77,11 +77,11 @@ private:
     class PartMan *partman = nullptr;
     class AutoPart *autopart = nullptr;
     class Replacer *replacer = nullptr;
+    class Crypto *crypto = nullptr;
     class Base *base = nullptr;
     class Oobe *oobe = nullptr;
     class BootMan *bootman = nullptr;
     class SwapMan *swapman = nullptr;
-    class PassEdit *passCrypto = nullptr;
 
     QPixmap helpBackdrop;
     // Splash screen
@@ -106,6 +106,7 @@ private:
     void setupAutoMount(bool enabled);
     void processNextPhase() noexcept;
     void pretendNextPhase() noexcept;
-    void manageConfig(enum ConfigAction mode) noexcept;
+    void loadConfig(int stage) noexcept;
+    void saveConfig() noexcept;
     bool eventFilter(QObject *watched, QEvent *event) noexcept;
 };

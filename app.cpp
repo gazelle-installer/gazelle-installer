@@ -91,7 +91,8 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription(QObject::tr("Customizable GUI installer for MX Linux and antiX Linux"));
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addOptions({{"auto", QObject::tr("Installs automatically using the configuration file (more information below).\n"
+    parser.addOptions({{"advanced", QObject::tr("Enable advanced settings, even in regular installation mode.")},
+        {"auto", QObject::tr("Installs automatically using the configuration file (more information below).\n"
             "-- WARNING: potentially dangerous option, it will wipe the partition(s) automatically.")},
         {"brave", QObject::tr("Overrules sanity checks on partitions and drives, causing them to be displayed.\n"
             "-- WARNING: this can break things, use it only if you don't care about data on drive.")},

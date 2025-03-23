@@ -42,6 +42,7 @@
 #include "partman.h"
 #include "autopart.h"
 #include "replacer.h"
+#include "crypto.h"
 #include "base.h"
 #include "oobe.h"
 #include "bootman.h"
@@ -59,6 +60,7 @@ enum Step {
     ENCRYPTION,
     CONFIRM,
     BOOT,
+    SWAP,
     SERVICES,
     NETWORK,
     LOCALIZATION,
@@ -82,6 +84,7 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     gui.textHelp->installEventFilter(this);
     gui.boxInstall->hide();
 
+    advanced = args.isSet("advanced");
     modeOOBE = args.isSet("oobe");
     pretend = args.isSet("pretend");
     if (!modeOOBE) {
@@ -129,9 +132,9 @@ MInstall::~MInstall() {
     if (bootman) delete bootman;
     if (swapman) delete swapman;
     if (partman) delete partman;
+    if (crypto) delete crypto;
     if (autopart) delete autopart;
     if (throbber) delete throbber;
-    if (passCrypto) delete passCrypto;
 }
 
 // meant to be run after the installer becomes visible
@@ -185,7 +188,8 @@ void MInstall::startup()
             checkmd5 = nullptr;
         }
 
-        partman = new PartMan(proc, gui, appConf, appArgs);
+        crypto = new Crypto(proc, gui);
+        partman = new PartMan(proc, gui, *crypto, appConf, appArgs);
         base = new Base(proc, *partman, appConf, appArgs);
         bootman = new BootMan(proc, *partman, gui, appConf, appArgs);
         swapman = new SwapMan(proc, *partman, gui);
@@ -210,10 +214,6 @@ void MInstall::startup()
             " or translate help files into different languages, or make suggestions,"
             " write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
             + "\n" + link_block);
-
-        // Password box setup
-        passCrypto = new PassEdit(gui.textCryptoPass, gui.textCryptoPass2, 1, this);
-        connect(passCrypto, &PassEdit::validationChanged, gui.pushNext, &QPushButton::setEnabled);
     }
 
     setupkeyboardbutton();
@@ -221,7 +221,7 @@ void MInstall::startup()
 
     oobe = new Oobe(proc, gui, this, appConf, oem, modeOOBE);
 
-    if (modeOOBE) manageConfig(CONFIG_LOAD2);
+    if (modeOOBE) loadConfig(2);
     else {
         // Build disk widgets
         partman->scan();
@@ -243,7 +243,7 @@ void MInstall::startup()
             gui.radioCustomPart->setChecked(true);
         }
         // Override with whatever is in the config.
-        manageConfig(CONFIG_LOAD1);
+        loadConfig(1);
         // Hibernation check box (regular install).
         gui.checkHibernationReg->setChecked(gui.checkHibernation->isChecked());
         connect(gui.checkHibernationReg, &QCheckBox::clicked, gui.checkHibernation, &QCheckBox::setChecked);
@@ -369,18 +369,6 @@ void MInstall::processNextPhase() noexcept
             // Start zram swap. In particular, the Argon2id KDF for LUKS uses a lot of memory.
             swapman->setupZRam();
 
-            if (gui.radioEntireDisk->isChecked()) {
-                partman->scan();
-                PartMan::Device *drive = autopart->selectedDrive();
-                if (!drive) throw QT_TR_NOOP("Cannot find selected drive.");
-                autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
-                bootman->buildBootLists(); // Load default boot options
-            } else if (gui.radioReplace->isChecked()) {
-                if (!replacer->preparePartMan()) {
-                    throw QT_TR_NOOP("Unable to prepare for replacement.");
-                }
-                bootman->buildBootLists(); // Load default boot options
-            }
             if (!partman->checkTargetDrivesOK()) throw "";
             autoMountEnabled = true; // disable auto mount by force
             setupAutoMount(false);
@@ -408,7 +396,9 @@ void MInstall::processNextPhase() noexcept
             proc.status(tr("Setting system configuration"));
             if (oem) oobe->enable();
             oobe->process();
-            manageConfig(CONFIG_SAVE);
+            if (!modeOOBE) {
+                saveConfig();
+            }
             proc.exec("sync"); // the sync(2) system call will block the GUI
             QStringList grubextra;
             swapman->install(grubextra);
@@ -449,7 +439,7 @@ void MInstall::processNextPhase() noexcept
         abortUI(false, closing);
         proc.unhalt();
         if (!modeOOBE) {
-            manageConfig(CONFIG_SAVE);
+            saveConfig();
             cleanup();
         }
 
@@ -469,71 +459,77 @@ void MInstall::pretendNextPhase() noexcept
         }
     }
     if (phase == PH_WAITING_FOR_INFO && gui.widgetStack->currentIndex() == Step::PROGRESS) {
-        manageConfig(CONFIG_SAVE);
+        saveConfig();
         phase = PH_FINISHED;
         gotoPage(Step::END);
     }
 }
 
-void MInstall::manageConfig(enum ConfigAction mode) noexcept
+void MInstall::loadConfig(int stage) noexcept
 {
-    if (mode == CONFIG_SAVE) {
-        configFile = pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf";
-        QFile::rename(configFile, configFile+".bak");
-    }
-    MSettings config(configFile, mode==CONFIG_SAVE);
+    MSettings config(configFile, false);
 
-    if (mode == CONFIG_SAVE) {
-        config.setString("Version", CODEBASE_VERSION);
-        config.setString("Product", PROJECTNAME + " " + PROJECTVERSION);
-    }
-    if ((mode == CONFIG_SAVE || mode == CONFIG_LOAD1) && !modeOOBE) {
+    if (stage == 1) {
         // Automatic or Manual partitioning
         config.setSection("Storage", gui.pageDisk);
         static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
         config.manageRadios("Target", 2, diskChoices, diskRadios);
-        const bool targetIsDrive = gui.radioEntireDisk->isChecked();
 
         // Storage and partition management
-        if(targetIsDrive || mode!=CONFIG_SAVE) autopart->manageConfig(config);
-        if (!targetIsDrive || mode!=CONFIG_SAVE) {
-            partman->manageConfig(config);
+        autopart->manageConfig(config);
+        partman->loadConfig(config);
+        crypto->manageConfig(config);
+    } else if (stage == 2) {
+        if (!modeOOBE) {
+            bootman->manageConfig(config);
+            swapman->manageConfig(config);
         }
-
-        // Encryption
-        config.setSection("Encryption", targetIsDrive ? gui.pageDisk : gui.pagePartitions);
-        config.addFilter("Pass");
-        if (mode != CONFIG_SAVE) {
-            const QString &epass = config.getString("Pass");
-            gui.textCryptoPass->setText(epass);
-            gui.textCryptoPass2->setText(epass);
-        }
-    }
-
-    if (!modeOOBE) {
-        const bool advanced = gui.radioCustomPart->isChecked();
-        if (mode == CONFIG_SAVE || mode == CONFIG_LOAD2) {
-            swapman->manageConfig(config, advanced);
-            if (advanced) bootman->manageConfig(config);
+        if (!oem) {
             oobe->manageConfig(config);
         }
-    } else if (mode == CONFIG_LOAD2) {
-        oobe->manageConfig(config);
     }
 
     if (!config.good) {
         QMessageBox::critical(this, windowTitle(),
             tr("Invalid settings found in configuration file (%1)."
                " Please review marked fields as you encounter them.").arg(configFile));
-    } else if (mode == CONFIG_SAVE) {
-        config.dumpDebug();
-        if (!pretend) {
-            config.closeAndCopyTo("/etc/minstalled.conf");
-            chmod(configFile.toUtf8().constData(), 0600);
-        }
+    }
+}
+void MInstall::saveConfig() noexcept
+{
+    configFile = pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf";
+    QFile::rename(configFile, configFile+".bak");
+    MSettings config(configFile, true);
+
+    config.setString("Version", CODEBASE_VERSION);
+    config.setString("Product", PROJECTNAME + " " + PROJECTVERSION);
+
+    // Automatic or Manual partitioning
+    config.setSection("Storage", gui.pageDisk);
+    static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
+    QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
+    config.manageRadios("Target", 2, diskChoices, diskRadios);
+
+    // Storage and partition management
+    if(gui.radioEntireDisk->isChecked()) {
+        autopart->manageConfig(config);
+    } else {
+        partman->saveConfig(config);
+    }
+    crypto->manageConfig(config);
+
+    bootman->manageConfig(config);
+    swapman->manageConfig(config);
+    if (!oem) {
+        oobe->manageConfig(config);
     }
 
+    config.dumpDebug();
+    if (!pretend) {
+        config.closeAndCopyTo("/etc/minstalled.conf");
+        chmod(configFile.toUtf8().constData(), 0600);
+    }
 }
 
 // logic displaying pages
@@ -597,17 +593,29 @@ int MInstall::showPage(int curr, int next) noexcept
         return Step::PARTITIONS;
     } else if (curr == Step::CONFIRM) {
         if (next > curr) {
-            if (gui.radioCustomPart->isChecked()) {
-                bootman->buildBootLists(); // Load default boot options
-                swapman->setupDefaults();
-                manageConfig(CONFIG_LOAD2);
-                return Step::BOOT;
-            } else {
+            if (gui.radioEntireDisk->isChecked()) {
                 gui.checkHibernation->setChecked(gui.checkHibernationReg->isChecked());
-                swapman->setupDefaults();
-                manageConfig(CONFIG_LOAD2);
-                return oem ? Step::PROGRESS : Step::NETWORK;
+                partman->scan();
+                PartMan::Device *drive = autopart->selectedDrive();
+                if (!drive) {
+                    gui.labelSplash->setText(tr("Cannot find selected drive."));
+                    abortEndUI(false);
+                    return Step::SPLASH;
+                }
+                autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
+                next = (oem ? Step::PROGRESS : Step::SWAP);
+            } else if (gui.radioReplace->isChecked()) {
+                if (!replacer->preparePartMan()) {
+                    gui.labelSplash->setText(tr("Unable to prepare for replacement."));
+                    abortEndUI(false);
+                    return Step::SPLASH;
+                }
+            } else {
+                advanced = true;
             }
+            bootman->buildBootLists();
+            swapman->setupDefaults();
+            loadConfig(2);
         } else {
             if (gui.radioEntireDisk->isChecked()) {
                 return Step::DISK;
@@ -617,14 +625,17 @@ int MInstall::showPage(int curr, int next) noexcept
                 return Step::REPLACE;
             }
         }
-    } else if (curr == Step::BOOT && next > curr) {
+    } else if (curr == Step::BOOT) {
+        return next;
+    } else if (curr == Step::SWAP && next > curr) {
         return oem ? Step::PROGRESS : Step::NETWORK;
-    } else if (curr == Step::NETWORK && next > curr) {
-        nextFocus = oobe->validateComputerName();
-        if (nextFocus) return curr;
-    } else if (curr == Step::NETWORK && next < curr) { // Backward
-        if (modeOOBE) return Step::TERMS;
-        else return Step::BOOT; // Skip pageServices
+    } else if (curr == Step::NETWORK) {
+        if(next > curr) {
+            nextFocus = oobe->validateComputerName();
+            if (nextFocus) return curr;
+        } else { // Backward
+            return modeOOBE ? Step::TERMS : Step::SWAP;
+        }
     } else if (curr == Step::LOCALIZATION && next > curr) {
         if (!pretend && oobe->haveSnapshotUserAccounts) {
             return Step::PROGRESS; // Skip pageUserAccounts and pageOldHome
@@ -644,8 +655,9 @@ int MInstall::showPage(int curr, int next) noexcept
             return Step::LOCALIZATION; // Skip pageUserAccounts and pageOldHome
         }
     } else if (curr == Step::PROGRESS && next < curr) { // Backward
-        if (oem) return Step::BOOT;
-        else if (!haveOldHome) {
+        if (oem) {
+            return Step::SWAP;
+        } else if (!haveOldHome) {
             // skip pageOldHome
             if (!pretend && oobe->haveSnapshotUserAccounts) {
                 return Step::LOCALIZATION;
@@ -810,7 +822,7 @@ void MInstall::pageDisplayed(int next) noexcept
     case Step::ENCRYPTION: // Disk encryption.
         gui.textHelp->setText("<p><b>" + tr("Encryption") + "</b><br/>"
             + ("You have chosen to encrypt at least one volume, and more information is required before continuing.") + "</p>");
-        enableNext = passCrypto->valid();
+        enableNext = crypto->valid();
         break;
 
     case Step::CONFIRM: // Confirmation and review.
@@ -826,13 +838,15 @@ void MInstall::pageDisplayed(int next) noexcept
             + tr("%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.").arg(PROJECTNAME) + "</p>"
             "<p>" + tr("By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.") + "</p>"
             "<p>" + tr("If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.") + "</p>"
-            "<p>" + tr("If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.") + "</p>"
-            "<p><b>" + tr("Create a swap file") + "</b><br/>"
-            + tr("A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.") + "</p>"
-            "<p>" + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "<br/>"
-            + tr("Setting the size to 0 has the same effect as unchecking this option.") + "</p>");
-
+            "<p>" + tr("If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.") + "</p>");
         enableBack = false;
+        break;
+
+    case Step::SWAP:
+        gui.textHelp->setText("<p><b>" + tr("Create a swap file") + "</b><br/>"
+            + tr("A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.") + "</p>"
+            "<p>" + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "</p>");
+        enableBack = advanced;
         break;
 
     case Step::SERVICES:
@@ -845,8 +859,6 @@ void MInstall::pageDisplayed(int next) noexcept
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
-        if (modeOOBE) enableBack = true;
-        else enableBack = gui.radioCustomPart->isChecked();
         break;
 
     case Step::LOCALIZATION:
@@ -921,7 +933,6 @@ void MInstall::pageDisplayed(int next) noexcept
             + "</p><p>"
             + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
             + "</p>");
-        enableBack = !oem || gui.radioCustomPart->isChecked();
         enableNext = false;
         break;
 
@@ -970,6 +981,7 @@ void MInstall::gotoPage(int next) noexcept
         gui.pushNext->setText(tr("Next"));
     }
     gui.pushNext->setIconSize(isize);
+
     if (next > Step::END) {
         // finished
         qApp->setOverrideCursor(Qt::WaitCursor);
@@ -1001,8 +1013,7 @@ void MInstall::gotoPage(int next) noexcept
     }
 
     // process next installation phase
-    if (next == Step::BOOT || next == Step::PROGRESS
-        || (gui.radioEntireDisk->isChecked() && next == Step::NETWORK)) {
+    if (next == Step::BOOT || next == Step::PROGRESS || (!advanced && next == Step::SWAP)) {
         processNextPhase();
     }
 }

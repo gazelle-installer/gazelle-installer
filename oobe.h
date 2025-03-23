@@ -30,6 +30,22 @@
 class Oobe : public QObject
 {
     Q_OBJECT
+public:
+    bool haveSnapshotUserAccounts = false;
+    Oobe(class MProcess &mproc, Ui::MeInstall &ui, QWidget *parent,
+         class MIni &appConf, bool oem, bool modeOOBE);
+    void manageConfig(class MSettings &config) const noexcept;
+    void enable() const;
+    void process() const;
+    void stashServices(bool save) const noexcept;
+    void setService(const QString &service, bool enabled) const;
+    QWidget *validateComputerName() const noexcept;
+    QWidget *validateUserInfo(bool automatic) const noexcept;
+    // Slots
+    void userPassValidationChanged() const noexcept;
+    void oldHomeToggled() const noexcept;
+
+private:
     class MProcess &proc;
     Ui::MeInstall &gui;
     QWidget *master;
@@ -40,33 +56,20 @@ class Oobe : public QObject
     bool online = false;
     QStringList timeZones; // cached time zone list
     PassEdit passUser, passRoot;
+    QString curUser, curHome;
+
     void buildServiceList(class MIni &appconf) noexcept;
-    int selectTimeZone(const QString &zone) noexcept;
-    void resetBlueman();
+    int selectTimeZone(const QString &zone) const noexcept;
+    void resetBlueman() const;
+    void setComputerName() const;
+    void setLocale() const;
+    void setUserClockFormat(const QString &skelpath) const noexcept;
+    void setUserInfo() const;
+    bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath) const noexcept;
+    bool containsAnySubstring(const QString& mainString, const QStringList& substrings) const noexcept;
     // Slots
-    void localeIndexChanged(int index) noexcept;
-    void timeAreaIndexChanged(int index) noexcept;
-
-public:
-    bool haveSnapshotUserAccounts = false;
-    Oobe(class MProcess &mproc, Ui::MeInstall &ui, QWidget *parent,
-        class MIni &appConf, bool oem, bool modeOOBE);
-    void manageConfig(class MSettings &config) noexcept;
-    void enable();
-    void process();
-    void stashServices(bool save) noexcept;
-    void setService(const QString &service, bool enabled);
-    QWidget *validateComputerName() noexcept;
-    QWidget *validateUserInfo(bool automatic) noexcept;
-    void setComputerName();
-    void setLocale();
-    void setUserInfo();
-    bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath);
-    // Slots
-    void userPassValidationChanged() noexcept;
-    void oldHomeToggled() noexcept;
-    bool containsAnySubstring(const QString& mainString, const QStringList& substrings);
-
-    };
+    void localeIndexChanged(int index) const noexcept;
+    void timeAreaIndexChanged(int index) const noexcept;
+};
 
 #endif // OOBE_H

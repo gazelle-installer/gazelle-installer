@@ -94,7 +94,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     for (QString &strloc : loclist) {
         strloc.replace("utf8", "UTF-8", Qt::CaseInsensitive);
         QLocale loc(strloc);
-        gui.comboLocale->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
+        gui.comboLocale->addItem(loc.nativeTerritoryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
     }
     gui.comboLocale->model()->sort(0);
     // default locale selection
@@ -136,9 +136,23 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     haveSamba = (val.compare("installed") == 0);
 
     buildServiceList(appConf);
+
+    // Current user details
+    curUser = getlogin();
+    if (curUser.isEmpty()) {
+        curUser = "demo";
+    }
+    // Using $HOME results in the wrong directory when run as root (with su).
+    MProcess::Section sect(proc, nullptr);
+    proc.shell("echo ~" + curUser, nullptr, true);
+    curHome = proc.readOut().trimmed();
+    if (curHome.isEmpty()) {
+        curHome = "/home/" + curUser;
+    }
+    qDebug() << "Current user:" << curUser << curHome;
 }
 
-void Oobe::manageConfig(MSettings &config) noexcept
+void Oobe::manageConfig(MSettings &config) const noexcept
 {
     const bool save = config.isSave();
     // Services page
@@ -181,28 +195,32 @@ void Oobe::manageConfig(MSettings &config) noexcept
     config.manageComboBox("Timezone", gui.comboTimeZone, true);
 
     // User Accounts page
-    config.setSection("User", gui.pageUserAccounts);
-    config.manageLineEdit("Username", gui.textUserName);
-    config.manageCheckBox("Autologin", gui.checkAutoLogin);
-    config.manageCheckBox("SaveDesktop", gui.checkSaveDesktop);
-    if (online) gui.checkSaveDesktop->setCheckState(Qt::Unchecked);
-    static constexpr const char *oldHomeActions[] = {"Use", "Save", "Delete"};
-    QRadioButton *const oldHomeRadios[] = {gui.radioOldHomeUse, gui.radioOldHomeSave, gui.radioOldHomeDelete};
-    config.manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
-    config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);
-    config.addFilter("UserPass");
-    config.addFilter("RootPass");
-    if (!save || oem) { // Transfer default passwords under OEM mode.
-        const QString &upass = config.getString("UserPass");
-        gui.textUserPass->setText(upass);
-        gui.textUserPass2->setText(upass);
-        const QString &rpass = config.getString("RootPass");
-        gui.textRootPass->setText(rpass);
-        gui.textRootPass2->setText(rpass);
+    if (!haveSnapshotUserAccounts) {
+        config.setSection("User", gui.pageUserAccounts);
+        config.manageLineEdit("Username", gui.textUserName);
+        config.manageCheckBox("Autologin", gui.checkAutoLogin);
+        config.manageCheckBox("SaveDesktop", gui.checkSaveDesktop);
+        if (online) {
+            gui.checkSaveDesktop->setCheckState(Qt::Unchecked);
+        }
+        static constexpr const char *oldHomeActions[] = {"Use", "Save", "Delete"};
+        QRadioButton *const oldHomeRadios[] = {gui.radioOldHomeUse, gui.radioOldHomeSave, gui.radioOldHomeDelete};
+        config.manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
+        config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);
+        config.addFilter("UserPass");
+        config.addFilter("RootPass");
+        if (!save) {
+            const QString &upass = config.getString("UserPass");
+            gui.textUserPass->setText(upass);
+            gui.textUserPass2->setText(upass);
+            const QString &rpass = config.getString("RootPass");
+            gui.textRootPass->setText(rpass);
+            gui.textRootPass2->setText(rpass);
+        }
     }
 }
 
-void Oobe::enable()
+void Oobe::enable() const
 {
     MProcess::Section sect(proc);
     sect.setRoot("/mnt/antiX");
@@ -217,7 +235,7 @@ void Oobe::enable()
     proc.exec("update-rc.d", {"-f", "oobe", "defaults"});
 }
 
-void Oobe::process()
+void Oobe::process() const
 {
     if (!oem) {
         MProcess::Section sect(proc);
@@ -237,11 +255,12 @@ void Oobe::process()
         setComputerName();
         setLocale();
     }
-    if (haveSnapshotUserAccounts || oem) { // skip user account creation
+    if (haveSnapshotUserAccounts) {
+        // Copy the whole /home/ directory for snapshot accounts.
         proc.exec("rsync", {"-a", "/home/", "/mnt/antiX/home/",
             "--exclude", ".cache", "--exclude", ".gvfs", "--exclude", ".dbus", "--exclude", ".Xauthority",
             "--exclude", ".ICEauthority", "--exclude", ".config/session"});
-    } else {
+    } else if (!oem) {
         setUserInfo();
     }
     if (online) {
@@ -297,7 +316,7 @@ void Oobe::buildServiceList(MIni &appconf) noexcept
     gui.treeServices->resizeColumnToContents(1);
 }
 
-void Oobe::stashServices(bool save) noexcept
+void Oobe::stashServices(bool save) const noexcept
 {
     QTreeWidgetItemIterator it(gui.treeServices);
     while (*it) {
@@ -309,7 +328,7 @@ void Oobe::stashServices(bool save) noexcept
     }
 }
 
-void Oobe::setService(const QString &service, bool enabled)
+void Oobe::setService(const QString &service, bool enabled) const
 {
     qDebug() << "Set service:" << service << enabled;
     MProcess::Section sect(proc);
@@ -343,7 +362,7 @@ void Oobe::setService(const QString &service, bool enabled)
     }
 }
 
-QWidget *Oobe::validateComputerName() noexcept
+QWidget *Oobe::validateComputerName() const noexcept
 {
     const QRegularExpression nametest("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\.");
     // see if name is reasonable
@@ -379,7 +398,7 @@ QWidget *Oobe::validateComputerName() noexcept
 }
 
 // set the computer name, can not be rerun
-void Oobe::setComputerName()
+void Oobe::setComputerName() const
 {
     QString etcpath = online ? "/etc" : "/mnt/antiX/etc";
     if (haveSamba) {
@@ -399,7 +418,7 @@ void Oobe::setComputerName()
 }
 
 // return 0 = success, 1 = bad area, 2 = bad zone
-int Oobe::selectTimeZone(const QString &zone) noexcept
+int Oobe::selectTimeZone(const QString &zone) const noexcept
 {
     int index = gui.comboTimeArea->findData(QVariant(zone.section('/', 0, 0)));
     if (index < 0) return 1;
@@ -411,7 +430,7 @@ int Oobe::selectTimeZone(const QString &zone) noexcept
     return 0;
 }
 
-void Oobe::setLocale()
+void Oobe::setLocale() const
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
 
@@ -462,58 +481,14 @@ void Oobe::setLocale()
     }
 
     // Set clock format
-    QString skelpath = online ? "/etc/skel" : "/mnt/antiX/etc/skel";
-    if (gui.radioClock12->isChecked()) {
-        //mx systems
-        proc.shell("sed -i '/data0=/c\\data0=%l:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
-        proc.shell("sed -i '/data0=/c\\data0=%l:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
-        proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' /home/demo/.config/xfce4/panel/datetime-1.rc");
-        proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
-        proc.shell("sed -i 's/%H/%l/' /home/demo/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
-        proc.shell("sed -i 's/%H/%l/' " + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
-
-        //mx kde
-        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=0' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc");
-        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=0' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc");
-
-        //mx fluxbox
-        proc.shell("sed -i '/time1_format/c\\time1_format=%l:%M' " + skelpath + "/.config/tint2/tint2rc");
-        proc.shell("sed -i '/time1_format/c\\time1_format=%l:%M' /home/demo/.config/tint2/tint2rc");
-
-        //antix systems
-        proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.icewm/preferences");
-        proc.shell("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.fluxbox/init");
-        proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.jwm/tray");
-    } else {
-        //mx systems
-        proc.shell("sed -i '/data0=/c\\data0=%H:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
-        proc.shell("sed -i '/data0=/c\\data0=%H:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
-        proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' /home/demo/.config/xfce4/panel/datetime-1.rc");
-        proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
-        proc.shell("sed -i 's/%l/%H/' /home/demo/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
-        proc.shell("sed -i 's/%l/%H/' " + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
-
-
-        //mx kde
-        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc");
-        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc");
-
-        //mx fluxbox
-        proc.shell("sed -i '/time1_format/c\\time1_format=%H:%M' " + skelpath + "/.config/tint2/tint2rc");
-        proc.shell("sed -i '/time1_format/c\\time1_format=%H:%M' /home/demo/.config/tint2/tint2rc");
-
-        //antix systems
-        proc.shell("sed -i 's/%H:%M/%H:%M/g' " + skelpath + "/.icewm/preferences");
-        proc.shell("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.fluxbox/init");
-        proc.shell("sed -i 's/%H:%M/%k:%M/g' " + skelpath + "/.jwm/tray");
-    }
+    setUserClockFormat(online ? "/etc/skel" : "/mnt/antiX/etc/skel");
 
     // localize repo
     qDebug() << "Localize repo";
     if (online) proc.exec("localize-repo", {"default"});
     else proc.exec("chroot", {"/mnt/antiX", "localize-repo", "default"});
-    
-    //machine id 
+
+    //machine id
     if (online){
         // create a /etc/machine-id file and /var/lib/dbus/machine-id file
         proc.exec("rm", {"/var/lib/dbus/machine-id", "/etc/machine-id"});
@@ -521,8 +496,45 @@ void Oobe::setLocale()
         proc.exec("dbus-uuidgen", {"--ensure"});
     }
 }
+void Oobe::setUserClockFormat(const QString &skelpath) const noexcept
+{
+    MProcess::Section sect(proc, nullptr);
+    if (gui.radioClock12->isChecked()) {
+        //mx systems
+        proc.shell("sed -i '/data0=/c\\data0=%l:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
+        proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
+        proc.shell("sed -i 's/%H/%l/' " + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
 
-QWidget *Oobe::validateUserInfo(bool automatic) noexcept
+        //mx kde
+        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=0' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc");
+
+        //mx fluxbox
+        proc.shell("sed -i '/time1_format/c\\time1_format=%l:%M' " + skelpath + "/.config/tint2/tint2rc");
+
+        //antix systems
+        proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.icewm/preferences");
+        proc.shell("sed -i 's/%k:%M/%l:%M/g' " + skelpath + "/.fluxbox/init");
+        proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.jwm/tray");
+    } else {
+        //mx systems
+        proc.shell("sed -i '/data0=/c\\data0=%H:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
+        proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
+        proc.shell("sed -i 's/%l/%H/' " + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
+
+        //mx kde
+        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc");
+
+        //mx fluxbox
+        proc.shell("sed -i '/time1_format/c\\time1_format=%H:%M' " + skelpath + "/.config/tint2/tint2rc");
+
+        //antix systems
+        proc.shell("sed -i 's/%H:%M/%H:%M/g' " + skelpath + "/.icewm/preferences");
+        proc.shell("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.fluxbox/init");
+        proc.shell("sed -i 's/%H:%M/%k:%M/g' " + skelpath + "/.jwm/tray");
+    }
+}
+
+QWidget *Oobe::validateUserInfo(bool automatic) const noexcept
 {
     const QString &userName = gui.textUserName->text();
     // see if username is reasonable length
@@ -564,7 +576,7 @@ QWidget *Oobe::validateUserInfo(bool automatic) noexcept
 }
 
 // setup the user, cannot be rerun
-void Oobe::setUserInfo()
+void Oobe::setUserInfo() const
 {
     // set the user passwords first
     bool ok = true;
@@ -578,10 +590,11 @@ void Oobe::setUserInfo()
         if (rootPass.isEmpty()) proc.exec("passwd", {"-d", "root"});
         else userinfo.append(QString("root:" + rootPass).toUtf8());
     }
-    if (userPass.isEmpty()) proc.exec("passwd", {"-d", "demo"});
-    else {
+    if (userPass.isEmpty()) {
+        proc.exec("passwd", {"-d", curUser});
+    } else {
         if (!userinfo.isEmpty()) userinfo.append('\n');
-        userinfo.append(QString("demo:" + userPass).toUtf8());
+        userinfo.append(QString(curUser + ':' + userPass).toUtf8());
     }
     if (!userinfo.isEmpty()) proc.exec("chpasswd", {}, &userinfo);
     sect.setRoot(nullptr);
@@ -610,8 +623,8 @@ void Oobe::setUserInfo()
     }
 
     // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
-    const bool remasteredDemo = QFileInfo("/live/linux/home/demo").isDir();
-    qDebug() << "check for remastered home demo folder:" << remasteredDemo;
+    const bool remasteredUserHome = QFileInfo("/live/linux" + curHome).isDir();
+    qDebug() << "check for remastered home folder:" << remasteredUserHome;
 
     if (QFileInfo::exists(dpath.toUtf8())) { // Still exists.
         sect.setExceptionMode(nullptr);
@@ -623,14 +636,15 @@ void Oobe::setUserInfo()
         proc.exec("cp", {"-Rn", skelpath + "/.local", dpath});
     } else { // dir does not exist, must create it
         // Copy skel to demo, unless demo folder exists in remastered linuxfs.
-        if (!remasteredDemo) {
+        if (!remasteredUserHome) {
             sect.setExceptionMode(QT_TR_NOOP("Sorry, failed to create user directory."));
             proc.exec("cp", {"-a", skelpath, dpath});
         } else { // still rename the demo directory even if remastered demo home folder is detected
             sect.setExceptionMode(QT_TR_NOOP("Sorry, failed to name user directory."));
-            proc.exec("mv", {"-f", rootpath + "/home/demo", dpath});
+            proc.exec("mv", {"-f", rootpath + curHome, dpath});
         }
     }
+    setUserClockFormat(dpath);
 
     sect.setExceptionMode(nullptr);
 
@@ -638,50 +652,50 @@ void Oobe::setUserInfo()
     if (gui.checkSaveDesktop->isChecked()) {
         resetBlueman();
         // rsync home folder
-        QString cmd = ("rsync -a --info=name1 /home/demo/ %1"
+        QString cmd = ("rsync -a --info=name1 %1/ %2"
             " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
             " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
             " --exclude '.idesktop/gazelle.lnk' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
             " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox'"
             " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
             " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'"
-            " --exclude '.config/session' | xargs -I '$' sed -i 's|home/demo|home/" + username + "|g' %1/$").arg(dpath);
+            " --exclude '.config/session' | xargs -I '$' sed -i 's|%1|/home/"
+            + username + "|g' %2/$").arg(curHome, dpath);
         proc.shell(cmd);
     }
 
     // check if remaster exists and checkSaveDesktop not checked, modify the remastered demo folder
-    if (remasteredDemo && !gui.checkSaveDesktop->isChecked())
+    if (remasteredUserHome && !gui.checkSaveDesktop->isChecked())
     {
         resetBlueman();
         // Change remaster "demo" to new user.
-        QString cmd = ("find " + dpath + " -maxdepth 1 -type f -name '.*' -print0 | xargs -0 sed -i 's|home/demo|home/" + username + "|g'").arg(dpath);
+        QString cmd = ("find " + dpath + " -maxdepth 1 -type f -name '.*' -print0 | xargs -0 sed -i 's|" + curHome + "|/home/" + username + "|g'").arg(dpath);
         proc.shell(cmd);
-        cmd = ("find " + dpath + "/.config -type f -print0 | xargs -0 sed -i 's|home/demo|home/" + username + "|g'").arg(dpath);
+        cmd = ("find " + dpath + "/.config -type f -print0 | xargs -0 sed -i 's|" + curHome + "|/home/" + username + "|g'").arg(dpath);
         proc.shell(cmd);
-        cmd = ("find " + dpath + "/.local -type f  -print0 | xargs -0 sed -i 's|home/demo|home/" + username + "|g'").arg(dpath);
+        cmd = ("find " + dpath + "/.local -type f  -print0 | xargs -0 sed -i 's|" + curHome + "|/home/" + username + "|g'").arg(dpath);
         proc.shell(cmd);
     }
 
     // fix the ownership, demo=newuser
     sect.setExceptionMode(QT_TR_NOOP("Failed to set ownership or permissions of user directory."));
-    proc.exec("chown", {"-R", "demo:demo", dpath});
+    proc.exec("chown", {"-R", curUser + ':' + curUser, dpath});
     // Set permissions according to /etc/adduser.conf
     const MIni addusercfg("/etc/adduser.conf", MIni::ReadOnly);
     mode_t mode = addusercfg.getString("DIR_MODE", "0700").toUInt(&ok, 8);
     if (chmod(dpath.toUtf8().constData(), mode) != 0) throw sect.failMessage();
 
     // change in files
-    sect.setExceptionMode(nullptr);
-    replaceStringInFile("demo", username, rootpath + "/etc/group");
-    replaceStringInFile("demo", username, rootpath + "/etc/gshadow");
-    replaceStringInFile("demo", username, rootpath + "/etc/passwd");
-    replaceStringInFile("demo", username, rootpath + "/etc/shadow");
-    replaceStringInFile("demo", username, rootpath + "/etc/subuid");
-    replaceStringInFile("demo", username, rootpath + "/etc/subgid");
-    replaceStringInFile("demo", username, rootpath + "/etc/slim.conf");
-    replaceStringInFile("demo", username, rootpath + "/etc/lightdm/lightdm.conf");
-    replaceStringInFile("demo", username, rootpath + "/home/*/.gtkrc-2.0");
-    replaceStringInFile("demo", username, rootpath + "/root/.gtkrc-2.0");
+    replaceStringInFile(curUser, username, rootpath + "/etc/group");
+    replaceStringInFile(curUser, username, rootpath + "/etc/gshadow");
+    replaceStringInFile(curUser, username, rootpath + "/etc/passwd");
+    replaceStringInFile(curUser, username, rootpath + "/etc/shadow");
+    replaceStringInFile(curUser, username, rootpath + "/etc/subuid");
+    replaceStringInFile(curUser, username, rootpath + "/etc/subgid");
+    replaceStringInFile(curUser, username, rootpath + "/etc/slim.conf");
+    replaceStringInFile(curUser, username, rootpath + "/etc/lightdm/lightdm.conf");
+    replaceStringInFile(curUser, username, rootpath + "/home/*/.gtkrc-2.0");
+    replaceStringInFile(curUser, username, rootpath + "/root/.gtkrc-2.0");
     if (gui.checkAutoLogin->isChecked()) {
         replaceStringInFile("#auto_login", "auto_login", rootpath + "/etc/slim.conf");
         replaceStringInFile("#default_user ", "default_user ", rootpath + "/etc/slim.conf");
@@ -696,14 +710,14 @@ void Oobe::setUserInfo()
     proc.exec("touch", {rootpath + "/var/mail/" + username});
 }
 
-void Oobe::resetBlueman()
+void Oobe::resetBlueman() const
 {
-    proc.exec("runuser", {"-l", "demo", "-c", "dconf reset /org/blueman/transfer/shared-path"}); //reset blueman path
+    proc.exec("runuser", {"-l", curUser, "-c", "dconf reset /org/blueman/transfer/shared-path"}); //reset blueman path
 }
 
 /* Slots */
 
-void Oobe::localeIndexChanged(int index) noexcept
+void Oobe::localeIndexChanged(int index) const noexcept
 {
     // riot control
     QLocale locale(gui.comboLocale->itemData(index).toString());
@@ -711,7 +725,7 @@ void Oobe::localeIndexChanged(int index) noexcept
     else gui.radioClock24->setChecked(true);
 }
 
-void Oobe::timeAreaIndexChanged(int index) noexcept
+void Oobe::timeAreaIndexChanged(int index) const noexcept
 {
     if (index < 0 || index >= gui.comboTimeArea->count()) return;
     const QString &area = gui.comboTimeArea->itemData(index).toString();
@@ -726,7 +740,7 @@ void Oobe::timeAreaIndexChanged(int index) noexcept
     gui.comboTimeZone->model()->sort(0);
 }
 
-void Oobe::userPassValidationChanged() noexcept
+void Oobe::userPassValidationChanged() const noexcept
 {
     bool ok = !gui.textUserName->text().isEmpty();
     if (ok) ok = passUser.valid() || gui.textUserName->text().isEmpty();
@@ -736,7 +750,7 @@ void Oobe::userPassValidationChanged() noexcept
     gui.pushNext->setEnabled(ok);
 }
 
-void Oobe::oldHomeToggled() noexcept
+void Oobe::oldHomeToggled() const noexcept
 {
     gui.pushNext->setEnabled(gui.radioOldHomeUse->isChecked()
         || gui.radioOldHomeSave->isChecked() || gui.radioOldHomeDelete->isChecked());
@@ -744,12 +758,13 @@ void Oobe::oldHomeToggled() noexcept
 
 /* Helpers*/
 
-bool Oobe::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
+bool Oobe::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath) const noexcept
 {
+    MProcess::Section sect(proc, nullptr);
     return proc.exec("sed", {"-i", QString("s/%1/%2/g").arg(oldtext, newtext), filepath});
 }
 
-bool Oobe::containsAnySubstring(const QString& mainString, const QStringList& substrings) {
+bool Oobe::containsAnySubstring(const QString& mainString, const QStringList& substrings) const noexcept {
     for (const QString& substring : substrings) {
         if (mainString.contains(substring)) {
             return true;

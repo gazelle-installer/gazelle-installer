@@ -26,7 +26,7 @@
    <item>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="opaqueResize">
       <bool>false</bool>
@@ -60,10 +60,10 @@
        </sizepolicy>
       </property>
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
+       <enum>QFrame::Shape::StyledPanel</enum>
       </property>
       <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::Shadow::Raised</enum>
       </property>
       <layout class="QGridLayout">
        <item row="4" column="4">
@@ -98,7 +98,7 @@
        <item row="4" column="1" colspan="3">
         <spacer>
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </spacer>
        </item>
@@ -123,7 +123,7 @@
              </sizepolicy>
             </property>
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="text">
              <string>Abort</string>
@@ -168,7 +168,7 @@
            <string>Gathering Information, please stand by.</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -212,7 +212,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 <set>Qt::TextInteractionFlag::TextSelectableByKeyboard|Qt::TextInteractionFlag::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
@@ -232,7 +232,7 @@
                    <string>Keyboard Settings</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignCenter</set>
+                   <set>Qt::AlignmentFlag::AlignCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -247,7 +247,7 @@
                    <string>Model:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -262,7 +262,7 @@
                    <string>Variant:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -272,7 +272,7 @@
                 <item row="1" column="0" rowspan="2">
                  <spacer>
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                  </spacer>
                 </item>
@@ -294,14 +294,14 @@
                    <string>Layout:</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
                 <item row="1" column="4" rowspan="2">
                  <spacer>
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                  </spacer>
                 </item>
@@ -332,7 +332,7 @@
            <item row="2" column="0" colspan="2">
             <spacer>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </spacer>
            </item>
@@ -367,10 +367,10 @@
                  <item row="2" column="0" colspan="2">
                   <widget class="QFrame" name="boxSliderPart">
                    <property name="frameShape">
-                    <enum>QFrame::StyledPanel</enum>
+                    <enum>QFrame::Shape::StyledPanel</enum>
                    </property>
                    <property name="frameShadow">
-                    <enum>QFrame::Sunken</enum>
+                    <enum>QFrame::Shadow::Sunken</enum>
                    </property>
                    <layout class="QGridLayout">
                     <property name="leftMargin">
@@ -394,7 +394,7 @@
                        <string>Root</string>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignCenter</set>
+                       <set>Qt::AlignmentFlag::AlignCenter</set>
                       </property>
                      </widget>
                     </item>
@@ -404,7 +404,7 @@
                        <string>Home</string>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignCenter</set>
+                       <set>Qt::AlignmentFlag::AlignCenter</set>
                       </property>
                      </widget>
                     </item>
@@ -457,7 +457,7 @@ QSlider::handle:horizontal:disabled {
                        <number>100</number>
                       </property>
                       <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
+                       <enum>Qt::Orientation::Horizontal</enum>
                       </property>
                      </widget>
                     </item>
@@ -467,13 +467,13 @@ QSlider::handle:horizontal:disabled {
                        <bool>false</bool>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignCenter</set>
+                       <set>Qt::AlignmentFlag::AlignCenter</set>
                       </property>
                       <property name="accelerated">
                        <bool>true</bool>
                       </property>
                       <property name="correctionMode">
-                       <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+                       <enum>QAbstractSpinBox::CorrectionMode::CorrectToPreviousValue</enum>
                       </property>
                       <property name="suffix">
                        <string>%</string>
@@ -489,13 +489,13 @@ QSlider::handle:horizontal:disabled {
                        <bool>false</bool>
                       </property>
                       <property name="alignment">
-                       <set>Qt::AlignCenter</set>
+                       <set>Qt::AlignmentFlag::AlignCenter</set>
                       </property>
                       <property name="accelerated">
                        <bool>true</bool>
                       </property>
                       <property name="correctionMode">
-                       <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+                       <enum>QAbstractSpinBox::CorrectionMode::CorrectToPreviousValue</enum>
                       </property>
                       <property name="suffix">
                        <string>%</string>
@@ -750,14 +750,14 @@ QSlider::handle:horizontal:disabled {
               <item row="8" column="2">
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Vertical</enum>
+                 <enum>Qt::Orientation::Vertical</enum>
                 </property>
                </spacer>
               </item>
               <item row="4" column="2">
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Vertical</enum>
+                 <enum>Qt::Orientation::Vertical</enum>
                 </property>
                </spacer>
               </item>
@@ -824,7 +824,7 @@ QSlider::handle:horizontal:disabled {
                  <number>512</number>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -841,7 +841,7 @@ QSlider::handle:horizontal:disabled {
                  <number>512</number>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -851,7 +851,7 @@ QSlider::handle:horizontal:disabled {
            <item>
             <spacer>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </spacer>
            </item>
@@ -882,12 +882,17 @@ QSlider::handle:horizontal:disabled {
               </item>
               <item>
                <widget class="QTreeWidget" name="treeConfirm">
+                <property name="selectionMode">
+                 <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
+                </property>
                 <attribute name="headerVisible">
                  <bool>false</bool>
                 </attribute>
-                <property name="selectionMode">
-                 <enum>QAbstractItemView::NoSelection</enum>
-                </property>
+                <column>
+                 <property name="text">
+                  <string notr="true">1</string>
+                 </property>
+                </column>
                </widget>
               </item>
              </layout>
@@ -909,6 +914,13 @@ QSlider::handle:horizontal:disabled {
            <property name="bottomMargin">
             <number>0</number>
            </property>
+           <item row="1" column="0">
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </spacer>
+           </item>
            <item row="0" column="0">
             <widget class="QGroupBox" name="boxBoot">
              <property name="title">
@@ -977,7 +989,7 @@ QSlider::handle:horizontal:disabled {
               <item row="0" column="4">
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                </spacer>
               </item>
@@ -1045,15 +1057,24 @@ QSlider::handle:horizontal:disabled {
              </layout>
             </widget>
            </item>
-           <item row="2" column="0">
-            <spacer>
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="0">
-            <widget class="QGroupBox" name="boxSwap">
+          </layout>
+         </widget>
+         <widget class="QWidget" name="pageSwap">
+          <layout class="QVBoxLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QGroupBox" name="boxSwapFile">
              <property name="title">
               <string>Create a swap file</string>
              </property>
@@ -1074,8 +1095,11 @@ QSlider::handle:horizontal:disabled {
                   <property name="suffix">
                    <string> MB</string>
                   </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
                   <property name="stepType">
-                   <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                   <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
                   </property>
                  </widget>
                 </item>
@@ -1128,6 +1152,97 @@ QSlider::handle:horizontal:disabled {
               </item>
              </layout>
             </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="boxSwapZram">
+             <property name="title">
+              <string>Configure zram swap</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+             <layout class="QGridLayout">
+              <item row="0" column="0">
+               <widget class="QRadioButton" name="radioZramPercent">
+                <property name="text">
+                 <string>Allocate based on RAM:</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="spinZramPercent">
+                <property name="suffix">
+                 <string>%</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="maximum">
+                 <number>1000</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="value">
+                 <number>100</number>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="labelZramRecPercent">
+                <property name="text">
+                 <string>Recommended maximum: 100%</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="radioZramSize">
+                <property name="text">
+                 <string>Allocate fixed size:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="spinZramSize">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="accelerated">
+                 <bool>true</bool>
+                </property>
+                <property name="suffix">
+                 <string> MB</string>
+                </property>
+                <property name="minimum">
+                 <number>1</number>
+                </property>
+                <property name="stepType">
+                 <enum>QAbstractSpinBox::StepType::AdaptiveDecimalStepType</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QLabel" name="labelZramRecSize">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -1320,10 +1435,10 @@ QSlider::handle:horizontal:disabled {
               <item row="3" column="0">
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                 <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
+                 <enum>QSizePolicy::Policy::Fixed</enum>
                 </property>
                </spacer>
               </item>
@@ -1333,7 +1448,7 @@ QSlider::handle:horizontal:disabled {
            <item row="1" column="0">
             <spacer>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </spacer>
            </item>
@@ -1390,7 +1505,7 @@ QSlider::handle:horizontal:disabled {
               <item row="3" column="3">
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                </spacer>
               </item>
@@ -1432,7 +1547,7 @@ QSlider::handle:horizontal:disabled {
                 <item>
                  <spacer>
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                  </spacer>
                 </item>
@@ -1455,7 +1570,7 @@ QSlider::handle:horizontal:disabled {
                    </sizepolicy>
                   </property>
                   <property name="sizeAdjustPolicy">
-                   <enum>QComboBox::AdjustToContents</enum>
+                   <enum>QComboBox::SizeAdjustPolicy::AdjustToContents</enum>
                   </property>
                  </widget>
                 </item>
@@ -1474,10 +1589,10 @@ QSlider::handle:horizontal:disabled {
            <item row="3" column="0">
             <spacer>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
              <property name="sizeType">
-              <enum>QSizePolicy::Expanding</enum>
+              <enum>QSizePolicy::Policy::Expanding</enum>
              </property>
             </spacer>
            </item>
@@ -1577,7 +1692,7 @@ QSlider::handle:horizontal:disabled {
               <item>
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                </spacer>
               </item>
@@ -1679,7 +1794,7 @@ QSlider::handle:horizontal:disabled {
                  </sizepolicy>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -1705,7 +1820,7 @@ QSlider::handle:horizontal:disabled {
                  </sizepolicy>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -1752,7 +1867,7 @@ QSlider::handle:horizontal:disabled {
                  </sizepolicy>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -1778,7 +1893,7 @@ QSlider::handle:horizontal:disabled {
                  </sizepolicy>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                </widget>
               </item>
@@ -1801,7 +1916,7 @@ QSlider::handle:horizontal:disabled {
            <item row="5" column="0">
             <spacer>
              <property name="orientation">
-              <enum>Qt::Vertical</enum>
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </spacer>
            </item>
@@ -1861,7 +1976,7 @@ QSlider::handle:horizontal:disabled {
               <item>
                <spacer>
                 <property name="orientation">
-                 <enum>Qt::Vertical</enum>
+                 <enum>Qt::Orientation::Vertical</enum>
                 </property>
                </spacer>
               </item>
@@ -1983,7 +2098,7 @@ QSlider::handle:horizontal:disabled {
                  <bool>false</bool>
                 </property>
                 <property name="textInteractionFlags">
-                 <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                 <set>Qt::TextInteractionFlag::TextSelectableByKeyboard|Qt::TextInteractionFlag::TextSelectableByMouse</set>
                 </property>
                </widget>
               </item>
