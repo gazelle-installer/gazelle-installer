@@ -744,11 +744,11 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
                 }
             }
         }
-        QString mount = volume->mountPoint();
+        const QString &mount = volume->mountPoint();
         if (mount.isEmpty()) continue;
         if (mount == "/") {
             rootdev = volume;
-        } else if (!mount.startsWith("/") && !volume->allowedUsesFor().contains(mount)) {
+        } else if (!mount.startsWith("/") && !volume->allowedUsesFor().contains(volume->usefor)) {
             QMessageBox::critical(gui.boxMain, QString(),
                 tr("Invalid use for %1: %2").arg(volume->shownDevice(), mount));
             return false;
