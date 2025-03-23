@@ -181,24 +181,28 @@ void Oobe::manageConfig(MSettings &config) noexcept
     config.manageComboBox("Timezone", gui.comboTimeZone, true);
 
     // User Accounts page
-    config.setSection("User", gui.pageUserAccounts);
-    config.manageLineEdit("Username", gui.textUserName);
-    config.manageCheckBox("Autologin", gui.checkAutoLogin);
-    config.manageCheckBox("SaveDesktop", gui.checkSaveDesktop);
-    if (online) gui.checkSaveDesktop->setCheckState(Qt::Unchecked);
-    static constexpr const char *oldHomeActions[] = {"Use", "Save", "Delete"};
-    QRadioButton *const oldHomeRadios[] = {gui.radioOldHomeUse, gui.radioOldHomeSave, gui.radioOldHomeDelete};
-    config.manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
-    config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);
-    config.addFilter("UserPass");
-    config.addFilter("RootPass");
-    if (!save) {
-        const QString &upass = config.getString("UserPass");
-        gui.textUserPass->setText(upass);
-        gui.textUserPass2->setText(upass);
-        const QString &rpass = config.getString("RootPass");
-        gui.textRootPass->setText(rpass);
-        gui.textRootPass2->setText(rpass);
+    if (!haveSnapshotUserAccounts) {
+        config.setSection("User", gui.pageUserAccounts);
+        config.manageLineEdit("Username", gui.textUserName);
+        config.manageCheckBox("Autologin", gui.checkAutoLogin);
+        config.manageCheckBox("SaveDesktop", gui.checkSaveDesktop);
+        if (online) {
+            gui.checkSaveDesktop->setCheckState(Qt::Unchecked);
+        }
+        static constexpr const char *oldHomeActions[] = {"Use", "Save", "Delete"};
+        QRadioButton *const oldHomeRadios[] = {gui.radioOldHomeUse, gui.radioOldHomeSave, gui.radioOldHomeDelete};
+        config.manageRadios("OldHomeAction", 3, oldHomeActions, oldHomeRadios);
+        config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);
+        config.addFilter("UserPass");
+        config.addFilter("RootPass");
+        if (!save) {
+            const QString &upass = config.getString("UserPass");
+            gui.textUserPass->setText(upass);
+            gui.textUserPass2->setText(upass);
+            const QString &rpass = config.getString("RootPass");
+            gui.textRootPass->setText(rpass);
+            gui.textRootPass2->setText(rpass);
+        }
     }
 }
 
@@ -237,11 +241,12 @@ void Oobe::process()
         setComputerName();
         setLocale();
     }
-    if (haveSnapshotUserAccounts || oem) { // skip user account creation
+    if (haveSnapshotUserAccounts) {
+        // Copy the whole /home/ directory for snapshot accounts.
         proc.exec("rsync", {"-a", "/home/", "/mnt/antiX/home/",
             "--exclude", ".cache", "--exclude", ".gvfs", "--exclude", ".dbus", "--exclude", ".Xauthority",
             "--exclude", ".ICEauthority", "--exclude", ".config/session"});
-    } else {
+    } else if (!oem) {
         setUserInfo();
     }
     if (online) {
