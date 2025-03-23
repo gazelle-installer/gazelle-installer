@@ -94,7 +94,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     for (QString &strloc : loclist) {
         strloc.replace("utf8", "UTF-8", Qt::CaseInsensitive);
         QLocale loc(strloc);
-        gui.comboLocale->addItem(loc.nativeCountryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
+        gui.comboLocale->addItem(loc.nativeTerritoryName() + " - " + loc.nativeLanguageName(), QVariant(strloc));
     }
     gui.comboLocale->model()->sort(0);
     // default locale selection
