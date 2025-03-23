@@ -481,7 +481,9 @@ void MInstall::loadConfig(int stage) noexcept
             bootman->manageConfig(config);
             swapman->manageConfig(config);
         }
-        oobe->manageConfig(config);
+        if (!oem) {
+            oobe->manageConfig(config);
+        }
     }
 
     if (!config.good) {
@@ -515,7 +517,9 @@ void MInstall::saveConfig() noexcept
 
     bootman->manageConfig(config);
     swapman->manageConfig(config);
-    oobe->manageConfig(config);
+    if (!oem) {
+        oobe->manageConfig(config);
+    }
 
     config.dumpDebug();
     if (!pretend) {
@@ -817,7 +821,6 @@ void MInstall::pageDisplayed(int next) noexcept
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
-        enableBack = !modeOOBE;
         break;
 
     case Step::LOCALIZATION:

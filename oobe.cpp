@@ -192,7 +192,7 @@ void Oobe::manageConfig(MSettings &config) noexcept
     config.manageGroupCheckBox("EnableRoot", gui.boxRootAccount);
     config.addFilter("UserPass");
     config.addFilter("RootPass");
-    if (!save || oem) { // Transfer default passwords under OEM mode.
+    if (!save) {
         const QString &upass = config.getString("UserPass");
         gui.textUserPass->setText(upass);
         gui.textUserPass2->setText(upass);
