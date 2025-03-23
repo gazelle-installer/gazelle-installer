@@ -467,23 +467,35 @@ void Oobe::setLocale()
     }
 
     // Set clock format
-    QString skelpath = online ? "/etc/skel" : "/mnt/antiX/etc/skel";
+    setUserClockFormat(online ? "/etc/skel" : "/mnt/antiX/etc/skel");
+
+    // localize repo
+    qDebug() << "Localize repo";
+    if (online) proc.exec("localize-repo", {"default"});
+    else proc.exec("chroot", {"/mnt/antiX", "localize-repo", "default"});
+
+    //machine id
+    if (online){
+        // create a /etc/machine-id file and /var/lib/dbus/machine-id file
+        proc.exec("rm", {"/var/lib/dbus/machine-id", "/etc/machine-id"});
+        proc.exec("dbus-uuidgen", {"--ensure=/etc/machine-id"});
+        proc.exec("dbus-uuidgen", {"--ensure"});
+    }
+}
+void Oobe::setUserClockFormat(const QString &skelpath) const noexcept
+{
+    MProcess::Section sect(proc, nullptr);
     if (gui.radioClock12->isChecked()) {
         //mx systems
-        proc.shell("sed -i '/data0=/c\\data0=%l:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
         proc.shell("sed -i '/data0=/c\\data0=%l:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
-        proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' /home/demo/.config/xfce4/panel/datetime-1.rc");
         proc.shell("sed -i '/time_format=/c\\time_format=%l:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
-        proc.shell("sed -i 's/%H/%l/' /home/demo/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
         proc.shell("sed -i 's/%H/%l/' " + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
 
         //mx kde
-        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=0' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc");
         proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=0' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc");
 
         //mx fluxbox
         proc.shell("sed -i '/time1_format/c\\time1_format=%l:%M' " + skelpath + "/.config/tint2/tint2rc");
-        proc.shell("sed -i '/time1_format/c\\time1_format=%l:%M' /home/demo/.config/tint2/tint2rc");
 
         //antix systems
         proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.icewm/preferences");
@@ -491,39 +503,20 @@ void Oobe::setLocale()
         proc.shell("sed -i 's/%H:%M/%l:%M/g' " + skelpath + "/.jwm/tray");
     } else {
         //mx systems
-        proc.shell("sed -i '/data0=/c\\data0=%H:%M' /home/demo/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
         proc.shell("sed -i '/data0=/c\\data0=%H:%M' " + skelpath + "/.config/xfce4/panel/xfce4-orageclock-plugin-1.rc");
-        proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' /home/demo/.config/xfce4/panel/datetime-1.rc");
         proc.shell("sed -i '/time_format=/c\\time_format=%H:%M' " + skelpath + "/.config/xfce4/panel/datetime-1.rc");
-        proc.shell("sed -i 's/%l/%H/' /home/demo/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
         proc.shell("sed -i 's/%l/%H/' " + skelpath + "/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml");
 
-
         //mx kde
-        proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' /home/demo/.config/plasma-org.kde.plasma.desktop-appletsrc");
         proc.shell("sed -i '/use24hFormat=/c\\use24hFormat=2' " + skelpath + "/.config/plasma-org.kde.plasma.desktop-appletsrc");
 
         //mx fluxbox
         proc.shell("sed -i '/time1_format/c\\time1_format=%H:%M' " + skelpath + "/.config/tint2/tint2rc");
-        proc.shell("sed -i '/time1_format/c\\time1_format=%H:%M' /home/demo/.config/tint2/tint2rc");
 
         //antix systems
         proc.shell("sed -i 's/%H:%M/%H:%M/g' " + skelpath + "/.icewm/preferences");
         proc.shell("sed -i 's/%k:%M/%k:%M/g' " + skelpath + "/.fluxbox/init");
         proc.shell("sed -i 's/%H:%M/%k:%M/g' " + skelpath + "/.jwm/tray");
-    }
-
-    // localize repo
-    qDebug() << "Localize repo";
-    if (online) proc.exec("localize-repo", {"default"});
-    else proc.exec("chroot", {"/mnt/antiX", "localize-repo", "default"});
-    
-    //machine id 
-    if (online){
-        // create a /etc/machine-id file and /var/lib/dbus/machine-id file
-        proc.exec("rm", {"/var/lib/dbus/machine-id", "/etc/machine-id"});
-        proc.exec("dbus-uuidgen", {"--ensure=/etc/machine-id"});
-        proc.exec("dbus-uuidgen", {"--ensure"});
     }
 }
 
@@ -636,6 +629,7 @@ void Oobe::setUserInfo()
             proc.exec("mv", {"-f", rootpath + "/home/demo", dpath});
         }
     }
+    setUserClockFormat(dpath);
 
     sect.setExceptionMode(nullptr);
 

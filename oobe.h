@@ -60,6 +60,7 @@ public:
     QWidget *validateUserInfo(bool automatic) noexcept;
     void setComputerName();
     void setLocale();
+    void setUserClockFormat(const QString &skelpath) const noexcept;
     void setUserInfo();
     bool replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath) const noexcept;
     bool containsAnySubstring(const QString& mainString, const QStringList& substrings) const noexcept;
