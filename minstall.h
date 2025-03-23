@@ -64,6 +64,7 @@ private:
     // command line options
     bool pretend, automatic;
     bool oem, modeOOBE, mountkeep;
+    bool advanced = false; // Always enabled with custom partitions.
     // configuration management
     QString configFile;
 

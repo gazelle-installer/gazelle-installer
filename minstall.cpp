@@ -82,6 +82,7 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     gui.textHelp->installEventFilter(this);
     gui.boxInstall->hide();
 
+    advanced = args.isSet("advanced");
     modeOOBE = args.isSet("oobe");
     pretend = args.isSet("pretend");
     if (!modeOOBE) {
@@ -583,7 +584,9 @@ int MInstall::showPage(int curr, int next) noexcept
                     return Step::SPLASH;
                 }
                 autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
-                next = (oem ? Step::PROGRESS : Step::NETWORK);
+                next = (oem ? Step::PROGRESS : Step::SWAP);
+            } else {
+                advanced = true;
             }
             bootman->buildBootLists();
             swapman->setupDefaults();
@@ -600,12 +603,7 @@ int MInstall::showPage(int curr, int next) noexcept
             nextFocus = oobe->validateComputerName();
             if (nextFocus) return curr;
         } else { // Backward
-            if (modeOOBE) {
-                return Step::TERMS;
-            } else if (gui.radioEntireDisk->isChecked()) {
-                return Step::BOOT;
-            }
-            return Step::SWAP;
+            return modeOOBE ? Step::TERMS : Step::SWAP;
         }
     } else if (curr == Step::LOCALIZATION && next > curr) {
         if (!pretend && oobe->haveSnapshotUserAccounts) {
@@ -626,8 +624,9 @@ int MInstall::showPage(int curr, int next) noexcept
             return Step::LOCALIZATION; // Skip pageUserAccounts and pageOldHome
         }
     } else if (curr == Step::PROGRESS && next < curr) { // Backward
-        if (oem) return Step::BOOT;
-        else if (!haveOldHome) {
+        if (oem) {
+            return Step::SWAP;
+        } else if (!haveOldHome) {
             // skip pageOldHome
             if (!pretend && oobe->haveSnapshotUserAccounts) {
                 return Step::LOCALIZATION;
@@ -805,6 +804,7 @@ void MInstall::pageDisplayed(int next) noexcept
         gui.textHelp->setText("<p><b>" + tr("Create a swap file") + "</b><br/>"
             + tr("A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.") + "</p>"
             "<p>" + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "</p>");
+        enableBack = advanced;
         break;
 
     case Step::SERVICES:
@@ -817,6 +817,7 @@ void MInstall::pageDisplayed(int next) noexcept
                              "<p>The computer and domain names can contain only alphanumeric characters, dots, hyphens. They cannot contain blank spaces, start or end with hyphens</p>"
                              "<p>The SaMBa Server needs to be activated if you want to use it to share some of your directories or printer "
                              "with a local computer that is running MS-Windows or Mac OSX.</p>"));
+        enableBack = !modeOOBE;
         break;
 
     case Step::LOCALIZATION:
@@ -891,7 +892,6 @@ void MInstall::pageDisplayed(int next) noexcept
             + "</p><p>"
             + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
             + "</p>");
-        enableBack = !oem || gui.radioCustomPart->isChecked();
         enableNext = false;
         break;
 
@@ -941,16 +941,6 @@ void MInstall::gotoPage(int next) noexcept
     }
     gui.pushNext->setIconSize(isize);
 
-    isize = gui.pushBack->iconSize();
-    if (next == Step::NETWORK && gui.radioEntireDisk->isChecked()) {
-        isize.setWidth(0);
-        gui.pushBack->setText(tr("Advanced"));
-    } else {
-        isize.setWidth(isize.height());
-        gui.pushBack->setText(tr("Back"));
-    }
-    gui.pushBack->setIconSize(isize);
-
     if (next > Step::END) {
         // finished
         qApp->setOverrideCursor(Qt::WaitCursor);
@@ -982,8 +972,7 @@ void MInstall::gotoPage(int next) noexcept
     }
 
     // process next installation phase
-    if (next == Step::BOOT || next == Step::PROGRESS
-        || (gui.radioEntireDisk->isChecked() && next == Step::NETWORK)) {
+    if (next == Step::BOOT || next == Step::PROGRESS || (!advanced && next == Step::SWAP)) {
         processNextPhase();
     }
 }
