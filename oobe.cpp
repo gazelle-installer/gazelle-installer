@@ -676,7 +676,6 @@ void Oobe::setUserInfo()
     if (chmod(dpath.toUtf8().constData(), mode) != 0) throw sect.failMessage();
 
     // change in files
-    sect.setExceptionMode(nullptr);
     replaceStringInFile("demo", username, rootpath + "/etc/group");
     replaceStringInFile("demo", username, rootpath + "/etc/gshadow");
     replaceStringInFile("demo", username, rootpath + "/etc/passwd");
@@ -749,12 +748,13 @@ void Oobe::oldHomeToggled() noexcept
 
 /* Helpers*/
 
-bool Oobe::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath)
+bool Oobe::replaceStringInFile(const QString &oldtext, const QString &newtext, const QString &filepath) const noexcept
 {
+    MProcess::Section sect(proc, nullptr);
     return proc.exec("sed", {"-i", QString("s/%1/%2/g").arg(oldtext, newtext), filepath});
 }
 
-bool Oobe::containsAnySubstring(const QString& mainString, const QStringList& substrings) {
+bool Oobe::containsAnySubstring(const QString& mainString, const QStringList& substrings) const noexcept {
     for (const QString& substring : substrings) {
         if (mainString.contains(substring)) {
             return true;
