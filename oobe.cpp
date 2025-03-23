@@ -136,6 +136,20 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     haveSamba = (val.compare("installed") == 0);
 
     buildServiceList(appConf);
+
+    // Current user details
+    curUser = QString::fromUtf8(getlogin());
+    if (curUser.isEmpty()) {
+        curUser = "demo";
+    }
+    // Using $HOME results in the wrong directory when run as root (with su).
+    MProcess::Section sect(proc, nullptr);
+    proc.shell("echo ~" + curUser, nullptr, true);
+    curHome = proc.readOut();
+    if (curHome.isEmpty()) {
+        curHome = "/home/" + curUser;
+    }
+    qDebug() << "Current user:" << curUser << curHome;
 }
 
 void Oobe::manageConfig(MSettings &config) const noexcept
@@ -576,10 +590,11 @@ void Oobe::setUserInfo() const
         if (rootPass.isEmpty()) proc.exec("passwd", {"-d", "root"});
         else userinfo.append(QString("root:" + rootPass).toUtf8());
     }
-    if (userPass.isEmpty()) proc.exec("passwd", {"-d", "demo"});
-    else {
+    if (userPass.isEmpty()) {
+        proc.exec("passwd", {"-d", curUser});
+    } else {
         if (!userinfo.isEmpty()) userinfo.append('\n');
-        userinfo.append(QString("demo:" + userPass).toUtf8());
+        userinfo.append(QString(curUser + ':' + userPass).toUtf8());
     }
     if (!userinfo.isEmpty()) proc.exec("chpasswd", {}, &userinfo);
     sect.setRoot(nullptr);
@@ -608,8 +623,8 @@ void Oobe::setUserInfo() const
     }
 
     // check the linuxfs squashfs for a home/demo folder, which indicates a remaster perserving /home.
-    const bool remasteredDemo = QFileInfo("/live/linux/home/demo").isDir();
-    qDebug() << "check for remastered home demo folder:" << remasteredDemo;
+    const bool remasteredUserHome = QFileInfo("/live/linux" + curHome).isDir();
+    qDebug() << "check for remastered home folder:" << remasteredUserHome;
 
     if (QFileInfo::exists(dpath.toUtf8())) { // Still exists.
         sect.setExceptionMode(nullptr);
@@ -621,12 +636,12 @@ void Oobe::setUserInfo() const
         proc.exec("cp", {"-Rn", skelpath + "/.local", dpath});
     } else { // dir does not exist, must create it
         // Copy skel to demo, unless demo folder exists in remastered linuxfs.
-        if (!remasteredDemo) {
+        if (!remasteredUserHome) {
             sect.setExceptionMode(QT_TR_NOOP("Sorry, failed to create user directory."));
             proc.exec("cp", {"-a", skelpath, dpath});
         } else { // still rename the demo directory even if remastered demo home folder is detected
             sect.setExceptionMode(QT_TR_NOOP("Sorry, failed to name user directory."));
-            proc.exec("mv", {"-f", rootpath + "/home/demo", dpath});
+            proc.exec("mv", {"-f", rootpath + curHome, dpath});
         }
     }
     setUserClockFormat(dpath);
@@ -637,49 +652,50 @@ void Oobe::setUserInfo() const
     if (gui.checkSaveDesktop->isChecked()) {
         resetBlueman();
         // rsync home folder
-        QString cmd = ("rsync -a --info=name1 /home/demo/ %1"
+        QString cmd = ("rsync -a --info=name1 %1/ %2"
             " --exclude '.cache' --exclude '.gvfs' --exclude '.dbus' --exclude '.Xauthority' --exclude '.ICEauthority'"
             " --exclude '.mozilla' --exclude 'Installer.desktop' --exclude 'minstall.desktop' --exclude 'Desktop/antixsources.desktop'"
             " --exclude '.idesktop/gazelle.lnk' --exclude '.jwm/menu' --exclude '.icewm/menu' --exclude '.fluxbox/menu'"
             " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-fluxbox'"
             " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-icewm'"
             " --exclude '.config/rox.sourceforge.net/ROX-Filer/pb_antiX-jwm'"
-            " --exclude '.config/session' | xargs -I '$' sed -i 's|home/demo|home/" + username + "|g' %1/$").arg(dpath);
+            " --exclude '.config/session' | xargs -I '$' sed -i 's|%1|/home/"
+            + username + "|g' %2/$").arg(curHome, dpath);
         proc.shell(cmd);
     }
 
     // check if remaster exists and checkSaveDesktop not checked, modify the remastered demo folder
-    if (remasteredDemo && !gui.checkSaveDesktop->isChecked())
+    if (remasteredUserHome && !gui.checkSaveDesktop->isChecked())
     {
         resetBlueman();
         // Change remaster "demo" to new user.
-        QString cmd = ("find " + dpath + " -maxdepth 1 -type f -name '.*' -print0 | xargs -0 sed -i 's|home/demo|home/" + username + "|g'").arg(dpath);
+        QString cmd = ("find " + dpath + " -maxdepth 1 -type f -name '.*' -print0 | xargs -0 sed -i 's|" + curHome + "|/home/" + username + "|g'").arg(dpath);
         proc.shell(cmd);
-        cmd = ("find " + dpath + "/.config -type f -print0 | xargs -0 sed -i 's|home/demo|home/" + username + "|g'").arg(dpath);
+        cmd = ("find " + dpath + "/.config -type f -print0 | xargs -0 sed -i 's|" + curHome + "|/home/" + username + "|g'").arg(dpath);
         proc.shell(cmd);
-        cmd = ("find " + dpath + "/.local -type f  -print0 | xargs -0 sed -i 's|home/demo|home/" + username + "|g'").arg(dpath);
+        cmd = ("find " + dpath + "/.local -type f  -print0 | xargs -0 sed -i 's|" + curHome + "|/home/" + username + "|g'").arg(dpath);
         proc.shell(cmd);
     }
 
     // fix the ownership, demo=newuser
     sect.setExceptionMode(QT_TR_NOOP("Failed to set ownership or permissions of user directory."));
-    proc.exec("chown", {"-R", "demo:demo", dpath});
+    proc.exec("chown", {"-R", curUser + ':' + curUser, dpath});
     // Set permissions according to /etc/adduser.conf
     const MIni addusercfg("/etc/adduser.conf", MIni::ReadOnly);
     mode_t mode = addusercfg.getString("DIR_MODE", "0700").toUInt(&ok, 8);
     if (chmod(dpath.toUtf8().constData(), mode) != 0) throw sect.failMessage();
 
     // change in files
-    replaceStringInFile("demo", username, rootpath + "/etc/group");
-    replaceStringInFile("demo", username, rootpath + "/etc/gshadow");
-    replaceStringInFile("demo", username, rootpath + "/etc/passwd");
-    replaceStringInFile("demo", username, rootpath + "/etc/shadow");
-    replaceStringInFile("demo", username, rootpath + "/etc/subuid");
-    replaceStringInFile("demo", username, rootpath + "/etc/subgid");
-    replaceStringInFile("demo", username, rootpath + "/etc/slim.conf");
-    replaceStringInFile("demo", username, rootpath + "/etc/lightdm/lightdm.conf");
-    replaceStringInFile("demo", username, rootpath + "/home/*/.gtkrc-2.0");
-    replaceStringInFile("demo", username, rootpath + "/root/.gtkrc-2.0");
+    replaceStringInFile(curUser, username, rootpath + "/etc/group");
+    replaceStringInFile(curUser, username, rootpath + "/etc/gshadow");
+    replaceStringInFile(curUser, username, rootpath + "/etc/passwd");
+    replaceStringInFile(curUser, username, rootpath + "/etc/shadow");
+    replaceStringInFile(curUser, username, rootpath + "/etc/subuid");
+    replaceStringInFile(curUser, username, rootpath + "/etc/subgid");
+    replaceStringInFile(curUser, username, rootpath + "/etc/slim.conf");
+    replaceStringInFile(curUser, username, rootpath + "/etc/lightdm/lightdm.conf");
+    replaceStringInFile(curUser, username, rootpath + "/home/*/.gtkrc-2.0");
+    replaceStringInFile(curUser, username, rootpath + "/root/.gtkrc-2.0");
     if (gui.checkAutoLogin->isChecked()) {
         replaceStringInFile("#auto_login", "auto_login", rootpath + "/etc/slim.conf");
         replaceStringInFile("#default_user ", "default_user ", rootpath + "/etc/slim.conf");
@@ -696,7 +712,7 @@ void Oobe::setUserInfo() const
 
 void Oobe::resetBlueman() const
 {
-    proc.exec("runuser", {"-l", "demo", "-c", "dconf reset /org/blueman/transfer/shared-path"}); //reset blueman path
+    proc.exec("runuser", {"-l", curUser, "-c", "dconf reset /org/blueman/transfer/shared-path"}); //reset blueman path
 }
 
 /* Slots */

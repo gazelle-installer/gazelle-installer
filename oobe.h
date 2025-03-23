@@ -56,6 +56,8 @@ private:
     bool online = false;
     QStringList timeZones; // cached time zone list
     PassEdit passUser, passRoot;
+    QString curUser, curHome;
+
     void buildServiceList(class MIni &appconf) noexcept;
     int selectTimeZone(const QString &zone) const noexcept;
     void resetBlueman() const;
