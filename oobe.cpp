@@ -138,7 +138,7 @@ Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, b
     buildServiceList(appConf);
 }
 
-void Oobe::manageConfig(MSettings &config) noexcept
+void Oobe::manageConfig(MSettings &config) const noexcept
 {
     const bool save = config.isSave();
     // Services page
@@ -206,7 +206,7 @@ void Oobe::manageConfig(MSettings &config) noexcept
     }
 }
 
-void Oobe::enable()
+void Oobe::enable() const
 {
     MProcess::Section sect(proc);
     sect.setRoot("/mnt/antiX");
@@ -221,7 +221,7 @@ void Oobe::enable()
     proc.exec("update-rc.d", {"-f", "oobe", "defaults"});
 }
 
-void Oobe::process()
+void Oobe::process() const
 {
     if (!oem) {
         MProcess::Section sect(proc);
@@ -302,7 +302,7 @@ void Oobe::buildServiceList(MIni &appconf) noexcept
     gui.treeServices->resizeColumnToContents(1);
 }
 
-void Oobe::stashServices(bool save) noexcept
+void Oobe::stashServices(bool save) const noexcept
 {
     QTreeWidgetItemIterator it(gui.treeServices);
     while (*it) {
@@ -314,7 +314,7 @@ void Oobe::stashServices(bool save) noexcept
     }
 }
 
-void Oobe::setService(const QString &service, bool enabled)
+void Oobe::setService(const QString &service, bool enabled) const
 {
     qDebug() << "Set service:" << service << enabled;
     MProcess::Section sect(proc);
@@ -348,7 +348,7 @@ void Oobe::setService(const QString &service, bool enabled)
     }
 }
 
-QWidget *Oobe::validateComputerName() noexcept
+QWidget *Oobe::validateComputerName() const noexcept
 {
     const QRegularExpression nametest("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\.");
     // see if name is reasonable
@@ -384,7 +384,7 @@ QWidget *Oobe::validateComputerName() noexcept
 }
 
 // set the computer name, can not be rerun
-void Oobe::setComputerName()
+void Oobe::setComputerName() const
 {
     QString etcpath = online ? "/etc" : "/mnt/antiX/etc";
     if (haveSamba) {
@@ -404,7 +404,7 @@ void Oobe::setComputerName()
 }
 
 // return 0 = success, 1 = bad area, 2 = bad zone
-int Oobe::selectTimeZone(const QString &zone) noexcept
+int Oobe::selectTimeZone(const QString &zone) const noexcept
 {
     int index = gui.comboTimeArea->findData(QVariant(zone.section('/', 0, 0)));
     if (index < 0) return 1;
@@ -416,7 +416,7 @@ int Oobe::selectTimeZone(const QString &zone) noexcept
     return 0;
 }
 
-void Oobe::setLocale()
+void Oobe::setLocale() const
 {
     proc.log(__PRETTY_FUNCTION__, MProcess::LOG_MARKER);
 
@@ -520,7 +520,7 @@ void Oobe::setUserClockFormat(const QString &skelpath) const noexcept
     }
 }
 
-QWidget *Oobe::validateUserInfo(bool automatic) noexcept
+QWidget *Oobe::validateUserInfo(bool automatic) const noexcept
 {
     const QString &userName = gui.textUserName->text();
     // see if username is reasonable length
@@ -562,7 +562,7 @@ QWidget *Oobe::validateUserInfo(bool automatic) noexcept
 }
 
 // setup the user, cannot be rerun
-void Oobe::setUserInfo()
+void Oobe::setUserInfo() const
 {
     // set the user passwords first
     bool ok = true;
@@ -694,14 +694,14 @@ void Oobe::setUserInfo()
     proc.exec("touch", {rootpath + "/var/mail/" + username});
 }
 
-void Oobe::resetBlueman()
+void Oobe::resetBlueman() const
 {
     proc.exec("runuser", {"-l", "demo", "-c", "dconf reset /org/blueman/transfer/shared-path"}); //reset blueman path
 }
 
 /* Slots */
 
-void Oobe::localeIndexChanged(int index) noexcept
+void Oobe::localeIndexChanged(int index) const noexcept
 {
     // riot control
     QLocale locale(gui.comboLocale->itemData(index).toString());
@@ -709,7 +709,7 @@ void Oobe::localeIndexChanged(int index) noexcept
     else gui.radioClock24->setChecked(true);
 }
 
-void Oobe::timeAreaIndexChanged(int index) noexcept
+void Oobe::timeAreaIndexChanged(int index) const noexcept
 {
     if (index < 0 || index >= gui.comboTimeArea->count()) return;
     const QString &area = gui.comboTimeArea->itemData(index).toString();
@@ -724,7 +724,7 @@ void Oobe::timeAreaIndexChanged(int index) noexcept
     gui.comboTimeZone->model()->sort(0);
 }
 
-void Oobe::userPassValidationChanged() noexcept
+void Oobe::userPassValidationChanged() const noexcept
 {
     bool ok = !gui.textUserName->text().isEmpty();
     if (ok) ok = passUser.valid() || gui.textUserName->text().isEmpty();
@@ -734,7 +734,7 @@ void Oobe::userPassValidationChanged() noexcept
     gui.pushNext->setEnabled(ok);
 }
 
-void Oobe::oldHomeToggled() noexcept
+void Oobe::oldHomeToggled() const noexcept
 {
     gui.pushNext->setEnabled(gui.radioOldHomeUse->isChecked()
         || gui.radioOldHomeSave->isChecked() || gui.radioOldHomeDelete->isChecked());
