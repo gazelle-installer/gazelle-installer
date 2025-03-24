@@ -2378,7 +2378,6 @@ QSize PartMan::ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const 
 QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &index) const
 {
     QWidget *widget = nullptr;
-    QComboBox *combo = nullptr;
     switch (index.column())
     {
     case PartMan::COL_SIZE:
@@ -2392,12 +2391,15 @@ QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOption
         }
         break;
     case PartMan::COL_USEFOR:
-        widget = combo = new QComboBox(parent);
-        combo->setEditable(true);
-        combo->setInsertPolicy(QComboBox::NoInsert);
-        combo->lineEdit()->setPlaceholderText("----");
+        {
+            QComboBox *combo = new QComboBox(parent);
+            combo->setEditable(true);
+            combo->setInsertPolicy(QComboBox::NoInsert);
+            combo->lineEdit()->setPlaceholderText("----");
+            widget = combo;
+        }
         break;
-    case PartMan::COL_FORMAT: widget = combo = new QComboBox(parent); break;
+    case PartMan::COL_FORMAT: widget = new QComboBox(parent); break;
     case PartMan::COL_PASS: widget = new QSpinBox(parent); break;
     case PartMan::COL_OPTIONS:
         {
@@ -2409,9 +2411,6 @@ QWidget *PartMan::ItemDelegate::createEditor(QWidget *parent, const QStyleOption
         }
         break;
     default: widget = new QLineEdit(parent);
-    }
-    if (combo) {
-        connect(combo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &ItemDelegate::emitCommit);
     }
     assert(widget != nullptr);
     widget->setAutoFillBackground(true);
@@ -2505,10 +2504,6 @@ void PartMan::ItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
         break;
     }
     partman->changeEnd(true, true);
-}
-void PartMan::ItemDelegate::emitCommit() noexcept
-{
-    emit commitData(qobject_cast<QWidget *>(sender()));
 }
 
 void PartMan::ItemDelegate::partOptionsMenu() noexcept
