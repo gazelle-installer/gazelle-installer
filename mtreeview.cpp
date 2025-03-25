@@ -62,7 +62,7 @@ QModelIndex MTreeView::moveCursor(CursorAction cursorAction, Qt::KeyboardModifie
                     return QModelIndex();
                 }
             }
-            if (index.flags() & Qt::ItemIsEnabled) {
+            if (!isColumnHidden(index.column()) && index.flags() & Qt::ItemIsEnabled) {
                 if (index.flags() & (Qt::ItemIsEditable | Qt::ItemIsUserCheckable)) break;
                 if (cursorAction == MoveLeft || cursorAction == MoveRight) break;
             }
