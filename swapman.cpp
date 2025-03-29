@@ -37,8 +37,8 @@ SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
     connect(ui.pushSwapSizeReset, &QToolButton::clicked, this, &SwapMan::sizeResetClicked);
     connect(ui.checkHibernation, &QCheckBox::clicked, this, &SwapMan::checkHibernationClicked);
     connect(ui.boxSwap, &QGroupBox::toggled, this, [=](bool on) {
-        if (on) ui.pushNext->setEnabled(true);
-        else ui.pushNext->setEnabled(setupBounds());
+        if (!on) gui.pushNext->setEnabled(true);
+        else gui.pushNext->setEnabled(setupBounds());
     });
 }
 
