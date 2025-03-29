@@ -50,8 +50,6 @@ private:
     class Core &core;
     Ui::MeInstall &gui;
     QWidget *master;
-    bool containsSystemD = false;
-    bool containsRunit = false;
     bool haveSamba = false;
     bool oem = false;
     bool online = false;

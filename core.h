@@ -27,11 +27,13 @@ public:
     Core(class MProcess &mproc);
     // Common functions that are traditionally carried out by processes.
     void sleep(const int msec, const bool silent = false) noexcept;
-    bool mkpath(const QString &path, mode_t mode = 0, bool force = false);
+    bool mkpath(const QString &path, mode_t mode = 0, bool force = false) const;
     // Operating system
     const QString &detectArch();
     int detectEFI(bool noTest = false);
     bool detectVirtualBox();
+    // Services
+    void setService(const QString &service, bool enabled) const;
 
 private:
     class MProcess &proc;
@@ -40,6 +42,9 @@ private:
     QString testArch;
     int testEFI = -1;
     int testVirtualBox = -1;
+    // Init systems
+    bool containsSystemd = false;
+    bool containsRunit = false;
 };
 
 #endif // CORE_H

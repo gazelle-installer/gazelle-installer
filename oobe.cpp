@@ -104,16 +104,8 @@ Oobe::Oobe(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, QWidget *parent, MIn
     else timeAreaIndexChanged(ixLocale);
 
     if (online) {
-        containsSystemD = QFileInfo("/usr/usr/bin/systemctl").isExecutable();
-        if (QFile::exists("/etc/service") && QFile::exists("/lib/runit/runit-init")) {
-            containsRunit = true;
-        }
         gui.checkSaveDesktop->hide();
     } else {
-        containsSystemD = QFileInfo("/live/aufs/usr/bin/systemctl").isExecutable();
-        if (QFile::exists("/live/aufs/etc/service") && QFile::exists("/live/aufs/sbin/runit")) {
-            containsRunit = true;
-        }
         // Detect snapshot-backup account(s)
         // test if there's another user other than demo in /home,
         // indicating a possible snapshot or complicated live-usb
@@ -244,13 +236,15 @@ void Oobe::process() const
 
         QTreeWidgetItemIterator it(gui.treeServices);
         for (; *it; ++it) {
-            if ((*it)->parent()) setService((*it)->text(0), (*it)->checkState(0) == Qt::Checked);
+            if ((*it)->parent()) {
+                core.setService((*it)->text(0), (*it)->checkState(0) == Qt::Checked);
+            }
         }
         if (haveSamba) {
             const bool enable = gui.checkSamba->isChecked();
-            setService("smbd", enable);
-            setService("nmbd", enable);
-            setService("samba-ad-dc", enable);
+            core.setService("smbd", enable);
+            core.setService("nmbd", enable);
+            core.setService("samba-ad-dc", enable);
         }
         sect.setRoot(nullptr);
         setComputerName();
@@ -326,40 +320,6 @@ void Oobe::stashServices(bool save) const noexcept
             (*it)->setCheckState(save?2:0, (*it)->checkState(save?0:2));
         }
         ++it;
-    }
-}
-
-void Oobe::setService(const QString &service, bool enabled) const
-{
-    qDebug() << "Set service:" << service << enabled;
-    MProcess::Section sect(proc);
-    const QString chroot(sect.root());
-    if (enabled) {
-        proc.exec("update-rc.d", {"-f", service, "defaults"});
-        if (containsSystemD) {
-            proc.exec("systemctl", {"unmask", service});
-            proc.exec("systemctl", {"enable", service});
-        }
-        if (containsRunit) {
-            QFile::remove(chroot + "/etc/sv/" + service + "/down");
-            if (!QFile::exists(chroot + "/etc/sv/" + service)) {
-                core.mkpath(chroot + "/etc/sv/" + service);
-                proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
-            }
-        }
-    } else {
-        proc.exec("update-rc.d", {"-f", service, "remove"});
-        if (containsSystemD) {
-            proc.exec("systemctl", {"disable", service});
-            proc.exec("systemctl", {"mask", service});
-        }
-        if (containsRunit) {
-            if (!QFile::exists(chroot + "/etc/sv/" + service)) {
-                core.mkpath(chroot + "/etc/sv/" + service);
-                proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
-            }
-            proc.exec("touch", {"/etc/sv/" + service + "/down"});
-        }
     }
 }
 

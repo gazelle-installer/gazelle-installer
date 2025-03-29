@@ -99,8 +99,11 @@ void SwapMan::install(QStringList &cmdboot_out)
         installSwapFile(cmdboot_out);
     }
     if (gui.boxSwapZram->isChecked()) {
+        MProcess::Section sect(proc, QT_TR_NOOP("Failed to configure zram swap."));
+        sect.setRoot("/mnt/antiX");
+        core.setService("zramswap", true);
         if (!configureZRam()) {
-            throw QT_TR_NOOP("Failed to configure zram swap.");
+            throw sect.failMessage();
         }
     }
 }

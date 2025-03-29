@@ -1058,7 +1058,7 @@ QSlider::handle:horizontal:disabled {
            <item>
             <widget class="QGroupBox" name="boxSwapZram">
              <property name="title">
-              <string>Configure zram swap</string>
+              <string>Enable zram swap</string>
              </property>
              <property name="checkable">
               <bool>true</bool>

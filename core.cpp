@@ -29,6 +29,17 @@
 
 Core::Core(MProcess &mproc) : proc(mproc)
 {
+    containsSystemd = QFileInfo("/usr/usr/bin/systemctl").isExecutable() // Online
+        || QFileInfo("/live/aufs/usr/bin/systemctl").isExecutable(); // Offline
+
+    // Online
+    if (QFile::exists("/etc/service") && QFile::exists("/lib/runit/runit-init")) {
+        containsRunit = true;
+    }
+    // Offline
+    if (QFile::exists("/live/aufs/etc/service") && QFile::exists("/live/aufs/sbin/runit")) {
+        containsRunit = true;
+    }
 }
 
 // Common functions that are traditionally carried out by processes.
@@ -51,7 +62,7 @@ void Core::sleep(const int msec, const bool silent) noexcept
         proc.log(logEntry, rc == 0 ? MProcess::STATUS_OK : MProcess::STATUS_CRITICAL);
     }
 }
-bool Core::mkpath(const QString &path, mode_t mode, bool force)
+bool Core::mkpath(const QString &path, mode_t mode, bool force) const
 {
     if (proc.checkHalt()) return false;
     if (!force && QFileInfo::exists(path)) return true;
@@ -107,4 +118,35 @@ bool Core::detectVirtualBox()
         testVirtualBox = rc ? 1 : 0;
     }
     return (testVirtualBox != 0);
+}
+
+// Services
+void Core::setService(const QString &service, bool enabled) const
+{
+    qDebug() << "Set service:" << service << enabled;
+    MProcess::Section sect(proc);
+    const QString chroot(sect.root());
+
+    proc.exec("update-rc.d", {"-f", service, enabled?"defaults":"remove"});
+    if (containsSystemd) {
+        if (enabled) {
+            proc.exec("systemctl", {"unmask", service});
+            proc.exec("systemctl", {"enable", service});
+        } else {
+            proc.exec("systemctl", {"disable", service});
+            proc.exec("systemctl", {"mask", service});
+        }
+    }
+    if (containsRunit) {
+        const QString &svcdir = "/etc/sv/" + service;
+        if (!QFile::exists(chroot + svcdir)) {
+            mkpath(chroot + svcdir);
+            proc.exec("ln", {"-fs", svcdir, "/etc/service/"});
+        } else if (enabled) {
+            QFile::remove(chroot + svcdir + "/down");
+        }
+        if (!enabled) {
+            proc.exec("touch", {svcdir + "/down"});
+        }
+    }
 }
