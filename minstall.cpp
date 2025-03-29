@@ -69,7 +69,7 @@ enum Step {
 };
 
 MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
-    : proc(this), appConf(acfg), appArgs(args), configFile(cfgfile)
+    : proc(this), core(proc), appConf(acfg), appArgs(args), configFile(cfgfile)
 {
     appConf.setSection("GUI");
     setWindowIcon(QIcon(appConf.getString("Logo", "/usr/share/gazelle-installer-data/logo.png")));
@@ -157,7 +157,7 @@ void MInstall::startup()
 
     if (!modeOOBE) {
         // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
-        if (proc.detectEFI(true)==64 && proc.detectArch()=="i686") {
+        if (core.detectEFI(true)==64 && core.detectArch()=="i686") {
             const int ans = QMessageBox::question(this, windowTitle(),
                 tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not"
                     " be able to boot unless you select Legacy Boot or similar at restart.\n"
@@ -187,11 +187,11 @@ void MInstall::startup()
         }
 
         crypto = new Crypto(proc, gui);
-        partman = new PartMan(proc, gui, *crypto, appConf, appArgs);
-        base = new Base(proc, *partman, appConf, appArgs);
-        bootman = new BootMan(proc, *partman, gui, appConf, appArgs);
-        swapman = new SwapMan(proc, *partman, gui);
-        autopart = new AutoPart(proc, partman, gui, appConf);
+        partman = new PartMan(proc, core, gui, *crypto, appConf, appArgs);
+        base = new Base(proc, core, *partman, appConf, appArgs);
+        bootman = new BootMan(proc, core, *partman, gui, appConf, appArgs);
+        swapman = new SwapMan(proc, core, *partman, gui);
+        autopart = new AutoPart(proc, core, partman, gui, appConf);
         partman->autopart = autopart;
         connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
         gui.labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
@@ -216,7 +216,7 @@ void MInstall::startup()
     setupkeyboardbutton();
     connect(gui.pushSetKeyboard, &QPushButton::clicked, this, &MInstall::runKeyboardSetup);
 
-    oobe = new Oobe(proc, gui, this, appConf, oem, modeOOBE);
+    oobe = new Oobe(proc, core, gui, this, appConf, oem, modeOOBE);
 
     if (modeOOBE) loadConfig(2);
     else {
@@ -315,7 +315,7 @@ void MInstall::setupAutoMount(bool enabled)
         }
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
-        proc.mkpath("/run/udev/rules.d");
+        core.mkpath("/run/udev/rules.d");
         for (const QString &rule : std::as_const(udev_temp_mdadm_rules)) {
             proc.exec("touch", {rule});
         }
@@ -791,7 +791,7 @@ void MInstall::pageDisplayed(int next) noexcept
         gui.textHelp->setText("<p><b>" + tr("Final Review and Confirmation") + "</b><br/>"
             + tr("Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.") + "</p>");
         if (!automatic) {
-            proc.sleep(500, true); // Prevent accidentally skipping the confirmation.
+            core.sleep(500, true); // Prevent accidentally skipping the confirmation.
         }
         break;
 

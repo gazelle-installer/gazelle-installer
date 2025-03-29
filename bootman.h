@@ -30,6 +30,7 @@ class BootMan : public QObject
 {
     Q_OBJECT
     class MProcess &proc;
+    class Core &core;
     Ui::MeInstall &gui;
     QWidget *master;
     class PartMan &partman;
@@ -42,7 +43,7 @@ class BootMan : public QObject
     void chosenBootPBR() noexcept;
     void chosenBootESP(bool checked) noexcept;
 public:
-    BootMan(class MProcess &mproc, class PartMan &pman, Ui::MeInstall &ui,
+    BootMan(class MProcess &mproc, class Core &mcore, class PartMan &pman, Ui::MeInstall &ui,
         class MIni &appConf, const QCommandLineParser &appArgs) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void buildBootLists() noexcept;

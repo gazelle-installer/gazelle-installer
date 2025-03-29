@@ -28,11 +28,12 @@
 #include <QLocale>
 #include <QTimeZone>
 #include "mprocess.h"
+#include "core.h"
 #include "msettings.h"
 #include "oobe.h"
 
-Oobe::Oobe(MProcess &mproc, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, bool oem, bool modeOOBE)
-    : QObject(parent), proc(mproc), gui(ui), master(parent), oem(oem), online(modeOOBE),
+Oobe::Oobe(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, bool oem, bool modeOOBE)
+    : QObject(parent), proc(mproc), core(mcore), gui(ui), master(parent), oem(oem), online(modeOOBE),
     passUser(ui.textUserPass, ui.textUserPass2, 0, this), passRoot(ui.textRootPass, ui.textRootPass2, 0, this)
 {
     appConf.setSection("OOBE");
@@ -342,7 +343,7 @@ void Oobe::setService(const QString &service, bool enabled) const
         if (containsRunit) {
             QFile::remove(chroot + "/etc/sv/" + service + "/down");
             if (!QFile::exists(chroot + "/etc/sv/" + service)) {
-                proc.mkpath(chroot + "/etc/sv/" + service);
+                core.mkpath(chroot + "/etc/sv/" + service);
                 proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
             }
         }
@@ -354,7 +355,7 @@ void Oobe::setService(const QString &service, bool enabled) const
         }
         if (containsRunit) {
             if (!QFile::exists(chroot + "/etc/sv/" + service)) {
-                proc.mkpath(chroot + "/etc/sv/" + service);
+                core.mkpath(chroot + "/etc/sv/" + service);
                 proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
             }
             proc.exec("touch", {"/etc/sv/" + service + "/down"});

@@ -52,6 +52,7 @@ public:
     void halt(bool exception = false) noexcept;
     void unhalt() noexcept;
     bool halted() const noexcept { return halting!=NO_HALT; }
+    bool checkHalt(); // Like halted() but throws an exception if THROW_HALT.
     // User interface
     static QString joinCommand(const QString &program, const QStringList &arguments) noexcept;
     class QListWidgetItem *log(const QString &text, const enum LogType type = LOG_LOG, bool save = true) noexcept;
@@ -59,19 +60,11 @@ public:
     void status(const QString &text, long progress = -1) noexcept;
     void status(long progress = -1) noexcept;
     void advance(int space, long steps) noexcept;
-    // Common functions that are traditionally carried out by processes.
-    void sleep(const int msec, const bool silent = false) noexcept;
-    bool mkpath(const QString &path, mode_t mode = 0, bool force = false);
-    // Operating system
-    const QString &detectArch();
-    int detectEFI(bool noTest = false);
-    bool detectVirtualBox();
 
 private:
     friend class ExceptionInfo;
     class Section *section = nullptr;
     int execount = 0;
-    int sleepcount = 0;
     enum HaltMode { NO_HALT, THROW_HALT, HALTED } halting = NO_HALT;
     bool debugUnusedOutput = true;
     class QListWidget *logView = nullptr;
@@ -79,14 +72,9 @@ private:
     int progSliceStart = 0, progSliceSpace = 0;
     long progSlicePos = 0, progSliceSteps = 0;
     int prevScrollMax = 0;
-    // System detection results
-    QString testArch;
-    int testEFI = -1;
-    int testVirtualBox = -1;
     // Common execution core
     bool exec(const QString &program, const QStringList &arguments,
         const QByteArray *input, bool needRead, class QListWidgetItem *logEntry);
-    bool checkHalt();
     void syncRoot() noexcept;
 };
 

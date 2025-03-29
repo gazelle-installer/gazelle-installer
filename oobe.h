@@ -32,7 +32,7 @@ class Oobe : public QObject
     Q_OBJECT
 public:
     bool haveSnapshotUserAccounts = false;
-    Oobe(class MProcess &mproc, Ui::MeInstall &ui, QWidget *parent,
+    Oobe(class MProcess &mproc, class Core &mcore, Ui::MeInstall &ui, QWidget *parent,
          class MIni &appConf, bool oem, bool modeOOBE);
     void manageConfig(class MSettings &config) const noexcept;
     void enable() const;
@@ -47,6 +47,7 @@ public:
 
 private:
     class MProcess &proc;
+    class Core &core;
     Ui::MeInstall &gui;
     QWidget *master;
     bool containsSystemD = false;

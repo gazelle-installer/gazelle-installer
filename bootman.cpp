@@ -25,13 +25,14 @@
 #include <QMessageBox>
 #include <QFileInfo>
 #include "mprocess.h"
+#include "core.h"
 #include "msettings.h"
 #include "partman.h"
 #include "bootman.h"
 
-BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
+BootMan::BootMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui,
     MIni &appConf, const QCommandLineParser &appArgs) noexcept
-    : QObject(ui.boxMain), proc(mproc), gui(ui), partman(pman)
+    : QObject(ui.boxMain), proc(mproc), core(mcore), gui(ui), partman(pman)
 {
     appConf.setSection("Storage");
     installFromRootDevice = appConf.getBoolean("InstallFromRootDevice");
@@ -90,7 +91,7 @@ void BootMan::buildBootLists() noexcept
     chosenBootPBR();
     const bool canPBR = (gui.comboBoot->count() > 0);
     gui.radioBootPBR->setEnabled(canPBR);
-    const bool canESP = proc.detectEFI();
+    const bool canESP = core.detectEFI();
     gui.radioBootESP->setEnabled(canESP);
 
     // load one as the default in preferential order: ESP, MBR, PBR
@@ -133,7 +134,7 @@ void BootMan::install(const QStringList &cmdextra)
         proc.status(tr("Installing GRUB"));
 
         // install new Grub now
-        const int efisize = proc.detectEFI(true);
+        const int efisize = core.detectEFI(true);
         const QString &bootdev = "/dev/" + gui.comboBoot->currentData().toString();
         if (!gui.radioBootESP->isChecked()) {
             proc.exec("grub-install", {"--target=i386-pc", "--recheck",
@@ -257,7 +258,7 @@ void BootMan::install(const QStringList &cmdextra)
                 if (!QFileInfo::exists(mtest)) mtest.clear();
             }
             if (!mtest.isEmpty()) {
-                proc.mkpath("/mnt/antiX/boot/uefi-mt", 0755);
+                core.mkpath("/mnt/antiX/boot/uefi-mt", 0755);
                 proc.exec("cp", {mtest, "/mnt/antiX/boot/uefi-mt"});
             }
         }

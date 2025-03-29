@@ -23,12 +23,13 @@
 #include <QFileInfo>
 #include <QDir>
 #include "mprocess.h"
+#include "core.h"
 #include "msettings.h"
 #include "partman.h"
 #include "swapman.h"
 
-SwapMan::SwapMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui) noexcept
-    : QObject(ui.boxMain), proc(mproc), partman(pman), gui(ui)
+SwapMan::SwapMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui) noexcept
+    : QObject(ui.boxMain), proc(mproc), core(mcore), partman(pman), gui(ui)
 {
     connect(ui.textSwapFile, &QLineEdit::textEdited, this, [this](const QString &) {
         gui.pushNext->setEnabled(setupBounds());
@@ -113,7 +114,7 @@ void SwapMan::installSwapFile(QStringList &cmdboot_out) const
 
     proc.status(tr("Creating swap file"));
     // Create a blank swap file.
-    proc.mkpath(QFileInfo(instpath).path(), 0700);
+    core.mkpath(QFileInfo(instpath).path(), 0700);
     const bool btrfs = (device->type == PartMan::Device::SUBVOLUME || device->finalFormat() == "btrfs");
     const QString &strsize = QStringLiteral("%1M").arg(gui.spinSwapSize->value());
     if (btrfs) {

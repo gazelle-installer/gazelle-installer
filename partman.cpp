@@ -43,15 +43,16 @@
 #include <QDialogButtonBox>
 #include <QStandardPaths>
 
+#include "core.h"
 #include "mprocess.h"
 #include "msettings.h"
 #include "crypto.h"
 #include "autopart.h"
 #include "partman.h"
 
-PartMan::PartMan(MProcess &mproc, Ui::MeInstall &ui, Crypto &cman,
+PartMan::PartMan(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, Crypto &cman,
     const MIni &appConf, const QCommandLineParser &appArgs)
-    : QAbstractItemModel(ui.boxMain), proc(mproc), gui(ui), crypto(cman)
+    : QAbstractItemModel(ui.boxMain), proc(mproc), core(mcore), gui(ui), crypto(cman)
 {
     root = new Device(*this);
     const QString &projShort = appConf.getString("ShortName");
@@ -908,7 +909,7 @@ bool PartMan::confirmSpace(QMessageBox &msgbox) const noexcept
 }
 bool PartMan::confirmBootable(QMessageBox &msgbox) const noexcept
 {
-    if (proc.detectEFI()) {
+    if (core.detectEFI()) {
         const char *msgtext = nullptr;
         const PartMan::Device *efidev = findByMount("/boot/efi");
         if (efidev == nullptr) {
@@ -937,7 +938,7 @@ bool PartMan::confirmBootable(QMessageBox &msgbox) const noexcept
         }
         // Potentially unbootable GPT when on a BIOS-based PC.
         const bool hasBoot = (drive->active != nullptr);
-        if (!proc.detectEFI() && drive->format=="GPT" && hasBoot && !hasBiosGrub) {
+        if (!core.detectEFI() && drive->format=="GPT" && hasBoot && !hasBiosGrub) {
             biosgpt += ' ' + drive->name;
         }
     }
@@ -1127,7 +1128,7 @@ void PartMan::preparePartitions()
         // Wipe the first and last 4MB to clear the partition tables, turbo-nuke style.
         const int gran = std::max(drive->discgran, drive->physec);
         const char *opts = drive->discgran ? "-fv" : "-fvz";
-        if (proc.detectVirtualBox()) {
+        if (core.detectVirtualBox()) {
             opts = "-fvz"; // VirtualBox incorrectly reports TRIM support.
         }
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
@@ -1224,7 +1225,7 @@ void PartMan::formatPartitions()
         if (volume->usefor == "FORMAT") proc.status(fmtstatus.arg(volume->name));
         else proc.status(fmtstatus.arg(volume->usefor));
         if (volume->usefor == "BIOS-GRUB") {
-            if (proc.detectVirtualBox()) {
+            if (core.detectVirtualBox()) {
                 proc.exec("blkdiscard", {"-fvz", dev}); // VirtualBox incorrectly reports TRIM support.
             } else {
                 sect.setExceptionMode(false);
@@ -2005,7 +2006,7 @@ QStringList PartMan::Device::allowedFormats() const noexcept
     if (type == DRIVE && !flags.oldLayout) {
         list.append("GPT");
         if (size < 2*TB && children.size() <= 4) {
-            if (partman.proc.detectEFI()) {
+            if (partman.core.detectEFI()) {
                 list.append("DOS");
             } else {
                 list.prepend("DOS");
@@ -2109,7 +2110,7 @@ PartMan::Device *PartMan::Device::addPart(long long defaultSize, const QString &
 void PartMan::Device::driveAutoSetActive() noexcept
 {
     if (active) return;
-    if (partman.proc.detectEFI() && format=="GPT") return;
+    if (partman.core.detectEFI() && format=="GPT") return;
 
     for (const QString &pref : QStringList({"/boot", "/"})) {
         for (PartMan::Iterator it(this); Device *device = *it; it.next()) {

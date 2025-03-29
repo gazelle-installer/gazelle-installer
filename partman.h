@@ -88,7 +88,7 @@ public:
     std::map<QString, struct VolumeSpec> volSpecs;
     QString bootUUID;
     class AutoPart *autopart = nullptr;
-    PartMan(class MProcess &mproc, class Ui::MeInstall &ui, class Crypto &cman,
+    PartMan(class MProcess &mproc, class Core &mcore, class Ui::MeInstall &ui, class Crypto &cman,
         const class MIni &appConf, const QCommandLineParser &appArgs);
     ~PartMan();
     void scan(Device *drvstart = nullptr);
@@ -118,6 +118,7 @@ private:
     friend class Device;
     friend class Iterator;
     class MProcess &proc;
+    class Core &core;
     class Device *root = nullptr;
     class Device *changing = nullptr;
     Ui::MeInstall &gui;

@@ -26,11 +26,13 @@
 
 #include "msettings.h"
 #include "mprocess.h"
+#include "core.h"
 #include "swapman.h"
 #include "autopart.h"
 
-AutoPart::AutoPart(MProcess &mproc, PartMan *pman, Ui::MeInstall &ui, MIni &appConf) noexcept
-    : QObject(ui.boxSliderPart), proc(mproc), gui(ui), partman(pman)
+AutoPart::AutoPart(MProcess &mproc, Core &mcore,
+    PartMan *pman, Ui::MeInstall &ui, MIni &appConf) noexcept
+    : QObject(ui.boxSliderPart), proc(mproc), core(mcore), gui(ui), partman(pman)
 {
     connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
     connect(gui.checkEncryptAuto, &QCheckBox::toggled, this, &AutoPart::toggleEncrypt);
@@ -114,7 +116,7 @@ bool AutoPart::validate(bool automatic, const QString &project) const noexcept
 {
     PartMan::Device *drive = selectedDrive();
     if (!drive) return false;
-    if (!automatic && !proc.detectEFI() && drive->size >= 2*TB) {
+    if (!automatic && !core.detectEFI() && drive->size >= 2*TB) {
         QMessageBox msgbox(gui.boxMain);
         msgbox.setIcon(QMessageBox::Warning);
         msgbox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
@@ -273,7 +275,7 @@ long long AutoPart::buildLayout(PartMan::Device *drive, long long rootFormatSize
     long long remaining = drive->size - PARTMAN_SAFETY;
 
     // Boot partitions.
-    if (proc.detectEFI()) {
+    if (core.detectEFI()) {
         if (updateTree) drive->addPart(256*MB, "ESP", crypto);
         if (volList) volList->append("ESP");
         remaining -= 256*MB;

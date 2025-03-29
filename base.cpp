@@ -27,14 +27,16 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include "mprocess.h"
+#include "core.h"
 #include "msettings.h"
 #include "partman.h"
 #include "base.h"
 
 #define BASE_BLOCK  (4*KB)
 
-Base::Base(MProcess &mproc, PartMan &pman, MIni &appConf, const QCommandLineParser &appArgs)
-    : proc(mproc), partman(pman)
+Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
+    MIni &appConf, const QCommandLineParser &appArgs)
+    : proc(mproc), core(mcore), partman(pman)
 {
     pretend = appArgs.isSet("pretend");
     appConf.setSection("Storage");
@@ -188,8 +190,8 @@ void Base::install()
     proc.advance(1, 1);
     proc.status(tr("Setting system configuration"));
     // make empty dir for opt. home already done.
-    proc.mkpath("/mnt/antiX/opt", 0755);
-    proc.mkpath("/mnt/antiX/tmp", 01777, true);
+    core.mkpath("/mnt/antiX/opt", 0755);
+    core.mkpath("/mnt/antiX/tmp", 01777, true);
     // Fix live setup to install before creating a chroot environment.
     // allow custom live-to-installed script
     proc.shell(liveToInstalled + " /mnt/antiX");
@@ -233,7 +235,7 @@ void Base::install()
     sect.setRoot(nullptr);
 
     // Disable VirtualBox Guest Additions if not running in VirtualBox.
-    if(!proc.detectVirtualBox()) {
+    if(!core.detectVirtualBox()) {
         proc.shell("mv -f /mnt/antiX/etc/rc5.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc5.d/K01virtualbox-guest-utils >/dev/null 2>&1");
         proc.shell("mv -f /mnt/antiX/etc/rc4.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc4.d/K01virtualbox-guest-utils >/dev/null 2>&1");
         proc.shell("mv -f /mnt/antiX/etc/rc3.d/S*virtualbox-guest-utils /mnt/antiX/etc/rc3.d/K01virtualbox-guest-utils >/dev/null 2>&1");

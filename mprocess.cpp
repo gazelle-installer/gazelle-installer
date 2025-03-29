@@ -18,14 +18,11 @@
  ***************************************************************************/
 
 #include <unistd.h>
-#include <sys/stat.h>
 
 #include <QApplication>
 #include <QProcessEnvironment>
 #include <QDebug>
-#include <QEventLoop>
 #include <QTimer>
-#include <QDir>
 #include <QListWidget>
 #include <QProgressBar>
 #include <QScrollBar>
@@ -70,7 +67,7 @@ void MProcess::syncRoot() noexcept
     }
 }
 
-inline bool MProcess::checkHalt()
+bool MProcess::checkHalt()
 {
     if (halting == THROW_HALT) throw("");
     else if (halting == HALTED) return true;
@@ -270,77 +267,6 @@ void MProcess::advance(int space, long steps) noexcept
     progSlicePos = -1;
     progBar->setValue(progSliceStart);
     qApp->processEvents();
-}
-
-// Common functions that are traditionally carried out by processes.
-
-void MProcess::sleep(const int msec, const bool silent) noexcept
-{
-    QListWidgetItem *logEntry = nullptr;
-    if (!silent) {
-        ++sleepcount;
-        logEntry = log(QString("SLEEP: %1ms").arg(msec), LOG_EXEC, false);
-        qDebug().nospace() << "Sleep #" << sleepcount << ": " << msec << "ms";
-    }
-    QTimer cstimer(this);
-    QEventLoop eloop(this);
-    connect(&cstimer, &QTimer::timeout, &eloop, &QEventLoop::quit);
-    cstimer.start(msec);
-    const int rc = eloop.exec();
-    if (!silent) {
-        qDebug().nospace() << "Sleep #" << sleepcount << ": exit " << rc;
-        log(logEntry, rc == 0 ? STATUS_OK : STATUS_CRITICAL);
-    }
-}
-bool MProcess::mkpath(const QString &path, mode_t mode, bool force)
-{
-    if (checkHalt()) return false;
-    if (!force && QFileInfo::exists(path)) return true;
-
-    QListWidgetItem *logEntry = log("MKPATH: "+path, LOG_EXEC, false);
-    bool rc = QDir().mkpath(path);
-    if (mode && rc) rc = (chmod(path.toUtf8().constData(), mode) == 0);
-    qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
-    log(logEntry, rc ? STATUS_OK : STATUS_CRITICAL);
-    if(!rc && section && section->failmsg) throw section->failmsg;
-    return rc;
-}
-
-const QString &MProcess::detectArch()
-{
-    if (testArch.isEmpty()) {
-        if (exec("uname", {"-m"}, nullptr, true)) testArch = readOut();
-        qDebug() << "Detect arch:" << testArch;
-    }
-    return testArch;
-}
-int MProcess::detectEFI(bool noTest)
-{
-    if (testEFI < 0) {
-        testEFI = 0;
-        QFile file("/sys/firmware/efi/fw_platform_size");
-        if (file.open(QFile::ReadOnly | QFile::Text)) {
-            testEFI = file.readLine().toInt();
-            file.close();
-        }
-        qDebug() << "Detect EFI:" << testEFI;
-    }
-    if (!noTest && testEFI == 64) {
-        // Bad combination: 32-bit OS on 64-bit EFI.
-        if (detectArch()=="i686") return 0;
-    }
-    return testEFI;
-}
-bool MProcess::detectVirtualBox()
-{
-    if (testVirtualBox < 0) {
-        Section sect(*this);
-        sect.setExceptionMode(false);
-        const bool rc = shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'");
-        qDebug() << "Detect VirtualBox:" << rc;
-        testVirtualBox = rc ? 1 : 0;
-    }
-    return (testVirtualBox != 0);
 }
 
 // Local execution environment
