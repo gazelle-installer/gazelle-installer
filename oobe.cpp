@@ -341,7 +341,7 @@ void Oobe::setService(const QString &service, bool enabled)
         if (containsRunit) {
             if (!QFile::exists(chroot + "/etc/sv/" + service)) {
                 proc.mkpath(chroot + "/etc/sv/" + service);
-                proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
+                proc.exec("unlink", {"/etc/sv/" + service, "/etc/service/"});
             }
             proc.exec("touch", {"/etc/sv/" + service + "/down"});
         }
@@ -683,17 +683,22 @@ void Oobe::setUserInfo()
     replaceStringInFile("demo", username, rootpath + "/etc/subuid");
     replaceStringInFile("demo", username, rootpath + "/etc/subgid");
     replaceStringInFile("demo", username, rootpath + "/etc/slim.conf");
+    replaceStringInFile("demo", username, rootpath + "/etc/slimski.local.conf");
     replaceStringInFile("demo", username, rootpath + "/etc/lightdm/lightdm.conf");
     replaceStringInFile("demo", username, rootpath + "/home/*/.gtkrc-2.0");
     replaceStringInFile("demo", username, rootpath + "/root/.gtkrc-2.0");
     if (gui.checkAutoLogin->isChecked()) {
         replaceStringInFile("#auto_login", "auto_login", rootpath + "/etc/slim.conf");
         replaceStringInFile("#default_user ", "default_user ", rootpath + "/etc/slim.conf");
+        replaceStringInFile("#autologin_enabled", "autologin_enabled", rootpath + "/etc/slimski.local.conf");
+        replaceStringInFile("#default_user ", "default_user ", rootpath + "/etc/slimski.local.conf");
         replaceStringInFile("User=", "User=" + username, rootpath + "/etc/sddm.conf");
     }
     else {
         replaceStringInFile("auto_login", "#auto_login", rootpath + "/etc/slim.conf");
         replaceStringInFile("default_user ", "#default_user ", rootpath + "/etc/slim.conf");
+        replaceStringInFile("autologin_enabled", "#autologin_enabled", rootpath + "/etc/slimski.local.conf");
+        replaceStringInFile("default_user ", "#default_user ", rootpath + "/etc/slimski.local.conf");
         replaceStringInFile("autologin-user=", "#autologin-user=", rootpath + "/etc/lightdm/lightdm.conf");
         replaceStringInFile("User=.*", "User=", rootpath + "/etc/sddm.conf");
     }
