@@ -138,15 +138,18 @@ void Core::setService(const QString &service, bool enabled) const
         }
     }
     if (containsRunit) {
-        const QString &svcdir = "/etc/sv/" + service;
-        if (!QFile::exists(chroot + svcdir)) {
-            mkpath(chroot + svcdir);
-            proc.exec("ln", {"-fs", svcdir, "/etc/service/"});
-        } else if (enabled) {
-            QFile::remove(chroot + svcdir + "/down");
-        }
-        if (!enabled) {
-            proc.exec("touch", {svcdir + "/down"});
+        if (enabled) {
+            QFile::remove(chroot + "/etc/sv/" + service + "/down");
+            if (!QFile::exists(chroot + "/etc/sv/" + service)) {
+                mkpath(chroot + "/etc/sv/" + service);
+                proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
+            }
+        } else {
+            if (!QFile::exists(chroot + "/etc/sv/" + service)) {
+                mkpath(chroot + "/etc/sv/" + service);
+                proc.exec("unlink", {"/etc/sv/" + service, "/etc/service/"});
+            }
+            proc.exec("touch", {"/etc/sv/" + service + "/down"});
         }
     }
 }

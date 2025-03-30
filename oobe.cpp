@@ -654,17 +654,22 @@ void Oobe::setUserInfo() const
     replaceStringInFile(curUser, username, rootpath + "/etc/subuid");
     replaceStringInFile(curUser, username, rootpath + "/etc/subgid");
     replaceStringInFile(curUser, username, rootpath + "/etc/slim.conf");
+    replaceStringInFile(curUser, username, rootpath + "/etc/slimski.local.conf");
     replaceStringInFile(curUser, username, rootpath + "/etc/lightdm/lightdm.conf");
     replaceStringInFile(curUser, username, rootpath + "/home/*/.gtkrc-2.0");
     replaceStringInFile(curUser, username, rootpath + "/root/.gtkrc-2.0");
     if (gui.checkAutoLogin->isChecked()) {
         replaceStringInFile("#auto_login", "auto_login", rootpath + "/etc/slim.conf");
         replaceStringInFile("#default_user ", "default_user ", rootpath + "/etc/slim.conf");
+        replaceStringInFile("#autologin_enabled", "autologin_enabled", rootpath + "/etc/slimski.local.conf");
+        replaceStringInFile("#default_user ", "default_user ", rootpath + "/etc/slimski.local.conf");
         replaceStringInFile("User=", "User=" + username, rootpath + "/etc/sddm.conf");
     }
     else {
         replaceStringInFile("auto_login", "#auto_login", rootpath + "/etc/slim.conf");
         replaceStringInFile("default_user ", "#default_user ", rootpath + "/etc/slim.conf");
+        replaceStringInFile("autologin_enabled", "#autologin_enabled", rootpath + "/etc/slimski.local.conf");
+        replaceStringInFile("default_user ", "#default_user ", rootpath + "/etc/slimski.local.conf");
         replaceStringInFile("autologin-user=", "#autologin-user=", rootpath + "/etc/lightdm/lightdm.conf");
         replaceStringInFile("User=.*", "User=", rootpath + "/etc/sddm.conf");
     }
