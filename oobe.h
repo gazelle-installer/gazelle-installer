@@ -32,8 +32,8 @@ class Oobe : public QObject
     Q_OBJECT
 public:
     bool haveSnapshotUserAccounts = false;
-    Oobe(class MProcess &mproc, class Core &mcore, Ui::MeInstall &ui, QWidget *parent,
-         class MIni &appConf, bool oem, bool modeOOBE);
+    Oobe(class MProcess &mproc, class Core &mcore, Ui::MeInstall &ui,
+        class MIni &appConf, bool oem, bool modeOOBE, QObject *parent = nullptr);
     void manageConfig(class MSettings &config) const noexcept;
     void enable() const;
     void process() const;
@@ -49,7 +49,6 @@ private:
     class MProcess &proc;
     class Core &core;
     Ui::MeInstall &gui;
-    QWidget *master;
     bool haveSamba = false;
     bool oem = false;
     bool online = false;

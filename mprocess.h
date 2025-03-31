@@ -41,7 +41,7 @@ public:
     };
     class Section;
 
-    MProcess(QObject *parent = Q_NULLPTR);
+    MProcess(QObject *parent = nullptr);
     void setupUI(class QListWidget *listLog, class QProgressBar *progInstall) noexcept;
     bool exec(const QString &program, const QStringList &arguments = {},
         const QByteArray *input = nullptr, bool needRead = false);

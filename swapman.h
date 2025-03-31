@@ -37,7 +37,8 @@ class SwapMan : public QObject
     void installSwapFile(QStringList &cmdboot_out) const;
     bool configureZRam() const noexcept;
 public:
-    SwapMan(class MProcess &mproc, class Core &mcore, class PartMan &pman, Ui::MeInstall &ui) noexcept;
+    SwapMan(class MProcess &mproc, class Core &mcore, class PartMan &pman,
+        Ui::MeInstall &ui, QObject *parent = nullptr) noexcept;
     void manageConfig(class MSettings &config) noexcept;
     void setupDefaults() noexcept;
     void install(QStringList &cmdboot_out);

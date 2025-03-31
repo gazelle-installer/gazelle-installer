@@ -27,7 +27,7 @@ protected:
     void reject() noexcept;
 
 public:
-    MInstall(class MIni &acfg, const class QCommandLineParser &args, const QString &cfgfile) noexcept;
+    MInstall(class MIni &acfg, const class QCommandLineParser &args, const QString &cfgfile, QWidget *parent = nullptr) noexcept;
     ~MInstall();
 
     QString PROJECTFORUM;

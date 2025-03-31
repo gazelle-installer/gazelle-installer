@@ -30,9 +30,9 @@
 #include "swapman.h"
 #include "autopart.h"
 
-AutoPart::AutoPart(MProcess &mproc, Core &mcore,
-    PartMan *pman, Ui::MeInstall &ui, MIni &appConf) noexcept
-    : QObject(ui.boxSliderPart), proc(mproc), core(mcore), gui(ui), partman(pman)
+AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
+    Ui::MeInstall &ui, MIni &appConf, QObject *parent) noexcept
+    : QObject(parent), proc(mproc), core(mcore), gui(ui), partman(pman)
 {
     connect(gui.comboDisk, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &AutoPart::diskChanged);
     connect(gui.checkEncryptAuto, &QCheckBox::toggled, this, &AutoPart::toggleEncrypt);

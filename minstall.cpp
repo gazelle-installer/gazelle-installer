@@ -68,8 +68,8 @@ enum Step {
     END
 };
 
-MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cfgfile) noexcept
-    : proc(this), core(proc), appConf(acfg), appArgs(args), configFile(cfgfile)
+MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cfgfile, QWidget *parent) noexcept
+    : QDialog(parent, Qt::Window), proc(this), core(proc), appConf(acfg), appArgs(args), configFile(cfgfile)
 {
     appConf.setSection("GUI");
     setWindowIcon(QIcon(appConf.getString("Logo", "/usr/share/gazelle-installer-data/logo.png")));
@@ -78,7 +78,6 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
     gui.setupUi(this);
     gui.listLog->addItem("Version " VERSION);
     proc.setupUI(gui.listLog, gui.progInstall);
-    setWindowFlags(Qt::Window); // for the close, min and max buttons
     gui.textHelp->installEventFilter(this);
     gui.boxInstall->hide();
 
@@ -186,12 +185,12 @@ void MInstall::startup()
             checkmd5 = nullptr;
         }
 
-        crypto = new Crypto(proc, gui);
-        partman = new PartMan(proc, core, gui, *crypto, appConf, appArgs);
+        crypto = new Crypto(proc, gui, this);
+        partman = new PartMan(proc, core, gui, *crypto, appConf, appArgs, this);
         base = new Base(proc, core, *partman, appConf, appArgs);
-        bootman = new BootMan(proc, core, *partman, gui, appConf, appArgs);
-        swapman = new SwapMan(proc, core, *partman, gui);
-        autopart = new AutoPart(proc, core, partman, gui, appConf);
+        bootman = new BootMan(proc, core, *partman, gui, appConf, appArgs, this);
+        swapman = new SwapMan(proc, core, *partman, gui, this);
+        autopart = new AutoPart(proc, core, partman, gui, appConf, this);
         partman->autopart = autopart;
         connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
         gui.labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
@@ -216,7 +215,7 @@ void MInstall::startup()
     setupkeyboardbutton();
     connect(gui.pushSetKeyboard, &QPushButton::clicked, this, &MInstall::runKeyboardSetup);
 
-    oobe = new Oobe(proc, core, gui, this, appConf, oem, modeOOBE);
+    oobe = new Oobe(proc, core, gui, appConf, oem, modeOOBE, this);
 
     if (modeOOBE) loadConfig(2);
     else {
@@ -985,8 +984,9 @@ void MInstall::gotoPage(int next) noexcept
 
 bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
 {
-    if (event->type() != QEvent::Paint) return false;
-    else if (watched == gui.labelSplash) {
+    if (event->type() != QEvent::Paint) {
+        return QDialog::eventFilter(watched, event);
+    } else if (watched == gui.labelSplash) {
         // Setup needed to draw the load indicator.
         QPainter painter(gui.labelSplash);
         painter.setRenderHints(QPainter::Antialiasing);
@@ -1019,7 +1019,7 @@ bool MInstall::eventFilter(QObject *watched, QEvent *event) noexcept
         painter.setRenderHints(QPainter::Antialiasing);
         painter.drawPixmap(gui.textHelp->viewport()->rect(), helpBackdrop, helpBackdrop.rect());
     }
-    return false;
+    return QDialog::eventFilter(watched, event);
 }
 
 void MInstall::changeEvent(QEvent *event) noexcept

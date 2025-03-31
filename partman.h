@@ -89,7 +89,7 @@ public:
     QString bootUUID;
     class AutoPart *autopart = nullptr;
     PartMan(class MProcess &mproc, class Core &mcore, class Ui::MeInstall &ui, class Crypto &cman,
-        const class MIni &appConf, const QCommandLineParser &appArgs);
+        const class MIni &appConf, const QCommandLineParser &appArgs, QObject *parent = nullptr);
     ~PartMan();
     void scan(Device *drvstart = nullptr);
     bool loadConfig(class MSettings &config) noexcept;
@@ -267,6 +267,9 @@ public:
 class PartMan::ItemDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
+public:
+    ItemDelegate(QObject *parent = nullptr) noexcept : QStyledItemDelegate(parent) {}
+private:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &,

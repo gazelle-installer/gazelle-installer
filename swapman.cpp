@@ -28,8 +28,8 @@
 #include "partman.h"
 #include "swapman.h"
 
-SwapMan::SwapMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui) noexcept
-    : QObject(ui.boxMain), proc(mproc), core(mcore), partman(pman), gui(ui)
+SwapMan::SwapMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui, QObject *parent) noexcept
+    : QObject(parent), proc(mproc), core(mcore), partman(pman), gui(ui)
 {
     connect(ui.textSwapFile, &QLineEdit::textEdited, this, [this](const QString &) {
         gui.pushNext->setEnabled(setupBounds());

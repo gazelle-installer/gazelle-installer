@@ -32,8 +32,8 @@
 #include "msettings.h"
 #include "oobe.h"
 
-Oobe::Oobe(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, QWidget *parent, MIni &appConf, bool oem, bool modeOOBE)
-    : QObject(parent), proc(mproc), core(mcore), gui(ui), master(parent), oem(oem), online(modeOOBE),
+Oobe::Oobe(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, MIni &appConf, bool oem, bool modeOOBE, QObject *parent)
+    : QObject(parent), proc(mproc), core(mcore), gui(ui), oem(oem), online(modeOOBE),
     passUser(ui.textUserPass, ui.textUserPass2, 0, this), passRoot(ui.textRootPass, ui.textRootPass2, 0, this)
 {
     appConf.setSection("OOBE");
@@ -271,7 +271,7 @@ void Oobe::buildServiceList(MIni &appconf) noexcept
     MIni services_desc("/usr/share/gazelle-installer-data/services.list", MIni::ReadOnly);
 
     appconf.setSection("Services");
-    for (const QString &service : appconf.getKeys()) {
+    for (const QStringList &keys = appconf.getKeys(); const QString &service : keys) {
         const QString &lang = QLocale::system().bcp47Name().toLower();
         services_desc.setSection(lang);
         if (!services_desc.contains(service)) {
@@ -318,30 +318,30 @@ void Oobe::stashServices(bool save) const noexcept
 
 QWidget *Oobe::validateComputerName() const noexcept
 {
-    const QRegularExpression nametest("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\.");
+    static const QRegularExpression nametest("[^0-9a-zA-Z-.]|^[.-]|[.-]$|\\.\\.");
     // see if name is reasonable
     if (gui.textComputerName->text().isEmpty()) {
-        QMessageBox::critical(master, master->windowTitle(), tr("Please enter a computer name."));
+        QMessageBox::critical(gui.boxMain, QString(), tr("Please enter a computer name."));
         return gui.textComputerName;
     } else if (gui.textComputerName->text().contains(nametest)) {
-        QMessageBox::critical(master, master->windowTitle(),
+        QMessageBox::critical(gui.boxMain, QString(),
             tr("Sorry, your computer name contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return gui.textComputerName;
     }
     // see if name is reasonable
     if (gui.textComputerDomain->text().isEmpty()) {
-        QMessageBox::critical(master, master->windowTitle(), tr("Please enter a domain name."));
+        QMessageBox::critical(gui.boxMain, QString(), tr("Please enter a domain name."));
         return gui.textComputerDomain;
     } else if (gui.textComputerDomain->text().contains(nametest)) {
-        QMessageBox::critical(master, master->windowTitle(),
-                              tr("Sorry, your computer domain contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
+        QMessageBox::critical(gui.boxMain, QString(),
+            tr("Sorry, your computer domain contains invalid characters.\nYou'll have to select a different\nname before proceeding."));
         return gui.textComputerDomain;
     }
 
     if (haveSamba) {
         // see if name is reasonable
         if (gui.textComputerGroup->text().isEmpty()) {
-            QMessageBox::critical(master, master->windowTitle(), tr("Please enter a workgroup."));
+            QMessageBox::critical(gui.boxMain, QString(), tr("Please enter a workgroup."));
             return gui.textComputerGroup;
         }
     } else {
@@ -492,8 +492,9 @@ QWidget *Oobe::validateUserInfo(bool automatic) const noexcept
 {
     const QString &userName = gui.textUserName->text();
     // see if username is reasonable length
-    if (!userName.contains(QRegularExpression("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$"))) {
-        QMessageBox::critical(master, master->windowTitle(),
+    static const QRegularExpression usertest("^[a-zA-Z_][a-zA-Z0-9_-]*[$]?$");
+    if (!userName.contains(usertest)) {
+        QMessageBox::critical(gui.boxMain, QString(),
             tr("The user name cannot contain special characters or spaces.\n"
                 "Please choose another name before proceeding."));
         return gui.textUserName;
@@ -504,7 +505,7 @@ QWidget *Oobe::validateUserInfo(bool automatic) const noexcept
         const QByteArray &match = QString("%1:").arg(userName).toUtf8();
         while (!file.atEnd()) {
             if (file.readLine().startsWith(match)) {
-                QMessageBox::critical(master, master->windowTitle(),
+                QMessageBox::critical(gui.boxMain, QString(),
                     tr("Sorry, that name is in use.\nPlease select a different name."));
                 return gui.textUserName;
             }
@@ -513,15 +514,15 @@ QWidget *Oobe::validateUserInfo(bool automatic) const noexcept
 
     if (!automatic && passUser.length()==0) {
         // Confirm that an empty user password is not accidental.
-        const QMessageBox::StandardButton ans = QMessageBox::warning(master, master->windowTitle(),
+        const QMessageBox::StandardButton ans = QMessageBox::warning(gui.boxMain, QString(),
             tr("You did not provide a passphrase for %1.").arg(gui.textUserName->text()) + '\n'
             + tr("Are you sure you want to continue?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if (ans != QMessageBox::Yes) return gui.textUserPass;
     }
     if (!automatic && gui.boxRootAccount->isChecked() && passRoot.length()==0) {
         // Confirm that an empty root password is not accidental.
-        const QMessageBox::StandardButton ans = QMessageBox::warning(master,
-            master->windowTitle(), tr("You did not provide a password for the root account."
+        const QMessageBox::StandardButton ans = QMessageBox::warning(gui.boxMain,
+            QString(), tr("You did not provide a password for the root account."
                 " Do you want to continue?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if (ans != QMessageBox::Yes) return gui.textRootPass;
     }

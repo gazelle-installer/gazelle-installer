@@ -22,8 +22,8 @@
 #include "partman.h"
 #include "crypto.h"
 
-Crypto::Crypto(MProcess &mproc, Ui::MeInstall &ui)
-    : proc(mproc), gui(ui), pass(ui.textCryptoPass, ui.textCryptoPass2, 1, this)
+Crypto::Crypto(MProcess &mproc, Ui::MeInstall &ui, QObject *parent)
+    : QObject(parent), proc(mproc), gui(ui), pass(ui.textCryptoPass, ui.textCryptoPass2, 1, this)
 {
     connect(&pass, &PassEdit::validationChanged, gui.pushNext, &QPushButton::setEnabled);
 

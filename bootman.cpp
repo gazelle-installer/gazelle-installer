@@ -33,8 +33,8 @@
 using namespace Qt::Literals::StringLiterals;
 
 BootMan::BootMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui,
-    MIni &appConf, const QCommandLineParser &appArgs) noexcept
-    : QObject(ui.boxMain), proc(mproc), core(mcore), gui(ui), partman(pman)
+    MIni &appConf, const QCommandLineParser &appArgs, QObject *parent) noexcept
+    : QObject(parent), proc(mproc), core(mcore), gui(ui), partman(pman)
 {
     appConf.setSection("Storage");
     installFromRootDevice = appConf.getBoolean("InstallFromRootDevice");
@@ -174,7 +174,7 @@ void BootMan::install(const QStringList &cmdextra)
             // Remove old boot variables of the same label.
             proc.exec("efibootmgr", {}, nullptr, true);
             const QStringList &existing = proc.readOutLines();
-            const QRegularExpression regex("^Boot([0-9A-F]{4})\\*?\\s(.*)$");
+            static const QRegularExpression regex("^Boot([0-9A-F]{4})\\*?\\s(.*)$");
             for (const QString &entry : existing) {
                 const QRegularExpressionMatch &match = regex.match(entry);
                 if (match.hasMatch() && match.captured(2) == loaderLabel) {

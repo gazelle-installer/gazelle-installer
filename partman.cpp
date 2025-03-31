@@ -51,8 +51,8 @@
 #include "partman.h"
 
 PartMan::PartMan(MProcess &mproc, Core &mcore, Ui::MeInstall &ui, Crypto &cman,
-    const MIni &appConf, const QCommandLineParser &appArgs)
-    : QAbstractItemModel(ui.boxMain), proc(mproc), core(mcore), gui(ui), crypto(cman)
+    const MIni &appConf, const QCommandLineParser &appArgs, QObject *parent)
+    : QAbstractItemModel(parent), proc(mproc), core(mcore), gui(ui), crypto(cman)
 {
     root = new Device(*this);
     const QString &projShort = appConf.getString("ShortName");
@@ -112,7 +112,7 @@ void PartMan::scan(Device *drvstart)
     QStringList order;
     QString curdev;
     proc.exec("parted", {"-lm"}, nullptr, true);
-    for(const QString &line : proc.readOutLines()) {
+    for(const QStringList &lines = proc.readOutLines(); const QString &line : lines) {
         const QString &sect = line.section(':', 0, 0);
         const int part = sect.toInt();
         if (part) order.append(joinName(curdev, part));
@@ -265,7 +265,7 @@ void PartMan::scanVirtualDevices(bool rescan)
         virt->origin = nullptr; // Clear stale origin pointer.
         // Find the associated partition and decrement its reference count if found.
         proc.exec("cryptsetup", {"status", virt->path}, nullptr, true);
-        for (const QString &line : proc.readOutLines()) {
+        for (const QStringList &lines = proc.readOutLines(); const QString &line : lines) {
             const QString &trline = line.trimmed();
             if (!trline.startsWith("device:")) continue;
             virt->origin = findByPath(trline.mid(8).trimmed());
@@ -727,8 +727,9 @@ bool PartMan::validate(bool automatic, QTreeWidgetItem *confroot) const noexcept
             // Ensure the subvolume label entry is valid.
             bool ok = true;
             const QString &cmptext = volume->label.trimmed();
+            static const QRegularExpression labeltest("[^A-Za-z0-9\\/\\@\\.\\-\\_]|\\/\\/");
             if (cmptext.isEmpty()) ok = false;
-            if (cmptext.count(QRegularExpression("[^A-Za-z0-9\\/\\@\\.\\-\\_]|\\/\\/"))) ok = false;
+            if (cmptext.count(labeltest)) ok = false;
             if (cmptext.startsWith('/') || cmptext.endsWith('/')) ok = false;
             if (!ok) {
                 QMessageBox::critical(gui.boxMain, QString(), tr("Invalid subvolume label"));
@@ -2112,7 +2113,7 @@ void PartMan::Device::driveAutoSetActive() noexcept
     if (active) return;
     if (partman.core.detectEFI() && format=="GPT") return;
 
-    for (const QString &pref : QStringList({"/boot", "/"})) {
+    for (const char *pref : {"/boot", "/"}) {
         for (PartMan::Iterator it(this); Device *device = *it; it.next()) {
             if (device->usefor == pref) {
                 while (device && device->type != PARTITION) device = device->parentItem;
@@ -2224,8 +2225,8 @@ void PartMan::Device::addToCombo(QComboBox *combo, bool warnNasty) const noexcep
 // Split a device name into its drive and partition.
 PartMan::NameParts PartMan::splitName(const QString &devname) noexcept
 {
-    const QRegularExpression rxdev1("^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$");
-    const QRegularExpression rxdev2("^(?:\\/dev\\/)*([a-z]*)([0-9]*)$");
+    static const QRegularExpression rxdev1("^(?:\\/dev\\/)*(mmcblk.*|nvme.*)p([0-9]*)$");
+    static const QRegularExpression rxdev2("^(?:\\/dev\\/)*([a-z]*)([0-9]*)$");
     QRegularExpressionMatch rxmatch(rxdev1.match(devname));
     if (!rxmatch.hasMatch()) rxmatch = rxdev2.match(devname);
     return {rxmatch.captured(1), rxmatch.captured(2)};
@@ -2313,13 +2314,13 @@ QSize PartMan::ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const 
     const int residue = 10 + width - option.fontMetrics.boundingRect(index.data(Qt::DisplayRole).toString()).width();
     switch(index.column()) {
     case PartMan::COL_FORMAT:
-        for (const QString &fmt : device->allowedFormats()) {
+        for (const QStringList &fmts = device->allowedFormats(); const QString &fmt : fmts) {
             const int fw = option.fontMetrics.boundingRect(device->shownFormat(fmt)).width() + residue;
             if (fw > width) width = fw;
         }
         break;
     case PartMan::COL_USEFOR:
-        for (const QString &use : device->allowedUsesFor(false)) {
+        for (const QStringList &uses = device->allowedUsesFor(false); const QString &use : uses) {
             const int uw = option.fontMetrics.boundingRect(use).width() + residue;
             if (uw > width) width = uw;
         }
