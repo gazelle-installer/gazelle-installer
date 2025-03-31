@@ -148,9 +148,9 @@ void SwapMan::installSwapFile(QStringList &cmdboot_out) const
 bool SwapMan::configureZRam() const noexcept
 {
     const QString zramfile("/mnt/antiX/etc/default/zramswap");
-    QFile::rename(zramfile, zramfile+".bak");
     bool ok = false;
-    MIni zramcfg(zramfile, MIni::NewOnly, &ok);
+    QFile::copy(zramfile, zramfile+".bak");
+    MIni zramcfg(zramfile, MIni::ReadWrite, &ok);
     if (!ok) return false;
 
     if (gui.radioZramPercent->isChecked()) {
