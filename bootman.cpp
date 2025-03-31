@@ -30,6 +30,8 @@
 #include "partman.h"
 #include "bootman.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 BootMan::BootMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui,
     MIni &appConf, const QCommandLineParser &appArgs) noexcept
     : QObject(ui.boxMain), proc(mproc), core(mcore), gui(ui), partman(pman)
@@ -124,7 +126,7 @@ void BootMan::install(const QStringList &cmdextra)
 
     bool efivars_ismounted = false;
     if (gui.boxBoot->isChecked() && gui.radioBootESP->isChecked()) {
-        QString efivars = QStringLiteral("/sys/firmware/efi/efivars");
+        const QString &efivars = u"/sys/firmware/efi/efivars"_s;
         if (QFileInfo(efivars).isDir()) {
             efivars_ismounted = proc.exec("mountpoint", {"-q", efivars});
         }
@@ -305,8 +307,11 @@ void BootMan::install(const QStringList &cmdextra)
     //}
 
     if (gui.checkBootHostSpecific->isChecked()) {
-        // Use MODULES=dep to trim the initrd, often results in faster boot.
-        proc.exec("sed", {"-i", "-r", "s/MODULES=.*/MODULES=dep/", "/etc/initramfs-tools/initramfs.conf"});
+        const QString &ircfname = sect.root() + u"/etc/initramfs-tools/initramfs.conf"_s;
+        QFile::copy(ircfname, ircfname+".bak");
+        MIni ircfg(ircfname, MIni::ReadWrite);
+        ircfg.setString("MODULES", "dep");
+        ircfg.save();
     }
 
     proc.exec("update-initramfs", {"-u", "-t", "-k", "all"});
