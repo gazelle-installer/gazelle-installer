@@ -832,6 +832,86 @@ QSlider::handle:horizontal:disabled {
               <bool>true</bool>
              </property>
              <layout class="QGridLayout">
+              <item row="1" column="0">
+               <widget class="QLabel" name="labelBoot">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>System boot disk:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="4">
+               <spacer>
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="1" colspan="4">
+               <widget class="QComboBox" name="comboBoot">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QRadioButton" name="radioBootESP">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>EFI System Partition</string>
+                </property>
+                <property name="text">
+                 <string>ESP</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QRadioButton" name="radioBootPBR">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>80</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Partition Boot Record</string>
+                </property>
+                <property name="text">
+                 <string>PBR</string>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="1">
                <widget class="QRadioButton" name="radioBootMBR">
                 <property name="sizePolicy">
@@ -863,73 +943,6 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
-              <item row="0" column="3">
-               <widget class="QRadioButton" name="radioBootESP">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>EFI System Partition</string>
-                </property>
-                <property name="text">
-                 <string>ESP</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="4">
-               <spacer>
-                <property name="orientation">
-                 <enum>Qt::Orientation::Horizontal</enum>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="2">
-               <widget class="QRadioButton" name="radioBootPBR">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>Partition Boot Record</string>
-                </property>
-                <property name="text">
-                 <string>PBR</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="labelBoot">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>System boot disk:</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="0">
                <widget class="QLabel" name="labelBootInstall">
                 <property name="sizePolicy">
@@ -943,16 +956,10 @@ QSlider::handle:horizontal:disabled {
                 </property>
                </widget>
               </item>
-              <item row="1" column="1" colspan="4">
-               <widget class="QComboBox" name="comboBoot">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
+              <item row="2" column="0" colspan="5">
+               <widget class="QCheckBox" name="checkBootHostSpecific">
+                <property name="text">
+                 <string>Generate host-specific initramfs image</string>
                 </property>
                </widget>
               </item>

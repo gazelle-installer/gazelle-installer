@@ -55,7 +55,10 @@ void BootMan::manageConfig(MSettings &config) noexcept
     static constexpr const char *grubChoices[] = {"MBR", "PBR", "ESP"};
     QRadioButton *const grubRadios[] = {gui.radioBootMBR, gui.radioBootPBR, gui.radioBootESP};
     config.manageRadios("TargetType", 3, grubChoices, grubRadios);
-    if (!gui.radioBootESP->isChecked()) config.manageComboBox("Location", gui.comboBoot, true);
+    if (!gui.radioBootESP->isChecked()) {
+        config.manageComboBox("Location", gui.comboBoot, true);
+    }
+    config.manageCheckBox("HostSpecific", gui.checkBootHostSpecific);
 }
 
 void BootMan::selectBootMain() noexcept
@@ -301,8 +304,10 @@ void BootMan::install(const QStringList &cmdextra)
         //proc.shell("grep -q crypto-crc32 /etc/initramfs-tools/modules || echo crypto-crc32 >> /etc/initramfs-tools/modules");
     //}
 
-    // Use MODULES=dep to trim the initrd, often results in faster boot.
-    //proc.exec("sed", {"-i", "-r", "s/MODULES=.*/MODULES=dep/", "/etc/initramfs-tools/initramfs.conf"});
+    if (gui.checkBootHostSpecific->isChecked()) {
+        // Use MODULES=dep to trim the initrd, often results in faster boot.
+        proc.exec("sed", {"-i", "-r", "s/MODULES=.*/MODULES=dep/", "/etc/initramfs-tools/initramfs.conf"});
+    }
 
     proc.exec("update-initramfs", {"-u", "-t", "-k", "all"});
     proc.status();
