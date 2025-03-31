@@ -588,7 +588,7 @@ int MInstall::showPage(int curr, int next) noexcept
                     return Step::SPLASH;
                 }
                 autopart->buildLayout(drive, autopart->partSize(), gui.checkEncryptAuto->isChecked());
-                next = (oem ? Step::PROGRESS : Step::SWAP);
+                next = (advanced ? Step::BOOT : Step::SWAP);
             } else {
                 advanced = true;
             }

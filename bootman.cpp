@@ -113,7 +113,7 @@ void BootMan::install(const QStringList &cmdextra)
         " the live medium and use the GRUB Rescue menu to repair the installation."));
     proc.advance(4, 4);
 
-    sect.setExceptionMode(false);
+    sect.setExceptionStrict(false);
     // the old initrd is not valid for this hardware
     proc.shell("ls /mnt/antiX/boot | grep 'initrd.img-3.6'", nullptr, true);
     const QString &val = proc.readOut();
@@ -128,7 +128,7 @@ void BootMan::install(const QStringList &cmdextra)
         if (!efivars_ismounted) proc.exec("mount", {"-t", "efivarfs", "efivarfs", efivars});
     }
 
-    sect.setExceptionMode(true);
+    sect.setExceptionStrict(true);
 
     if (gui.boxBoot->isChecked()) {
         proc.status(tr("Installing GRUB"));
@@ -145,10 +145,10 @@ void BootMan::install(const QStringList &cmdextra)
 
             if (efivars_ismounted) {
                 // remove any efivars-dump-entries in NVRAM
-                sect.setExceptionMode(false);
+                sect.setExceptionStrict(false);
                 proc.shell("ls /sys/firmware/efi/efivars | grep dump", nullptr, true);
                 const QString &dump = proc.readOut();
-                sect.setExceptionMode(true);
+                sect.setExceptionStrict(true);
                 if (!dump.isEmpty()) proc.shell("rm /sys/firmware/efi/efivars/dump*", nullptr, true);
             }
 
@@ -165,7 +165,7 @@ void BootMan::install(const QStringList &cmdextra)
             proc.exec("grub-install", grubinstargs);
 
             // Update the boot NVRAM variables. Non-critial step so no need to fail.
-            sect.setExceptionMode(false);
+            sect.setExceptionStrict(false);
             // Remove old boot variables of the same label.
             proc.exec("efibootmgr", {}, nullptr, true);
             const QStringList &existing = proc.readOutLines();
@@ -182,7 +182,7 @@ void BootMan::install(const QStringList &cmdextra)
                 proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", "/dev/"+bs.drive, "-p", bs.partition,
                     "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
             }
-            sect.setExceptionMode(true);
+            sect.setExceptionStrict(true);
             sect.setRoot(nullptr);
         }
 

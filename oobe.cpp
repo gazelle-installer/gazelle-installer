@@ -268,10 +268,6 @@ void Oobe::process() const
 
 void Oobe::buildServiceList(MIni &appconf) noexcept
 {
-    //setup treeServices
-    gui.treeServices->header()->setMinimumSectionSize(150);
-    gui.treeServices->header()->resizeSection(0,150);
-
     MIni services_desc("/usr/share/gazelle-installer-data/services.list", MIni::ReadOnly);
 
     appconf.setSection("Services");
@@ -288,17 +284,15 @@ void Oobe::buildServiceList(MIni &appconf) noexcept
 
         if (QFile::exists("/etc/init.d/"+service) || QFile::exists("/etc/sv/"+service)) {
             QList<QTreeWidgetItem *> found_items = gui.treeServices->findItems(category, Qt::MatchExactly, 0);
-            QTreeWidgetItem *top_item;
-            QTreeWidgetItem *item;
             QTreeWidgetItem *parent;
             if (found_items.size() == 0) { // add top item if no top items found
-                top_item = new QTreeWidgetItem(gui.treeServices);
-                top_item->setText(0, category);
-                parent = top_item;
+                parent = new QTreeWidgetItem(gui.treeServices);
+                parent->setFirstColumnSpanned(true);
+                parent->setText(0, category);
             } else {
                 parent = found_items.last();
             }
-            item = new QTreeWidgetItem(parent);
+            QTreeWidgetItem *item = new QTreeWidgetItem(parent);
             item->setText(0, service);
             item->setText(1, description);
             item->setCheckState(0, appconf.getBoolean(service) ? Qt::Checked : Qt::Unchecked);
@@ -308,7 +302,6 @@ void Oobe::buildServiceList(MIni &appconf) noexcept
 
     gui.treeServices->expandAll();
     gui.treeServices->resizeColumnToContents(0);
-    gui.treeServices->resizeColumnToContents(1);
 }
 
 void Oobe::stashServices(bool save) const noexcept

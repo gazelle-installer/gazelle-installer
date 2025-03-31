@@ -1134,11 +1134,11 @@ void PartMan::preparePartitions()
         // First 17KB = primary partition table (accounts for both MBR and GPT disks).
         // First 17KB, from 32KB = sneaky iso-hybrid partition table (maybe USB with an ISO burned onto it).
         const long long length = (4*MB + (gran - 1)) / gran; // ceiling
-        sect.setExceptionMode(false);
+        sect.setExceptionStrict(false);
         if (proc.exec("blkdiscard", {opts, "-l", QString::number(length*gran), drive->path})) {
-            sect.setExceptionMode(true);
+            sect.setExceptionStrict(true);
         } else {
-            sect.setExceptionMode(true);
+            sect.setExceptionStrict(true);
             opts = "-fvz"; // use zero instead of failing - but reported - trim support
             proc.exec("blkdiscard", {opts, "-l", QString::number(length*gran), drive->path});
         }
@@ -1228,12 +1228,12 @@ void PartMan::formatPartitions()
             if (core.detectVirtualBox()) {
                 proc.exec("blkdiscard", {"-fvz", dev}); // VirtualBox incorrectly reports TRIM support.
             } else {
-                sect.setExceptionMode(false);
+                sect.setExceptionStrict(false);
                 if (! proc.exec("blkdiscard", {volume->discgran ? "-fv" : "-fvz", dev})) {
-                    sect.setExceptionMode(true);
+                    sect.setExceptionStrict(true);
                     proc.exec("blkdiscard", {"-fvz", dev});
                 }
-                sect.setExceptionMode(true);
+                sect.setExceptionStrict(true);
             }
             const NameParts &devsplit = splitName(dev);
             proc.exec("parted", {"-s", "/dev/" + devsplit.drive, "set", devsplit.partition, "bios_grub", "on"});

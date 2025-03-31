@@ -112,7 +112,7 @@ bool Core::detectVirtualBox()
 {
     if (testVirtualBox < 0) {
         MProcess::Section sect(proc);
-        sect.setExceptionMode(false);
+        sect.setExceptionStrict(false);
         const bool rc = proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'");
         qDebug() << "Detect VirtualBox:" << rc;
         testVirtualBox = rc ? 1 : 0;

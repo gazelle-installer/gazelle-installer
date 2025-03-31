@@ -93,17 +93,12 @@ public:
     inline Section(class MProcess &mproc, const char *failmessage) noexcept
         : Section(mproc) { failmsg = failmessage; }
     ~Section() noexcept;
-    inline const char *failMessage() noexcept { return failmsg; }
-    inline bool strict() noexcept { return strictfail; }
+    inline const char *failMessage() const noexcept { return failmsg; }
+    inline bool strict() const noexcept { return strictfail; }
     inline void setExceptionMode(const char *message) noexcept { failmsg = message; }
-    inline void setExceptionMode(bool strict) noexcept { strictfail = strict; }
-    inline void setExceptionMode(const char *message, bool strict) noexcept
-    {
-        failmsg = message;
-        strictfail = strict;
-    }
+    inline void setExceptionStrict(bool strict) noexcept { strictfail = strict; }
     void setRoot(const char *newroot) noexcept;
-    inline const char *root() noexcept { return rootdir; }
+    inline const char *root() const noexcept { return rootdir; }
     Section(const Section &) = delete;
     Section &operator=(const Section &) = delete;
 };
