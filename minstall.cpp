@@ -157,12 +157,16 @@ void MInstall::startup()
     if (!modeOOBE) {
         // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
         if (core.detectEFI(true)==64 && core.detectArch()=="i686") {
-            const int ans = QMessageBox::question(this, windowTitle(),
-                tr("You are running 32bit OS started in 64 bit UEFI mode, the system will not"
-                    " be able to boot unless you select Legacy Boot or similar at restart.\n"
-                    "We recommend you quit now and restart in Legacy Boot\n\n"
-                    "Do you want to continue the installation?"), QMessageBox::Yes, QMessageBox::No);
-            if (ans != QMessageBox::Yes) exit(EXIT_FAILURE);
+            QMessageBox msgbox(this);
+            msgbox.setText(tr("You are running 32-bit OS started in 64-bit UEFI mode."));
+            msgbox.setInformativeText(tr("The system will not be able to boot unless you"
+                " restart the system in Legacy Boot (or similar mode) before proceeding.")
+                + "\n\n" + tr("Do you want to continue the installation?"));
+            msgbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgbox.setDefaultButton(QMessageBox::No);
+            if (msgbox.exec() != QMessageBox::Yes) {
+                exit(EXIT_FAILURE);
+            }
         }
 
         // Log live boot command line, looking for the "checkmd5" option.
@@ -486,9 +490,11 @@ void MInstall::loadConfig(int stage) noexcept
     }
 
     if (!config.good) {
-        QMessageBox::critical(this, windowTitle(),
-            tr("Invalid settings found in configuration file (%1)."
-               " Please review marked fields as you encounter them.").arg(configFile));
+        QMessageBox msgbox(this);
+        msgbox.setIcon(QMessageBox::Critical);
+        msgbox.setText(tr("Invalid settings found in configuration file (%1).").arg(configFile));
+        msgbox.setInformativeText(tr("Please review marked fields as you encounter them."));
+        msgbox.exec();
     }
 }
 void MInstall::saveConfig() noexcept
@@ -559,9 +565,11 @@ int MInstall::showPage(int curr, int next) noexcept
         }
         gui.treeConfirm->expandAll();
         if (!pretend && !(base && base->saveHomeBasic())) {
-            QMessageBox::critical(this, windowTitle(),
-                tr("The data in /home cannot be preserved because"
-                    " the required information could not be obtained."));
+            QMessageBox msgbox(this);
+            msgbox.setIcon(QMessageBox::Critical);
+            msgbox.setText(tr("The data in /home cannot be preserved because"
+                " the required information could not be obtained."));
+            msgbox.exec();
             return curr;
         }
         for (PartMan::Iterator it(*partman); *it; it.next()) {
@@ -1068,10 +1076,13 @@ void MInstall::abortUI(bool manual, bool closing) noexcept
     if (abortion != AB_NO_ABORT) return; // Don't abort an abortion.
     else if (phase > PH_READY && phase < PH_FINISHED) {
         if (manual) {
-            const QMessageBox::StandardButton rc = QMessageBox::warning(this, QString(),
-                tr("The installation and configuration is incomplete.\nDo you really want to stop now?"),
-                QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-            if (rc == QMessageBox::No) return;
+            QMessageBox msgbox(this);
+            msgbox.setIcon(QMessageBox::Warning);
+            msgbox.setText(tr("The installation and configuration is incomplete."));
+            msgbox.setInformativeText(tr("Do you really want to stop now?"));
+            msgbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgbox.setDefaultButton(QMessageBox::No);
+            if (msgbox.exec() == QMessageBox::No) return;
             proc.log("MANUALLY ABORTED", MProcess::LOG_FAIL);
         }
     }

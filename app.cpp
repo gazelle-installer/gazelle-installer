@@ -135,17 +135,19 @@ int main(int argc, char *argv[])
     // The lock is released when this object is destroyed.
     QLockFile lockfile("/var/lock/gazelle-installer.lock");
     if (!parser.isSet("pretend")) {
+        QMessageBox msgbox;
+        msgbox.setIcon(QMessageBox::Critical);
         // Set Lock or exit if lockfile is present.
         if (!lockfile.tryLock()) {
-            QMessageBox::critical(nullptr, QString(),
-                QObject::tr("The installer won't launch because it appears to be running already in the background.\n\n"
-                    "Please close it if possible, or run 'pkill minstall' in terminal."));
+            msgbox.setText(QObject::tr("The installer appears to be running already."));
+            msgbox.setInformativeText(QObject::tr("Please close it if possible, or run 'pkill minstall' in terminal."));
+            msgbox.exec();
             return EXIT_FAILURE;
         }
         // Alert the user if not running as root.
         if (getuid() != 0) {
-            QMessageBox::critical(nullptr, QString(),
-                QObject::tr("This operation requires root access."));
+            msgbox.setText(QObject::tr("This operation requires root access."));
+            msgbox.exec();
             return EXIT_FAILURE;
         }
     }
@@ -165,8 +167,10 @@ int main(int argc, char *argv[])
         }
         // give error message and exit if no config file found
         if (! QFile::exists(cfgfile)) {
-            QMessageBox::warning(nullptr, QString(),
-                QObject::tr("Configuration file (%1) not found.").arg(cfgfile));
+            QMessageBox msgbox;
+            msgbox.setIcon(QMessageBox::Warning);
+            msgbox.setText(QObject::tr("Configuration file (%1) not found.").arg(cfgfile));
+            msgbox.exec();
             return EXIT_FAILURE;
         }
     }

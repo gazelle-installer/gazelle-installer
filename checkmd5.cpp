@@ -140,10 +140,13 @@ void CheckMD5::halt(bool silent) noexcept
 {
     if (!checking) return;
     if (!silent) {
-        QMessageBox::StandardButton rc = QMessageBox::warning(labelSplash, QString(),
-            tr("Are you sure you want to skip checking the installation media?"),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if(rc != QMessageBox::Yes) return;
+        QMessageBox msgbox(labelSplash);
+        msgbox.setIcon(QMessageBox::Warning);
+        msgbox.setText(tr("The installation media is still being checked."));
+        msgbox.setInformativeText(tr("Are you sure you want to skip checking the installation media?"));
+        msgbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgbox.setDefaultButton(QMessageBox::No);
+        if(msgbox.exec() != QMessageBox::Yes) return;
     }
     checking = false;
 }

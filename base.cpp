@@ -25,7 +25,6 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
-#include <QMessageBox>
 #include "mprocess.h"
 #include "core.h"
 #include "msettings.h"

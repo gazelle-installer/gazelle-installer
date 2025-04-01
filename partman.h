@@ -144,8 +144,8 @@ private:
     void partMenuUnlock(class Device *part);
     void partMenuLock(class Device *volume);
     void scanSubvolumes(class Device *part);
-    bool confirmSpace(class QMessageBox &msgbox) const noexcept;
-    bool confirmBootable(class QMessageBox &msgbox) const noexcept;
+    bool confirmSpace() const noexcept;
+    bool confirmBootable() const noexcept;
 
     // Model View Controller
     class ItemDelegate;
