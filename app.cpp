@@ -22,7 +22,7 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QDateTime>
-#include <QDebug>
+#include <QtDebug>
 #include <QFile>
 #include <QLibraryInfo>
 #include <QLocale>
@@ -38,16 +38,17 @@
 #include "msettings.h"
 #include "version.h"
 
-static QFile logFile("/var/log/minstall.log");
+using namespace Qt::Literals::StringLiterals;
 
-void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+static void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+static QtMessageHandler origHandler = nullptr;
 
 int main(int argc, char *argv[])
 {
     const bool defskin = (!getenv("QT_QPA_PLATFORMTHEME") && !getenv("XDG_CURRENT_DESKTOP"));
     if (defskin) {
         // The default style in the OOBE environment is hideous and unusable.
-        QApplication::setStyle("cde"); // Qt docs say do this before the QApplication instance.
+        QApplication::setStyle(u"cde"_s); // Qt docs say do this before the QApplication instance.
         QPalette pal;
         pal.setColor(QPalette::Window, Qt::black);
         pal.setColor(QPalette::WindowText, Qt::white);
@@ -69,21 +70,21 @@ int main(int argc, char *argv[])
     }
 
     QApplication a(argc, argv);
-    if (defskin) a.setStyleSheet("QDialog { border: 2px ridge gray; }");
-    a.setApplicationVersion(VERSION);
-    //a.setWindowIcon(QIcon("/usr/share/gazelle-installer-data/logo.png"));
+    if (defskin) a.setStyleSheet(u"QDialog { border: 2px ridge gray; }"_s);
+    a.setApplicationVersion(QStringLiteral(VERSION));
+    //a.setWindowIcon(QIcon(u"/usr/share/gazelle-installer-data/logo.png"_s));
 
     const QString &transpath = QLibraryInfo::path(QLibraryInfo::TranslationsPath);
     QTranslator qtTran;
-    if (qtTran.load(QLocale::system(), "qt", "_", transpath)) {
+    if (qtTran.load(QLocale::system(), u"qt"_s, u"_"_s, transpath)) {
         a.installTranslator(&qtTran);
     }
     QTranslator qtBaseTran;
-    if (qtBaseTran.load(QLocale::system(), "qtbase", "_", transpath)) {
+    if (qtBaseTran.load(QLocale::system(), u"qtbase"_s, u"_"_s, transpath)) {
         a.installTranslator(&qtBaseTran);
     }
     QTranslator appTran;
-    if (appTran.load(QLocale::system(), "gazelle-installer", "_", "/usr/share/gazelle-installer/locale")) {
+    if (appTran.load(QLocale::system(), u"gazelle-installer"_s, u"_"_s, u"/usr/share/gazelle-installer/locale"_s)) {
         a.installTranslator(&appTran);
     }
 
@@ -116,7 +117,7 @@ int main(int argc, char *argv[])
         {"media-check", QObject::tr("Always check the installation media at the beginning.")},
         {"no-media-check", QObject::tr("Do not check the installation media at the beginning.\n"
             "Not recommended unless the installation media is guaranteed to be free from errors.")}});
-    parser.addPositionalArgument("config-file", QObject::tr("Load a configuration file as specified by <config-file>."), "<config-file>");
+    parser.addPositionalArgument(u"config-file"_s, QObject::tr("Load a configuration file as specified by <config-file>."), u"<config-file>"_s);
     parser.process(a);
 
     if (parser.positionalArguments().size() > 1) {
@@ -124,17 +125,17 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    QString confPath = "/usr/share/gazelle-installer-data/installer.conf";
-    if (QFile::exists("/etc/gazelle-installer-data/installer.conf")) {
-        confPath = "/etc/gazelle-installer-data/installer.conf";
+    QString confPath = u"/usr/share/gazelle-installer-data/installer.conf"_s;
+    if (QFile::exists(u"/etc/gazelle-installer-data/installer.conf"_s)) {
+        confPath = u"/etc/gazelle-installer-data/installer.conf"_s;
     }
     MIni appConf(confPath, MIni::ReadOnly);
     a.setWindowIcon(QIcon(appConf.getString("LOGO-IMAGE", "/usr/share/gazelle-installer-data/logo.png")));
-    a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.getString("Name")));
+    a.setApplicationDisplayName(QObject::tr("%1 Installer").arg(appConf.getString(u"Name"_s)));
 
     // The lock is released when this object is destroyed.
-    QLockFile lockfile("/var/lock/gazelle-installer.lock");
-    if (!parser.isSet("pretend")) {
+    QLockFile lockfile(u"/var/lock/gazelle-installer.lock"_s);
+    if (!parser.isSet(u"pretend"_s)) {
         QMessageBox msgbox;
         msgbox.setIcon(QMessageBox::Critical);
         // Set Lock or exit if lockfile is present.
@@ -152,18 +153,14 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (logFile.open(QFile::Append | QFile::Text)) {
-        qInstallMessageHandler(messageHandler);
-    } else {
-        qDebug() << "Cannot write to installer log:" << logFile.fileName();
-    }
+    origHandler = qInstallMessageHandler(messageHandler);
 
     QString cfgfile;
-    if (parser.isSet("config") || parser.positionalArguments().size() == 1) {
+    if (parser.isSet(u"config"_s) || parser.positionalArguments().size() == 1) {
         if (parser.positionalArguments().size() == 1) { // use config file if passed as argument
             cfgfile = parser.positionalArguments().at(0);
-        } else if (parser.isSet("config")) { // use default config file if no argument
-            cfgfile = "/etc/minstall.conf";
+        } else if (parser.isSet(u"config"_s)) { // use default config file if no argument
+            cfgfile = u"/etc/minstall.conf"_s;
         }
         // give error message and exit if no config file found
         if (! QFile::exists(cfgfile)) {
@@ -176,7 +173,7 @@ int main(int argc, char *argv[])
     }
 
     // main routine
-    qDebug() << "Installer version:" << VERSION;
+    qInfo() << "Installer version:" << VERSION;
     MInstall minstall(appConf, parser, cfgfile);
     const QRect &geo = a.primaryScreen()->availableGeometry();
     int width = 800;
@@ -195,27 +192,25 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 
-// The implementation of the handler
+// Qt log message handler
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    // Write to terminal
-    QTextStream term_out(stdout);
-    term_out << msg << Qt::endl;
-
-    // Open stream file writes
-    QTextStream out(&logFile);
-
-    // Write the date of recording
-    out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz ");
-    // By type determine to what level belongs message
-    switch (type)
-    {
-    case QtInfoMsg:     out << "INF "; break;
-    case QtDebugMsg:    out << "DBG "; break;
-    case QtWarningMsg:  out << "WRN "; break;
-    case QtCriticalMsg: out << "CRT "; break;
-    case QtFatalMsg:    out << "FTL "; break;
+    static constexpr char logfile[] = "/var/log/minstall.log";
+    static FILE *log = fopen(logfile, "a");
+    static bool nolog = false;
+    if (log) {
+        // QtDebugMsg = 0, QtWarningMsg = 1, QtCriticalMsg = 2, QtFatalMsg = 3, QtInfoMsg = 4
+        static const char *chtype[] = { "DBG", "WRN", "CRT", "FTL", "INF" };
+        fprintf(log, "%s %s %s: %s\n",
+            QDateTime::currentDateTime().toString().toUtf8().constData(),
+            chtype[type], context.category, msg.toUtf8().constData());
+        fflush(log);
+    } else if (!nolog) {
+        fprintf(stderr, "Cannot write to installer log: %s\n", logfile);
+        nolog = true;
     }
-    // Write to the output category of the message and the message itself
-    out << context.category << ": " << msg << Qt::endl;
+    // Call the original handler which should print text to the console.
+    if (origHandler) {
+        (*origHandler)(type, context, msg);
+    }
 }
