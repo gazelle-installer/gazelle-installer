@@ -30,6 +30,8 @@
 #include "swapman.h"
 #include "autopart.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
     Ui::MeInstall &ui, MIni &appConf, QObject *parent) noexcept
     : QObject(parent), proc(mproc), core(mcore), gui(ui), partman(pman)
@@ -57,23 +59,23 @@ AutoPart::AutoPart(MProcess &mproc, Core &mcore, PartMan *pman,
 
     strRoot = tr("Root");
     strHome = tr("Home");
-    strNone = "----";
+    strNone = "----"_L1;
     gui.spinHome->setSpecialValueText(strNone);
-    appConf.setSection("Storage");
-    installFromRootDevice = appConf.getBoolean("InstallFromRootDevice");
+    appConf.setSection(u"Storage"_s);
+    installFromRootDevice = appConf.getBoolean(u"InstallFromRootDevice"_s);
     appConf.setSection();
     refresh();
 }
 
 void AutoPart::manageConfig(MSettings &config) noexcept
 {
-    config.setSection("Storage", gui.pageDisk);
-    config.manageComboBox("Drive", gui.comboDisk, true);
-    config.manageCheckBox("DriveEncrypt", gui.checkEncryptAuto);
+    config.setSection(u"Storage"_s, gui.pageDisk);
+    config.manageComboBox(u"Drive"_s, gui.comboDisk, true);
+    config.manageCheckBox(u"DriveEncrypt"_s, gui.checkEncryptAuto);
     if (config.isSave()) {
-        config.setInteger("RootPortion", gui.sliderPart->value());
-    } else if (config.contains("RootPortion")) {
-         const int portion = config.getInteger("RootPortion");
+        config.setInteger(u"RootPortion"_s, gui.sliderPart->value());
+    } else if (config.contains(u"RootPortion"_s)) {
+         const int portion = config.getInteger(u"RootPortion"_s);
          gui.sliderPart->setSliderPosition(portion);
          if (gui.sliderPart->value() != portion) {
              config.markBadWidget(gui.boxSliderPart);
@@ -83,7 +85,7 @@ void AutoPart::manageConfig(MSettings &config) noexcept
 
 void AutoPart::scan() noexcept
 {
-    long long minSpace = partman->volSpecTotal("/", QStringList()).minimum;
+    long long minSpace = partman->volSpecTotal(u"/"_s, QStringList()).minimum;
     gui.comboDisk->blockSignals(true);
     gui.comboDisk->clear();
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
@@ -138,14 +140,14 @@ void AutoPart::setParams(bool swapfile, bool encrypt, bool hibernation, bool sna
     PartMan::Device *drive = selectedDrive();
     if (!drive) return;
     available = buildLayout(drive, -1, encrypt, false, &volumes);
-    volumes.append("/home");
-    const PartMan::VolumeSpec &vspecRoot = partman->volSpecTotal("/", volumes);
+    volumes.append(u"/home"_s);
+    const PartMan::VolumeSpec &vspecRoot = partman->volSpecTotal(u"/"_s, volumes);
     if (available <= vspecRoot.minimum) return;
     minRoot = vspecRoot.minimum;
     recRoot = vspecRoot.preferred;
     addSnapshot = 2 * vspecRoot.image;
 
-    const PartMan::VolumeSpec &vspecHome = partman->volSpecTotal("/home", volumes);
+    const PartMan::VolumeSpec &vspecHome = partman->volSpecTotal(u"/home"_s, volumes);
     minHome = vspecHome.minimum;
     recHome = vspecHome.preferred;
     if (swapfile) {
@@ -185,7 +187,7 @@ long long AutoPart::partSize(Part part) const noexcept
 
 PartMan::Device *AutoPart::selectedDrive() const noexcept
 {
-    return partman->findByPath("/dev/" + gui.comboDisk->currentData().toString());
+    return partman->findByPath("/dev/"_L1 + gui.comboDisk->currentData().toString());
 }
 
 // Layout Builder
@@ -216,10 +218,10 @@ void AutoPart::builderGUI(PartMan::Device *drive) noexcept
         2*minRoot, 1, QLocale::DataSizeTraditionalFormat), &dialog);
     layout.addRow(gui.boxSliderPart);
     layout.addRow(checkEncrypt);
-    layout.addRow("Base install size:", labelBase);
-    layout.addRow("Allow for a swap file of optimal size", checkSwapFile);
-    layout.addRow("Allow for hibernation support", checkHibernation);
-    layout.addRow("Allow for one standard snapshot", checkSnapshot);
+    layout.addRow(u"Base install size:"_s, labelBase);
+    layout.addRow(u"Allow for a swap file of optimal size"_s, checkSwapFile);
+    layout.addRow(u"Allow for hibernation support"_s, checkHibernation);
+    layout.addRow(u"Allow for one standard snapshot"_s, checkSnapshot);
 
     // Is encryption possible?
     const bool canEncrypt = (buildLayout(drive, -1, true, false) >= minRoot);
@@ -276,18 +278,18 @@ long long AutoPart::buildLayout(PartMan::Device *drive, long long rootFormatSize
 
     // Boot partitions.
     if (core.detectEFI()) {
-        if (updateTree) drive->addPart(256*MB, "ESP", crypto);
-        if (volList) volList->append("ESP");
+        if (updateTree) drive->addPart(256*MB, u"ESP"_s, crypto);
+        if (volList) volList->append(u"ESP"_s);
         remaining -= 256*MB;
-    } else if (drive->format == "GPT") {
-        if (updateTree) drive->addPart(1*MB, "BIOS-GRUB", crypto);
-        if (volList) volList->append("BIOS-GRUB");
+    } else if (drive->format == "GPT"_L1) {
+        if (updateTree) drive->addPart(1*MB, u"BIOS-GRUB"_s, crypto);
+        if (volList) volList->append(u"BIOS-GRUB"_s);
         remaining -= 1*MB;
     }
     if (crypto) {
-        const long long bootFormatSize = partman->volSpecs["/boot"].preferred;
-        if (updateTree) drive->addPart(bootFormatSize, "/boot", crypto);
-        if (volList) volList->append("/boot");
+        const long long bootFormatSize = partman->volSpecs[u"/boot"_s].preferred;
+        if (updateTree) drive->addPart(bootFormatSize, u"/boot"_s, crypto);
+        if (volList) volList->append(u"/boot"_s);
         remaining -= bootFormatSize;
     }
 
@@ -295,12 +297,12 @@ long long AutoPart::buildLayout(PartMan::Device *drive, long long rootFormatSize
     if (rootFormatSize > remaining) rootFormatSize = remaining;
     remaining -= rootFormatSize;
     if (volList) {
-        volList->append("/");
-        if (remaining > 0) volList->append("/home");
+        volList->append(u"/"_s);
+        if (remaining > 0) volList->append(u"/home"_s);
     }
     if (updateTree) {
-        drive->addPart(rootFormatSize, "/", crypto);
-        if (remaining > 0) drive->addPart(remaining, "/home", crypto);
+        drive->addPart(rootFormatSize, u"/"_s, crypto);
+        if (remaining > 0) drive->addPart(remaining, u"/home"_s, crypto);
         drive->labelParts();
         drive->driveAutoSetActive();
     }
@@ -389,7 +391,7 @@ void AutoPart::sliderValueChanged(int value) noexcept
 {
     sizeRoot = portion(available, value, MB);
     QString valstr = sizeString(sizeRoot);
-    gui.labelSliderRoot->setText(valstr + "\n" + strRoot);
+    gui.labelSliderRoot->setText(valstr + '\n' + strRoot);
 
     gui.spinRoot->setValue(value);
     gui.spinHome->setValue(100-value);
@@ -403,7 +405,7 @@ void AutoPart::sliderValueChanged(int value) noexcept
         if (sizeRoot < (recRoot+recHome)) palRoot.setColor(QPalette::WindowText, Qt::red);
     } else {
         valstr = sizeString(newHome);
-        valstr += "\n" + strHome;
+        valstr += '\n' + strHome;
         if (newHome < recHome) palHome.setColor(QPalette::WindowText, Qt::red);
     }
     gui.labelSliderHome->setText(valstr);
@@ -413,7 +415,7 @@ void AutoPart::sliderValueChanged(int value) noexcept
 
     // Unselect features that won't fit with the current configuration.
     const QStringList vols(sizeRoot < available ? "/home" : "/");
-    const long long rmin = partman->volSpecTotal("/", vols).minimum;
+    const long long rmin = partman->volSpecTotal(u"/"_s, vols).minimum;
     if (checkSnapshot && checkSnapshot->isChecked()) {
         bool ok = false;
         if (!newHome) ok = (sizeRoot >= (rmin + addSnapshot));

@@ -27,17 +27,19 @@
 #include "mprocess.h"
 #include "core.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 Core::Core(MProcess &mproc) : proc(mproc)
 {
-    containsSystemd = QFileInfo("/usr/usr/bin/systemctl").isExecutable() // Online
-        || QFileInfo("/live/aufs/usr/bin/systemctl").isExecutable(); // Offline
+    containsSystemd = QFileInfo(u"/usr/usr/bin/systemctl"_s).isExecutable() // Online
+        || QFileInfo(u"/live/aufs/usr/bin/systemctl"_s).isExecutable(); // Offline
 
     // Online
-    if (QFile::exists("/etc/service") && QFile::exists("/lib/runit/runit-init")) {
+    if (QFile::exists(u"/etc/service"_s) && QFile::exists(u"/lib/runit/runit-init"_s)) {
         containsRunit = true;
     }
     // Offline
-    if (QFile::exists("/live/aufs/etc/service") && QFile::exists("/live/aufs/sbin/runit")) {
+    if (QFile::exists(u"/live/aufs/etc/service"_s) && QFile::exists(u"/live/aufs/sbin/runit"_s)) {
         containsRunit = true;
     }
 }
@@ -49,7 +51,7 @@ void Core::sleep(const int msec, const bool silent) noexcept
     QListWidgetItem *logEntry = nullptr;
     if (!silent) {
         ++sleepcount;
-        logEntry = proc.log(QString("SLEEP: %1ms").arg(msec), MProcess::LOG_EXEC, false);
+        logEntry = proc.log(QStringLiteral("SLEEP: %1ms").arg(msec), MProcess::LOG_EXEC, false);
         qDebug().nospace() << "Sleep #" << sleepcount << ": " << msec << "ms";
     }
     QTimer cstimer(&proc);
@@ -67,7 +69,7 @@ bool Core::mkpath(const QString &path, mode_t mode, bool force) const
     if (proc.checkHalt()) return false;
     if (!force && QFileInfo::exists(path)) return true;
 
-    QListWidgetItem *logEntry = proc.log("MKPATH: "+path, MProcess::LOG_EXEC, false);
+    QListWidgetItem *logEntry = proc.log("MKPATH: "_L1 + path, MProcess::LOG_EXEC, false);
     bool rc = QDir().mkpath(path);
     if (mode && rc) rc = (chmod(path.toUtf8().constData(), mode) == 0);
     qDebug() << (rc ? "MkPath(SUCCESS):" : "MkPath(FAILURE):") << path;
@@ -86,7 +88,7 @@ bool Core::mkpath(const QString &path, mode_t mode, bool force) const
 const QString &Core::detectArch()
 {
     if (testArch.isEmpty()) {
-        if (proc.exec("uname", {"-m"}, nullptr, true)) testArch = proc.readOut();
+        if (proc.exec(u"uname"_s, {u"-m"_s}, nullptr, true)) testArch = proc.readOut();
         qDebug() << "Detect arch:" << testArch;
     }
     return testArch;
@@ -95,7 +97,7 @@ int Core::detectEFI(bool noTest)
 {
     if (testEFI < 0) {
         testEFI = 0;
-        QFile file("/sys/firmware/efi/fw_platform_size");
+        QFile file(u"/sys/firmware/efi/fw_platform_size"_s);
         if (file.open(QFile::ReadOnly | QFile::Text)) {
             testEFI = file.readLine().toInt();
             file.close();
@@ -104,7 +106,7 @@ int Core::detectEFI(bool noTest)
     }
     if (!noTest && testEFI == 64) {
         // Bad combination: 32-bit OS on 64-bit EFI.
-        if (detectArch()=="i686") return 0;
+        if (detectArch() == "i686"_L1) return 0;
     }
     return testEFI;
 }
@@ -113,7 +115,7 @@ bool Core::detectVirtualBox()
     if (testVirtualBox < 0) {
         MProcess::Section sect(proc);
         sect.setExceptionStrict(false);
-        const bool rc = proc.shell("lspci -n | grep -qE '80ee:beef|80ee:cafe'");
+        const bool rc = proc.shell(u"lspci -n | grep -qE '80ee:beef|80ee:cafe'"_s);
         qDebug() << "Detect VirtualBox:" << rc;
         testVirtualBox = rc ? 1 : 0;
     }
@@ -127,29 +129,29 @@ void Core::setService(const QString &service, bool enabled) const
     MProcess::Section sect(proc);
     const QString chroot(sect.root());
 
-    proc.exec("update-rc.d", {"-f", service, enabled?"defaults":"remove"});
+    proc.exec(u"update-rc.d"_s, {u"-f"_s, service, enabled?u"defaults"_s:u"remove"_s});
     if (containsSystemd) {
         if (enabled) {
-            proc.exec("systemctl", {"unmask", service});
-            proc.exec("systemctl", {"enable", service});
+            proc.exec(u"systemctl"_s, {u"unmask"_s, service});
+            proc.exec(u"systemctl"_s, {u"enable"_s, service});
         } else {
-            proc.exec("systemctl", {"disable", service});
-            proc.exec("systemctl", {"mask", service});
+            proc.exec(u"systemctl"_s, {u"disable"_s, service});
+            proc.exec(u"systemctl"_s, {u"mask"_s, service});
         }
     }
     if (containsRunit) {
         if (enabled) {
-            QFile::remove(chroot + "/etc/sv/" + service + "/down");
-            if (!QFile::exists(chroot + "/etc/sv/" + service)) {
-                mkpath(chroot + "/etc/sv/" + service);
-                proc.exec("ln", {"-fs", "/etc/sv/" + service, "/etc/service/"});
+            QFile::remove(chroot + "/etc/sv/"_L1 + service + "/down"_L1);
+            if (!QFile::exists(chroot + "/etc/sv/"_L1 + service)) {
+                mkpath(chroot + "/etc/sv/"_L1 + service);
+                proc.exec(u"ln"_s, {u"-fs"_s, "/etc/sv/"_L1 + service, u"/etc/service/"_s});
             }
         } else {
-            if (!QFile::exists(chroot + "/etc/sv/" + service)) {
-                mkpath(chroot + "/etc/sv/" + service);
-                proc.exec("unlink", {"/etc/sv/" + service, "/etc/service/"});
+            if (!QFile::exists(chroot + "/etc/sv/"_L1 + service)) {
+                mkpath(chroot + "/etc/sv/"_L1 + service);
+                proc.exec(u"unlink"_s, {"/etc/sv/"_L1 + service, u"/etc/service/"_s});
             }
-            proc.exec("touch", {"/etc/sv/" + service + "/down"});
+            proc.exec(u"touch"_s, {"/etc/sv/"_L1 + service + u"/down"_s});
         }
     }
 }

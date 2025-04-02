@@ -29,6 +29,8 @@
 #include <zxcvbn.h>
 #include "passedit.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 // Password generator parameters applicable accross every PassEdit instance.
 static constexpr qsizetype GEN_WORD_MAX     = 6;    // Maximum number of characters per word.
 static constexpr size_t GEN_NUMBER_MAX      = 999;  // Numbers will go from 0 to GEN_NUMBER_MAX without duplicates.
@@ -66,7 +68,7 @@ void PassEdit::generate() noexcept
     static std::vector<QString> words;
     static size_t pos;
     if (words.empty()) {
-        QFile file("/usr/share/dict/words");
+        QFile file(u"/usr/share/dict/words"_s);
         if (file.open(QFile::ReadOnly | QFile::Text)) {
             while (!file.atEnd()) {
                 const QByteArray &word = file.readLine().trimmed();
@@ -138,7 +140,7 @@ void PassEdit::masterTextChanged(const QString &text) noexcept
     else if(entropy < 100) score = 3; // Moderate
     else if(entropy < 130) score = 4; // Strong
     else score = 5; // Very strong
-    actionGauge->setIcon(QIcon(":/gauge/" + QString::number(score)));
+    actionGauge->setIcon(QIcon(":/gauge/"_L1 + QString::number(score)));
     static const char *ratings[] = {
         QT_TR_NOOP("Negligible"), QT_TR_NOOP("Very weak"), QT_TR_NOOP("Weak"),
         QT_TR_NOOP("Moderate"), QT_TR_NOOP("Strong"), QT_TR_NOOP("Very strong")

@@ -29,12 +29,14 @@
 
 #include "mprocess.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 MProcess::MProcess(QObject *parent)
     : QProcess(parent)
 {
     // Stop user-selected locale from interfering with command output parsing.
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("LC_ALL", "C.UTF-8");
+    env.insert(u"LC_ALL"_s, u"C.UTF-8"_s);
     setProcessEnvironment(env);
 }
 
@@ -142,14 +144,14 @@ bool MProcess::shell(const QString &cmd,  const QByteArray *input, bool needRead
     if (checkHalt()) return false;
     ++execount;
     qDebug().nospace().noquote() << "Bash #" << execount << ": " << cmd;
-    return exec("/usr/bin/bash", {"-c", cmd}, input, needRead, log(cmd, LOG_EXEC, false));
+    return exec(u"/usr/bin/bash"_s, {u"-c"_s, cmd}, input, needRead, log(cmd, LOG_EXEC, false));
 }
 
 QString MProcess::readOut(bool everything) noexcept
 {
     QString strout(readAllStandardOutput().trimmed());
     if (everything) return strout;
-    return strout.section("\n", 0, 0).trimmed();
+    return strout.section('\n', 0, 0).trimmed();
 }
 QStringList MProcess::readOutLines() noexcept
 {
@@ -196,9 +198,9 @@ QString MProcess::joinCommand(const QString &program, const QStringList &argumen
                 break;
             }
         }
-        arg.replace("\"", "\\\"");
+        arg.replace('\"', "\\\""_L1);
         if (!wspace) text += ' ' + arg;
-        else text += " \"" + arg + "\"";
+        else text += " \""_L1 + arg + '\"';
     }
     return text;
 }
@@ -238,7 +240,7 @@ void MProcess::status(const QString &text, long progress) noexcept
 {
     if (!progBar) log(text, LOG_STATUS);
     else {
-        QString fmt = "%p% - " + text;
+        QString fmt = "%p% - "_L1 + text;
         if (progBar->format() != fmt) {
             log(text, LOG_STATUS);
             progBar->setFormat(fmt);
@@ -285,7 +287,7 @@ MProcess::Section::~Section() noexcept
 {
     const char *oldroot = oldsection ? oldsection->rootdir : nullptr;
     if (qstrcmp(oldroot, rootdir)) {
-        proc.log(QString("Revert root: ")+oldroot, LOG_LOG);
+        proc.log(u"Revert root: "_s + oldroot, LOG_LOG);
     }
     proc.section = oldsection;
     proc.syncRoot();
@@ -295,7 +297,7 @@ MProcess::Section::~Section() noexcept
 void MProcess::Section::setRoot(const char *newroot) noexcept
 {
     if (qstrcmp(newroot, rootdir)) {
-        proc.log(QString("Change root: ")+newroot, LOG_LOG);
+        proc.log(u"Change root: "_s + newroot, LOG_LOG);
     }
     rootdir = newroot; // Might be different pointers to the same text.
     proc.syncRoot();

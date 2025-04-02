@@ -22,25 +22,27 @@
 #include "partman.h"
 #include "crypto.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 Crypto::Crypto(MProcess &mproc, Ui::MeInstall &ui, QObject *parent)
     : QObject(parent), proc(mproc), gui(ui), pass(ui.textCryptoPass, ui.textCryptoPass2, 1, this)
 {
     connect(&pass, &PassEdit::validationChanged, gui.pushNext, &QPushButton::setEnabled);
 
-    QFileInfo cryptsetup("/usr/sbin/cryptsetup");
-    QFileInfo crypsetupinitramfs("/usr/share/initramfs-tools/conf-hooks.d/cryptsetup");
+    QFileInfo cryptsetup(u"/usr/sbin/cryptsetup"_s);
+    QFileInfo crypsetupinitramfs(u"/usr/share/initramfs-tools/conf-hooks.d/cryptsetup"_s);
     cryptsupport = (cryptsetup.exists() && cryptsetup.isExecutable() && crypsetupinitramfs.exists());
 }
 
 bool Crypto::manageConfig(MSettings &config) noexcept
 {
-    config.setSection("Encryption", gui.pageEncryption);
+    config.setSection(u"Encryption"_s, gui.pageEncryption);
     if(!config.isSave()) {
-        const QString &epass = config.getString("Pass");
+        const QString &epass = config.getString(u"Pass"_s);
         gui.textCryptoPass->setText(epass);
         gui.textCryptoPass2->setText(epass);
     }
-    config.addFilter("Pass");
+    config.addFilter(u"Pass"_s);
     return true;
 }
 
@@ -56,8 +58,8 @@ void Crypto::formatAll(const PartMan &partman)
     for (PartMan::Iterator it(partman); PartMan::Device *part = *it; it.next()) {
         if (!part->encrypt || !part->willFormat()) continue;
         proc.status(tr("Creating encrypted volume: %1").arg(part->name));
-        proc.exec("cryptsetup", {"--batch-mode", "--key-size=512",
-                                 "--hash=sha512", "luksFormat", part->path}, &encPass);
+        proc.exec(u"cryptsetup"_s, {u"--batch-mode"_s, u"--key-size=512"_s,
+            u"--hash=sha512"_s, u"luksFormat"_s, part->path}, &encPass);
         proc.status();
         open(part, encPass);
     }
@@ -66,12 +68,14 @@ void Crypto::open(PartMan::Device *part, const QByteArray &password)
 {
     MProcess::Section sect(proc, QT_TR_NOOP("Failed to open LUKS container."));
     if (part->map.isEmpty()) {
-        proc.exec("cryptsetup", {"luksUUID", part->path}, nullptr, true);
+        proc.exec(u"cryptsetup"_s, {u"luksUUID"_s, part->path}, nullptr, true);
         part->map = "luks-" + proc.readAll().trimmed();
     }
-    QStringList cargs({"open", part->path, part->map, "--type", "luks"});
-    if (part->discgran) cargs.prepend("--allow-discards");
-    proc.exec("cryptsetup", cargs, &password);
+    QStringList cargs({u"open"_s, part->path, part->map, u"--type"_s, u"luks"_s});
+    if (part->discgran) {
+        cargs.prepend(u"--allow-discards"_s);
+    }
+    proc.exec(u"cryptsetup"_s, cargs, &password);
 }
 
 // write out crypttab if encrypting for auto-opening
@@ -83,7 +87,7 @@ bool Crypto::makeCrypttab(const PartMan &partman) noexcept
         if (device->addToCrypttab) ++cryptcount;
     }
     // Add devices to crypttab.
-    QFile file("/mnt/antiX/etc/crypttab");
+    QFile file(u"/mnt/antiX/etc/crypttab"_s);
     if (!file.open(QIODevice::WriteOnly)) return false;
     QTextStream out(&file);
     for (PartMan::Iterator it(partman); PartMan::Device *device = *it; it.next()) {
