@@ -176,6 +176,7 @@ void Base::install(QSettings &appConf)
             findargs << "!" << "-path" << "/mnt/antiX/home";
         }
         findargs << "-delete";
+        sect.setExceptionMode(false);
         proc.exec("find", findargs);
     }
 
