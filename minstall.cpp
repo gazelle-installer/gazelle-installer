@@ -50,6 +50,8 @@
 #include "version.h"
 #include "minstall.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 enum Step {
     SPLASH,
     TERMS,
@@ -71,35 +73,35 @@ enum Step {
 MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cfgfile, QWidget *parent) noexcept
     : QDialog(parent, Qt::Window), proc(this), core(proc), appConf(acfg), appArgs(args), configFile(cfgfile)
 {
-    appConf.setSection("GUI");
-    setWindowIcon(QIcon(appConf.getString("Logo", "/usr/share/gazelle-installer-data/logo.png")));
-    helpBackdrop = appConf.getString("HelpBackdrop", "/usr/share/gazelle-installer-data/backdrop-textbox.png");
+    appConf.setSection(u"GUI"_s);
+    setWindowIcon(QIcon(appConf.getString(u"Logo"_s, u"/usr/share/gazelle-installer-data/logo.png"_s)));
+    helpBackdrop = appConf.getString(u"HelpBackdrop"_s, u"/usr/share/gazelle-installer-data/backdrop-textbox.png"_s);
     appConf.setSection();
     gui.setupUi(this);
-    gui.listLog->addItem("Version " VERSION);
+    gui.listLog->addItem(u"Version " VERSION ""_s);
     proc.setupUI(gui.listLog, gui.progInstall);
     gui.textHelp->installEventFilter(this);
     gui.boxInstall->hide();
 
-    advanced = args.isSet("advanced");
-    modeOOBE = args.isSet("oobe");
-    pretend = args.isSet("pretend");
+    advanced = args.isSet(u"advanced"_s);
+    modeOOBE = args.isSet(u"oobe"_s);
+    pretend = args.isSet(u"pretend"_s);
     if (!modeOOBE) {
-        automatic = args.isSet("auto");
-        oem = args.isSet("oem");
-        mountkeep = args.isSet("mount-keep");
+        automatic = args.isSet(u"auto"_s);
+        oem = args.isSet(u"oem"_s);
+        mountkeep = args.isSet(u"mount-keep"_s);
     } else {
         automatic = oem = false;
         gui.pushClose->setText(tr("Shutdown"));
     }
 
     // setup system variables
-    PROJECTNAME = appConf.getString("Name");
-    PROJECTSHORTNAME = appConf.getString("ShortName");
-    PROJECTVERSION = appConf.getString("Version");
-    appConf.setSection("Links");
-    PROJECTURL = appConf.getString("Website");
-    PROJECTFORUM = appConf.getString("Forum");
+    PROJECTNAME = appConf.getString(u"Name"_s);
+    PROJECTSHORTNAME = appConf.getString(u"ShortName"_s);
+    PROJECTVERSION = appConf.getString(u"Version"_s);
+    appConf.setSection(u"Links"_s);
+    PROJECTURL = appConf.getString(u"Website"_s);
+    PROJECTFORUM = appConf.getString(u"Forum"_s);
     appConf.setSection();
 
     gotoPage(Step::SPLASH);
@@ -115,7 +117,7 @@ MInstall::MInstall(MIni &acfg, const QCommandLineParser &args, const QString &cf
             proc.unhalt();
             const bool closenow = (!msg || !*msg);
             if(!closenow) {
-                proc.log(QStringLiteral("FAILED START - ") + msg, MProcess::LOG_FAIL);
+                proc.log("FAILED START - "_L1 + msg, MProcess::LOG_FAIL);
                 gui.labelSplash->setText(tr(msg));
             }
             abortEndUI(closenow);
@@ -156,12 +158,12 @@ void MInstall::startup()
 
     if (!modeOOBE) {
         // Check for a bad combination, like 32-bit ISO and 64-bit UEFI.
-        if (core.detectEFI(true)==64 && core.detectArch()=="i686") {
+        if (core.detectEFI(true)==64 && core.detectArch()=="i686"_L1) {
             QMessageBox msgbox(this);
             msgbox.setText(tr("You are running 32-bit OS started in 64-bit UEFI mode."));
             msgbox.setInformativeText(tr("The system will not be able to boot unless you"
                 " restart the system in Legacy Boot (or similar mode) before proceeding.")
-                + "\n\n" + tr("Do you want to continue the installation?"));
+                + "\n\n"_L1 + tr("Do you want to continue the installation?"));
             msgbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
             msgbox.setDefaultButton(QMessageBox::No);
             if (msgbox.exec() != QMessageBox::Yes) {
@@ -171,7 +173,7 @@ void MInstall::startup()
 
         // Log live boot command line, looking for the "checkmd5" option.
         bool nocheck = pretend;
-        QFile fileCLine("/live/config/proc-cmdline");
+        QFile fileCLine(u"/live/config/proc-cmdline"_s);
         if (fileCLine.open(QFile::ReadOnly | QFile::Text)) {
             QByteArray data = fileCLine.readAll();
             nocheck = data.contains("checkmd5\n");
@@ -179,9 +181,9 @@ void MInstall::startup()
             fileCLine.close();
         }
         // Check the installation media for errors (skip if not required).
-        if (appArgs.isSet("media-check")) nocheck = false;
-        else if (appArgs.isSet("no-media-check")) nocheck = true;
-        if(nocheck) proc.log("No media check");
+        if (appArgs.isSet(u"media-check"_s)) nocheck = false;
+        else if (appArgs.isSet(u"no-media-check"_s)) nocheck = true;
+        if(nocheck) proc.log(u"No media check"_s);
         else {
             checkmd5 = new CheckMD5(proc, gui.labelSplash);
             checkmd5->check(); // Must be separate from constructor for halt() to work.
@@ -198,22 +200,22 @@ void MInstall::startup()
         partman->autopart = autopart;
         connect(gui.radioEntireDisk, &QRadioButton::toggled, gui.boxAutoPart, &QGroupBox::setEnabled);
         gui.labelConfirm->setText(tr("The %1 installer will now perform the requested actions.").arg(PROJECTNAME)
-            + "<br/><img src=':/dialog-warning'/>" + tr("These actions cannot be undone. Do you want to continue?")
-            + "<img src=':/dialog-warning'/>");
+            + "<br/><img src=':/dialog-warning'/>"_L1 + tr("These actions cannot be undone. Do you want to continue?")
+            + "<img src=':/dialog-warning'/>"_L1);
 
         // set some distro-centric text
         QString link_block;
-        appConf.setSection("Links");
+        appConf.setSection(u"Links"_s);
         const QStringList &links = appConf.getKeys();
         for (const QString &link : links) {
-            link_block += "\n\n" + tr(link.toUtf8().constData()) + ": " + appConf.getString(link);
+            link_block += "\n\n"_L1 + tr(link.toUtf8().constData()) + ": "_L1 + appConf.getString(link);
         }
         appConf.setSection();
         gui.textReminders->setPlainText(tr("Support %1\n\n"
             "%1 is supported by people like you. Some help others at the support forum - %2,"
             " or translate help files into different languages, or make suggestions,"
             " write documentation, or help test new software.").arg(PROJECTNAME, PROJECTFORUM)
-            + "\n" + link_block);
+            + '\n' + link_block);
     }
 
     setupkeyboardbutton();
@@ -283,23 +285,23 @@ void MInstall::setupAutoMount(bool enabled)
     if (autoMountEnabled == enabled) return;
     // check if the systemctl program is present
     bool have_sysctl = false;
-    const QStringList &envpath = QProcessEnvironment::systemEnvironment().value("PATH").split(':');
+    const QStringList &envpath = QProcessEnvironment::systemEnvironment().value(u"PATH"_s).split(':');
     for (const QString &path : envpath) {
-        if (QFileInfo(path + "/systemctl").isExecutable()) {
+        if (QFileInfo(path + "/systemctl"_L1).isExecutable()) {
             have_sysctl = true;
             break;
         }
     }
     // check if udisksd is running.
     bool udisksd_running = false;
-    if (proc.shell("ps -e | grep 'udisksd'")) udisksd_running = true;
+    if (proc.shell(u"ps -e | grep 'udisksd'"_s)) udisksd_running = true;
     // create a list of rules files that are being temporarily overridden
     QStringList udev_temp_mdadm_rules;
-    if (QFileInfo("/run/udev").isDir()) {
-        proc.shell("grep -El '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d/*", nullptr, true);
+    if (QFileInfo(u"/run/udev"_s).isDir()) {
+        proc.shell(u"grep -El '^[^#].*mdadm (-I|--incremental)' /lib/udev/rules.d/*"_s, nullptr, true);
         udev_temp_mdadm_rules = proc.readOutLines();
         for (QString &rule : udev_temp_mdadm_rules) {
-            rule.replace("/lib/udev", "/run/udev");
+            rule.replace("/lib/udev"_L1, "/run/udev"_L1);
         }
     }
 
@@ -308,43 +310,43 @@ void MInstall::setupAutoMount(bool enabled)
         // disable auto-mount
         if (have_sysctl) {
             // Use systemctl to prevent automount by masking currently unmasked mount points
-            proc.shell("systemctl list-units --full --all -t mount --no-legend 2>/dev/null"
+            proc.shell(u"systemctl list-units --full --all -t mount --no-legend 2>/dev/null"
                 " | grep -v masked | cut -f1 -d' ' | grep -Ev '^(dev-hugepages|dev-mqueue|proc-sys-fs-binfmt_misc"
-                    "|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'", nullptr, true);
+                    "|run-user-.*-gvfs|sys-fs-fuse-connections|sys-kernel-config|sys-kernel-debug)'"_s, nullptr, true);
             const QStringList &maskedMounts = proc.readOutLines();
             if (!maskedMounts.isEmpty()) {
-                proc.exec("systemctl", QStringList({"--runtime", "mask", "--quiet", "--"}) + maskedMounts);
+                proc.exec(u"systemctl"_s, QStringList({u"--runtime"_s, u"mask"_s, u"--quiet"_s, u"--"_s}) + maskedMounts);
             }
         }
         // create temporary blank overrides for all udev rules which
         // automatically start Linux Software RAID array members
-        core.mkpath("/run/udev/rules.d");
+        core.mkpath(u"/run/udev/rules.d"_s);
         for (const QString &rule : std::as_const(udev_temp_mdadm_rules)) {
-            proc.exec("touch", {rule});
+            proc.exec(u"touch"_s, {rule});
         }
 
         if (udisksd_running) {
-            proc.shell("echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/91-mx-udisks-inhibit.rules");
-            proc.exec("udevadm", {"control", "--reload"});
-            proc.exec("udevadm", {"trigger", "--subsystem-match=block"});
+            proc.shell(u"echo 'SUBSYSTEM==\"block\", ENV{UDISKS_IGNORE}=\"1\"' > /run/udev/rules.d/91-mx-udisks-inhibit.rules"_s);
+            proc.exec(u"udevadm"_s, {u"control"_s, u"--reload"_s});
+            proc.exec(u"udevadm"_s, {u"trigger"_s, u"--subsystem-match=block"_s});
         }
     } else {
         // enable auto-mount
         if (udisksd_running) {
-            proc.exec("rm", {"-f", "/run/udev/rules.d/91-mx-udisks-inhibit.rules"});
-            proc.exec("udevadm", {"control", "--reload"});
+            proc.exec(u"rm"_s, {u"-f"_s, u"/run/udev/rules.d/91-mx-udisks-inhibit.rules"_s});
+            proc.exec(u"udevadm"_s, {u"control"_s, u"--reload"_s});
             // For partitions to appear in the file manager.
-            proc.exec("service", {"udev", "stop"});
-            proc.exec("service", {"udev", "start"});
+            proc.exec(u"service"_s, {u"udev"_s, u"stop"_s});
+            proc.exec(u"service"_s, {u"udev"_s, u"start"_s});
         }
         // clear the rules that were temporarily overridden
         for (const QString &rule : std::as_const(udev_temp_mdadm_rules)) {
-            proc.shell("rm -f " + rule); // TODO: check if each rule is a single file name.
+            proc.shell("rm -f "_L1 + rule); // TODO: check if each rule is a single file name.
         }
 
         // Use systemctl to restore that status of any mount points changed above
         if (have_sysctl && !listMaskedMounts.isEmpty()) {
-            proc.shell("systemctl --runtime unmask --quiet -- $MOUNTLIST");
+            proc.shell(u"systemctl --runtime unmask --quiet -- $MOUNTLIST"_s);
         }
     }
     autoMountEnabled = enabled;
@@ -398,7 +400,7 @@ void MInstall::processNextPhase() noexcept
             if (!modeOOBE) {
                 saveConfig();
             }
-            proc.exec("sync"); // the sync(2) system call will block the GUI
+            proc.exec(u"sync"_s); // the sync(2) system call will block the GUI
             QStringList grubextra;
             swapman->install(grubextra);
             bootman->install(grubextra);
@@ -409,11 +411,11 @@ void MInstall::processNextPhase() noexcept
 
             phase = PH_FINISHED;
             proc.status(tr("Finished"));
-            if (appArgs.isSet("reboot")) {
-                proc.shell("/usr/local/bin/persist-config --shutdown --command reboot &");
+            if (appArgs.isSet(u"reboot"_s)) {
+                proc.shell(u"/usr/local/bin/persist-config --shutdown --command reboot &"_s);
             }
-            if (appArgs.isSet("poweroff")) {
-                proc.shell("/usr/local/bin/persist-config --shutdown --command poweroff &");
+            if (appArgs.isSet(u"poweroff"_s)) {
+                proc.shell(u"/usr/local/bin/persist-config --shutdown --command poweroff &"_s);
             }
             gotoPage(Step::END);
         }
@@ -425,13 +427,13 @@ void MInstall::processNextPhase() noexcept
             oobe->process();
             phase = PH_FINISHED;
             gui.labelSplash->setText(tr("Configuration complete. Restarting system."));
-            proc.exec("/usr/sbin/reboot");
+            proc.exec(u"/usr/sbin/reboot"_s);
         }
     } catch (const char *msg) {
         if (!msg || !msg[0] || abortion) {
             msg = QT_TR_NOOP("The installation was aborted.");
         }
-        proc.log("FAILED Phase " + QString::number(phase) + " - " + msg, MProcess::LOG_FAIL);
+        proc.log("FAILED Phase "_L1 + QString::number(phase) + " - "_L1 + msg, MProcess::LOG_FAIL);
 
         const bool closing = (abortion == AB_CLOSING);
         gui.labelSplash->setText(tr(msg));
@@ -470,10 +472,10 @@ void MInstall::loadConfig(int stage) noexcept
 
     if (stage == 1) {
         // Automatic or Manual partitioning
-        config.setSection("Storage", gui.pageDisk);
+        config.setSection(u"Storage"_s, gui.pageDisk);
         static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
         QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
-        config.manageRadios("Target", 2, diskChoices, diskRadios);
+        config.manageRadios(u"Target"_s, 2, diskChoices, diskRadios);
 
         // Storage and partition management
         autopart->manageConfig(config);
@@ -499,18 +501,18 @@ void MInstall::loadConfig(int stage) noexcept
 }
 void MInstall::saveConfig() noexcept
 {
-    configFile = pretend ? "./minstall.conf" : "/mnt/antiX/etc/minstall.conf";
-    QFile::rename(configFile, configFile+".bak");
+    configFile = pretend ? "./minstall.conf"_L1 : "/mnt/antiX/etc/minstall.conf"_L1;
+    QFile::rename(configFile, configFile+".bak"_L1);
     MSettings config(configFile, true);
 
-    config.setString("Version", CODEBASE_VERSION);
-    config.setString("Product", PROJECTNAME + " " + PROJECTVERSION);
+    config.setString(u"Version"_s, u"" CODEBASE_VERSION ""_s);
+    config.setString(u"Product"_s, PROJECTNAME + ' ' + PROJECTVERSION);
 
     // Automatic or Manual partitioning
-    config.setSection("Storage", gui.pageDisk);
+    config.setSection(u"Storage"_s, gui.pageDisk);
     static constexpr const char *diskChoices[] = {"Drive", "Partitions"};
     QRadioButton *const diskRadios[] = {gui.radioEntireDisk, gui.radioCustomPart};
-    config.manageRadios("Target", 2, diskChoices, diskRadios);
+    config.manageRadios(u"Target"_s, 2, diskChoices, diskRadios);
 
     // Storage and partition management
     if(gui.radioEntireDisk->isChecked()) {
@@ -528,7 +530,7 @@ void MInstall::saveConfig() noexcept
 
     config.dumpDebug();
     if (!pretend) {
-        config.closeAndCopyTo("/etc/minstalled.conf");
+        config.closeAndCopyTo(u"/etc/minstalled.conf"_s);
         chmod(configFile.toUtf8().constData(), 0600);
     }
 }
@@ -538,8 +540,8 @@ int MInstall::showPage(int curr, int next) noexcept
 {
     if (next == Step::SPLASH) { // Enter splash screen
         gui.boxMain->setCursor(Qt::WaitCursor);
-        appConf.setSection("GUI");
-        splashSetThrobber(appConf.getBoolean("SplashThrobber", true));
+        appConf.setSection(u"GUI"_s);
+        splashSetThrobber(appConf.getBoolean(u"SplashThrobber"_s, true));
         appConf.setSection();
     } else if (curr == Step::SPLASH) { // Leave splash screen
         gui.labelSplash->clear();
@@ -669,152 +671,152 @@ void MInstall::pageDisplayed(int next) noexcept
         if (phase > PH_READY) break;
         [[fallthrough]];
     case Step::TERMS:
-        gui.textHelp->setText("<p><b>" + tr("General Instructions") + "</b><br/>"
-            + (modeOOBE ? "" : (tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p><p>"))
+        gui.textHelp->setText("<p><b>"_L1 + tr("General Instructions") + "</b><br/>"_L1
+            + (modeOOBE ? QString() : (tr("BEFORE PROCEEDING, CLOSE ALL OTHER APPLICATIONS.") + "</p><p>"_L1))
             + tr("On each page, please read the instructions, make your selections, and then click on Next when you are ready to proceed."
-                " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"
-            + "<p><b>" + tr("Limitations") + "</b><br/>"
+                " You will be prompted for confirmation before any destructive actions are performed.") + "</p>"_L1
+            + "<p><b>"_L1 + tr("Limitations") + "</b><br/>"_L1
             + tr("Remember, this software is provided AS-IS with no warranty what-so-ever."
-                " It is solely your responsibility to backup your data before proceeding.") + "</p>");
+                " It is solely your responsibility to backup your data before proceeding.") + "</p>"_L1);
         break;
     case Step::DISK:
-        gui.textHelp->setText("<p><b>" + tr("Installation Options") + "</b><br/>"
-            + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"
-            "<p><b>" + tr("Using the root-home space slider") + "</b><br/>"
-            + tr("The drive can be divided into separate system (root) and user data (home) partitions using the slider.") + "</p>"
-            "<p>" + tr("The <b>root</b> partition will contain the operating system and applications.") + "<br/>"
-            + tr("The <b>home</b> partition will contain the data of all users, such as their settings, files, documents, pictures, music, videos, etc.") + "</p>"
-            "<p>" + tr("Move the slider to the right to increase the space for <b>root</b>. Move it to the left to increase the space for <b>home</b>.") + "<br/>"
-            + tr("Move the slider all the way to the right if you want both root and home on the same partition.") + "</p>"
-            "<p>" + tr("Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier."
-                " This can also improve overall performance by constraining the system files to a defined portion of the drive.") + "</p>"
-            "<p><b>" + tr("Encryption") + "</b><br/>"
-            + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
-            "<p>" + tr("A separate unencrypted boot partition is required.") + "</p>"
-            "<p>" + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>"
-            "<p><b>" + tr("Using a custom disk layout") + "</b><br/>"
+        gui.textHelp->setText("<p><b>"_L1 + tr("Installation Options") + "</b><br/>"_L1
+            + tr("If you are running Mac OS or Windows OS (from Vista onwards), you may have to use that system's software to set up partitions and boot manager before installing.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Using the root-home space slider") + "</b><br/>"_L1
+            + tr("The drive can be divided into separate system (root) and user data (home) partitions using the slider.") + "</p>"_L1
+            "<p>"_L1 + tr("The <b>root</b> partition will contain the operating system and applications.") + "<br/>"_L1
+            + tr("The <b>home</b> partition will contain the data of all users, such as their settings, files, documents, pictures, music, videos, etc.") + "</p>"_L1
+            "<p>"_L1 + tr("Move the slider to the right to increase the space for <b>root</b>. Move it to the left to increase the space for <b>home</b>.") + "<br/>"_L1
+            + tr("Move the slider all the way to the right if you want both root and home on the same partition.") + "</p>"_L1
+            "<p>"_L1 + tr("Keeping the home directory in a separate partition improves the reliability of operating system upgrades. It also makes backing up and recovery easier."
+                " This can also improve overall performance by constraining the system files to a defined portion of the drive.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Encryption") + "</b><br/>"_L1
+            + tr("Encryption is possible via LUKS. A password is required.") + "</p>"_L1
+            "<p>"_L1 + tr("A separate unencrypted boot partition is required.") + "</p>"_L1
+            "<p>"_L1 + tr("When encryption is used with autoinstall, the separate boot partition will be automatically created.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Using a custom disk layout") + "</b><br/>"_L1
             + tr("If you need more control over where %1 is installed to, select \"<b>%2</b>\" and click <b>Next</b>."
                 " On the next page, you will then be able to select and configure the storage devices and"
-                " partitions you need.").arg(PROJECTNAME, gui.radioCustomPart->text().remove('&')) + "</p>");
+                " partitions you need.").arg(PROJECTNAME, gui.radioCustomPart->text().remove('&')) + "</p>"_L1);
         break;
 
     case Step::PARTITIONS:
-        gui.textHelp->setText("<p><b>" + tr("Choose Partitions") + "</b><br/>"
-            + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"
-            "<p>" + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"
-            "<p>" + tr("<i>Size</i> - The size of the partition. This can only be changed on a new layout.") + "</p>"
-            "<p>" + tr("<i>Use For</i> - To use this partition in an installation, you must select something here.")
-            + "<table border='1'>"
-            "<tr><td>FORMAT</td><td>" + tr("Format without mounting") + "</td></tr>"
-            "<tr><td>BIOS-GRUB</td><td>" + tr("BIOS Boot GPT partition for GRUB") + "</td></tr>"
-            "<tr><td>ESP</td><td rowspan='2'>" + tr("EFI System Partition") + "</td></tr>"
-            "<tr><td>/boot/efi</td></tr>"
-            "<tr><td>/boot</td><td>" + tr("Boot manager") + "</td></tr>"
-            "<tr><td>/</td><td>" + tr("System root") + "</td></tr>"
-            "<tr><td>/home</td><td>" + tr("User data") + "</td></tr>"
-            "<tr><td>/usr</td><td>" + tr("Static data") + "</td></tr>"
-            "<tr><td>/var</td><td>" + tr("Variable data") + "</td></tr>"
-            "<tr><td>/tmp</td><td>" + tr("Temporary files") + "</td></tr>"
-            "<tr><td>/swap</td><td>" + tr("Swap files") + "</td></tr>"
-            "<tr><td>SWAP</td><td>" + tr("Swap partition") + "</td></tr>"
-            "</table>"
-            + tr("In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (\"/\").") + "</p>"
-            "<p>" + tr("<i>Label</i> - The label that is assigned to the partition once it has been formatted.") + "</p>"
-            "<p>" + tr("<i>Encrypt</i> - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.") + "</p>"
-            "<p>" + tr("<i>Format</i> - This is the partition's format. Available formats depend on what the partition is used for."
-                " When working with an existing layout, you may be able to preserve the format of the partition by selecting <b>Preserve</b>.") + "<br/>"
+        gui.textHelp->setText("<p><b>"_L1 + tr("Choose Partitions") + "</b><br/>"_L1
+            + tr("The partition list allows you to choose what partitions are used for this installation.") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Device</i> - This is the block device name that is, or will be, assigned to the created partition.") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Size</i> - The size of the partition. This can only be changed on a new layout.") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Use For</i> - To use this partition in an installation, you must select something here.")
+            + "<table border='1'>"_L1
+            "<tr><td>FORMAT</td><td>"_L1 + tr("Format without mounting") + "</td></tr>"_L1
+            "<tr><td>BIOS-GRUB</td><td>"_L1 + tr("BIOS Boot GPT partition for GRUB") + "</td></tr>"_L1
+            "<tr><td>ESP</td><td rowspan='2'>"_L1 + tr("EFI System Partition") + "</td></tr>"_L1
+            "<tr><td>/boot/efi</td></tr>"_L1
+            "<tr><td>/boot</td><td>"_L1 + tr("Boot manager") + "</td></tr>"_L1
+            "<tr><td>/</td><td>"_L1 + tr("System root") + "</td></tr>"_L1
+            "<tr><td>/home</td><td>"_L1 + tr("User data") + "</td></tr>"_L1
+            "<tr><td>/usr</td><td>"_L1 + tr("Static data") + "</td></tr>"_L1
+            "<tr><td>/var</td><td>"_L1 + tr("Variable data") + "</td></tr>"_L1
+            "<tr><td>/tmp</td><td>"_L1 + tr("Temporary files") + "</td></tr>"_L1
+            "<tr><td>/swap</td><td>"_L1 + tr("Swap files") + "</td></tr>"_L1
+            "<tr><td>SWAP</td><td>"_L1 + tr("Swap partition") + "</td></tr>"_L1
+            "</table>"_L1
+            + tr("In addition to the above, you can also type your own mount point. Custom mount points must start with a slash (\"/\").") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Label</i> - The label that is assigned to the partition once it has been formatted.") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Encrypt</i> - Use LUKS encryption for this partition. The password applies to all partitions selected for encryption.") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Format</i> - This is the partition's format. Available formats depend on what the partition is used for."
+                " When working with an existing layout, you may be able to preserve the format of the partition by selecting <b>Preserve</b>.") + "<br/>"_L1
             + tr("Selecting <b>Preserve /home</b> for the root partition preserves the contents of the /home directory, deleting everything else."
-                " This option can only be used when /home is on the same partition as the root partition.") + "</p>"
-            "<p>" + tr("The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.") + "</p>"
-            "<p>" + tr("<i>Check</i> - Check and correct for bad blocks on the drive (not supported for all formats)."
-                " This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"
-            "<p>" + tr("<i>Mount Options</i> - This specifies mounting options that will be used for this partition.") + "</p>"
-            "<p>" + tr("<i>Dump</i> - Instructs the dump utility to include this partition in the backup.") + "</p>"
-            "<p>" + tr("<i>Pass</i> - The sequence in which this file system is to be checked at boot. If zero, the file system is not checked.") + "</p>"
-            "<p><b>" + tr("Menus and actions") + "</b><br/>"
-            + tr("A variety of actions are available by right-clicking any drive or partition item in the list.") + "<br/>"
-            + tr("The buttons to the right of the list can also be used to manipulate the entries.") + "</p>"
-            "<p>" + tr("The installer cannot modify the layout already on the drive."
+                " This option can only be used when /home is on the same partition as the root partition.") + "</p>"_L1
+            "<p>"_L1 + tr("The ext2, ext3, ext4, jfs, xfs and btrfs Linux filesystems are supported and ext4 is recommended.") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Check</i> - Check and correct for bad blocks on the drive (not supported for all formats)."
+                " This is very time consuming, so you may want to skip this step unless you suspect that your drive has bad blocks.") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Mount Options</i> - This specifies mounting options that will be used for this partition.") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Dump</i> - Instructs the dump utility to include this partition in the backup.") + "</p>"_L1
+            "<p>"_L1 + tr("<i>Pass</i> - The sequence in which this file system is to be checked at boot. If zero, the file system is not checked.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Menus and actions") + "</b><br/>"_L1
+            + tr("A variety of actions are available by right-clicking any drive or partition item in the list.") + "<br/>"_L1
+            + tr("The buttons to the right of the list can also be used to manipulate the entries.") + "</p>"_L1
+            "<p>"_L1 + tr("The installer cannot modify the layout already on the drive."
                 " To create a custom layout, mark the drive for a new layout with the <b>New layout</b> menu action"
-                " or button (%1). This clears the existing layout.").arg("<img src=':/edit-clear-all'/>") + "</p>"
-            "<p><b>" + tr("Basic layout requirements") + "</b><br/>"
+                " or button (%1). This clears the existing layout.").arg(u"<img src=':/edit-clear-all'/>"_s) + "</p>"_L1
+            "<p><b>"_L1 + tr("Basic layout requirements") + "</b><br/>"_L1
             + tr("%1 requires a root partition. The swap partition is optional but highly recommended."
-                " If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.").arg(PROJECTNAME) + "</p>"
-            "<p>" + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future,"
-                " but this will not be possible if you are upgrading from an installation that does not have a separate home partition.") + "</p>"
-            "<p><b>" + tr("Active partition") + "</b><br/>"
-            + tr("For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.") + "</p>"
-            "<p>" + tr("The active partition of a drive can be chosen using the <b>Active partition</b> menu action.") + "<br/>"
-            + tr("A partition with an asterisk (*) next to its device name is, or will become, the active partition.") + "</p>"
-            "<p><b>" + tr("EFI System Partition") + "</b><br/>"
-            + tr("If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.") + "<br/>"
-            + tr("These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.") + "<br/>"
-            + tr("Most systems built within the last 10 years use EFI.") + "</p>"
-            "<p><b>" + tr("Boot partition") + "</b><br/>"
-            + tr("This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.") + "<br/>"
-            + tr("It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.") + "</p>"
-            "<p><b>" + tr("BIOS-GRUB partition") + "</b><br/>"
-            + tr("When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.") + "</p>"
-            "<p><b>" + tr("Need help creating a layout?") + "</b><br/>"
-            + tr("Just right-click on a drive and select <b>Layout Builder</b> from the menu. This can create a layout similar to that of the regular install.") + "</p>"
-            "<p><b>" + tr("Upgrading") + "</b><br/>"
-            + tr("To upgrade from an existing Linux installation, select the same home partition as before and select <b>Preserve</b> as the format.") + "</p>"
-            "<p>" + tr("If you do not use a separate home partition, select <b>Preserve /home</b> on the root file system entry to preserve the existing /home directory located on your root partition."
-                " The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.") + "</p>"
-            "<p><b>" + tr("Preferred Filesystem Type") + "</b><br/>"
-            + tr("For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.").arg(PROJECTNAME) + "</p>"
-            "<p>" + tr("Additional compression options are available for drives using btrfs."
-                " Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.") + "</p>"
-            "<p><b>" + tr("System partition management tool") + "</b><br/>"
+                " If you want to use the Suspend-to-Disk feature of %1, you will need a swap partition that is larger than your physical memory size.").arg(PROJECTNAME) + "</p>"_L1
+            "<p>"_L1 + tr("If you choose a separate /home partition it will be easier for you to upgrade in the future,"
+                " but this will not be possible if you are upgrading from an installation that does not have a separate home partition.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Active partition") + "</b><br/>"_L1
+            + tr("For the installed operating system to boot, the appropriate partition (usually the boot or root partition) must be the marked as active.") + "</p>"_L1
+            "<p>"_L1 + tr("The active partition of a drive can be chosen using the <b>Active partition</b> menu action.") + "<br/>"_L1
+            + tr("A partition with an asterisk (*) next to its device name is, or will become, the active partition.") + "</p>"_L1
+            "<p><b>"_L1 + tr("EFI System Partition") + "</b><br/>"_L1
+            + tr("If your system uses the Extensible Firmware Interface (EFI), a partition known as the EFI System Partition (ESP) is required for the system to boot.") + "<br/>"_L1
+            + tr("These systems do not require any partition marked as Active, but instead require a partition formatted with a FAT file system, marked as an ESP.") + "<br/>"_L1
+            + tr("Most systems built within the last 10 years use EFI.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Boot partition") + "</b><br/>"_L1
+            + tr("This partition is generally only required for root partitions on virtual devices such as encrypted, LVM or software RAID volumes.") + "<br/>"_L1
+            + tr("It contains a basic kernel and drivers used to access the encrypted disk or virtual devices.") + "</p>"_L1
+            "<p><b>"_L1 + tr("BIOS-GRUB partition") + "</b><br/>"_L1
+            + tr("When using a GPT-formatted drive on a non-EFI system, a 1MB BIOS boot partition is required when using GRUB.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Need help creating a layout?") + "</b><br/>"_L1
+            + tr("Just right-click on a drive and select <b>Layout Builder</b> from the menu. This can create a layout similar to that of the regular install.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Upgrading") + "</b><br/>"_L1
+            + tr("To upgrade from an existing Linux installation, select the same home partition as before and select <b>Preserve</b> as the format.") + "</p>"_L1
+            "<p>"_L1 + tr("If you do not use a separate home partition, select <b>Preserve /home</b> on the root file system entry to preserve the existing /home directory located on your root partition."
+                " The installer will only preserve /home, and will delete everything else. As a result, the installation will take much longer than usual.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Preferred Filesystem Type") + "</b><br/>"_L1
+            + tr("For %1, you may choose to format the partitions as ext2, ext3, ext4, f2fs, jfs, xfs or btrfs.").arg(PROJECTNAME) + "</p>"_L1
+            "<p>"_L1 + tr("Additional compression options are available for drives using btrfs."
+                " Lzo is fast, but the compression is lower. Zlib is slower, with higher compression.") + "</p>"_L1
+            "<p><b>"_L1 + tr("System partition management tool") + "</b><br/>"_L1
             + tr("For more control over the drive layouts (such as modifying the existing layout on a disk), click the"
                 " partition management button (%1). This will run the operating system's partition management tool,"
-                " which will allow you to create the exact layout you need.").arg("<img src=':/partitionmanager'/>") + "</p>"
-            "<p><b>" + tr("Encryption") + "</b><br/>"
-            + tr("Encryption is possible via LUKS. A password is required.") + "</p>"
-            "<p>" + tr("A separate unencrypted boot partition is required.") + "</p>"
-            "<p>" + tr("To preserve an encrypted partition, right-click on it and select <b>Unlock</b>. In the dialog that appears, enter a name for the virtual device and the password."
-                " When the device is unlocked, the name you chose will appear under <i>Virtual Devices</i>, with similar options to that of a regular partition.") + "</p><p>"
-            + tr("For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the <b>Add to crypttab</b> menu action to do this.") + "</p>"
-            "<p><b>" + tr("Other partitions") + "</b><br/>"
-            + tr("The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.") + "</p>"
-            "<p><b>" + tr("Subvolumes") + "</b><br/>"
+                " which will allow you to create the exact layout you need.").arg(u"<img src=':/partitionmanager'/>"_s) + "</p>"_L1
+            "<p><b>"_L1 + tr("Encryption") + "</b><br/>"_L1
+            + tr("Encryption is possible via LUKS. A password is required.") + "</p>"_L1
+            "<p>"_L1 + tr("A separate unencrypted boot partition is required.") + "</p>"_L1
+            "<p>"_L1 + tr("To preserve an encrypted partition, right-click on it and select <b>Unlock</b>. In the dialog that appears, enter a name for the virtual device and the password."
+                " When the device is unlocked, the name you chose will appear under <i>Virtual Devices</i>, with similar options to that of a regular partition.") + "</p><p>"_L1
+            + tr("For the encrypted partition to be unlocked at boot, it needs to be added to the crypttab file. Use the <b>Add to crypttab</b> menu action to do this.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Other partitions") + "</b><br/>"_L1
+            + tr("The installer allows other partitions to be created or used for other purposes, however be mindful that older systems cannot handle drives with more than 4 partitions.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Subvolumes") + "</b><br/>"_L1
             + tr("Some file systems, such as Btrfs, support multiple subvolumes in a single partition."
-                " These are not physical subdivisions, and so their order does not matter.") + "<br/>"
+                " These are not physical subdivisions, and so their order does not matter.") + "<br/>"_L1
             + tr("Use the <b>Scan subvolumes</b> menu action to search an existing Btrfs partition for subvolumes."
-                " To create a new subvolume, use the <b>New subvolume</b> menu action.") + "</p><p>"
-            + tr("Existing subvolumes can be preserved, however the name must remain the same.") + "</p>"
-            "<p><b>" + tr("Virtual Devices") + "</b><br/>"
-            + tr("If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"
-            "<p>" + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>");
+                " To create a new subvolume, use the <b>New subvolume</b> menu action.") + "</p><p>"_L1
+            + tr("Existing subvolumes can be preserved, however the name must remain the same.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Virtual Devices") + "</b><br/>"_L1
+            + tr("If the installer detects any virtual devices such as opened LUKS partitions, LVM logical volumes or software-based RAID volumes, they may be used for the installation.") + "</p>"_L1
+            "<p>"_L1 + tr("The use of virtual devices (beyond preserving encrypted file systems) is an advanced feature. You may have to edit some files (eg. initramfs, crypttab, fstab) to ensure the virtual devices used are created upon boot.") + "</p>"_L1);
         break;
 
     case Step::ENCRYPTION: // Disk encryption.
-        gui.textHelp->setText("<p><b>" + tr("Encryption") + "</b><br/>"
-            + ("You have chosen to encrypt at least one volume, and more information is required before continuing.") + "</p>");
+        gui.textHelp->setText("<p><b>"_L1 + tr("Encryption") + "</b><br/>"_L1
+            + tr("You have chosen to encrypt at least one volume, and more information is required before continuing.") + "</p>"_L1);
         enableNext = crypto->valid();
         break;
 
     case Step::CONFIRM: // Confirmation and review.
-        gui.textHelp->setText("<p><b>" + tr("Final Review and Confirmation") + "</b><br/>"
-            + tr("Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.") + "</p>");
+        gui.textHelp->setText("<p><b>"_L1 + tr("Final Review and Confirmation") + "</b><br/>"_L1
+            + tr("Please review this list carefully. This is the last opportunity to check, review and confirm the actions of the installation process before proceeding.") + "</p>"_L1);
         if (!automatic) {
             core.sleep(500, true); // Prevent accidentally skipping the confirmation.
         }
         break;
 
     case Step::BOOT: // Start of installation.
-        gui.textHelp->setText("<p><b>" + tr("Install GRUB for Linux and Windows") + "</b><br/>"
-            + tr("%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.").arg(PROJECTNAME) + "</p>"
-            "<p>" + tr("By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.") + "</p>"
-            "<p>" + tr("If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.") + "</p>"
-            "<p>" + tr("If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.") + "</p>");
+        gui.textHelp->setText("<p><b>"_L1 + tr("Install GRUB for Linux and Windows") + "</b><br/>"_L1
+            + tr("%1 uses the GRUB bootloader to boot %1 and Microsoft Windows.").arg(PROJECTNAME) + "</p>"_L1
+            "<p>"_L1 + tr("By default GRUB is installed in the Master Boot Record (MBR) or ESP (EFI System Partition for 64-bit UEFI boot systems) of your boot drive and replaces the boot loader you were using before. This is normal.") + "</p>"_L1
+            "<p>"_L1 + tr("If you choose to install GRUB to Partition Boot Record (PBR) instead, then GRUB will be installed at the beginning of the specified partition. This option is for experts only.") + "</p>"_L1
+            "<p>"_L1 + tr("If you uncheck the Install GRUB box, GRUB will not be installed at this time. This option is for experts only.") + "</p>"_L1);
         enableBack = false;
         break;
 
     case Step::SWAP:
-        gui.textHelp->setText("<p><b>" + tr("Create a swap file") + "</b><br/>"
-            + tr("A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.") + "</p>"
-            "<p>" + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "</p>");
+        gui.textHelp->setText("<p><b>"_L1 + tr("Create a swap file") + "</b><br/>"_L1
+            + tr("A swap file is more flexible than a swap partition; it is considerably easier to resize a swap file to adapt to changes in system usage.") + "</p>"_L1
+            "<p>"_L1 + tr("By default, this is checked if no swap partitions have been set, and unchecked if swap partitions are set. This option should be left untouched, and is for experts only.") + "</p>"_L1);
         enableBack = advanced;
         break;
 
@@ -831,57 +833,57 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::LOCALIZATION:
-        gui.textHelp->setText("<p><b>" + tr("Localization Defaults") + "</b><br/>"
-            + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"
-            "<p><b>" + tr("Configure Clock") + "</b><br/>"
+        gui.textHelp->setText("<p><b>"_L1 + tr("Localization Defaults") + "</b><br/>"_L1
+            + tr("Set the default locale. This will apply unless they are overridden later by the user.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Configure Clock") + "</b><br/>"_L1
             + tr("If you have an Apple or a pure Unix computer, by default the system clock is set to Greenwich Meridian Time (GMT) or Coordinated Universal Time (UTC)."
-                " To change this, check the \"<b>System clock uses local time</b>\" box.") + "</p>"
-            "<p>" + tr("The system boots with the timezone preset to GMT/UTC."
-                " To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.") + "</p>"
-            "<p><b>" + tr("Service Settings") + "</b><br/>"
+                " To change this, check the \"<b>System clock uses local time</b>\" box.") + "</p>"_L1
+            "<p>"_L1 + tr("The system boots with the timezone preset to GMT/UTC."
+                " To change the timezone, after you reboot into the new installation, right click on the clock in the Panel and select Properties.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Service Settings") + "</b><br/>"_L1
             + tr("Most users should not change the defaults."
                 " Users with low-resource computers sometimes want to disable unneeded services in order to keep the RAM usage as low as possible."
                 " Make sure you know what you are doing!"));
         break;
 
     case Step::USER_ACCOUNTS:
-        gui.textHelp->setText("<p><b>" + tr("Default User Login") + "</b><br/>"
+        gui.textHelp->setText("<p><b>"_L1 + tr("Default User Login") + "</b><br/>"_L1
         + tr("Please enter the name for a new (default) user account that you will use on a daily basis."
-            " If needed, you can add other user accounts later with %1 User Manager.").arg(PROJECTNAME) + "</p>"
-        "<p><b>" + tr("Root (administrator) account") + "</b><br/>"
+            " If needed, you can add other user accounts later with %1 User Manager.").arg(PROJECTNAME) + "</p>"_L1
+        "<p><b>"_L1 + tr("Root (administrator) account") + "</b><br/>"_L1
         + tr("The root user is similar to the Administrator user in some other operating systems."
-            " You should not use the root user as your daily user account.") + "<br/>"
+            " You should not use the root user as your daily user account.") + "<br/>"_L1
         + tr("The root account is disabled on MX Linux, as administrative tasks are performed with an elevation prompt for the default user.") + "<br/>"
-        "<i>" + tr("Enabling the root account is strongly recommended for antiX Linux.") + "</i></p>"
-        "<p><b>" + tr("Passwords") + "</b><br/>"
+        "<i>"_L1 + tr("Enabling the root account is strongly recommended for antiX Linux.") + "</i></p>"_L1
+        "<p><b>"_L1 + tr("Passwords") + "</b><br/>"_L1
         + tr("Enter a new password for your default user account and for the root account."
-            " Each password must be entered twice.") + "</p>"
-        "<p><b>" + tr("No passwords") + "</b><br/>"
+            " Each password must be entered twice.") + "</p>"_L1
+        "<p><b>"_L1 + tr("No passwords") + "</b><br/>"_L1
         + tr("If you want the default user account to have no password, leave its password fields empty."
-            " This allows you to log in without requiring a password.") + "<br/>"
+            " This allows you to log in without requiring a password.") + "<br/>"_L1
         + tr("Obviously, this should only be done in situations where the user account"
-            " does not need to be secure, such as a public terminal.") + "</p>");
+            " does not need to be secure, such as a public terminal.") + "</p>"_L1);
         if (!nextFocus) nextFocus = gui.textUserName;
         oobe->userPassValidationChanged();
         enableNext = gui.pushNext->isEnabled();
         break;
 
     case Step::OLD_HOME:
-        gui.textHelp->setText("<p><b>" + tr("Old Home Directory") + "</b><br/>"
+        gui.textHelp->setText("<p><b>"_L1 + tr("Old Home Directory") + "</b><br/>"_L1
             + tr("A home directory already exists for the user name you have chosen."
-                " This screen allows you to choose what happens to this directory.") + "</p>"
-            "<p><b>" + tr("Re-use it for this installation") + "</b><br/>"
+                " This screen allows you to choose what happens to this directory.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Re-use it for this installation") + "</b><br/>"_L1
             + tr("The old home directory will be used for this user account."
-                " This is a good choice when upgrading, and your files and settings will be readily available.") + "</p>"
-            "<p><b>" + tr("Rename it and create a new directory") + "</b><br/>"
+                " This is a good choice when upgrading, and your files and settings will be readily available.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Rename it and create a new directory") + "</b><br/>"_L1
             + tr("A new home directory will be created for the user, but the old home directory will be renamed."
-                " Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.") + "</p>"
-            "<p>" + tr("The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.") + "</p>"
-            "<p><b>" + tr("Delete it and create a new directory") + +"</b><br/>"
-            + tr("The old home directory will be deleted, and a new one will be created from scratch.") + "<br/>"
-            "<b>" + tr("Warning") + "</b>: "
+                " Your files and settings will not be immediately visible in the new installation, but can be accessed using the renamed directory.") + "</p>"_L1
+            "<p>"_L1 + tr("The old directory will have a number at the end of it, depending on how many times the directory has been renamed before.") + "</p>"_L1
+            "<p><b>"_L1 + tr("Delete it and create a new directory") + "</b><br/>"_L1
+            + tr("The old home directory will be deleted, and a new one will be created from scratch.") + "<br/>"_L1
+            "<b>"_L1 + tr("Warning") + "</b>: "_L1
             + tr("All files and settings will be deleted permanently if this option is selected."
-                " Your chances of recovering them are low.") + "</p>");
+                " Your chances of recovering them are low.") + "</p>"_L1);
         // disable the Next button if none of the old home options are selected
         oobe->oldHomeToggled();
         // if the Next button is disabled, avoid enabling both Back and Next at the end
@@ -892,16 +894,16 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::PROGRESS:
-        gui.textHelp->setText("<p><b>" + tr("Installation in Progress") + "</b><br/>"
+        gui.textHelp->setText("<p><b>"_L1 + tr("Installation in Progress") + "</b><br/>"_L1
             + tr("%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
-            + "</p><p>"
+            + "</p><p>"_L1
             + tr("If you click the Abort button, the installation will be stopped as soon as possible.")
-            + "</p><p>"
-            + "<b>" + tr("Change settings while you wait") + "</b><br/>"
+            + "</p><p>"_L1
+            + "<b>"_L1 + tr("Change settings while you wait") + "</b><br/>"_L1
             + tr("While %1 is being installed, you can click on the <b>Next</b> or <b>Back</b> buttons to enter other information required for the installation.").arg(PROJECTNAME)
-            + "</p><p>"
+            + "</p><p>"_L1
             + tr("Complete these steps at your own pace. The installer will wait for your input if necessary.")
-            + "</p>");
+            + "</p>"_L1);
         enableNext = false;
         break;
 
@@ -913,7 +915,7 @@ void MInstall::pageDisplayed(int next) noexcept
                              "Many of the apps were developed specifically for the %1 project. "
                              "These are shown in the main menus. "
                              "<p>In addition %1 includes many standard Linux applications that are run only from the command line and therefore do not show up in the Menu.</p>").arg(PROJECTNAME)
-                             + "<p><b>" + tr("Enjoy using %1").arg(PROJECTNAME) + "</b></p>");
+                             + "<p><b>"_L1 + tr("Enjoy using %1").arg(PROJECTNAME) + "</b></p>"_L1);
         break;
     }
 
@@ -955,7 +957,7 @@ void MInstall::gotoPage(int next) noexcept
         // finished
         qApp->setOverrideCursor(Qt::WaitCursor);
         if (!pretend && gui.checkExitReboot->isChecked()) {
-            proc.shell("/usr/local/bin/persist-config --shutdown --command reboot &");
+            proc.shell(u"/usr/local/bin/persist-config --shutdown --command reboot &"_s);
         }
         qApp->exit(EXIT_SUCCESS);
         return;
@@ -1055,7 +1057,7 @@ void MInstall::closeEvent(QCloseEvent *event) noexcept
         gui.labelSplash->clear();
         gotoPage(Step::SPLASH);
         proc.unhalt();
-        proc.exec("/usr/sbin/shutdown", {"-hP", "now"});
+        proc.exec(u"/usr/sbin/shutdown"_s, {u"-hP"_s, u"now"_s});
     } else {
         // Fully aborted installation (but not OOBE).
         event->accept();
@@ -1083,7 +1085,7 @@ void MInstall::abortUI(bool manual, bool closing) noexcept
             msgbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
             msgbox.setDefaultButton(QMessageBox::No);
             if (msgbox.exec() == QMessageBox::No) return;
-            proc.log("MANUALLY ABORTED", MProcess::LOG_FAIL);
+            proc.log(u"MANUALLY ABORTED"_s, MProcess::LOG_FAIL);
         }
     }
     // At this point the abortion has not been cancelled.
@@ -1115,11 +1117,11 @@ void MInstall::cleanup()
 
     const char *destlog = "/mnt/antiX/var/log/minstall.log";
     QFile::remove(destlog);
-    bool ok = QFile::copy("/var/log/minstall.log", destlog);
+    bool ok = QFile::copy(u"/var/log/minstall.log"_s, destlog);
     if (ok) ok = (chmod(destlog, 0400) == 0);
-    if (!ok) proc.log("Failed to copy the installation log to the target.", MProcess::LOG_FAIL);
+    if (!ok) proc.log(u"Failed to copy the installation log to the target."_s, MProcess::LOG_FAIL);
 
-    proc.exec("rm", {"-rf", "/mnt/antiX/mnt/antiX"});
+    proc.exec(u"rm"_s, {u"-rf"_s, u"/mnt/antiX/mnt/antiX"_s});
     if (!mountkeep) partman->clearWorkArea();
     setupAutoMount(true);
 }
@@ -1189,19 +1191,19 @@ void MInstall::progressUpdate(int value) noexcept
 
 void MInstall::setupkeyboardbutton() noexcept
 {
-    const MIni ini("/etc/default/keyboard", MIni::ReadOnly);
-    gui.labelKeyboardModel->setText(ini.getString("XKBMODEL"));
-    gui.labelKeyboardLayout->setText(ini.getString("XKBLAYOUT"));
-    gui.labelKeyboardVariant->setText(ini.getString("XKBVARIANT"));
+    const MIni ini(u"/etc/default/keyboard"_s, MIni::ReadOnly);
+    gui.labelKeyboardModel->setText(ini.getString(u"XKBMODEL"_s));
+    gui.labelKeyboardLayout->setText(ini.getString(u"XKBLAYOUT"_s));
+    gui.labelKeyboardVariant->setText(ini.getString(u"XKBVARIANT"_s));
 }
 
 void MInstall::runKeyboardSetup() noexcept
 {
     this->setEnabled(false);
-    if (proc.shell("command -v  system-keyboard-qt >/dev/null 2>&1")) {
-        proc.exec("system-keyboard-qt");
+    if (proc.shell(u"command -v  system-keyboard-qt >/dev/null 2>&1"_s)) {
+        proc.exec(u"system-keyboard-qt"_s);
     } else {
-        proc.shell("env GTK_THEME='Adwaita' fskbsetting");
+        proc.shell(u"env GTK_THEME='Adwaita' fskbsetting"_s);
     }
     setupkeyboardbutton();
     this->setEnabled(true);
