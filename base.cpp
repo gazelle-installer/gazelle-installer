@@ -184,6 +184,7 @@ void Base::install()
             findargs << u"!"_s << u"-path"_s << u"/mnt/antiX/home"_s;
         }
         findargs << u"-delete"_s;
+        sect.setExceptionStrict(false);
         proc.exec(u"find"_s, findargs);
     }
 
