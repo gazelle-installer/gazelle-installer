@@ -315,7 +315,7 @@ void BootMan::install(const QStringList &cmdextra)
     //}
 
     if (gui.checkBootHostSpecific->isChecked()) {
-        const QString &ircfname = sect.root() + u"/etc/initramfs-tools/initramfs.conf"_s;
+        const QString ircfname = sect.root() + "/etc/initramfs-tools/initramfs.conf"_L1;
         QFile::copy(ircfname, ircfname+".bak"_L1);
         MIni ircfg(ircfname, MIni::ReadWrite);
         ircfg.setString(u"MODULES"_s, u"dep"_s);

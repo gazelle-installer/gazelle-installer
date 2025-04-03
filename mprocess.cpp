@@ -287,7 +287,7 @@ MProcess::Section::~Section() noexcept
 {
     const char *oldroot = oldsection ? oldsection->rootdir : nullptr;
     if (qstrcmp(oldroot, rootdir)) {
-        proc.log(u"Revert root: "_s + oldroot, LOG_LOG);
+        proc.log("Revert root: "_L1 + oldroot, LOG_LOG);
     }
     proc.section = oldsection;
     proc.syncRoot();
@@ -297,7 +297,7 @@ MProcess::Section::~Section() noexcept
 void MProcess::Section::setRoot(const char *newroot) noexcept
 {
     if (qstrcmp(newroot, rootdir)) {
-        proc.log(u"Change root: "_s + newroot, LOG_LOG);
+        proc.log("Change root: "_L1 + newroot, LOG_LOG);
     }
     rootdir = newroot; // Might be different pointers to the same text.
     proc.syncRoot();

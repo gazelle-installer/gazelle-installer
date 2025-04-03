@@ -70,7 +70,7 @@ Base::Base(MProcess &mproc, Core &mcore, PartMan &pman,
     if (pretend) sect.setExceptionMode(nullptr);
 
     // Boot space required.
-    proc.exec(u"du"_s, {"-scb", bootSource}, nullptr, true);
+    proc.exec(u"du"_s, {u"-scb"_s, bootSource}, nullptr, true);
     vspecBoot.image = proc.readOut(true).section('\n', -1).section('\t', 0, 0).toLongLong();
     vspecBoot.minimum = vspecBoot.image * 3; // Include 1 backup and 1 new initrd image.
     vspecBoot.preferred = vspecBoot.minimum;
@@ -134,8 +134,8 @@ bool Base::saveHomeBasic() noexcept
     const QString &homedev = mount->mappedDevice();
 
     // Just in case the device or mount point is in use elsewhere.
-    proc.exec(u"umount"_s, {"-q", homedev});
-    proc.exec(u"umount"_s, {"-q", "/mnt/antiX"});
+    proc.exec(u"umount"_s, {u"-q"_s, homedev});
+    proc.exec(u"umount"_s, {u"-q"_s, u"/mnt/antiX"_s});
 
     // Store a listing of /home to compare with the user name given later.
     mkdir("/mnt/antiX", 0755);
@@ -143,12 +143,12 @@ bool Base::saveHomeBasic() noexcept
     if (mount->type == PartMan::Device::SUBVOLUME) {
         opts += ",subvol="_L1 + mount->curLabel;
     }
-    bool ok = proc.exec(u"mount"_s, {"-o", opts, homedev, "/mnt/antiX"});
+    bool ok = proc.exec(u"mount"_s, {u"-o"_s, opts, homedev, u"/mnt/antiX"_s});
     if (ok) {
         QDir hd("/mnt/antiX"_L1 + homedir);
         ok = hd.exists() && hd.isReadable();
         homes = hd.entryList(QDir::Dirs);
-        proc.exec(u"umount"_s, {"-l", "/mnt/antiX"});
+        proc.exec(u"umount"_s, {u"-l"_s, u"/mnt/antiX"_s});
     }
     return ok;
 }
@@ -167,7 +167,7 @@ void Base::install()
         // if root was not formatted and not using --sync option then re-use it
         // remove all folders in root except for /home
         proc.status(tr("Deleting old system"));
-        QStringList findargs({"/mnt/antiX", "-mindepth", "1", "-xdev"});
+        QStringList findargs({u"/mnt/antiX"_s, u"-mindepth"_s, u"1"_s, u"-xdev"_s});
         // Preserve mount points of other file systems.
         bool homeSeparate = false;
         for (PartMan::Iterator it(partman); *it; it.next()) {
@@ -200,22 +200,22 @@ void Base::install()
     proc.shell(liveToInstalled + " /mnt/antiX"_L1);
     if (!partman.installTabs()) throw sect.failMessage();
     // Create a chroot environment.
-    proc.exec(u"mount"_s, {"--mkdir", "--rbind", "--make-rslave", "/dev", "/mnt/antiX/dev"});
-    proc.exec(u"mount"_s, {"--mkdir", "--rbind", "--make-rslave", "/sys", "/mnt/antiX/sys"});
-    proc.exec(u"mount"_s, {"--mkdir", "--rbind", "/proc", "/mnt/antiX/proc"});
-    proc.exec(u"mount"_s, {"--mkdir", "-t", "tmpfs", "-o", "size=100m,nodev,mode=755", "tmpfs", "/mnt/antiX/run"});
-    proc.exec(u"mount"_s, {"--mkdir", "--rbind", "/run/udev", "/mnt/antiX/run/udev"});
+    proc.exec(u"mount"_s, {u"--mkdir"_s, u"--rbind"_s, u"--make-rslave"_s, u"/dev"_s, u"/mnt/antiX/dev"_s});
+    proc.exec(u"mount"_s, {u"--mkdir"_s, u"--rbind"_s, u"--make-rslave"_s, u"/sys"_s, u"/mnt/antiX/sys"_s});
+    proc.exec(u"mount"_s, {u"--mkdir"_s, u"--rbind"_s, u"/proc"_s, u"/mnt/antiX/proc"_s});
+    proc.exec(u"mount"_s, {u"--mkdir"_s, u"-t"_s, u"tmpfs"_s, u"-o"_s, u"size=100m,nodev,mode=755"_s, u"tmpfs"_s, u"/mnt/antiX/run"_s});
+    proc.exec(u"mount"_s, {u"--mkdir"_s, u"--rbind"_s, u"/run/udev"_s, u"/mnt/antiX/run/udev"_s});
 
     sect.setExceptionMode(nullptr);
     proc.status();
 
     qDebug() << "Desktop menu";
-    proc.exec(u"chroot"_s, {"/mnt/antiX", "desktop-menu", "--write-out-global"});
+    proc.exec(u"chroot"_s, {u"/mnt/antiX"_s, u"desktop-menu"_s, u"--write-out-global"_s});
 
     // Disable hibernation inside initramfs.
     for (PartMan::Iterator it(partman); PartMan::Device *dev = *it; it.next()) {
         if (dev->mountPoint() == "swap"_L1 && dev->willEncrypt()) {
-            proc.exec(u"touch"_s, {"/mnt/antiX/initramfs-tools/conf.d/resume"});
+            proc.exec(u"touch"_s, {u"/mnt/antiX/initramfs-tools/conf.d/resume"_s});
             QFile file(u"/mnt/antiX/etc/initramfs-tools/conf.d/resume"_s);
             if (file.open(QIODevice::WriteOnly)) {
                 QTextStream out(&file);
@@ -228,13 +228,13 @@ void Base::install()
 
     //remove home unless a demo home is found in remastered linuxfs
     if (!QFileInfo(u"/live/linux/home/demo"_s).isDir())
-        proc.exec(u"rm"_s, {"-rf", "/mnt/antiX/home/demo"});
+        proc.exec(u"rm"_s, {u"-rf"_s, u"/mnt/antiX/home/demo"_s});
 
     // create a /etc/machine-id file and /var/lib/dbus/machine-id file
     sect.setRoot("/mnt/antiX");
-    proc.exec(u"rm"_s, {"/var/lib/dbus/machine-id", "/etc/machine-id"});
-    proc.exec(u"dbus-uuidgen"_s, {"--ensure=/etc/machine-id"});
-    proc.exec(u"dbus-uuidgen"_s, {"--ensure"});
+    proc.exec(u"rm"_s, {u"/var/lib/dbus/machine-id"_s, u"/etc/machine-id"_s});
+    proc.exec(u"dbus-uuidgen"_s, {u"--ensure=/etc/machine-id"_s});
+    proc.exec(u"dbus-uuidgen"_s, {u"--ensure"_s});
     sect.setRoot(nullptr);
 
     // Disable VirtualBox Guest Additions if not running in VirtualBox.

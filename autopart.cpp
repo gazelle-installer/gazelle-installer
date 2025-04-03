@@ -18,7 +18,6 @@
  ***************************************************************************/
 
 #include <QApplication>
-#include <QStringLiteral>
 #include <QToolTip>
 #include <QFormLayout>
 #include <QDialogButtonBox>
