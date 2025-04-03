@@ -16,6 +16,7 @@ DEFINES += CODEBASE_VERSION=\\\"$${VERSION}\\\"
 
 FORMS += meinstall.ui
 HEADERS += \
+    core.h \
     crypto.h \
     minstall.h \
     autopart.h \
@@ -33,6 +34,7 @@ HEADERS += \
     mprocess.h
 SOURCES += \
     app.cpp \
+    core.cpp \
     crypto.cpp \
     minstall.cpp \
     autopart.cpp \

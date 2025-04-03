@@ -32,7 +32,7 @@ class Crypto : public QObject
     PassEdit pass;
     bool cryptsupport;
 public:
-    Crypto(class MProcess &mproc, Ui::MeInstall &ui);
+    Crypto(class MProcess &mproc, Ui::MeInstall &ui, QObject *parent = nullptr);
     bool manageConfig(class MSettings &config) noexcept;
     bool valid() const noexcept;
     inline bool supported() const noexcept { return cryptsupport; }

@@ -28,6 +28,7 @@ class Base
 {
     Q_DECLARE_TR_FUNCTIONS(Base)
     class MProcess &proc;
+    class Core &core;
     class PartMan &partman;
     QString liveToInstalled;
     long long sourceInodes = 1;
@@ -42,7 +43,8 @@ public:
     QStringList rootSources;
     QStringList homes;
 
-    Base(class MProcess &mproc, class PartMan &pman, class MIni &appConf, const QCommandLineParser &appArgs);
+    Base(class MProcess &mproc, class Core &mcore, class PartMan &pman,
+        class MIni &appConf, const QCommandLineParser &appArgs);
     bool saveHomeBasic() noexcept;
     void install();
 };

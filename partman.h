@@ -88,8 +88,8 @@ public:
     std::map<QString, struct VolumeSpec> volSpecs;
     QString bootUUID;
     class AutoPart *autopart = nullptr;
-    PartMan(class MProcess &mproc, class Ui::MeInstall &ui, class Crypto &cman,
-        const class MIni &appConf, const QCommandLineParser &appArgs);
+    PartMan(class MProcess &mproc, class Core &mcore, class Ui::MeInstall &ui, class Crypto &cman,
+        const class MIni &appConf, const QCommandLineParser &appArgs, QObject *parent = nullptr);
     ~PartMan();
     void scan(Device *drvstart = nullptr);
     bool loadConfig(class MSettings &config) noexcept;
@@ -118,6 +118,7 @@ private:
     friend class Device;
     friend class Iterator;
     class MProcess &proc;
+    class Core &core;
     class Device *root = nullptr;
     class Device *changing = nullptr;
     Ui::MeInstall &gui;
@@ -143,8 +144,8 @@ private:
     void partMenuUnlock(class Device *part);
     void partMenuLock(class Device *volume);
     void scanSubvolumes(class Device *part);
-    bool confirmSpace(class QMessageBox &msgbox) const noexcept;
-    bool confirmBootable(class QMessageBox &msgbox) const noexcept;
+    bool confirmSpace() const noexcept;
+    bool confirmBootable() const noexcept;
 
     // Model View Controller
     class ItemDelegate;
@@ -267,13 +268,15 @@ public:
 class PartMan::ItemDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
+public:
+    ItemDelegate(QObject *parent = nullptr) noexcept : QStyledItemDelegate(parent) {}
+private:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &,
         const QModelIndex &index) const override;
     void setEditorData(QWidget *editor, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
-    void emitCommit() noexcept;
     void partOptionsMenu() noexcept;
 };
 

@@ -30,6 +30,8 @@
 #include "checkmd5.h"
 #include "msettings.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 CheckMD5::CheckMD5(MProcess &mproc, QLabel *splash) noexcept
     : proc(mproc), labelSplash(splash)
 {
@@ -39,16 +41,16 @@ void CheckMD5::check()
 {
     const QString osplash = labelSplash->text();
     const QString &nsplash = tr("Checking installation media.")
-        + "<br/><font size=2>%1% - " + tr("Press ESC to skip.") + "</font>";
+        + "<br/><font size=2>%1% - "_L1 + tr("Press ESC to skip.") + "</font>"_L1;
     labelSplash->setText(nsplash.arg(0));
 
     checking = true;
-    const MIni liveInfo("/live/config/initrd.out", MIni::ReadOnly);
-    const QString &sqtoram = liveInfo.getString("TORAM_MP", "/live/to-ram")
-        + '/' + liveInfo.getString("SQFILE_PATH", "antiX");
-    const QString &sqfile = liveInfo.getString("SQFILE_NAME", "linuxfs");
+    const MIni liveInfo(u"/live/config/initrd.out"_s, MIni::ReadOnly);
+    const QString &sqtoram = liveInfo.getString(u"TORAM_MP"_s, u"/live/to-ram"_s)
+        + '/' + liveInfo.getString(u"SQFILE_PATH"_s, u"antiX"_s);
+    const QString &sqfile = liveInfo.getString(u"SQFILE_NAME"_s, u"linuxfs"_s);
     const QString &path = QFile::exists(sqtoram+'/'+sqfile)
-        ? sqtoram : liveInfo.getString("SQFILE_DIR", "/live/boot-dev/antiX");
+        ? sqtoram : liveInfo.getString(u"SQFILE_DIR"_s, u"/live/boot-dev/antiX"_s);
 
     off_t btotal = 0;
     struct HashTarget {
@@ -60,10 +62,10 @@ void CheckMD5::check()
     std::vector<HashTarget> targets;
     static const char *failmsg = QT_TR_NOOP("The installation media is corrupt.");
     // Obtain a list of MD5 hashes and their files.
-    QDirIterator it(path, {"*.md5"}, QDir::Files);
+    QDirIterator it(path, {u"*.md5"_s}, QDir::Files);
     QStringList missing(sqfile);
-    if (!QFile::exists("/live/config/did-toram") || QFile::exists("/live/config/toram-all")) {
-        missing << "vmlinuz" << "initrd.gz";
+    if (!QFile::exists(u"/live/config/did-toram"_s) || QFile::exists(u"/live/config/toram-all"_s)) {
+        missing << u"vmlinuz"_s << u"initrd.gz"_s;
     }
     size_t bufsize = 0;
     while (it.hasNext()) {
@@ -99,7 +101,7 @@ void CheckMD5::check()
     std::unique_ptr<char[]> buf(new char[bufsize]);
     qint64 bprog = 0;
     for(const auto &target : targets) {
-        auto logEntry = proc.log("Check MD5: " + target.path, MProcess::LOG_EXEC);
+        auto logEntry = proc.log("Check MD5: "_L1 + target.path, MProcess::LOG_EXEC);
         const int fd = open(target.path.toUtf8().constData(), O_RDONLY);
         MProcess::Status status = MProcess::STATUS_OK;
         if (fd > 0) {
@@ -132,7 +134,9 @@ void CheckMD5::check()
     }
 
     labelSplash->setText(osplash);
-    if (!checking) proc.log("Check halted", MProcess::LOG_FAIL);
+    if (!checking) {
+        proc.log(u"Check halted"_s, MProcess::LOG_FAIL);
+    }
     checking = false;
 }
 
@@ -140,10 +144,13 @@ void CheckMD5::halt(bool silent) noexcept
 {
     if (!checking) return;
     if (!silent) {
-        QMessageBox::StandardButton rc = QMessageBox::warning(labelSplash, QString(),
-            tr("Are you sure you want to skip checking the installation media?"),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if(rc != QMessageBox::Yes) return;
+        QMessageBox msgbox(labelSplash);
+        msgbox.setIcon(QMessageBox::Warning);
+        msgbox.setText(tr("The installation media is still being checked."));
+        msgbox.setInformativeText(tr("Are you sure you want to skip checking the installation media?"));
+        msgbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgbox.setDefaultButton(QMessageBox::No);
+        if(msgbox.exec() != QMessageBox::Yes) return;
     }
     checking = false;
 }

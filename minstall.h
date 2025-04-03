@@ -17,6 +17,7 @@
  ****************************************************************************/
 #include "ui_meinstall.h"
 #include "mprocess.h"
+#include "core.h"
 
 class MInstall : public QDialog {
     Q_OBJECT
@@ -26,7 +27,7 @@ protected:
     void reject() noexcept;
 
 public:
-    MInstall(class MIni &acfg, const class QCommandLineParser &args, const QString &cfgfile) noexcept;
+    MInstall(class MIni &acfg, const class QCommandLineParser &args, const QString &cfgfile, QWidget *parent = nullptr) noexcept;
     ~MInstall();
 
     QString PROJECTFORUM;
@@ -42,6 +43,7 @@ public:
 private:
     Ui::MeInstall gui;
     MProcess proc;
+    Core core;
     class MIni &appConf;
     const class QCommandLineParser &appArgs;
     enum Phase {
