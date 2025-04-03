@@ -728,10 +728,10 @@ void MInstall::pageDisplayed(int next) noexcept
         break;
 
     case Step::REPLACE:
-        gui.textHelp->setText("<p><b>" + tr("Replace existing installation") + "</b><br/>"
-            + tr("If you have an existing installation, you can use this function to replace it with a fresh installation.") + "</p>"
-            "<p>" + tr("This is particularly useful if you are upgrading from a previous version and want to preserve your data.") + "<br/>"
-            + tr("There is no guarantee of this working successfully. Ensure you have a good working backup of all important data before continuing.") + "</p>");
+        gui.textHelp->setText("<p><b>"_L1 + tr("Replace existing installation") + "</b><br/>"_L1
+            + tr("If you have an existing installation, you can use this function to replace it with a fresh installation.") + "</p>"_L1
+            "<p>"_L1 + tr("This is particularly useful if you are upgrading from a previous version and want to preserve your data.") + "<br/>"_L1
+            + tr("There is no guarantee of this working successfully. Ensure you have a good working backup of all important data before continuing.") + "</p>"_L1);
 
         if(gui.tableExistInst->rowCount() <= 0) {
             replacer->scan(true);

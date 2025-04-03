@@ -23,11 +23,13 @@
 #include "msettings.h"
 #include "replacer.h"
 
+using namespace Qt::Literals::StringLiterals;
+
 Replacer::Replacer(class MProcess &mproc, class PartMan *pman, Ui::MeInstall &ui, class MIni &appConf)
     : proc(mproc), partman(pman), gui(ui)
 {
-    appConf.setSection("Storage");
-    installFromRootDevice = appConf.getBoolean("InstallFromRootDevice");
+    appConf.setSection(u"Storage"_s);
+    installFromRootDevice = appConf.getBoolean(u"InstallFromRootDevice"_s);
     appConf.setSection();
     connect(gui.pushReplaceScan, &QPushButton::clicked, this, [this](bool) noexcept {
         scan(true);
@@ -42,7 +44,7 @@ void Replacer::scan(bool full) noexcept
         gui.tableExistInst->removeRow(0);
     }
 
-    long long minSpace = partman->volSpecTotal("/", QStringList()).minimum;
+    long long minSpace = partman->volSpecTotal(u"/"_s, QStringList()).minimum;
     bases.clear();
     for (PartMan::Iterator it(*partman); PartMan::Device *device = *it; it.next()) {
         if (device->type == PartMan::Device::PARTITION && device->size >= minSpace
@@ -96,13 +98,13 @@ bool Replacer::preparePartMan() const noexcept
     for(const auto &mount : rbase.mounts) {
         for (PartMan::Iterator it(*partman); *it; it.next()) {
             PartMan::Device *dev = *it;
-            if ((mount.fsname.startsWith("UUID=") && dev->uuid == mount.fsname.mid(5))
-                || (mount.fsname.startsWith("LABEL=") && dev->curLabel == mount.fsname.mid(6))
+            if ((mount.fsname.startsWith("UUID="_L1) && dev->uuid == mount.fsname.mid(5))
+                || (mount.fsname.startsWith("LABEL="_L1) && dev->curLabel == mount.fsname.mid(6))
                 || (mount.fsname == dev->path)) {
                 partman->changeBegin(dev);
                 dev->usefor = mount.dir;
-                if (mount.dir == "/" && !rbase.homeSeparate) {
-                    dev->format = "PRESERVE";
+                if (mount.dir == "/"_L1 && !rbase.homeSeparate) {
+                    dev->format = "PRESERVE"_L1;
                 }
                 partman->changeEnd();
             }
@@ -119,23 +121,23 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
     QString mountpoint;
     bool premounted = false;
     devpath = device->path;
-    if (proc.exec("findmnt", {"-AfncoTARGET", "--source", devpath}, nullptr, true)) {
+    if (proc.exec(u"findmnt"_s, {u"-AfncoTARGET"_s, u"--source"_s, devpath}, nullptr, true)) {
         mountpoint = proc.readOut();
         premounted = !mountpoint.isEmpty();
     }
     if (!premounted) {
-        mountpoint = "/mnt/temp";
-        ok = proc.exec("mount", {"-o", "ro", devpath, "-m", mountpoint});
+        mountpoint = "/mnt/temp"_L1;
+        ok = proc.exec(u"mount"_s, {u"-o"_s, u"ro"_s, devpath, u"-m"_s, mountpoint});
         if (!ok) return;
     }
 
     // Extract the release from lsb-release.
-    MIni lsbrel(mountpoint + "/etc/lsb-release", MIni::OpenMode::ReadOnly);
-    release = lsbrel.getString("PRETTY_NAME");
+    MIni lsbrel(mountpoint + "/etc/lsb-release"_L1, MIni::OpenMode::ReadOnly);
+    release = lsbrel.getString(u"PRETTY_NAME"_s);
 
     if (!release.isEmpty()) {
         // Parse fstab
-        const QString &fstname(mountpoint + "/etc/fstab");
+        const QString &fstname(mountpoint + "/etc/fstab"_L1);
         FILE *fstab = setmntent(fstname.toUtf8().constData(), "r");
         if (fstab) {
             for (struct mntent *mntent = getmntent(fstab); mntent != nullptr; mntent = getmntent(fstab)) {
@@ -151,7 +153,7 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
 
     if (ok) {
         // Parse crypttab
-        QFile crypttab(mountpoint + "/etc/crypttab");
+        QFile crypttab(mountpoint + "/etc/crypttab"_L1);
         if (crypttab.open(QFile::ReadOnly | QFile::Text)) {
             while (!crypttab.atEnd()) {
                 const QByteArray &line = crypttab.readLine().simplified();
@@ -166,7 +168,7 @@ Replacer::RootBase::RootBase(MProcess &proc, PartMan::Device *device) noexcept
     }
 
     if (premounted && !mountpoint.isEmpty()) {
-        proc.exec("umount", {mountpoint});
+        proc.exec(u"umount"_s, {mountpoint});
     }
 }
 
