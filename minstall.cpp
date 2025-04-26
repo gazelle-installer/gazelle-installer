@@ -68,7 +68,7 @@ enum Step {
     LOCALIZATION,
     USER_ACCOUNTS,
     OLD_HOME,
-    PROGRESS,
+    TIPS,
     END
 };
 
@@ -383,7 +383,7 @@ void MInstall::processNextPhase() noexcept
             proc.advance(11, partman->countPrepSteps());
             partman->prepStorage();
             base->install();
-            if (gui.widgetStack->currentIndex() != Step::PROGRESS) {
+            if (gui.widgetStack->currentIndex() != Step::TIPS) {
                 gui.progInstall->setEnabled(false);
                 // Using proc.status() prepends the percentage to the text.
                 gui.progInstall->setFormat(tr("Paused for required operator input"));
@@ -392,7 +392,7 @@ void MInstall::processNextPhase() noexcept
             }
             phase = PH_WAITING_FOR_INFO;
         }
-        if (phase == PH_WAITING_FOR_INFO && gui.widgetStack->currentIndex() == Step::PROGRESS) {
+        if (phase == PH_WAITING_FOR_INFO && gui.widgetStack->currentIndex() == Step::TIPS) {
             phase = PH_CONFIGURING;
             gui.progInstall->setEnabled(true);
             gui.pushBack->setEnabled(false);
@@ -463,7 +463,7 @@ void MInstall::pretendNextPhase() noexcept
             phase = PH_WAITING_FOR_INFO;
         }
     }
-    if (phase == PH_WAITING_FOR_INFO && gui.widgetStack->currentIndex() == Step::PROGRESS) {
+    if (phase == PH_WAITING_FOR_INFO && gui.widgetStack->currentIndex() == Step::TIPS) {
         saveConfig();
         phase = PH_FINISHED;
         gotoPage(Step::END);
@@ -637,7 +637,7 @@ int MInstall::showPage(int curr, int next) noexcept
     } else if (curr == Step::BOOT) {
         return next;
     } else if (curr == Step::SWAP && next > curr) {
-        return oem ? Step::PROGRESS : Step::NETWORK;
+        return oem ? Step::TIPS : Step::NETWORK;
     } else if (curr == Step::NETWORK) {
         if(next > curr) {
             nextFocus = oobe->validateComputerName();
@@ -647,14 +647,14 @@ int MInstall::showPage(int curr, int next) noexcept
         }
     } else if (curr == Step::LOCALIZATION && next > curr) {
         if (!pretend && oobe->haveSnapshotUserAccounts) {
-            return Step::PROGRESS; // Skip pageUserAccounts and pageOldHome
+            return Step::TIPS; // Skip pageUserAccounts and pageOldHome
         }
     } else if (curr == Step::USER_ACCOUNTS && next > curr) {
         nextFocus = oobe->validateUserInfo(automatic);
         if (nextFocus) return curr;
         // Check for pre-existing /home directory, see if user directory already exists.
         haveOldHome = base && base->homes.contains(gui.textUserName->text());
-        if (!haveOldHome) return Step::PROGRESS; // Skip pageOldHome
+        if (!haveOldHome) return Step::TIPS; // Skip pageOldHome
         else {
             const QString &str = tr("The home directory for %1 already exists.");
             gui.labelOldHome->setText(str.arg(gui.textUserName->text()));
@@ -663,7 +663,7 @@ int MInstall::showPage(int curr, int next) noexcept
         if (!pretend && oobe->haveSnapshotUserAccounts) {
             return Step::LOCALIZATION; // Skip pageUserAccounts and pageOldHome
         }
-    } else if (curr == Step::PROGRESS && next < curr) { // Backward
+    } else if (curr == Step::TIPS && next < curr) { // Backward
         if (oem) {
             return Step::SWAP;
         } else if (!haveOldHome) {
@@ -685,9 +685,9 @@ void MInstall::pageDisplayed(int next) noexcept
     bool enableBack = true, enableNext = true;
     if (!modeOOBE) {
         // progress bar shown only for install and configuration pages.
-        gui.boxInstall->setVisible(next >= Step::BOOT && next <= Step::PROGRESS);
+        gui.boxInstall->setVisible(next >= Step::BOOT && next <= Step::TIPS);
         // save the last tip and stop it updating when the progress page is hidden.
-        if (next != Step::PROGRESS) ixTipStart = ixTip;
+        if (next != Step::TIPS) ixTipStart = ixTip;
     }
 
     // This prevents the user accidentally skipping the confirmation.
@@ -931,7 +931,7 @@ void MInstall::pageDisplayed(int next) noexcept
         }
         break;
 
-    case Step::PROGRESS:
+    case Step::TIPS:
         gui.textHelp->setText("<p><b>"_L1 + tr("Installation in Progress") + "</b><br/>"_L1
             + tr("%1 is installing. For a fresh install, this will probably take 3-20 minutes, depending on the speed of your system and the size of any partitions you are reformatting.").arg(PROJECTNAME)
             + "</p><p>"_L1
@@ -1022,7 +1022,7 @@ void MInstall::gotoPage(int next) noexcept
     }
 
     // process next installation phase
-    if (next == Step::BOOT || next == Step::PROGRESS || (!advanced && next == Step::SWAP)) {
+    if (next == Step::BOOT || next == Step::TIPS || (!advanced && next == Step::SWAP)) {
         processNextPhase();
     }
 }
@@ -1170,7 +1170,7 @@ void MInstall::progressUpdate(int value) noexcept
     if (ixTipStart < 0) {
         ixTipStart = 0; // First invocation of this function.
     } else {
-        if (gui.widgetStack->currentIndex() != Step::PROGRESS) {
+        if (gui.widgetStack->currentIndex() != Step::TIPS) {
             iLastProgress = -1;
             return; // No point loading a new tip when will be invisible.
         } else if (iLastProgress < 0) {

@@ -153,7 +153,7 @@ void Oobe::manageConfig(MSettings &config) const noexcept
 {
     const bool save = config.isSave();
     // Services page
-    config.setSection(u"Services"_s, gui.pageServices);
+    config.setSection(u"Services"_s, gui.boxServices);
     QTreeWidgetItemIterator it(gui.treeServices);
     while (*it) {
         if ((*it)->parent() != nullptr) {
