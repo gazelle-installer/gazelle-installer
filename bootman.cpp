@@ -42,7 +42,7 @@ BootMan::BootMan(MProcess &mproc, Core &mcore, PartMan &pman, Ui::MeInstall &ui,
     removeNoSplash = appConf.getBoolean(u"RemoveNosplash"_s);
     appConf.setSection();
     loaderID = appConf.getString("ShortName").toLower();
-    loaderLabel = appConf.getString("ShortName").toLower();
+    loaderLabel = appConf.getString("Name");
     brave = appArgs.isSet("brave");
     connect(gui.radioBootMBR, &QRadioButton::toggled, this, &BootMan::chosenBootMBR);
     connect(gui.radioBootPBR, &QRadioButton::toggled, this, &BootMan::chosenBootPBR);
