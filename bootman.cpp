@@ -27,6 +27,7 @@
 #include "mprocess.h"
 #include "msettings.h"
 #include "partman.h"
+#include "qradiobutton.h"
 #include "bootman.h"
 
 BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
@@ -38,8 +39,8 @@ BootMan::BootMan(MProcess &mproc, PartMan &pman, Ui::MeInstall &ui,
     appConf.setSection("OOBE");
     removeNoSplash = appConf.getBoolean("RemoveNosplash");
     appConf.setSection();
-    loaderID = appConf.getString("ShortName");
-    loaderLabel = appConf.getString("Name");
+    loaderID = appConf.getString("ShortName").toLower();
+    loaderLabel = appConf.getString("ShortName").toLower();
     brave = appArgs.isSet("brave");
 
     connect(gui.radioBootMBR, &QRadioButton::toggled, this, &BootMan::chosenBootMBR);
@@ -175,8 +176,20 @@ void BootMan::install(const QStringList &cmdextra)
             // Add a new NVRAM boot variable.
             if (fitesp != partman.mounts.end()) {
                 const PartMan::NameParts &bs = PartMan::splitName(fitesp->second->name);
+                //efi size & secureboot
+                //if 32, don't bother with secure boot
+                //if 64, check for secure boot
+                QString efitype;
+                if (efisize==32){
+                    efitype="/grubia32.efi";
+                } else {
+                    efitype="/grubx64.efi";
+                    if (QFile("/usr/lib/shim/shimx64.efi").exists()){
+                        efitype="/shimx64.efi";
+                    }
+                }
                 proc.exec("efibootmgr", {"-qcL", loaderLabel, "-d", "/dev/"+bs.drive, "-p", bs.partition,
-                    "-l", "/EFI/" + loaderID + (efisize==32 ? "/grubia32.efi" : "/grubx64.efi")});
+                    "-l", "/EFI/" + loaderID + efitype});
             }
             sect.setExceptionMode(true);
             sect.setRoot(nullptr);
